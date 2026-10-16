@@ -11,13 +11,13 @@
  *   AICPU  ins_temp_all_gather_mesh_1D.cc（358 行）—— 语义 + 布局 + 编排 + 资源混在一起
  *   CCU    ccu_temp_all_gather_mesh_1D.cc（128 行）+ ccu_kernel_all_gather_mesh1d.cc（159 行）
  *   本文件只保留"语义与参数"，编排与引擎原语下沉 L4。
+ *   R20 · #13（2026-10-16）：CalcRes 引擎半边收集上移 L2——本头零 Engine 知识。
  */
 #ifndef REFACTOR_POC_ACTION_COLLECT_ALL_H
 #define REFACTOR_POC_ACTION_COLLECT_ALL_H
 
 #include "action_args.h"
 #include "action_spec.h"
-#include "backend_registry.h"
 
 namespace mc2_ops_hccl::refactor {
 
@@ -47,23 +47,18 @@ struct CollectAllArgs {
 class CollectAll {
 public:
     // ---------------------------------------------------------------- 接口①
-    // CalcRes：资源申报（方案 §6.5）
-    //   通道申请：引擎无关公共件（现状两引擎各调一次 CalcChannelRequestMesh1D，逐字相同）
-    //   引擎相关量：后端条目分派
+    // CalcRes：资源申报（方案 §6.5）——只剩引擎无关半边（R20 · #13 L3 引擎知识
+    //   出清，2026-10-16）：通道申请是引擎无关公共件（现状两引擎各调一次
+    //   CalcChannelRequestMesh1D，逐字相同）；引擎相关量（CCU kernel 条目 /
+    //   AICPU 线程公式）由 L2 SegmentBuilder::CalcResOf 统一收集（recipe_sole.h
+    //   引擎循环唯一落点——本头不再出现 Engine 枚举字面量，L3 不知引擎存在）。
     static ResourceClaim CalcRes(const ActionSpec& a)
     {
         ResourceClaim claim;
-        // ① 引擎无关：按 domain × pattern × channelsPerRank 申请通道
+        // 通道：按 domain × pattern × channelsPerRank 申请
         for (u32 r : a.domain.ranks) {
             if (r == a.domain.myRank) continue;
             claim.channels.push_back(ChannelReq{r, a.channelsPerRank});
-        }
-        // ② 引擎相关：后端条目自报（CCU 反查 kernel / AICPU 线程公式）
-        if (auto* be = BackendRegistry::Peek(ActionKind::CollectAll, Engine::CCU)) {
-            be->ClaimEngineRes(a, claim);
-        }
-        if (auto* be = BackendRegistry::Peek(ActionKind::CollectAll, Engine::AICPU)) {
-            be->ClaimEngineRes(a, claim);
         }
         return claim;
     }
@@ -84,9 +79,16 @@ public:
         args.mySliceSize = a.layout.SliceSizeOf(me, n);
         args.myCount = a.layout.CountOf(me, n);
 
-        // 遍历顺序由 pattern 决定（MESH: 逐个换新 peer；RING: 固定相邻；NHR: 定制序）
-        for (u32 step = 0; step < n - 1; ++step) {
-            const u32 peerAlgRank = NextPeer(a.pattern, me, step, n);
+        // 遍历顺序：升序通道表（R12-9 修复轮 P1-2 裁决——四方统一升序）。
+        //   peers 序 = claim.channels 注册序（remoteRank 升序，R11 两遍对齐）= 老 kernel
+        //   InitResource 的 peerId 升序遍历（:66-74）。v5 隐式映射（数据帧按通道序
+        //   消费）与 server 游标、ST 模型全部按此序建模。NextPeer 的 pattern 分派
+        //   保留（RING/NHR 遍历序的唯一定义点——AICPU 单侧线程分配与未来 pattern
+        //   载体消费），CCU mesh 路径不再经它。
+        for (u32 peerAlgRank = 0; peerAlgRank < n; ++peerAlgRank) {
+            if (peerAlgRank == me) {
+                continue;   // 升序跳过 me（单源纪律：直接按 domain.ranks 升序，不二次 sort）
+            }
             CollectAllArgs::PeerSlot slot;
             slot.peerRank = a.domain.ranks[peerAlgRank];
             slot.peerAlgRank = peerAlgRank;

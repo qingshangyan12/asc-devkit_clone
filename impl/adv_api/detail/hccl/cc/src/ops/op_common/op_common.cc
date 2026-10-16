@@ -1721,6 +1721,10 @@ static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_EVENT_MS_V2 = 400;
 // 也需为所有 die 创建 reqDesc，保证后续算子在该 die 上有 kernel 时容量充足。
 static constexpr uint32_t CCU_DEFAULT_DIE_NUM = 2;
 
+// R16 · #6：resType 数组宽（HcommCcuResType 0..6 无 BUTT 哨兵——对拍函数按此宽
+// 建数组；与 GetCcuResTypes() 的 7 元素序一致）
+static constexpr uint32_t HCOMM_CCU_RES_TYPE_COUNT = 7;
+
 static const std::vector<HcommCcuResType>& GetCcuResTypes()
 {
     static const std::vector<HcommCcuResType> types = {
@@ -3074,6 +3078,12 @@ namespace {
 // 构造 unified 路径的 KFC server CcuKernelInfo（对照 CcuTempKfcServer::CalcRes :196-217）：
 // kernelFunc/kernalFuncName 直填 server 本体；kernelArg 经 InheritKfcServerKernelArg 从
 // "源动作 kernel"占位条目继承（unified 动作 kernel 无私有 kernelArg，域信息从公共入参取）。
+// R12 · WP-5（2026-10-09）：前缀第二档泛化——plan.kernelFuncName 以 "CcuVerb" 开头
+//（KFC_UNIFIED_VERB_PREFIX）时 InheritKfcServerKernelArg 覆写 role=UNIFIED_VERB（v5
+// 动词序执行器），"CcuAction" 前缀维持 UNIFIED_PLAN（v3）——本函数零改动（识别键在
+// srcKernel.kernelFuncName 字符串里，InheritKfcServerKernelArg 的前缀分支已泛化两档）。
+// 灰度分叉（host 组装段产 v5 blob vs v4 blob）由 UseUnifiedVerbPath 控制，见
+// hccl_alloc_ctx_res.cc 的 ④ 段。
 HcclResult BuildUnifiedKfcServerKernelInfo(HcclComm comm, const OpParam& param,
     const refactor::CcuKernelPlan& plan, CcuKernelInfo& serverKernel, std::string& err)
 {
@@ -3115,9 +3125,16 @@ HcclResult BuildUnifiedKfcServerKernelInfo(HcclComm comm, const OpParam& param,
 // 通道 desc 构造（ChannelReq → HcclChannelDesc，复用 HcclChannelAcquireUnified 的探测链
 // 口径）：unified Materialize 已按 ChannelReq 申请过通道（AcquireChannels），注册链只需
 // desc 形状供 InheritKfcServerKernelArg 继承 channels。
+// R13 · WP-4（2026-10-09，M0 复核修正 A 甲路线）：NHR 段（kernelFuncName 前缀
+// "CcuVerb"）通道申请改调 CalcChannelRequestNhrMultiJetty——与 v2 NHR 链同源同序
+//（connectRanks{rank±2^s} 建链集升序去重，channel.cc:839-901），server 侧 VerbNhrRun
+// 的 chIdx 重建按同一建链集公式（ccu_kernel_kfc_server.cc R13 注），两端口径单源。
+// mesh 段（"CcuAction" 前缀族）维持 CalcChannelRequestMesh1D（全连接表——R12-9
+// P1-2 升序四方口径）零变化。两族在当前灰度下不混发（一个 Plan 一族注册名）。
 HcclResult BuildUnifiedChannelDescs(HcclComm comm, const OpParam& param,
-    const std::vector<refactor::ChannelReq>& channels, std::vector<HcclChannelDesc>& descs, std::string& err)
+    const refactor::CcuKernelPlan& plan, std::vector<HcclChannelDesc>& descs, std::string& err)
 {
+    const std::vector<refactor::ChannelReq>& channels = plan.channels;
     if (channels.empty()) {
         err = "unified plan has no channel requests";
         return HCCL_E_PARA;
@@ -3130,13 +3147,91 @@ HcclResult BuildUnifiedChannelDescs(HcclComm comm, const OpParam& param,
     TopoInfoWithNetLayerDetails topoMinimal;
     topoMinimal.userRank = param.userRank;
     topoMinimal.userRankSize = static_cast<u32>(subcommInfo[0].size());
+    // R13：v5 动词注册名族走 NHR 建链集申请（甲路线）；v3 "CcuAction" 族维持 mesh。
+    // KFC_UNIFIED_VERB_PREFIX（"CcuVerb"，kfc_server_message.h 纯追加段）——devkit
+    // 真头常量直用，非镜像（本文件在 devkit 树内）。
+    const bool isVerbKernel = plan.kernelFuncName.compare(0, HcclKfcProtocol::KFC_UNIFIED_VERB_PREFIX_LEN,
+        HcclKfcProtocol::KFC_UNIFIED_VERB_PREFIX) == 0;
+    if (isVerbKernel) {
+        return CalcChannelRequestNhrMultiJetty(comm, param, &topoMinimal, subcommInfo, descs);
+    }
     return CalcChannelRequestMesh1D(comm, param, &topoMinimal, subcommInfo, descs);
 }
 } // namespace
 
+// R16 · #6：claim.ccu 申报 vs 驱动反查真值的"注册时刻双源对拍"（M0_R16）。
+// 纯函数（可单测）：claimCcu（L4 ClaimEngineRes 估算——R16 起公式补全 event 等）与
+// queriedRes（HcommCcuKernelQueryResReq 反查，按 resType 数组序 = GetCcuResTypes()）
+// 逐 resType 比对。返回值：0=全部一致；否则位掩码（bit i = 第 i 类不一致——调用方
+// 逐位 WARN）。dieId 口径：反查真值带真 dieId（注册链 :3160-3177 反查），claim 恒
+// 键 0（双域分 die 申报挂 P2）——对拍按 claim 的 [dieId][resGroup] 展开与真值
+// (dieId, resGroup) 聚合匹配，dieId 不一致不判漂移（登记 P2）。
+static uint32_t CompareClaimVsQueriedRes(
+    const std::map<uint32_t, std::map<uint32_t, refactor::ResCounters>>& claimCcu,
+    uint32_t dieId, uint32_t resGroup, const uint32_t queriedRes[HCOMM_CCU_RES_TYPE_COUNT])
+{
+    (void)dieId;
+    auto itDie = claimCcu.find(0U);   // claim 恒键 0（申报公式现状——见上注）
+    if (itDie == claimCcu.end()) {
+        return 0U;   // 申报面无 CCU 半边（AICPU 引擎路径不可达——只对拍 CCU）
+    }
+    auto itGrp = itDie->second.find(resGroup);
+    if (itGrp == itDie->second.end()) {
+        itGrp = itDie->second.find(0U);   // resGroup 对齐（申报恒 0，防御双值形态）
+        if (itGrp == itDie->second.end()) {
+            return 0U;
+        }
+    }
+    const refactor::ResCounters& c = itGrp->second;
+    const uint32_t claimed[HCOMM_CCU_RES_TYPE_COUNT] = {
+        c.loop, c.ccuBuf, c.variable, c.address, c.event, c.ccuThread, c.instruction};
+    uint32_t drift = 0U;
+    for (uint32_t t = 0; t < HCOMM_CCU_RES_TYPE_COUNT; ++t) {
+        if (claimed[t] != queriedRes[t]) {
+            drift |= (1U << t);
+        }
+    }
+    return drift;
+}
+
+// 对拍的漂移位 → 逐 resType WARN/FAIL（R16 · #6：常规 WARN+diff 维测可见化；
+// env MC2_UNIFIED_RES_DEBUG 非零 → HCCL_ERROR+返回 true 让调用方 FAIL——CI 门禁
+// 形态，防"估算值静默漂移"。static bool 首调定格与 unified_route.h:118 同式）。
+static bool ReportClaimResDrift(uint32_t drift, uint32_t dieId, uint32_t resGroup,
+    const refactor::ResCounters& claimRes, const uint32_t queriedRes[HCOMM_CCU_RES_TYPE_COUNT])
+{
+    if (drift == 0U) {
+        return false;
+    }
+    static const bool resDebugOn = []() {
+        const char* v = std::getenv("MC2_UNIFIED_RES_DEBUG");
+        return !(v == nullptr || v[0] == '\0' || v[0] == '0');
+    }();
+    const uint32_t claimed[HCOMM_CCU_RES_TYPE_COUNT] = {
+        claimRes.loop, claimRes.ccuBuf, claimRes.variable, claimRes.address,
+        claimRes.event, claimRes.ccuThread, claimRes.instruction};
+    for (uint32_t t = 0; t < HCOMM_CCU_RES_TYPE_COUNT; ++t) {
+        if ((drift & (1U << t)) == 0U) {
+            continue;
+        }
+        const char* name = GetCcuResTypeName(static_cast<HcommCcuResType>(t));
+        if (resDebugOn) {
+            HCCL_ERROR("[UnifiedRes] claim.ccu drift (DEBUG gate): dieId[%u] resGroup[%u] resType[%s] "
+                       "claim[%u] != queried[%u].",
+                dieId, resGroup, name, claimed[t], queriedRes[t]);
+        } else {
+            HCCL_WARNING("[UnifiedRes] claim.ccu drift: dieId[%u] resGroup[%u] resType[%s] claim[%u] "
+                         "!= queried[%u] (estimation formula vs driver query).",
+                dieId, resGroup, name, claimed[t], queriedRes[t]);
+        }
+    }
+    return resDebugOn;
+}
+
 HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
     const std::vector<refactor::CcuKernelPlan>& kernels, refactor::CcuKernelHandle& kernelHandleOut,
-    std::string& err)
+    std::string& err,
+    const std::map<uint32_t, std::map<uint32_t, refactor::ResCounters>>* claimCcu)
 {
     kernelHandleOut = 0;
     if (kernels.empty()) {
@@ -3177,7 +3272,7 @@ HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
             kernels.size());
         const refactor::CcuKernelPlan& probePlan = kernels[0];
         std::vector<HcclChannelDesc> probeDescs;
-        HcclResult probeRet = BuildUnifiedChannelDescs(comm, param, probePlan.channels, probeDescs, err);
+        HcclResult probeRet = BuildUnifiedChannelDescs(comm, param, probePlan, probeDescs, err);
         if (probeRet != HCCL_SUCCESS) {
             return probeRet;
         }
@@ -3227,7 +3322,7 @@ HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
     // ③ 通道申请：ChannelReq 直投 HcclChannelAcquire（unified 路径 Materialize 已完成
     // 探测展开，此处按 desc 申请 + dieId 反查，对照 HcclGetChannelForCcu :1518-1561）
     std::vector<HcclChannelDesc> channelDescs;
-    ret = BuildUnifiedChannelDescs(comm, param, plan.channels, channelDescs, err);
+    ret = BuildUnifiedChannelDescs(comm, param, plan, channelDescs, err);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("[UnifiedRes] build channel descs failed, ret[%d], err[%s].", static_cast<int>(ret), err.c_str());
         return ret;
@@ -3318,6 +3413,53 @@ HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
         "[UnifiedRes] CCU kernel registered: func[%s], kernelHandle[0x%llx], dieId[%u], channels[%u] "
         "(v3 id dispatch, single server instance).",
         serverKernel.kernelFuncName, static_cast<unsigned long long>(kernelHandle), serverKernel.dieId, channelNum);
+
+    // R16 · #6 注册时刻双源对拍：claim.ccu（估算申报，经 broker 从 plan.claim 透传）
+    // vs 驱动反查真值（HcommCcuKernelQueryResReq 同 AccumulateKernelRes 链——注册的
+    // server kernel 微码解析逐 resType）。漂移常规 WARN；env MC2_UNIFIED_RES_DEBUG
+    // 非零 FAIL（防估算值静默漂移的 CI 门禁形态）。对拍失败不回滚注册（申报值仅
+    // 维测画像——零消费方已考证；FAIL 语义 = 显式暴露供拦截，非资源不足）。
+    if (claimCcu != nullptr && !claimCcu->empty() && IsCcuDynamicResApiSupported()) {
+        HcommCcuResDescHandle cmpDesc = 0;
+        CcuResult cmpCreate = HcommCcuInsResDescCreate(serverKernel.dieId, &cmpDesc);
+        if (cmpCreate == CCU_SUCCESS) {
+            const void* cmpArgs[] = {serverKernel.kernelArg};
+            CcuResult cmpQuery = HcommCcuKernelQueryResReq(
+                reinterpret_cast<void*>(serverKernel.kernelFunc), cmpArgs, 1, cmpDesc);
+            if (cmpQuery == CCU_SUCCESS) {
+                uint32_t queried[HCOMM_CCU_RES_TYPE_COUNT] = {0};
+                bool qAllOk = true;
+                for (uint32_t t = 0; t < HCOMM_CCU_RES_TYPE_COUNT; ++t) {
+                    if (HcommCcuInsResDescQueryNum(
+                            cmpDesc, static_cast<HcommCcuResType>(t), &queried[t]) != CCU_SUCCESS) {
+                        qAllOk = false;
+                        break;
+                    }
+                }
+                if (qAllOk) {
+                    const uint32_t drift = CompareClaimVsQueriedRes(*claimCcu, serverKernel.dieId,
+                        serverKernel.resGroup, queried);
+                    refactor::ResCounters zeroRes;
+                    auto itDie = claimCcu->find(0U);
+                    const refactor::ResCounters& claimRes = (itDie != claimCcu->end() &&
+                        itDie->second.find(serverKernel.resGroup) != itDie->second.end())
+                        ? itDie->second.at(serverKernel.resGroup) : zeroRes;
+                    if (ReportClaimResDrift(drift, serverKernel.dieId, serverKernel.resGroup,
+                        claimRes, queried)) {
+                        HcommCcuInsResDescDestroy(cmpDesc);
+                        err = "claim.ccu drift under MC2_UNIFIED_RES_DEBUG (estimation formula stale)";
+                        return HCCL_E_INTERNAL;
+                    }
+                }
+            } else {
+                HCCL_INFO("[UnifiedRes] claim-vs-queried compare skipped: query ret[%d].", cmpQuery);
+            }
+            HcommCcuInsResDescDestroy(cmpDesc);
+        } else {
+            HCCL_INFO("[UnifiedRes] claim-vs-queried compare skipped: desc create ret[%d].", cmpCreate);
+        }
+    }
+
     kernelHandleOut = kernelHandle;   // M3-条件A：注册产物回传（发射链 ccuKernels[0]）
     return HCCL_SUCCESS;
 }

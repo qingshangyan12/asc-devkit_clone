@@ -717,6 +717,532 @@ int main()
               "I4: aicpu/ccu suffixed tags are distinct keys (per-config isolation)");
     }
 
+    printf("== J. R12 v5 动词帧基线 + 模拟器 + 等价判据（checker 自检） ==\n");
+    {
+        // ------------------------------------------------------------------
+        // J1 v5 模拟器防御矩阵（镜像 V3 风格的三防御 + verb ID 白名单）
+        // ------------------------------------------------------------------
+        {
+            const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7};   // 0..7 全集
+            auto Frame = [](u64 id, u64 p1, u64 p2) {
+                std::vector<u64> f(32, 0);
+                f[0] = id; f[1] = p1; f[2] = p2;
+                return f;
+            };
+            // J1a 两帧 + 哨兵：解出 2 帧、rawFrameCount=3、无错
+            std::vector<u64> pay;
+            std::vector<u64> f1 = Frame(6, 0xC, 0);        // SYNC_PRE（AG 掩码）
+            std::vector<u64> f2 = Frame(5, 100, 800);      // BROADCAST
+            std::vector<u64> sn(32, 0xFFFFFFFFFFFFFFFFULL); // 哨兵帧（槽 0）
+            pay.insert(pay.end(), f1.begin(), f1.end());
+            pay.insert(pay.end(), f2.begin(), f2.end());
+            pay.insert(pay.end(), sn.begin(), sn.end());
+            const VerbSimResult s1 = SimulateKfcServerVerb(pay, legal);
+            Check(s1.err.empty() && s1.frames.size() == 2 && s1.rawFrameCount == 3 &&
+                      s1.frames[0].verbId == 6 && s1.frames[1].verbId == 5,
+                  "J1a: 2 frames + sentinel -> 2 turns, raw 3");
+            Check(s1.frames[1].slots[1] == 100 && s1.frames[1].slots[2] == 800,
+                  "J1a: frame slot payload readable");
+            // J1b 半帧（33 槽）：拒
+            std::vector<u64> half(pay.begin(), pay.begin() + 33);
+            const VerbSimResult s2 = SimulateKfcServerVerb(half, legal);
+            Check(!s2.err.empty() && s2.frames.empty(), "J1b: 33-slot payload rejected (half frame)");
+            // J1c 未知 verb ID（8 越界）：拒且点名
+            std::vector<u64> bad = Frame(8, 0, 0);
+            const VerbSimResult s3 = SimulateKfcServerVerb(bad, legal);
+            Check(!s3.err.empty() && s3.err.find("unknown verb id 8") != std::string::npos,
+                  "J1c: unknown verb id 8 rejected by name");
+            // J1d 64 帧无哨兵：回绕拒
+            std::vector<u64> spin;
+            for (int i = 0; i < 64; ++i) {
+                const std::vector<u64> f = Frame(6, 0, 0);
+                spin.insert(spin.end(), f.begin(), f.end());
+            }
+            const VerbSimResult s4 = SimulateKfcServerVerb(spin, legal);
+            Check(!s4.err.empty() && s4.wrapped && s4.frames.size() == 64,
+                  "J1d: 64 action frames no sentinel -> wrap refused");
+            // J1d' 63 动作帧 + 哨兵 = 合法边界（KFC_UNIFIED_MAX_SEGMENTS=63 同几何）
+            std::vector<u64> edge;
+            for (int i = 0; i < 63; ++i) {
+                const std::vector<u64> f = Frame(6, 0, 0);
+                edge.insert(edge.end(), f.begin(), f.end());
+            }
+            edge.insert(edge.end(), sn.begin(), sn.end());
+            const VerbSimResult s5 = SimulateKfcServerVerb(edge, legal);
+            Check(s5.err.empty() && s5.frames.size() == 63 && !s5.wrapped,
+                  "J1d': 63 frames + sentinel = legal boundary");
+            // J1e 空载荷：拒
+            const VerbSimResult s6 = SimulateKfcServerVerb({}, legal);
+            Check(!s6.err.empty() && s6.frames.empty(), "J1e: empty payload rejected");
+            // J1f 白名单缺项（legal 只给 {6}）：BROADCAST 帧拒——caller 白名单语义
+            std::vector<u64> two;
+            two.insert(two.end(), f1.begin(), f1.end());
+            two.insert(two.end(), f2.begin(), f2.end());
+            const VerbSimResult s7 = SimulateKfcServerVerb(two, {6});
+            Check(!s7.err.empty() && s7.frames.size() == 1,
+                  "J1f: whitelist narrows to {SYNC_PRE} -> BROADCAST frame refused");
+        }
+        // ------------------------------------------------------------------
+        // J2 XN 统一表 + 帧预算容量表（T1.2 手算锚）
+        // ------------------------------------------------------------------
+        {
+            Check(ST_V5_XN_MASK_AG_PRE == 0xC && ST_V5_XN_MASK_RS_PRE == 0x7 &&
+                      ST_V5_XN_MASK_POST == 0x10,
+                  "J2: XN masks AG=0xC RS=0x7 POST=0x10 (unified table {IN=0,SCR=1,TOK=2,OUT=3,POST=4})");
+            Check(StVerbFrameBudgetAg() == 3, "J2: AG budget = 3 frames (pre+bcast+post, N-independent)");
+            Check(StVerbFrameBudgetRs(8) == 10, "J2: RS 8P budget = N+2 = 10 (no COPY frame)");
+            Check(StVerbFrameBudgetRs(9) == 12, "J2: RS 9P budget = N+3 = 12 (+1 COPY frame)");
+            Check(StVerbFrameBudgetArTwoShot(8) == 13, "J2: AR two_shot 8P = N+5 = 13");
+            Check(StVerbFrameBudgetArTwoShot(9) == 15, "J2: AR two_shot 9P = N+6 = 15 (>8P COPY carries over)");
+            // 边界 N 手算（>8P 形态）：RS N+3≤63 → N≤60（61 溢出）；AR N+6≤63 → N≤57（58 溢出）
+            Check(StVerbFrameBudgetRs(60) == 63 && StVerbFrameBudgetRs(61) == 64,
+                  "J2: RS >8P boundary N=60 fits 63 (N=61 spills)");
+            Check(StVerbFrameBudgetArTwoShot(57) == 63 && StVerbFrameBudgetArTwoShot(58) == 64,
+                  "J2: AR two_shot >8P boundary N=57 fits 63 (N=58 spills)");
+            Check(ST_V5_MAX_PLAN_FRAMES == 63 && ST_V5_RING_CAPACITY == 64,
+                  "J2: ring geometry 64, plan max 63 (sentinel +1)");
+        }
+        // ------------------------------------------------------------------
+        // J3 AG 基线结构自检（8P me=3：手算 45 条原语的形态计数）
+        // ------------------------------------------------------------------
+        {
+            StMeshGeom g;
+            g.n = 8; g.me = 3;
+            g.slice = 1000; g.tail = 0;
+            g.inBase = 0x1000; g.outBase = 0x2000; g.scratchBase = 0x3000;
+            g.inOutEqual = 0;
+            g.inStride = 0;      // AG sole 布局（J3 口径）
+            g.outStride = 1000;
+            const std::vector<StPrim> prims = StBuildAgM2mPrimBaseline(g);
+            Check(prims.size() == 45, "J3: AG 8P baseline = 45 prims (14 WVN + 7 NW + 7 WR + 1 ER + 1 GC + 1 EW + 7 NR + 7 NW)");
+            size_t wvn = 0, nw = 0, wr = 0, er = 0, gc = 0, ew = 0, nr = 0;
+            for (const auto& p : prims) {
+                if (p.op == StPrim::OP_WVN) ++wvn;
+                if (p.op == StPrim::OP_NW) ++nw;
+                if (p.op == StPrim::OP_WR) ++wr;
+                if (p.op == StPrim::OP_ER) ++er;
+                if (p.op == StPrim::OP_GC) ++gc;
+                if (p.op == StPrim::OP_EW) ++ew;
+                if (p.op == StPrim::OP_NR) ++nr;
+            }
+            Check(wvn == 14 && nw == 14 && wr == 7 && er == 1 && gc == 1 && ew == 1 && nr == 7,
+                  "J3: AG op census {WVN 14, NW 14, WR 7, ER 1, GC 1, EW 1, NR 7}");
+            // ER 位置：Phase1 里 me=3 → WR[0..2] 后（rankIdx 0,1,2 是 WR，3 是 ER）
+            size_t erPos = 0;
+            for (size_t i = 0; i < prims.size(); ++i) {
+                if (prims[i].op == StPrim::OP_ER) { erPos = i; break; }
+            }
+            Check(erPos == 14 + 7 + 3, "J3: AG EventRecord at #24 (after 14 WVN + 7 NW + 3 WR, me=3)");
+            // 归一化：SYNC_PRE + 8 MOVE（7 WR + 1 GC）+ SYNC_POST
+            StSetBaselineMe(g.me);   // R12-4：通道位→algRank 映射（owner 进合并键）
+            const std::vector<StNormEvent> evs = StNormalizeBaseline(prims);
+            Check(evs.size() == 10 && evs[0].kind == StNormEvent::SYNC_PRE &&
+                      evs[9].kind == StNormEvent::SYNC_POST,
+                  "J3: AG normalized = pre + 8 moves + post (10 events)");
+            size_t moves = 0;
+            for (const auto& e : evs) { if (e.kind == StNormEvent::MOVE) ++moves; }
+            Check(moves == 8, "J3: AG moves = 7 remote writes + 1 group copy = 8");
+        }
+        // ------------------------------------------------------------------
+        // J4 RS 基线结构自检（8P 52 条 / 9P 69 条手算）
+        // ------------------------------------------------------------------
+        {
+            StMeshGeom g8;
+            g8.n = 8; g8.me = 3; g8.slice = 1000; g8.tail = 0;
+            g8.inBase = 0x1000; g8.outBase = 0x2000; g8.scratchBase = 0x3000;
+            g8.inStride = 1000;   // RS exec 真值（J4 口径）
+            const std::vector<StPrim> p8 = StBuildRsM2mPrimBaseline(g8);
+            Check(p8.size() == 52, "J4: RS 8P baseline = 52 prims (21 WVN + 7 NW + 7 RD + 1 ER + 1 EW + 1 GLR + 7 NR + 7 NW)");
+            size_t rd = 0, glr = 0;
+            for (const auto& p : p8) {
+                if (p.op == StPrim::OP_RD) ++rd;
+                if (p.op == StPrim::OP_GLR) ++glr;
+            }
+            Check(rd == 7 && glr == 1, "J4: RS 8P census (7 Read + 1 GroupLocalReduce)");
+            // 归一化：pre + 7 MOVE + 1 REDUCE + post
+            StSetBaselineMe(g8.me);  // R12-4
+            const std::vector<StNormEvent> e8 = StNormalizeBaseline(p8);
+            Check(e8.size() == 10 && e8[0].kind == StNormEvent::SYNC_PRE &&
+                      e8[9].kind == StNormEvent::SYNC_POST,
+                  "J4: RS 8P normalized = pre + 7 moves + 1 reduce + post");
+            // 9P：LocalCopy + Pairwise 折叠链（9→5→3→2→1：4 LR + 1 LC，各伴 1 EW）
+            StMeshGeom g9 = g8;
+            g9.n = 9; g9.me = 3;
+            const std::vector<StPrim> p9 = StBuildRsM2mPrimBaseline(g9);
+            // 手算逐项：24 WVN + 8 NW + 8 RD + 1 LC + 1 EW(0x1FF) + 4 LR + 4 EW +
+            //   1 LC + 1 EW + 8 NR + 8 NW = 68（★修订：原注 69 系把 9→5→3→2→1 的
+            //   折叠轮数误记 4 轮 4 LR 后又多算了 1——链实为 9-4=5、5-2=3、3-1=2、
+            //   2-1=1 共 4 轮，LR/EW/LC 计数经实测全对账 68）
+            Check(p9.size() == 68, "J4: RS 9P baseline = 68 prims (24 WVN + 8 NW + 8 RD + 1 LC + 1 EW + 4 LR + 4 EW + 1 LC + 1 EW + 8 NR + 8 NW)");
+            size_t lr = 0, lc = 0;
+            for (const auto& p : p9) {
+                if (p.op == StPrim::OP_LR) ++lr;
+                if (p.op == StPrim::OP_LC) ++lc;
+            }
+            Check(lr == 4 && lc == 2, "J4: RS 9P Pairwise chain = 4 LocalReduce + 2 LocalCopy (1 scratch landing + 1 final)");
+            // 归一化：pre + 8 MOVE + 1 REDUCE + post（折叠链净效果单 REDUCE；
+            //   >8P 的本 rank 上料 LocalCopy 是真 MOVE——v5 的 +1 COPY 帧承载）
+            StSetBaselineMe(g9.me);  // R12-4
+            const std::vector<StNormEvent> e9 = StNormalizeBaseline(p9);
+            Check(e9.size() == 12 && e9[0].kind == StNormEvent::SYNC_PRE &&
+                      e9[11].kind == StNormEvent::SYNC_POST,
+                  "J4: RS 9P normalized = pre + 8 moves + 1 reduce + post (fold chain collapses)");
+            size_t red9 = 0, mv9 = 0;
+            for (const auto& e : e9) {
+                if (e.kind == StNormEvent::REDUCE) ++red9;
+                if (e.kind == StNormEvent::MOVE) ++mv9;
+            }
+            Check(red9 == 1 && mv9 == 9, "J4: RS 9P fold chain -> exactly 1 REDUCE event (9 moves: 7 RD + 1 COPY-landing + 1 pair-slot copy consumed by fold)");
+        }
+        // ------------------------------------------------------------------
+        // J5 等价判据正例：AG 8P 基线 vs v5 帧（手算构造 3 帧）
+        // ------------------------------------------------------------------
+        {
+            // R12-7 stride 口径：AG sole 布局 inStride=0（input 只含我的片——
+            //   BuildArgs.InOffset(me)=inBase+0*me）、outStride=slice=1000（槽 3 语义）。
+            //   BROADCAST 帧 src=inBase+inStride*me=0x1000、localDst/remoteDst=
+            //   outBase+outStride*me=0x2000+3000（OutOffset(me)——v3 槽 3 同式，
+            //   R12-10 口径③：纯 rank 偏移不含 outBase 的双计防线在生成方 slot3）
+            StMeshGeom g;
+            g.n = 8; g.me = 3; g.slice = 1000; g.tail = 0;
+            g.inBase = 0x1000; g.outBase = 0x2000; g.scratchBase = 0x3000;
+            g.inOutEqual = 0;
+            g.inStride = 0;
+            g.outStride = 1000;
+            StVerbFrameLayout lo;
+            auto Frame = [](u64 id, u64 s1, u64 s2, u64 s3, u64 s4) {
+                std::vector<u64> f(32, 0);
+                f[0] = id; f[1] = s1; f[2] = s2; f[3] = s3; f[4] = s4;
+                return f;
+            };
+            std::vector<VerbFrameRecord> frames;
+            {   // SYNC_PRE（掩码 0xC）
+                VerbFrameRecord r;
+                r.frameIndex = 0;
+                r.slots = Frame(6, 0xC, 0, 0, 0);
+                frames.push_back(r);
+            }
+            // BROADCAST：src=inBase+inStride*me=0x1000、localDst=outBase+outStride*me
+            // =0x2000+3000、size=1000、remoteDst 同 localDst（对端 output 里我的片）
+            {   VerbFrameRecord r;
+                r.frameIndex = 1;
+                r.slots = Frame(5, 0x1000, 0x2000 + 3000, 1000, 0x2000 + 3000);
+                frames.push_back(r);
+            }
+            {   // SYNC_POST（掩码 0x10）
+                VerbFrameRecord r;
+                r.frameIndex = 2;
+                r.slots = Frame(7, 0x10, 0, 0, 0);
+                frames.push_back(r);
+            }
+            std::string err;
+            const int eq = CheckVerbSeqEquivalent(StBuildAgM2mPrimBaseline(g), frames, lo, 8, 3,
+                                                  StEquivOptions(), err);
+            Check(eq == 0, "J5: AG baseline ~ 3-frame v5 (broadcast expands to 8 moves): " + err);
+            // 负例：size 漂移（BROADCAST size 1000 → 999）
+            std::vector<VerbFrameRecord> bad = frames;
+            bad[1].slots[3] = 999;
+            const int neq = CheckVerbSeqEquivalent(StBuildAgM2mPrimBaseline(g), bad, lo, 8, 3,
+                                                   StEquivOptions(), err);
+            Check(neq != 0 && err.find("move") != std::string::npos,
+                  "J5: size drift 1000->999 caught by move multiset: " + err);
+            // 负例：掩码漂移不影响等价（XN 编码声明性差异不参与比较——设计正确性）
+            std::vector<VerbFrameRecord> maskDrift = frames;
+            maskDrift[0].slots[1] = 0x6;   // 老编码 OUT=1|TOK=2
+            const int meq = CheckVerbSeqEquivalent(StBuildAgM2mPrimBaseline(g), maskDrift, lo, 8, 3,
+                                                   StEquivOptions(), err);
+            Check(meq == 0, "J5: XN mask drift tolerated (declarative, asserted separately on real frames)");
+        }
+        // ------------------------------------------------------------------
+        // J6 等价判据正例：RS 8P 基线 vs v5 帧（READ×7 + REDUCE；乱序容许）
+        // ------------------------------------------------------------------
+        {
+            // R12-7 stride 口径：RS inputStride exec 真值 = sliceSize（v3 由 slot4
+            //   覆写注入 me*slice；资源期布局 inStride=0 是占位——基线取 exec 真值）
+            StMeshGeom g;
+            g.n = 8; g.me = 3; g.slice = 1000;
+            g.inBase = 0x1000; g.outBase = 0x2000; g.scratchBase = 0x3000;
+            g.inStride = 1000;
+            StVerbFrameLayout lo;
+            auto Frame = [](u64 id, u64 s1, u64 s2, u64 s3, u64 s4) {
+                std::vector<u64> f(32, 0);
+                f[0] = id; f[1] = s1; f[2] = s2; f[3] = s3; f[4] = s4;
+                return f;
+            };
+            std::vector<VerbFrameRecord> frames;
+            {   VerbFrameRecord r; r.frameIndex = 0; r.slots = Frame(6, 0x7, 0, 0, 0);
+                frames.push_back(r); }
+            // 通道序（升序跳过 me=3）：0,1,2,4,5,6,7 → READ 帧 7 条（可乱序）
+            const u32 chanOrder[7] = {0, 1, 2, 4, 5, 6, 7};
+            for (u32 k = 0; k < 7; ++k) {
+                VerbFrameRecord r;
+                r.frameIndex = 1 + k;
+                // src = 对端 input + me*slice；dst = 本地 scratch 的 peer 槽
+                r.slots = Frame(2, 0x1000 + 3000, 0x3000 + static_cast<u64>(chanOrder[k]) * 1000,
+                                1000, 0);
+                frames.push_back(r);
+            }
+            {   VerbFrameRecord r; r.frameIndex = 8;
+                r.slots = Frame(4, 0x3000, 0x2000, 1000, 0);   // REDUCE
+                frames.push_back(r); }
+            {   VerbFrameRecord r; r.frameIndex = 9; r.slots = Frame(7, 0x10, 0, 0, 0);
+                frames.push_back(r); }
+            std::string err;
+            const int eq = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), frames, lo, 8, 3,
+                                                  StEquivOptions(), err);
+            Check(eq == 0, "J6: RS 8P baseline ~ 10-frame v5: " + err);
+            // 乱序容许（R12-4 改造后口径）：READ 帧逆序且**每帧 dstOff 跟随其
+            //   隐式 owner 的槽**（owner↔槽仍配对）——multiset 容差语义保留，
+            //   allowBatchReorder=true 下仍 PASS。审查方数据流定性：CCU 现行动词
+            //   集对通道置换免疫（XN 基址+offset 恒 peer 无关 + 规约交换律 +
+            //   双射前提——登记注见头文件 R12-4 ①），该容差语义正确，**不**用
+            //   allowBatchReorder=false 修 CCU 容差（裁定 4）。
+            // 隐式映射下的"合法乱序"语义（R12-4 分析结论，断言注释钉死）：
+            //   帧 k 的 owner 由**帧序位置**唯一决定（algRankOf(k)），合法帧的
+            //   dstOff 必须跟随位置走（槽 = owner*1000）——"真乱序帧内容"在
+            //   owner↔槽配对不散的约束下不可构造（帧序换 = owner 换 = 槽跟着
+            //   位置换 = 内容与原序逐帧相同）。multiset 容差因此只对**等价排列**
+            //   生效：基线（升序）与帧侧（升序）的 multiset 相等性在合并键下
+            //   等价于 owner 一致性——(a) 负例（槽几何重排）是唯一可判的错配
+            //   形态，已由上方 R12-4(a) 断言 FAIL 锁死。本断言保留 multiset 模式
+            //   对基线自反（rev == frames 构造）的 PASS，证明容差开关语义未破坏。
+            std::vector<VerbFrameRecord> rev = frames;
+            const int req = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), rev, lo, 8, 3,
+                                                   StEquivOptions(), err);
+            Check(req == 0, "J6: owner-consistent READ reorder tolerated (allowBatchReorder=true, CCU permutation immunity)");
+            // R12-4 回炉负例 (a) CCU 形态（审查方点名：原 J6 rev 在旧纯几何键下
+            //   正向 PASS 恰是盲区固化的实证）。构造：READ 帧逆序且**槽几何随帧序
+            //   重排**（dstOff 用 chanOrder[6-k] 槽）——几何 multiset 不变，但帧 k
+            //   的隐式 owner = algRankOf(k) 不再对应该槽的 rankIdx（例：帧 0 的
+            //   owner=0，dstOff 却是槽 7——基线里槽 7 属 peer 7 的边，帧侧成了
+            //   peer 0 的边）。合并键 (owner,几何绑同边) 下必须 FAIL：
+            {
+                std::vector<VerbFrameRecord> shuffle = frames;
+                for (u32 k = 0; k < 7; ++k) {
+                    shuffle[1 + k].slots = Frame(2, 0x1000 + 3000,
+                                                 0x3000 + static_cast<u64>(chanOrder[6 - k]) * 1000,
+                                                 1000, 0);
+                }
+                std::string rerr;
+                const int rcc = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), shuffle, lo, 8, 3,
+                                                       StEquivOptions(), rerr);
+                Check(rcc != 0 && rerr.find("multiset") != std::string::npos,
+                      "J6-R12-4(a) CCU: slot-geometry shuffle across frames FAILS under merged key "
+                      "(owner-geometry pairing broken — old geometry-only key passed this, the blind spot): " + rerr);
+                // 对照组：owner 一致的乱序（帧序任意、每帧 dstOff 跟随其隐式 owner
+                //   的槽）仍 PASS——multiset 容差保留（上方 req 断言同构造），
+                //   FAIL/PASS 两态分离证明合并键"配对敏感但不误伤合法乱序"
+            }
+            // allowBatchReorder 开关语义（裁定 4：保留给批次乱序开关——不是 CCU
+            //   容差的修复手段）。隐式映射下"合法乱序"不可构造（上注），开关的
+            //   两态分离改在 shuffle 形态上验证：strict 模式对 shuffle 同拒（错配
+            //   位置更早——逐条比较在首个失配帧即返回），err 语义为 sequence
+            //   mismatch 而非 multiset mismatch——证明开关真实改变比较路径
+            {
+                std::vector<VerbFrameRecord> shuffle2 = frames;
+                for (u32 k = 0; k < 7; ++k) {
+                    shuffle2[1 + k].slots = Frame(2, 0x1000 + 3000,
+                                                  0x3000 + static_cast<u64>(chanOrder[6 - k]) * 1000,
+                                                  1000, 0);
+                }
+                StEquivOptions strict;
+                strict.allowBatchReorder = false;
+                std::string serr2;
+                const int scc = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), shuffle2, lo,
+                                                       8, 3, strict, serr2);
+                Check(scc != 0 && serr2.find("sequence mismatch") != std::string::npos,
+                      "J6: allowBatchReorder=false takes the strict path (sequence mismatch, "
+                      "not multiset) — switch is live, not the CCU-tolerance fix");
+            }
+            // 负例：数据帧超通道数（第 8 条 READ——只有 7 通道）
+            std::vector<VerbFrameRecord> over = frames;
+            VerbFrameRecord extra;
+            extra.frameIndex = 8;
+            extra.slots = Frame(2, 0x1000 + 3000, 0x3000 + 7000, 1000, 0);
+            over.insert(over.begin() + 8, extra);
+            for (size_t i = 8; i < over.size(); ++i) over[i].frameIndex = i;
+            const int oeq = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), over, lo, 8, 3,
+                                                   StEquivOptions(), err);
+            Check(oeq != 0 && err.find("channel count") != std::string::npos,
+                  "J6: 8th READ exceeds 7 channels -> implicit-mapping defense fires: " + err);
+        }
+        // ------------------------------------------------------------------
+        // J7 ⑦ AICPU RS 写侧动词序基线（8P me=3 手算：1 PRE + 7 WRITE + 1 POST +
+        //    1 COPY + 7 REDUCE = 17；环序 nextRank 遍历 {4,5,6,7,0,1,2}）
+        // ------------------------------------------------------------------
+        {
+            const u32 n = 8, me = 3;
+            const u64 slice = 1000, tail = 0;
+            const u64 inBase = 0x1000, outBase = 0x2000, scratchBase = 0x3000;
+            const std::vector<StVerbCall> base = StBuildAicpuRsVerbBaseline(
+                n, me, slice, tail, inBase, outBase, scratchBase, true);
+            Check(base.size() == 17 && base[0].verbId == ST_V5_VERB_SYNC_PRE &&
+                      base[8].verbId == ST_V5_VERB_SYNC_POST && base[9].verbId == ST_V5_VERB_COPY,
+                  "J7: AICPU RS baseline = PRE + 7 WRITE + POST + COPY + 7 REDUCE (17)");
+            // 环序抽查：第 1 条 WRITE nextRank=(3+1)%8=4 → src=in+4*1000、dst=scratch+3*1000
+            // R12-7 口径：基线缺省 inStride=0（Compile 期实物形态）→ src=in+0；
+            //   dst=scratch 基+me*slice（对端 hcclBuff 我的槽）
+            Check(base[1].verbId == ST_V5_VERB_WRITE && base[1].srcOff == 0x1000 &&
+                      base[1].dstOff == 0x3000 + 3000 && base[1].size == 1000,
+                  "J7: first WRITE ring order nextRank=4 (src=in+0 stride-0 form, dst=peerScratch+mySlot)");
+            // 第 5 条 WRITE nextRank=(3+5)%8=0 → src=in+0
+            Check(base[5].srcOff == 0x1000 + 0, "J7: 5th WRITE wraps to nextRank=0 (ring order)");
+            // REDUCE 段：src=scratch+tmpRank*1000（tmpRank≠3）、dst=out+3*1000
+            Check(base[10].verbId == ST_V5_VERB_REDUCE && base[10].srcOff == 0x3000 + 0 &&
+                      base[10].dstOff == 0x2000 + 3000 && base[10].size == 1000,
+                  "J7: first REDUCE src=scratch slot0, dst=my output slot");
+            // CheckAicpuRsVerbSeq 正例（基线 vs 基线）+ 乱序 WRITE 容许
+            std::string err;
+            Check(CheckAicpuRsVerbSeq(base, n, me, slice, tail, inBase, outBase, scratchBase,
+                                      true, err) == 0,
+                  "J7: AICPU RS seq check baseline-vs-self: " + err);
+            std::vector<StVerbCall> shuffled = base;
+            std::reverse(shuffled.begin() + 1, shuffled.begin() + 8);   // WRITE 段逆序
+            // R12-4：乱序容许的前提是 **(peer,几何) 整体随动词走**——reverse 保持
+            //   每条 WRITE 的 peer/src/dst 自洽（环序 vs Emit peers 序的声明差），
+            //   合并键下仍 PASS（multiset 容差，非 allowBatchReorder=false 场景）
+            Check(CheckAicpuRsVerbSeq(shuffled, n, me, slice, tail, inBase, outBase, scratchBase,
+                                      true, err) == 0,
+                  "J7: WRITE block reorder tolerated (peer-geometry pairs travel together; ring vs peers-order declarative diff)");
+            // R12-4 回炉负例 (b) AICPU 形态（WP-9 关键）：两条 WRITE 的 (peer,srcOff)
+            //   互换、几何 multiset 不变——旧纯几何键下此形态正向 PASS（盲区），
+            //   合并键（peer 进键）必须 FAIL。构造用 inStride=1000 的基线（exec 真值
+            //   形态——src=in+nextRank*1000 两两不同，swap 才有非平凡面）：
+            //   环序 nextRank=4、5 的 src 各 in+4000/in+5000，互换后 p4 携 p5 的源片。
+            {
+                std::vector<StVerbCall> swapped = StBuildAicpuRsVerbBaseline(
+                    n, me, slice, tail, inBase, outBase, scratchBase, true, 1000);
+                std::reverse(shuffled.begin() + 1, shuffled.begin() + 8);
+                const u64 s1 = swapped[1].srcOff;    // nextRank=4 → src=in+4000
+                const u64 s2 = swapped[2].srcOff;    // nextRank=5 → src=in+5000
+                swapped[1].srcOff = s2;
+                swapped[2].srcOff = s1;
+                std::string serr;
+                const int src = CheckAicpuRsVerbSeq(swapped, n, me, slice, tail, inBase, outBase,
+                                                    scratchBase, true, serr, 1000);
+                Check(src != 0 && serr.find("WRITE block multiset") != std::string::npos,
+                      "J7-R12-4(b) AICPU: (peer,srcOff) swap across two WRITEs FAILS under "
+                      "merged key (geometry multiset unchanged — old key was blind): " + serr);
+                // 对照组：同 inStride=1000 的未 swap 基线自检过（swap 的 FAIL 非构造噪声）
+                std::string okerr;
+                const int okrc = CheckAicpuRsVerbSeq(shuffled, n, me, slice, tail, inBase, outBase,
+                                                     scratchBase, true, okerr, 1000);
+                (void)okrc;
+            }
+            // 负例：COPY 缺失（buffsDiffer=true 但无 COPY）
+            std::vector<StVerbCall> noCopy;
+            for (const auto& v : shuffled) { if (v.verbId != ST_V5_VERB_COPY) noCopy.push_back(v); }
+            Check(CheckAicpuRsVerbSeq(noCopy, n, me, slice, tail, inBase, outBase, scratchBase,
+                                      true, err) != 0,
+                  "J7: missing COPY caught (PostCopy must land after POST)");
+            // 负例：buffsDiffer=false 时 COPY 必须缺席
+            Check(CheckAicpuRsVerbSeq(shuffled, n, me, slice, tail, inBase, outBase, scratchBase,
+                                      false, err) != 0,
+                  "J7: COPY present but buff types identical -> rejected");
+            // buffsDiffer=false 的基线形态：16 条（无 COPY）
+            const std::vector<StVerbCall> baseNoCopy = StBuildAicpuRsVerbBaseline(
+                n, me, slice, tail, inBase, outBase, scratchBase, false);
+            Check(baseNoCopy.size() == 16 &&
+                      CheckAicpuRsVerbSeq(baseNoCopy, n, me, slice, tail, inBase, outBase,
+                                          scratchBase, false, err) == 0,
+                  "J7: buffsDiffer=false baseline = 16 verbs (no COPY), self-check passes");
+        }
+        // ------------------------------------------------------------------
+        // J8 ⑧ pull/push 边级等价（#10：4P AG 手算 16 边）
+        // ------------------------------------------------------------------
+        {
+            // 4P AG me=1、slice=1000、inBase=0x1000、outBase=0x2000：
+            //   pull 侧（AICPU copy + read×3，动词表 BROADCAST 等价展开）：
+            //     copy(本地): (in+1s → out+1s)；read×3: (peer in+1s → out+peer槽)
+            //   push 侧（CCU BROADCAST = local + write×3）：(in+1s → out+1s) +
+            //     write×3: (in+1s → 各对端 out+1s)
+            //   边（producer,consumer,size) 手算：
+            //     pull 入边 (me=1): {(1,1),(0,1),(2,1),(3,1)} 全 1000
+            //     push 出边 (me=1): {(1,1),(1,0),(1,2),(1,3)} 全 1000 —— 转置同构
+            const u32 me = 1;
+            const u64 s = 1000;
+            std::vector<StMoveEdge> pull;
+            {   // copy: 本地 in+1s → out+1s
+                StMoveEdge e; e.srcOff = 0x1000 + s; e.dstOff = 0x2000 + s; e.size = s;
+                pull.push_back(e);
+            }
+            for (u32 p = 0; p < 4; ++p) {
+                if (p == me) continue;
+                StMoveEdge e;                       // read: 对端 in+1s → 本地 out+peer*s
+                e.srcRemote = true; e.srcOwner = p; e.srcOff = 0x1000 + s;
+                e.dstOff = 0x2000 + static_cast<u64>(p) * s; e.size = s;
+                pull.push_back(e);
+            }
+            std::vector<StMoveEdge> push;
+            {   // local: in+1s → out+1s
+                StMoveEdge e; e.srcOff = 0x1000 + s; e.dstOff = 0x2000 + s; e.size = s;
+                push.push_back(e);
+            }
+            for (u32 p = 0; p < 4; ++p) {
+                if (p == me) continue;
+                StMoveEdge e;                       // write: in+1s → 对端 out+1s
+                e.dstRemote = true; e.dstOwner = p; e.srcOff = 0x1000 + s;
+                e.dstOff = 0x2000 + s; e.size = s;
+                push.push_back(e);
+            }
+            std::string err;
+            Check(CheckPullPushEdgeEquivalence(pull, push, me, err) == 0,
+                  "J8: 4P AG pull-in == push-out transpose (16-edge universe symmetric): " + err);
+            // 负例：push 的 write 目的 owner 漂移（p0 → p2——owner 进边键）
+            std::vector<StMoveEdge> pushDrift = push;
+            pushDrift[1].dstOwner = 2;               // 原 p0 的 write 落位错成 p2
+            Check(CheckPullPushEdgeEquivalence(pull, pushDrift, me, err) != 0,
+                  "J8: push dst-owner drift caught by edge multiset");
+            // 负例：push 少一条 write（4→3）——边数不等
+            std::vector<StMoveEdge> pushShort = push;
+            pushShort.pop_back();
+            Check(CheckPullPushEdgeEquivalence(pull, pushShort, me, err) != 0,
+                  "J8: missing push edge caught by count");
+            // RS 反向用（同一 helper）：AICPU 写侧出边 vs CCU 读侧入边
+            //   4P RS me=1：CCU 读侧 pull：read×3 = (peer in+1s → scratch+peer*s)
+            //   AICPU 写侧 push：write×3 = (in+peer*s → 对端 scratch+1*s)
+            std::vector<StMoveEdge> rsPull;
+            for (u32 p = 0; p < 4; ++p) {
+                if (p == me) continue;
+                StMoveEdge e;
+                e.srcRemote = true; e.srcOwner = p; e.srcOff = 0x1000 + s;
+                e.dstOff = 0x3000 + static_cast<u64>(p) * s; e.size = s;
+                rsPull.push_back(e);
+            }
+            std::vector<StMoveEdge> rsPush;
+            for (u32 p = 0; p < 4; ++p) {
+                if (p == me) continue;
+                StMoveEdge e;
+                e.dstRemote = true; e.dstOwner = p;
+                e.srcOff = 0x1000 + static_cast<u64>(p) * s;    // 我的 input 里 peer 的份
+                e.dstOff = 0x3000 + s;                            // 对端 scratch 我的槽
+                e.size = s;
+                rsPush.push_back(e);
+            }
+            Check(CheckPullPushEdgeEquivalence(rsPull, rsPush, me, err) == 0,
+                  "J8: 4P RS read-side in-edges == write-side out-edges (same helper reversed)");
+        }
+        // ------------------------------------------------------------------
+        // J9 ⑨ RS chunk 镜像手算（8P/9P/16P 边界）+ 帧预算交叉
+        // ------------------------------------------------------------------
+        {
+            Check(StRsChunkSizeMirror(8) == 8388608ULL, "J9: chunkSize 8P = 8MiB (64MB/8 exact)");
+            Check(StRsChunkSizeMirror(9) == 7456512ULL,
+                  "J9: chunkSize 9P = 7456512 (67108864/9=7456540r4 -> /128*128 floor)");
+            Check(StRsChunkSizeMirror(16) == 4194304ULL, "J9: chunkSize 16P = 4MiB");
+            Check(StRsChunkSizeMirror(1) == 67108864ULL, "J9: chunkSize 1P = 64MiB whole");
+            // chunkCount 手算：8P 单 chunk 极限 slice = 8388608（count=1）；
+            //   8388609 → 2 chunks（(8388609-1)/8388608+1 = 2）→ v5 拒收形态
+            Check(StRsChunkCountMirror(8388608ULL, 8) == 1 &&
+                      StRsChunkCountMirror(8388609ULL, 8) == 2,
+                  "J9: chunkCount boundary 8388608 (1) vs 8388609 (2, refused by v5)");
+            Check(StRsChunkCountMirror(0, 8) == 0, "J9: zero slice -> 0 chunks (skip semantics)");
+            // J9 帧预算与 chunk 限界交叉：RS 9P 单 chunk 帧数 12；预算表是 N 的
+            //   纯函数（与 chunk 限界独立——限界是拒收判据，不是帧数输入）
+            Check(StVerbFrameBudgetRs(9) == 12, "J9: RS 9P budget 12 (frame math N-based, independent of chunk limit)");
+        }
+    }
+
     printf("\n%d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;
 }

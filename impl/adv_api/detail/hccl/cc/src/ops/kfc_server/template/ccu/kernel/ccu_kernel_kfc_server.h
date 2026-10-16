@@ -67,6 +67,32 @@ struct KfcServerContext : CcuKernelCtxBase {
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar;
     std::vector<ccu::Variable> importMissionVar;
+
+    // v5（R12 · 动词序执行器，2026-10-09）：动词帧执行的跨帧状态——SYNC_PRE 缓存的
+    // 逐通道对端变量（GetResByChannel 产物）+ 段内数据帧游标（通道隐式映射）。
+    // 生命周期 = server 实例（对端缓存 SYNC_PRE 覆写；游标按段归零）。纯追加字段
+    //（KfcServerContext 是 gen 期 host 侧结构，非 ABI——server kernel 签名不变）。
+    struct VerbExecState {
+        std::vector<ccu::Variable> peerIn;
+        std::vector<ccu::Variable> peerScr;
+        std::vector<ccu::Variable> peerOut;
+        std::vector<ccu::Variable> peerTok;
+        // R12-9 修复轮 P0-1：本端基址缓存（SYNC_PRE 帧槽 2..4 的写入方注入值——
+        // 数据帧组址的本端半边：BROADCAST src=本端 IN、READ dst=本端 SCR、
+        // BROADCAST localDst/REDUCE dst=本端 OUT。按段覆写（last-segment-wins），
+        // 与对端缓存同生命周期）
+        ccu::Variable localIn;
+        ccu::Variable localScr;
+        ccu::Variable localOut;
+        uint32_t dataCursor{0};
+        // R13（M0_R13_NHR_V5.md §八）：NHR 段的自持量缓存——NHR_RUN 帧的
+        // inputSliceOffset 逐 rank 前缀表（host 期从帧槽 4 按 rankSize 重建，
+        // kernel ctx.inputSliceOffset 同构）+ 输出基址（帧槽 2 写入方注入绝对值——
+        // NHR 收尾 LocalCopy 直写 output 无对端交换）。SYNC_PRE 覆写
+        //（last-segment-wins，与四向量同生命周期；NHR_RUN 帧到达时填）。
+        std::vector<ccu::Variable> nhrSliceOffset;
+        ccu::Variable nhrOutput;
+    } verbExec;
 };
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {

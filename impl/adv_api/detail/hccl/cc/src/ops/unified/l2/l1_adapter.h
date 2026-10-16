@@ -61,8 +61,12 @@ struct ResourceBroker {
     // M3-条件A（M1 审查，2026-09-21）：kernelHandle 只在注册时刻返回一次（无按名反查
     // API），发射期 CcuKernelLaunch 要求 resourceCtx.ccuKernels[0]!=0——出参带回，
     // 由组装段落进 resCtxHost.ccuKernels。
+    // R16 · #6：claimCcuOut 可选参数——plan.claim.ccu 的估算申报透传给真实现，
+    // 注册链内与驱动反查真值双源对拍（NoopBroker/探测路径忽略，缺省 nullptr 零影响——
+    // 既有调用面不变，既有 broker 实现不改签名即可覆写的兼容形态）。
     virtual HcclResult AcquireCcuKernel(const std::vector<CcuKernelPlan>& kernels,
-                                        CcuKernelHandle& kernelHandle, std::string& err) = 0;
+                                        CcuKernelHandle& kernelHandle, std::string& err,
+                                        const std::map<u32, std::map<u32, ResCounters>>* claimCcu = nullptr) = 0;
 };
 
 // 缺省空实现（host 自检用：不触真实申请，记录调用序列供断言）
@@ -88,8 +92,10 @@ struct NoopBroker : ResourceBroker {
         return HCCL_SUCCESS;
     }
     HcclResult AcquireCcuKernel(const std::vector<CcuKernelPlan>& kernels,
-                                CcuKernelHandle& kernelHandle, std::string& err) override
+                                CcuKernelHandle& kernelHandle, std::string& err,
+                                const std::map<u32, std::map<u32, ResCounters>>* claimCcu = nullptr) override
     {
+        (void)claimCcu;   // host 自检不消费（R16 · #6 对拍只在真实现）
         (void)err;
         kernelHandle = 0;   // NoopBroker 无真实注册（host 自检），handle 置 0 供断言
         calls.push_back("ccuk:" + std::to_string(kernels.size()));
@@ -227,7 +233,11 @@ public:
             // 资源重心在 kernel 注册（七类资源经 HcommCcuKernelQueryResReq 反查）。
             // M3-条件A：kernelHandle 出参带回（NoopBroker 下置 0；真实现
             // HcclCcuKernelRegisterUnified 注册返回值），M3 组装段落进 resCtxHost。
-            HcclResult ret = broker.AcquireCcuKernel(claim.kernels, kernelHandleOut, err);
+            // R16 · #6：claim.ccu（估算申报）随注册链下发——真实现内与驱动反查
+            // 真值"注册时刻双源对拍"（漂移可见化：常规 WARN / env MC2_UNIFIED_RES_
+            // DEBUG FAIL）。NoopBroker（host 自检）不消费该参数，零影响。
+            HcclResult ret = broker.AcquireCcuKernel(claim.kernels, kernelHandleOut, err,
+                                                     &claim.ccu);
             if (ret != HCCL_SUCCESS) return ret;
         }
         // 通道：引擎无关公共件（两引擎同一批 CalcChannelRequest*，§6.5——只申请一次）

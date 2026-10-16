@@ -32,17 +32,14 @@ public:
         return BackendCaps{/*symmem*/ true, /*64bit*/ true, /*maxSplits*/ 4, /*overheadUs*/ 43};
     }
 
-    // 线程/notify 公式的唯一实现点
-    // 现状：同一段公式在 65 个 AICPU template 的 GetRes()/CalcRes() 里各写一遍
-    //   （ins_temp_all_gather_mesh_1D.cc:33-41 与 ins_temp_reduce_scatter_mesh_1D.cc:63-68
-    //    仅"threadNum 取 N-1 还是 N"一处差异，其余逐字相同）
+    // 线程/notify 公式（R16 · 8g：改委托 ClaimAicpuThreadRes 单源件——action_spec.h。
+    // 现状考古：同一段公式在 65 个 AICPU template 的 GetRes()/CalcRes() 里各写一遍
+    //（ins_temp_all_gather_mesh_1D.cc:33-41 与 ins_temp_reduce_scatter_mesh_1D.cc:63-68
+    // 仅"threadNum 取 N-1 还是 N"一处差异，其余逐字相同——该差异由
+    // DomainThreadTotalNeed 的 AG/RS 分叉承载，两后端只剩一行委托）
     void ClaimEngineRes(const ActionSpec& a, ResourceClaim& claim) const override
     {
-        const u32 n = a.domain.Size();
-        const u32 threadNum = (n > 1) ? n - 1 : 1;      // CollectAll: 一 peer 一线程
-        claim.slaveThreadNum = threadNum - 1;
-        claim.notifyNumPerThread.assign(claim.slaveThreadNum, 1);
-        claim.notifyNumOnMainThread = threadNum - 1;
+        ClaimAicpuThreadRes(a, claim);   // AG：threadNum = max(1, n-1)
     }
 
     // Emit：只使用七个公共语义动词（§6.4.1），不出现 offset 计算

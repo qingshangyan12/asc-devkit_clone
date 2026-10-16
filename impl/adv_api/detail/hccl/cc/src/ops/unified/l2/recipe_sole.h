@@ -12,6 +12,8 @@
  *       （纯数据构造，不调 L3 执行函数——L2 调 L3 的方式不是函数调用，是数据构造，§6.3）。
  *   sole 一份配方服务 5 原语（AG/RS/AR/A2A/A2AV）—— 现状是每原语一个 *SoleExecutor
  *       + 每 pattern 一个注册项（§6.2 配方清单）。
+ * R20 · #13（2026-10-16，L3 引擎知识出清）：L3 动作头 CalcRes 的双引擎反查上移
+ *   本文件 CalcResOf——引擎半边收集唯一落点（kAllEngines 循环），L3 零 Engine 知识。
  */
 #ifndef REFACTOR_POC_RECIPE_SOLE_H
 #define REFACTOR_POC_RECIPE_SOLE_H
@@ -20,6 +22,9 @@
 #include "action_reduce_slice.h"   // R6：ReduceSlice::CalcRes（RS 段资源申报，two_shot 首段）
 #include "action_spec.h"
 #include "alg_config_parser.h"
+// R20 · #13：显式 include——CalcResOf 引擎循环（Peek/ClaimEngineRes）与 Validate
+// （:426）消费注册表；原经 action_collect_all.h 传递可见（L3 头出清后不再携带）。
+#include "backend_registry.h"
 
 #include <algorithm>
 #include <string>
@@ -84,6 +89,62 @@ inline bool IsAllReduce(int op)
 // 公共件：段构造 / 段形态展开 / chunk 切分 / 资源求和
 // 所有配方共用——这是"配方只描述结构、不重复动作知识"的落点（§6.2）
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// R19 · #12（2026-10-15 用户裁定，M0_R19_THREAD_CLAIM.md）：线程申报策略查表
+// 绑定——公式是编排方式（Recipe）的属性，不是全局开关。
+//
+// ClaimFormula：申报公式档位。ClaimFormulaOf(Recipe) = 映射表（switch 全枚举
+// 覆盖——-Werror 下漏 case 即编译错：新增 Recipe 枚举值时强制在此显式决策，
+// 这正是设计）。**新编排方式 = 查表加一行**；REJECTED 是显式决策非缺省。
+//
+// 老树公式镜像（行号本轮 grep 核实，AG/RS 两树同族）：
+//   · sole     模板 CalcRes 直通（ins_v2_all_gather_sole_executor.cc:44——AG；
+//     AR ins_v2_all_reduce_sole_executor.cc:64 同构）→ MAX_REUSE：单段/多段
+//     max 累积即老树池复用（two_shot 两段 max == 单模板 templateRankSize−1，
+//     ins_temp_all_reduce_mesh_1D_two_shot.cc:51；chunk 多段 max 同理）
+//   · parallel intra + inter + 2（RS ins_reduce_scatter_parallel_executor.cc:
+//     76-77 / AG ins_v2_all_gather_parallel_executor.cc:130-131；AR 两域各 +2
+//     共 +4——ins_v2_all_reduce_parallel_executor.cc:120）→ CONCURRENT_SUM：
+//     Σ_d(need_d−1)+(D−1) 比老树 +2 **少 1**（B 档：专职控制线程职能已被编排器
+//     域 main 交叉握手接管，恒 ≤ 老树申报量）
+//   · split    temp0 + temp1 + 1（RS ins_reduce_scatter_concurrent_executor.
+//     cc:68-69 / AG ins_v2_all_gather_concurrent_executor.cc:89）→ CONCURRENT_
+//     SUM 与老树 **恰同式零差**（+1 = D−1 的 D=2 特例——域0 main 兼控制位）
+//   · sequence max(inter, intra)（RS ins_v2_reduce_scatter_sequence_executor.
+//     cc:84 / AG ins_v2_all_gather_sequence_executor.cc:66——"slaveThread和对应
+//     notify可以复用"）→ MAX_REUSE：operator+= max 累积逐字
+//   · pipeline 裁剪不实现（registry Get 返回 nullptr，Expand 不可达）→ REJECTED
+//     哨兵登记（查表行存在 = 显式决策，防"缺省即通过"）
+// ---------------------------------------------------------------------------
+enum class ClaimFormula {
+    MAX_REUSE,        // 池复用取峰值：operator+= max 累积即终值（SOLE/SEQUENCE）
+    CONCURRENT_SUM,   // 并发求和：CalcConcurrencySlaveClaim 覆写（SPLIT/PARALLEL）
+    REJECTED,         // 裁剪/未实现编排方式的显式拒收哨兵（PIPELINE）
+};
+
+inline ClaimFormula ClaimFormulaOf(Recipe r)
+{
+    switch (r) {
+        case Recipe::SOLE:     return ClaimFormula::MAX_REUSE;       // sole：模板直通/池复用
+        case Recipe::PARALLEL: return ClaimFormula::CONCURRENT_SUM;  // parallel：B 档 Σ−1
+        case Recipe::SEQUENCE: return ClaimFormula::MAX_REUSE;       // sequence：max 复用
+        case Recipe::SPLIT:    return ClaimFormula::CONCURRENT_SUM;  // split：老树 +1 同式
+        case Recipe::PIPELINE: return ClaimFormula::REJECTED;        // 裁剪哨兵（Get 恒 nullptr）
+    }
+    return ClaimFormula::REJECTED;   // 不可达（全枚举覆盖；防 -Wreturn-type 兜底）
+}
+
+// ---------------------------------------------------------------------------
+// R20 · #13（2026-10-16，L3 引擎知识出清）：引擎清单直列数组——CalcResOf 引擎
+// 半边收集的遍历序。**序 = 行为契约非风格偏好**：ClaimEngineRes 对 slave/
+// notify 是直赋非累加（CCU 条目先置 0、AICPU 条目后置公式值），段本地终值 =
+// 末次写入——原 L3 CalcRes 的 Peek 次序即 CCU→AICPU，倒序（枚举界循环按
+// Engine{AICPU,CCU} 声明序天然倒序）会让 CCU 的 0 成为终值、slave 恒 0。
+// 显式决策非缺省（与上方 ClaimFormulaOf switch 同哲学）：新引擎 = 注册表加
+// 后端 + 本数组加一项，L3 动作头与 CalcResOf switch 均零改。
+// ---------------------------------------------------------------------------
+constexpr Engine kAllEngines[] = {Engine::CCU, Engine::AICPU};
+
 class SegmentBuilder {
 public:
     // AR 段形态 AUTO 档阈值：现状 selector 按数据量分档（§6.8-③"可钉可 AUTO"）；
@@ -201,29 +262,64 @@ public:
     // 注册条目 CcuActionReduceSlice）；ExchangeAll/LocalReduce 的 CalcRes 随各自
     // 动作文件落地（P2）。通道申请引擎无关、与现状同式（RS/AG 各调一次
     // CalcChannelRequestMesh1D，逐字相同，见 action_collect_all.h CalcRes 注）。
+    // R20 · #13（2026-10-16，L3 引擎知识出清）：L3 动作头原内嵌的两段
+    // Peek(kind, CCU/AICPU)→ClaimEngineRes 双引擎反查上移至此——引擎半边收集
+    // 唯一落点，L3 CalcRes 只剩引擎无关通道半边（L3 头零 Engine 字面量）。
+    //   形态：段本地 segClaim 先聚齐再 claim += segClaim（与原"claim += L3 产物"
+    //   同构——ClaimEngineRes 对 slave/notify 是直赋非累加，直写累积器会破坏
+    //   operator+= 的 max/追加合并语义，M0_R20 §一/§二）；引擎循环放 switch 后
+    //   统一执行（LocalReduce/ExchangeAll 现无注册后端 → no-op 零差，后端注册
+    //   即自动纳入申报，无"缺省即漏报"面）。
+    //   新引擎 = 注册表加后端 + kAllEngines 加一项（L3/L2 case 均零改）。
     static void CalcResOf(const ActionSpec& seg, ResourceClaim& claim)
     {
+        ResourceClaim segClaim;
         switch (seg.kind) {
             case ActionKind::CollectAll:
-                claim += CollectAll::CalcRes(seg);
-                return;
+                segClaim += CollectAll::CalcRes(seg);
+                break;
             case ActionKind::ReduceSlice:
-                claim += ReduceSlice::CalcRes(seg);
-                return;
+                segClaim += ReduceSlice::CalcRes(seg);
+                break;
             case ActionKind::LocalReduce:
-                return;   // 本地动作：不占通道（正式件申报 AICPU 向量执行时间）
+                break;   // 本地动作：不占通道（正式件申报 AICPU 向量执行时间）
             default:      // ExchangeAll：通道同式
                 for (u32 r : seg.domain.ranks) {
                     if (r == seg.domain.myRank) continue;
-                    claim.channels.push_back(ChannelReq{r, seg.channelsPerRank});
+                    segClaim.channels.push_back(ChannelReq{r, seg.channelsPerRank});
                 }
-                return;
+                break;
         }
+        // 引擎半边：后端条目自报（CCU 反查 kernel / AICPU 线程公式——原 L3 CalcRes
+        // ②段逐字上移）。未注册组合 Peek nullptr 跳过（与原 if 守卫语义相同）。
+        for (Engine e : kAllEngines) {
+            if (auto* be = BackendRegistry::Peek(seg.kind, e)) {
+                be->ClaimEngineRes(seg, segClaim);
+            }
+        }
+        claim += segClaim;
     }
 
-    static void SumRes(Plan& plan)
+    static void SumRes(Plan& plan, Recipe r)
     {
         for (const auto& seg : plan.segments) CalcResOf(seg, plan.claim);
+        // R19 · #12（2026-10-15 用户裁定，M0_R19_THREAD_CLAIM.md）：申报公式按
+        // 编排方式查表绑定（ClaimFormulaOf——上方映射表），与 env/宏无关。
+        //   · CONCURRENT_SUM（SPLIT/PARALLEL）：slaveThreadNum 覆写为
+        //     CalcConcurrencySlaveClaim = Σ_d(need_d−1)+(D−1)（action_spec.h 单源；
+        //     SPLIT 与老树 +1 同式零差、PARALLEL 比老树 +2 少 1——B 档）；
+        //   · MAX_REUSE（SOLE/SEQUENCE）：上方累积（operator+= max，:224）即终值
+        //     零动作——老树 sole 直通/sequence max(inter,intra) 同式；
+        //   · REJECTED（PIPELINE）：unreachable——registry Get 已返回 nullptr，
+        //     Expand 不可达（REJECTED 是查表显式决策，非缺省放行）。
+        // R15 · ③ 旧门控（UseUnifiedConcurrencyPath 覆写）随本轮退役出申报面——
+        // 执行面编排器灰度（aicpu_consumer.h:667 分叉）独立保留，跨进程失配从
+        // "公式错配"收窄为"执行面机器新旧"，申报恒按编排方式报足（编排器没开
+        // 时跑串行 for，多报线程闲置无害——M0_R15 §九失配安全同向）。notify
+        // 合并维持（maxNotifyNum+1 ≥ 任一线程需求——超配安全，M0 §九）。
+        if (ClaimFormulaOf(r) == ClaimFormula::CONCURRENT_SUM) {
+            plan.claim.slaveThreadNum = CalcConcurrencySlaveClaim(plan.segments);
+        }
     }
 
     // transport 解析：钉了就用；AUTO 按对称内存支持度选（现状 executor 同式）
@@ -338,7 +434,8 @@ public:
         if (buildRet != HCCL_SUCCESS) return buildRet;   // 错误码透传（不吞不改，§6.9）
         // 切轮（§10.2 A2）：容量约束非零时按 OrchestrateLoop 语义切轮
         SegmentBuilder::SplitRounds(plan.segments, ctx.capacity);
-        SegmentBuilder::SumRes(plan);
+        // R19 · #12：申报按编排身份查表（SOLE → MAX_REUSE，恒 max 累积）
+        SegmentBuilder::SumRes(plan, Recipe::SOLE);
         return HCCL_SUCCESS;
     }
 

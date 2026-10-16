@@ -59,6 +59,20 @@ int32_t HcommReadOnThread(ThreadHandle thread, ChannelHandle channel, void* dst,
     Record("Read", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), len);
     return g_stubRet;
 }
+// R12 · WP-9②：WRITE/REDUCE 桩（sink 新接线两原语——RS×AICPU 写侧）
+int32_t HcommWriteOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len)
+{
+    Record("Write", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), len);
+    return g_stubRet;
+}
+int32_t HcommLocalReduceOnThread(ThreadHandle thread, void* dst, const void* src, uint64_t count,
+    HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("LocalReduce", thread, 0, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx)
 {
     Record("ThreadNotifyRecord", thread, dstThread, dstNotifyIdx, 0, 0);
@@ -77,6 +91,21 @@ int32_t HcommChannelNotifyRecordOnThread(ThreadHandle thread, ChannelHandle chan
 int32_t HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t timeOut)
 {
     Record("ChNotifyWait", thread, channel, localNotifyIdx, timeOut, 0);
+    return g_stubRet;
+}
+// R15 · ②：NHR_RUN 执行面原语桩（sink DoNhrRun 消费）
+int32_t HcommWriteReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("WriteReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+int32_t HcommReadReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("ReadReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
     return g_stubRet;
 }
 }
@@ -100,6 +129,9 @@ static HcommVerbRes MakeRes8Ranks()
         ChannelInfo ch;
         ch.remoteRank = peer;
         ch.handle = 0x20000 + peer;          // 通道句柄逐 peer 唯一
+        // R12 · WP-9②：对端 cclBuff 基址（WRITE dst 合成源——remoteCclMem，
+        // alg_param.h:453；R12-2① 写侧几何的 sink 侧半边）
+        ch.remoteCclMem.addr = reinterpret_cast<void*>(static_cast<uintptr_t>(0x20000 + peer * 0x100000));
         res.channels[peer] = {ch};
     }
     return res;
@@ -337,21 +369,59 @@ int main()
               "Compile 域 Emit 序：pre → read×7 → post（结构一致性）");
     }
 
-    printf("== ⑥ 未实现动词显式拒绝（不静默） ==\n");
+    printf("== ⑥ 未实现动词显式拒绝（不静默）+ WP-9 WRITE/REDUCE 已接线形态 ==\n");
     {
+        // R12 · WP-9②（2026-10-09）：WRITE/REDUCE 已从"未实现拒绝"转为真接线
+        //（RS×AICPU 写侧——原 R6 断言的"not wired"口径退役，改断真原语序）。
+        // BROADCAST 维持拒绝（CCU 声明式专属）。
         g_stubCalls.clear();
         HcommVerbRes res = MakeRes8Ranks();
         HcommVerbSink sink(res);
+        // WRITE：五步序（R12-2③——与 READ 同构方向相反）+ threads[1..] 偏移 1
+        //（R12-2②：threadNum=N，主线程不下发写）
         sink.Emit(VerbCall{VerbCall::WRITE, 0x1, 0x2, 0x100, 5});
-        Check(sink.ErrCode() != 0 && sink.Err().find("not wired") != std::string::npos,
-              "WRITE rejected: " + sink.Err());
-        sink.Emit(VerbCall{VerbCall::REDUCE, 0x1, 0x2, 0x100, 5});
-        Check(sink.ErrCode() != 0, "REDUCE rejected");
+        Check(sink.ErrCode() == 0, "WRITE wired (R12 WP-9): " + sink.Err());
+        {
+            // 期望序（手写，对照 wrapper DoSendRecvBatchTx :116-140 逐行）：
+            //   ChNotifyRecord(th=threads[1], ch=peer5 的 handle, ACK=0)
+            //   ChNotifyWait(th=threads[1], ch, ACK, 1836)
+            //   Write(th, ch, dst=remoteCclMem+0x2, src=0x1, 0x100)
+            //   ChNotifyRecord(th, ch, DATA_SIGNAL=1)
+            //   ChNotifyWait(th, ch, 1, 1836)
+            const u64 expectCh = 0x20000 + 5;   // MakeRes8Ranks: peer5 → 0x20005
+            const u64 expectTh = 0x1001;        // 第 1 条 WRITE → threads[0+1]
+            // dst 合成手算：remoteCclMem(peer5) = 0x20000+5*0x100000 = 0x520000，
+            //   + 帧 dst 结构量 0x2 → 0x520002（R12-2①：remoteCclMem 合成）
+            const u64 expectDst = 0x20000 + 5ULL * 0x100000 + 0x2;
+            bool seqOk = g_stubCalls.size() == 5 &&
+                g_stubCalls[0].func == "ChNotifyRecord" && g_stubCalls[0].thread == expectTh &&
+                g_stubCalls[0].channel == expectCh && g_stubCalls[0].a1 == 0 &&
+                g_stubCalls[1].func == "ChNotifyWait" && g_stubCalls[1].thread == expectTh &&
+                g_stubCalls[1].channel == expectCh && g_stubCalls[1].a1 == 0 &&
+                g_stubCalls[2].func == "Write" && g_stubCalls[2].thread == expectTh &&
+                g_stubCalls[2].channel == expectCh && g_stubCalls[2].a1 == expectDst &&
+                g_stubCalls[2].a2 == 0x1 && g_stubCalls[2].a3 == 0x100 &&
+                g_stubCalls[3].func == "ChNotifyRecord" && g_stubCalls[3].a1 == 1 &&
+                g_stubCalls[4].func == "ChNotifyWait" && g_stubCalls[4].a1 == 1;
+            Check(seqOk, "WRITE 五步序 + threads[1] + remoteCclMem 合成 dst（R12-2①②③）");
+        }
+        // REDUCE：HcommLocalReduceOnThread（wrapper LocalReduce 语义）+ threads[0]
+        g_stubCalls.clear();
+        sink.Emit(VerbCall{VerbCall::REDUCE, 0x1, 0x2, 0x100, 0});
+        Check(sink.ErrCode() == 0, "REDUCE wired (R12 WP-9)");
+        // 真签名 6 参（hcomm_primitives.h:99）：count = size/dts = 0x100/2 = 0x80
+        //（元素数非字节——R12 修正：sink DoReduce 按 dataTypeSize 换算）
+        Check(g_stubCalls.size() == 1 && g_stubCalls[0].func == "LocalReduce" &&
+                  g_stubCalls[0].thread == 0x1000 && g_stubCalls[0].a1 == 0x2 &&
+                  g_stubCalls[0].a2 == 0x1 && g_stubCalls[0].a3 == 0x80,
+              "REDUCE → HcommLocalReduceOnThread(threads[0])（真签名 count=元素数 0x80）");
+        // BROADCAST：维持拒绝（CCU 声明式专属——kAicpuVerbMap N/A 行）
+        g_stubCalls.clear();
         sink.Emit(VerbCall{VerbCall::BROADCAST, 0x1, 0x2, 0x100, 0});
         Check(sink.ErrCode() != 0 && sink.Err().find("not wired") != std::string::npos,
               "BROADCAST rejected (AICPU N/A 表行): " + sink.Err());
-        Check(sink.Calls().size() == 3, "拒绝动词仍留调用记录（诊断完整）");
-        Check(g_stubCalls.empty(), "拒绝动词零原语下发");
+        Check(sink.Calls().size() == 3, "三动词均留调用记录（诊断完整）");
+        Check(g_stubCalls.empty(), "BROADCAST 拒绝零原语下发");
     }
 
     printf("== ⑦ 原语失败：停发真原语但记录继续 ==\n");
@@ -391,6 +461,70 @@ int main()
         s3.Emit(VerbCall{VerbCall::READ, 0x1, 0x2, 0x100, 5});
         Check(s3.ErrCode() != 0 && s3.Err().find("no channel") != std::string::npos,
               "READ without peer channel → rejected: " + s3.Err());
+    }
+
+    // ========================================================================
+    // R16 · #7：线程策略表驱动对拍锁（表列 ↔ 实际线程分配逐动词一致）。
+    // 期望值手写（threads 池 7 条：主 0x1000 + 从 0x1001..0x1006——同 MakeRes8Ranks）。
+    // 锁点：kAicpuVerbMap.thread 列与 sink ThreadFor 查表行为的一致性——
+    // 改表列不改 ThreadFor（或反之）此段必 FAIL（表实漂移即抓）。
+    // ========================================================================
+    printf("== R16 #7 线程策略表↔实际分配对拍 ==\n");
+    {
+        // a) 表列声明值逐动词核对（手写期望——与 sink 行为无关的独立声明面）
+        Check(ThreadPolicyOf(VerbCall::COPY, false) == ThreadPolicy::MAIN, "表: COPY=MAIN");
+        Check(ThreadPolicyOf(VerbCall::POST_COPY, false) == ThreadPolicy::MAIN, "表: POST_COPY=MAIN");
+        Check(ThreadPolicyOf(VerbCall::READ, false) == ThreadPolicy::COUNTER_OFF_0, "表: READ=COUNTER_OFF_0");
+        Check(ThreadPolicyOf(VerbCall::WRITE, false) == ThreadPolicy::COUNTER_OFF_1, "表: WRITE=COUNTER_OFF_1");
+        Check(ThreadPolicyOf(VerbCall::REDUCE, false) == ThreadPolicy::MAIN, "表: REDUCE=MAIN");
+        Check(ThreadPolicyOf(VerbCall::SYNC_PEER_PRE, false) == ThreadPolicy::MAIN_PLUS_SLAVES,
+              "表: SYNC_PEER_PRE=MAIN_PLUS_SLAVES");
+        Check(ThreadPolicyOf(VerbCall::SYNC_PEER_POST, false) == ThreadPolicy::MAIN_PLUS_SLAVES,
+              "表: SYNC_PEER_POST=MAIN_PLUS_SLAVES");
+        Check(ThreadPolicyOf(VerbCall::BROADCAST, false) == ThreadPolicy::NOT_WIRED, "表: BROADCAST=NOT_WIRED");
+        Check(ThreadPolicyOf(VerbCall::NHR_RUN, false) == ThreadPolicy::BY_CHANNEL, "表: NHR_RUN=BY_CHANNEL");
+        // CCU 表恒 NA（无线程概念——微码自驱动）
+        bool ccuAllNa = true;
+        const VerbCall::Verb all[] = {VerbCall::COPY, VerbCall::POST_COPY, VerbCall::READ,
+                                      VerbCall::WRITE, VerbCall::REDUCE, VerbCall::BROADCAST,
+                                      VerbCall::SYNC_PEER_PRE, VerbCall::SYNC_PEER_POST,
+                                      VerbCall::NHR_RUN};
+        for (VerbCall::Verb v : all) {
+            ccuAllNa = ccuAllNa && ThreadPolicyOf(v, true) == ThreadPolicy::NA;
+        }
+        Check(ccuAllNa, "表: kCcuVerbMap 全 9 行=NA（CCU 微码自驱动无线程）");
+
+        // b) 表→行为对拍（同一 sink 实例混发动词，逐条断原语记录的 thread 字面量）
+        g_stubCalls.clear();
+        g_stubRet = 0;
+        HcommVerbRes res = MakeRes8Ranks();
+        HcommVerbSink sink(res);
+        // COPY → threads[0]=0x1000（MAIN）
+        sink.Emit(VerbCall{VerbCall::COPY, 0x1, 0x2, 0x100});
+        Check(sink.ErrCode() == 0 && g_stubCalls.size() == 1 && g_stubCalls[0].func == "LocalCopy" &&
+                  g_stubCalls[0].thread == 0x1000,
+              "对拍: COPY 落 threads[0]（表 MAIN）");
+        // REDUCE → threads[0]=0x1000（MAIN）
+        g_stubCalls.clear();
+        sink.Emit(VerbCall{VerbCall::REDUCE, 0x1, 0x2, 0x100});
+        Check(sink.ErrCode() == 0 && g_stubCalls.size() == 1 && g_stubCalls[0].func == "LocalReduce" &&
+                  g_stubCalls[0].thread == 0x1000,
+              "对拍: REDUCE 落 threads[0]（表 MAIN）");
+        // READ×2 → threads[0]/threads[1]（COUNTER_OFF_0——主线程承载首条）
+        g_stubCalls.clear();
+        sink.Emit(VerbCall{VerbCall::READ, 0xA, 0xB, 0x100, 1});
+        sink.Emit(VerbCall{VerbCall::READ, 0xA, 0xB, 0x100, 2});
+        Check(sink.ErrCode() == 0 && g_stubCalls.size() == 10 &&
+                  g_stubCalls[0].func == "ChNotifyRecord" && g_stubCalls[0].thread == 0x1000 &&
+                  g_stubCalls[5].func == "ChNotifyRecord" && g_stubCalls[5].thread == 0x1001,
+              "对拍: READ 首条 threads[0]、次条 threads[1]（表 COUNTER_OFF_0）");
+        // WRITE → threads[1]=0x1001（COUNTER_OFF_1——主线程不下发写；READ 计数 2 不干扰）
+        g_stubCalls.clear();
+        sink.Emit(VerbCall{VerbCall::WRITE, 0x1, 0x2, 0x100, 5});
+        Check(sink.ErrCode() == 0 && g_stubCalls.size() == 5 && g_stubCalls[0].func == "ChNotifyRecord" &&
+                  g_stubCalls[0].thread == 0x1001,
+              "对拍: WRITE 首条落 threads[1]（表 COUNTER_OFF_1，与 READ 计数独立）");
+        // NOT_WIRED 走 Dispatch 的 BROADCAST 拒绝（既有 ⑥ 断言锁——此处零新增）
     }
 
     printf("\n%d passed, %d failed\n", g_pass, g_fail);

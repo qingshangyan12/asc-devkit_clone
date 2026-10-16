@@ -61,8 +61,8 @@
 #include "action_args.h"
 #include "action_collect_all.h"   // CollectAll::NextPeer（pattern 遍历序的唯一实现点，复用不重写）
 #include "action_spec.h"
-#include "backend_registry.h"
 #include "loop_splitter.h"
+#include "nhr_steps.h"             // R16 · 8a：CalcNhrConnectRanks（建链集单源回收——CalcRes 消费）
 
 namespace mc2_ops_hccl::refactor {
 
@@ -101,37 +101,66 @@ struct ReduceSliceArgs {
 class ReduceSlice {
 public:
     // ---------------------------------------------------------------- 接口①
-    // CalcRes：资源申报（§6.5，形态对齐 CollectAll::CalcRes）
-    //   通道申请：引擎无关公共件（现状 RS/AG 各调一次 CalcChannelRequestMesh1D，逐字相同）
-    //   引擎相关量：后端条目自报（CCU kernel 注册条目 + scratch 需求在 L4 侧申报）
+    // CalcRes：资源申报（§6.5，形态对齐 CollectAll::CalcRes）——只剩引擎无关
+    //   半边（R20 · #13 L3 引擎知识出清，2026-10-16）：通道申请按建链集/mesh
+    //   全连接申报（引擎无关公共件，现状 RS/AG 各调一次 CalcChannelRequestMesh1D
+    //   逐字相同）；引擎相关量（CCU kernel 注册条目 + scratch 需求在 L4 侧申报）
+    //   由 L2 SegmentBuilder::CalcResOf 统一收集（recipe_sole.h 引擎循环唯一
+    //   落点——本头不再出现 Engine 枚举字面量，L3 不知引擎存在）。
     static ResourceClaim CalcRes(const ActionSpec& a)
     {
         ResourceClaim claim;
-        for (u32 r : a.domain.ranks) {
-            if (r == a.domain.myRank) continue;
-            claim.channels.push_back(ChannelReq{r, a.channelsPerRank});
-        }
-        if (auto* be = BackendRegistry::Peek(ActionKind::ReduceSlice, Engine::CCU)) {
-            be->ClaimEngineRes(a, claim);
-        }
-        if (auto* be = BackendRegistry::Peek(ActionKind::ReduceSlice, Engine::AICPU)) {
-            be->ClaimEngineRes(a, claim);
+        // R13 · WP-4（M0 复核修正 A 甲路线）：NHR 段公共通道清单按建链集申报——
+        // connectRanks{me±2^s} 升序去重（CalcNHRChannelConnect 同式，8 卡 6 条 ≠
+        // 全连接 7 条）。R16 · 8a：内联建链循环回收为 CalcNhrConnectRanks 单源件
+        //（nhr_steps.h:91——本处与 L4 ClaimEngineRes NHR 分支/注册链
+        // BuildUnifiedChannelDescs 分叉/server VerbNhrRun 的 connectRanks 重建
+        // 四端同公式）。mesh 段维持全连接升序跳 me。
+        if (a.pattern == CommPattern::NHR) {
+            const u32 n = a.domain.Size();
+            const u32 me = a.domain.MyAlgRank();
+            const std::vector<u32> connectRanks = CalcNhrConnectRanks(me, n);
+            for (u32 r : connectRanks) {
+                claim.channels.push_back(ChannelReq{a.domain.ranks[r], a.channelsPerRank});
+            }
+        } else {
+            for (u32 r : a.domain.ranks) {
+                if (r == a.domain.myRank) continue;
+                claim.channels.push_back(ChannelReq{r, a.channelsPerRank});
+            }
         }
         return claim;
     }
 
     // ---------------------------------------------------------------- 接口②
     // BuildArgs：把 ActionSpec 编译为后端无关参数集（全部 offset 经 DataLayout 访问器）
-    //   仅受理 MESH 形态（NHR 是 R9 交付物——R9 M0-④ 勘误：并发 RS 的 NHR 槽区间
-    //   起 16 至 24 共 25 槽（含动作 ID）≤ 32 槽记录宽，槽宽不是拒收因；真缺口 =
-    //   v3 帧无 pattern 载体 + NHR kernel 的 jettyNum/stepInfoVector/rank2ChannelIdx
-    //   三件 ctx.arg 自持量在 unified 注册链无人填（见 plan_serializer.h R9 M0-④
-    //   注）。SerializeSegmentV3 亦拒收 NHR，双处同一防线）
+    //   MESH 与 NHR 两形态（R13：NHR 放开——v5 blob pattern 载体 + NHR_RUN 动词 +
+    //   server VerbNhrRun 三件落地后 BuildArgs 受理；v3 SerializeSegmentV3 仍拒收
+    //   NHR——v3 帧无 pattern 载体是 R9 M0-④ 既有边界，双格式分叉由 verbPath 判）
     static HcclResult BuildArgs(const ActionSpec& a, ReduceSliceArgs& args, std::string& err)
     {
         if (a.pattern == CommPattern::NHR) {
-            err = "ReduceSlice NHR pattern not in delivery scope (v3 frame has no pattern carrier; NHR dispatch needs v5 protocol, see R9 M0-4)";
-            return HCCL_E_NOT_SUPPORT;
+            // R13 · NHR 受理（M0_R13 §八）：NHR 段动词序 = {SYNC_PRE, NHR_RUN,
+            // SYNC_POST} 恒三帧——九标量从 layout 直取（帧槽由序列化器段级补写，
+            // mesh 的 peers/chunk 集不适用——NHR 无逐 peer 读、无 chunk 循环）。
+            const u32 me = a.domain.MyAlgRank();
+            const u32 n = a.domain.Size();
+            if (a.nhrJettyNum == 0U || a.nhrJettyNum > 4U) {
+                err = "ReduceSlice NHR jettyNum " + std::to_string(a.nhrJettyNum) +
+                      " out of [1,4] (maxPathNum)";
+                return HCCL_E_PARA;
+            }
+            args.myAlgRank = me;
+            args.rankNum = n;
+            args.inputAddrOff = a.layout.inBaseOff;
+            args.outputAddrOff = a.layout.outBaseOff;
+            args.mySliceSize = a.layout.SliceSizeOf(me, n);
+            args.myCount = a.layout.CountOf(me, n);
+            // R16 · 8b：stride 三分支收敛为 DataLayout::RsInStride 访问器（唯一实现点）
+            const u64 nhrInStride = a.layout.RsInStride();
+            args.rankSliceOffset = nhrInStride * me;
+            args.repeatNumInv = ~0ULL - a.layout.repeatNum;
+            return HCCL_SUCCESS;
         }
         const u32 me = a.domain.MyAlgRank();
         const u32 n = a.domain.Size();
@@ -146,8 +175,24 @@ public:
         // rankSliceOffset = 纯 rank 偏移（不含 inBaseOff——kernel 侧 myInput.addr =
         // input[rankId] + rankSliceOffset，基址槽与偏移槽分列，v2 写入方 :551 同式）。
         // RS 的 inputSliceStride 在布局语义上 = 各 rank 片在 input 里的间隔（现状
-        // executor :152-153：strideCount==0 时取全量 dataSize）
-        args.rankSliceOffset = a.layout.inputSliceStride * me;
+        // executor :152-153：strideCount==0 时取全量 dataSize）。
+        // ★P0-3（R12-9 修复轮）：Compile 期布局 inputSliceStride=0（BuildRequest
+        // 对 input 不设步长——RS 的 input 步长是 exec 期 slot4 语义），故此处按
+        // 三分支语义取步长：inputSliceStride 非零（exec 注入后——consumer
+        // InstantiateRsSegment :327 同式）则直用；为零（Compile 期）退
+        // outputSliceStride——BuildRequest :117-118 已按同式编码
+        // （strideCount==0 ? count*dts : strideCount*dts），RS 的 input/output 步长
+        // 同式同值。Compile 期即可产出真值 rankSliceOffset。
+        // ★双道防线分工（R12-17 验收④——两道各防一引擎，非冗余，勿删任一道）：
+        //   host 三分支（本处）覆盖 **AICPU 消费路径**——consumer 重建 ActionSpec
+        //   后从 layout 直推 BuildArgs，不经设备写入方；
+        //   设备覆写（hccl_ccu_v0_prepare.h :891-892 同式）覆盖 **CCU server 路径**
+        //   ——blob 资源期占位由 AIV prepare 注入真值。
+        //   两道数值同式（rsInStride 三分支 × me），删 host 道则 AICPU 丢注入点、
+        //   删设备道则 CCU 丢注入点。（R16 · 8b：三分支已收敛为 DataLayout::
+        //   RsInStride 访问器）
+        const u64 rsInStride = a.layout.RsInStride();
+        args.rankSliceOffset = rsInStride * me;
         // repeatNumInv 不占 RS 消息槽：v2 并发布局 [1..15] 无此参数——kernel 三阶段的
         // repeatNum 单 die 恒硬编码 UINT64_MAX-1（kernel :393-395，与并发 RS 的
         // KFC_CONCURRENT_RS_NHR_REPEAT_NUM_INV 是两码事），段级 repeat 由 chunk 循环承载。
@@ -161,8 +206,13 @@ public:
         // 逐 peer：RS mesh 读对端 input 的"我的片"（src 恒 = 对端基址 + 我的偏移），
         // 落本地 scratch 的"peer 槽"（scratch 按 peerAlgRank 分槽，kernel
         // InitReduceScatterAddr :275-277 的 scratchOffset += sliceSize 推进同式）
-        for (u32 step = 0; step < n - 1; ++step) {
-            const u32 peerAlgRank = CollectAll::NextPeer(a.pattern, me, step, n);
+        // 遍历序：升序通道表（R12-9 修复轮 P1-2——与 claim.channels 注册序/老 kernel
+        // InitResource peerId 升序遍历/Validate 双推导四方同一口径；不再经 NextPeer
+        // 环序）
+        for (u32 peerAlgRank = 0; peerAlgRank < n; ++peerAlgRank) {
+            if (peerAlgRank == me) {
+                continue;   // 升序跳过 me
+            }
             ReduceSliceArgs::PeerSlot slot;
             slot.peerRank = a.domain.ranks[peerAlgRank];
             slot.peerAlgRank = peerAlgRank;

@@ -109,24 +109,47 @@ struct HcclMem {
     void* addr = nullptr;
     uint64_t size = 0;
 };
+// R15 · ②：NHR DoNhrRun 的 DMA 读侧自判需要通道协议（真实头
+// hcomm_res_defs.h:73-81 CommProtocol——HCCS=0/ROCE=1/PCIE=2/SIO=3/UBC_CTP=4…
+// shim 补同值序枚举面；真实链路（devkit 树内）alg_param.h 链已带真实定义，
+// 本枚举在 include guard 内不冲突）
+typedef enum {
+    COMM_PROTOCOL_HCCS = 0,
+    COMM_PROTOCOL_ROCE = 1,
+    COMM_PROTOCOL_PCIE = 2,
+    COMM_PROTOCOL_SIO = 3,
+    COMM_PROTOCOL_UBC_CTP = 4,
+} CommProtocol;
 struct ChannelInfo {
     bool isValid = false;
     u32 remoteRank = 0xFFFFFFFFu;
+    CommProtocol protocol = COMM_PROTOCOL_HCCS;
     u32 notifyNum = 0;
     u32 portGroupSize = 1;
     ChannelHandle handle = 0;
     HcclMem remoteCclMem;
 };
 
-// 真原语（真实链路 hcomm_primitives.h:87/116/126/226/334/355 同签名；shim 下由
+// 真原语（真实链路 hcomm_primitives.h:87/116/126/166/226/334/355 同签名；shim 下由
 // 测试提供桩实现或仅声明——本 sink 单测在 shim 进程里用自定义桩链接）
 extern "C" {
 int32_t HcommLocalCopyOnThread(ThreadHandle thread, void* dst, const void* src, uint64_t len);
 int32_t HcommReadOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len);
+// R12 · WP-9②：WRITE（hcomm_primitives.h:166）与 REDUCE（:99 HcommLocalReduceOnThread）
+// 接线——RS×AICPU 写侧原语（sink DoWrite/DoReduce 消费）
+int32_t HcommWriteOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len);
+int32_t HcommLocalReduceOnThread(ThreadHandle thread, void* dst, const void* src, uint64_t count,
+    HcommDataType dataType, HcommReduceOp reduceOp);   // R12 真签名 6 参（hcomm_primitives.h:99）
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx);
 int32_t HcommThreadNotifyWaitOnThread(ThreadHandle thread, uint32_t notifyIdx, uint32_t timeOut);
 int32_t HcommChannelNotifyRecordOnThread(ThreadHandle thread, ChannelHandle channel, uint32_t remoteNotifyIdx);
 int32_t HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t timeOut);
+// R15 · ②：NHR_RUN 执行面原语（hcomm_primitives.h:179/:239 真签名——count=元素数
+// + dataType + reduceOp，与 HcommLocalReduceOnThread 同参型）
+int32_t HcommWriteReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp);
+int32_t HcommReadReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp);
 }
 
 // R6 · WP-A2：MakeHcommVerbRes 消费的最小 resCtx 类型面（真实头 alg_param.h:500

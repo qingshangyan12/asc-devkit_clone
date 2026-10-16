@@ -24,6 +24,8 @@
 #define REFACTOR_POC_BACKEND_CCU_REDUCE_SLICE_H
 
 #include "action_reduce_slice.h"
+#include "nhr_steps.h"             // R18 · #11：CalcNhrSteps（展开动词序步表）
+#include "nhr_slice_geometry.h"    // R18 · #11：几何公共件（server 侧同源推导）
 #include "backend_registry.h"
 
 namespace mc2_ops_hccl::refactor {
@@ -53,19 +55,42 @@ public:
         claim.notifyNumOnMainThread = 0;
         CcuKernelPlan plan;
         plan.kernelFuncName = "CcuActionReduceSlice";
-        for (u32 r : a.domain.ranks) {
-            if (r == a.domain.myRank) continue;
-            plan.channels.push_back(ChannelReq{r, a.channelsPerRank});
+        // R13 · WP-4（M0 复核修正 A 甲路线）：NHR 段通道清单按**建链集**申报——
+        // connectRanks{me±2^s} 升序去重（CalcNHRChannelConnect 同式，非全连接
+        // N-1！8 卡 6 条 ≠ 7 条）。R16 · 8a：内联建链循环回收为 CalcNhrConnectRanks
+        // 单源件（nhr_steps.h:91——L3 CalcRes/注册链 BuildUnifiedChannelDescs 分叉/
+        // server VerbNhrRun 的 connectRanks 重建四端同公式）。mesh 段维持全连接
+        // 申报（既有零变化）。
+        if (a.pattern == CommPattern::NHR) {
+            const u32 n = a.domain.Size();
+            const u32 me = a.domain.MyAlgRank();
+            const std::vector<u32> connectRanks = CalcNhrConnectRanks(me, n);
+            for (u32 r : connectRanks) {
+                plan.channels.push_back(ChannelReq{a.domain.ranks[r], a.channelsPerRank});
+            }
+        } else {
+            for (u32 r : a.domain.ranks) {
+                if (r == a.domain.myRank) continue;
+                plan.channels.push_back(ChannelReq{r, a.channelsPerRank});
+            }
         }
         claim.kernels.push_back(plan);
-        // 真实实现：HcommCcuKernelQueryResReq 让驱动解析微码逐 resType 反查
-        //（对照 RS kernel 实际占用：input/scratch/token 每 peer 一对 Variable、
-        // events = RS_UNROLL_NUM*ceil(rankSize/16)、1 个 loopGroup）
+        // 真实实现：HcommCcuKernelQueryResReq 让驱动解析微码逐 resType 反查。
+        // R16 · #6 公式补全（M0_R16 手算锚）：event 按 kernel 实际 resize 全量申报——
+        // 三阶段 events = RS_UNROLL_NUM(16) × ceil(rankSize/16)（kernel InitResource
+        // :100-102：numEventsPerIter=ceil(N/BIT_NUM_PER_CKE=16)，resize(16*numEventsPerIter)
+        // ——驱动 QueryResReq 解析的是微码声明的资源量非动态分支，按 resize 上界）。
+        // 原 req.event=2（"Pre/PostSync 各一"）是误注——Pre/PostSync 走通道级
+        // NotifyRecord/NotifyWait（CKE_IDX_0，kernel :134-160），不占 events 向量。
+        // 单 die 下 unroll 1..15 路休眠（kernel :393-394 哨兵注释）但声明量不减——
+        // 多 die 才用满（双域分 die 申报挂 P2，dieId 真值在注册链 :3160-3177 反查）。
         ResCounters req;
         req.loop = 1;
         req.ccuBuf = 1;
         req.variable = a.domain.Size() * 3 + 2;   // input/scratch/token 每 peer 三 + chunk/goSize
-        req.event = 2;                            // Pre/PostSync 各一（三阶段 events 在 kernel 内部）
+        req.event = 16U * ((a.domain.Size() + 15U) / 16U);   // RS_UNROLL_NUM * ceil(N/16)
+        // R12-1 裁决⑤：req.instruction 按 verb 分发循环重推导（v5 灰度开前 P2 复核，
+        // 与 backend_ccu_collect_all.h 同注——v3 整体 kernel 口径 1，v5 按帧序计）
         req.instruction = 1;
         claim.ccu[/*dieId*/ 0][/*resGroup*/ 0] += req;
     }
@@ -74,6 +99,11 @@ public:
     // ★真原语不在本轮 CCU 侧范围（R7 随 CCU lowering 落地）：本轮动词序供 ST 语义
     // checker 断言（trace 口径）+ 注册链/序列化闭环；verb → ccu::Read/GroupLocalReduce
     // 的映射工单在 verb_sink.h 的 kCcuVerbMap（READ/REDUCE 行已有）。
+    //
+    // R13 · NHR 分支（M0_R13 §一）：老 NHR kernel 无 mesh 三阶段——PreSync（IN|TOK
+    // 两变量）→ RunStep×S（步间屏障 + 逐 slice WriteReduce）→ 收尾 LocalCopy →
+    // PostSync。动词投影 = SYNC_PRE → NHR_RUN（一帧整段）→ SYNC_POST（Emit 内
+    // pattern 分叉，见下方分支注）。
     //
     // ★动词序与 kernel 三阶段批次语义的差距（R6 审查方点名，注释写明——AICPU 侧
     // 将来不得按动词序逐条直译）：
@@ -95,6 +125,48 @@ public:
         // ① 段前握手：互发 input/scratch/token + 等齐（现状 PreSync :134-149）
         if (a.sync.preBarrier) {
             Fire(ctx, VerbCall{VerbCall::SYNC_PEER_PRE});
+        }
+
+        // R18 · #11 全删轮（用户裁定 2026-10-14）：NHR 段动词序展开——与 mesh
+        // 的 READ×(N-1) 地位对等、与 AICPU 半边同构（backend_aicpu_reduce_slice.h
+        // 展开分支同式）。原 NHR_RUN 紧凑帧分支（一帧承载步/slice/jetty/repeat
+        // 四层循环、server VerbNhrRun 帧内展开）删除——宏/展开均未经真机验证，
+        // 双路径无保留价值；B 形态 12 段全展开 114 帧超 63 上限的段切分兜底
+        // 留 B 形态启用时验证（chunk 限定词既有机制）。
+        // CCU 口径动词序 = SYNC_PRE → 逐步[CH_SYNC×4 + SLICE_REDUCE×nSlices]
+        // → SYNC_POST（无上料/归位 COPY——CCU 老链在 server 帧内/GroupLocalReduce
+        // 承载，动词序忠实平移老 kernel 的步进流本体）。
+        if (a.pattern == CommPattern::NHR) {
+            // 种子载荷（与 AICPU 半边同源——11 标量 + 域成员映射）
+            VerbCall::NhrRunScalars seed;
+            seed.valid = true;
+            seed.myAlgRank = args.myAlgRank;
+            seed.rankNum = args.rankNum;
+            seed.channelsPerRank = a.channelsPerRank;
+            seed.sliceSize = args.mySliceSize;
+            seed.inputBase = a.layout.inBaseOff;
+            seed.inputSliceStride = a.layout.RsInStride();
+            seed.scratchBase = a.layout.scratchBaseOff;
+            seed.repeatNum = a.layout.repeatNum;
+            seed.inputRepeatStride = a.layout.inputRepeatStride;
+            seed.outputRepeatStride = a.layout.outputRepeatStride;
+            seed.domainRanks = a.domain.ranks;
+            const std::vector<NhrStepInfo> steps = CalcNhrSteps(args.myAlgRank, args.rankNum);
+            for (size_t s = 0; s < steps.size(); ++s) {
+                const NhrStepInfo& st = steps[s];
+                Fire(ctx, MakeChSync(seed, st, true, false));   // ACK-Record
+                Fire(ctx, MakeChSync(seed, st, true, true));    // ACK-Wait
+                for (u32 i = 0; i < st.nSlices; ++i) {
+                    Fire(ctx, MakeSliceReduce(seed, st, static_cast<u32>(s), i));
+                }
+                Fire(ctx, MakeChSync(seed, st, false, false));  // DATA-Record
+                Fire(ctx, MakeChSync(seed, st, false, true));   // DATA-Wait
+            }
+            // ⑤ 段后握手（老 NHR kernel PostSync :96-105 同式）
+            if (a.sync.postBarrier) {
+                Fire(ctx, VerbCall{VerbCall::SYNC_PEER_POST});
+            }
+            return;
         }
 
         // ② >8P：本 rank 片先落 scratch 槽（Pairwise 路径的 Phase1 本 rank 半边，
@@ -127,6 +199,33 @@ public:
     }
 
 private:
+    // R18 · #11：展开动词构造便捷件（与 AICPU backend 同式——载荷=种子+索引）
+    // R18 全删轮补：peer 槽显式进帧（src=peerWR / dst=peerRD——server
+    // VerbSliceReduce 通道查表消费；几何由执行端 NhrSliceOf 推导）
+    static VerbCall MakeSliceReduce(const VerbCall::NhrRunScalars& seed, const NhrStepInfo& st,
+                                    u32 step, u32 sliceIdx)
+    {
+        VerbCall vc;
+        vc.verb = VerbCall::SLICE_REDUCE;
+        vc.src = st.sendTo;       // peerWR（帧槽 4）
+        vc.dst = st.recvFrom;     // peerRD（帧槽 5）
+        vc.size = seed.sliceSize;
+        vc.nhr = seed;
+        vc.nhr.stepIdx = step;
+        vc.nhr.sliceIdx = sliceIdx;
+        return vc;
+    }
+    static VerbCall MakeChSync(const VerbCall::NhrRunScalars& seed, const NhrStepInfo& st,
+                               bool isAck, bool isWait)
+    {
+        VerbCall vc;
+        vc.verb = VerbCall::CH_SYNC;
+        vc.src = st.sendTo;
+        vc.dst = st.recvFrom;
+        vc.size = static_cast<u64>((isAck ? 0U : 2U) + (isWait ? 1U : 0U));
+        vc.nhr = seed;
+        return vc;
+    }
     static void Fire(EmitCtx& ctx, const VerbCall& call)
     {
         FireVerb(ctx.sink, &ctx.trace, call);

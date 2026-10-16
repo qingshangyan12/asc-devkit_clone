@@ -469,10 +469,13 @@ int main()
         Check(rargs.chunks.chunkSize == 8388608ULL && rargs.chunks.chunkLoopNum == 0xFFFFFFFFFFFFFFFCULL &&
                   rargs.chunks.tailSize == 3222784ULL, "BuildArgs chunk triplet");
         Check(rargs.peers.size() == 7, "BuildArgs 7 peers");
-        // NHR 拒收对齐（BuildArgs 与序列化同一防线）
+        // R13 · NHR 放开（M0_R13_NHR_V5.md §八）：BuildArgs 受理 NHR 段（v5 NHR_RUN
+        // 动词落地），v3 序列化器仍拒收（v3 帧无 pattern 载体——上一断言既有边界，
+        // 两链路分叉由 verbPath 判：NHR 段只走 v5）。BuildArgs NHR 产物：peers 空
+        //（无逐 peer 读）、九标量从 layout 直取（帧槽由 v5 序列化器段级补写）。
         ReduceSliceArgs nArgs;
-        Check(ReduceSlice::BuildArgs(nhr, nArgs, berr) == HCCL_E_NOT_SUPPORT,
-              "BuildArgs rejects NHR (same fence as serializer)");
+        Check(ReduceSlice::BuildArgs(nhr, nArgs, berr) == HCCL_SUCCESS,
+              "R13 BuildArgs accepts NHR (v5 NHR_RUN; v3 serializer still rejects)");
     }
 
     printf("\n%d passed, %d failed\n", g_pass, g_fail);

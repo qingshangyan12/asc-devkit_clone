@@ -35,6 +35,13 @@ int32_t HcommLocalCopyOnThread(ThreadHandle t, void* d, const void* s, uint64_t 
 { Rec("LocalCopy", t, 0, (u64)(uintptr_t)d, (u64)(uintptr_t)s, l); return g_stubRet; }
 int32_t HcommReadOnThread(ThreadHandle t, ChannelHandle ch, void* d, const void* s, uint64_t l)
 { Rec("Read", t, ch, (u64)(uintptr_t)d, (u64)(uintptr_t)s, l); return g_stubRet; }
+// R12 · WP-9②：WRITE/REDUCE 桩（sink 新接线两原语——RS×AICPU 写侧）
+int32_t HcommWriteOnThread(ThreadHandle t, ChannelHandle ch, void* d, const void* s, uint64_t l)
+{ Rec("Write", t, ch, (u64)(uintptr_t)d, (u64)(uintptr_t)s, l); return g_stubRet; }
+int32_t HcommLocalReduceOnThread(ThreadHandle t, void* d, const void* s, uint64_t c,
+    HcommDataType dt, HcommReduceOp op)
+{ Rec("LocalReduce", t, 0, (u64)(uintptr_t)d, (u64)(uintptr_t)s, c); (void)dt; (void)op; return g_stubRet; }
+
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle t, ThreadHandle dt, uint32_t i)
 { Rec("ThNRec", t, dt, i, 0, 0); return g_stubRet; }
 int32_t HcommThreadNotifyWaitOnThread(ThreadHandle t, uint32_t i, uint32_t to)
@@ -43,6 +50,13 @@ int32_t HcommChannelNotifyRecordOnThread(ThreadHandle t, ChannelHandle ch, uint3
 { Rec("ChNRec", t, ch, i, 0, 0); return g_stubRet; }
 int32_t HcommChannelNotifyWaitOnThread(ThreadHandle t, ChannelHandle ch, uint32_t i, uint32_t to)
 { Rec("ChNWait", t, ch, i, to, 0); return g_stubRet; }
+// R15 · ②：NHR_RUN 执行面原语桩（sink DoNhrRun 消费）
+int32_t HcommWriteReduceOnThread(ThreadHandle t, ChannelHandle ch, void* d, const void* s,
+    uint64_t c, HcommDataType dt, HcommReduceOp op)
+{ Rec("WriteReduce", t, ch, (u64)(uintptr_t)d, (u64)(uintptr_t)s, c); (void)dt; (void)op; return g_stubRet; }
+int32_t HcommReadReduceOnThread(ThreadHandle t, ChannelHandle ch, void* d, const void* s,
+    uint64_t c, HcommDataType dt, HcommReduceOp op)
+{ Rec("ReadReduce", t, ch, (u64)(uintptr_t)d, (u64)(uintptr_t)s, c); (void)dt; (void)op; return g_stubRet; }
 }
 
 static OpParam MakeAgOp(u32 rankSize, u64 countPerRank)

@@ -62,6 +62,17 @@ struct DataLayout {
     }
     u64 CountOf(u32 algRank, u32 rankNum) const { return SliceSizeOf(algRank, rankNum) / dataTypeSize; }
 
+    // RS input 步长的三分支唯一实现点（R16 · 8b 收敛）：inputSliceStride 非零
+    //（exec 期注入后）直用；为零（Compile 期——BuildRequest 对 input 不设步长，
+    // l1_adapter.h:117-118）退 outputSliceStride（RS 的 input/output 步长同式同值，
+    // BuildRequest 同式编码）。原七处内联三元式（action_reduce_slice.h
+    // :181/:215、backend_aicpu_reduce_slice.h:89/:155/:179、verb_serializer.h:210
+    // 及 consumer 侧 msg 形态）收敛于此。
+    u64 RsInStride() const
+    {
+        return (inputSliceStride != 0U) ? inputSliceStride : outputSliceStride;
+    }
+
     // two_shot：RS 段的 output 即 AG 段的 input（配方声明数据流边时调用）
     DataLayout ForSecondStage() const
     {
@@ -157,6 +168,10 @@ struct ActionSpec {
     CommPattern pattern{CommPattern::AUTO};
     SegShape shape{SegShape::NONE};
     u32 channelsPerRank{1};          // single/multi-channel 限定词的落点
+    // R13（M0_R13_NHR_V5.md §三）：NHR 段 jetty 数（v2 链的 srcArg->portNum 语义）。
+    // 缺省 1 == devkit RS NHR 链恒值（KFC_RS_NHR_PORT_NUM=1）——加法不改法：既有
+    // Plan（MESH 段）不设该字段时零变化；>1 是 kernel 能力，协议面保留（帧槽 10）。
+    u32 nhrJettyNum{1};
     u64 token{0};                    // 内存 token（devkit GetToken 产出，进消息槽）
     TransportPolicy transport{TransportPolicy::AUTO};
     SyncSpec sync;
@@ -215,6 +230,127 @@ struct ResourceClaim {
         return *this;
     }
 };
+
+// 域分组唯一实现点（R16 · 8c 收敛）：domain.ranks 序列相等去重（首现序）。
+// domainOfSegOut 非空时逐段域号一并产出（编排器 R14 :170-186 与 Σ 申报 R15
+// :265-278 原两处内联循环单源化——两处去重逻辑逐字同构，仅编排器多产 domainOfSeg）。
+inline std::vector<std::vector<u32>> GroupDomains(const std::vector<ActionSpec>& segs,
+                                                  std::vector<u32>* domainOfSegOut = nullptr)
+{
+    std::vector<std::vector<u32>> domainRanks;
+    if (domainOfSegOut != nullptr) {
+        domainOfSegOut->assign(segs.size(), 0xFFFFFFFFU);
+    }
+    for (size_t i = 0; i < segs.size(); ++i) {
+        const std::vector<u32>& ranks = segs[i].domain.ranks;
+        bool found = false;
+        for (size_t k = 0; k < domainRanks.size(); ++k) {
+            if (domainRanks[k] == ranks) {
+                if (domainOfSegOut != nullptr) {
+                    (*domainOfSegOut)[i] = static_cast<u32>(k);
+                }
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            if (domainOfSegOut != nullptr) {
+                (*domainOfSegOut)[i] = static_cast<u32>(domainRanks.size());
+            }
+            domainRanks.push_back(ranks);
+        }
+    }
+    return domainRanks;
+}
+
+// ---------------------------------------------------------------------------
+// 域线程预算与并发申报（R15 · ③ 首版 → R19 · #12 B 档定稿）。
+//
+// DomainThreadTotalNeed(seg)：单段线程总量（main+slaves——编排器切池口径）。
+// pattern-aware（R15 必答 F/H 定稿）：
+//   RS·NHR → max(1, channelsPerRank)（模板 GetThreadNum=1×channelsPerRank，
+//     ins_temp_reduce_scatter_nhr.cc:72；devkit 恒 1）
+//   RS·MESH → max(1, n)（backend_aicpu_reduce_slice.h:53 ClaimEngineRes 同式）
+//   AG → max(1, n−1)（backend_aicpu_collect_all.h:42 同式；**不按 pattern 分叉**
+//     ——AG NHR AICPU 执行面未交付，保持 ClaimEngineRes 既有口径防 sole[nhr] AG
+//     申报漂移）
+// 与 R14 编排器 DomainThreadNeed 的关系：编排器委托本函数（单源——两侧公式
+// 一致由 ST R15-③ 断言锁）。ClaimEngineRes（backend 层引擎申报）R16 · 8g 起
+// 委托 ClaimAicpuThreadRes（同文件上方）——申报公式单源三处收敛为一处。
+//
+// CalcConcurrencySlaveClaim(segs)：CONCURRENT_SUM 档公式（R19 · #12 B 档，
+// 2026-10-15 用户裁定，M0_R19_THREAD_CLAIM.md）：
+//   claim = Σ_d (DomainThreadTotalNeed_d − 1) + (D − 1)
+// （D = 域数，GroupDomains 去重——R16 · 8c 唯一实现点）。SPLIT/PARALLEL 配方
+// 经 ClaimFormulaOf 查表绑定消费（l2/recipe_sole.h），与 env 无关。老树对照
+// （行号本轮 grep 核实）：
+//   · SPLIT 与老树 temp0+temp1+1 **恰同式零差**（RS ins_reduce_scatter_
+//     concurrent_executor.cc:68-69 / AG ins_v2_all_gather_concurrent_executor.
+//     cc:89——域0 main 兼控制位 = D−1 的 D=2 特例）；
+//   · PARALLEL 比老树 intra+inter+2 **少 1**（RS ins_reduce_scatter_parallel_
+//     executor.cc:76-77 / AG ins_v2_all_gather_parallel_executor.cc:130-131 的
+//     专职控制线程职能已被编排器域 main 交叉握手接管，恒 ≤ 老树申报量）；
+//   · D=1 退化恒等式：(need−1)+0 = need−1 = 单域 MAX_REUSE 自然值（两档单域
+//     恒等，ST R19 断言锁）。
+// MAX_REUSE 档（SOLE/SEQUENCE）不走本函数——operator+= max 累积（:224）即
+// 终值。R15 旧口径（Σ(need−1)+D，gated env 开关）随 R19 退役：申报面与 env
+// 解耦，执行面编排器灰度（aicpu_consumer.h UseUnifiedConcurrencyPath）独立
+// 保留。R15 首版的"1 条冗余=老控制线程位"（M0_R15 §十-3 登记真机复核后可
+// 一行改）即本式兑现。
+// ---------------------------------------------------------------------------
+inline u32 DomainThreadTotalNeed(const ActionSpec& seg)
+{
+    const u32 n = seg.domain.Size();
+    u32 t = 1;
+    if (seg.kind == ActionKind::ReduceSlice) {
+        if (seg.pattern == CommPattern::NHR) {
+            t = (seg.channelsPerRank > 1U) ? seg.channelsPerRank : 1U;   // NHR：1×channelsPerRank
+        } else {
+            t = (n > 1U) ? n : 1U;                                        // mesh RS：N
+        }
+    } else {
+        t = (n > 1U) ? (n - 1U) : 1U;                                     // AG：N-1
+    }
+    return t;
+}
+
+// AICPU 线程申报唯一实现点（R16 · 8g 收敛）：threadNum 从 DomainThreadTotalNeed
+// 单源取值（AG：N-1 / RS·mesh：N——真差异仅此一处，主线程是否参与数据动词），
+// notify 三件套（slave 数、逐线程各 1、main 收 N-1）两后端逐字同模板。
+// 原 backend_aicpu_collect_all.h:41-45 与 backend_aicpu_reduce_slice.h:54-58
+// 两处镜像收敛于此；backend 侧 ClaimEngineRes 改委托本函数（等价由 ST R16 段
+// 断言锁：两后端输出 == 旧手写模板）。
+inline void ClaimAicpuThreadRes(const ActionSpec& a, ResourceClaim& claim)
+{
+    const u32 threadNum = DomainThreadTotalNeed(a);
+    claim.slaveThreadNum = threadNum - 1;
+    claim.notifyNumPerThread.assign(claim.slaveThreadNum, 1);
+    claim.notifyNumOnMainThread = threadNum - 1;
+}
+
+inline u32 CalcConcurrencySlaveClaim(const std::vector<ActionSpec>& segs)
+{
+    // R19 · #12 B 档：Σ_d(need_d − 1) + (D − 1)——空 segs 守卫（D=0 时上式
+    // 退化出 −1，直接报 0——不存在的段序列无申报）。域分组（GroupDomains
+    // 唯一实现点）→ 逐域 max（同域段混排两动作时保守——R14 DomainThreadNeed
+    // 同口径）→ Σ (need−1) + (D−1)（控制位由编排器域 main 交叉握手承接）
+    if (segs.empty()) {
+        return 0;
+    }
+    const std::vector<std::vector<u32>> domainRanks = GroupDomains(segs);
+    u32 slaveTotal = 0;
+    for (size_t d = 0; d < domainRanks.size(); ++d) {
+        u32 need = 1;
+        for (size_t i = 0; i < segs.size(); ++i) {
+            if (segs[i].domain.ranks == domainRanks[d]) {
+                const u32 t = DomainThreadTotalNeed(segs[i]);
+                need = (need > t) ? need : t;
+            }
+        }
+        slaveTotal += (need > 0U) ? (need - 1U) : 0U;
+    }
+    return slaveTotal + (domainRanks.size() > 0U ? static_cast<u32>(domainRanks.size()) - 1U : 0U);
+}
 
 // ---------------------------------------------------------------------------
 // R9 · 档位参数（TierParams）：selector 数据量分档的 Plan 化（§3.6-② 档位参数）

@@ -67,7 +67,8 @@ public:
         }
         // parallel 的各段互不依赖：inputRanks 各自独立（与 sequence 的区别就在这里）
         SegmentBuilder::SplitRounds(plan.segments, ctx.capacity);   // §10.2 A2
-        SegmentBuilder::SumRes(plan);
+        // R19 · #12：申报按编排身份查表（PARALLEL → CONCURRENT_SUM，B 档 Σ−1）
+        SegmentBuilder::SumRes(plan, Recipe::PARALLEL);
         // R9 · WP-1（2026-10-07）：RS 双域配方挂档位参数——骨架（每域 1 段）+
         // TierParams 随 Plan 下发，A/B 段序列展开在**消费方 exec 期**（Instantiate
         // 单决策点，§3.6-②③：RS 资源期 count=0 展不开 + R6-③"不预编两个候选
@@ -148,7 +149,8 @@ public:
             }
         }
         SegmentBuilder::SplitRounds(plan.segments, ctx.capacity);   // §10.2 A2
-        SegmentBuilder::SumRes(plan);
+        // R19 · #12：申报按编排身份查表（SEQUENCE → MAX_REUSE，max 复用即老树公式）
+        SegmentBuilder::SumRes(plan, Recipe::SEQUENCE);
         return HCCL_SUCCESS;
     }
 };
@@ -179,7 +181,8 @@ public:
             if (buildRet != HCCL_SUCCESS) return buildRet;   // 错误码透传（不吞不改，§6.9）
         }
         SegmentBuilder::SplitRounds(plan.segments, ctx.capacity);   // §10.2 A2
-        SegmentBuilder::SumRes(plan);
+        // R19 · #12：申报按编排身份查表（SPLIT → CONCURRENT_SUM，与老树 +1 同式零差）
+        SegmentBuilder::SumRes(plan, Recipe::SPLIT);
         return HCCL_SUCCESS;
     }
 };

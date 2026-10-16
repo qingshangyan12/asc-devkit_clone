@@ -18,6 +18,8 @@
 #include "unified_route.h"
 #include "l1_adapter.h"        // ResourceBroker / L1Adapter::Compile / Materialize（unified 树 l2/）
 #include "plan_serializer.h"   // M2/M3：SerializePlanV3（CCU v3 blob——device 写入方消费）
+#include "verb_serializer.h"   // R12 · WP-5：SerializeVerbPlan/ValidateVerbSegment（v5 动词帧 blob）
+#include "verb_capture.h"      // R12 · WP-5：CaptureVerbSegment（L4 Emit 序捕获 → VerbSegment）
 #include "unified_aicpu_exec.h" // R6 WP-A2：kUnifiedAicpuAlgKey（AICPU exec 分叉识别键回填）
 
 #include <algorithm>            // R11 · WP-2：AssembleUnifiedAicpuResCtx 的 remoteRank 展开序重放（std::sort）
@@ -47,8 +49,11 @@ public:
 
     // M3-条件A（M1 审查，2026-09-21）：kernelHandle 出参——注册时刻唯一回传点
     //（hccl_res.h 无按名反查 API，发射链 CcuKernelLaunch 要求 ccuKernels[0]!=0）
+    // R16 · #6：claimCcu 透传——plan.claim.ccu（估算申报）带到注册链内与驱动反查
+    // 真值双源对拍（HcclCcuKernelRegisterUnified 内 CompareClaimVsQueriedRes）。
     HcclResult AcquireCcuKernel(const std::vector<refactor::CcuKernelPlan>& kernels,
-                                refactor::CcuKernelHandle& kernelHandle, std::string& err) override;
+                                refactor::CcuKernelHandle& kernelHandle, std::string& err,
+        const std::map<u32, std::map<u32, refactor::ResCounters>>* claimCcu = nullptr) override;
 
     // R11 · WP-1（句柄回收，2026-10-08）：Materialize 申请的 threads/channels 句柄
     // 收集口——R10 前真实现申请后丢弃（组装资源束无句柄来源）。GetUnifiedOpParam-
@@ -121,7 +126,8 @@ HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
     std::vector<ChannelHandle>* handlesOut = nullptr);
 HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
     const std::vector<refactor::CcuKernelPlan>& kernels, refactor::CcuKernelHandle& kernelHandle,
-    std::string& err);
+    std::string& err,
+    const std::map<u32, std::map<u32, refactor::ResCounters>>* claimCcu = nullptr);
 HcclResult HcclSerializeUnifiedPlan(HcclComm comm, const OpParam& param, const std::string& unifiedAlgTag,
     const std::string& planBlob, void** resCtxOut);
 } // namespace mc2_ops_hccl
@@ -1042,9 +1048,10 @@ HcclResult UnifiedResourceBroker::AcquireChannels(const std::vector<refactor::Ch
 }
 
 HcclResult UnifiedResourceBroker::AcquireCcuKernel(const std::vector<refactor::CcuKernelPlan>& kernels,
-    refactor::CcuKernelHandle& kernelHandle, std::string& err)
+    refactor::CcuKernelHandle& kernelHandle, std::string& err,
+    const std::map<u32, std::map<u32, refactor::ResCounters>>* claimCcu)
 {
-    return mc2_ops_hccl::HcclCcuKernelRegisterUnified(comm_, param_, kernels, kernelHandle, err);
+    return mc2_ops_hccl::HcclCcuKernelRegisterUnified(comm_, param_, kernels, kernelHandle, err, claimCcu);
 }
 
 // algConfig 来源：ccTiling->algConfig（GetForcedAlgName 同源数据，但走结构化解析而非整串比对）
@@ -1178,9 +1185,56 @@ HcclResult GetUnifiedOpParamResCtxImpl(
     // 口径，action_spec.h:314 退役预留说明）——仅停用本调用点。
     const std::string unifiedAlgTag = UnifiedAlgTag(algConfig, engine);
     std::vector<u64> blobSlots;
-    if (!SerializePlanV3(plan, blobSlots, err)) {
-        HCCL_ERROR("[UnifiedRes] SerializePlanV3 failed, err[%s]. retreating to legacy path.", err.c_str());
-        return HCCL_E_PARA;
+    // R12 · WP-5（2026-10-09，v5 灰度分叉）：CCU 引擎 + UseUnifiedVerbPath 命中 →
+    // 序列化切 v5 动词帧 blob（SerializeVerbPlan：L4 Emit 的 VerbCall 序 → 动词帧；
+    // server DispatchUnifiedVerbs 按 verb ID → 原语组合）。三层判据（编译期宏 +
+    // MC2_USE_UNIFIED_VERB env + unified 路由行）全开才走 v5，否则维持 v4 段帧
+    //（SerializePlanV3）——v3/v4 链路零变化。Emit 序捕获经 CaptureVerbSink（unified
+    // 树 l5/，IVerbSink 实现）；AICPU 引擎不进 v5（消费方 RunUnifiedAicpuOp 走 v4
+    // 段帧解读，RS 段 AICPU 半边是 WP-9 的 v4 面扩展）。
+    bool verbPath = (engine == Engine::CCU) && UseUnifiedVerbPath(static_cast<int>(opParam.opType));
+    if (verbPath) {
+        std::vector<VerbSegment> verbSegs;
+        for (size_t i = 0; i < plan.segments.size(); ++i) {
+            VerbSegment vs = CaptureVerbSegment(plan, i, Engine::CCU);
+            if (vs.calls.empty()) {
+                HCCL_ERROR("[UnifiedRes] v5 verb Emit produced no calls for segment[%zu] "
+                           "(kind[%d]) — retreating to v3 path.", i, static_cast<int>(plan.segments[i].kind));
+                verbPath = false;   // 本地变量改判（C++14 无 if-init）：降级 v4 继续走
+                break;
+            }
+            std::string verr;
+            if (!ValidateVerbSegment(vs, verr)) {
+                HCCL_ERROR("[UnifiedRes] v5 ValidateVerbSegment failed, seg[%zu]: %s — "
+                           "retreating to v3 path.", i, verr.c_str());
+                verbPath = false;
+                break;
+            }
+            verbSegs.push_back(vs);
+        }
+        if (verbPath && SerializeVerbPlan(verbSegs, plan, blobSlots, err)) {
+            HCCL_INFO("[UnifiedRes] v5 verb blob: frames[%llu], slots[%zu].",
+                (unsigned long long)blobSlots[2], blobSlots.size());
+        } else if (verbPath) {
+            HCCL_WARNING("[UnifiedRes] SerializeVerbPlan failed, err[%s] — retreating to v3 path.",
+                err.c_str());
+            verbPath = false;
+        }
+    }
+    if (!verbPath && blobSlots.empty()) {
+        // R15 · ① tier 承载 gate（M0_R15 §十-5 裁决 5——引擎半边在此判定）：
+        // 仅 AICPU 引擎消费的 blob 放行 tier 槽写入 + NHR 骨架段序列化（规范形态
+        // 半边在 TierSkeletonCanonical 内判）。CCU 路径（含 verbPath=false 降级）
+        // 不传 tierPlan → 槽 16 恒 0、NHR 段照旧拒收 = 现状零变化。
+        const refactor::TierParams* tierPlan = nullptr;
+        if (engine == refactor::Engine::AICPU && refactor::UseUnifiedTierPath(static_cast<int>(opParam.opType)) &&
+            refactor::TierSkeletonCanonical(plan)) {
+            tierPlan = &plan.tier;
+        }
+        if (!SerializePlanV3(plan, blobSlots, err, tierPlan)) {
+            HCCL_ERROR("[UnifiedRes] SerializePlanV3 failed, err[%s]. retreating to legacy path.", err.c_str());
+            return HCCL_E_PARA;
+        }
     }
     const char* blobBytes = reinterpret_cast<const char*>(blobSlots.data());
     const std::string planBlob(blobBytes, blobSlots.size() * sizeof(u64));
@@ -1296,6 +1350,17 @@ static HcclResult AssembleUnifiedAicpuResCtx(HcclComm comm, OpParam& opParam,
             level0 = std::vector<u32>{opParam.userRank};
         }
         resCtxHost->algHierarchyInfo.infos.push_back({level0});
+        // R15 · ① tier 慢轴域成员（level1 追加填充——加法不改法）：tier 骨架双域
+        // 配方（parallel[mesh,nhr]）的域 1 成员从 physicalLevels[1].localRanks 取
+        //（跨 server Clos 域——与老链 temp1HierarchyInfo 的 level1 同源数据）；存在
+        // 才追加（单域 Plan infos[0] 恒 1 元素 = 消费方 domainRanks2 空 = tier 分支
+        // 拒收非 tier 不受影响）。★真机 level1 拓扑提取考证挂 P2（M0_R15 §十一差距①
+        // ——physicalLevels[1] 形态真机复核；host 测试直构 resCtx 无此依赖）。
+        if (topoInfoUnified->physicalLevels.size() > 1U &&
+            !topoInfoUnified->physicalLevels[1].localRanks.empty()) {
+            resCtxHost->algHierarchyInfo.infos[0].push_back(
+                topoInfoUnified->physicalLevels[1].localRanks);
+        }
     }
     // channels：句柄回填进 ChannelInfo（对照 HcclGetChannelImpl :1287-1296 的
     // isValid/remoteRank/handle 三元组——unified 侧无 HcclRankGraphGetEndpointInfo
@@ -1357,6 +1422,30 @@ static HcclResult AssembleUnifiedAicpuResCtx(HcclComm comm, OpParam& opParam,
                        "expanded[%zu] (serializer drift).",
                 resCtxHost->channels[0].size(), idx);
             return HCCL_E_INTERNAL;
+        }
+        // R12 · WP-6①（#21 MINOR-2 守卫，2026-10-09）：remoteRank 单调不减校验——
+        // 对齐回填后按展开序数学（remoteRank 升序 × count 展开）核验：已写槽的
+        // remoteRank 序列必单调不减（升序 rank × 恒正 count）。INVALID 占位（未写
+        // 槽，acquiredChannelReqs 为空时的防御形态）跳过。违反 → 展开序重放与真
+        // HcclChannelAcquireUnified 序脱钩（R12-4 单源派生断链），E_PARA 拒绝——
+        // 不静默（错序通道表 = sink 按 map[peer] 取错通道，数据面错配）。
+        {
+            u32 prevRank = 0U;
+            bool hasPrev = false;
+            for (const ChannelInfo& ch : resCtxHost->channels[0]) {
+                if (ch.remoteRank == INVALID_VALUE_RANKID) {
+                    continue;   // INVALID 占位跳过（count mismatch 已由上方 idx 校验兜底）
+                }
+                if (hasPrev && ch.remoteRank < prevRank) {
+                    HCCL_ERROR("[UnifiedRes][AICPU] channel remoteRank order violated: [%u] after [%u] "
+                               "(expand-order replay drifted from HcclChannelAcquireUnified; "
+                               "single-source channel order broken — refusing).",
+                        ch.remoteRank, prevRank);
+                    return HCCL_E_PARA;
+                }
+                prevRank = ch.remoteRank;
+                hasPrev = true;
+            }
         }
     }
     // cclMem：HcclGetHcclBuffer（CCU 组装段 :1622-1626 同式——AG VIA_CCUBUF 的
@@ -1889,6 +1978,11 @@ static HcclResult AssembleUnifiedCcuDeliverables(HcclComm comm, void* stream, co
     // 读回头部 + 尺寸交叉校验（segs×32+7 × 8B == ctx 分配尺寸——R6 头部 4→7 槽，
     // KfcUnifiedBlobTotalSlots 随 KFC_UNIFIED_BLOB_HEADER_SLOTS 常量同步，此处零改动）。
     // ctx 尺寸从 HcclEngineCtxGet 反查（同 tag 再 Get 一次拿 actualSize）。
+    // R12 · WP-5（2026-10-09）：v5 双格式受理——头读回先按 magic 判格式（UPL3=v4
+    // 段帧 / UPL5=v5 动词帧，版本 4/5 互锁），尺寸公式按各自头常量取（v5 是
+    // frameCount×32+7，KfcUnifiedVerbBlobTotalSlots）。两格式均校验后放行给写入方
+    //（CcuPrepareForUnifiedPlan 只认 v4——v5 blob 由 v5 写入方 CcuPrepareForUnifiedVerbPlan
+    // 消费，device 侧按同 magic 判据分派，hccl_ccu_v0.h 的 158 分派点同名分叉）。
     std::vector<u64> blobHead(HcclKfcProtocol::KFC_UNIFIED_BLOB_HEADER_SLOTS, 0);
     {
         const errno_t gRet = memset_s(blobHead.data(), blobHead.size() * sizeof(u64), 0, blobHead.size() * sizeof(u64));
@@ -1897,14 +1991,28 @@ static HcclResult AssembleUnifiedCcuDeliverables(HcclComm comm, void* stream, co
             blobHead.size() * sizeof(u64), ACL_MEMCPY_DEVICE_TO_HOST);
         CHK_PRT_RET(aclRet != ACL_SUCCESS,
             HCCL_ERROR("[UnifiedRes] read back blob head failed, ret[%d].", aclRet), HCCL_E_RUNTIME);
-        CHK_PRT_RET(blobHead[0] != HcclKfcProtocol::KFC_UNIFIED_BLOB_MAGIC,
-            HCCL_ERROR("[UnifiedRes] blob magic mismatch: [0x%llx] != UPL3.",
-                static_cast<unsigned long long>(blobHead[0])), HCCL_E_INTERNAL);
-        CHK_PRT_RET(blobHead[1] != HcclKfcProtocol::KFC_UNIFIED_BLOB_VERSION,
-            HCCL_ERROR("[UnifiedRes] blob version mismatch: [%llu] != 4 (R6 header 4->7 slots).",
-                static_cast<unsigned long long>(blobHead[1])), HCCL_E_INTERNAL);
-        const u64 segNum = blobHead[2];
-        const uint32_t expectSlots = HcclKfcProtocol::KfcUnifiedBlobTotalSlots(static_cast<uint32_t>(segNum));
+        // R12 · WP-5：v5 双格式受理——先按 magic 分派（v5 头与 v4 头同为 7 槽，读回
+        // 一次覆盖两格式），再按格式取版本/尺寸公式。灰度默认关时恒走 v4 半边
+        //（行为零变化）；v5 半边校验 UPL5/版本 5 + frameCount×32+7 尺寸公式。
+        const bool isVerbBlob = (blobHead[0] == HcclKfcProtocol::KFC_UNIFIED_VERB_BLOB_MAGIC);
+        u64 recordNum = 0;               // v4=segNum / v5=frameCount（尺寸公式输入）
+        uint32_t expectSlots = 0;
+        if (isVerbBlob) {
+            CHK_PRT_RET(blobHead[1] != HcclKfcProtocol::KFC_UNIFIED_VERB_BLOB_VERSION,
+                HCCL_ERROR("[UnifiedRes] v5 verb blob version mismatch: [%llu] != 5.",
+                    static_cast<unsigned long long>(blobHead[1])), HCCL_E_INTERNAL);
+            recordNum = blobHead[2];
+            expectSlots = HcclKfcProtocol::KfcUnifiedVerbBlobTotalSlots(static_cast<uint32_t>(recordNum));
+        } else {
+            CHK_PRT_RET(blobHead[0] != HcclKfcProtocol::KFC_UNIFIED_BLOB_MAGIC,
+                HCCL_ERROR("[UnifiedRes] blob magic mismatch: [0x%llx] != UPL3/UPL5.",
+                    static_cast<unsigned long long>(blobHead[0])), HCCL_E_INTERNAL);
+            CHK_PRT_RET(blobHead[1] != HcclKfcProtocol::KFC_UNIFIED_BLOB_VERSION,
+                HCCL_ERROR("[UnifiedRes] blob version mismatch: [%llu] != 4 (R6 header 4->7 slots).",
+                    static_cast<unsigned long long>(blobHead[1])), HCCL_E_INTERNAL);
+            recordNum = blobHead[2];
+            expectSlots = HcclKfcProtocol::KfcUnifiedBlobTotalSlots(static_cast<uint32_t>(recordNum));
+        }
         // ctx 尺寸反查（tag = UnifiedAlgTag，与 GetUnifiedOpParamResCtxImpl 的 ④ 同源键）
         const refactor::Engine engine = refactor::L1Adapter::EngineOf(opParamUnified);
         const std::string unifiedAlgTag = refactor::UnifiedAlgTag(unifiedAlgConfig, engine);
@@ -1916,12 +2024,13 @@ static HcclResult AssembleUnifiedCcuDeliverables(HcclComm comm, void* stream, co
             HCCL_ERROR("[UnifiedRes] blob ctx probe failed: tag[%s] ret[%d].", unifiedAlgTag.c_str(),
                 static_cast<int>(getRet)), HCCL_E_INTERNAL);
         CHK_PRT_RET(actualSize != static_cast<uint64_t>(expectSlots) * sizeof(u64),
-            HCCL_ERROR("[UnifiedRes] blob size mismatch: segs[%llu] expect[%uB] actual[%lluB] "
+            HCCL_ERROR("[UnifiedRes] blob size mismatch: %s[%llu] expect[%uB] actual[%lluB] "
                        "(stale blob ctx or serializer drift).",
-                static_cast<unsigned long long>(segNum), expectSlots * 8U,
-                static_cast<unsigned long long>(actualSize)), HCCL_E_INTERNAL);
-        HCCL_INFO("[UnifiedRes] blob verified: segs[%llu], size[%uB].", static_cast<unsigned long long>(segNum),
-            expectSlots * 8U);
+                isVerbBlob ? "frames" : "segs", static_cast<unsigned long long>(recordNum),
+                expectSlots * 8U, static_cast<unsigned long long>(actualSize)), HCCL_E_INTERNAL);
+        HCCL_INFO("[UnifiedRes] blob verified: %s[%llu] (%s), size[%uB].",
+            isVerbBlob ? "frames" : "segs", static_cast<unsigned long long>(recordNum),
+            isVerbBlob ? "v5 verb" : "v4 segment", expectSlots * 8U);
     }
 
     // ① 分派键三件（FillCcuAlgorithmInfo 等价物；algorithmType 直赋 158——
@@ -1949,12 +2058,26 @@ static HcclResult AssembleUnifiedCcuDeliverables(HcclComm comm, void* stream, co
     resCtxHost->topoInfo = *topoInfoUnified;
     {
         // token：cclBuffer 优先（GetTokenFromBuffInfo 同式——op_common.cc :142）
+        // R12 · WP-6②（#12 token 空报错语义，2026-10-09）：GetToken 失败静默返 0 →
+        // 透传错误。对齐 hcomm 真语义（CcuAlgTemplateBase::GetToken，
+        // ccu_alg_template_base.cc:201-218 的三分支末尾 HCCL_E_PTR）——token=0 下发
+        // 是 server 侧"非法内存访问凭证"，静默 0 = 数据面错配比报错更危险。
         void* cclBufferAddr = nullptr;
         uint64_t cclBufferSize = 0;
         uint64_t token = 0;
-        if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS && cclBufferAddr != nullptr) {
-            token = hcomm::CcuRep::GetTokenInfo(reinterpret_cast<uint64_t>(cclBufferAddr), cclBufferSize);
+        const HcclResult tokenRet = HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize);
+        if (tokenRet != HCCL_SUCCESS) {
+            HCCL_ERROR("[UnifiedRes][CCU] HcclGetHcclBuffer failed, ret[%d] — no token source "
+                       "(GetToken semantics: propagate, not silent zero).",
+                static_cast<int>(tokenRet));
+            return tokenRet;
         }
+        if (cclBufferAddr == nullptr) {
+            HCCL_ERROR("[UnifiedRes][CCU] cclBuffer is null — no token source "
+                       "(GetToken semantics: HCCL_E_PTR, not silent zero).");
+            return HCCL_E_PTR;
+        }
+        token = hcomm::CcuRep::GetTokenInfo(reinterpret_cast<uint64_t>(cclBufferAddr), cclBufferSize);
         resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
         // 线程：CCU-KFC 分支同式（slaveThreadNum=0 → 1 条，notify=0）
         constexpr u32 kMissionNum = 1U;

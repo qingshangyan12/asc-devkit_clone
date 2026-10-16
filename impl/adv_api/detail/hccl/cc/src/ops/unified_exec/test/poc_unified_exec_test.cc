@@ -55,6 +55,20 @@ int32_t HcommReadOnThread(ThreadHandle thread, ChannelHandle channel, void* dst,
     Record("Read", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), len);
     return g_stubRet;
 }
+// R12 · WP-9②：WRITE/REDUCE 桩（sink 新接线两原语——RS×AICPU 写侧）
+int32_t HcommWriteOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len)
+{
+    Record("Write", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), len);
+    return g_stubRet;
+}
+int32_t HcommLocalReduceOnThread(ThreadHandle thread, void* dst, const void* src, uint64_t count,
+    HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("LocalReduce", thread, 0, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx)
 {
     Record("ThreadNotifyRecord", thread, dstThread, dstNotifyIdx, 0, 0);
@@ -73,6 +87,21 @@ int32_t HcommChannelNotifyRecordOnThread(ThreadHandle thread, ChannelHandle chan
 int32_t HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t timeOut)
 {
     Record("ChNotifyWait", thread, channel, localNotifyIdx, timeOut, 0);
+    return g_stubRet;
+}
+// R15 · ②：NHR_RUN 执行面原语桩（DoNhrRun 消费）
+int32_t HcommWriteReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("WriteReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+int32_t HcommReadReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Record("ReadReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
     return g_stubRet;
 }
 }

@@ -139,6 +139,13 @@ HcclResult RunUnifiedAicpuOp(const OpParam& param, const AlgResourceCtxSerializa
         HCCL_INFO("[UnifiedExec][AICPU] single-rank domain, nothing to orchestrate.");
         return HCCL_SUCCESS;
     }
+    // R15 · ① tier 慢轴域成员（level1）：infos[0][1]（资源期组装段
+    // AssembleUnifiedAicpuResCtx 的 level1 追加填充——加法不改法，单域 Plan 该槽
+    // 不存在 = 空）。空 → 消费方 tier 分支显式拒收（组装断层不静默退化单域）。
+    std::vector<u32> domainRanks2;
+    if (!resCtx.algHierarchyInfo.infos.empty() && resCtx.algHierarchyInfo.infos[0].size() > 1U) {
+        domainRanks2 = resCtx.algHierarchyInfo.infos[0][1];
+    }
 
     // ③ HcommVerbRes 组装（threads + 逐 peer 通道——l5/MakeHcommVerbRes，
     //    kernel_launch.cc 分叉点同式：同源不重复）
@@ -184,7 +191,7 @@ HcclResult RunUnifiedAicpuOp(const OpParam& param, const AlgResourceCtxSerializa
     //    perSegTrace 即其调用记录的 TraceSink 重放——诊断同源）。
     const UnifiedExecResult r = ConsumeUnifiedPlanAicpu(
         blob, msg, param.userRank, domainRanks,
-        static_cast<u32>(param.opType), res);
+        static_cast<u32>(param.opType), res, domainRanks2);
     if (r.ret != HCCL_SUCCESS) {
         HCCL_ERROR("[UnifiedExec][AICPU] ConsumeUnifiedPlanAicpu failed: %s (segments run %u).",
             r.err.c_str(), r.segmentsRun);

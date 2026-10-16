@@ -290,6 +290,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         // server 已在哨兵帧退出、永不轮询该槽。两种情形均无害——"空转一轮"不存在
         //（早先按轮询交错模型写的描述有误，按幂等模型改写）。v2 判定链下方逐字节保持。
         if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            // R12 · WP-4（2026-10-09）：unified 158 分派的 blob 格式分叉——读 res[1]
+            // 首 4 槽按 magic 判（UPL3 → v4 段帧 CcuPrepareForUnifiedPlan 零变化 /
+            // UPL5 → v5 动词帧 CcuPrepareForUnifiedVerbPlan）。灰度默认关时 host 恒
+            // 产 UPL3，本分叉零命中（行为零变化）；两写入方帧几何同构（剥 7 槽头 →
+            // 32 槽/帧 → flush → 逐帧 commit），差别在覆写（v4 有/v5 无）与帧数上
+            // 限口径（段/帧同名 63）。device 侧无 env 读取面——v5 blob 只在 host 三
+            // 层判据全开后产出，本判据是格式跟随（magic 已分派，无需重复开关）。
+            __gm__ uint64_t* unifiedBlob = reinterpret_cast<__gm__ uint64_t*>(hcclNewContext_->res[1]);
+            const uint64_t unifiedMagic = (unifiedBlob != nullptr) ? ReadHBMData(unifiedBlob) : 0ULL;
+            if (unifiedMagic == KFC_UNIFIED_VERB_BLOB_MAGIC) {
+                ccuUsedXnNum_ = 0;
+                CcuPrepareForUnifiedVerbPlan(&handleParamGM_[handleId]);
+                return;
+            }
             ccuUsedXnNum_ = 0;
             CcuPrepareForUnifiedPlan(&handleParamGM_[handleId]);
             return;
@@ -356,9 +370,21 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             // R7 · WP-1（2026-10-06）：unified Plan(160) 分派放开 RS——与 ALLGATHER 分支
             // 同式（ccuUsedXnNum_=0 跳过 v2 xn 写循环防写坏 resourceId 首槽；blob 落盘 +
             // 哨兵 + 逐帧信号由 CcuPrepareForUnifiedPlan 一次性自管，其帧循环按帧动作 ID
-            // 分叉 AG/RS 两套覆写）。原 R6 前瞻护栏（"v3 scope is AG only"拒收）随 RS
-            // instantiation 落地移除——unified 自有分支的替换。PR rebase 勘误（2026-10-16）：
-            // 分派键 158→160（上游 master 尾部已占 158/159）。
+            // 分叉 AG/RS 两套覆写）。PR rebase 勘误（2026-10-16）：分派键 158→160
+            //（上游 master 尾部已占 158/159）。
+            // R13 · WP-4（2026-10-09）：RS 分支的 blob 格式分叉补齐——与 ALLGATHER
+            // 分支同式（读 res[1] 首 4 槽按 magic 判：UPL3 → v4 段帧
+            // CcuPrepareForUnifiedPlan 零变化 / UPL5 → v5 动词帧
+            // CcuPrepareForUnifiedVerbPlan——NHR 段动词序经此链落盘，M0_R13 §八）。
+            // 原实现只调 v4 写入方：R12 时 RS 尚无 verb 流量；R13 NHR 放开后 RS×CCU
+            // + verbPath 三开关命中会产 UPL5 blob，v4 写入方只认 UPL3 会拒发死等。
+            __gm__ uint64_t* unifiedBlob = reinterpret_cast<__gm__ uint64_t*>(hcclNewContext_->res[1]);
+            const uint64_t unifiedMagic = (unifiedBlob != nullptr) ? ReadHBMData(unifiedBlob) : 0ULL;
+            if (unifiedMagic == KFC_UNIFIED_VERB_BLOB_MAGIC) {
+                ccuUsedXnNum_ = 0;
+                CcuPrepareForUnifiedVerbPlan(&handleParamGM_[handleId]);
+                return;
+            }
             ccuUsedXnNum_ = 0;
             CcuPrepareForUnifiedPlan(&handleParamGM_[handleId]);
             return;

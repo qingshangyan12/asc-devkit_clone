@@ -435,6 +435,424 @@ constexpr size_t ST_R11_TOPO_DEFAULT_SEQ = 128; // 默认构造 topo Serialize �
 constexpr u32 ST_R11_COMM_NAME_LEN = 160;       // COMM_INDENTIFIER_MAX_LENGTH（真实 alg_param.h:69-71）
 constexpr u32 ST_R11_ALG_TAG_LEN = 288;         // ALG_TAG_LENGTH = TAG_LENGTH(160)+OP_ALG_LENGTH(128)
 
+// ---------------------------------------------------------------------------
+// R12 · CCU 动词序执行器 · v5 动词帧独立基线 + checker 扩展（2026-10-08）
+//
+// 背景（用户方向 + 主会话裁决 R12-1，2026-10-08）：退役整体流水 kernel 的 server
+// 直调（DispatchUnifiedPlanV3 直调 CcuKfcAllGatherMesh1DMem2MemKernel /
+// CcuReduceScatterMesh1DMem2MemKernel，ccu_kernel_kfc_server.cc:200-255），改
+// **动词 ID → 原语组合**；灰度并行 = 新 role UNIFIED_VERB + v5 blob（"CcuVerb"
+// 前缀第二档），v3/"CcuAction" 路径零变化（T3 灰度回归断言的既有面）。
+//
+// 本组九件（期望值全部独立手算，不转抄生成方；行号 = 本仓实数）：
+//   ① StPrim 原语调用序基线（T1.1）：AG sole mesh / RS mesh 老 kernel 逐行推导
+//   ② 帧预算容量表（T1.2，裁决 1 动词帧口径）
+//   ③ v5 帧布局锚（T1.3，裁决 2 设计针 + ST 槽位锚）
+//   ④ SimulateKfcServerVerb（T2.1）：v5 动词帧逐轮解包模拟器（镜像 V3 三防御）
+//   ⑤ VerbFrameRecord/VerbSimResult + ExtractVerbParams（T2.2，分发读取序锚）
+//   ⑥ CheckVerbSeqEquivalent（T2.3）：基线 vs verb 帧展开的数据流等价判据
+//   ⑦ StBuildAicpuRsVerbBaseline（裁决 4①：AICPU RS 写侧动词序独立基线）
+//   ⑧ CheckPullPushEdgeEquivalence（裁决 5，#10：pull/push 边级等价证明件）
+//   ⑨ RS 单 chunk 限界镜像（裁决 3：chunkCount>1 拒收的 ST 判据半边）
+// ---------------------------------------------------------------------------
+
+// ---- ③-1 XN 统一表（裁决 2 设计针：v5 SYNC 帧掩码的位定义）----
+// 旧 kernel 常量 → v5 统一表迁移登记（等价判据的**声明性差异**，非不等价——
+// CheckVerbSeqEquivalent 比较 sync 边界位置与搬运集合，不比较两时代 XN 编码）：
+//   AG 老（ccu_kernel_kfc_all_gather_mesh1d_mem2mem.cc:14-17）：output=1→OUT=3
+//     （迁位避让 SCR）、token=2→TOK=2（不动）、post=3→POST=4（迁位）
+//   RS 老（ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc:17-20）：input=0→IN=0、
+//     scratch=1→SCR=1、token=2→TOK=2（RS 三元恒等映射）、post=3→POST=4
+constexpr u32 ST_V5_XN_IN = 0U;
+constexpr u32 ST_V5_XN_SCR = 1U;
+constexpr u32 ST_V5_XN_TOK = 2U;
+constexpr u32 ST_V5_XN_OUT = 3U;
+constexpr u32 ST_V5_XN_POST = 4U;
+// SYNC_PRE 帧携 XN 掩码（裁决 2）：AG=OUT|TOK、RS=IN|SCR|TOK；SYNC_POST=POST 位
+constexpr u32 ST_V5_XN_MASK_AG_PRE = (1U << ST_V5_XN_OUT) | (1U << ST_V5_XN_TOK);      // 0xC
+constexpr u32 ST_V5_XN_MASK_RS_PRE = (1U << ST_V5_XN_IN) | (1U << ST_V5_XN_SCR) |
+                                     (1U << ST_V5_XN_TOK);                              // 0x7
+constexpr u32 ST_V5_XN_MASK_POST = (1U << ST_V5_XN_POST);                               // 0x10
+
+// ---- ③-2 v5 第一级动词 ID 锚（帧槽 0 的 dispatch 键）----
+// 锚定 VerbCall::Verb 枚举序（verb_sink.h:40-52：COPY=0..SYNC_PEER_POST=7）——
+// 两级动词的第一级即帧动词，第二级 = 原语组合（server verb 分发循环展开）。
+constexpr u64 ST_V5_VERB_COPY = 0U;
+constexpr u64 ST_V5_VERB_POST_COPY = 1U;
+constexpr u64 ST_V5_VERB_READ = 2U;
+constexpr u64 ST_V5_VERB_WRITE = 3U;
+constexpr u64 ST_V5_VERB_REDUCE = 4U;
+constexpr u64 ST_V5_VERB_BROADCAST = 5U;
+constexpr u64 ST_V5_VERB_SYNC_PRE = 6U;
+constexpr u64 ST_V5_VERB_SYNC_POST = 7U;
+constexpr u64 ST_V5_VERB_ID_MAX = 7U;
+// 帧几何（沿 v3：server LoadFuncParamFromMemory 一次 32 槽 = CCU_PARAM_NUM_PER_DIE，
+// 环形队列 CCU_TASK_NUM_MAX=64；哨兵 = INVALID_U64 同槽位惯例）
+constexpr u64 ST_V5_SENTINEL = 0xFFFFFFFFFFFFFFFFULL;
+constexpr u32 ST_V5_SLOTS_PER_FRAME = 32U;
+constexpr u32 ST_V5_RING_CAPACITY = 64U;
+constexpr u32 ST_V5_MAX_PLAN_FRAMES = 63U;       // 环容量 - 1 出口哨兵
+
+// ---- ② 帧预算容量表（T1.2，R12-1 裁决 1：动词帧口径，全部手算）----
+//   AG sole mesh 单段    = 3（SYNC_PRE + BROADCAST + SYNC_POST；任意 N——BROADCAST
+//                          是声明式原语，扇出在引擎内部，不随 N 涨帧）
+//   RS mesh 单 chunk ≤8P = N+2（SYNC_PRE + READ×(N-1) + REDUCE + SYNC_POST；8P=10）
+//   RS mesh 单 chunk >8P = N+3（+1 COPY 帧：>8P 本 rank 片先落 scratch 槽，kernel
+//                          :176-179 LocalCopy；9P=12）
+//   AR two_shot（RS→AG） = (N+2 或 N+3) + 3（RS 段 + AG 段；≤8P 即 N+5，8P=13；
+//                          >8P 为 N+6——RS 的 COPY 帧随 RS 段带入；合取屏障规则下
+//                          post[i] AND pre[i+1] 合并的是**等待语义**，帧仍各自存在）
+//   单 Plan 上限         = 63（哨兵 +1 = 64 环几何不变）
+//   边界 N（手算）：RS 单 chunk >8P 形态 N+3 ≤ 63 → N ≤ 60（61 溢出）；AR two_shot
+//   >8P 形态 N+6 ≤ 63 → N ≤ 57（58 溢出）；≤8P 形态恒远低于上限（RS 最大 10、
+//   AR 最大 13）。
+//   A/B tiered（登记行，裁决 1：**非容量断言对象**）——v5 放开 NHR 前不进 verb
+//   灰度，双因：①NHR v3 拒收既有边界（帧无 pattern 载体，R9 M0-④）；②B 步进
+//   超限：16P 4×4（mesh4×nhr4）档 stepNum=6（scale 分支：slowRankSize=4 ≤ ratio
+//   4.286 → maxStep=6，tier_expand.h:162/:172）→ 12 段 × (4+2)帧 = 72 > 63。
+inline u64 StVerbFrameBudgetAg() { return 3ULL; }
+inline u64 StVerbFrameBudgetRs(u32 n) { return static_cast<u64>(n) + 2ULL + (n > 8U ? 1ULL : 0ULL); }
+inline u64 StVerbFrameBudgetArTwoShot(u32 n) { return StVerbFrameBudgetRs(n) + 3ULL; }
+
+// ---- ⑨ RS verb 单 chunk 限界镜像（裁决 3）----
+// chunkSize = scratchSize(64MB)/rankNum/128*128（128B 对齐下取整；设备侧写入方
+// hccl_ccu_v0_prepare.h:546-563 与 loop_splitter.h CalcRsChunks:168-182 同式——
+// 本镜像是 ST 独立第三实现，与生成方数字互为交叉锚）。手算例：
+//   8P：67108864/8=8388608 → /128=65536 → *128=8388608（恰 8MB 整）
+//   9P：67108864/9=7456540 → /128=58254（7456540/128=58254.53 下取整）→ *128=7456512
+// chunkCount>1 的 RS 段 v5 序列化器拒收（T3 负例锚 [A7]）。
+inline u64 StRsChunkSizeMirror(u32 rankNum)
+{
+    constexpr u64 ST_RS_SCRATCH_MIRROR = 64ULL * 1024 * 1024;
+    constexpr u64 ST_RS_ALIGN_MIRROR = 128ULL;
+    if (rankNum == 0U) {
+        return 0ULL;
+    }
+    return ST_RS_SCRATCH_MIRROR / rankNum / ST_RS_ALIGN_MIRROR * ST_RS_ALIGN_MIRROR;
+}
+inline u64 StRsChunkCountMirror(u64 sliceSize, u32 rankNum)
+{
+    const u64 chunkSize = StRsChunkSizeMirror(rankNum);
+    if (sliceSize == 0ULL || chunkSize == 0ULL) {
+        return 0ULL;
+    }
+    return (sliceSize - 1ULL) / chunkSize + 1ULL;
+}
+
+// ---------------------------------------------------------------------------
+// ① 原语调用序基线（T1.1）：老 kernel 逐行推导的结构化期望。
+//
+// 推导源（行号 = 本仓实数，ST 独立推导不转抄生成方）：
+//   AG（ccu_kernel_kfc_all_gather_mesh1d_mem2mem.cc，376 行）：
+//     PreSync :110-125   每通道 2 条 WriteVariableWithNotify（output[XN=1] +
+//                        token[XN=2]，:115-120 循环体两条为一组）→ 2×(N-1) 条；
+//                        再 NotifyWait(mask=OUT|TOK=0x6) ×(N-1)（:121-123）
+//     三阶段 :222-270    repeatNum=1 → CCU_WHILE 单趟：
+//       Phase1 :237-253 → DoAllGatherWrite :164-182：rankIdx 0..N-1 升序，
+//         ==me → EventRecord(events[0], 1<<me)（:174）；否则 Write(ch, dst[rankIdx],
+//         src, sliceSize, events[0], 1<<rankIdx)（:176-178）→ (N-1) Write + 1 ER
+//       Phase2 :256     → DoAllGatherGroupCopy :198-220：CCU_IF(isInputOutputEqual
+//         ==0)（:200）→ GroupCopy(localDst, srcLocCopy, goSize)（:214）
+//       Phase3 :260-266 → DoAllGatherWait :184-196：eventNumPerIter=ceil(N/16)（:168）
+//         → EventWait(mask=(1<<min(N,16))-1)（:190-193）
+//     PostSync :127-137  NotifyRecord(POST=3, bit 0x8) ×(N-1)（:130-132）→
+//                        NotifyWait(mask 0x8) ×(N-1)（:133-135）
+//   RS（ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc，462 行）：
+//     PreSync :134-149   每通道 3 条 WVWN（input[XN=0]/scratch[XN=1]/token[XN=2]，
+//                        :136-143 三条为一组）→ 3×(N-1)；NotifyWait(mask=0x7)（:144-147）
+//     三阶段 :321-368    单 chunk（chunkLoopNum=UINT64_MAX-1 → 1 趟，:377）：
+//       Phase1 :330-334 → DoReduceScatterRead :162-186：rankIdx 升序，==me →
+//         N≤8 EventRecord 占位（:172-174，零搬运）/ N>8 LocalCopy(scratchMem[me],
+//         myInput)（:176-179）；否则 Read(ch, scratchMem[rankIdx], remoteInput
+//         [rankIdx], slice)（:180-183）
+//       Phase2 :354-360 → DoReduceScatterWait :189-201：EventWait(mask=(1<<N)-1，
+//         N≤16 单条 :195-199)
+//       Phase3 :366     → DoReduceScatterReduce :297-318 单趟 → DoReduceScatter
+//         :235-256：N≤8 → GroupLocalReduce（scratch[me] 替换为 input 直读，:246-250）；
+//         N>8 → PairwiseLocalReduce :204-232（remainPieces 链 N→..→1，每轮
+//         LocalReduce(inputVec[0], inputVec[remain-rp], rp*slice) + EventWait(1)
+//         :222-223；末尾 LocalCopy(myOutput, inputVec[0]) + EventWait :228-229）
+//     PostSync :151-160  NotifyRecord(POST=3, 0x8) + NotifyWait(0x8) 各 ×(N-1)
+//
+// 计数手算（8P me=3、repeatNum=1、单 chunk、inOutEqual=0）：
+//   AG = 14 WVWN + 7 NW + 7 WR + 1 ER + 1 GC + 1 EW + 7 NR + 7 NW = 45 条
+//   RS(≤8P) = 21 WVWN + 7 NW + 7 RD + 1 ER + 1 EW + 1 GLR + 7 NR + 7 NW = 52 条
+//   RS(9P)  = 24 WVWN + 8 NW + 8 RD + 1 LC + 1 EW(0x1FF) + [4 LR + 4 EW + 1 LC +
+//             1 EW]（Pairwise 折叠链 9→5→3→2→1）+ 8 NR + 8 NW = 69 条
+// ---------------------------------------------------------------------------
+struct StPrim {
+    enum Op : u32 {
+        OP_WVN = 0,   // WriteVariableWithNotify（PreSync 地址/token 广播）
+        OP_NW,        // NotifyWait
+        OP_NR,        // NotifyRecord
+        OP_WR,        // Write（机间：src 本地 → dst 对端 output）
+        OP_RD,        // Read（机间：src 对端 input → dst 本地 scratch 槽）
+        OP_LC,        // LocalCopy（本地搬运）
+        OP_GC,        // GroupCopy（本地分块搬运——goSize 分块为搬运内细节，总量计 1 条）
+        OP_GLR,       // GroupLocalReduce（≤8P 本地折叠一步）
+        OP_LR,        // LocalReduce（>8P Pairwise 折叠步）
+        OP_ER,        // EventRecord（批内完成跟踪——v5 帧不承载，归一化丢弃）
+        OP_EW         // EventWait（同上）
+    };
+    Op op{OP_WVN};
+    u32 peer{0};           // OP_WR/OP_RD：通道对端 algRank（通道序 = remoteRank 升序跳过 me）
+    u64 dstOff{0};         // WR：对端 output 基+me*S；RD：本地 scratch 基+peer 槽；LC/GC/LR：dst
+    u64 srcOff{0};         // WR/RD/LC/GC：src；LR：折叠源槽
+    u64 size{0};           // WR/RD/LC/LR：字节；GC：总量；GLR：本 rank 片
+    u32 mask{0};           // ER/EW：事件位；NW：掩码；NR：位
+    u32 xn{0};             // WVN：xnId；NW/NR：语义 XN（旧表登记用）
+    bool foldReduce{false}; // >8P Pairwise 的 LR/尾 LC：归一化折叠进单条 REDUCE 事件
+};
+
+// 基线地址几何（符号 owner + 绝对 offset：所有 rank 的 input/output/scratch 共用
+// 同名基址锚，rank 维度由 owner 区分——multiset 比较与边归一化的统一口径）。
+// R12-7 stride 修正：inStride/outStride 是 kernel 槽 9/3 的**exec 真值**口径——
+//   AG sole 布局：inStride=0（input 只含我的片，slot9=0 无需覆写）、outStride=
+//   outputSliceStride（slot3=stride*me）
+//   RS：inStride **exec 真值 = sliceSize**（v3 链由 exec 期 slot4 覆写注入
+//   me*slice——StInstantiateRsFrame r[4] 同式；资源期布局 inStride=0 是占位，
+//   v5 零覆写下面 RS READ 帧携带 0 是 F3 缺陷——基线取 exec 真值才能检出）
+//   缺省 0（caller 显式给值；J 组自检按各自手算口径设置）
+struct StMeshGeom {
+    u32 n{8};
+    u32 me{0};
+    u64 slice{0};            // 正常片字节
+    u64 tail{0};             // 尾片（0=均匀；AG 末 rank 生效，kernel :305 同式）
+    u64 inBase{0};
+    u64 outBase{0};
+    u64 scratchBase{0};
+    u64 inOutEqual{0};       // AG：isInputOutputEqual（0 → GroupCopy 在场）
+    u64 inStride{0};         // input 片步长（kernel 槽 9 语义 = inStride*me）
+    u64 outStride{0};        // output 片步长（kernel 槽 3 语义 = outStride*me）
+};
+
+// AG sole mesh 单段原语序（上述推导的实现；repeatNum 恒 1——v3 槽 10 单 die 语义）
+std::vector<StPrim> StBuildAgM2mPrimBaseline(const StMeshGeom& g);
+// RS mesh 单 chunk 原语序（≤8P 零搬运占位 / >8P LocalCopy+Pairwise 两形态）
+std::vector<StPrim> StBuildRsM2mPrimBaseline(const StMeshGeom& g);
+
+// ---- 归一化比较粒度 ----
+// 本地地址 owner 哨兵（owner 仅对 remote 有意义；边归一化时以 me 代入本地侧）
+constexpr u32 ST_MOVE_SELF = 0xFFFFFFFFU;
+struct StMoveEdge {                 // 归一化搬运（符号地址：remote 标志 + owner + 绝对 offset）
+    bool srcRemote{false};
+    u32 srcOwner{ST_MOVE_SELF};
+    u64 srcOff{0};
+    bool dstRemote{false};
+    u32 dstOwner{ST_MOVE_SELF};
+    u64 dstOff{0};
+    u64 size{0};
+    u32 chanIdx{0};                 // R12-4：通道位降诊断字段（基线侧真值；帧侧隐式
+                                    // 映射模型下 = 第 k 条数据帧的 k——比较不进键）
+};
+struct StNormEvent {                // 归一化事件：MOVE / REDUCE / SYNC 边界
+    enum Kind : u32 { MOVE = 0, REDUCE = 1, SYNC_PRE = 2, SYNC_POST = 3 };
+    Kind kind{MOVE};
+    StMoveEdge mv;                  // MOVE/REDUCE（REDUCE：src=scratch 基、dst=output、size=片）
+    u32 xnMask{0};                  // SYNC（两时代 XN 编码不同——声明性差异，不参与比较）
+};
+
+// 基线原语序 → 归一化事件流：前导 WVN/NW 连续块折叠单条 SYNC_PRE；尾随 NR/NW
+// 连续块折叠单条 SYNC_POST；ER/EW 丢弃（批内完成跟踪，v5 帧不承载）；GC 折叠单条
+// MOVE；GLR 单条 REDUCE；foldReduce 连续段（Pairwise LR*/EW*/LC/EW）折叠单条 REDUCE
+//（src=首条 LR 的累积基 inputVec[0]、dst/size=末条 LC 落定值）。
+// R12-4：OP_WR/OP_RD 的 owner 一律存对端 **algRank**（通道位 chanIdx 降诊断字段）；
+// 归一化需要 me 做通道位→rank 映射——StSetBaselineMe 由 caller（等价判据入口）
+// 预置，StBaselineMe 为缺省 me=0 的读出（单进程单基线，测试面安全；头文件无
+// 状态全局的替代是给 StNormalizeBaseline 加 me 形参——会改既有调用面，从简）。
+void StSetBaselineMe(u32 me);
+u32 StBaselineMe();
+std::vector<StNormEvent> StNormalizeBaseline(const std::vector<StPrim>& prims);
+
+// ---------------------------------------------------------------------------
+// ③-3 v5 帧布局锚（T1.3）+ ④⑤ 模拟器与参数抽取（T2.1/T2.2）
+//
+// 槽位锚（生成方 M0 落盘后重锚，见文末清单 [A2]/[A3]）：
+//   槽 0 = verb ID（第一级动词）
+//   数据帧 READ/WRITE/COPY/POST_COPY：槽1=src、槽2=dst、槽3=size、槽4..31=0
+//     ——**无 channelIdx/peer 槽**（裁决 2：段内数据帧按通道序隐式映射，第 k 条
+//     数据帧 ↔ channels[k]，channels 按 remoteRank 升序）
+//   BROADCAST：槽1=src、槽2=localDstOff、槽3=size、槽4=remoteDstOff（扇出目的槽）
+//   REDUCE：槽1=scratch 基、槽2=output、槽3=本 rank 片
+//   SYNC_PEER_PRE/SYNC_PEER_POST：槽1=XN 掩码（AG 0xC / RS 0x7 / POST 0x10）
+//   头部锚 [A4]：7 槽 {magic "UPL5"=0x55504C35, version 5, frameCount, reserved,
+//     dataType, outputType, reduceType}（镜像 v4 头布局）
+// ---------------------------------------------------------------------------
+struct StVerbFrameLayout {
+    u32 slotSrc{1};       // 数据帧 src
+    u32 slotDst{2};       // 数据帧 dst
+    u32 slotSize{3};      // 数据帧 size
+    u32 slotAux{4};       // BROADCAST：remoteDstOff（其余数据动词未用=0）
+    u32 slotXnMask{1};    // SYNC 帧掩码
+};
+
+struct VerbFrameRecord {            // 模拟器逐帧解包产物（server verb 循环视角）
+    u64 verbId{0};                  // 槽 0（INVALID_U64 以外的合法动词 ID）
+    std::vector<u64> slots;         // 本帧 32 槽原始值（含槽 0；未写槽为 0）
+    u64 frameIndex{0};              // 第几帧（0 起，环回前语义）
+};
+
+struct VerbSimResult {
+    std::vector<VerbFrameRecord> frames;   // 逐帧解包产物（哨兵帧不进列表）
+    u64 rawFrameCount{0};                  // 含哨兵帧的总帧数（环回前）
+    bool wrapped{false};                   // 是否发生 64 帧环形回绕
+    std::string err;                       // 非空 = 拒发（server 视角的错误）
+};
+
+// v5 动词帧逐轮解包模拟器（镜像 SimulateKfcServerV3 的三防御 + verb ID 白名单）：
+//   防御① 半帧（载荷非 32 倍数）——序列化器写错/截断，server 读半帧拿残影槽值
+//   防御② 环形容量 64 帧（CCU_TASK_NUM_MAX）——超容量帧永远等不到信号
+//   防御③ 整圈无出口哨兵——server 回绕重放 0 号帧死循环（满 64 帧全动作帧）
+//   白名单：槽 0 verb ID 不在 caller 给的合法集合 → 拒发点名（server 微码对未知
+//   ID 只打日志继续——v2/v3 同惯例；ST 加严显式化，v3 模拟器同口径）
+// serialized = 帧记录区（caller 剥头部；哨兵帧若随载荷传入则按出口语义消费）。
+VerbSimResult SimulateKfcServerVerb(const std::vector<u64>& serialized,
+                                    const std::vector<u64>& legalVerbIds);
+
+// 逐动词参数抽取（T2.2——server verb 分发循环读取序的 host 镜像，锚 [A6]：
+// 生成方落盘后按真分发循环逐槽重锚）。frame 须含 32 槽。
+struct StVerbParams {
+    u64 verbId{0};
+    u64 src{0};
+    u64 dst{0};
+    u64 size{0};
+    u64 aux{0};            // BROADCAST：remoteDstOff
+    u64 xnMask{0};         // SYNC 帧
+};
+StVerbParams ExtractVerbParams(const std::vector<u64>& frame, const StVerbFrameLayout& lo);
+
+// v5 帧 → 归一化事件流（等价判据的 verb 半边）：
+//   SYNC 帧 → SYNC_PRE/SYNC_POST 事件（SYNC_PRE 同时重置段内数据帧计数）
+//   READ/WRITE → MOVE（peer = 段内第 k 条数据帧 ↔ 升序通道表第 k 项；
+//     k ≥ N-1 → err"数据帧超通道数"——帧无 channelIdx 槽的越界防御形态）
+//   COPY/POST_COPY → MOVE（本地）
+//   BROADCAST → 展开 MOVE×N：本地 1（src→localDst）+ 机间写 (N-1)（src→各通道
+//     remoteDstOff；kCcuVerbMap BROADCAST 行 = GroupBroadcast 的扇出语义）
+//   REDUCE → REDUCE 事件（scratch 基 → output，原子级——Pairwise/GroupLocalReduce
+//     两形态同为 REDUCE 动词的原语组合，等价判据不分解其内部）
+std::vector<StNormEvent> StExpandVerbFrames(const std::vector<VerbFrameRecord>& frames,
+                                            const StVerbFrameLayout& lo, u32 n, u32 me,
+                                            std::string& err);
+
+// ---------------------------------------------------------------------------
+// ⑥ CheckVerbSeqEquivalent（T2.3）：老路径原语序基线 vs 新 verb 帧展开序。
+// 数据流等价判据（三段）：
+//   ① 同步边界结构：两侧归一化事件的 kind 序列（SYNC_PRE/MOVE/REDUCE/SYNC_POST
+//      交错序）逐位相等——pre 在首个数据事件前、post 在末个数据事件后、段间
+//      post→pre 相邻对（合取屏障：post[i] AND pre[i+1] 合并等待，帧各自存在）
+//   ② 搬运集合：同步窗（相邻 SYNC 标记之间）内 MOVE 的 {src,dst,size} multiset
+//      相等（allowBatchReorder=true：AG 批量 Write / RS 批量 Read 批次内乱序容许
+//      ——显式声明的容许差异；false：逐条严格相等）
+//   ③ REDUCE：窗内逐条（src/dst/size）相等且相对序一致
+// XN 编码两时代不同（旧 AG OUT=1/POST=3 → v5 OUT=3/POST=4）——声明性差异，
+//   不参与比较（v5 帧掩码正确性由 T3 对真帧直接断言）。
+// 返回 0=等价；非 0 时 err 给出第一条不等价规则。
+// ---------------------------------------------------------------------------
+struct StEquivOptions {
+    bool allowBatchReorder{true};   // 同步窗内搬运乱序容许（AG/RS 批量语义）
+};
+int CheckVerbSeqEquivalent(const std::vector<StPrim>& baseline,
+                           const std::vector<VerbFrameRecord>& frames,
+                           const StVerbFrameLayout& lo, u32 n, u32 me,
+                           const StEquivOptions& opt, std::string& err);
+
+// ---------------------------------------------------------------------------
+// ⑦ AICPU RS 段动词序独立基线（裁决 4①；推导源 ins_temp_reduce_scatter_mesh_1D.cc
+// 307 行，AICPU 是**写侧**语义——与 CCU 读侧不同）：
+//   KernelRun :63-102：(threadNum>1) PreSyncInterThreads :80-84 → SYNC_PEER_PRE
+//   RunReduceScatter :174-249：rankIdx=1..N-1（:181），nextRank=(me+rankIdx)%N
+//     （:182 —— **环序**，非升序！与 v5 通道序的声明差）；每通道（channelsPerRank
+//     =1）SendRecvBatchWrite（:243）→ WRITE 动词：
+//       src = input 基 + nextRank*inputSliceStride（:224-228，我的 input 里属于
+//             nextRank 输出份的那片）
+//       dst = 对端 hcclBuff + me*outputSliceStride（:229-233，对端 scratch 我的槽）
+//       size = sliceSize（nextRank 是末 rank 且 tail>0 时取 tail，:186-190）
+//   PostSyncInterThreads :86-90 → SYNC_PEER_POST
+//   PostCopy :104-172：in/out buff 型或基址不同（:132-133）→ LocalCopy（:134-144）
+//     → COPY 动词（我的片 input→output 落位）；再 tmpRank≠me 逐个 LocalReduce
+//     （:155-169，hcclBuff 对端槽 → output 我的槽）→ REDUCE×(N-1)
+//   ★结构差登记（与 CCU 读侧）：AICPU 的 COPY+REDUCE×(N-1) 在 SYNC_POST **之后**
+//   （PostCopy 在 KernelRun 返回后执行）；CCU 的 REDUCE 在 SYNC_POST 之前（Phase3）。
+//   边集合两侧同构（每 rank 的入边 {(p,me)}），跨引擎等价走 ⑧ 的边级判据。
+// ---------------------------------------------------------------------------
+struct StVerbCall {                  // 动词序基线的元素（词法面对齐 VerbCall 值对象）
+    u64 verbId{0};                   // ST_V5_VERB_*
+    u64 srcOff{0};
+    u64 dstOff{0};
+    u64 size{0};
+    u32 peer{0};                     // R12-4：WRITE/READ 对端 algRank——AICPU 侧 =
+                                    // VerbCall 显式 peer 值（写侧配对负例的可表达性
+                                    // 前提：两条 WRITE 换 peer 不换几何，纯几何键
+                                    // 盲区）；CCU 侧 = 隐式模型"第 k 数据帧↔升序
+                                    // 第 k peer"（帧无 channelIdx 槽，裁决 2）
+};
+// R12-7 stride 口径：WRITE src = inBase + inStride*nextRank。inStride 取值随
+// 断言场景：Compile 期布局值 0（BuildRequest :113——当前实物形态）/ exec 真值
+// sliceSize（v3 slot4 覆写语义——老 kernel :270-272 形态）。缺省 0 对齐当前实物。
+std::vector<StVerbCall> StBuildAicpuRsVerbBaseline(u32 n, u32 me, u64 slice, u64 tail,
+                                                   u64 inBase, u64 outBase, u64 scratchBase,
+                                                   bool buffsDiffer, u64 inStride = 0);
+// 实际动词序 vs 基线：动词 kind 序列严格相等；WRITE 段与 REDUCE 段内部容许排列
+// （AICPU 环序 vs Emit peers 序的声明差），段间位置（PRE/POST/COPY）严格。
+int CheckAicpuRsVerbSeq(const std::vector<StVerbCall>& actual, u32 n, u32 me, u64 slice,
+                        u64 tail, u64 inBase, u64 outBase, u64 scratchBase, bool buffsDiffer,
+                        std::string& err, u64 inStride = 0);
+
+// ---------------------------------------------------------------------------
+// ⑧ CheckPullPushEdgeEquivalence（裁决 5，#10：AICPU BROADCAST N/A 等价展开证明）。
+// 命题：读侧聚合（AICPU copy+read×(N-1)，动词表 BROADCAST 行的等价展开）与写侧
+// 扇出（CCU BROADCAST = local+write×(N-1)）搬运集合边级等价——
+//   pull 侧每 rank 入边集 == push 侧每 rank 出边集的**转置**。
+// 边归一化：producer = src.remote ? src.owner : me；consumer = dst.remote ?
+//   dst.owner : me（4P AG 手算：me=1 时 pull 边 {(1,1),(0,1),(2,1),(3,1)}；
+//   push 边 {(1,1),(1,0),(1,2),(1,3)}，转置后逐值相等——16 边全集两引擎同构）。
+// 同一 helper 反向用即 RS 跨引擎（AICPU 写侧出边 vs CCU 读侧入边）。
+// ---------------------------------------------------------------------------
+int CheckPullPushEdgeEquivalence(const std::vector<StMoveEdge>& pullSide,
+                                 const std::vector<StMoveEdge>& pushSide,
+                                 u32 me, std::string& err);
+
+// ---------------------------------------------------------------------------
+// R12 重锚任务清单（T4；生成方 M0/落盘后逐项对数，零偏移闭环——R11 惯例）：
+//   [A1] v5 第一级动词 ID 取值（ST_V5_VERB_* 锚 = VerbCall::Verb 枚举序 0..7；
+//        生成方若另立 ID 表 → 重锚常量 + 测试白名单）
+//   [A2] 数据帧槽位 slotSrc/Dst/Size/Aux = 1/2/3/4（未用槽 5..31 = 0）
+//   [A3] SYNC 帧掩码槽位 slotXnMask = 1；BROADCAST aux 槽语义（remoteDstOff）
+//   [A4] v5 blob 头部（锚 7 槽 UPL5/version 5/frameCount/reserved/dt/odt/rt，
+//        镜像 v4 头布局；含 magic 字面量 0x55504C35）
+//   [A5] role 枚举值（UNIFIED_VERB 锚 = 10，纯追加于 UNIFIED_PLAN=9 后）与
+//        kernelFuncName 前缀（"CcuVerb"，len 7——KFC_UNIFIED_VERB_PREFIX 锚）
+//   [A6] server verb 分发循环读取序（ExtractVerbParams 逐动词读取序镜像）
+//   [A7] RS 单 chunk 拒收判据（chunkCount>1 → 序列化器 err——T3 负例锚）
+//   [A8] WP-9 四件：AicpuReduceSlice Emit 动词序/地址口径（⑦ 基线对数）、
+//        HcommVerbSink WRITE/REDUCE 接线入口序（WRITE → SendRecvWrite 五步
+//        wrapper :275-294 record ACK/wait ACK/HcommWriteOnThread/record DS/wait DS；
+//        REDUCE → LocalReduce wrapper :737——64bit/PROD 走 AicpuReduce）、RS 路由
+//        AICPU 半边激活（route 表 RS 行全引擎 + :64-68 半激活注撤除）、
+//        aicpu_consumer RS 段分派（:319/:343 CollectAll 硬编码改帧 kind 分派）
+//   [A9] AR two_shot 混排序列化格式（两段 XN 掩码逐段不同 0x7→0xC——T3 格式级，
+//        路由激活不在 R12，不断言运行时行为）
+// 设计针（裁决 2 已定，非重锚项）：XN 统一表 {IN=0,SCR=1,TOK=2,OUT=3,POST=4}；
+//   SYNC_PRE 帧携 XN 掩码；数据帧通道序隐式映射（无 channelIdx 槽）；合取屏障
+//   （post[i] AND pre[i+1] 合并——帧各自存在，等待语义合一）。
+//
+// R12-4 口径登记（审查裁定 2026-10-08，合并键方案——等价判据 ⑥/⑦/⑧ 的键结构
+// 与两条能力边界，回炉负例见 J 节 R12-4 组）：
+//   ① CCU 通道置换免疫的**前提不变量**（multiset 容差语义正确的依据）：
+//     (a) 帧不携对端裸地址——READ/WRITE 帧的 dst/src 都是"本 rank 视角的结构
+//         offset + XN 基址"，同一 offset 在任何对端解析出等价槽位（peer 无关）；
+//     (b) 规约交换律——REDUCE 的折叠次序不影响结果（SUM/MAX 等交换半格）；
+//     (c) 双射前提——段内数据帧数 == 通道数，隐式映射 k↔升序第 k peer 是双射。
+//     未来任一前提失效（动词携带 peer 相关远端 offset、非交换规约、帧数≠通道数），
+//     免疫静默失效——届时合并键（owner 已在键内）从"配对敏感增强"升为**必选**，
+//     本登记即升级触发器的判据清单。
+//   ② host checker 能力极限：本 checker 只能验证"帧内容 ↔ checker 的 server 序
+//     模型（升序通道表）"一致性；"server 的通道表真为升序"不在测试可达面——
+//     由生成方 M0 的单源构造保证（通道表与隐式映射同源派生，主会话已下发要求）。
+//     若通道表非升序，本 checker 全绿但真机错跑——该风险归生成方构造面，
+//     ST 侧以本登记声明边界（不伪造覆盖）。
+// ---------------------------------------------------------------------------
+
 } // namespace mc2_ops_hccl::refactor::st
 
 #endif

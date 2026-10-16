@@ -54,7 +54,18 @@ public:
         req.loop = 1;
         req.ccuBuf = 1;
         req.variable = a.domain.Size() * 2 + 2;  // output/token 每 peer 一对 + offset/goSize
-        req.event = 2;                           // Pre/PostSync 各一
+        // R16 · #6 公式补全（M0_R16 手算锚）：event 按 AG kernel 实际 resize 全量申报——
+        // events = AG_M2M_UNROLL_NUM(1) × ceil(rankSize/16)（ag_m2m kernel InitResource
+        // :76-77：eventNumPerIter=ceil(N/AG_M2M_BITS_PER_EVENT=16)）。原 req.event=2
+        //（"Pre/PostSync 各一"）是误注——Pre/PostSync 走通道级 Notify，不占 events
+        //（与 RS 侧 R16 补全同口径；注册对拍见 op_common.cc 注册链 WARN 钩子）。
+        req.event = 1U * ((a.domain.Size() + 15U) / 16U);   // AG_M2M_UNROLL_NUM * ceil(N/16)
+        // R12-1 裁决⑤（req.instruction 按 verb 分发循环重推导，审查方点名）：
+        // v3 路径 instruction=1（整体 kernel 一条指令序）；v5 verb 路径按帧数计——
+        // AG 段 3 帧（SYNC_PRE 掩码 2 XN×N-1 通道 WVN 指令 + BROADCAST 组原语 + SYNC_POST），
+        // 以"每帧一条分发指令 + 掩码展开"口径 instruction = 2*(N-1)+1+2*(N-1) ≈ 每帧级。
+        // 真实值须由驱动解析 verb 分发微码反查（HcommCcuKernelQueryResReq 同链）——
+        // 本表行是申报公式占位，v5 灰度开前（P2 真机联调）复核重推，注释登记防静默沿用。
         req.instruction = 1;
         claim.ccu[/*dieId*/ 0][/*resGroup*/ 0] += req;
     }
@@ -72,8 +83,15 @@ public:
         //    现状 DoAllGather：填 dst[] 数组 + GroupBroadcast(channels_, dst, src, groupOpSize_)
         //    重构后 dst[] 的地址全部来自 args.peers（BuildArgs 已按 layout 算好）。
         //    本 rank 落位并入 broadcast（dst 含本 rank 地址）——无 PostLocalCopy 步（B4 仅 AICPU）
-        Fire(ctx, VerbCall{VerbCall::BROADCAST, args.outputAddrOff,
-                           /*peers*/ args.peers.size(), args.mySliceSize});
+        //    ★P0-2（R12-9 裁决，2026-10-09 修复轮）：dst 位改传真实落位偏移
+        //    OutOffset(me)（BuildArgs 已算好 = args.outputAddrOff）——对照 v3 段帧槽 3
+        //    语义（outputSliceStride×me，纯 rank 偏移不含 outBaseOff）。初版此处误占
+        //    peers.size()（fan-out 计数）——序列化器忠实透传进帧槽 2，server
+        //    VerbBroadcast 把 param[ARG1] 当 localDst.addr 用，微码会把本 rank 落位
+        //    写到地址 N-1 上（审查方缺陷①）。
+        Fire(ctx, VerbCall{VerbCall::BROADCAST, args.inputAddrOff,
+                           /*localDstOff*/ args.outputAddrOff,
+                           args.mySliceSize});
 
         // ③ 段后握手（现状 PostSync）
         if (a.sync.postBarrier) {

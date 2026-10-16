@@ -802,6 +802,261 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 //   ★RS goSize 上界不查 2GiB：RS goSize 按 chunkSize（≤64MB/8=8MB）计算而非
 //   sliceSize 全量（v2 无此检查同因——chunk 恒小）；2GiB 防线对 AG 保留。
 // ============================================================================
+// R12 · WP-4（2026-10-09）：v5 动词帧 blob 的 device 写入方——CcuPrepareForUnifiedVerbPlan。
+// 复用 CcuPrepareForUnifiedPlan 的帧落盘几何（剥 7 槽头 → 逐帧 32 槽拷 → flush 64B 行 ×4
+// → 逐帧 commitCKE + 哨兵帧），差别三件：
+//   ① 头部判据：UPL5/版本 5/frameCount（≤63）；帧数上限 = KFC_UNIFIED_VERB_MAX_FRAMES
+//     （帧 ≠ 段——一段产多帧，环 64 容量口径一致）；
+//   ② ★exec 现值覆写（R12-9 裁决，2026-10-09 修复轮——推翻初版"逐槽零覆写"表述：
+//     资源期 Compile 产出里 count=0 是既有事实（PrepareParamForAllGather 显式置 0，
+//     本文件 :617 原注——初版误以为帧载荷全是资源期可信结构量，审查方阶段二以
+//     "count 真值在设备链上无注入点"证伪：server 微码常驻循环只读 xn 帧，param 槽值
+//     之外无任何 exec 现值入口）。资源期退化 blob 下全部布局量（sliceSize/stride/
+//     rank 偏移）皆 0，写入方按 v4 同源公式逐槽注入 exec 真值。槽位语义 = M0 §一
+//     帧格式契约的**纯相对偏移**，基址三层注入：
+//       (一) SYNC_PRE 基址槽（2..4）：写入方注绝对值（sendBuf/recvBuf+repeatOffset
+//            合成式 + scratchAddr 直替——v4 槽 1/2/3 同式）——它是 XN 广播的本端半边
+//            （对端 GetResByChannel 取值）+ server 本端缓存（ve.localIn/Scr/Out）；
+//       (二) 对端基址：SYNC_PRE 的 XN 变量交换（server VerbSyncPre 的 WVN/NW——写入
+//            方不知道对端地址，本来就不进帧）；
+//       (三) 本端 token：ctx.token（server 侧自持，同 v2/v3/v4 恒取）。
+//     数据帧逐动词覆写名单（帧槽 0 分叉；派生偏移 = 纯覆写（v4 槽 3/4 同式），基址
+//     不进数据帧——server 以 (一) 的缓存 + (二) 的 XN 值合成）：
+//       READ：槽 1 = rankSliceOffset（rankId×(strideCount==0?sliceSize:strideCount×dts)
+//             三分支，v4 :891-892 / v2 :437-439 逐式平移——对端 IN 里"我的片"偏移，
+//             审查方缺陷②的注入点）；槽 2 = peerAlgRank×sliceSize（本端 SCR 的 peer
+//             槽——写入方按段内数据帧计数推导 peerAlgRank：升序跳过 me，与序列化器
+//             /server 游标/ST 模型四方同一口径）；槽 3 = sliceSize；
+//       WRITE：槽 1 = peerAlgRank×strideSize（本端 IN 里 peer 的份）、槽 2 =
+//             rankId×strideSize（对端 SCR 我的槽）、槽 3 = sliceSize（CCU v5 不产
+//             WRITE 帧——AICPU 写侧走 v4 消费方；分支按协议完备性保留）；
+//       COPY：槽 1 = rankSliceOffset（本端 IN 我的片）、槽 2 = rankId×sliceSize
+//             （本端 SCR 我的槽，老 kernel :176-179 上料几何）、槽 3 = sliceSize；
+//       BROADCAST：槽 2/4 = rankId×strideSize（本端 OUT 落位 / 对端 OUT 我的片——
+//             纯 rank 偏移，P0-2 口径同 v4 槽 3）、槽 3 = sliceSize、goSize 槽 5..8
+//             按覆写后 sliceSize 设备侧 CalcGoSize 重算（AG config {8,32768×8}）；
+//             槽 1（src 结构量）恒 InOffset(me)=0（AG inStride=0），不覆写；
+//       REDUCE：槽 3 = sliceSize + goSize 重算（RS config {16,4096} 不 ×8——kernel
+//             步进错位硬约束）；槽 1/2 结构量恒 0（RS 布局基址不设），不覆写——
+//             server 以 ve.localScr/localOut 合成即基址本身；
+//       SYNC_PRE：见 (一)；TOK 恒 ctx.token 不占槽；段内数据帧计数复位；
+//       SYNC_POST：槽 1 掩码（0x10）已是终值，透传。
+//     2GiB 防线保留（sliceSize > 262144×8192 拒收——比 v2 严的语义不丢，v4 同式；
+//     RS 侧单 chunk 已由 host 序列化器拒收 chunkCount>1，此处 AG 单防线）。
+//   ③ 帧循环逐槽全写（#17 后 32 槽登记的 verb 侧半边）：v5 维持 32 槽帧宽（==
+//     server Load 宽度），未用槽清 0 由序列化器保证（host SerializeVerbPlan 逐帧
+//     memset 语义），写入方拷贝 32/32 不缺槽。
+// 未知 verb ID 不在写入方防御（server 侧日志继续 + host Validate 前置拦截——两道
+// 防线分工与 v3 相同；写入方只管格式完整性）。
+// ============================================================================
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForUnifiedVerbPlan(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    if (!newCcuFlag_ || hcclNewContext_ == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan requires new ccu context (OpResCtx).");
+        return;
+    }
+    __gm__ uint64_t* blob = reinterpret_cast<__gm__ uint64_t*>(hcclNewContext_->res[1]);
+    if (blob == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan res[1] (verb blob addr) is null.");
+        return;
+    }
+    const uint64_t magic = ReadHBMData(blob);
+    if (magic != KFC_UNIFIED_VERB_BLOB_MAGIC) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan bad magic[0x%llx] != UPL5.",
+            (unsigned long long)magic);
+        return;
+    }
+    const uint64_t version = ReadHBMData(blob + 1);
+    if (version != KFC_UNIFIED_VERB_BLOB_VERSION) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan bad version[%llu] != 5.",
+            (unsigned long long)version);
+        return;
+    }
+    const uint64_t frameCount = ReadHBMData(blob + 2);
+    if (frameCount == 0U || frameCount > KFC_UNIFIED_VERB_MAX_FRAMES) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan invalid frameCount[%llu] (need 1..63).",
+            (unsigned long long)frameCount);
+        return;
+    }
+
+    // ── exec 现值派生量（②注：全部帧共用，v4 :826-840 同式）──
+    const uint64_t dts = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceSize = commParam->count * dts;   // RS：count 即每 rank 输出份元素数（selector 口径）
+    constexpr uint64_t kGoSizeLoopLimit = 262144ULL * 8192ULL;   // 2GiB（v4 同防线，勿在 v2 对齐时移除）
+    if (sliceSize > kGoSizeLoopLimit) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan sliceSize[%llu] > 2GiB goSize loop "
+            "limit[%llu] (v2 single-frame capacity; rejecting — stricter than v2, do not remove).",
+            (unsigned long long)sliceSize, (unsigned long long)kGoSizeLoopLimit);
+        return;
+    }
+    const uint64_t repeatOffset = commParam->count * ccuParam_.repeatIndex * dts;      // v4 :838 同式
+    const uint64_t strideSize =
+        (commParam->strideCount == 0U) ? sliceSize : (commParam->strideCount * dts);   // v4 :839-840 同式
+    const uint64_t rankSliceOffset = ccuParam_.rankId * strideSize;                    // v4 :891-892 / v2 :437-439 同式
+
+    GM_ADDR queueBase = reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr);
+    __gm__ uint64_t* segBase = blob + KFC_UNIFIED_VERB_BLOB_HEADER_SLOTS;
+    const uint64_t totalFrames = frameCount + 1U;   // 动词帧 + 哨兵帧
+    // 段内数据帧计数（SYNC_PRE 复位）：READ/WRITE 的 peer 槽推导——第 k 条数据帧的
+    // peerAlgRank = 升序跳过 me（与序列化器 peers 序/server 游标/ST 模型四方同源，
+    // R12-9 P1-2 升序裁决）。COPY 不占通道（server 游标不动），计数不进。
+    uint32_t dataFrameIdx = 0;
+
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForUnifiedVerbPlan blob[0x%llx] frames[%llu] queueBase[0x%llx] "
+        "exec: count[%llu] dts[%llu] slice[%llu] rank[%u/%u] stride[%llu] rankSliceOff[%llu] repeatIdx[%u]",
+        (unsigned long long)(uint64_t)(blob), (unsigned long long)frameCount,
+        (unsigned long long)(uint64_t)queueBase,
+        (unsigned long long)commParam->count, (unsigned long long)dts,
+        (unsigned long long)sliceSize, ccuParam_.rankId, ccuParam_.rankNum,
+        (unsigned long long)strideSize, (unsigned long long)rankSliceOffset, ccuParam_.repeatIndex);
+
+    for (uint64_t frame = 0; frame < totalFrames; ++frame) {
+        GM_ADDR frameAddr = queueBase + frame * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+        __gm__ uint64_t* dst = reinterpret_cast<__gm__ uint64_t*>(frameAddr);
+        if (frame < frameCount) {
+            // 动词帧：逐槽拷 32（序列化器保证未用槽清 0），拷贝后、flush/信号前做
+            // ②注的 exec 现值覆写（派生偏移纯覆写 + SYNC_PRE 基址合成式）
+            __gm__ uint64_t* src = segBase + frame * KFC_VERB_SLOTS_PER_FRAME;
+            for (uint32_t i = 0; i < KFC_VERB_SLOTS_PER_FRAME; ++i) {
+                dst[i] = ReadHBMData(src + i);
+            }
+            const uint64_t verbId = dst[KFC_UNIFIED_VERB_ID];
+            if (verbId == KFC_UNIFIED_VERB_SYNC_PRE) {
+                // 基址槽注入（②注 (一)）：三槽无条件注入（掩码只管 XN 广播位——
+                // AG 段 IN/SCR 槽供 server 本端缓存（BROADCAST src 合成用），RS 段
+                // OUT 槽同理（REDUCE dst 合成用）；未广播位对端不取值，多填无害）。
+                //   槽 2 = IN 基址（sendBuf 合成式——two_shot 二段 AG 的 input 在
+                //   scratch 的形态不在 R12 verb 域（[A9] 混排），届时此处需按段判
+                //   scratchAddr，登记 P2）；
+                //   槽 3 = SCR 基址（scratchAddr 直替——v4 RS 槽 3 同式）；
+                //   槽 4 = OUT 基址（recvBuf 合成式）。
+                dst[KFC_VERB_SLOT_ARG1] =
+                    (uint64_t)commParam->sendBuf + repeatOffset + dst[KFC_VERB_SLOT_ARG1];
+                dst[KFC_VERB_SLOT_ARG2] = ccuParam_.scratchAddr;
+                dst[KFC_VERB_SLOT_ARG3] =
+                    (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_VERB_SLOT_ARG3];
+                dataFrameIdx = 0;
+                KERNEL_LOG(
+                    KERNEL_INFO, "ApiClient CcuPrepareForUnifiedVerbPlan frame[%llu] SYNC_PRE bases: "
+                    "in[0x%llx] scr[0x%llx] out[0x%llx].",
+                    (unsigned long long)frame, (unsigned long long)dst[KFC_VERB_SLOT_ARG1],
+                    (unsigned long long)dst[KFC_VERB_SLOT_ARG2], (unsigned long long)dst[KFC_VERB_SLOT_ARG3]);
+            } else if (verbId == KFC_UNIFIED_VERB_READ || verbId == KFC_UNIFIED_VERB_WRITE) {
+                // 数据帧：peer 槽按段内序推导（升序跳过 me），偏移纯覆写 + size 现值
+                const uint32_t peerAlgRank =
+                    (dataFrameIdx < ccuParam_.rankId) ? dataFrameIdx : (dataFrameIdx + 1U);
+                if (verbId == KFC_UNIFIED_VERB_READ) {
+                    // RS 读侧：src = 对端 IN 里"我的片"（rankSliceOffset）、dst = 本端
+                    // SCR 的 peer 槽（peerAlgRank×sliceSize，老 kernel scratchOffset
+                    // += normalSliceSize 推进同式）
+                    dst[KFC_VERB_SLOT_ARG0] = rankSliceOffset;
+                    dst[KFC_VERB_SLOT_ARG1] = static_cast<uint64_t>(peerAlgRank) * sliceSize;
+                } else {
+                    // 写侧（协议完备分支——CCU v5 不产 WRITE 帧）：src = 本端 IN 里
+                    // peer 的份、dst = 对端 SCR 我的槽
+                    dst[KFC_VERB_SLOT_ARG0] = static_cast<uint64_t>(peerAlgRank) * strideSize;
+                    dst[KFC_VERB_SLOT_ARG1] = static_cast<uint64_t>(ccuParam_.rankId) * strideSize;
+                }
+                dst[KFC_VERB_SLOT_ARG2] = sliceSize;
+                ++dataFrameIdx;
+            } else if (verbId == KFC_UNIFIED_VERB_COPY) {
+                // >8P 本 rank 上料（老 kernel :176-179）：src = 本端 IN 我的片、
+                // dst = 本端 SCR 我的槽
+                dst[KFC_VERB_SLOT_ARG0] = rankSliceOffset;
+                dst[KFC_VERB_SLOT_ARG1] = static_cast<uint64_t>(ccuParam_.rankId) * sliceSize;
+                dst[KFC_VERB_SLOT_ARG2] = sliceSize;
+            } else if (verbId == KFC_UNIFIED_VERB_BROADCAST) {
+                // AG 广播：本端/对端 OUT 落位同偏移（rankId×strideSize 纯覆写——
+                // P0-2 口径，v4 槽 3 同式）；size 现值 + goSize 重算。槽 1（src 结构
+                // 量 = InOffset(me)）恒 0（AG inStride=0）不覆写——server 以
+                // ve.localIn（SYNC_PRE 槽 2 缓存）合成
+                dst[KFC_VERB_SLOT_ARG1] = static_cast<uint64_t>(ccuParam_.rankId) * strideSize;
+                dst[KFC_VERB_SLOT_ARG3] = static_cast<uint64_t>(ccuParam_.rankId) * strideSize;
+                dst[KFC_VERB_SLOT_ARG2] = sliceSize;
+                uint64_t agGo[4] = {0, 0, 0, 0};
+                CalcGoSize(sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, agGo);
+                dst[KFC_VERB_GO_SIZE_0] = agGo[0];
+                dst[KFC_VERB_GO_SIZE_1] = agGo[1];
+                dst[KFC_VERB_GO_SIZE_2] = agGo[2];
+                dst[KFC_VERB_GO_SIZE_3] = agGo[3];
+            } else if (verbId == KFC_UNIFIED_VERB_REDUCE) {
+                // RS 折叠：槽 1/2 结构量恒 0 不覆写（server 以 ve.localScr/localOut
+                // 合成即基址本身）；size 现值 + goSize 重算（RS config：loopCount=16、
+                // memSlice=4096 不 ×8——kernel :26-30 步进错位硬约束；单 chunk 已由
+                // host 序列化器拒收 chunkCount>1，全量 sliceSize 即 chunk 口径）
+                dst[KFC_VERB_SLOT_ARG2] = sliceSize;
+                uint64_t rsGo[4] = {0, 0, 0, 0};
+                CalcGoSize(sliceSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, rsGo);
+                dst[KFC_VERB_GO_SIZE_0] = rsGo[0];
+                dst[KFC_VERB_GO_SIZE_1] = rsGo[1];
+                dst[KFC_VERB_GO_SIZE_2] = rsGo[2];
+                dst[KFC_VERB_GO_SIZE_3] = rsGo[3];
+            } else if (verbId == KFC_UNIFIED_VERB_NHR_RUN) {
+                // R13 · NHR_RUN 帧实例化（M0_R13 §八；对照 v2 sole NHR 写入方
+                // CcuPrepareForReduceScatterSoleNhrM2M :495-525 逐式——RS 语义下
+                // commParam->count 即每 rank 输出份元素数）：
+                //   槽 1 透传（段内结构量——server 以 ve.localIn/peerIn[chIdx] 合成基址
+                //        的段内偏移半边，恒 inBaseOff 结构量）；
+                //   槽 2 = OUTPUT 绝对基址（recvBuf 合成式——NHR 收尾 LocalCopy 直写
+                //        output 无对端交换，M0_R13 §八：不同于 mesh 数据帧的纯偏移口径）；
+                //   槽 3 = sliceSize 现值；槽 4 = stride 三分支（strideCount 是 exec 现值）；
+                //   槽 5/6 = jetty 公式（v2 :507-510 逐字同式：先除 jettyNum 再对齐——
+                //        sliceOneJetty = slice/jetty/alignCnt*alignCnt、lastJetty =
+                //        slice-(jetty-1)*oneJetty；alignCnt = 128/dts；jettyNum 读槽 10）；
+                //   槽 7 = UINT64_MAX-1（sole repeatNum=1）；槽 8/9 = 0（sole 双 stride=0）；
+                //   槽 10 透传（jettyNum 资源期拓扑量，host Validate 已拦 0/超界）。
+                // jettyNum==0 防御拒发（host Validate 前置拦截后的设备侧双保险）。
+                const uint64_t nhrJettyNum = dst[KFC_VERB_NHR_JETTY_NUM];
+                if (nhrJettyNum == 0ULL || nhrJettyNum > 4ULL) {
+                    KERNEL_LOG(
+                        KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedVerbPlan NHR jettyNum[%llu] invalid "
+                        "(need 1..4, refusing frame).", (unsigned long long)nhrJettyNum);
+                    return;
+                }
+                dst[KFC_VERB_NHR_OUTPUT] =
+                    (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_VERB_NHR_OUTPUT];
+                dst[KFC_VERB_NHR_SLICE_SIZE] = sliceSize;
+                dst[KFC_VERB_NHR_INPUT_SLICE_STRIDE] =
+                    (commParam->strideCount == 0U) ? sliceSize : (commParam->strideCount * dts);
+                // v2 :499-510 逐字同式（hcclMinSliceAlign=128、sliceAlignCount=128/dts
+                // 元素数、先除 jettyNum 再对齐下取整）
+                constexpr uint64_t nhrMinSliceAlign = 128U;
+                const uint64_t nhrAlignCount = nhrMinSliceAlign / dts;
+                dst[KFC_VERB_NHR_SLICE_ONE_JETTY_SIZE] =
+                    sliceSize / nhrJettyNum / nhrAlignCount * nhrAlignCount;
+                dst[KFC_VERB_NHR_SLICE_LAST_JETTY_SIZE] =
+                    sliceSize - (nhrJettyNum - 1U) * dst[KFC_VERB_NHR_SLICE_ONE_JETTY_SIZE];
+                dst[KFC_VERB_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U;   // sole repeatNum=1（v2 :519 同式）
+                dst[KFC_VERB_NHR_INPUT_REPEAT_STRIDE] = 0U;           // sole 双 stride=0（v2 :520）
+                dst[KFC_VERB_NHR_OUTPUT_REPEAT_STRIDE] = 0U;          // v2 :521
+            }
+            // SYNC_POST：槽 1 掩码（0x10）已是终值，无现值消费——透传即落盘值
+        } else {
+            // 哨兵帧：槽 0 = INVALID_U64（server 出口判定 param[0]==INVALID_U64），其余清 0
+            for (uint32_t i = 0; i < KFC_VERB_SLOTS_PER_FRAME; ++i) {
+                dst[i] = 0ULL;
+            }
+            dst[KFC_UNIFIED_VERB_ID] = 0xFFFFFFFFFFFFFFFFULL;
+        }
+        // flush：32 槽 = 256B = 4 行 64B（v4 同节奏——CcuSendMsg 折算式）
+        for (uint32_t i = 0; i < ((KFC_VERB_SLOTS_PER_FRAME + 7U) / 8U); ++i) {
+            FlushDataCache(frameAddr + MAX_DCCI_CNT * i);
+        }
+        // 逐帧 commit 信号（帧粒度，v4 同式——GetCommitCkeAddr(frame, 0) 与 server
+        // waitAddr+frame*8 对称）
+        ccuMsg_.commitCKEAddr = GetCommitCkeAddr(static_cast<uint8_t>(frame), 0U);
+        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
+    }
+
+    KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForUnifiedVerbPlan done: [%llu] verb frames written + signaled.",
+        (unsigned long long)frameCount);
+}
+
+// ============================================================================
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForUnifiedPlan(
     __gm__ CommonPrepareParamCcu* commParam)

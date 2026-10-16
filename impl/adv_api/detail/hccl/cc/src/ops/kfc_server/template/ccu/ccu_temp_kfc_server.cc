@@ -52,6 +52,19 @@ HcclResult InheritKfcServerKernelArg(
     if (isUnifiedPlanKernelSrc) {
         kfcArg->role = KfcServerRole::UNIFIED_PLAN;
     }
+    // v5 分叉（R12 · 动词序执行器，2026-10-09，纯新增第二档前缀）："CcuVerb" 前缀
+    //（KFC_UNIFIED_VERB_PREFIX，len 7——kfc_server_message.h v5 段）命中覆写 role =
+    // UNIFIED_VERB（server 循环 DispatchUnifiedVerbs：动词 ID → 原语组合）。与
+    // "CcuAction" 同机制第二分支；v2/v3 名单 kernelFuncName 均不带两前缀，覆写分支
+    // 零命中。前缀判定以真实注册值直测 + 病灶反例断言守门（poc_unified_verb_exec_
+    // test.cc / run.sh 探针——第四轮 BLOCKER-1 纪律）。
+    static_assert(sizeof(KFC_UNIFIED_VERB_PREFIX) - 1 == KFC_UNIFIED_VERB_PREFIX_LEN,
+        "verb prefix literal length must equal the compare sub-length");
+    const bool isUnifiedVerbKernelSrc =
+        srcName.compare(0, KFC_UNIFIED_VERB_PREFIX_LEN, KFC_UNIFIED_VERB_PREFIX) == 0;
+    if (isUnifiedVerbKernelSrc) {
+        kfcArg->role = KfcServerRole::UNIFIED_VERB;
+    }
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         const auto* baseArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
         CHK_PTR_NULL(baseArg);
@@ -292,11 +305,18 @@ HcclResult CcuTempKfcServer::CalcRes(
         // 下方 v2 判定逐字节保持。
         const bool isUnifiedPlanKernel =
             sourceName.compare(0, KFC_UNIFIED_ACTION_PREFIX_LEN, KFC_UNIFIED_ACTION_PREFIX) == 0;
-        if (isUnifiedPlanKernel) {
-            HCCL_INFO("[CcuTempKfcServer::CalcRes] unified plan kernel[%s] at mission[%u] (v3 id dispatch)",
-                resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName, missionIndex);
+        // v5 分叉（R12，2026-10-09，纯新增第二档前缀）："CcuVerb" 前缀（动词序执行器
+        // 注册名）同跳过 v2 白名单——role 由 InheritKfcServerKernelArg 覆写为
+        // UNIFIED_VERB，server DispatchUnifiedVerbs 按逐帧动词 ID → 原语组合。
+        // v2 名单 kernelFuncName 均不带两前缀，下方 v2 判定逐字节保持。
+        const bool isUnifiedVerbKernel =
+            sourceName.compare(0, KFC_UNIFIED_VERB_PREFIX_LEN, KFC_UNIFIED_VERB_PREFIX) == 0;
+        if (isUnifiedPlanKernel || isUnifiedVerbKernel) {
+            HCCL_INFO("[CcuTempKfcServer::CalcRes] unified kernel[%s] at mission[%u] (id dispatch, %s)",
+                resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName, missionIndex,
+                isUnifiedVerbKernel ? "v5 verb" : "v3 action");
         }
-        if (!isUnifiedPlanKernel) {
+        if (!isUnifiedPlanKernel && !isUnifiedVerbKernel) {
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
              !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr) ||

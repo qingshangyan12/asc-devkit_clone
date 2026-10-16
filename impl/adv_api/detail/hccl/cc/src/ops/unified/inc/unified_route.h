@@ -61,11 +61,11 @@ static const RouteEntry kUnifiedRoutes[] = {
     //   ③ CCU 写入方 RS 帧实例化（WP-1：CcuPrepareForUnifiedPlan 帧级动作 ID 分叉，
     //      ReduceSlice 帧按 v2 并发 RS 写入方逐式覆写槽 1..15）；
     //   ④ device 侧 CcuPrepareForOp 的 RS 分支 158 分派（WP-1 同轮放开）。
-    // 范围注（半激活语义）：本行激活 = RS × CCU 生产链路贯通；RS × AICPU 仍不可用
-    //（ReduceSlice 的 AICPU 后端未注册——Validate 快速失败 → 灰度回退老路径，
-    // 与 R6 备注的 ① 同因，无静默错跑面）。CCU Emit 真原语（R7 立项②）不阻塞本行：
-    // CCU 消费方是 server 常驻循环直调既有 kernel（CcuReduceScatterMesh1DMem2MemKernel），
-    // 路径不经过 Emit——Emit 动词序只服务 ST 语义 checker。
+    // R7 · WP-2（2026-10-06）：RS 行激活；R12 · WP-9③（2026-10-09）半激活注撤除——
+    // RS × AICPU 后端（l4/backend_aicpu_reduce_slice.h）已注册，本行 = RS 全引擎
+    //（AICPU 走 v4 段帧消费链 + 写侧动词序；CCU 走 v3/v5 双格式）。灰度同款双开关
+    //（MC2_UNIFIED_RESOURCE/MC2_USE_UNIFIED_RES——未设 env 时 RS×AICPU 仍走老路径，
+    // 本表只在三开关判定通过后生效）。
     { HcclCMDType::HCCL_CMD_REDUCE_SCATTER, ActionKind::ReduceSlice },
     // { HcclCMDType::HCCL_CMD_ALLREDUCE, ActionKind::CollectAll },  // one_shot/two_shot 段形态
     // { HcclCMDType::HCCL_CMD_ALLTOALL, ActionKind::ExchangeAll },
@@ -97,6 +97,129 @@ inline bool UseUnifiedPath(int op)
     return false;
 #endif
 }
+
+// ---------------------------------------------------------------------------
+// R12 · v5 动词序执行器灰度开关（2026-10-09，主会话裁决 R12-1③）：unified 路径
+// 已命中（UseUnifiedPath）之上的**第二层**分叉——CCU 引擎的 blob 产出从 v4 段帧
+// 切 v5 动词帧（host 组装段按本开关产 v5 blob + "CcuVerb" 前缀注册名）。
+// 双开关与 §12-8 灰度纪律同款：
+//   ① 编译期：MC2_UNIFIED_VERB_RESOURCE（默认**关**——与 MC2_UNIFIED_RESOURCE 的
+//      默认开不同：v5 是机制重建轮，默认关 = 合入零行为变化；置 OFF 可显式确认关闭）
+//   ② 运行期：env MC2_USE_UNIFIED_VERB（默认关——未设置/空/=0 关，非零值开）
+// 两开关同时开 + UseUnifiedPath 命中（AG/RS 路由行）才走 v5。三层判据保 v3/v4
+// 链路零变化：env 未设时即使宏开也恒 v4。
+// ---------------------------------------------------------------------------
+inline bool UseUnifiedVerbPath(int op)
+{
+#if !defined(MC2_UNIFIED_VERB_RESOURCE)
+    (void)op;
+    return false;                       // 编译期默认关（R12 机制轮零行为变化）
+#else
+    if (!UseUnifiedPath(op)) {
+        return false;                   // 未进 unified 路由 → 无 verb 分叉可言
+    }
+    static const bool verbEnvOn = []() {
+        const char* v = std::getenv("MC2_USE_UNIFIED_VERB");
+        if (v == nullptr || v[0] == '\0' || v[0] == '0') {
+            return false;               // 未设置 / 空 / =0 → 关（v4 段帧，现状行为）
+        }
+        return true;                    // 非零值 → 开（v5 动词帧）
+    }();
+    return verbEnvOn;
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// R14 · A 形态执行期并发灰度开关（2026-10-10，挂账 #6——AICPU 消费方编排器）：
+// UseUnifiedVerbPath 之上的**消费方编排**分叉——AICPU 消费方的段分派循环从
+// "串行 for" 切 "按 sync 位编排的并发执行器"（段间 sync=false 的相邻段按域绑
+// 线程组并发派发，sync=true 处合取屏障，l5/segment_orchestrator.h）。
+// 与 VERB 家族同式三层（MC2_UNIFIED_VERB_RESOURCE 同款）：
+//   ① 编译期：MC2_UNIFIED_CONCURRENCY_RESOURCE（默认**关**——env 缺省关时
+//      编译产物零行为变化；纯编排能力轮，不动路由不动协议）
+//   ② 运行期：env MC2_USE_UNIFIED_CONCURRENCY（默认关——未设置/空/=0 关，
+//      非零值开）
+//   ③ 范围：AICPU 消费方内部（ConsumeUnifiedPlanAicpu 的段循环分叉点）——
+//      CCU server 侧不动（帧序消费天然串行，CCU 的 A 形态并发走"每域一
+//      kernel"既有路径）
+// 两开关同时开才走并发编排器；env 未设时即使宏开也恒串行 for（既有循环零变化）。
+// ---------------------------------------------------------------------------
+inline bool UseUnifiedConcurrencyPath()
+{
+#if !defined(MC2_UNIFIED_CONCURRENCY_RESOURCE)
+    return false;                       // 编译期默认关（R14 编排能力轮零行为变化）
+#else
+    static const bool concEnvOn = []() {
+        const char* v = std::getenv("MC2_USE_UNIFIED_CONCURRENCY");
+        if (v == nullptr || v[0] == '\0' || v[0] == '0') {
+            return false;               // 未设置 / 空 / =0 → 关（串行 for，现状行为）
+        }
+        return true;                    // 非零值 → 开（并发编排器）
+    }();
+    return concEnvOn;
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// R15 · ① TierParams 承载灰度开关（2026-10-11，M0_R15_TRIPLE.md §一/§十-5）：
+// tier 九值经骨架段 0 帧槽 16..24 进 v4 blob（方案甲——不升版本、CCU 写入方/
+// server 只读槽 0..15 零影响、AICPU D2H 直取）。三层灰度与 CONCURRENCY 家族
+// 同式：
+//   ① 编译期：MC2_UNIFIED_TIER_RESOURCE（默认**关**——合入零行为变化）
+//   ② 运行期：env MC2_USE_UNIFIED_TIER（默认关——未设置/空/=0 关，非零值开）
+//   ③ 范围：AICPU 引擎 tier 骨架承载（SerializePlanV3 的 tierPlan 传参 +
+//      NHR 骨架段放行 gate 的引擎半边在调用点 hccl_alloc_ctx_res.cc——
+//      engine==AICPU && 本开关；CCU 降级路径维持 NHR 拒收）
+// A/B 展开仍在消费方 exec 期（R6-③ 裁决不预编）——本开关只管"tier 参数是否
+// 进 blob"，消费方展开分叉见 aicpu_consumer.h（槽 16==1 判别）。
+// ---------------------------------------------------------------------------
+inline bool UseUnifiedTierPath(int op)
+{
+#if !defined(MC2_UNIFIED_TIER_RESOURCE)
+    (void)op;
+    return false;                       // 编译期默认关（R15 承载轮零行为变化）
+#else
+    static const bool tierEnvOn = []() {
+        const char* v = std::getenv("MC2_USE_UNIFIED_TIER");
+        if (v == nullptr || v[0] == '\0' || v[0] == '0') {
+            return false;               // 未设置 / 空 / =0 → 关（tier 不进 blob，现状行为）
+        }
+        return true;                    // 非零值 → 开（tier 九值写槽 16..24）
+    }();
+    return tierEnvOn;
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// R15 · ② NHR AICPU 执行面灰度开关（2026-10-11，M0_R15 §四/§十）：
+// backend_aicpu_reduce_slice.h 的 NHR Emit 分支 + hcomm_verb_sink.h 的
+// DoNhrRun 接线。三层同式：
+//   ① 编译期：MC2_UNIFIED_NHR_AICPU_RESOURCE（默认**关**）
+//   ② 运行期：env MC2_USE_UNIFIED_NHR_AICPU（默认关）
+//   ③ 范围：AICPU 半边 NHR 段（mesh 写侧分支一行不动；ungated NHR 段照旧
+//      全连接迭代 ChannelOf Fail = 现状行为）
+// ---------------------------------------------------------------------------
+inline bool UseUnifiedNhrAicpuPath()
+{
+#if !defined(MC2_UNIFIED_NHR_AICPU_RESOURCE)
+    return false;                       // 编译期默认关（R15 执行面轮零行为变化）
+#else
+    static const bool nhrEnvOn = []() {
+        const char* v = std::getenv("MC2_USE_UNIFIED_NHR_AICPU");
+        if (v == nullptr || v[0] == '\0' || v[0] == '0') {
+            return false;               // 未设置 / 空 / =0 → 关（NHR 段维持 mesh 分支现状）
+        }
+        return true;                    // 非零值 → 开（NHR Emit 分支 + sink DoNhrRun）
+    }();
+    return nhrEnvOn;
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// R18 · #11 全删轮（用户裁定 2026-10-14）：UseUnifiedNhrExpandPath 灰度开关删除
+// ——展开形态转正为 NHR 唯一 Emit 形态（宏动词 NHR_RUN 路径整体删除），形态
+// 选择不复存在；NHR AICPU 执行面整体灰度仍由 UseUnifiedNhrAicpuPath 承载。
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // C10 · unified 路径的 algTag 缓存键（§10.2 C10）

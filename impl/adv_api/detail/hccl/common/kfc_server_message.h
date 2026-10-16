@@ -301,6 +301,232 @@ constexpr char KFC_UNIFIED_ACTION_REDUCE_SLICE_KERNEL_NAME[] = "CcuActionReduceS
 constexpr char KFC_UNIFIED_ACTION_PREFIX[] = "CcuAction";
 constexpr uint32_t KFC_UNIFIED_ACTION_PREFIX_LEN = 9U;   // == strlen(KFC_UNIFIED_ACTION_PREFIX)
 
+// ============================================================================
+// v5 动词帧协议（R12 · CCU 动词序执行器，2026-10-09）：server 从"动作 ID → 整体
+// kernel 直调"改为"动词 ID → 原语组合"（DispatchUnifiedVerbs，ccu_kernel_kfc_server.cc
+// 纯新增分支）。v3/v4 链路零变化（纯追加段）。
+//
+// 【两级动词（主会话裁决 R12-1）】
+//   叶子动词：SYNC_PEER_PRE/SYNC_PEER_POST/READ/WRITE/COPY——server 直接发射原语；
+//   组原语动词：BROADCAST → GroupBroadcast、REDUCE → GroupLocalReduce(≤8P)/
+//   PairwiseLocalReduce(>8P)——复用保留的基础 kernel 原语层（ccu_kernel_alg_base）。
+//
+// 【第一级动词 ID = VerbCall::Verb 枚举值 0..7】（unified inc/verb_sink.h:40-52）——
+// 序列化器写 static_cast<u64>，server 分支引用本组常量，unified 测试镜像 static_assert
+// 三方互锁。与 v3 动作 ID（0..4）的值域重叠由三层隔离消化：role 分叉（UNIFIED_VERB=10
+// vs UNIFIED_PLAN=9，kfc_server_protocol.h 追加）、blob 头部（UPL5/版本 5）、注册名前缀
+//（"CcuVerb" vs "CcuAction"）。
+//
+// 【帧布局（32 槽 == server Load 宽度；未用槽清 0；出口哨兵 = 槽 0 INVALID_U64 同 v3）】
+//   槽 0     = 动词 ID（KFC_UNIFIED_VERB_*）
+//   数据帧（READ/WRITE/COPY/POST_COPY）：槽 1=srcOff、槽 2=dstOff、槽 3=size、槽 4=0
+//     ——★无 channelIdx/peer 槽（R12-1 裁决①隐式映射：段内数据帧按通道序隐式消费，
+//       帧不携通道号，游标随数据帧推进、非数据帧不动；host Validate 校验
+//       "段内数据帧数==channelCount"+"序列化器迭代序==注册通道序"（单源派生，
+//       R12-4：序列化器 peer 迭代序 = claim.channels 注册序，不做二次 sort））
+//   BROADCAST：槽 1=srcOff（IN 相对）、槽 2=localDstOff（OUT 相对）、槽 3=size、
+//              槽 4=remoteDstOff（对端 OUT 相对）、槽 5..8=goSize 四元组
+//   REDUCE：   槽 1=srcOff（SCR 相对）、槽 2=dstOff（OUT 相对）、槽 3=size、
+//              槽 5..8=goSize 四元组（>8P Pairwise 由 server 按 rankSize 分叉，不占槽）
+//   SYNC_PEER_PRE：槽 1=XN 掩码（AG=OUT|TOK=0xC / RS=IN|SCR|TOK=0x7）、槽 2=本端 IN 基址、
+//              槽 3=本端 SCR 基址、槽 4=本端 OUT 基址（掩码含位才有效；TOK 恒取
+//              ctx.token 不占槽——v2/v3 同格局）
+//   SYNC_PEER_POST：槽 1=XN 掩码（恒 POST 位 0x10）
+//
+// 【XN 统一变量表（R12-1 裁决②/R12-2 尾款）】{IN=0, SCR=1, TOK=2, OUT=3, POST=4}——
+//   对端地址不进帧：沿老 kernel PreSync 互发机制（WriteVariableWithNotify 广播本端
+//   基址 + GetResByChannel 取对端值）。POST 迁 4 避让：AG 老表 POST=3 与新 OUT=3
+//   撞位会互踩 CKE mask（审查方已核）。
+//
+// 【v5 blob 头部（镜像 v4 头布局，7 槽）】[0]=magic "UPL5"、[1]=版本 5、[2]=frameCount
+//   （≠v3 段数——一段产多帧）、[3]=保留、[4..6]=dataType/outputType/reduceType（纯
+//   维测 dump，R6 尾款终裁口径不变）。总槽 = 7 + frameCount*32。
+// ============================================================================
+
+// v5 第一级动词 ID 常量：值必须与 unified inc/verb_sink.h 的 VerbCall::Verb 枚举逐项相等
+//（COPY=0/POST_COPY=1/READ=2/WRITE=3/REDUCE=4/BROADCAST=5/SYNC_PEER_PRE=6/
+// SYNC_PEER_POST=7）。三方同名登记：unified 枚举 ↔ 本常量 ↔ server DispatchUnifiedVerbs
+// 分支（分支直接引用本常量，构造性对齐；unified 测试以镜像常量 static_assert 守门）。
+// R13（2026-10-09）：NHR_RUN=8 尾追加（NHR 段数据动词——ReduceScatter NHR 的
+// WriteReduce 步进流，M0_R13_NHR_V5.md §八；枚举尾追加零既有消费回归）。
+constexpr uint32_t KFC_UNIFIED_VERB_COPY = 0U;          // == VerbCall::COPY
+constexpr uint32_t KFC_UNIFIED_VERB_POST_COPY = 1U;     // == VerbCall::POST_COPY
+constexpr uint32_t KFC_UNIFIED_VERB_READ = 2U;          // == VerbCall::READ
+constexpr uint32_t KFC_UNIFIED_VERB_WRITE = 3U;         // == VerbCall::WRITE
+constexpr uint32_t KFC_UNIFIED_VERB_REDUCE = 4U;        // == VerbCall::REDUCE
+constexpr uint32_t KFC_UNIFIED_VERB_BROADCAST = 5U;     // == VerbCall::BROADCAST
+constexpr uint32_t KFC_UNIFIED_VERB_SYNC_PRE = 6U;      // == VerbCall::SYNC_PEER_PRE
+constexpr uint32_t KFC_UNIFIED_VERB_SYNC_POST = 7U;     // == VerbCall::SYNC_PEER_POST
+constexpr uint32_t KFC_UNIFIED_VERB_NHR_RUN = 8U;       // == VerbCall::NHR_RUN（R13）
+// R18 · #11（M0_R18 §四）：NHR 步进流展开动词——SLICE_REDUCE（方向无关的逐
+// slice 规约，帧带 step/sliceIdx 索引+双侧 peer）+ CH_SYNC（步间通道握手半边
+// 四态）。纯追加（枚举尾），NHR_RUN 紧凑帧形态保留（灰度共存）。
+constexpr uint32_t KFC_UNIFIED_VERB_SLICE_REDUCE = 9U;  // == VerbCall::SLICE_REDUCE（R18）
+constexpr uint32_t KFC_UNIFIED_VERB_CH_SYNC = 10U;      // == VerbCall::CH_SYNC（R18）
+constexpr uint32_t KFC_UNIFIED_VERB_ID_MAX = 10U;
+static_assert(KFC_UNIFIED_VERB_ID_MAX < UINT64_MAX,
+    "v5 verb ids must never collide with the INVALID_U64 exit sentinel");
+
+// v5 帧槽位枚举（逐动词载荷布局见上方注释表）
+enum KfcUnifiedVerbSlot : uint32_t {
+    KFC_UNIFIED_VERB_ID = 0,
+    KFC_VERB_SLOT_ARG0 = 1,    // 数据帧=srcOff / SYNC=掩码 / BROADCAST=srcOff
+    KFC_VERB_SLOT_ARG1 = 2,    // 数据帧=dstOff / SYNC_PRE=本端 IN 基址
+    KFC_VERB_SLOT_ARG2 = 3,    // 数据帧=size / SYNC_PRE=本端 SCR 基址
+    KFC_VERB_SLOT_ARG3 = 4,    // BROADCAST=remoteDstOff / SYNC_PRE=本端 OUT 基址
+    KFC_VERB_GO_SIZE_0 = 5,    // BROADCAST/REDUCE：goSize 四元组（其余动词 0）
+    KFC_VERB_GO_SIZE_1 = 6,
+    KFC_VERB_GO_SIZE_2 = 7,
+    KFC_VERB_GO_SIZE_3 = 8,
+    KFC_VERB_SLOTS_PER_FRAME = 32U,   // == CCU_PARAM_NUM_PER_DIE（server Load 宽度）
+};
+
+// R13 · NHR_RUN 帧槽位（M0_R13 §八；槽序镜像 KFC_RS_SOLE_NHR_*（上方 :140-152）
+// + 槽 10 jettyNum 扩展——v5 段数据帧布局沿用 sole NHR 槽序，主会话预置裁决 1）：
+//   槽 1 = INPUT 基址偏移（段内结构量，server 合成本端 ve.localIn / 对端 peerIn[chIdx]）
+//   槽 2 = OUTPUT 基址（★绝对地址——写入方 recvBuf 合成式注入；NHR 收尾 LocalCopy
+//          直写 output，无对端交换）
+//   槽 3 = SLICE_SIZE（每 rank 输出份字节）
+//   槽 4 = INPUT_SLICE_STRIDE（各 rank 分片在 input 的步长）
+//   槽 5 = SLICE_ONE_JETTY_SIZE（jettyNum==1 时不被消费——kernel :114 循环零次）
+//   槽 6 = SLICE_LAST_JETTY_SIZE（尾 jetty 字节）
+//   槽 7 = REPEAT_NUM_INV（UINT64_MAX - repeatNum 倒计数）
+//   槽 8 = INPUT_REPEAT_STRIDE
+//   槽 9 = OUTPUT_REPEAT_STRIDE
+//   槽 10 = JETTY_NUM（devkit 链恒 1；>1 是 kernel 能力协议面保留）
+//   槽 11..30 = 0；槽 31 = pattern（段级载体在 SYNC_PRE 帧，数据帧槽 31 恒 0）
+enum KfcVerbNhrRunSlot : uint32_t {
+    KFC_VERB_NHR_INPUT = 1,
+    KFC_VERB_NHR_OUTPUT = 2,
+    KFC_VERB_NHR_SLICE_SIZE = 3,
+    KFC_VERB_NHR_INPUT_SLICE_STRIDE = 4,
+    KFC_VERB_NHR_SLICE_ONE_JETTY_SIZE = 5,
+    KFC_VERB_NHR_SLICE_LAST_JETTY_SIZE = 6,
+    KFC_VERB_NHR_REPEAT_NUM_INV = 7,
+    KFC_VERB_NHR_INPUT_REPEAT_STRIDE = 8,
+    KFC_VERB_NHR_OUTPUT_REPEAT_STRIDE = 9,
+    KFC_VERB_NHR_JETTY_NUM = 10,
+    KFC_VERB_NHR_PARAM_NUM = 11,
+};
+// 槽序互锁（三处同名登记之二——与 sole NHR 布局静态守门，漂移即编译失败；
+// 值比较走 uint32_t 显式转换（两枚举类型不同，直接 == 触发 -Wenum-compare 告警——
+// 下方 V3_SLOT_GUARD 同惯例）
+constexpr uint32_t NHR_SLOT_GUARD(uint32_t v) { return v; }
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_SLICE_SIZE) == NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_SLICE_SIZE),
+    "v5 NHR slot 3 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_INPUT_SLICE_STRIDE) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_INPUT_SLICE_STRIDE),
+    "v5 NHR slot 4 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_SLICE_ONE_JETTY_SIZE) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_SLICE_ONE_JETTY_SIZE),
+    "v5 NHR slot 5 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_SLICE_LAST_JETTY_SIZE) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_SLICE_LAST_JETTY_SIZE),
+    "v5 NHR slot 6 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_REPEAT_NUM_INV) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_REPEAT_NUM_INV),
+    "v5 NHR slot 7 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_INPUT_REPEAT_STRIDE) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_INPUT_REPEAT_STRIDE),
+    "v5 NHR slot 8 drift");
+static_assert(NHR_SLOT_GUARD(KFC_VERB_NHR_OUTPUT_REPEAT_STRIDE) ==
+                  NHR_SLOT_GUARD(KFC_RS_SOLE_NHR_OUTPUT_REPEAT_STRIDE),
+    "v5 NHR slot 9 drift");
+
+// R18 · #11（M0_R18 §四）：NHR 展开动词帧槽（SLICE_REDUCE/CH_SYNC——步/slice
+// 循环外置到帧序，索引+双侧 peer 进帧，repeat 种子段级补写）。槽位与 unified
+// 侧 UnifiedV5SliceReduceSlot/UnifiedV5ChSyncSlot 镜像（三处同名登记之二）。
+enum KfcVerbSliceReduceSlot : uint32_t {
+    KFC_VERB_SR_STEP = 1,               // 步索引（执行端步表重建入参）
+    KFC_VERB_SR_SLICE_IDX = 2,          // slice 索引（tx 序重建入参）
+    KFC_VERB_SR_SIZE = 3,               // SliceSizeOf（校验用）
+    KFC_VERB_SR_PEER_WR = 4,            // WR 半边 peer（algRank——sendTo）
+    KFC_VERB_SR_PEER_RD = 5,            // RD 半边 peer（algRank——recvFrom）
+    KFC_VERB_SR_INPUT_SLICE_STRIDE = 6, // step0-skip 的 input 直取步长（种子）
+    KFC_VERB_SR_REPEAT_NUM_INV = 7,     // repeat 种子（照 NHR_RUN 槽 7 同型）
+    KFC_VERB_SR_IN_REPEAT_STRIDE = 8,
+    KFC_VERB_SR_OUT_REPEAT_STRIDE = 9,
+    KFC_VERB_SR_JETTY_NUM = 10,
+};
+enum KfcVerbChSyncSlot : uint32_t {
+    KFC_VERB_CS_PEER = 1,               // peer（algRank）
+    KFC_VERB_CS_DIR = 2,                // 四态 {0=ACK-Rec,1=ACK-Wait,2=DATA-Rec,3=DATA-Wait}
+    KFC_VERB_CS_IDX = 3,                // NOTIFY_IDX（0=ACK/1=DATA——与 dir 冗余校验）
+};
+
+// XN 统一变量表 + SYNC_PRE 掩码（M0 §二；值 = 位号，掩码 = 位集合）
+constexpr uint32_t KFC_VERB_XN_IN = 0U;
+constexpr uint32_t KFC_VERB_XN_SCR = 1U;
+constexpr uint32_t KFC_VERB_XN_TOK = 2U;
+constexpr uint32_t KFC_VERB_XN_OUT = 3U;
+constexpr uint32_t KFC_VERB_XN_POST = 4U;
+constexpr uint32_t KFC_VERB_XN_MASK_AG_PRE = (1U << KFC_VERB_XN_OUT) | (1U << KFC_VERB_XN_TOK);
+constexpr uint32_t KFC_VERB_XN_MASK_RS_PRE =
+    (1U << KFC_VERB_XN_IN) | (1U << KFC_VERB_XN_SCR) | (1U << KFC_VERB_XN_TOK);
+constexpr uint32_t KFC_VERB_XN_MASK_POST = (1U << KFC_VERB_XN_POST);
+// R13 · NHR 段 SYNC_PRE 掩码（M0_R13_NHR_V5.md §五）：IN|TOK = 0x5。老 NHR kernel 表
+//（INPUT=0/TOKEN=1 → 掩码 0x3，ccu_kernel_kfc_...nhr1d_...cc:19-20）是旧编码，迁 v5
+// 统一位（TOK=2 恒等；SCR/OUT 位不广播——NHR 无 scratch、无 output 交换）。
+constexpr uint32_t KFC_VERB_XN_MASK_NHR_PRE = (1U << KFC_VERB_XN_IN) | (1U << KFC_VERB_XN_TOK);
+
+// R13 · v5 帧段 pattern 载体（M0_R13 §五）：SYNC_PRE 帧槽 31 = pattern（段级语义挂
+// 段首帧——每段必有 SYNC_PRE，天然段界标；blob 头部槽是 Plan 级不适用）。MESH=0
+// 缺省零变化（既有帧该槽恒 0）；NHR=1 声明性登记——server 实际分派按 SYNC_PRE 掩码
+//（0xC/0x7/0x5 三互异），槽 31 是写入方/host Validate/ST 消费的冗余防线。
+constexpr uint32_t KFC_VERB_SLOTS_PER_FRAME_ = 32U;   // == KFC_VERB_SLOTS_PER_FRAME
+constexpr uint32_t KFC_VERB_SLOT_PATTERN = 31U;
+constexpr uint32_t KFC_VERB_PATTERN_MESH = 0U;
+constexpr uint32_t KFC_VERB_PATTERN_NHR = 1U;
+
+// v5 动词 kernel 注册名前缀（server host 侧第二档识别键，与 "CcuAction" 同机制：
+// InheritKfcServerKernelArg 按 compare(0, LEN, PREFIX) 命中覆写 role=UNIFIED_VERB）。
+// 第四轮 BLOCKER-1 纪律：前缀字面量与子串长度 static_assert 互锁 + 判定回归断言。
+constexpr char KFC_UNIFIED_VERB_PREFIX[] = "CcuVerb";
+constexpr uint32_t KFC_UNIFIED_VERB_PREFIX_LEN = 7U;    // == strlen(KFC_UNIFIED_VERB_PREFIX)
+
+// v5 blob 头部常量（镜像 v4 头布局；与 unified inc/verb_serializer.h 镜像常量互锁）
+constexpr uint64_t KFC_UNIFIED_VERB_BLOB_MAGIC = 0x55504C35ULL;     // "UPL5"
+constexpr uint64_t KFC_UNIFIED_VERB_BLOB_VERSION = 5ULL;
+constexpr uint32_t KFC_UNIFIED_VERB_BLOB_HEADER_SLOTS = 7U;
+constexpr uint32_t KFC_UNIFIED_VERB_BLOB_HEADER_RESERVED = 3U;      // 槽 3 保留（0）
+constexpr uint32_t KFC_UNIFIED_VERB_BLOB_HEADER_DATA_TYPE = 4U;     // 纯维测 dump（R6 终裁口径）
+constexpr uint32_t KFC_UNIFIED_VERB_BLOB_HEADER_OUTPUT_TYPE = 5U;
+constexpr uint32_t KFC_UNIFIED_VERB_BLOB_HEADER_REDUCE_TYPE = 6U;
+constexpr uint32_t KfcUnifiedVerbBlobTotalSlots(uint32_t frameCount)
+{
+    return KFC_UNIFIED_VERB_BLOB_HEADER_SLOTS + frameCount * KFC_VERB_SLOTS_PER_FRAME;
+}
+// 单 Plan 帧数上限：环形队列 64 帧（CCU_TASK_NUM_MAX）− 1 出口哨兵（跨圈多帧挂 P2，
+// A/B tiered 不进 R12 verb 灰度——B 步进 16P 档 72 帧超限，M0 §三）
+constexpr uint32_t KFC_UNIFIED_VERB_MAX_FRAMES = 63U;
+
+// ── 数据帧计数契约（R12-19 登记项；本表是 v5 帧序隐式映射的权威口径）──────────
+// 隐式映射（数据帧不携 channelIdx，帧序即通道序）下，两处消费者按**同一计数规则**
+// 推导数据帧 ↔ 通道的配对，错一处即配对错位（隐式映射断链）：
+//   ① 写入方 CcuPrepareForUnifiedVerbPlan（hccl_ccu_v0_prepare.h）的 dataFrameIdx
+//      ——第 k 条数据帧的 peerAlgRank = 升序跳过 me 的第 k 个 rank；
+//   ② server DispatchUnifiedVerbs（ccu_kernel_kfc_server.cc）的 ve.dataCursor
+//      ——第 k 条数据帧消费 channels[k]。
+// 逐动词计数规则（动词 ID 见上方常量）：
+//   | 动词            | 计数 | 理由                                                |
+//   |-----------------|------|-----------------------------------------------------|
+//   | READ(2)         | ++   | RS 读侧——一通道一帧                                 |
+//   | WRITE(3)        | ++   | 写侧——一通道一帧（CCU v5 不产，协议完备保留）       |
+//   | COPY(0)         | 不计 | 本端上料/本地搬运，不占通道序（server 游标同口径不动）|
+//   | BROADCAST(5)    | 不计 | 组原语自含扇出，独占本段通道表（server 游标置满防越界）|
+//   | REDUCE(4)       | 不计 | 本地折叠，不走通道                                   |
+//   | SYNC_PEER_PRE(6)| 复位 | 段边界——新段数据帧从首通道重新配对（计数器清 0）     |
+//   | SYNC_PEER_POST(7)| 不计 | 非数据动词                                          |
+//   | POST_COPY(1)    | 不计 | AICPU 专用（CCU 不发射），且语义为本地落位不占通道   |
+//   | NHR_RUN(8)      | 不计 | R13（M0_R13 §二）：NHR 段整段自持通道表——数据帧序
+//   |                 |      | ≠ 通道序（通道 = chIdx(toRank) 显式推导，每步全部
+//   |                 |      | slice 走同一通道），隐式游标对 NHR 不适用（游标不动）|
+// ★演进契约：序列化器（unified inc/verb_serializer.h）新增**数据动词**（隐式消费
+//   通道序的动词）时，必须同步三处——本表 + 写入方 dataFrameIdx 计数分支 + server
+//   Verb* 游标推进分支；host Validate 的"数据帧数==channelCount"断言是配对断链的
+//   唯一前置防线（M0_R12_VERB_EXECUTOR.md §六-1 引用本表）。
+// ─────────────────────────────────────────────────────────────────────────────
+
 // 段数上限（机制轮）：单圈队列 64 记录（CCU_TASK_NUM_MAX，ccu_kernel_kfc_server.h:27）
 // 预留 1 条出口哨兵 → 有效 63 段；跨圈多段随 device 写入方（下一轮）落地后放开。
 constexpr uint32_t KFC_UNIFIED_MAX_SEGMENTS = 63U;

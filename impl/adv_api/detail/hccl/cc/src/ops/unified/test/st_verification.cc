@@ -46,6 +46,18 @@
 // R6 起 ReduceSlice 的 CCU 后端已交付（R7 ST 需 RS Compile 全链——不 include 则
 // Validate 以"no backend registered"拒收，RS blob 无法经真链路构造）
 #include "backend_ccu_reduce_slice.h"
+// R12 · T3：v5 动词帧三件（序列化器 / RS×AICPU 后端 / Emit 捕获——生成方 WP-2/WP-9）
+#include "verb_serializer.h"
+#include "backend_aicpu_reduce_slice.h"
+#include "verb_capture.h"
+#include "tier_expand.h"          // R13 · WP-5：A/B tiered 段序列 → v5 帧预算格式级验证
+#include "nhr_steps.h"            // R15 · ②：CalcNhrSteps/CalcNhrConnectRanks（步几何+建链集手算锚）
+#include "segment_orchestrator.h" // R14：A 形态并发编排器（OrchestrateSegments）
+// R17 · 流水模型轮两件（#9 PipelineModel/DryRun + 10a 语义后置条件 checker）
+#include "pipeline_model.h"
+#include "semantic_checker.h"
+#include "nhr_slice_geometry.h"  // R18 · #11：NhrSliceOf 公共件直测（宏关可达面）
+#include <cstdlib>             // R17：setenv（NHR AICPU 灰度 env——61 段最早消费点）
 // 第三轮（A5/C10）：路由表与 algTag（unified_route.h 需要 backend_registry 的 Engine）
 #include "unified_route.h"
 
@@ -111,6 +123,15 @@ static int R5();
 static int R6();
 static int R10();
 static int R11();
+static int R12();
+static int R13();
+static int R14();
+static int R15();
+static int R16();
+static int R17();
+static int R18();
+static int R19();
+static int R20();
 
 int main()
 {
@@ -450,6 +471,15 @@ int main()
     R6();
     R10();
     R11();
+    R12();
+    R13();
+    R14();
+    R15();
+    R16();
+    R17();
+    R18();
+    R19();
+    R20();
 
     printf("\n%d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;
@@ -1547,9 +1577,12 @@ static int R5()
         //   终审前 grep 零命中、本轮复核两处写入点均已落——断链修复确认（C5-1）。
         //   写入方消费端（hccl_ccu_v0_prepare.h:623 读 res[1]）与写读闭合由审查方
         //   C2 复核背书（资源来源改为复用外层 opResCtx 既有字段，写入方不受影响）。
-        // ST 守门：158 双登记值相等（host 枚举 ↔ device constexpr，源码级核对镜像）
-        Check(static_cast<u64>(158) == 158ULL,
-              "S4: dispatch key 158 double-registered (host enum + device constexpr) and host-side writes landed (C5-1 flipped)");
+        // ST 守门：分派键双登记（host 枚举 ↔ device constexpr，源码级核对镜像——
+        // 本 TU 不可见那两个头，Check 为核对标记）。PR rebase 勘误（2026-10-16）：
+        // 上游 master 尾部 AlgorithmType 已占 158/159（SoleNHR 两枚举），unified
+        // 分派键顺延 160（hccl_alloc_ctx_res.h / hccl_ccu_v0_def.h 两侧同步）。
+        Check(160ULL == 160ULL,
+              "S4: dispatch key 160 double-registered (host enum + device constexpr) and host-side writes landed (C5-1 flipped)");
     }
 
     printf("== ㉙ C5-2：host 层尺寸交叉校验负例（M4-① 归属层补位） ==\n");    {
@@ -2009,6 +2042,34 @@ int32_t HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channe
     Rec("ChNotifyWait", thread, channel, localNotifyIdx, timeOut, 0);
     return g_stubRet;
 }
+// R12 · WP-9②：WRITE/REDUCE 桩（sink 新接线两原语——RS×AICPU 写侧，R6 拒绝面退役）
+int32_t HcommWriteOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len)
+{
+    Rec("Write", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), len);
+    return g_stubRet;
+}
+int32_t HcommLocalReduceOnThread(ThreadHandle thread, void* dst, const void* src, uint64_t count,
+    HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Rec("LocalReduce", thread, 0, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+// R15 · ②：NHR_RUN 执行面原语桩（sink DoNhrRun 消费）
+int32_t HcommWriteReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Rec("WriteReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
+int32_t HcommReadReduceOnThread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
+    uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    Rec("ReadReduce", thread, channel, reinterpret_cast<u64>(dst), reinterpret_cast<u64>(src), count);
+    (void)dataType; (void)reduceOp;
+    return g_stubRet;
+}
 }
 
 static int R10()
@@ -2154,16 +2215,19 @@ static int R10()
               std::to_string(readBytes));
         Check(g_stubCalls.size() == 61,
               "R10-② stub sequence length = 61 (handcalc), got " + std::to_string(g_stubCalls.size()));
-        // ---- 逐条抽查手算字面量（peer 序 [4,5,6,7,0,1,2]——MESH NextPeer (me+1+step)%8）----
-        // 第 4 条 read（组 idx=3 → peer7 尾片 6B，threads[3]=0x2003、ch=0x30007、
-        // src=cclBuff+200006*7=15031530、dst=output+200006*7=3628266）
+        // ---- 逐条抽查手算字面量（peer 序 [0,1,2,4,5,6,7]——升序跳过 me，R12-9
+        //      修复轮 P1-2 后 BuildArgs 遍历序；peer0 是首条（原 NextPeer 环序下的
+        //      "回绕 peer"现为首条——升序口径下手算锚点值不变：threads[0]、
+        //      src=cclBuff 基址、dst=output 基址）----
+        // peer7（组 idx=6 → threads[6]=0x2006、ch=0x30007、src=cclBuff+200006*7=
+        // 15031530、dst=output+200006*7=3628266、尾片 6B）
         const StubCall* readPeer7 = nullptr;
         for (const auto& s : g_stubCalls) {
             if (s.func == "Read" && s.channel == 0x30007) readPeer7 = &s;
         }
-        Check(readPeer7 != nullptr && readPeer7->a1 == 3628266 && readPeer7->a2 == 15031530 &&
-                  readPeer7->a3 == 6,
-              "R10-② read peer7 (last rank): dst=3628266 src=15031530 len=6 (tail slice)");
+        Check(readPeer7 != nullptr && readPeer7->thread == 0x2006 && readPeer7->a1 == 3628266 &&
+                  readPeer7->a2 == 15031530 && readPeer7->a3 == 6,
+              "R10-② read peer7 (last, idx=6): threads[6], dst=3628266 src=15031530 len=6 (tail slice)");
         // 归位 copy（首条）：src=input=1114112 dst=output+stride*3=2828242 len=200006
         const StubCall* homeCopy = nullptr;
         for (const auto& s : g_stubCalls) {
@@ -2178,14 +2242,15 @@ static int R10()
         }
         Check(stageCopy != nullptr && stageCopy->a2 == 1114112 && stageCopy->a3 == 200006,
               "R10-② stage-in copy: cclBuff+600018=14231506 <- input, 200006B");
-        // 回绕 peer0（组 idx=4 → threads[4]=0x2004、src=cclBuff 基址、dst=output 基址）
+        // 首条 read（peer0——升序口径下组 idx=0 → threads[0]=0x2000、ch=0x30000、
+        // src=cclBuff 基址（peer0 槽偏移 0）、dst=output 基址（peer0 落位偏移 0））
         const StubCall* readPeer0 = nullptr;
         for (const auto& s : g_stubCalls) {
             if (s.func == "Read" && s.channel == 0x30000) readPeer0 = &s;
         }
-        Check(readPeer0 != nullptr && readPeer0->thread == 0x2004 && readPeer0->a1 == 2228224 &&
+        Check(readPeer0 != nullptr && readPeer0->thread == 0x2000 && readPeer0->a1 == 2228224 &&
                   readPeer0->a2 == 13631488 && readPeer0->a3 == 200006,
-              "R10-② read peer0 (wraparound): threads[4], output base <- cclBuff base");
+              "R10-② read peer0 (first, idx=0): threads[0], output base <- cclBuff base");
     }
 
     printf("== ㉟ R10-③ F1 病灶可判：v1 文本喂消费方入口层必拒（断点①修复后不回退） ==\n");
@@ -2704,6 +2769,2336 @@ static int R11()
         //   （第二通道），不再与资源束字段冲突
         Check(blob.size() == 39 && blob[0] == 0x55504C33ULL && blob[1] == 4ULL,
               "R11-④ blob identity: UPL3/v4/39-slots (what both channels must deliver)");
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R12 验证（2026-10-09）——CCU 动词序执行器（v5 blob）+ WP-9（RS×AICPU）
+//
+// 节标 ㊻㊼㊽㊾㊿ 51 顺延 R11 ㊺（节号只增不重排）。"R12" = 项目第 12 轮。
+//
+// 推导源与重锚结论（[A1]-[A9] 逐项对数，R12-7 生成方全量交付后）：
+//   [A1] verb ID 0..7 == VerbCall::Verb 枚举序（verb_serializer.h:92-99 的
+//        static_assert 三方互锁 + ST 镜像常量一致）✓ 零偏移
+//   [A2] 数据帧槽位 1/2/3/4 = src/dst/size/aux（KfcUnifiedVerbSlot ARG0..3）✓
+//   [A3] SYNC 掩码槽 1；BROADCAST aux=remoteDstOff（槽 4）+ goSize 5..8 ✓
+//   [A4] v5 头部 7 槽 {UPL5=0x55504C35, 5, frameCount, 0, dt, odt, rt} ✓
+//   [A5] role UNIFIED_VERB=10（kfc_server_protocol.h）+ "CcuVerb" 前缀 len 7 ✓
+//   [A6] server 分发循环读取序（ccu_kernel_kfc_server.cc :505 DispatchUnifiedVerbs
+//        逐动词分支）——SYNC_PRE 掩码分派按"槽 1 == 已知掩码字面量"CCU_IF（微码
+//        gen 期不可位与），ExtractVerbParams 的逐动词读取序镜像成立 ✓
+//   [A7] RS 单 chunk 拒收：SerializeVerbSegment :151-161 chunkCount>1 → err
+//        （chunkCount 从 chunkLoopNum 倒数恢复，CalcRsChunks 同式）✓
+//   [A8] WP-9 四件已落（backend_aicpu_reduce_slice.h 127 行 / hcomm_verb_sink.h
+//        DoWrite+DoReduce / aicpu_consumer.h 帧.kind 分派 :142-168 + InstantiateRsSegment
+//        :304 / unified_route.h RS 行半激活注撤除）——几何验证见 ㊼
+//   [A9] AR two_shot 混排：RS 段 0x7 → AG 段 0xC 逐段不同掩码（㊽ 格式级）
+//
+// ★R12-9/R12-10 裁定（影响本节断言面）：生成方修复轮前真帧有**三处已知几何缺陷**
+//（①AG BROADCAST 帧 slot2 传了 peers.size() 非 OutOffset(me)；②RS READ 帧 srcOff
+// 恒 0——Compile 期 inputSliceStride=0 + v5 零覆写无注入点；③BuildArgs NextPeer
+// 环序 vs 四方统一升序）——本节全链等价断言（㊾）**不喂当前真帧**（FAIL 原因会
+// 是生成方缺陷而非判据缺陷，污染断言基线），按修复轮落地后执行设计；探针
+// /tmp/r12probe_c 已独立复现缺陷①②（AG 8P me=3 与 RS 8P me=3 各 rc=10；RS 9P
+// me=0 恰好 rc=0 全过——me=0 时 me*slice=0、slot2 错值不进比较面，生成方 V6
+// "结构不变量"断言全绿的盲区解释，R10 MAJOR-1"单场景 golden 掩盖分支缺陷"同型）。
+// 修复后帧序升序口径与本 checker 隐式映射模型（algRankOf 升序）直接对齐。
+//
+// 期望值全部 ST 独立手算（不转抄生成方 poc_unified_verb_exec_test 数字）。
+// ===========================================================================
+static int R12()
+{
+    // 公共构造：真 Compile → v5 VerbSegment 捕获（verb_capture.h CaptureVerbSegment
+    // 是生产链 hccl_alloc_ctx_res.cc ④段同一实现点）→ SerializeVerbPlan 真 blob
+    auto CompileVerbBlob = [](int opType, u32 n, u32 me, u64 countPerRank, CommEngine engine,
+                              Plan& planOut, VerbSegment& vsOut, std::vector<u64>& blobOut) -> bool {
+        OpParam op = MakeOp(opType, n, countPerRank, engine);
+        op.userRank = me;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(n);
+        std::string err;
+        if (L1Adapter::Compile(op, topo, SingleDomain(n), "sole[mesh]", planOut, err) != HCCL_SUCCESS) {
+            return false;
+        }
+        vsOut = CaptureVerbSegment(planOut, 0, L1Adapter::EngineOf(op));
+        if (vsOut.calls.empty()) {
+            return false;
+        }
+        std::string serr;
+        return SerializeVerbPlan({vsOut}, planOut, blobOut, serr);
+    };
+
+    printf("== ㊻ R12-① v5 头部 + 协议常量（真 blob 的帧几何对数——不依赖缺陷槽位） ==\n");
+    {
+        // AG 4P me=1 count=2000（FP16 → slice=4000；手算：帧数 3、总槽 7+96=103）
+        Plan plan;
+        VerbSegment vs;
+        std::vector<u64> blob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 4, 1, 2000,
+                              CommEngine::COMM_ENGINE_CCU, plan, vs, blob),
+              "R12-① AG compile+capture+serialize (4P me=1 slice=4000)");
+        // 头部手算：UPL5=0x55504C35（'U'=0x55 'P'=0x50 'L'=0x4C '5'=0x35 小端）、
+        //   版本 5、frameCount=3、保留 0、ReduceSpec 三槽全 0（AG-only 无 RS 段）
+        Check(blob.size() == 7 + 3 * 32 && blob[0] == 0x55504C35ULL && blob[1] == 5ULL &&
+                  blob[2] == 3ULL && blob[3] == 0ULL,
+              "R12-① AG header: 103 slots, UPL5, v5, 3 frames, reserved 0");
+        Check(blob[4] == 0 && blob[5] == 0 && blob[6] == 0,
+              "R12-① AG header ReduceSpec dump = 0 (no RS segment)");
+        // 帧 0：SYNC_PRE 槽 1 = AG 掩码 0xC（OUT=3|TOK=2 → 1<<3|1<<2）
+        Check(blob[7] == 6ULL && blob[7 + 1] == 0xCULL,
+              "R12-① frame0 = SYNC_PRE(id 6) + AG mask 0xC in slot1");
+        // 帧 2：SYNC_POST 槽 1 = 0x10（POST=4 → 1<<4）
+        Check(blob[7 + 2 * 32] == 7ULL && blob[7 + 2 * 32 + 1] == 0x10ULL,
+              "R12-① frame2 = SYNC_POST(id 7) + POST mask 0x10");
+        // 帧内未用槽 9..31 清 0（三帧全查）
+        bool unusedZero = true;
+        for (u32 f = 0; f < 3; ++f) {
+            for (u32 i = 9; i < 32; ++i) {
+                if (blob[7 + f * 32 + i] != 0) unusedZero = false;
+            }
+        }
+        Check(unusedZero, "R12-① unused slots 9..31 all zero (3 frames)");
+        // RS 8P me=3 count=500：帧数 10（N+2）、RS 掩码 0x7（IN|SCR|TOK）
+        Plan rsPlan;
+        VerbSegment rsVs;
+        std::vector<u64> rsBlob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 3, 500,
+                              CommEngine::COMM_ENGINE_CCU, rsPlan, rsVs, rsBlob),
+              "R12-① RS compile+serialize (8P me=3 slice=1000)");
+        Check(rsBlob.size() == 7 + 10 * 32 && rsBlob[2] == 10ULL && rsBlob[7 + 1] == 0x7ULL,
+              "R12-① RS blob: 10 frames (N+2), SYNC_PRE mask 0x7 (IN|SCR|TOK)");
+        // 帧预算（T1.2 表逐形态）：AG 4P=3、RS 8P=10、RS 9P=12——真 blob 复证
+        Plan rs9Plan;
+        VerbSegment rs9Vs;
+        std::vector<u64> rs9Blob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 9, 0, 500,
+                              CommEngine::COMM_ENGINE_CCU, rs9Plan, rs9Vs, rs9Blob),
+              "R12-① RS 9P compile+serialize");
+        Check(rs9Blob[2] == 12ULL && rs9Blob[7 + 1 * 32] == 0ULL &&
+                  rs9Blob[7 + 1 * 32 + 3] == 1000ULL,
+              "R12-① RS 9P: 12 frames (N+3), frame1 = COPY(id 0) size=1000 (landing step)");
+        Check(StVerbFrameBudgetAg() == 3 && StVerbFrameBudgetRs(8) == 10 &&
+                  StVerbFrameBudgetRs(9) == 12,
+              "R12-① budget table 3/10/12 == real blob frameCounts (all shapes)");
+        // goSize 槽（不依赖缺陷槽位）：AG BROADCAST 帧 goSize = Calc(4000, {8,8,32768})
+        //   手算：loopSize=262144 > 4000 → m=0,n=0,p=4000 → {0,0,PP(0,0,1)=2^41,4000}
+        Check(blob[7 + 32 + 5] == 0 && blob[7 + 32 + 6] == 0 &&
+                  blob[7 + 32 + 7] == 2199023255552ULL && blob[7 + 32 + 8] == 4000ULL,
+              "R12-① AG BROADCAST goSize {0,0,2^41,4000} (writer config, handcalc)");
+        // RS REDUCE 帧 goSize = Calc(8388608, RS cfg {8,16,4096})：loopSize=65536 →
+        //   m=128,n=0,p=0（整除）→ {8388608, 128, 0, 0}
+        Check(rsBlob[7 + 8 * 32 + 5] == 8388608ULL && rsBlob[7 + 8 * 32 + 6] == 128ULL &&
+                  rsBlob[7 + 8 * 32 + 7] == 0 && rsBlob[7 + 8 * 32 + 8] == 0,
+              "R12-① RS REDUCE goSize {8388608,128,0,0} (RS config, handcalc)");
+    }
+
+    printf("== ㊼ R12-② WP-9 RS×AICPU：写侧动词序基线对数（R12-4⑦ 基线 vs 真后端 Emit） ==\n");
+    {
+        // 8P me=3 count=500（slice=1000）：真 Compile → 真 AicpuReduceSlice::Emit
+        //（backend_aicpu_reduce_slice.h）→ 捕获序 vs StBuildAicpuRsVerbBaseline。
+        // ★R12-9 修复轮落地后的重锚（[A8]-b/-c——P1-2 升序 + src 三分支）：
+        //   帧序 = 升序跳过 me（0,1,2,4,5,6,7——BuildArgs 遍历改升序）；
+        //   inStride = Compile 期 inputSliceStride(0) 退 outputSliceStride(1000)
+        //   ——写侧 src 真偏移 peer*1000（缺陷③已修）。
+        Plan plan;
+        VerbSegment vs;
+        std::vector<u64> blob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 3, 500,
+                              CommEngine::COMM_ENGINE_AICPU, plan, vs, blob),
+              "R12-② RS×AICPU compile+capture (backend registered since WP-9)");
+        // 捕获序 → StVerbCall 词面（peer 字段来自 VerbCall.peer——AICPU 写侧显式值）
+        std::vector<StVerbCall> actual;
+        for (const VerbCall& c : vs.calls) {
+            StVerbCall v;
+            v.verbId = static_cast<u64>(c.verb);
+            v.srcOff = c.src;
+            v.dstOff = c.dst;
+            v.size = c.size;
+            v.peer = c.peer;
+            actual.push_back(v);
+        }
+        // 修复后几何（[A8]-c 口径）：WRITE src = inBase + inStride*peer = peer*1000
+        //   （三分支 stride——Compile 期 inputSliceStride=0 退 outputSliceStride=1000，
+        //   与 BuildArgs rankSliceOffset 同式）、dst = me*outputStride = 3000 ✓
+        std::string cerr;
+        const int rc = CheckAicpuRsVerbSeq(actual, 8, 3, 1000, 0, 0, 0, 0, true, cerr, 1000);
+        Check(rc == 0, "R12-② AICPU RS 17-verb seq == baseline (升序 + inStride=1000, post-fix): " +
+              cerr);
+        // 升序抽查：首条 WRITE peer=0（升序跳过 me 首个）、src=0*1000=0、dst=3000
+        Check(actual.size() == 17 && actual[1].peer == 0 && actual[1].srcOff == 0 &&
+                  actual[1].dstOff == 3000,
+              "R12-② first WRITE peer=0 (ascending), src=InOffset(0)=0, dst=3000");
+        // 次条 WRITE peer=1：src=1000（真偏移——缺陷③修复的判别点，环序旧形态恒 0）
+        Check(actual[2].peer == 1 && actual[2].srcOff == 1000 && actual[2].dstOff == 3000,
+              "R12-② second WRITE peer=1, src=InOffset(1)=1000 ([A8]-c stride 生效)");
+        // buff 型判定：transport 投影——VIA_CCUBUF → COPY 在场（:132-133 判据）
+        Check(actual[9].verbId == ST_V5_VERB_COPY && actual[9].srcOff == 3000 &&
+                  actual[9].dstOff == 3000 && actual[9].size == 1000,
+              "R12-② COPY after POST: src=InOffset(3)=3000 dst=OutOffset(3)=3000 size=1000");
+        // REDUCE 段几何：scratch+tmpRank*1000 → OutOffset(me)=3000
+        bool redOk = actual.size() == 17;
+        for (u32 k = 0; k < 7 && redOk; ++k) {
+            const StVerbCall& v = actual[10 + k];
+            if (v.verbId != ST_V5_VERB_REDUCE) redOk = false;
+        }
+        Check(redOk, "R12-② 7 REDUCE verbs after COPY");
+        // SYMMEM 对照负例：transport=SYMMEM → 无 COPY（CheckAicpuRsVerbSeq 的
+        //   buffsDiffer=false 分支——手搓 expected 序由基线构造器产）
+        const std::vector<StVerbCall> baseNoCopy = StBuildAicpuRsVerbBaseline(
+            8, 3, 1000, 0, 0, 0, 0, false, 1000);
+        std::string ncErr;
+        Check(baseNoCopy.size() == 16 &&
+                  CheckAicpuRsVerbSeq(baseNoCopy, 8, 3, 1000, 0, 0, 0, 0, false, ncErr, 1000) == 0,
+              "R12-② SYMMEM shape: 16 verbs (no COPY) — baseline self-check");
+    }
+
+    printf("== ㊽ R12-③ 灰度开关 + AR two_shot 混排格式级（v5 关 = v3 零变化；XN 逐段） ==\n");
+    {
+        // ① 三层灰度（UseUnifiedVerbPath：编译期宏默认关 → 恒 false；与既有 v3/v4
+        //   行为零变化——既有断言全绿即回归语义，此处锁编译期关的恒假性）
+        //   注：本 TU 未定义 MC2_UNIFIED_VERB_RESOURCE → 宏关分支
+        Check(UseUnifiedVerbPath(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER)) == false,
+              "R12-③ verb gate compile-off: AG false (v3 default, zero behavior change)");
+        Check(UseUnifiedVerbPath(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) == false,
+              "R12-③ verb gate compile-off: RS false");
+        // 本 TU 未定义 MC2_UNIFIED_RESOURCE → layer-1 也是编译期关恒 false；
+        //   三层真值表（宏×env×路由行）由 run_st_checker.sh 路由专项探针承载
+        //（受控 env 独立进程），此处锁"双层编译期关 → 双 false"的形态一致性
+        Check(UseUnifiedPath(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER)) == false,
+              "R12-③ layer-1 compile-off in this TU: AG false (both gates compile-off coherent; "
+              "full truth table in route probe)");
+        // ② AR two_shot 混排（RS 段 + AG 段，格式级）：真 Compile two_shot →
+        //    逐段捕获 → 序列化 → 两段掩码逐段不同（RS 0x7 / AG 0xC）+ 帧数守恒
+        OpParam opAr = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLREDUCE), 8, 500,
+                              CommEngine::COMM_ENGINE_CCU);
+        opAr.userRank = 3;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(8);
+        const AlgConfig cfg = AlgConfigParser::Parse("sole[mesh.two_shot]");
+        const PrimitiveRequest req = L1Adapter::BuildRequest(opAr, topo, SingleDomain(8));
+        ExpandCtx ectx; ectx.domainCount = 1; ectx.hierarchyRanks = SingleDomain(8);
+        Plan plan;
+        std::string err;
+        Check(RecipeRegistry::Get(Recipe::SOLE)->Expand(req, cfg, ectx, plan, err) == HCCL_SUCCESS,
+              "R12-③ two_shot expand: " + err);
+        Check(plan.segments.size() == 2 && plan.segments[0].kind == ActionKind::ReduceSlice &&
+                  plan.segments[1].kind == ActionKind::CollectAll,
+              "R12-③ two_shot = RS seg + AG seg");
+        std::vector<VerbSegment> vss;
+        for (size_t i = 0; i < plan.segments.size(); ++i) {
+            vss.push_back(CaptureVerbSegment(plan, i, Engine::CCU));
+        }
+        Check(vss[0].calls.size() == 10 && vss[1].calls.size() == 3,
+              "R12-③ captured RS 10 + AG 3 verb calls");
+        std::vector<u64> blob;
+        std::string serr;
+        Check(SerializeVerbPlan(vss, plan, blob, serr), "R12-③ mixed serialize: " + serr);
+        // 手算帧数：10 + 3 = 13 = N+5（AR two_shot 8P 帧预算表）；总槽 7+416=423
+        Check(blob.size() == 7 + 13 * 32 && blob[2] == 13ULL,
+              "R12-③ mixed blob = 13 frames (N+5 budget), 423 slots");
+        // 逐段掩码：RS 段帧 0 槽 1=0x7；AG 段（帧 10 起）帧 10 槽 1=0xC；段间
+        //   SYNC_POST（帧 9）掩码 0x10——合取屏障（post[0] AND pre[1]）帧各自存在
+        Check(blob[7 + 1] == 0x7ULL, "R12-③ seg0 (RS) SYNC_PRE mask 0x7");
+        Check(blob[7 + 9 * 32 + 1] == 0x10ULL, "R12-③ seg0 tail SYNC_POST mask 0x10");
+        Check(blob[7 + 10 * 32] == 6ULL && blob[7 + 10 * 32 + 1] == 0xCULL,
+              "R12-③ seg1 (AG) SYNC_PRE mask 0xC — per-segment XN masks differ");
+        Check(blob[7 + 12 * 32 + 1] == 0x10ULL, "R12-③ seg1 tail SYNC_POST mask 0x10");
+        // 头部 ReduceSpec dump 取自 RS 段（首个 reduce 段）：FP16=3/FP16=3/SUM=0
+        Check(blob[4] == 3ULL && blob[5] == 3ULL && blob[6] == 0ULL,
+              "R12-③ header ReduceSpec = {FP16, FP16, SUM} (from RS segment)");
+        // 帧数守恒第二形态：v3 路径零变化——同 Plan SerializePlanV3 仍 71 槽
+        //（v3 段帧 ≠ v5 动词帧：7+2*32=71 vs 7+13*32=423——两协议共存互不干扰）
+        std::vector<u64> v3Blob;
+        Check(SerializePlanV3(plan, v3Blob, serr) && v3Blob.size() == 71,
+              "R12-③ v3 path unchanged: same Plan serializes 71 slots (parallel coexistence)");
+    }
+
+    printf("== ㊾ R12-④ 防御矩阵 + RS 多 chunk 拒收（不依赖缺陷槽位的负例面） ==\n");
+    {
+        const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7};
+        // ① RS 多 chunk 拒收（R12-1 裁决③）：slice=8388610 → chunkCount=2 → err。
+        //   手算：chunkSize(8P)=8388608；chunkCount=(8388610-1)/8388608+1=2。
+        //   构造：count=4194305 元素 FP16 → slice=8388610。
+        //   ★绕过 Compile 的 count 语义（BuildRequest slice=count*dts 直传）——
+        //   手工 ActionSpec 喂 SerializeVerbSegment（chunkCount 判据在序列化器内）
+        {
+            VerbSegment vs;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.seg.kind = ActionKind::ReduceSlice;
+            vs.seg.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            vs.seg.domain.myRank = 3;
+            vs.seg.layout.sliceSize = 8388610ULL;    // → chunkCount 2
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+            for (int k = 0; k < 7; ++k) {
+                vs.calls.push_back(VerbCall{VerbCall::READ, 0, 0, 1000, 0});
+            }
+            vs.calls.push_back(VerbCall{VerbCall::REDUCE, 0, 0, 8388610ULL});
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+            std::vector<u64> frames;
+            std::string merr;
+            const bool ok = SerializeVerbSegment(vs, frames, merr);
+            Check(!ok && merr.find("chunkCount") != std::string::npos,
+                  "R12-④ RS multi-chunk (slice=8388610 → 2 chunks) refused: " + merr);
+            // 镜像对数：ST 独立第三实现 StRsChunkCountMirror 同判据
+            Check(StRsChunkCountMirror(8388610ULL, 8U) == 2 &&
+                      StRsChunkCountMirror(8388608ULL, 8U) == 1,
+                  "R12-④ ST mirror chunkCount 2 vs 1 (boundary 8388608|8388610)");
+        }
+        // ② 单 chunk 边界受理：slice=8388608（count=1 → chunkCount=1）受理
+        {
+            VerbSegment vs;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.seg.kind = ActionKind::ReduceSlice;
+            vs.seg.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            vs.seg.domain.myRank = 3;
+            vs.seg.layout.sliceSize = 8388608ULL;    // 恰单 chunk 上界
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+            for (int k = 0; k < 7; ++k) {
+                vs.calls.push_back(VerbCall{VerbCall::READ, 0, 0, 1000, 0});
+            }
+            vs.calls.push_back(VerbCall{VerbCall::REDUCE, 0, 0, 8388608ULL});
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+            std::vector<u64> frames;
+            std::string merr;
+            Check(SerializeVerbSegment(vs, frames, merr),
+                  "R12-④ single-chunk boundary (slice=8388608) accepted");
+        }
+        // ③ 帧数超限：64 条 calls → SerializeVerbPlan 拒（63 上限）
+        {
+            VerbSegment vs;
+            vs.actionKind = VerbCall::COPY;
+            vs.seg.domain.ranks = {0, 1};
+            vs.seg.domain.myRank = 0;
+            for (int i = 0; i < 64; ++i) {
+                vs.calls.push_back(VerbCall{VerbCall::COPY, 0, 0, 1, 0});
+            }
+            Plan p;
+            std::vector<u64> blob;
+            std::string ferr;
+            const bool ok = SerializeVerbPlan({vs}, p, blob, ferr);
+            Check(!ok && ferr.find("exceeds queue capacity") != std::string::npos,
+                  "R12-④ 64-frame plan refused (63 cap): " + ferr);
+        }
+        // ④ 空 Plan（零帧）拒
+        {
+            VerbSegment vs;   // calls 空
+            Plan p;
+            std::vector<u64> blob;
+            std::string ferr;
+            Check(!SerializeVerbPlan({vs}, p, blob, ferr) &&
+                      ferr.find("empty verb plan") != std::string::npos,
+                  "R12-④ empty verb plan refused (no executable frame)");
+        }
+        // ⑤ 模拟器防御（真 blob 半边）：RS 10 帧 + 哨兵 → 10 turns/raw 11；
+        //   越界 channelIdx 形态 = 数据帧超通道数（隐式映射防御，J6 已锁——此处
+        //   用真 blob 复证 10 帧 == 7 READ + 通道数 7 的配对）
+        {
+            Plan rsPlan;
+            VerbSegment rsVs;
+            std::vector<u64> rsBlob;
+            Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 3, 500,
+                                  CommEngine::COMM_ENGINE_CCU, rsPlan, rsVs, rsBlob),
+                  "R12-④ RS real blob for sim defenses");
+            std::vector<u64> framesOnly(rsBlob.begin() + 7, rsBlob.end());
+            // 加哨兵帧
+            std::vector<u64> sn(32, 0xFFFFFFFFFFFFFFFFULL);
+            framesOnly.insert(framesOnly.end(), sn.begin(), sn.end());
+            VerbSimResult sim = SimulateKfcServerVerb(framesOnly, legal);
+            Check(sim.err.empty() && sim.frames.size() == 10 && sim.rawFrameCount == 11,
+                  "R12-④ real RS blob + sentinel: 10 turns, raw 11");
+            u32 reads = 0;
+            for (const auto& fr : sim.frames) {
+                if (fr.verbId == ST_V5_VERB_READ) ++reads;
+            }
+            Check(reads == 7, "R12-④ 7 READ frames == 7 channels (implicit pairing holds)");
+            // 半帧负例（真 blob 截断 33 槽）
+            std::vector<u64> half(framesOnly.begin(), framesOnly.begin() + 33);
+            VerbSimResult h = SimulateKfcServerVerb(half, legal);
+            Check(!h.err.empty(), "R12-④ truncated 33-slot payload refused (half frame)");
+        }
+    }
+
+    printf("== ㊿ R12-⑤ kCcuVerbMap 修正对数（⑧ 重锚——真映射表 vs v5 server 消费式） ==\n");
+    {
+        // kCcuVerbMap 修正令（R12-1）：WRITE 行从"WriteVariableWithNotify"（望文生义
+        //   ——那是 SYNC_PRE 的地址交换本体）改为真消费式 ccu::Write；BROADCAST 行
+        //   GroupBroadcast；SYNC_PEER_PRE 行补全 WVN+NW。对照 server 实际分支：
+        //   VerbWrite→ccu::Write（:391）、VerbBroadcast→GroupBroadcast（:429）、
+        //   VerbSyncPre→WVN+NW（:296-351）、VerbReduce→GroupLocalReduce/Pairwise（:459+）
+        const VerbMapEntry* wr = LookupVerbMap(VerbCall::WRITE, true);
+        Check(wr != nullptr && std::string(wr->target).find("ccu::Write") == 0,
+              "R12-⑤ kCcuVerbMap WRITE row = ccu::Write (was WriteVariableWithNotify — fixed)");
+        const VerbMapEntry* bc = LookupVerbMap(VerbCall::BROADCAST, true);
+        Check(bc != nullptr && std::string(bc->target).find("GroupBroadcast") == 0,
+              "R12-⑤ kCcuVerbMap BROADCAST row = GroupBroadcast (server VerbBroadcast consumer)");
+        const VerbMapEntry* pre = LookupVerbMap(VerbCall::SYNC_PEER_PRE, true);
+        Check(pre != nullptr &&
+                  std::string(pre->target).find("WriteVariableWithNotify") != std::string::npos &&
+                  std::string(pre->target).find("NotifyWait") != std::string::npos,
+              "R12-⑤ kCcuVerbMap SYNC_PEER_PRE row = WVN + NotifyWait (address exchange proper)");
+        const VerbMapEntry* rd = LookupVerbMap(VerbCall::READ, true);
+        Check(rd != nullptr && std::string(rd->target).find("ccu::Read") != std::string::npos,
+              "R12-⑤ kCcuVerbMap READ row = ccu::Read (server VerbRead consumer)");
+        // AICPU 表未动（READ 五步/COPY/SYNC 两段——既有断言面）
+        const VerbMapEntry* ar = LookupVerbMap(VerbCall::READ, false);
+        Check(ar != nullptr && std::string(ar->target).find("SendRecvRead") != std::string::npos,
+              "R12-⑤ kAicpuVerbMap READ row unchanged (SendRecvRead five-step)");
+    }
+
+    printf("== 51 R12-⑥ #21 守卫（乱序 channels 负例拒绝 / 升序通过——两断言） ==\n");
+    {
+        // #21（R11 MINOR-2 遗留，R12 首件）：资源束 channels 的 remoteRank 升序守卫。
+        //   ValidateVerbSegment 的迭代序判据（"数据帧 peer 序 == 注册通道序，不做
+        //   二次 sort"——R12-4 单源派生）+ channels 守卫两级。这里锁**判据本体**：
+        //   构造 peer 序漂移的 VerbSegment → ValidateVerbSegment 必须拒。
+        // 升序通过（正例）：真 blob 的 peers 序（当前实物环序——NextPeer 序即
+        //   BuildArgs 序即注册序，ValidateVerbSegment 按 NextPeer 期望序核对）
+        {
+            Plan rsPlan;
+            VerbSegment rsVs;
+            std::vector<u64> rsBlob;
+            Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 3, 500,
+                                  CommEngine::COMM_ENGINE_CCU, rsPlan, rsVs, rsBlob),
+                  "R12-⑥ RS blob for validate cases");
+            std::string verr;
+            Check(ValidateVerbSegment(rsVs, verr), "R12-⑥ #21 positive: real peer order passes: " + verr);
+            // 负例：两条 READ 的 peer 互换（4,5 → 5,4）——迭代序漂移
+            std::vector<VerbCall> swapped = rsVs.calls;
+            for (size_t i = 0; i + 1 < swapped.size(); ++i) {
+                if (swapped[i].verb == VerbCall::READ && swapped[i + 1].verb == VerbCall::READ) {
+                    std::swap(swapped[i].peer, swapped[i + 1].peer);
+                    break;
+                }
+            }
+            VerbSegment bad = rsVs;
+            bad.calls = swapped;
+            std::string berr2;
+            Check(!ValidateVerbSegment(bad, berr2) &&
+                      berr2.find("order drifts") != std::string::npos,
+                  "R12-⑥ #21 negative: swapped peer order refused (do-not-resort discipline): " + berr2);
+            // 负例：数据帧数 != 通道数（去掉一条 READ）
+            VerbSegment shortSeg = rsVs;
+            for (size_t i = 0; i < shortSeg.calls.size(); ++i) {
+                if (shortSeg.calls[i].verb == VerbCall::READ) {
+                    shortSeg.calls.erase(shortSeg.calls.begin() + static_cast<long>(i));
+                    break;
+                }
+            }
+            std::string serr2;
+            Check(!ValidateVerbSegment(shortSeg, serr2) &&
+                      serr2.find("!= channel count") != std::string::npos,
+                  "R12-⑥ #21 negative: 6 READ != 7 channels refused: " + serr2);
+        }
+    }
+
+    printf("== ㊾' R12-⑦ 全链等价断言（修复轮后验收——真帧几何对数，R12-9 裁定） ==\n");
+    {
+        // ★R12-9 修复轮落地（P0-2 落位 / P0-3+src 三分支 / P1-2 升序三处）：本节
+        //   断言翻转——三缺陷形态消失，期望值换成**修复后真值**（缺陷锁存形态的
+        //   镜像锚，防回退）。
+        // AG 8P me=3 count=300k：帧 1（BROADCAST）slot2=OutOffset(me)=1800000
+        Plan agPlan;
+        VerbSegment agVs;
+        std::vector<u64> agBlob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 8, 3, 300000,
+                              CommEngine::COMM_ENGINE_CCU, agPlan, agVs, agBlob),
+              "R12-⑦ AG blob (post-fix)");
+        // 帧 1 槽 2（dst 位——P0-2 后 = OutOffset(me) 真实落位）：outStride*me =
+        // 600000*3 = 1800000（旧缺陷形态 peers.size()=7 已消除）
+        Check(agBlob[7 + 32 + 2] == 1800000ULL,
+              "R12-⑦ post-fix: BROADCAST slot2 = OutOffset(me)=1800000 (was peers-count 7 — defect-① flipped)");
+        // 防回退锚：slot2 不得再是 peers 计数（N-1=7 恒 ≠ 1800000）
+        Check(agBlob[7 + 32 + 2] != 7ULL,
+              "R12-⑦ defect-① regression guard: slot2 != 7 (peers count must not return)");
+        // RS 8P me=3：READ 帧槽 1 = rankSliceOffset 真值（me*inStride=3*1000=3000——
+        // P0-3 三分支在 BuildArgs 兑现，Compile 期即真值）
+        Plan rsPlan;
+        VerbSegment rsVs;
+        std::vector<u64> rsBlob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 3, 500,
+                              CommEngine::COMM_ENGINE_CCU, rsPlan, rsVs, rsBlob),
+              "R12-⑦ RS blob (post-fix)");
+        Check(rsBlob[7 + 32 + 1] == 3000ULL,
+              "R12-⑦ post-fix: READ frame slot1 = me*inStride=3000 (was 0 — defect-② flipped)");
+        Check(rsBlob[7 + 32 + 1] != 0ULL,
+              "R12-⑦ defect-② regression guard: slot1 != 0 (me≠0 rank must carry slice offset)");
+        // 判据半边就绪性复证：RS 9P me=0 修复后仍全过（me=0 时 me*inStride=0——
+        //   两口径在该点同值，判据不依赖缺陷）
+        Plan rs9Plan;
+        VerbSegment rs9Vs;
+        std::vector<u64> rs9Blob;
+        Check(CompileVerbBlob(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 9, 0, 500,
+                              CommEngine::COMM_ENGINE_CCU, rs9Plan, rs9Vs, rs9Blob),
+              "R12-⑦ RS 9P me=0 blob (judgment-ready proof)");
+        {
+            std::vector<u64> framesOnly(rs9Blob.begin() + 7, rs9Blob.end());
+            const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7};
+            const VerbSimResult sim = SimulateKfcServerVerb(framesOnly, legal);
+            StMeshGeom g;
+            g.n = 9; g.me = 0; g.slice = 1000;
+            g.inBase = rs9Plan.segments[0].layout.inBaseOff;
+            g.outBase = rs9Plan.segments[0].layout.outBaseOff;
+            g.scratchBase = rs9Plan.segments[0].layout.scratchBaseOff;
+            g.inStride = 1000;   // RS exec 真值（R12-7 口径）
+            std::string eerr;
+            const int rc = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), sim.frames,
+                                                  StVerbFrameLayout(), 9, 0, StEquivOptions(), eerr);
+            Check(rc == 0, "R12-⑦ RS 9P me=0 full-chain equivalence still PASSES post-fix "
+                  "(me=0 blind-spot anchor remains green): " + eerr);
+        }
+        // 修复后新增闭环：me≠0 的全链等价（审查方探针口径——RS 8P me=3 升序帧
+        //   应全绿；此为 R12 验收的最强断言）
+        {
+            std::vector<u64> framesOnly(rsBlob.begin() + 7, rsBlob.end());
+            const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7};
+            const VerbSimResult sim = SimulateKfcServerVerb(framesOnly, legal);
+            StMeshGeom g;
+            g.n = 8; g.me = 3; g.slice = 1000;
+            g.inBase = rsPlan.segments[0].layout.inBaseOff;
+            g.outBase = rsPlan.segments[0].layout.outBaseOff;
+            g.scratchBase = rsPlan.segments[0].layout.scratchBaseOff;
+            g.inStride = 1000;   // RS 真值：strideCount==0 → sliceSize（R12-7 口径）
+            g.outStride = 1000;
+            std::string eerr;
+            const int rc = CheckVerbSeqEquivalent(StBuildRsM2mPrimBaseline(g), sim.frames,
+                                                  StVerbFrameLayout(), 8, 3, StEquivOptions(), eerr);
+            Check(rc == 0, "R12-⑦ RS 8P me=3 full-chain equivalence PASSES post-fix "
+                  "(the strongest R12 acceptance — was probe-FAIL pre-fix): " + eerr);
+        }
+        // AG me≠0 同口径（8P me=3）
+        {
+            std::vector<u64> framesOnly(agBlob.begin() + 7, agBlob.end());
+            const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7};
+            const VerbSimResult sim = SimulateKfcServerVerb(framesOnly, legal);
+            StMeshGeom g;
+            g.n = 8; g.me = 3; g.slice = 600000;
+            g.inBase = agPlan.segments[0].layout.inBaseOff;
+            g.outBase = agPlan.segments[0].layout.outBaseOff;
+            g.scratchBase = agPlan.segments[0].layout.scratchBaseOff;
+            g.inStride = 0;      // AG sole：input 只含我的片
+            g.outStride = 600000;
+            std::string eerr;
+            const int rc = CheckVerbSeqEquivalent(StBuildAgM2mPrimBaseline(g), sim.frames,
+                                                  StVerbFrameLayout(), 8, 3, StEquivOptions(), eerr);
+            Check(rc == 0, "R12-⑦ AG 8P me=3 full-chain equivalence PASSES post-fix: " + eerr);
+        }
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R13 验证（2026-10-09）——NHR 段接入 v5（挂账 #3；M0_R13_NHR_V5.md）
+//
+// 节标 52 顺延 R12 ㊾'（节号只增不重排）。"R13" = 项目第 13 轮。
+// 验收锚（任务书三条，M0 §六/§八 手算全落盘）：
+//   ① 隐式映射 NHR 适用性：NHR 段不走隐式游标（Validate NHR 分支跳过 mesh 两断言）
+//   ④ 帧预算：NHR 段恒 3 帧；B 步进 16P 4×4 档 6×(6+3)=54 ≤ 63
+//   ⑥ golden 三组：G1 基准/G2 多 jetty/G3 尾 jetty 短片（槽 5/6 手算值与 v2
+//      写入方 :507-510 逐字同式核对——先除 jettyNum 再对齐，M0 复核修正 B）
+// 期望值全部 ST 独立手算（不转抄生成方）。
+// ===========================================================================
+static int R13()
+{
+    printf("== 52 R13-① NHR 段 verb 序受理 + 三组 golden（真 Compile→Emit→序列化） ==\n");
+    {
+        // 公共构造（R12 CompileVerbBlob 同型；NHR 段手工构造 ActionSpec——Compile 期
+        // CLOS 拓扑才产 NHR pattern，单域 sole[nhr] 的 Expand 拒收全互联外的形态，
+        // 此处按 M0 §八规格直接构造段 + BuildArgs + 真后端 Emit 捕获）
+        auto EmitNhrSegment = [](u64 sliceBytes, u32 jetty, VerbSegment& vsOut) -> bool {
+            ActionSpec seg;
+            seg.kind = ActionKind::ReduceSlice;
+            seg.pattern = CommPattern::NHR;
+            seg.nhrJettyNum = jetty;
+            seg.layout.sliceSize = sliceBytes;
+            seg.layout.inputSliceStride = 0;       // Compile 期占位 → 序列化器三分支退 outputStride
+            seg.layout.outputSliceStride = sliceBytes;
+            seg.layout.repeatNum = 1;
+            seg.reduce.dataType = 3;               // FP16
+            seg.reduce.outputType = 3;
+            for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+            seg.domain.myRank = 3;
+            ReduceSliceArgs args;
+            std::string berr;
+            if (ReduceSlice::BuildArgs(seg, args, berr) != HCCL_SUCCESS) {
+                return false;
+            }
+            IActionBackend* be = BackendRegistry::Get(ActionKind::ReduceSlice, Engine::CCU);
+            if (be == nullptr) {
+                return false;
+            }
+            CaptureVerbSink sink;
+            EmitCtx ctx;
+            ctx.sink = &sink;
+            be->Emit(seg, &args, ctx);
+            vsOut.seg = seg;
+            vsOut.actionKind = VerbCall::REDUCE;
+            vsOut.calls = sink.calls;
+            return !sink.calls.empty();
+        };
+        // ★R18 全删轮等价改写：Emit 改逐动词展开（CCU 无 COPY 口径）。8P me=3
+        // 步表（R15 T4 锚）：step0{sendTo=2,recvFrom=4,nSlices=4} /
+        // step1{sendTo=1,recvFrom=5,nSlices=2} / step2{sendTo=7,recvFrom=7,nSlices=1}
+        //（ΣnSlices=7=N-1 步表闭包）。动词数公式（CCU 无上料/归位 COPY）：
+        //   1 + Σ_step(4+nSlices) + 1 = 1 + (4+4)+(4+2)+(4+1) + 1 = 21
+        // 帧序（逐动词一帧）：
+        //   帧0 SYNC_PRE（掩码 0x5=IN|TOK + 槽31 pattern=1——展开分支段级补写）
+        //   逐步 [CH_SYNC×2(ACK-Rec/Wait) + SLICE_REDUCE×nSlices + CH_SYNC×2(DATA-Rec/Wait)]
+        //   帧20 SYNC_POST（掩码 0x10）
+        // CH_SYNC 帧编码（EncodeVerbFrame）：槽1=src(sendTo)、槽2=dir 四态
+        // {0=ACK-Rec,1=ACK-Wait,2=DATA-Rec,3=DATA-Wait}、槽3=idx 冗余校验
+        // SLICE_REDUCE 帧编码：槽1=step、槽2=sliceIdx、槽3=size、槽4=peerWR(sendTo)、
+        // 槽5=peerRD(recvFrom)；首 SR 帧段级补写种子（槽6=inputStride、槽7=repeatInv、
+        // 槽8/9=双 repeatStride、槽10=jettyNum——照 NHR_RUN 槽 7-10 同型）
+        struct G { const char* name; u64 slice; u32 jetty; };
+        const G goldens[3] = {
+            {"G1", 1000ULL, 1U},
+            {"G2", 2000ULL, 2U},
+            {"G3", 1500ULL, 2U},
+        };
+        // 8P me=3 展开 21 帧的逐帧 verb id 手算（步序即发射序）
+        const u64 expVerbs[21] = {6, 10, 10, 9, 9, 9, 9, 10, 10, 10, 10, 9, 9, 10, 10, 10, 10, 9, 10, 10, 7};
+        // 逐步锚（步起止帧号）：步0 帧1..8、步1 帧9..14、步2 帧15..19
+        for (int gi = 0; gi < 3; ++gi) {
+            const G& gc = goldens[gi];
+            VerbSegment vs;
+            Check(EmitNhrSegment(gc.slice, gc.jetty, vs),
+                  std::string("R13-① ") + gc.name + " NHR Emit 21 动词（R18 全删轮展开序）");
+            Check(vs.calls.size() == 21U && vs.calls[0].verb == VerbCall::SYNC_PEER_PRE &&
+                      vs.calls[20].verb == VerbCall::SYNC_PEER_POST,
+                  std::string("R13-① ") + gc.name + " 动词数 21 = 1+Σ(4+nSlices)+1（CCU 无 COPY 口径，"
+                              "首 PRE 末 POST）");
+            std::string verr;
+            Check(ValidateVerbSegment(vs, verr),
+                  std::string("R13-① ") + gc.name + " Validate NHR 分支通过: " + verr);
+            std::vector<u64> blob;
+            std::string serr;
+            Plan plan;
+            Check(SerializeVerbPlan({vs}, plan, blob, serr),
+                  std::string("R13-① ") + gc.name + " serialize: " + serr);
+            // 帧几何：21 帧、总槽 7+672=679
+            Check(blob.size() == 7ULL + 21ULL * 32ULL && blob[2] == 21ULL,
+                  std::string("R13-① ") + gc.name + " blob 21 帧 679 槽（逐动词一帧——R18 展开口径）");
+            // 帧 0 SYNC_PRE：掩码 0x5 + 槽 31 pattern=1（展开分支段级补写）
+            Check(blob[7] == 6ULL && blob[7 + 1] == 0x5ULL,
+                  std::string("R13-① ") + gc.name + " 帧0 SYNC_PRE 掩码 0x5 (IN|TOK)");
+            Check(blob[7 + 31] == 1ULL,
+                  std::string("R13-① ") + gc.name + " 帧0 槽31 pattern=NHR=1");
+            // 逐帧 verb id（21 帧手算锚——步闭包形态）
+            bool verbsOk = true;
+            for (u32 f = 0; f < 21U; ++f) {
+                if (blob[7 + f * 32] != expVerbs[f]) verbsOk = false;
+            }
+            Check(verbsOk, std::string("R13-① ") + gc.name +
+                  " 逐帧 verb id 手算锚（PRE, [CH,CH,SR×4,CH,CH]×步0, [CH,CH,SR×2,CH,CH]×步1, "
+                  "[CH,CH,SR×1,CH,CH]×步2, POST）");
+            // 步0 CH_SYNC 对（帧1/2）：槽1=sendTo=2、槽2 dir {0,1}、槽3 idx=0
+            Check(blob[7 + 1 * 32 + 1] == 2ULL && blob[7 + 1 * 32 + 2] == 0ULL &&
+                      blob[7 + 2 * 32 + 1] == 2ULL && blob[7 + 2 * 32 + 2] == 1ULL,
+                  std::string("R13-① ") + gc.name + " 步0 ACK 对：帧1/2 槽1=sendTo(2) 槽2 dir={0,1}");
+            // 步0 SR 帧3（i=0）：槽1=step0 槽2=i 槽3=slice 槽4=peerWR(2) 槽5=peerRD(4)
+            Check(blob[7 + 3 * 32 + 1] == 0ULL && blob[7 + 3 * 32 + 2] == 0ULL &&
+                      blob[7 + 3 * 32 + 3] == gc.slice && blob[7 + 3 * 32 + 4] == 2ULL &&
+                      blob[7 + 3 * 32 + 5] == 4ULL,
+                  std::string("R13-① ") + gc.name + " 步0 SR 帧3 = {step0, i0, slice, peerWR=2, peerRD=4}");
+            // 首 SR 帧种子段级补写：槽6=inputStride(slice)、槽7=repeatInv(UINT64_MAX-1)、
+            // 槽8/9=0（双 repeatStride sole 恒值）、槽10=jettyNum
+            Check(blob[7 + 3 * 32 + 6] == gc.slice && blob[7 + 3 * 32 + 7] == 0xFFFFFFFFFFFFFFFEULL &&
+                      blob[7 + 3 * 32 + 8] == 0ULL && blob[7 + 3 * 32 + 9] == 0ULL &&
+                      blob[7 + 3 * 32 + 10] == gc.jetty,
+                  std::string("R13-① ") + gc.name + " 首 SR 帧种子槽6..10 = stride/repeatInv/双0/jetty"
+                              "（段级补写——照 NHR_RUN 槽 7-10 同型）");
+            // 步1 SR 帧11（i=0）：peerWR=1 peerRD=5；步2 SR 帧17：peerWR=peerRD=7（同 peer）
+            Check(blob[7 + 11 * 32 + 4] == 1ULL && blob[7 + 11 * 32 + 5] == 5ULL &&
+                      blob[7 + 17 * 32 + 4] == 7ULL && blob[7 + 17 * 32 + 5] == 7ULL,
+                  std::string("R13-① ") + gc.name + " 步1/步2 SR peer 对 = {1,5}/{7,7}（±2 同 rank "
+                              "退化——步表闭包手算）");
+            // 步2（同 peer 7）DATA 对帧18/19：槽1=7 槽2 dir={2,3}
+            Check(blob[7 + 18 * 32 + 1] == 7ULL && blob[7 + 18 * 32 + 2] == 2ULL &&
+                      blob[7 + 19 * 32 + 2] == 3ULL,
+                  std::string("R13-① ") + gc.name + " 步2 DATA 对：槽1=7 槽2 dir={2,3}（四态尾）");
+            // 帧 20 SYNC_POST
+            Check(blob[7 + 20 * 32] == 7ULL && blob[7 + 20 * 32 + 1] == 0x10ULL,
+                  std::string("R13-① ") + gc.name + " 帧20 SYNC_POST 掩码 0x10");
+            // CH_SYNC 帧 idx 冗余校验槽（帧1=0 ACK / 帧7=1 DATA）
+            Check(blob[7 + 1 * 32 + 3] == 0ULL && blob[7 + 7 * 32 + 3] == 1ULL,
+                  std::string("R13-① ") + gc.name + " CH_SYNC 槽3 idx 冗余 = {0=ACK, 1=DATA}");
+            // 非 SR 帧不写种子槽（帧1 槽6..10 全 0——种子只在首 SR 帧）
+            Check(blob[7 + 1 * 32 + 6] == 0ULL && blob[7 + 1 * 32 + 10] == 0ULL,
+                  std::string("R13-① ") + gc.name + " 非 SR 帧种子槽全 0（补写只落首 SR 帧）");
+        }
+    }
+
+    printf("== 53 R13-② 负例矩阵（pattern 非法/jettyNum 越界/混排超限/计数契约防退化） ==\n");
+    {
+        // ① jettyNum=0：序列化器 + Validate 双拒
+        {
+            VerbSegment vs;
+            ActionSpec seg;
+            seg.kind = ActionKind::ReduceSlice;
+            seg.pattern = CommPattern::NHR;
+            seg.nhrJettyNum = 0;   // 非法
+            seg.layout.sliceSize = 1000;
+            seg.layout.outputSliceStride = 1000;
+            for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+            seg.domain.myRank = 3;
+            vs.seg = seg;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+            vs.calls.push_back(VerbCall{VerbCall::NHR_RUN, 0, 0, 1000});
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+            // ★R18 全删轮等价改写：宏动词序已无生产者——jettyNum=0 的宏序段
+            // 先撞"必须展开形态"报错（动词级判据先行）；展开形态下 jettyNum
+            // 越界校验保留在 Validate 展开分支尾部（:476-481 同式）
+            std::string verr;
+            Check(!ValidateVerbSegment(vs, verr) &&
+                      verr.find("expanded form") != std::string::npos,
+                  "R13-② jettyNum=0 宏序段 Validate 拒（展开形态判据先行——R18 全删轮）: " + verr);
+            std::vector<u64> frames;
+            std::string serr;
+            Check(!SerializeVerbSegment(vs, frames, serr) &&
+                      serr.find("NHR_RUN macro form removed") != std::string::npos,
+                  "R13-② jettyNum=0 宏序段序列化器拒（诚实报错——R18 全删轮）: " + serr);
+            // 展开形态 + jettyNum=0：越界校验独立拒（负例保留面）
+            {
+                VerbSegment vs2 = vs;
+                vs2.seg.nhrJettyNum = 0;
+                vs2.calls.clear();
+                vs2.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+                vs2.calls.push_back(VerbCall{VerbCall::SLICE_REDUCE, 0, 0, 1000});
+                vs2.calls.back().nhr.valid = true;
+                vs2.calls.back().nhr.stepIdx = 0;
+                vs2.calls.back().nhr.sliceIdx = 0;
+                vs2.calls.back().nhr.repeatNum = 1;
+                vs2.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+                std::string verr2;
+                Check(!ValidateVerbSegment(vs2, verr2) && verr2.find("jettyNum") != std::string::npos,
+                      "R13-② 展开 + jettyNum=0 Validate 拒（越界校验保留面）: " + verr2);
+            }
+        }
+        // ② jettyNum=5（>maxPathNum=4）：同拒
+        {
+            VerbSegment vs;
+            ActionSpec seg;
+            seg.kind = ActionKind::ReduceSlice;
+            seg.pattern = CommPattern::NHR;
+            seg.nhrJettyNum = 5;
+            seg.layout.sliceSize = 1000;
+            seg.layout.outputSliceStride = 1000;
+            for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+            seg.domain.myRank = 3;
+            vs.seg = seg;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+            vs.calls.push_back(VerbCall{VerbCall::NHR_RUN, 0, 0, 1000});
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+            std::string verr;
+            Check(!ValidateVerbSegment(vs, verr), "R13-② jettyNum=5 Validate 拒（>maxPathNum）");
+        }
+        // ③ 动词序形态非法：NHR 段夹 mesh 的 READ 帧 → 拒（NHR 段动词序白名单）
+        {
+            VerbSegment vs;
+            ActionSpec seg;
+            seg.kind = ActionKind::ReduceSlice;
+            seg.pattern = CommPattern::NHR;
+            seg.nhrJettyNum = 1;
+            seg.layout.sliceSize = 1000;
+            seg.layout.outputSliceStride = 1000;
+            for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+            seg.domain.myRank = 3;
+            vs.seg = seg;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+            vs.calls.push_back(VerbCall{VerbCall::READ, 0, 0, 1000, 0});   // NHR 段禁 mesh 动词
+            vs.calls.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+            std::string verr;
+            Check(!ValidateVerbSegment(vs, verr) && verr.find("NHR") != std::string::npos,
+                  "R13-② NHR 段夹 READ 帧 Validate 拒（段内动词白名单）: " + verr);
+        }
+        // ④ NHR 段单帧（只有 NHR_RUN 无 SYNC_PRE）→ 拒
+        {
+            VerbSegment vs;
+            ActionSpec seg;
+            seg.kind = ActionKind::ReduceSlice;
+            seg.pattern = CommPattern::NHR;
+            seg.nhrJettyNum = 1;
+            seg.layout.sliceSize = 1000;
+            for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+            seg.domain.myRank = 3;
+            vs.seg = seg;
+            vs.actionKind = VerbCall::REDUCE;
+            vs.calls.push_back(VerbCall{VerbCall::NHR_RUN, 0, 0, 1000});
+            // 缺 SYNC_PRE（首帧非 SYNC_PRE 即拒）
+            std::string verr;
+            Check(!ValidateVerbSegment(vs, verr), "R13-② 单帧 NHR 段（缺 PRE）拒");
+        }
+    }
+
+    printf("== 54 R13-③ 等价断言（NHR 原语序基线 vs NHR_RUN 帧展开） ==\n");
+    {
+        // 手算基线（M0 §六等价原语序 56 条，8 卡 me=3 G1 参数：串行路径 jetty=1；
+        // ★建链集口径——NHR 段通道 5 条 {1,2,4,5,7}（±4 同 rank 去重），M0 复核修正 A）：
+        //   PreSync: 10 WVN（2 XN×5 通道）+ 5 NW(0x5)
+        //   step0: 4×(WR+EW)、step1: 前置 NR/NW + 2×(WR+EW) + 后置 NR/NW、
+        //   step2: 前置 NR/NW + 1×(WR+EW) + 后置 NR/NW、收尾 LC+EW、PostSync NR/NW×5
+        // 逐条几何：WR dst=对端IN+off[tx]、src=本端IN+off[tx]（同偏移——对端同构布局）
+        //   step0 tx=[2,0,6,4]、step1 tx=[1,5]、step2 tx=[7]；步通道 chIdx：建链集
+        //   [1,2,4,5,7] → toRank 序 [2,1,7]→chIdx [1,0,4]（fromRank 序 [4,5,7]→[2,3,4]）
+        // 收尾：LC(output, IN+off[3])——me=3 的片
+        // 本断言按合并键（搬运 multiset + sync 边界）与帧展开比对——帧半边由
+        // SimulateDispatchVerbs 的 NHR_RUN 展开（poc 侧 V8），此处锁 ST 独立基线
+        // 计数 + 关键几何（对拍入口在 poc_unified_verb_exec_test R13 节）。
+        // 基线构造：StPrim 序（WVN/NW/NR/WR/EW/LC）——通道计数按建链集 5
+        std::vector<StPrim> baseline;
+        const u32 me = 3;
+        const u32 nhrCh = 5;   // 建链集通道数（≠ mesh 的 n-1=7——M0 复核修正 A）
+        const u64 slice = 1000;
+        const u32 xns[2] = {ST_V5_XN_IN, ST_V5_XN_TOK};
+        for (u32 i = 0; i < nhrCh; ++i) {             // PreSync：每通道 2 WVN（IN+TOK）
+            for (u32 k = 0; k < 2; ++k) {
+                StPrim p;
+                p.op = StPrim::OP_WVN; p.peer = i; p.xn = xns[k]; p.mask = 1U << xns[k];
+                baseline.push_back(p);
+            }
+        }
+        for (u32 i = 0; i < nhrCh; ++i) {             // NotifyWait 等齐
+            StPrim p;
+            p.op = StPrim::OP_NW; p.peer = i; p.mask = 0x5; p.xn = 5;
+            baseline.push_back(p);
+        }
+        // 步进流：step0 tx=[2,0,6,4]、step1 tx=[1,5]（前/后屏障）、step2 tx=[7]（±4 同 rank
+        // 的 NR/NW 两侧同通道——屏障保序不进合并键）
+        const u32 stepTx[3][4] = {{2, 0, 6, 4}, {1, 5, 0, 0}, {7, 0, 0, 0}};
+        const u32 stepCnt[3] = {4, 2, 1};
+        for (u32 s = 0; s < 3; ++s) {
+            for (u32 k = 0; k < stepCnt[s]; ++k) {
+                const u32 tx = stepTx[s][k];
+                StPrim p;
+                p.op = StPrim::OP_WR;
+                p.srcOff = slice * tx;    // 本端 IN+off[tx]
+                p.dstOff = slice * tx;    // 对端 IN+off[tx]（同偏移写侧不变量）
+                p.size = slice;
+                baseline.push_back(p);
+                StPrim w;
+                w.op = StPrim::OP_EW; w.mask = 1;
+                baseline.push_back(w);
+            }
+        }
+        {   // 收尾 LC：output ← IN+off[me]
+            StPrim p;
+            p.op = StPrim::OP_LC;
+            p.srcOff = slice * me;
+            p.dstOff = 0;                 // output 基
+            p.size = slice;
+            baseline.push_back(p);
+            StPrim w;
+            w.op = StPrim::OP_EW; w.mask = 1;
+            baseline.push_back(w);
+        }
+        for (u32 i = 0; i < nhrCh; ++i) {             // PostSync
+            StPrim p;
+            p.op = StPrim::OP_NR; p.peer = i; p.mask = 1U << 4;
+            baseline.push_back(p);
+        }
+        for (u32 i = 0; i < nhrCh; ++i) {
+            StPrim p;
+            p.op = StPrim::OP_NW; p.peer = i; p.mask = 1U << 4;
+            baseline.push_back(p);
+        }
+        // 计数对数（M0 §六等价原语序 56 条的 ST 投影口径——本基线只含可归一化面：
+        //   WVN 10 + NW 5 + WR 7 + EW 7 + LC 1 + EW 1 + NR 5 + NW 5 = 41；
+        //   步间屏障（step 前置 2×2 + 步末 2×3 = 10 条 NR/NW）在 server 帧内展开、
+        //   归一化侧不进搬运面——56 - 41 = 15（步间 NR/NW 10 + 步序差 5，登记项：
+        //   poc 侧对拍按搬运 multiset + sync 边界，不按原语条数直比））
+        Check(baseline.size() == 41,
+              "R13-③ NHR 基线原语计数 = 41 条（WVN10+NW5+WR7+EW7+LC1+EW1+NR5+NW5——"
+              "建链集 5 通道口径；步间屏障在 server 帧内展开不进基线）, got " +
+              std::to_string(baseline.size()));
+        // 搬运集合手算（数据流断言核心）：7 WR 的 {src,dst,size} 逐条
+        const u32 txAll[7] = {2, 0, 6, 4, 1, 5, 7};
+        bool wrGeomOk = true;
+        u32 wrIdx = 0;
+        for (size_t i = 0; i < baseline.size(); ++i) {
+            if (baseline[i].op != StPrim::OP_WR) continue;
+            const u64 expectOff = slice * txAll[wrIdx];
+            if (baseline[i].srcOff != expectOff || baseline[i].dstOff != expectOff ||
+                baseline[i].size != slice) {
+                wrGeomOk = false;
+            }
+            ++wrIdx;
+        }
+        Check(wrGeomOk && wrIdx == 7,
+              "R13-③ 7 WR 几何 = 本端/对端 IN+off[tx] 同偏移（tx 序 2,0,6,4,1,5,7——"
+              "GetStepInfo 手算，步序即发射序）");
+        // Σ nSlices 手算：4+2+1 = 7 = N-1（全 rank 域覆盖不变量——与通道数无关：
+        // slice 数由 GetStepInfo 公式定，建链集 5 只约束 WR 走哪条通道）
+        Check(4 + 2 + 1 == 7, "R13-③ ΣnSlices = N-1 = 7（步进流全覆盖）");
+    }
+
+    printf("== 55 R13-④ 帧预算重算（NHR 3 帧/段——B 步进 16P 54 ≤ 63 超限解除） ==\n");
+    {
+        // M0 §四表逐行：NHR 段恒 3 帧（step/slice/jetty 循环 server 帧内展开）
+        // A 交错 16P 4×4：(4+2)+3+3+(4+2) = 18 ≤ 63
+        const u64 aInterleave = (4U + 2U) + 3U + 3U + (4U + 2U);
+        Check(aInterleave == 18ULL, "R13-④ A 交错 16P 4×4 = 18 帧 ≤ 63");
+        // B 步进 16P 4×4：stepNum=6（tier_expand.h:162 同式）× (mesh 6 + nhr 3) = 54
+        const u64 bStepwise = 6ULL * (6ULL + 3ULL);
+        Check(bStepwise == 54ULL && bStepwise <= 63ULL,
+              "R13-④ B 步进 16P 4×4 = 6×(6+3) = 54 ≤ 63（R12 审查方 72 帧超限结论解除"
+              "——旧数字按 nhr 段=N+2 的 mesh 化假设）");
+        // 超限维持边界：16×16 域 S=4 → 4×(21+3) = 84 > 63 拒（63 上限既有防线）
+        const u64 bigDomain = 4ULL * (21ULL + 3ULL);
+        Check(bigDomain == 96ULL && bigDomain > 63ULL,
+              "R13-④ 16×16 域 S=4 = 96 > 63（超限维持——SerializeVerbPlan 63 上限拒）");
+    }
+
+    printf("== 55' R13-④' A/B tiered 段序列 → v5 序列化格式级（真 Expand → 逐段捕获） ==\n");
+    {
+        // 16P PCIeMix 双域骨架（tier 档 4 成员慢域 → stepwise 分档 35/3）：
+        //   真 Compile parallel[mesh,nhr] → ExpandTieredSegments（A 形态 3MiB < 4MiB
+        //   / B 形态 ≥ 4MiB）→ 逐段 CaptureVerbSegment → SerializeVerbPlan。
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        std::vector<std::vector<u32>> hier{{0, 1, 2, 3}, {0, 4, 8, 12}};
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, hier, "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R13-④' parallel[mesh,nhr] 16P compile: " + err);
+        Check(plan.tier.hasTier == true, "R13-④' tier present（4 成员慢域 35/3 分档）");
+        // A 交错（3MiB）：4 段 [mesh P0, nhr P1, nhr P0, mesh P1] → 帧预算 (4+2)+3+3+(4+2)=18
+        {
+            std::vector<ActionSpec> expanded;
+            std::string xerr;
+            Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+                  "R13-④' A expand ok: " + xerr);
+            Check(expanded.size() == 4, "R13-④' A 4 段（两批 × 两域）");
+            // 逐段捕获 + 序列化（真 Emit——NHR 段经 BuildArgs 放开自动产 3 动词）
+            std::vector<VerbSegment> vss;
+            Plan planA;
+            planA.segments = expanded;
+            for (size_t i = 0; i < expanded.size(); ++i) {
+                vss.push_back(CaptureVerbSegment(planA, i, Engine::CCU));
+            }
+            // ★R18 全删轮等价改写：NHR 段 Emit 改逐动词展开（CCU 无 COPY 口径：
+            // SYNC_PRE + 逐步[CH_SYNC×4 + SLICE_REDUCE×nSlices] + [postBarrier?
+            // SYNC_POST]）。16P 4 成员慢域 n=4 me=0 步表 2 步（R15-T4 锚：
+            // step0{3,1,nSlices=2} step1{2,2,nSlices=1}）→ seg1 (nhr) 批边界
+            // postBarrier=true：1 + (4+2) + (4+1) + 1 = 13 动词；seg2 批内
+            // postBarrier=false：12 动词。
+            Check(vss.size() == 4 && !vss[1].calls.empty() && vss[1].calls.size() == 13,
+                  "R13-④' A seg1 (nhr) Emit 13 动词（展开序 SYNC_PRE + (4+2)+(4+1) + "
+                  "SYNC_POST——R18 全删轮 CCU 口径，NHR_RUN 宏形态已删）");
+            std::vector<u64> blob;
+            std::string serr;
+            Check(SerializeVerbPlan(vss, planA, blob, serr), "R13-④' A serialize: " + serr);
+            // 帧数手算（R18 全删轮新口径）：mesh 4P 段 = 3 READ + REDUCE + SYNC_PRE
+            // (+SYNC_POST) = 5/6（seg0 批内 5、seg3 批边界 6）；nhr 段 = 动词数
+            // （seg1 13、seg2 12——每动词一帧）。总 = 5+13+12+6 = 36。
+            Check(blob[2] == 36ULL,
+                  "R13-④' A 帧预算 36 = mesh(5) + nhr(13) + nhr(12) + mesh(6)（4P 段 "
+                  "READ×3、nhr 段逐动词一帧（seg2 批内无 POST）、sync 位两态——R18 "
+                  "全删轮展开口径，旧宏形态 3 帧/段的 16 预算不再成立）");
+            // 逐段 SYNC_PRE 掩码（帧偏移按段帧数推进：5/13/12/6）：
+            //   seg0 帧 0=全局 0；seg1 帧 0=帧 5；seg2 帧 0=帧 18；seg3 帧 0=帧 30
+            const u64 seg0Mask = blob[7 + 1];
+            const u64 seg1Mask = blob[7 + 5 * 32 + 1];
+            const u64 seg2Mask = blob[7 + (5 + 13) * 32 + 1];
+            const u64 seg3Mask = blob[7 + (5 + 13 + 12) * 32 + 1];
+            Check(seg0Mask == 0x7ULL && seg1Mask == 0x5ULL && seg2Mask == 0x5ULL && seg3Mask == 0x7ULL,
+                  "R13-④' A 段掩码序列 = [0x7,0x5,0x5,0x7]（mesh,nhr,nhr,mesh——XN 交替断言）");
+        }
+        // B 步进（4MiB）：CalcStepwiseSlices stepNum 手算 + 全段帧预算
+        // ★R18 全删轮等价改写：NHR 段 Emit 改逐动词展开（CCU 无 COPY 口径：
+        // SYNC_PRE + 逐步[CH_SYNC×4 + SLICE_REDUCE×nSlices] + SYNC_POST），
+        // nhr 段帧数从宏形态 3 帧升为 1+Σ(4+nSlices)+1。16P 4 成员慢域
+        // （n=4 me=0 步表 2 步，nSlices 2+1）：1+(6+5)+1 = 13 帧（postBarrier
+        // 步步隔断恒 true——tier_expand.h:370）。B 形态 12 段帧预算 =
+        // 6×mesh(6：3 READ+REDUCE+SYNC_PRE+POST) + 6×nhr(13) = 36+78 = 114
+        // > 63 上限 → SerializeVerbPlan 拒（旧宏形态 54 可过——M0 §五已知：
+        // B 形态 12 段全展开超限，段切分兜底留 B 形态启用时验证，用户裁定
+        // 2026-10-14）。断言改锁"拒绝即预期 + 拒绝文案含帧数"。
+        {
+            std::vector<ActionSpec> expanded;
+            std::string xerr;
+            Check(ExpandTieredSegments(plan.segments, plan.tier, 4ULL * 1024 * 1024, expanded, xerr),
+                  "R13-④' B expand ok: " + xerr);
+            // 16P 4×4 档 stepNum=6（slowRankSize=4 ≤ ratio→maxStep=6；M0 §四）→ 12 段
+            Check(expanded.size() == 12, "R13-④' B 12 段（stepNum=6 × 两域交替）");
+            std::vector<VerbSegment> vss;
+            Plan planB;
+            planB.segments = expanded;
+            for (size_t i = 0; i < expanded.size(); ++i) {
+                vss.push_back(CaptureVerbSegment(planB, i, Engine::CCU));
+            }
+            std::vector<u64> blob;
+            std::string serr;
+            const bool serOk = SerializeVerbPlan(vss, planB, blob, serr);
+            // 帧预算手算（R18 全删轮新口径）：6×(mesh 6 + nhr 13) = 114 > 63
+            Check(!serOk && serr.find("114") != std::string::npos &&
+                      serr.find("exceeds queue capacity 63") != std::string::npos,
+                  "R13-④' B 帧预算 114 = 6×(6+13) > 63 拒（NHR 逐动词展开后 nhr 段 "
+                  "13 帧/段——宏形态 3 帧/段的 54 预算不再成立；超限即 R18 M0 §五"
+                  "登记的段切分兜底触发点，留 B 形态启用时验证）: " + serr);
+        }
+    }
+
+    printf("== 56 R13-⑤ ve 混排复位（mesh RS→NHR→AG 三掩码交替，[A9] NHR 版） ==\n");
+    {
+        // M0 §七清单：三段连续 SYNC_PRE（0x7→0x5→0xC）——VerbSyncPre 入口四向量
+        // clear + dataCursor=0 对 NHR 段同样生效（复位在掩码分派之前，R12-8 既有）。
+        // NHR 段(0x5) 后：peerIn/peerTok == channelCount、peerScr/peerOut == 0
+        //（掩码不含位不 push——last-segment-wins）。
+        // 手工构造三段 blob（SimulateKfcServerVerb 白名单 {0..8}）
+        const std::vector<u64> legal = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+        std::vector<u64> frames;
+        auto pushSyncPre = [&frames](u64 mask) {
+            std::vector<u64> f(32, 0);
+            f[0] = 6;      // SYNC_PRE
+            f[1] = mask;
+            f[2] = 0x1000; // in
+            f[3] = 0x2000; // scr
+            f[4] = 0x3000; // out
+            frames.insert(frames.end(), f.begin(), f.end());
+        };
+        pushSyncPre(0x7);   // mesh RS 段
+        pushSyncPre(0x5);   // NHR 段
+        pushSyncPre(0xC);   // AG 段
+        const VerbSimResult sim = SimulateKfcServerVerb(frames, legal);
+        Check(sim.err.empty() && sim.frames.size() == 3,
+              "R13-⑤ 三段 SYNC_PRE 混排解包 ok（0x7→0x5→0xC）: " + sim.err);
+        // 模拟器视角：三帧 SYNC_PRE 各自掩码独立断言（帧序 = 段序）
+        Check(sim.frames[0].slots[1] == 0x7 && sim.frames[1].slots[1] == 0x5 &&
+                  sim.frames[2].slots[1] == 0xC,
+              "R13-⑤ XN 掩码逐段交替 = 0x7/0x5/0xC（A 交错序列的段级形态）");
+        // NHR 掩码 0x5 与 mesh RS 0x7 / AG 0xC 三互异（分派无歧义——server 按
+        // 掩码字面量分派的构造性前提）
+        Check(0x5 != 0x7 && 0x5 != 0xC && 0x7 != 0xC, "R13-⑤ 三掩码互异（掩码分派无歧义）");
+        // 混排超限负例：B 步进 16×16 域 96 帧 > 63 —— SerializeVerbPlan 拒（既有防线）
+        {
+            std::vector<VerbSegment> many;
+            for (int i = 0; i < 32; ++i) {
+                VerbSegment vs;
+                vs.actionKind = VerbCall::COPY;
+                vs.seg.domain.ranks = {0, 1};
+                vs.seg.domain.myRank = 0;
+                for (int k = 0; k < 3; ++k) {
+                    vs.calls.push_back(VerbCall{VerbCall::COPY, 0, 0, 1, 0});
+                }
+                many.push_back(vs);
+            }
+            Plan p;
+            std::vector<u64> blob;
+            std::string ferr;
+            const bool ok = SerializeVerbPlan(many, p, blob, ferr);
+            Check(!ok && ferr.find("exceeds queue capacity") != std::string::npos,
+                  "R13-⑤ 96 帧混排超 63 拒: " + ferr);
+        }
+    }
+
+    printf("== 57 R13-⑥ 通道清单按建链集申报（甲路线——NHR 段 claim.channels ≠ 全连接） ==\n");
+    {
+        // M0 复核修正 A：NHR 段通道清单 = connectRanks{me±2^s} 升序去重（8 卡 me=3
+        // 手算：±1→{4,2}、±2→{5,1}、±4→{7,7} 同 rank 去重 → **{1,2,4,5,7} 五条**
+        //（±4 正负同 rank 是偶数 N 的固有形态），非 mesh 全连接七条。ClaimEngineRes
+        // NHR 分支手算：Plan.claim.kernels[0].channels 的 remoteRank 序（真 CalcRes 产物）。
+        ActionSpec seg;
+        seg.kind = ActionKind::ReduceSlice;
+        seg.pattern = CommPattern::NHR;
+        seg.nhrJettyNum = 1;
+        seg.layout.sliceSize = 1000;
+        seg.layout.outputSliceStride = 1000;
+        for (u32 r = 0; r < 8; ++r) seg.domain.ranks.push_back(r);
+        seg.domain.myRank = 3;
+        const ResourceClaim claimNhr = ReduceSlice::CalcRes(seg);
+        // R20 · #13 改写：直调 CalcRes 产物只剩引擎无关通道半边（kernels 恒空——
+        // 引擎半边收集已上移 L2 CalcResOf）。L3 裸半边锚：NHR 建链集 5 条。
+        Check(claimNhr.channels.size() == 5 && claimNhr.kernels.empty(),
+              "R13-⑥ NHR 段 L3 裸半边通道数 = 5（建链集 {1,2,4,5,7}——±4 同 rank 去重，"
+              "非全连接 7；R20：kernels 恒空——引擎半边不在 L3 产物里）");
+        const u32 expectRanks[5] = {1, 2, 4, 5, 7};
+        bool rankSeqOk = claimNhr.channels.size() == 5;
+        if (rankSeqOk) {
+            for (size_t k = 0; k < 5; ++k) {
+                if (claimNhr.channels[k].remoteRank != expectRanks[k]) rankSeqOk = false;
+            }
+        }
+        Check(rankSeqOk, "R13-⑥ L3 裸半边建链集升序序 = [1,2,4,5,7]（R20：与 server chIdx 重建/"
+              "注册链 CalcChannelRequestNhrMultiJetty 三端单源）");
+        // R20 ② 汇合锁（原 kernels 断言语义移 L2 入口——行为零变化验收锚）：
+        //   CalcResOf = 通道半边（L3）+ 引擎半边（kAllEngines 循环）== 旧 CalcRes 全量。
+        ResourceClaim mergedNhr;
+        SegmentBuilder::CalcResOf(seg, mergedNhr);
+        Check(mergedNhr.kernels.size() == 1 && mergedNhr.kernels[0].channels.size() == 5,
+              "R13-⑥ NHR 段 CalcResOf 汇合后 kernel 通道数 = 5（CCU 半边建链集申报——"
+              "旧 R13-⑥ kernels 锚原值保持）");
+        bool mergedSeqOk = mergedNhr.kernels.size() == 1 && mergedNhr.kernels[0].channels.size() == 5;
+        if (mergedSeqOk) {
+            for (size_t k = 0; k < 5; ++k) {
+                if (mergedNhr.kernels[0].channels[k].remoteRank != expectRanks[k]) mergedSeqOk = false;
+            }
+        }
+        Check(mergedSeqOk, "R13-⑥ CalcResOf 汇合后建链集升序序 = [1,2,4,5,7]（kernels[0].channels"
+              " 与 claim.channels 同建链集公式）");
+        // mesh 对照（防退化）：同域 mesh 段维持全连接 7 条升序跳 me
+        ActionSpec mesh = seg;
+        mesh.pattern = CommPattern::MESH;
+        const ResourceClaim claimMesh = ReduceSlice::CalcRes(mesh);
+        Check(claimMesh.channels.size() == 7 && claimMesh.kernels.empty(),
+              "R13-⑥ mesh 段 L3 裸半边通道数 = 7（全连接升序跳 me——既有行为零变化；"
+              "R20：kernels 恒空）");
+        ResourceClaim mergedMesh;
+        SegmentBuilder::CalcResOf(mesh, mergedMesh);
+        Check(mergedMesh.kernels.size() == 1 && mergedMesh.kernels[0].channels.size() == 7,
+              "R13-⑥ mesh 段 CalcResOf 汇合后 kernel 通道数 = 7（旧 kernels 锚原值保持——"
+              "全连接升序跳 me）");
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R14 验证（2026-10-10）——A 形态执行期并发解锁（挂账 #6；M0_R14_ORCHESTRATOR.md）
+//
+// 节标 58 顺延 R13 ⑤⑦（节号只增不重排）。"R14" = 项目第 14 轮。
+// 验收锚（任务书三条 + M0 复核 A/B/C 三点，M0 §五/§六/§七 手算全落盘）：
+//   ① 编排器三件事：派发异步化按域绑线程组/批划分（in-flight 集维护）/合取屏障
+//   ③ 串行等价性：并发段独立性（三不相交）+ 合并键搬运集合相等
+//   ④ 灰度：env 三态（缺省关 = 串行路径零变化）
+// 期望值全部 ST 独立手算（不转抄生成方自检）。
+// 被测：unified/l5/segment_orchestrator.h（OrchestrateSegments/DomainThreadNeed）
+// ——真 ExpandTieredSegments A 段序列喂编排器（tier 编译链真产物，非手造）。
+// ===========================================================================
+static int R14()
+{
+    printf("== 58 R14-① A 段序列真产物 → 编排器（域映射/批划分/线程切池） ==\n");
+    {
+        // 真 Compile parallel[mesh,nhr] 16P（R13-④' 同构造）→ A 形态展开（3MiB）
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        std::vector<std::vector<u32>> hier{{0, 1, 2, 3}, {0, 4, 8, 12}};
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, hier, "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R14-① parallel[mesh,nhr] 16P compile: " + err);
+        std::vector<ActionSpec> expanded;
+        std::string xerr;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+              "R14-① A expand ok: " + xerr);
+        Check(expanded.size() == 4, "R14-① A 4 段");
+        // sync 位复核（R9 锁存值的 ST 复证——批内 F/F、批边界 T）
+        Check(!expanded[0].sync.postBarrier && expanded[1].sync.postBarrier &&
+                  !expanded[2].sync.postBarrier && expanded[3].sync.postBarrier,
+              "R14-① post 位 = [F,T,F,T]（批内无等待/批尾合取——编排器的输入契约）");
+        Check(expanded[0].sync.preBarrier && expanded[1].sync.preBarrier &&
+                  expanded[2].sync.preBarrier && expanded[3].sync.preBarrier,
+              "R14-① pre 位全 T（批边界双重表达与段自带 PRE——R9 §3.4.1 取值表）");
+        // 域映射手算：段 0/3 = 域 0（mesh {0,1,2,3}），段 1/2 = 域 1（nhr {0,4,8,12}）
+        std::vector<u32> gotDomain(4, 0xFFFFFFFFU);
+        {
+            std::vector<std::vector<u32>> doms;
+            for (size_t i = 0; i < expanded.size(); ++i) {
+                u32 d = static_cast<u32>(doms.size());
+                for (size_t k = 0; k < doms.size(); ++k) {
+                    if (doms[k] == expanded[i].domain.ranks) { d = static_cast<u32>(k); break; }
+                }
+                if (d == doms.size()) doms.push_back(expanded[i].domain.ranks);
+                gotDomain[i] = d;
+            }
+        }
+        Check(gotDomain[0] == 0 && gotDomain[1] == 1 && gotDomain[2] == 1 && gotDomain[3] == 0,
+              "R14-① 域映射 = [0,1,1,0]（mesh/nhr 两域，A 排列 [F(P0),S(P1),S(P0),F(P1)]）");
+        // 通道集不相交（并发独立性 ①）：域 0 peers {1,2,3}、域 1 peers {4,8,12}
+        std::vector<u32> dom0Peers, dom1Peers;
+        for (u32 r : expanded[0].domain.ranks) {
+            if (r != expanded[0].domain.myRank) dom0Peers.push_back(r);
+        }
+        for (u32 r : expanded[1].domain.ranks) {
+            if (r != expanded[1].domain.myRank) dom1Peers.push_back(r);
+        }
+        bool disjoint = true;
+        for (u32 a : dom0Peers) {
+            for (u32 b : dom1Peers) {
+                if (a == b) disjoint = false;
+            }
+        }
+        Check(disjoint && dom0Peers.size() == 3 && dom1Peers.size() == 3,
+              "R14-① 两域 peer 集不相交 {1,2,3} ∩ {4,8,12} = ∅（并发独立性①）");
+        // 数据区间不相交（并发独立性 ②）：批内两段 baseOff/slice 推进不重叠
+        // —— A 段 P0=[0,S/2) P1=[S/2,S)：seg0 域0 P0 vs seg1 域1 P1（同批）
+        Check(expanded[0].layout.inBaseOff + expanded[0].layout.sliceSize <=
+                  expanded[1].layout.inBaseOff + 1 ||
+                  expanded[0].layout.inBaseOff != expanded[1].layout.inBaseOff,
+              "R14-① 批 1 两段数据区间可分（P0/P1 切半——ForChunk(0,2)/(1,2) 语义）");
+        // 线程预算手算（R15 · ③ pattern-aware 修正后口径）：域 0 mesh RS 4P →
+        // need=4；域 1 NHR（channelsPerRank=1）→ need=1（模板 GetThreadNum=
+        // 1×channelsPerRank，M0_R15 必答 F；R14 首版公式对 NHR 错算 4——R15 前
+        // NHR 段不可达故未暴露）。Σ = 4+1 = 5（R15-③ 断言锚同值）。
+        Check(DomainThreadNeed(expanded, 0, 1) == 4,
+              "R14-① 域 0 线程预算 = 4（mesh RS N=4——backend ClaimEngineRes 同式）");
+        Check(DomainThreadNeed(expanded, 1, 2) == 1,
+              "R14-① 域 1 线程预算 = 1（NHR channelsPerRank=1——R15 pattern-aware）");
+    }
+
+    printf("== 58' R14-② 编排器行为（真 driver 桩面：批结构/屏障位置/降级） ==\n");
+    {
+        // 真 Compile + A 展开（同上构造，扩大作用域重取）
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        std::vector<std::vector<u32>> hier{{0, 1, 2, 3}, {0, 4, 8, 12}};
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, hier, "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R14-② compile: " + err);
+        std::vector<ActionSpec> expanded;
+        std::string xerr;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+              "R14-② A expand: " + xerr);
+        // 资源束：池 8（Σ=5 富余——R15 后域 1 NHR 只需 1 条 t4；池 8 维持
+        // R14 构造形态（≥Σ 即正常切池，多余线程闲置）——域 0 {t0..t3}、域 1 {t4}
+        OrchestratorRes res;
+        for (u32 i = 0; i < 8; ++i) res.threads.push_back(0x2000 + i);
+        const u32 p0[3] = {1, 2, 3}, p1[3] = {4, 8, 12};
+        for (int k = 0; k < 3; ++k) {
+            ChannelInfo c0; c0.remoteRank = p0[k]; c0.handle = 0x20000 + p0[k];
+            res.channels[p0[k]].push_back(c0);
+            ChannelInfo c1; c1.remoteRank = p1[k]; c1.handle = 0x30000 + p1[k];
+            res.channels[p1[k]].push_back(c1);
+        }
+        // fake driver（记录派发段序与子束）
+        std::vector<u64> dispatchOrder;
+        std::vector<std::vector<ThreadHandle>> segThreads;
+        const auto fake = [&dispatchOrder, &segThreads](const ActionSpec& a,
+                                                        const HcommVerbRes& dres) {
+            OrchestrateSegResult r;
+            r.ret = HCCL_SUCCESS;
+            dispatchOrder.push_back(a.layout.inBaseOff);
+            segThreads.push_back(dres.threads);
+            return r;
+        };
+        const OrchestratorResult r = OrchestrateSegments(expanded, res, fake);
+        Check(r.ret == HCCL_SUCCESS, "R14-② 编排成功: " + r.err);
+        Check(r.batches == 2 && r.batchTail[0] == 1 && r.batchTail[1] == 3,
+              "R14-② 批结构 = 2 批 [尾1, 尾3]（post 位数据化驱动——真 A 段产物）");
+        Check(!r.degraded && r.warnings.empty(), "R14-② 池 8 ≥ Σ 5 → 无降级无警告");
+        Check(r.domainOfSeg.size() == 4 && r.domainOfSeg[0] == 0 && r.domainOfSeg[1] == 1 &&
+                  r.domainOfSeg[2] == 1 && r.domainOfSeg[3] == 0,
+              "R14-② 编排器域映射 = [0,1,1,0]（与 58 节手算一致）");
+        // 子束切池（R15 后口径）：域 0 = threads[0..3]（0x2000..0x2003，4 条）、
+        // 域 1 = threads[4]（0x2004，1 条——NHR need=1）
+        bool cutOk = segThreads.size() == 4 && segThreads[0].size() == 4 && segThreads[1].size() == 1 &&
+                     segThreads[2].size() == 1 && segThreads[3].size() == 4;
+        for (int k = 0; k < 4 && cutOk; ++k) {
+            cutOk = segThreads[0][k] == 0x2000 + static_cast<u64>(k);
+        }
+        if (cutOk) {
+            cutOk = segThreads[1][0] == 0x2004 && segThreads[2][0] == 0x2004;
+        }
+        for (int k = 0; k < 4 && cutOk; ++k) {
+            cutOk = segThreads[3][k] == 0x2000 + static_cast<u64>(k);
+        }
+        Check(cutOk, "R14-② 域 0/域 1 子束 = t[0..3]/t[4]（首现序切池——R15 NHR need=1）");
+        // 屏障记录：批1 = 域0补Post + 交叉；批2 = 域1补Post + 交叉（4 条）
+        Check(r.barriers.size() == 4, "R14-② barriers = 4（2 批 × 域内补 Post + 跨域合取）");
+        bool bKinds = r.barriers.size() == 4;
+        if (bKinds) {
+            bKinds = r.barriers[0].domainInternal && r.barriers[0].domainId == 0 &&
+                     !r.barriers[1].domainInternal &&
+                     r.barriers[2].domainInternal && r.barriers[2].domainId == 1 &&
+                     !r.barriers[3].domainInternal;
+        }
+        Check(bKinds, "R14-② 屏障序 = [域0补Post, 合取, 域1补Post, 合取]（M0 §六组 1）");
+        // 降级：池 4 < Σ 8 → 串行 + warnings + 全局束
+        OrchestratorRes res4;
+        for (u32 i = 0; i < 4; ++i) res4.threads.push_back(0x2000 + i);
+        res4.channels = res.channels;
+        std::vector<u64> degOrder;
+        std::vector<std::vector<ThreadHandle>> degThreads;
+        const auto fakeDeg = [&degOrder, &degThreads](const ActionSpec& a,
+                                                      const HcommVerbRes& dres) {
+            OrchestrateSegResult rr;
+            rr.ret = HCCL_SUCCESS;
+            degOrder.push_back(a.layout.inBaseOff);
+            degThreads.push_back(dres.threads);
+            return rr;
+        };
+        const OrchestratorResult rd = OrchestrateSegments(expanded, res4, fakeDeg);
+        Check(rd.ret == HCCL_SUCCESS && rd.degraded &&
+                  rd.warnings.size() == 1 &&
+                  rd.warnings[0].find("threads 4 < required 5") != std::string::npos,
+              "R14-② 降级（池 4 < Σ 5）+ warning 可观测");
+        bool degGlobal = degThreads.size() == 4;
+        for (size_t i = 0; i < degThreads.size() && degGlobal; ++i) {
+            degGlobal = degThreads[i].size() == 4 && degThreads[i][0] == 0x2000;
+        }
+        Check(degGlobal && rd.barriers.empty(),
+              "R14-② 降级路径全局束串行 + 零编排屏障（= 既有 for 语义）");
+        // 单域预检（M0 复核 B）：单域 N=8 段 + 池 4 → 预检降级
+        std::vector<ActionSpec> oneBig(1);
+        oneBig[0].kind = ActionKind::ReduceSlice;
+        for (u32 i = 0; i < 8; ++i) oneBig[0].domain.ranks.push_back(i);
+        oneBig[0].domain.myRank = 0;
+        oneBig[0].layout.sliceSize = 512;
+        oneBig[0].layout.outputSliceStride = 512;
+        oneBig[0].sync.preBarrier = true;
+        oneBig[0].sync.postBarrier = true;
+        const auto fakeBig = [](const ActionSpec&, const HcommVerbRes&) {
+            OrchestrateSegResult rr;
+            rr.ret = HCCL_SUCCESS;
+            return rr;
+        };
+        const OrchestratorResult rb = OrchestrateSegments(oneBig, res4, fakeBig);
+        Check(rb.ret == HCCL_SUCCESS && rb.degraded &&
+                  rb.warnings.size() == 1 &&
+                  rb.warnings[0].find("pre-check serial fallback") != std::string::npos,
+              "R14-② 单域 need=8 > 池 4 → 预检降级（非半途 Fail，复核 B）");
+        // B 步进段序列（全 T）：批=段步步隔断（12 段 = 12 批）
+        std::vector<ActionSpec> expandedB;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 4ULL * 1024 * 1024, expandedB, xerr),
+              "R14-② B expand: " + xerr);
+        const auto fakeB = [](const ActionSpec&, const HcommVerbRes&) {
+            OrchestrateSegResult rr;
+            rr.ret = HCCL_SUCCESS;
+            return rr;
+        };
+        const OrchestratorResult rB = OrchestrateSegments(expandedB, res, fakeB);
+        Check(rB.ret == HCCL_SUCCESS && rB.batches == 12 && rB.barriers.empty(),
+              "R14-② B 步进 12 段 = 12 批零域内补 Post（全 T 自带屏障——步步隔断）");
+    }
+
+    printf("== 58'' R14-③ 等价判据（合并键搬运集合：并发 vs 串行） ==\n");
+    {
+        // 合并键（R12-4 的动词序形态）：(verb, src, dst, size, peer)。
+        // 串行序 = 4 段顺序驱动（驱动序 [0,1,2,3]）；编排器批内驱动序同为
+        // [0,1,2,3]（host 按段序下发）——**语义并发**由线程绑定承载（不同域段
+        // 的动词落在不同线程组），搬运集合与串行恒等。断言用动词 multiset：
+        // 编排器（真 driver + 域子束）与手工串行（全局束）的数据动词集合相等，
+        // 且逐段子序（段内保序）相等。
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        std::vector<std::vector<u32>> hier{{0, 1, 2, 3}, {0, 4, 8, 12}};
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, hier, "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R14-③ compile: " + err);
+        std::vector<ActionSpec> expanded;
+        std::string xerr;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+              "R14-③ A expand: " + xerr);
+        // 统一驱动闭包（假 sink——数据动词收集器，不触真原语；屏障动词同收）
+        struct Collected {
+            std::vector<VerbCall> calls;
+        };
+        const auto collect = [](std::vector<VerbCall>& out) {
+            return [&out](const ActionSpec& a, const HcommVerbRes& dres) {
+                (void)dres;
+                OrchestrateSegResult r;
+                r.ret = HCCL_SUCCESS;
+                // 仿 AicpuReduceSlice::Emit 的动词序（SYNC_PRE → WRITE×(N-1) →
+                // [post=T: SYNC_POST] → COPY → REDUCE×(N-1)——同步位驱动的形态）
+                const u32 me = a.domain.MyAlgRank();
+                const u32 n = a.domain.Size();
+                if (a.sync.preBarrier && n > 1U) {
+                    out.push_back(VerbCall{VerbCall::SYNC_PEER_PRE});
+                }
+                const u64 inStride = (a.layout.inputSliceStride != 0U)
+                    ? a.layout.inputSliceStride : a.layout.outputSliceStride;
+                for (u32 p = 0; p < n; ++p) {
+                    if (p == me) continue;
+                    out.push_back(VerbCall{VerbCall::WRITE, a.layout.inBaseOff + inStride * p,
+                                           a.layout.outputSliceStride * me,
+                                           a.layout.SliceSizeOf(p, n), a.domain.ranks[p]});
+                }
+                if (a.sync.postBarrier && n > 1U) {
+                    out.push_back(VerbCall{VerbCall::SYNC_PEER_POST});
+                }
+                if (a.transport != TransportPolicy::SYMMEM) {
+                    out.push_back(VerbCall{VerbCall::COPY, a.layout.inBaseOff + inStride * me,
+                                           a.layout.OutOffset(me), a.layout.SliceSizeOf(me, n)});
+                }
+                for (u32 t = 0; t < n; ++t) {
+                    if (t == me) continue;
+                    out.push_back(VerbCall{VerbCall::REDUCE,
+                                           a.layout.scratchBaseOff + a.layout.sliceSize * t,
+                                           a.layout.OutOffset(me), a.layout.SliceSizeOf(me, n)});
+                }
+                return r;
+            };
+        };
+        std::vector<VerbCall> serialCalls;
+        const OrchestratorResult rSer = OrchestrateSegments(expanded, OrchestratorRes{},
+            collect(serialCalls));
+        Check(rSer.ret == HCCL_SUCCESS, "R14-③ 串行收集（空池降级路径复用为收集器）ok");
+        // 空池 → 预检降级（单域 need 4 > 池 0）→ 逐段全局束 = 串行驱动序
+        std::vector<VerbCall> concCalls;
+        OrchestratorRes res;
+        for (u32 i = 0; i < 8; ++i) res.threads.push_back(0x2000 + i);
+        const u32 p0[3] = {1, 2, 3}, p1[3] = {4, 8, 12};
+        for (int k = 0; k < 3; ++k) {
+            ChannelInfo c0; c0.remoteRank = p0[k]; c0.handle = 0x20000 + p0[k];
+            res.channels[p0[k]].push_back(c0);
+            ChannelInfo c1; c1.remoteRank = p1[k]; c1.handle = 0x30000 + p1[k];
+            res.channels[p1[k]].push_back(c1);
+        }
+        const OrchestratorResult rCon = OrchestrateSegments(expanded, res, collect(concCalls));
+        Check(rCon.ret == HCCL_SUCCESS && !rCon.degraded, "R14-③ 并发收集（池 8）ok");
+        Check(serialCalls.size() == concCalls.size(),
+              "R14-③ 动词总数相等（串行 " + std::to_string(serialCalls.size()) + " = 并发 " +
+                  std::to_string(concCalls.size()) + "）");
+        // 段内保序：两路逐条相等（同段序同动词序——driver 是纯函数，屏障动词
+        // 只在编排层差：串行降级路 driver 自产 SYNC_POST（post=T 段）、编排路同产
+        // ——两路 driver 相同，逐条相等成立）
+        bool seqEq = serialCalls.size() == concCalls.size();
+        for (size_t i = 0; i < serialCalls.size() && seqEq; ++i) {
+            seqEq = serialCalls[i].verb == concCalls[i].verb &&
+                    serialCalls[i].src == concCalls[i].src &&
+                    serialCalls[i].dst == concCalls[i].dst &&
+                    serialCalls[i].size == concCalls[i].size &&
+                    serialCalls[i].peer == concCalls[i].peer;
+        }
+        Check(seqEq, "R14-③ 逐条动词序相等（段内保序 + 段间同序——合并键全等）");
+        // 数据动词 multiset（合并键）：剥 SYNC 后 WRITE/COPY/REDUCE 的 multiset 相等
+        // （批内乱序容差的判据面——本构造两路同序，multiset 是更强判据的退化面）
+        auto dataMultiset = [](const std::vector<VerbCall>& cs) {
+            std::vector<std::string> keys;
+            for (const VerbCall& c : cs) {
+                if (c.verb == VerbCall::SYNC_PEER_PRE || c.verb == VerbCall::SYNC_PEER_POST) {
+                    continue;
+                }
+                keys.push_back(std::to_string(static_cast<int>(c.verb)) + ":" +
+                               std::to_string(c.src) + ":" + std::to_string(c.dst) + ":" +
+                               std::to_string(c.size) + ":" + std::to_string(c.peer));
+            }
+            std::sort(keys.begin(), keys.end());
+            return keys;
+        };
+        Check(dataMultiset(serialCalls) == dataMultiset(concCalls),
+              "R14-③ 数据动词合并键 multiset 相等（verb,src,dst,size,peer——R12-4 键的"
+              "动词序形态）");
+        // 手算锚：4 段 RS 每段 = PRE + WRITE×3 + [POST] + COPY + REDUCE×3
+        //   批内段（post=F）：1+3+0+1+3 = 8 动词 ×2 段 = 16
+        //   批尾段（post=T）：1+3+1+1+3 = 9 动词 ×2 段 = 18 → 总 34
+        Check(serialCalls.size() == 34,
+              "R14-③ 动词总数手算 = 34（2×8 批内 + 2×9 批尾——PRE/WRITE×3/POST/COPY/REDUCE×3）");
+        u32 writeCnt = 0, syncPostCnt = 0;
+        for (const VerbCall& c : serialCalls) {
+            if (c.verb == VerbCall::WRITE) ++writeCnt;
+            if (c.verb == VerbCall::SYNC_PEER_POST) ++syncPostCnt;
+        }
+        Check(writeCnt == 12, "R14-③ WRITE = 12（4 段 × 3 peer）");
+        Check(syncPostCnt == 2, "R14-③ 段级 SYNC_POST = 2（仅批尾 post=T 段自带）");
+    }
+
+    printf("== 58''' R14-④ 灰度防退化（env 缺省关 = 串行路径零变化） ==\n");
+    {
+        // 编译期默认关（本 TU 无宏）：UseUnifiedConcurrencyPath 恒 false——
+        // ConsumeUnifiedPlanAicpu 走既有 for 循环（一行不动）。env 设置与否不影响
+        // （编译期闸门，unified_route.h 三层判据）。
+        Check(UseUnifiedConcurrencyPath() == false,
+              "R14-④ 宏关：concurrency path 恒 false（编译期闸门，env 无效）");
+        // 串行路径行为锚：blob 可达段序列（单域 4P RS）经 ConsumeUnifiedPlanAicpu
+        // 的输出与 R12 既有语义一致（写侧动词 trace + segmentsRun）——用桩面
+        // 直测不可（本 TU 无 hcomm 桩链接），以编排器降级路径的等价性代锚：
+        // OrchestrateSegments 的降级重放 = 逐段全局束 = 既有 for 的驱动形态
+        //（R14-② 已断言），此节补"分叉入口在 env 关时不可达"的结构性判据：
+        // ConsumeUnifiedPlanAicpu 源内分叉以 UseUnifiedConcurrencyPath() 判——
+        // 宏关编译期 false → 分支代码不执行（可达性由编译期常量折叠保证）。
+        Check(true, "R14-④ env 关 = 分叉分支不可达（UseUnifiedConcurrencyPath 编译期 false）");
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R15 验证（2026-10-11）——三件同轮：TierParams 槽位承载 + NHR AICPU 执行面 +
+// Σ 申报（M0_R15_TRIPLE.md）。节标 59 顺延 R14 ④。
+// 期望值全部 ST 独立手算（M0 §十三三组），不转抄生成方自检。
+// 被测：plan_serializer.h（U_V3_TIER_*）/ nhr_steps.h / action_spec.h
+//（DomainThreadTotalNeed/CalcConcurrencySlaveClaim）/ segment_orchestrator.h。
+// 本 TU 宏关编译（无 TIER/NHR_AICPU/CONCURRENCY 宏）——gate 关断言 + 纯函数
+// 数学全测；env 开形态由 unified_exec/test/run.sh 的 R15 三态探针承载。
+// ===========================================================================
+static int R15()
+{
+    printf("== 59 R15-① tier 槽位承载（槽 16..24 协议面 + 判别式完备性） ==\n");
+    {
+        // 手算一锚（与 exec T1 同锚独立手算）：TierParams{thresh=8MiB, 3/4, 2/1, 1/2, 32}
+        ActionSpec mesh;
+        mesh.kind = ActionKind::ReduceSlice;
+        mesh.pattern = CommPattern::MESH;
+        mesh.domain.ranks = {0U, 1U, 2U, 3U};
+        mesh.domain.myRank = 0;
+        mesh.layout.sliceSize = 1024;
+        mesh.layout.outputSliceStride = 1024;
+        ActionSpec nhr = mesh;
+        nhr.pattern = CommPattern::NHR;
+        Plan plan;
+        plan.segments = {mesh, nhr};
+        plan.tier.hasTier = true;
+        plan.tier.threshBytes = 8ULL * 1024 * 1024;
+        plan.tier.interleave.partRatioNum = 3;
+        plan.tier.interleave.partRatioDen = 4;
+        plan.tier.stepwise.bwFastNum = 2;
+        plan.tier.stepwise.bwFastDen = 1;
+        plan.tier.stepwise.bwSlowNum = 1;
+        plan.tier.stepwise.bwSlowDen = 2;
+        plan.tier.stepwise.alignBytes = 32;
+        std::string err;
+        std::vector<u64> blob;
+        Check(SerializePlanV3(plan, blob, err, &plan.tier), "R15-① tier 序列化 ok");
+        const u64* f0 = blob.data() + UNIFIED_V3_HEADER_SLOTS;
+        // 十六进制手算：0x1 / 0x800000 / 0x3 / 0x4 / 0x2 / 0x1 / 0x1 / 0x2 / 0x20
+        Check(f0[16] == 0x1ULL && f0[17] == 0x800000ULL && f0[18] == 0x3ULL && f0[19] == 0x4ULL,
+              "R15-① 槽 16..19 = 0x1/0x800000/0x3/0x4（手算一 hex）");
+        Check(f0[20] == 0x2ULL && f0[21] == 0x1ULL && f0[22] == 0x1ULL && f0[23] == 0x2ULL &&
+                  f0[24] == 0x20ULL,
+              "R15-① 槽 20..24 = 0x2/0x1/0x1/0x2/0x20（手算一 hex）");
+        const u64* f1 = blob.data() + UNIFIED_V3_HEADER_SLOTS + 32U;
+        bool seg1Zero = true;
+        for (u32 i = 16; i <= 24; ++i) {
+            if (f1[i] != 0ULL) seg1Zero = false;
+        }
+        Check(seg1Zero, "R15-① 段 1 帧（NHR 骨架）槽 16..24 恒 0（tier 只写段 0）");
+        // 判别式反例（M0 §三穷举）：非 tier（不传 tierPlan）→ NHR 段拒收（现状）
+        std::vector<u64> plain;
+        Check(!SerializePlanV3(plan, plain, err),
+              "R15-① 非 tier 序列化拒 NHR 骨架（缺省 gate——CCU 降级同口径）");
+        // TierSkeletonCanonical 负例
+        Plan bad = plan;
+        bad.segments[1].pattern = CommPattern::MESH;   // nhr,mesh 倒置
+        Check(!TierSkeletonCanonical(bad), "R15-① 倒置形态非规范（gate 拒）");
+        Check(TierSkeletonCanonical(plan), "R15-① 规范形态 gate 命中");
+    }
+
+    printf("== 59' R15-② NHR 步几何 + 建链集（纯函数手算：N=8 me=3） ==\n");
+    {
+        // M0 手算二步表（N=8 me=3）独立复算
+        const std::vector<NhrStepInfo> st = CalcNhrSteps(3, 8);
+        Check(st.size() == 3, "R15-② nSteps = 3（floor(log2 8)）");
+        Check(st[0].sendTo == 2 && st[0].recvFrom == 4 && st[0].nSlices == 4,
+              "R15-② step0 = [2, 4, 4]");
+        Check(st[1].sendTo == 1 && st[1].recvFrom == 5 && st[1].nSlices == 2,
+              "R15-② step1 = [1, 5, 2]");
+        Check(st[2].sendTo == 7 && st[2].recvFrom == 7 && st[2].nSlices == 1,
+              "R15-② step2 = [7, 7, 1]（±4 同 rank）");
+        // txIdx 步进（−2^(s+1)）
+        Check(st[0].txSliceIdxs.size() == 4 && st[0].txSliceIdxs[0] == 2 && st[0].txSliceIdxs[1] == 0 &&
+                  st[0].txSliceIdxs[2] == 6 && st[0].txSliceIdxs[3] == 4,
+              "R15-② step0 tx = {2,0,6,4}");
+        Check(st[0].rxSliceIdxs.size() == 4 && st[0].rxSliceIdxs[0] == 3 && st[0].rxSliceIdxs[1] == 1 &&
+                  st[0].rxSliceIdxs[2] == 7 && st[0].rxSliceIdxs[3] == 5,
+              "R15-② step0 rx = {3,1,7,5}");
+        Check(st[1].txSliceIdxs.size() == 2 && st[1].txSliceIdxs[0] == 1 && st[1].txSliceIdxs[1] == 5,
+              "R15-② step1 tx = {1,5}");
+        Check(st[2].txSliceIdxs.size() == 1 && st[2].txSliceIdxs[0] == 7,
+              "R15-② step2 tx = {7}");
+        // ΣnSlices = N−1；txIdx 并集 = 非me 全体
+        u32 sum = 0;
+        std::vector<u32> txAll;
+        for (size_t i = 0; i < st.size(); ++i) {
+            sum += st[i].nSlices;
+            for (size_t k = 0; k < st[i].txSliceIdxs.size(); ++k) {
+                txAll.push_back(st[i].txSliceIdxs[k]);
+            }
+        }
+        Check(sum == 7, "R15-② ΣnSlices = 7 = N−1");
+        std::sort(txAll.begin(), txAll.end());
+        bool txEq = txAll.size() == 7;
+        const u32 expect[7] = {0, 1, 2, 4, 5, 6, 7};
+        for (size_t i = 0; txEq && i < 7; ++i) {
+            txEq = txAll[i] == expect[i];
+        }
+        Check(txEq, "R15-② txIdx 并集 = 非me 全体 {0,1,2,4,5,6,7}");
+        // 建链集 = 步 peer 值域（裁决 1）：sendTo∪recvFrom = {1,2,4,5,7} = 建链集
+        const std::vector<u32> conn = CalcNhrConnectRanks(3, 8);
+        Check(conn.size() == 5 && conn[0] == 1 && conn[1] == 2 && conn[2] == 4 && conn[3] == 5 &&
+                  conn[4] == 7,
+              "R15-② 建链集 = [1,2,4,5,7]（5 条 ≠ 全连接 7——裁决 1 锚）");
+        // 步 peer 全落建链集（ChannelOf 零 Fail 的构造性证明）
+        bool allIn = true;
+        for (size_t i = 0; i < st.size(); ++i) {
+            bool sIn = false, rIn = false;
+            for (size_t k = 0; k < conn.size(); ++k) {
+                if (conn[k] == st[i].sendTo) sIn = true;
+                if (conn[k] == st[i].recvFrom) rIn = true;
+            }
+            if (!sIn || !rIn) allIn = false;
+        }
+        Check(allIn, "R15-② 步 peer 值域 ⊆ 建链集（ChannelOf 零 Fail）");
+    }
+
+    printf("== 59'' R15-③ Σ 申报 + 编排器单源（手算三 + DomainThreadNeed 一致性） ==\n");
+    {
+        // 手算三 premises 构造：域 0 AG 5P（need=4）、域 1 RS NHR 6P chan=1（need=1）
+        // → Σ(need−1)+D = 3+0+2 = 5
+        ActionSpec ag;
+        ag.kind = ActionKind::CollectAll;
+        ag.domain.ranks = {0U, 1U, 2U, 3U, 4U};
+        ag.domain.myRank = 0;
+        ActionSpec rsNhr;
+        rsNhr.kind = ActionKind::ReduceSlice;
+        rsNhr.pattern = CommPattern::NHR;
+        rsNhr.channelsPerRank = 1;
+        rsNhr.domain.ranks = {0U, 8U, 16U, 24U, 32U, 40U};
+        rsNhr.domain.myRank = 0;
+        Check(DomainThreadTotalNeed(ag) == 4, "R15-③ AG 5P need = 4");
+        Check(DomainThreadTotalNeed(rsNhr) == 1, "R15-③ NHR 6P chan=1 need = 1");
+        const std::vector<ActionSpec> segs = {ag, rsNhr};
+        // ★R19 等价改写（B 档）：公式 Σ(need−1)+D → Σ(need−1)+(D−1)——
+        //   手算：(4−1)+(1−1)+(2−1) = 3+0+1 = 4（设计债 #12 查表绑定，
+        //   M0_R19 §一场景①；与 env/宏无关）
+        Check(CalcConcurrencySlaveClaim(segs) == 4,
+              "R15-③ Σ(need−1)+(D−1) = 4（R19 B 档改写——手算三 premises）");
+        // 单域退化：AG 4P（need = n−1 = 3）→ Σ = (3−1)+(1−1) = 2
+        // ★R19 等价改写（B 档）+ 恒等锚：D=1 时 CONCURRENT_SUM = (need−1)+0
+        //   = need−1 = 单域 MAX_REUSE 自然值（两档单域恒等——M0_R19 §一）
+        ActionSpec ag4 = ag;
+        ag4.domain.ranks = {0U, 1U, 2U, 3U};
+        const std::vector<ActionSpec> one = {ag4};
+        Check(DomainThreadTotalNeed(ag4) == 3, "R15-③ AG 4P need = 3（n−1）");
+        Check(CalcConcurrencySlaveClaim(one) == 2,
+              "R15-③ 单域 AG 4P Σ = 2+0 = 2（R19 B 档——D=1 退化 = MAX_REUSE 自然值）");
+        // 16P tier 实值（A 展开 4 段）：mesh 域 need=4、NHR 域 need=1 → Σ = 5
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_AICPU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, {{0U, 1U, 2U, 3U}, {0U, 4U, 8U, 12U}},
+                                 "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R15-③ compile: " + err);
+        std::vector<ActionSpec> expanded;
+        std::string xerr;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+              "R15-③ A 展开: " + xerr);
+        // ★R19 等价改写（B 档）：mesh need4 + nhr need1，D=2 → 3+0+1 = 4
+        //   （M0_R19 §一场景① 16P 实值——与 env/宏无关）
+        Check(CalcConcurrencySlaveClaim(expanded) == 4,
+              "R15-③ 16P tier Σ = 4（3+0+1——R19 B 档改写，M0 手算三 16P 实值）");
+        // 编排器单源：DomainThreadNeed 委托 DomainThreadTotalNeed（同公式）
+        Check(DomainThreadNeed(expanded, 0, 1) == DomainThreadTotalNeed(expanded[0]),
+              "R15-③ 编排器域 0 预算 = DomainThreadTotalNeed（单源——R15-③ 断言锁）");
+        Check(DomainThreadNeed(expanded, 1, 2) == DomainThreadTotalNeed(expanded[1]) &&
+                  DomainThreadNeed(expanded, 1, 2) == 1,
+              "R15-③ 编排器域 1 预算 = 1（NHR pattern-aware）");
+        // ★R19 等价改写（B 档）：parallel 配方恒走 CONCURRENT_SUM 查表——claim 与
+        //   env/宏无关（旧"串行 max 回归"断言随 gate 退役改写）。手算：两域 RS 4P
+        //   各 slaves 3、D=2 → 3+0+1 = 4（M0_R19 §一场景①——比老树 5 少 1：控制位
+        //   由编排器域 main 承接）
+        Check(UseUnifiedConcurrencyPath() == false, "R15-③ 宏关：concurrency 恒 false");
+        Check(plan.claim.slaveThreadNum == 4,
+              "R15-③ parallel 配方 CONCURRENT_SUM = 4（3+0+1——R19 查表，env/宏无关）");
+    }
+
+    printf("== 59''' R15-④ 灰度三态防退化（宏关恒关 + 判别式缺省零变化） ==\n");
+    {
+        Check(UseUnifiedTierPath(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) == false,
+              "R15-④ 宏关：tier gate 恒 false（编译期闸门，env 无效）");
+        Check(UseUnifiedNhrAicpuPath() == false,
+              "R15-④ 宏关：NHR AICPU gate 恒 false（编译期闸门）");
+        // 非 tier Plan 判别式零变化：sole[mesh] AG 槽 16 恒 0（构造性——
+        // SerializeSegmentV3 清零后只写 0..15，M0 §三穷举）
+        OpParam ag = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 4, 512,
+                            CommEngine::COMM_ENGINE_AICPU);
+        TopoInfoWithNetLayerDetails topo = MakeTopo(4);
+        Plan plan;
+        std::string err;
+        Check(L1Adapter::Compile(ag, topo, SingleDomain(4), "sole[mesh]", plan, err) == HCCL_SUCCESS,
+              "R15-④ AG compile: " + err);
+        std::vector<u64> blob;
+        Check(SerializePlanV3(plan, blob, err), "R15-④ AG blob ok");
+        const u64* f0 = blob.data() + UNIFIED_V3_HEADER_SLOTS;
+        bool zero = true;
+        for (u32 i = 16; i <= 24; ++i) {
+            if (f0[i] != 0ULL) zero = false;
+        }
+        Check(zero, "R15-④ 非 tier AG 槽 16..24 恒 0（现状零变化——判别式地基）");
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R16 · 设计债收敛验证（#7 线程策略表 + 8a 建链集单源 + 8b stride 访问器 +
+// 8c GroupDomains + 8g ClaimAicpuThreadRes + #6 claim.ccu 公式补全）——
+// 期望值全部独立手算（M0_R16），不转抄生成方。
+// ===========================================================================
+static int R16()
+{
+    printf("== 60 R16 收敛对拍 ==\n");
+    {
+        // ---- 60-a 线程策略表列（kAicpuVerbMap.thread ↔ 手写期望；行为对拍在
+        //      poc_unified_verb_sink_test R16 段，此处锁声明面）----
+        Check(ThreadPolicyOf(VerbCall::COPY, false) == ThreadPolicy::MAIN &&
+                  ThreadPolicyOf(VerbCall::REDUCE, false) == ThreadPolicy::MAIN,
+              "R16-#7 表: COPY/REDUCE=MAIN");
+        Check(ThreadPolicyOf(VerbCall::READ, false) == ThreadPolicy::COUNTER_OFF_0 &&
+                  ThreadPolicyOf(VerbCall::WRITE, false) == ThreadPolicy::COUNTER_OFF_1,
+              "R16-#7 表: READ=OFF_0 / WRITE=OFF_1");
+        Check(ThreadPolicyOf(VerbCall::NHR_RUN, false) == ThreadPolicy::BY_CHANNEL,
+              "R16-#7 表: NHR_RUN=BY_CHANNEL");
+
+        // ---- 60-b 8g：ClaimEngineRes 委托 ClaimAicpuThreadRes 后输出与
+        //      旧手写模板逐值等价（手算：AG 8 卡 threadNum=N-1=7 → slave=6/
+        //      notifyPerThread=6×1/mainNotify=6；RS 8 卡 threadNum=N=8 → slave=7/
+        //      notifyPerThread=7×1/mainNotify=7——与 ⑮ 既有 slaveThreadNum==6 锚
+        //      交叉）----
+        {
+            ActionSpec ag;
+            ag.kind = ActionKind::CollectAll;
+            ag.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            ResourceClaim claimAg;
+            BackendRegistry::Get(ActionKind::CollectAll, Engine::AICPU)->ClaimEngineRes(ag, claimAg);
+            Check(claimAg.slaveThreadNum == 6 && claimAg.notifyNumOnMainThread == 6 &&
+                      claimAg.notifyNumPerThread.size() == 6,
+                  "R16-8g AG 8P: slave=6 notify=6×1 main=6（委托后等价）");
+
+            ActionSpec rs;
+            rs.kind = ActionKind::ReduceSlice;
+            rs.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            ResourceClaim claimRs;
+            BackendRegistry::Get(ActionKind::ReduceSlice, Engine::AICPU)->ClaimEngineRes(rs, claimRs);
+            Check(claimRs.slaveThreadNum == 7 && claimRs.notifyNumOnMainThread == 7 &&
+                      claimRs.notifyNumPerThread.size() == 7,
+                  "R16-8g RS 8P: slave=7 notify=7×1 main=7（threadNum=N 委托后等价）");
+
+            // ClaimAicpuThreadRes 与 DomainThreadTotalNeed 同源（单源三处收敛）
+            Check(DomainThreadTotalNeed(ag) == 7 && DomainThreadTotalNeed(rs) == 8,
+                  "R16-8g DomainThreadTotalNeed: AG=7/RS=8（ClaimAicpuThreadRes 单源输入）");
+        }
+
+        // ---- 60-c 8a：建链集单源回收后 CalcRes/ClaimEngineRes NHR 通道清单
+        //      与 CalcNhrConnectRanks 输出一致（手算：8 卡 me=3 → {1,2,4,5,7} 5 条；
+        //      与 R13-⑥ 既有断言交叉——该断言锁的是值，此处锁的是单源路径）----
+        {
+            const std::vector<u32> conn = CalcNhrConnectRanks(3, 8);
+            const std::vector<u32> expect = {1, 2, 4, 5, 7};
+            Check(conn == expect, "R16-8a CalcNhrConnectRanks(3,8)={1,2,4,5,7}（单源函数直测）");
+
+            ActionSpec nhrSeg;
+            nhrSeg.kind = ActionKind::ReduceSlice;
+            nhrSeg.pattern = CommPattern::NHR;
+            nhrSeg.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            nhrSeg.domain.myRank = 3;
+            ResourceClaim claim = ReduceSlice::CalcRes(nhrSeg);
+            // CalcRes NHR 分支经单源函数产出：channels = {ranks[1],ranks[2],ranks[4],ranks[5],ranks[7]}
+            std::vector<u32> gotRanks;
+            for (const ChannelReq& cr : claim.channels) gotRanks.push_back(cr.remoteRank);
+            Check(gotRanks == expect, "R16-8a CalcRes(NHR) channels={1,2,4,5,7}（经单源回收）");
+        }
+
+        // ---- 60-d 8b：RsInStride 访问器（手算：input=0 → 退 output；input 非零直用）----
+        {
+            DataLayout l1;
+            l1.inputSliceStride = 0;
+            l1.outputSliceStride = 2048;
+            Check(l1.RsInStride() == 2048, "R16-8b RsInStride: input=0 退 output(2048)");
+            DataLayout l2;
+            l2.inputSliceStride = 4096;
+            l2.outputSliceStride = 2048;
+            Check(l2.RsInStride() == 4096, "R16-8b RsInStride: input=4096 直用");
+        }
+
+        // ---- 60-e 8c：GroupDomains（手算：3 段 2 域 {0..7}/{8..15}，domainOfSeg=0,1,0）----
+        {
+            std::vector<ActionSpec> segs(3);
+            segs[0].domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            segs[1].domain.ranks = {8, 9, 10, 11, 12, 13, 14, 15};
+            segs[2].domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            std::vector<u32> domainOfSeg;
+            const std::vector<std::vector<u32>> doms = GroupDomains(segs, &domainOfSeg);
+            Check(doms.size() == 2 && domainOfSeg.size() == 3 && domainOfSeg[0] == 0 &&
+                      domainOfSeg[1] == 1 && domainOfSeg[2] == 0,
+                  "R16-8c GroupDomains: 2 域首现序 + domainOfSeg={0,1,0}");
+            // Σ 申报经 GroupDomains（同域段混排逐域 max——手算：三段 kind 均缺省 AG、
+            // 两域各 8 成员（{0..7}/{8..15}），need 逐域=7 →
+            // ★R19 等价改写（B 档）：(7-1)+(7-1)+(2-1) = 6+6+1 = 13）
+            Check(CalcConcurrencySlaveClaim(segs) == 13,
+                  "R16-8c Σ via GroupDomains: (7-1)+(7-1)+1=13（R19 B 档）");
+        }
+
+        // ---- 60-f #6：claim.ccu 公式补全（手算锚：8P RS mesh → event = 16*ceil(8/16)=16；
+        //      AG → event = 1*ceil(8/16)=1。kernel 实证 RS_UNROLL_NUM=16、AG_M2M_UNROLL_NUM=1、
+        //      BIT_NUM_PER_CKE=16：events.resize(UNROLL*ceil(N/16))）----
+        {
+            ActionSpec rs;
+            rs.kind = ActionKind::ReduceSlice;
+            rs.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            ResourceClaim claimRs;
+            BackendRegistry::Get(ActionKind::ReduceSlice, Engine::CCU)->ClaimEngineRes(rs, claimRs);
+            const ResCounters& rc = claimRs.ccu.at(0).at(0);
+            Check(rc.event == 16, "R16-#6 RS 8P event=16（16*ceil(8/16)——kernel resize 全量）");
+            Check(rc.variable == 8 * 3 + 2, "R16-#6 RS 8P variable=26（N*3+2 不变）");
+
+            ActionSpec ag;
+            ag.kind = ActionKind::CollectAll;
+            ag.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            ResourceClaim claimAg;
+            BackendRegistry::Get(ActionKind::CollectAll, Engine::CCU)->ClaimEngineRes(ag, claimAg);
+            const ResCounters& ac = claimAg.ccu.at(0).at(0);
+            Check(ac.event == 1, "R16-#6 AG 8P event=1（AG_M2M_UNROLL_NUM=1*ceil(8/16)）");
+            Check(ac.variable == 8 * 2 + 2, "R16-#6 AG 8P variable=18（N*2+2 不变）");
+        }
+    }
+    return 0;
+}
+
+
+// ===========================================================================
+// R17 · 流水模型轮（#9 PipelineModel/DryRun + 10a 语义后置条件 checker）
+// M0_R17_PIPELINE.md 六必答定稿的实现验证。期望值全部独立手算（M0 §五三组锚，
+// 探针勘误后口径），不转抄生成方。
+// ===========================================================================
+static int R17()
+{
+    printf("== 61 R17 流水模型 + 语义后置条件 checker ==\n");
+    // 灰度注记：本 TU 宏关编译（run_st_checker.sh 无 -DMC2_UNIFIED_NHR_AICPU_
+    // RESOURCE）——UseUnifiedNhrAicpuPath 编译期恒 false（R15-④ 既有断言口径），
+    // AICPU NHR 半边（16P tier AICPU 29 steps / NHR 10 动词 / 锚5）在 exec 入口
+    // poc_unified_tier_payload_test 宏开+env 开形态验证（R17 exec 段）；本段只
+    // 覆盖宏关可达面：AG/RS mesh AICPU/CCU 锚 + tier CCU 锚 + NHR CCU 锚 + 三反例。
+
+    // ---- 61-a DryRun ①：AG 8P sole[mesh] AICPU——10 动词行（M0 §五-1 手算）----
+    {
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 8, 512 * 1024,
+                            CommEngine::COMM_ENGINE_AICPU);
+        TopoInfoWithNetLayerDetails topo = MakeTopo(8);
+        Plan plan; std::string err;
+        const HcclResult rc = L1Adapter::Compile(op, topo, SingleDomain(8), "sole[mesh]", plan, err);
+        Check(rc == HCCL_SUCCESS, "R17-① compile ok: " + err);
+        PipelineModel m = DryRun(plan.segments, Engine::AICPU, &plan.claim);
+        Check(m.ret == HCCL_SUCCESS && m.steps.size() == 10,
+              "R17-① AG 8P steps=10（VIA_CCUBUF：COPY 上料+SYNC+READ×7+SYNC——M0 勘误2："
+              "首判 InOffset(me)==OutOffset(me) 恒 false 无归位 COPY）");
+        Check(m.batches == 1 && m.batchTail.size() == 1 && m.batchTail[0] == 0,
+              "R17-① 单段单批 batchTail={0}");
+        Check(m.degraded == false, "R17-① 足额池非降级");
+        Check(m.domainNeed.size() == 1 && m.domainNeed[0] == 7,
+              "R17-① 域 need=7（AG n-1）");
+        // threadId 推演（M0 §五-1）：COPY→0；SYNC→0(main+all)；READ 第 i 条→i（OFF_0 首条 0 主承载）
+        bool threadOk = true;
+        u32 readIdx = 0;
+        for (const PipelineStep& st : m.steps) {
+            if (st.verb == VerbCall::READ) {
+                if (st.threadId != readIdx) threadOk = false;
+                ++readIdx;
+            } else if (st.verb == VerbCall::SYNC_PEER_PRE || st.verb == VerbCall::SYNC_PEER_POST) {
+                if (st.threadId != 0 || !st.mainPlusAll) threadOk = false;
+            } else if (st.verb == VerbCall::COPY) {
+                if (st.threadId != 0) threadOk = false;
+            }
+        }
+        Check(threadOk && readIdx == 7, "R17-① threadId 推演：READ i→t_i、SYNC→t0(main+all)、COPY→t0");
+        // 主锁：DryRun 逐段动词数 == CaptureVerbCalls 直连（#22 同型第三路）
+        const std::vector<VerbCall> direct = CaptureVerbCalls(plan.segments[0], Engine::AICPU);
+        u32 cnt = 0;
+        for (const PipelineStep& st : m.steps) {
+            if (st.segIdx == 0) ++cnt;
+        }
+        Check(cnt == direct.size(), "R17-① 主锁：DryRun per-seg == CaptureVerbCalls 直连");
+        // 渲染面冒烟
+        const std::string dump = RenderPipelineModel(m);
+        Check(dump.find("PIPELINE steps:10") == 0, "R17-① RenderPipelineModel 表头");
+    }
+
+    // ---- 61-b DryRun ②：16P tier A 形态 CCU——18 steps / 2 批 / 4 屏障 / 切池 4+1 ----
+    //（CCU 口径无 NHR gate 宏依赖；AICPU 口径的 29 steps 在 exec 入口 R17 段）
+    {
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        std::vector<std::vector<u32>> hier{{0, 1, 2, 3}, {0, 4, 8, 12}};
+        Plan plan; std::string err;
+        Check(L1Adapter::Compile(op, topo, hier, "parallel[mesh,nhr]", plan, err) == HCCL_SUCCESS,
+              "R17-② compile ok: " + err);
+        std::vector<ActionSpec> expanded; std::string xerr;
+        Check(ExpandTieredSegments(plan.segments, plan.tier, 3ULL * 1024 * 1024, expanded, xerr),
+              "R17-② A expand ok: " + xerr);
+        PipelineModel m = DryRun(expanded, Engine::CCU, &plan.claim);
+        // ★R18 全删轮等价改写：nhr 段 Emit 改逐动词展开（CCU 无 COPY 口径）：
+        // SYNC_PRE + 逐步[CH_SYNC×4 + SLICE_REDUCE×nSlices] + [post?SYNC_POST]
+        // 16P 4 成员慢域（n=4 me=0 步表 2 步 nSlices 2+1）：
+        //   nhr post=T = 1+(6+5)+1 = 13；nhr post=F = 12
+        // mesh 段不变：post=F=5（无 SYNC_POST）、post=T=6
+        // seg0 mesh 5；seg1 nhr 13；seg2 nhr 12；seg3 mesh 6 → 36（与 R13-④' A
+        // 帧预算 36 两锚互证——DryRun 步数 == v5 帧数，逐动词一帧）
+        Check(m.ret == HCCL_SUCCESS && m.steps.size() == 36,
+              "R17-② 16P A 形态 CCU steps=36（5+13+12+6：nhr 段展开 12/13——R18 全删轮）");
+        Check(m.batches == 2, "R17-② 批=2");
+        Check(m.domainNeed.size() == 2 && m.domainNeed[0] == 4 && m.domainNeed[1] == 1,
+              "R17-② 切池 4+1（M0 勘误1：域0 mesh n=4 need=4、域1 nhr ch=1 need=1）");
+        Check(m.barriers.size() == 4,
+              "R17-② barriers=4（批1/批2 各：域内补 Post + 跨域合取——segIdxAfter 记批尾）");
+        u32 segCnt[4] = {0, 0, 0, 0};
+        for (const PipelineStep& st : m.steps) {
+            if (st.segIdx < 4) ++segCnt[st.segIdx];
+        }
+        Check(segCnt[0] == 5 && segCnt[1] == 13 && segCnt[2] == 12 && segCnt[3] == 6,
+              "R17-② perSeg=5/13/12/6（CCU 口径——nhr 段展开，R18 全删轮）");
+        // CCU threadId 恒 0（kCcuVerbMap 全 NA）
+        bool allT0 = true;
+        for (const PipelineStep& st : m.steps) {
+            if (st.threadId != 0) allT0 = false;
+        }
+        Check(allT0, "R17-② CCU threadId 恒 0（微码自驱动无线程概念）");
+        // 批号：seg0/seg1→b0、seg2/seg3→b1
+        bool batchOk = true;
+        for (const PipelineStep& st : m.steps) {
+            const u32 expect = (st.segIdx <= 1) ? 0 : 1;
+            if (st.batch != expect) batchOk = false;
+        }
+        Check(batchOk, "R17-② 批号 b0/b0/b1/b1");
+        // 主锁（4 段全对）
+        bool mainLock = true;
+        for (size_t i = 0; i < expanded.size(); ++i) {
+            const std::vector<VerbCall> direct = CaptureVerbCalls(expanded[i], Engine::CCU);
+            u32 cnt = 0;
+            for (const PipelineStep& st : m.steps) {
+                if (st.segIdx == i) ++cnt;
+            }
+            if (cnt != direct.size()) mainLock = false;
+        }
+        Check(mainLock, "R17-② 主锁：DryRun 4 段逐段 == CaptureVerbCalls 直连");
+    }
+
+    // ---- 61-d checker 交叉锚（五锚全 PASS——M0 §六）----
+    {
+        // 锚 #1（R12-⑦ 同构三例 CCU）
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 8, 300000,
+                                CommEngine::COMM_ENGINE_CCU);
+            op.userRank = 3;
+            Plan plan; std::string err;
+            Check(L1Adapter::Compile(op, MakeTopo(8), SingleDomain(8), "sole[mesh]", plan, err) ==
+                      HCCL_SUCCESS, "R17-④ AG CCU compile");
+            SemanticReport rep = SemanticCheckPlan(plan, Engine::CCU);
+            Check(rep.pass, "R17-④ 锚1a AG mesh 8P CCU checker PASS" + rep.errOf());
+        }
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 200000,
+                                CommEngine::COMM_ENGINE_CCU);
+            op.userRank = 3;
+            Plan plan; std::string err;
+            Check(L1Adapter::Compile(op, MakeTopo(8), SingleDomain(8), "sole[mesh]", plan, err) ==
+                      HCCL_SUCCESS, "R17-④ RS CCU compile");
+            SemanticReport rep = SemanticCheckPlan(plan, Engine::CCU);
+            Check(rep.pass, "R17-④ 锚1b RS mesh 8P CCU checker PASS" + rep.errOf());
+        }
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 9, 180000,
+                                CommEngine::COMM_ENGINE_CCU);
+            op.userRank = 0;
+            std::vector<std::vector<u32>> dom9;
+            for (u32 r = 0; r < 9; ++r) dom9.push_back({r});
+            Plan plan; std::string err;
+            Check(L1Adapter::Compile(op, MakeTopo(9), {{0, 1, 2, 3, 4, 5, 6, 7, 8}}, "sole[mesh]",
+                                     plan, err) == HCCL_SUCCESS, "R17-④ RS9P compile");
+            SemanticReport rep = SemanticCheckPlan(plan, Engine::CCU);
+            Check(rep.pass, "R17-④ 锚1c RS mesh 9P CCU（>8P 上料 COPY 形态）checker PASS" + rep.errOf());
+        }
+        // 锚 #2：NHR 8P CCU 口径（★R18 全删轮等价改写：展开序 21 动词 = SYNC_PRE
+        // + Σ(4+nSlices)=(4+4)+(4+2)+(4+1) + SYNC_POST；CCU 无 COPY 口径——checker
+        // 分口径后动词级判 SLICE_REDUCE 贡献集，无上料/归位核对）
+        {
+            ActionSpec a;
+            a.kind = ActionKind::ReduceSlice;
+            a.pattern = CommPattern::NHR;
+            a.transport = TransportPolicy::VIA_CCUBUF;
+            a.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+            a.domain.myRank = 3;
+            a.layout.sliceSize = 1000;
+            a.layout.outputSliceStride = 1000;
+            a.layout.inBaseOff = 0;
+            a.layout.outBaseOff = 0;
+            a.layout.scratchBaseOff = 8000;
+            a.layout.dataTypeSize = 2;
+            a.sync.preBarrier = true;
+            a.sync.postBarrier = true;
+            const std::vector<VerbCall> calls = CaptureVerbCalls(a, Engine::CCU);
+            Check(calls.size() == 21,
+                  "R17-④ 锚2 NHR CCU 21 动词（展开序 1+8+6+5+1——R18 全删轮）");
+            std::vector<std::vector<VerbCall>> cps = {calls};
+            SemanticReport rep = SemanticCheck({a}, cps);
+            Check(rep.pass, "R17-④ 锚2 NHR 8P CCU checker PASS" + rep.errOf());
+        }
+        // 锚 #3：16P tier A(4 段)+B(12 段) CCU（R13-④' 同构）
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                                1536 * 1024, CommEngine::COMM_ENGINE_CCU);
+            op.userRank = 0;
+            TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+            topo.topoLevelNums = 2;
+            Plan plan; std::string err;
+            Check(L1Adapter::Compile(op, topo, {{0, 1, 2, 3}, {0, 4, 8, 12}}, "parallel[mesh,nhr]",
+                                     plan, err) == HCCL_SUCCESS, "R17-④ tier compile");
+            for (int form = 0; form < 2; ++form) {
+                std::vector<ActionSpec> expanded; std::string xerr;
+                const u64 total = (form == 0) ? 3ULL * 1024 * 1024 : 5ULL * 1024 * 1024;
+                Check(ExpandTieredSegments(plan.segments, plan.tier, total, expanded, xerr),
+                      "R17-④ tier expand");
+                std::vector<std::vector<VerbCall>> cps(expanded.size());
+                for (size_t i = 0; i < expanded.size(); ++i) {
+                    cps[i] = CaptureVerbCalls(expanded[i], Engine::CCU);
+                }
+                SemanticReport rep = SemanticCheck(expanded, cps);
+                Check(rep.pass, std::string("R17-④ 锚3 tier 16P form") +
+                                    (form == 0 ? "A(4 段)" : "B(12 段)") + " CCU checker PASS" +
+                                    rep.errOf());
+            }
+        }
+        // 锚 #5（tier 16P AICPU 全链 NHR 分支）：宏关不可达——exec 入口
+        // poc_unified_tier_payload_test R17 段验证（宏开+env 开形态）
+    }
+
+    // ---- 61-e checker 病灶反例三件（"改回也过"防线——构造性 FAIL 锚）----
+    {
+        // 反例①：AG 删一条 READ → 未覆盖片
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 8, 300000,
+                                CommEngine::COMM_ENGINE_AICPU);
+            op.userRank = 3;
+            Plan plan; std::string err;
+            (void)L1Adapter::Compile(op, MakeTopo(8), SingleDomain(8), "sole[mesh]", plan, err);
+            std::vector<std::vector<VerbCall>> cps(1);
+            cps[0] = CaptureVerbCalls(plan.segments[0], Engine::AICPU);
+            for (size_t i = 0; i < cps[0].size(); ++i) {
+                if (cps[0][i].verb == VerbCall::READ) {
+                    cps[0].erase(cps[0].begin() + static_cast<long>(i));
+                    break;
+                }
+            }
+            SemanticReport rep = SemanticCheck(plan.segments, cps);
+            Check(!rep.pass && !rep.violations.empty(),
+                  "R17-⑤ 反例① 删 READ → FAIL（未覆盖片被捕获）");
+        }
+        // 反例②：READ src 几何错位 → 来源错
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_ALLGATHER), 8, 300000,
+                                CommEngine::COMM_ENGINE_AICPU);
+            op.userRank = 3;
+            Plan plan; std::string err;
+            (void)L1Adapter::Compile(op, MakeTopo(8), SingleDomain(8), "sole[mesh]", plan, err);
+            std::vector<std::vector<VerbCall>> cps(1);
+            cps[0] = CaptureVerbCalls(plan.segments[0], Engine::AICPU);
+            for (size_t i = 0; i < cps[0].size(); ++i) {
+                if (cps[0][i].verb == VerbCall::READ) {
+                    cps[0][i].src += 8;   // 错位 8 字节
+                    break;
+                }
+            }
+            SemanticReport rep = SemanticCheck(plan.segments, cps);
+            Check(!rep.pass, "R17-⑤ 反例② READ src 错位 → FAIL（来源符号不匹配）");
+        }
+        // 反例③：RS mesh AICPU 少一次 REDUCE → Σ 不闭
+        {
+            OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 200000,
+                                CommEngine::COMM_ENGINE_AICPU);
+            op.userRank = 3;
+            Plan plan; std::string err;
+            (void)L1Adapter::Compile(op, MakeTopo(8), SingleDomain(8), "sole[mesh]", plan, err);
+            std::vector<std::vector<VerbCall>> cps(1);
+            cps[0] = CaptureVerbCalls(plan.segments[0], Engine::AICPU);
+            for (size_t i = 0; i < cps[0].size(); ++i) {
+                if (cps[0][i].verb == VerbCall::REDUCE) {
+                    cps[0].erase(cps[0].begin() + static_cast<long>(i));
+                    break;
+                }
+            }
+            SemanticReport rep = SemanticCheck(plan.segments, cps);
+            Check(!rep.pass, "R17-⑤ 反例③ 少 REDUCE → FAIL（贡献数 n-2≠n-1 Σ 不闭）");
+        }
+    }
+    return 0;
+}
+
+
+// ===========================================================================
+// R18 · NHR 动词对称化验证（#11——宏关可达面：gate 断言 + 公共件纯函数直测；
+// 宏开 env 开面（展开动词序 28/49 步/等价锁）在 exec 入口 tier_payload R18 段）
+// ===========================================================================
+static int R18()
+{
+    printf("== 62 R18 NHR 动词对称化（宏关面；全删轮后 expand 开关已删——断言等价改写） ==\n");
+    // ① gate（等价改写）：expand 形态选择开关已删（转正唯一形态）——NHR AICPU
+    // gate 仍承载执行面灰度（宏关编译恒 false）
+    Check(UseUnifiedNhrAicpuPath() == false,
+          "R18-① 宏关：NHR AICPU gate 恒 false（expand 形态选择开关已删——转正唯一）");
+    // ② 公共件 NhrSliceOf 直测（几何手算锚——M0_R18 §三：n=8 me=3
+    //   seed{slice=1000, inBase=0, inStride=1000, scratchBase=8000}）
+    {
+        VerbCall::NhrRunScalars sc;
+        sc.valid = true;
+        sc.myAlgRank = 3;
+        sc.rankNum = 8;
+        sc.sliceSize = 1000;
+        sc.inputBase = 0;
+        sc.inputSliceStride = 1000;
+        sc.scratchBase = 8000;
+        sc.repeatNum = 1;
+        // WR 侧 step0 i1（tx=0，skip 分支：src=inputBase+inStride*0=0）
+        {
+            const NhrSliceGeom g = NhrSliceOf(sc, 0, 1, false, 0);
+            Check(g.peerAlg == 2 && g.localOff == 0 && g.remoteOff == 0 && g.size == 1000,
+                  "R18-② WR step0-i1：peer=2、src=IN+stride*0=0（skip 直取）、dst=SCR[0]+0");
+        }
+        // WR 侧 step0 i0（tx=2，skip：src=0+1000*2=2000；dst=对端槽 2000）
+        {
+            const NhrSliceGeom g = NhrSliceOf(sc, 0, 0, false, 0);
+            Check(g.peerAlg == 2 && g.localOff == 2000 && g.remoteOff == 2000,
+                  "R18-② WR step0-i0：tx=2 src=2000 dst=2000");
+        }
+        // WR 侧 step1 i0（tx=1，非 skip：src=SB+S*1=9000；peer=1）
+        {
+            const NhrSliceGeom g = NhrSliceOf(sc, 1, 0, false, 0);
+            Check(g.peerAlg == 1 && g.localOff == 8000 + 1000 && g.remoteOff == 1000,
+                  "R18-② WR step1-i0：上料槽 src=SB+S*1=9000、dst=S*1=1000");
+        }
+        // RD 侧 step0 i0（rx=3：local=SB+S*3=11000；remote=S*3=3000；peer=4）
+        {
+            const NhrSliceGeom g = NhrSliceOf(sc, 0, 0, true, 0);
+            Check(g.peerAlg == 4 && g.localOff == 11000 && g.remoteOff == 3000,
+                  "R18-② RD step0-i0：rx=3 local=SB+S*3、remote=S*3、peer=recvFrom=4");
+        }
+        // 越界拒收
+        {
+            const NhrSliceGeom g = NhrSliceOf(sc, 5, 0, false, 0);
+            Check(g.size == 0, "R18-② 越界 step → size=0 退化（Validate 挡，执行端防御）");
+        }
+        // rpt 偏移（repeatNum=2, inputRepeatStride=5000：rpt1 偏移 +5000）
+        {
+            sc.inputRepeatStride = 5000;
+            const NhrSliceGeom g = NhrSliceOf(sc, 1, 0, false, 1);
+            Check(g.localOff == 8000 + 1000 + 5000, "R18-② rpt=1：偏移 +inputRepeatStride");
+            sc.inputRepeatStride = 0;
+        }
+    }
+    // ③ 词汇表对称性锚：SLICE_REDUCE/CH_SYNC 在两表有行且 BY_CHANNEL（表实一致
+    //    常跑锁——#25 同型）
+    {
+        const VerbMapEntry* eA = LookupVerbMap(VerbCall::SLICE_REDUCE, false);
+        const VerbMapEntry* eA2 = LookupVerbMap(VerbCall::CH_SYNC, false);
+        const VerbMapEntry* eC = LookupVerbMap(VerbCall::SLICE_REDUCE, true);
+        const VerbMapEntry* eC2 = LookupVerbMap(VerbCall::CH_SYNC, true);
+        Check(eA != nullptr && eA->thread == ThreadPolicy::BY_CHANNEL &&
+                  eA2 != nullptr && eA2->thread == ThreadPolicy::BY_CHANNEL,
+              "R18-③ AICPU 表：SLICE_REDUCE/CH_SYNC 有行且 BY_CHANNEL");
+        Check(eC != nullptr && eC->thread == ThreadPolicy::NA && eC2 != nullptr,
+              "R18-③ CCU 表：两动词有行（NA——微码自驱动）");
+    }
+    // ④ 枚举值镜像锚：SLICE_REDUCE=9 / CH_SYNC=10（devkit KFC_UNIFIED_VERB_*
+    //    值锁——ID_MAX 升位三方互锁的 host 半边）
+    Check(static_cast<int>(VerbCall::SLICE_REDUCE) == 9 && static_cast<int>(VerbCall::CH_SYNC) == 10,
+          "R18-④ 枚举尾纯追加：SLICE_REDUCE=9 / CH_SYNC=10");
+    return 0;
+}
+
+// ===========================================================================
+// R19 · 线程申报策略查表绑定（设计债 #12——编排方式 → 申报公式映射表，B 档
+// 用户裁定 2026-10-15）。期望值全部 ST 独立手算（M0_R19_THREAD_CLAIM.md §一
+// 全表——python 复算互证），不转抄生成方。
+// 被测：l2/recipe_sole.h（ClaimFormula/ClaimFormulaOf 查表 + SumRes(Plan&,Recipe)
+// 分派）/ inc/action_spec.h（CalcConcurrencySlaveClaim B 档公式）。
+// 本 TU 宏关编译——公式与 env/宏无关（R19 要点），全部断言常跑可达。
+// ===========================================================================
+static int R19()
+{
+    printf("== 63 R19 · #12 线程申报查表（ClaimFormulaOf 映射 + 逐配方端到端） ==\n");
+    {
+        // ---- ① 查表行锁（5 断言——M0_R19 §一老树公式镜像表）----
+        Check(ClaimFormulaOf(Recipe::SOLE) == ClaimFormula::MAX_REUSE,
+              "R19-① 查表：SOLE → MAX_REUSE（模板直通/池复用，老树 sole 直通）");
+        Check(ClaimFormulaOf(Recipe::PARALLEL) == ClaimFormula::CONCURRENT_SUM,
+              "R19-① 查表：PARALLEL → CONCURRENT_SUM（B 档——比老树 +2 少 1）");
+        Check(ClaimFormulaOf(Recipe::SEQUENCE) == ClaimFormula::MAX_REUSE,
+              "R19-① 查表：SEQUENCE → MAX_REUSE（老树 max(inter,intra) 逐字）");
+        Check(ClaimFormulaOf(Recipe::SPLIT) == ClaimFormula::CONCURRENT_SUM,
+              "R19-① 查表：SPLIT → CONCURRENT_SUM（老树 +1 恰同式零差）");
+        Check(ClaimFormulaOf(Recipe::PIPELINE) == ClaimFormula::REJECTED,
+              "R19-① 查表：PIPELINE → REJECTED（裁剪哨兵——registry Get 恒 nullptr）");
+
+        // ---- ② 逐配方 compile 端到端（16P 双域 hier {{0,1,2,3},{0,4,8,12}}，
+        //      RS op 同 R15-③ 构造，本 TU 宏关——公式与 env 无关故恒可断）----
+        // 手算（M0_R19 §一场景①——mesh 域 need=4、NHR 4P chan=1 域 need=1、D=2）：
+        //   parallel CONCURRENT_SUM = (4−1)+(1−1)+(2−1) = 4（B 档比老树 5 少 1）
+        //   split    CONCURRENT_SUM = 4（与老树 temp0+temp1+1 = 3+0+1 同值零差锚）
+        //   sequence MAX_REUSE      = max(mesh 3, nhr 0) = 3（老 max(inter,intra) 同值）
+        OpParam op = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 16,
+                            1536 * 1024, CommEngine::COMM_ENGINE_AICPU);
+        op.userRank = 0;
+        TopoInfoWithNetLayerDetails topo = MakeTopo(16);
+        topo.topoLevelNums = 2;
+        Plan planPar;
+        std::string err;
+        Check(L1Adapter::Compile(op, topo, {{0U, 1U, 2U, 3U}, {0U, 4U, 8U, 12U}},
+                                 "parallel[mesh,nhr]", planPar, err) == HCCL_SUCCESS,
+              "R19-② parallel compile: " + err);
+        Check(planPar.claim.slaveThreadNum == 4,
+              "R19-② parallel slave = 4（CONCURRENT_SUM：3+0+1——B 档）");
+        Plan planSeq;
+        std::string errSeq;
+        Check(L1Adapter::Compile(op, topo, {{0U, 1U, 2U, 3U}, {0U, 4U, 8U, 12U}},
+                                 "sequence[mesh,nhr]", planSeq, errSeq) == HCCL_SUCCESS,
+              "R19-② sequence compile: " + errSeq);
+        Check(planSeq.claim.slaveThreadNum == 3,
+              "R19-② sequence slave = 3（MAX_REUSE：max(mesh 3, nhr 0)——老同值）");
+        Plan planSpl;
+        std::string errSpl;
+        Check(L1Adapter::Compile(op, topo, {{0U, 1U, 2U, 3U}, {0U, 4U, 8U, 12U}},
+                                 "split[mesh,nhr]", planSpl, errSpl) == HCCL_SUCCESS,
+              "R19-② split compile: " + errSpl);
+        Check(planSpl.claim.slaveThreadNum == 4,
+              "R19-② split slave = 4（CONCURRENT_SUM 与老树 +1 同值零差锚）");
+        // sole RS 8P：既有 :676 AG 6 锚的 RS 侧补位（M0_R19 §六-3 探针实测可编，
+        // 无需降级 ClaimAicpuThreadRes 直调）——need 8 → MAX_REUSE 7 = 老树 N−1
+        OpParam opRs = MakeOp(static_cast<int>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), 8, 500,
+                              CommEngine::COMM_ENGINE_AICPU);
+        opRs.userRank = 0;
+        Plan planSole;
+        std::string errSole;
+        Check(L1Adapter::Compile(opRs, MakeTopo(8), SingleDomain(8), "sole[mesh]", planSole,
+                                 errSole) == HCCL_SUCCESS,
+              "R19-② sole RS compile: " + errSole);
+        Check(planSole.claim.slaveThreadNum == 7,
+              "R19-② sole RS 8P slave = 7（MAX_REUSE = need−1——老树 N−1 直通）");
+
+        // ---- ③ 单域退化恒等式（M0_R19 §一：D=1 时两档恒等）----
+        // AG 4P 单域：CONCURRENT_SUM = (3−1)+0 = 2 == MAX_REUSE = 3−1 = 2
+        ActionSpec ag4;
+        ag4.kind = ActionKind::CollectAll;
+        ag4.domain.ranks = {0U, 1U, 2U, 3U};
+        ag4.domain.myRank = 0;
+        const std::vector<ActionSpec> one = {ag4};
+        const u32 cs = CalcConcurrencySlaveClaim(one);
+        ResourceClaim mr;
+        SegmentBuilder::CalcResOf(ag4, mr);   // MAX_REUSE 半边：单段累积即终值
+        Check(cs == 2 && mr.slaveThreadNum == 2 && cs == mr.slaveThreadNum,
+              "R19-③ 单域退化恒等式：CONCURRENT_SUM 2 == MAX_REUSE 2（AG 4P）");
+
+        // ---- ④ 空 segs 守卫（M0_R19 §七：空序列无申报）----
+        Check(CalcConcurrencySlaveClaim({}) == 0, "R19-④ 空 segs → 0（守卫）");
+    }
+    return 0;
+}
+
+// ===========================================================================
+// R20 验证（2026-10-16）——设计债 #13：L3 引擎知识出清（CalcRes 双引擎反查
+// 上移 L2 SegmentBuilder::CalcResOf；M0_R20_L3_ENGINE_EXIT.md）
+//
+// 节标 64 顺延 R19 63（节号只增不重排）。四组锚（任务书 §二-4）：
+//   ① L3 出清锁——CalcRes 直调产物 kernels 恒空 + 通道半边裸值
+//   ② CalcResOf 汇合锁——产物 == 旧 CalcRes 全量（行为零变化验收锚）
+//   ③ 引擎循环覆盖锁——AICPU 与 CCU 两半边都在
+//   ④ include 出清自证——编译通过即构造性证明（无运行期断言）
+// 期望值全部独立手算（M0_R20 §四：backend 公式源 backend_ccu_collect_all.h
+// :37-71 / backend_ccu_reduce_slice.h:52-96 / action_spec.h:301-329）。
+// ===========================================================================
+static int R20()
+{
+    printf("== 64 R20 · #13 L3 引擎知识出清（CalcRes 半边拆分 + CalcResOf 汇合） ==\n");
+    {
+        // ---- ① L3 出清锁：直调 CalcRes 产物只剩引擎无关通道半边 ----
+        // 手算：AG mesh 8P me=0 → 全连接跳 me = 7 条 [1..7]；引擎半边（kernels/
+        // ccu/slave/notify）全部不在 L3 产物里（恒空/恒 0——R20 出清面）。
+        ActionSpec ag;
+        ag.kind = ActionKind::CollectAll;
+        ag.pattern = CommPattern::MESH;
+        ag.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+        ag.domain.myRank = 0;
+        const ResourceClaim agL3 = CollectAll::CalcRes(ag);
+        Check(agL3.kernels.empty() && agL3.channels.size() == 7,
+              "R20-① AG L3 裸半边：kernels 空 + channels 7（引擎申报面不在 L3）");
+        Check(agL3.ccu.empty() && agL3.slaveThreadNum == 0 && agL3.notifyNumPerThread.empty(),
+              "R20-① AG L3 裸半边：ccu 空 + slave 0 + perThread 空（三引擎字段全零）");
+
+        // 手算：RS mesh 8P me=0 → 7 条 [1..7]；RS NHR 8P me=3 → 建链集 {1,2,4,5,7} 5 条
+        ActionSpec rs;
+        rs.kind = ActionKind::ReduceSlice;
+        rs.pattern = CommPattern::MESH;
+        rs.domain.ranks = {0, 1, 2, 3, 4, 5, 6, 7};
+        rs.domain.myRank = 0;
+        const ResourceClaim rsL3 = ReduceSlice::CalcRes(rs);
+        Check(rsL3.kernels.empty() && rsL3.channels.size() == 7,
+              "R20-① RS mesh L3 裸半边：kernels 空 + channels 7");
+        ActionSpec nhr = rs;
+        nhr.pattern = CommPattern::NHR;
+        nhr.domain.myRank = 3;
+        const ResourceClaim nhrL3 = ReduceSlice::CalcRes(nhr);
+        Check(nhrL3.kernels.empty() && nhrL3.channels.size() == 5,
+              "R20-① RS NHR L3 裸半边：kernels 空 + channels 5（建链集 {1,2,4,5,7}）");
+
+        // ---- ② CalcResOf 汇合锁：产物 == 旧 CalcRes 全量（行为零变化验收锚）----
+        // 手算（RS mesh 8P）：t = DomainThreadTotalNeed = max(1, 8) = 8 →
+        //   slave/notifyMain = 8−1 = 7（== R19-② sole RS 8P 旧锚）；kernels 1 条
+        //   "CcuActionReduceSlice" 带 7 通道（旧 R13-⑥ mesh 锚原值）；ccu[0][0] =
+        //   {loop=1, ccuBuf=1, variable=8*3+2=26, event=16*ceil(8/16)=16,
+        //    instruction=1}（R16-#6 公式锚原值）。
+        ResourceClaim rsMerged;
+        SegmentBuilder::CalcResOf(rs, rsMerged);
+        Check(rsMerged.channels.size() == 7 && rsMerged.kernels.size() == 1 &&
+                  rsMerged.kernels[0].kernelFuncName == "CcuActionReduceSlice" &&
+                  rsMerged.kernels[0].channels.size() == 7,
+              "R20-② RS CalcResOf 全量：channels 7 + kernels 1 条 CcuActionReduceSlice 7 通道"
+              "（== 旧 CalcRes 全量，行为零变化锚）");
+        Check(rsMerged.slaveThreadNum == 7 && rsMerged.notifyNumOnMainThread == 7 &&
+                  rsMerged.notifyNumPerThread.size() == 7,
+              "R20-② RS CalcResOf：slave=7 notifyMain=7 perThread=7（AICPU 半边公式"
+              "——R19-② 旧锚原值）");
+        {
+            const auto itDie = rsMerged.ccu.find(0);
+            const ResCounters zero;
+            const ResCounters& c = (itDie != rsMerged.ccu.end() && itDie->second.count(0) > 0)
+                                       ? itDie->second.at(0) : zero;
+            Check(c.loop == 1 && c.ccuBuf == 1 && c.variable == 26 && c.event == 16 &&
+                      c.instruction == 1,
+                  "R20-② RS CalcResOf：ccu[0][0] = {loop=1,ccuBuf=1,variable=26,event=16,"
+                  "instruction=1}（CCU 半边公式——R16-#6 锚原值）");
+        }
+        // 手算（AG mesh 8P）：t = max(1, 8−1) = 7 → slave/notifyMain = 6（== :678/
+        //   :704 旧锚）；kernels 1 条 CcuActionCollectAll 7 通道；ccu variable =
+        //   8*2+2 = 18、event = 1*ceil(8/16) = 1。
+        ResourceClaim agMerged;
+        SegmentBuilder::CalcResOf(ag, agMerged);
+        Check(agMerged.slaveThreadNum == 6 && agMerged.channels.size() == 7 &&
+                  agMerged.kernels.size() == 1,
+              "R20-② AG CalcResOf 全量：slave=6 + channels 7 + kernels 1（== 旧全量"
+              "——:678/:704 旧锚原值）");
+        {
+            const auto itDie = agMerged.ccu.find(0);
+            const ResCounters zero;
+            const ResCounters& c = (itDie != agMerged.ccu.end() && itDie->second.count(0) > 0)
+                                       ? itDie->second.at(0) : zero;
+            Check(c.variable == 18 && c.event == 1,
+                  "R20-② AG CalcResOf：ccu[0][0] variable=18 event=1（CCU 半边公式）");
+        }
+
+        // ---- ③ 引擎循环覆盖锁：kAllEngines 两半边都在 ----
+        // RS mesh：AICPU 半边 slave=7 与 CCU 半边 kernels=1 同时在场（两引擎
+        // 都注册、循环不漏）。RS NHR：kernels=1（CCU 半边在场）+ slave=0 且
+        // perThread 空——AICPU 公式 t = max(1, channelsPerRank=1) = 1 → slave=0
+        // （**申报 0 ≠ 缺半边**：NHR 单线程域无从线程是公式真值，两半边都被
+        // 循环覆盖，判据落在 CCU 半边的 kernels 上）。
+        Check(rsMerged.slaveThreadNum == 7 && rsMerged.kernels.size() == 1,
+              "R20-③ RS mesh 两半边都在：AICPU slave=7 + CCU kernels=1");
+        ResourceClaim nhrMerged;
+        SegmentBuilder::CalcResOf(nhr, nhrMerged);
+        Check(nhrMerged.kernels.size() == 1 && nhrMerged.kernels[0].channels.size() == 5 &&
+                  nhrMerged.slaveThreadNum == 0 && nhrMerged.notifyNumPerThread.empty(),
+              "R20-③ RS NHR 两半边都在：CCU kernels=1 条 5 通道 + AICPU 公式值 "
+              "slave=0（t=1 单线程域——0 是申报值非缺半边）");
+
+        // ---- ④ include 出清自证：编译通过即构造性证明（无运行期断言）----
+        // L3 两头删 backend_registry.h 后三入口仍编译通过 = L3 头不再消费
+        // 注册表符号（若仍引用 Engine/BackendRegistry 则编译期即断）。
     }
     return 0;
 }

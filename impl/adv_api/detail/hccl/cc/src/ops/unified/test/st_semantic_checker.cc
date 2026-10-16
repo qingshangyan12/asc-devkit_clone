@@ -10,6 +10,7 @@
  */
 #include "st_semantic_checker.h"
 
+#include <algorithm>   // R12：multiset 比较的 sort（等价判据窗内乱序容许）
 #include <cstdlib>
 #include <cstring>   // R11：镜像字段的字节序读写（memcpy 语义经逐字节移位实现）
 
@@ -979,6 +980,924 @@ bool StKfcCacheKeyGate(const char* commName, const char* algTag)
         return true;
     };
     return bounded(commName) && bounded(algTag);
+}
+
+// ===========================================================================
+// R12 · CCU 动词序执行器 · v5 动词帧基线 + 模拟器 + 等价判据（接口契约见
+// st_semantic_checker.h R12 节注；期望值全部独立手算——行号为本仓实数）。
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// ⑨ 补充：地址几何的片宽（AG 末 rank 尾片，kernel :305 的 (me==N-1&&tail) 同式；
+// RS 无 per-rank output 偏移——片宽恒 slice，chunk 内无尾差）
+// ---------------------------------------------------------------------------
+namespace {
+inline u64 StAgSliceOf(const StMeshGeom& g, u32 r)
+{
+    return (r == g.n - 1U && g.tail != 0ULL) ? g.tail : g.slice;
+}
+} // namespace
+
+// ---------------------------------------------------------------------------
+// R12-4：基线 me 的预置/读出（StNormalizeBaseline 的通道位→algRank 映射用；
+// 单进程单基线，测试面安全——约定注见头文件）
+// ---------------------------------------------------------------------------
+namespace {
+u32 g_stBaselineMe = 0;
+}
+void StSetBaselineMe(u32 me) { g_stBaselineMe = me; }
+u32 StBaselineMe() { return g_stBaselineMe; }
+
+// ---------------------------------------------------------------------------
+// ① AG sole mesh 单段原语序基线（PreSync + 三阶段 + PostSync；推导注见头文件）
+// ---------------------------------------------------------------------------
+std::vector<StPrim> StBuildAgM2mPrimBaseline(const StMeshGeom& g)
+{
+    std::vector<StPrim> out;
+    const u32 nch = g.n - 1U;                       // 通道数（remoteRank 升序跳过 me）
+    // ---- PreSync :110-125：每通道一组 {WVN(OUT/XN=1), WVN(TOK/XN=2)}，通道序 ----
+    //   dst = 对端 output/token 槽（XN 取数地址，非数据地址——等价判据只看它的
+    //   出现次数与掩码语义，dstOff 记 XN 值便于诊断）
+    for (u32 i = 0; i < nch; ++i) {
+        StPrim p1;
+        p1.op = StPrim::OP_WVN; p1.peer = i; p1.xn = 1; p1.mask = 1U << 1;   // OUT bit
+        out.push_back(p1);
+        StPrim p2;
+        p2.op = StPrim::OP_WVN; p2.peer = i; p2.xn = 2; p2.mask = 1U << 2;   // TOK bit
+        out.push_back(p2);
+    }
+    for (u32 i = 0; i < nch; ++i) {                 // NotifyWait(mask=OUT|TOK=0x6)
+        StPrim p;
+        p.op = StPrim::OP_NW; p.peer = i; p.mask = 0x6; p.xn = 6;
+        out.push_back(p);
+    }
+    // ---- 三阶段（repeatNum=1 → 单趟；AG_M2M_UNROLL_NUM=1 → eventIdx=0 单组）----
+    // Phase1 DoAllGatherWrite :164-182：rankIdx 0..N-1 升序；通道序 = rankIdx 升序
+    //   跳过 me（InitResource :66-74 的 channelIdx 推进同式）
+    // R12-7 stride 修正：src.addr = input + inBase + inStride*me（kernel :142 与
+    //   BuildArgs.InOffset(me) 同式——AG sole 布局 inStride=0 但基线取通用式）；
+    //   dst[rankIdx] = output[rankIdx] + outStride*me（:156-157——全员互写我的片
+    //   到各自 output，落位偏移 = outStride*me，v5 BROADCAST 帧 remoteDst 同口径）
+    const u64 srcOff = g.inBase + g.inStride * static_cast<u64>(g.me);
+    const u64 dstOff = g.outBase + g.outStride * static_cast<u64>(g.me);
+    u32 ch = 0;
+    for (u32 r = 0; r < g.n; ++r) {
+        if (r == g.me) {
+            StPrim p;
+            p.op = StPrim::OP_ER; p.mask = 1U << r; // EventRecord(events[0], 1<<me)
+            out.push_back(p);
+        } else {
+            StPrim p;
+            p.op = StPrim::OP_WR; p.peer = ch;
+            p.dstOff = dstOff;
+            p.srcOff = srcOff;
+            p.size = StAgSliceOf(g, g.me);
+            out.push_back(p);
+            ++ch;
+        }
+    }
+    // Phase2 DoAllGatherGroupCopy :198-220：isInputOutputEqual==0 才有 GroupCopy
+    if (g.inOutEqual == 0ULL) {
+        StPrim p;
+        p.op = StPrim::OP_GC;
+        p.dstOff = dstOff;                          // localDst = output + outStride*me
+        p.srcOff = srcOff;                          // srcLocCopy = input + inBase + inStride*me
+        p.size = StAgSliceOf(g, g.me);
+        out.push_back(p);
+    }
+    // Phase3 DoAllGatherWait :184-196：eventNumPerIter = ceil(N/16)；8P → 1 条
+    {
+        const u32 evIters = (g.n + 15U) / 16U;
+        for (u32 e = 0; e < evIters; ++e) {
+            const u32 remaining = g.n - e * 16U;
+            const u32 m = (remaining >= 16U) ? 0xFFFFU : ((1U << remaining) - 1U);
+            StPrim p;
+            p.op = StPrim::OP_EW; p.mask = m;
+            out.push_back(p);
+        }
+    }
+    // ---- PostSync :127-137：NR(0x8) ×nch → NW(0x8) ×nch ----
+    for (u32 i = 0; i < nch; ++i) {
+        StPrim p;
+        p.op = StPrim::OP_NR; p.peer = i; p.mask = 1U << 3; p.xn = 3;
+        out.push_back(p);
+    }
+    for (u32 i = 0; i < nch; ++i) {
+        StPrim p;
+        p.op = StPrim::OP_NW; p.peer = i; p.mask = 1U << 3; p.xn = 3;
+        out.push_back(p);
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------
+// ① RS mesh 单 chunk 原语序基线（≤8P / >8P 两形态）
+// ---------------------------------------------------------------------------
+std::vector<StPrim> StBuildRsM2mPrimBaseline(const StMeshGeom& g)
+{
+    std::vector<StPrim> out;
+    const u32 nch = g.n - 1U;
+    // ---- PreSync :134-149：每通道一组 {WVN(IN/0), WVN(SCR/1), WVN(TOK/2)} ----
+    for (u32 i = 0; i < nch; ++i) {
+        const u32 xns[3] = {0U, 1U, 2U};
+        for (u32 k = 0; k < 3; ++k) {
+            StPrim p;
+            p.op = StPrim::OP_WVN; p.peer = i; p.xn = xns[k]; p.mask = 1U << xns[k];
+            out.push_back(p);
+        }
+    }
+    for (u32 i = 0; i < nch; ++i) {                 // NotifyWait(mask=IN|SCR|TOK=0x7)
+        StPrim p;
+        p.op = StPrim::OP_NW; p.peer = i; p.mask = 0x7; p.xn = 7;
+        out.push_back(p);
+    }
+    // ---- 三阶段（单 chunk：chunkLoopNum=UINT64_MAX-1 → 1 趟 :377）----
+    // Phase1 DoReduceScatterRead :162-186：rankIdx 升序；本 rank 槽位 ≤8P 占位 /
+    // >8P LocalCopy；peer 槽 Read（src = 对端 input 我的片 → dst = 本地 scratch peer 槽）
+    u32 ch = 0;
+    for (u32 r = 0; r < g.n; ++r) {
+        if (r == g.me) {
+            if (g.n <= 8U) {
+                StPrim p;                           // 零搬运占位（EventRecord）
+                p.op = StPrim::OP_ER; p.mask = 1U << r;
+                out.push_back(p);
+            } else {
+                StPrim p;                           // :176-179 LocalCopy 落 scratch[me]
+                p.op = StPrim::OP_LC;
+                p.dstOff = g.scratchBase + static_cast<u64>(r) * g.slice;
+                // R12-7 stride 修正：myInput = input + inBase + inStride*me（:267-268
+                //   InitReduceScatterAddr 同式；inStride exec 真值 = sliceSize——
+                //   v3 由 slot4 覆写注入，v5 修复轮的 READ src 同口径）
+                p.srcOff = g.inBase + g.inStride * static_cast<u64>(g.me);
+                p.size = g.slice;
+                // 上料搬运（input→scratch 落位）是真 MOVE——v5 的 COPY 帧承载
+                //（RS 9P 帧预算 N+3 的 +1 即此）；foldReduce 只属于 Phase3 折叠链
+                out.push_back(p);
+            }
+        } else {
+            StPrim p;
+            p.op = StPrim::OP_RD; p.peer = ch;
+            // src = 对端 input + inBase + inStride*me（我的片在对端 input 的位置——
+            //   R12-7 stride 修正：inStride exec 真值 = sliceSize，与 v3 slot4 覆写
+            //   同口径；kernel :270-272 的 remoteInput.addr = input[rankIdx] + offset）
+            p.srcOff = g.inBase + g.inStride * static_cast<u64>(g.me);
+            // dst = 本地 scratch 的 r 槽（scratchMem[r] = scratch + r*slice）
+            p.dstOff = g.scratchBase + static_cast<u64>(r) * g.slice;
+            p.size = g.slice;
+            out.push_back(p);
+            ++ch;
+        }
+    }
+    // Phase2 DoReduceScatterWait :189-201：EventWait(mask=(1<<N)-1，N≤16)
+    {
+        const u32 evIters = (g.n + 15U) / 16U;
+        for (u32 e = 0; e < evIters; ++e) {
+            const u32 remaining = g.n - e * 16U;
+            const u32 m = (remaining >= 16U) ? 0xFFFFU : ((1U << remaining) - 1U);
+            StPrim p;
+            p.op = StPrim::OP_EW; p.mask = m;
+            out.push_back(p);
+        }
+    }
+    // Phase3 DoReduceScatter :235-256：≤8P GroupLocalReduce / >8P PairwiseLocalReduce
+    if (g.n <= 8U) {
+        StPrim p;
+        p.op = StPrim::OP_GLR;
+        p.srcOff = g.scratchBase;                   // scratch 全槽（me 槽已替换为 input 直读）
+        p.dstOff = g.outBase;                       // myOutput = output + 0（RS 无偏移）
+        p.size = g.slice;
+        out.push_back(p);
+    } else {
+        // PairwiseLocalReduce :204-232：remainPieces 链 N→N-N/2→..→1；每轮
+        //   LocalReduce(inputVec[0], inputVec[remain-rp], rp*slice) + EventWait(1)
+        //   末尾 LocalCopy(myOutput, inputVec[0], slice) + EventWait(1)
+        //   全链 foldReduce=true（归一化折叠为单条 REDUCE：scratch 基 → output）
+        u32 remain = g.n;
+        while (remain > 1U) {
+            const u32 rp = remain / 2U;
+            const u32 srcIdx = remain - rp;
+            StPrim p;
+            p.op = StPrim::OP_LR;
+            p.srcOff = g.scratchBase + static_cast<u64>(srcIdx) * g.slice;  // 折叠源槽
+            p.dstOff = g.scratchBase;                                        // 折叠目的槽 0
+            p.size = static_cast<u64>(rp) * g.slice;
+            p.foldReduce = true;
+            out.push_back(p);
+            StPrim w;
+            w.op = StPrim::OP_EW; w.mask = 1U; w.foldReduce = true;
+            out.push_back(w);
+            remain -= rp;
+        }
+        StPrim lc;
+        lc.op = StPrim::OP_LC;
+        lc.dstOff = g.outBase;                      // myOutput
+        lc.srcOff = g.scratchBase;                  // inputVec[0]（折叠结果槽）
+        lc.size = g.slice;
+        lc.foldReduce = true;
+        out.push_back(lc);
+        StPrim w2;
+        w2.op = StPrim::OP_EW; w2.mask = 1U; w2.foldReduce = true;
+        out.push_back(w2);
+    }
+    // ---- PostSync :151-160 ----
+    for (u32 i = 0; i < nch; ++i) {
+        StPrim p;
+        p.op = StPrim::OP_NR; p.peer = i; p.mask = 1U << 3; p.xn = 3;
+        out.push_back(p);
+    }
+    for (u32 i = 0; i < nch; ++i) {
+        StPrim p;
+        p.op = StPrim::OP_NW; p.peer = i; p.mask = 1U << 3; p.xn = 3;
+        out.push_back(p);
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------
+// 基线 → 归一化事件流。规则（头注契约）：
+//   · WVN/NW 前导连续块 → SYNC_PRE（把 >1 的位算进掩码语义——取首条 NW 的掩码）
+//   · NR/NW 尾随连续块 → SYNC_POST
+//   · ER/EW（foldReduce=false）丢弃；GC → MOVE；WR/RD/LC → MOVE；GLR → REDUCE
+//   · foldReduce 连续段（LR*/EW*/LC/EW）折叠单条 REDUCE（src=首 LR 目的槽、
+//     dst=末 LC 目的、size=末 LC size——即折叠链的净效果）
+// ---------------------------------------------------------------------------
+std::vector<StNormEvent> StNormalizeBaseline(const std::vector<StPrim>& prims)
+{
+    // R12-4：通道位→algRank 映射需要 me（ch < me ? ch : ch+1——通道表升序跳过
+    // me 的错位规则）。me 由 caller 经 StSetBaselineMe 预置（等价判据入口
+    // CheckVerbSeqEquivalent 已置；直接调用 StNormalizeBaseline 的旧断言
+    // （J3/J4 结构自检）在 me≠0 场景须自行 StSetBaselineMe——本文件头有约定注）。
+    const u32 me = StBaselineMe();
+    std::vector<StNormEvent> out;
+    size_t i = 0;
+    // 前导 WVN/NW 块
+    {
+        StNormEvent e;
+        e.kind = StNormEvent::SYNC_PRE;
+        for (; i < prims.size(); ++i) {
+            if (prims[i].op == StPrim::OP_WVN) {
+                e.xnMask |= prims[i].mask;
+            } else if (prims[i].op == StPrim::OP_NW) {
+                e.xnMask |= prims[i].mask;
+            } else {
+                break;
+            }
+        }
+        out.push_back(e);
+    }
+    for (; i < prims.size(); ++i) {
+        const StPrim& p = prims[i];
+        if (p.op == StPrim::OP_WVN || p.op == StPrim::OP_NW) {
+            // 中段不应出现（前导块已吞）——防御：跳过（结构异常由 kind 序比较抓）
+            continue;
+        }
+        if (p.op == StPrim::OP_NR || p.op == StPrim::OP_NW) {
+            // 尾随 NR/NW 块 → SYNC_POST（吞到末尾）
+            StNormEvent e;
+            e.kind = StNormEvent::SYNC_POST;
+            for (size_t j = i; j < prims.size(); ++j) {
+                if (prims[j].op == StPrim::OP_NR || prims[j].op == StPrim::OP_NW) {
+                    e.xnMask |= prims[j].mask;
+                } else {
+                    break;
+                }
+            }
+            out.push_back(e);
+            break;
+        }
+        if (p.foldReduce) {
+            // foldReduce 连续段折叠单条 REDUCE
+            StNormEvent e;
+            e.kind = StNormEvent::REDUCE;
+            u64 foldSrc = p.srcOff;
+            u64 foldDst = p.dstOff;
+            u64 foldSize = p.size;
+            size_t j = i;
+            for (; j < prims.size(); ++j) {
+                if (!prims[j].foldReduce) break;
+                if (prims[j].op == StPrim::OP_LR || prims[j].op == StPrim::OP_LC) {
+                    if (prims[j].op == StPrim::OP_LR) {
+                        foldSrc = prims[j].dstOff;        // 首条 LR 的折叠目的槽
+                    } else {
+                        foldDst = prims[j].dstOff;        // 末条 LC 落定 output
+                        foldSize = prims[j].size;
+                    }
+                }
+            }
+            // LR 系列先跑（j 从 i 推进），LC 在链尾——两分支赋值先后天然保证
+            // "首 LR 的目的、末 LC 的落定"。修正：foldSrc 应取**第一条 LR**的目的，
+            // foldDst/foldSize 取**最后一条 LC**。上面循环里 LR 覆写 foldSrc 每次都
+            // 更新——改为只在第一条 LR 时取。
+            (void)foldSrc; (void)foldDst; (void)foldSize;
+            // 重走一遍（明确取首/末）：
+            u64 firstLrDst = 0;
+            u64 lastLcDst = 0;
+            u64 lastLcSize = 0;
+            for (size_t k = i; k < j; ++k) {
+                if (prims[k].op == StPrim::OP_LR && firstLrDst == 0 && prims[k].size != 0) {
+                    firstLrDst = prims[k].dstOff;
+                }
+                if (prims[k].op == StPrim::OP_LC) {
+                    lastLcDst = prims[k].dstOff;
+                    lastLcSize = prims[k].size;
+                }
+            }
+            e.mv.srcOff = firstLrDst;
+            e.mv.dstOff = lastLcDst;
+            e.mv.size = lastLcSize;
+            out.push_back(e);
+            i = j - 1;
+            continue;
+        }
+        switch (p.op) {
+            case StPrim::OP_ER:
+            case StPrim::OP_EW:
+                break;                                // 批内完成跟踪：丢弃
+            case StPrim::OP_WR:
+            case StPrim::OP_RD: {
+                StNormEvent e;
+                e.kind = StNormEvent::MOVE;
+                // ★owner 维度语义（R12-4 合并键方案）：基线侧 owner 一律存
+                // **algRank**（通道位 p.peer 仅降为诊断字段——基线构造点已按
+                // 通道序推进 ch，此处映射回 rankIdx：ch < me ? ch : ch+1）。
+                // 等价判据 ⑥ 的 MOVE 键 = 合并键 (producer, consumer, srcOff,
+                // dstOff, size)——owner 与几何绑同一条边内，配对敏感（两 WRITE
+                // 换 peer 不换几何时 FAIL——纯几何键的盲区形态）；multiset 容差
+                // 保留（合法批次乱序仍过——CCU 现行动词集对通道置换免疫的前提
+                // 见头文件 R12-4 登记注）。
+                const u32 algRank = (p.peer >= 0x7FFFFFFFU) ? p.peer
+                    : ((p.peer < me) ? p.peer : (p.peer + 1U));
+                if (p.op == StPrim::OP_WR) {
+                    e.mv.srcRemote = false; e.mv.srcOwner = ST_MOVE_SELF;
+                    e.mv.srcOff = p.srcOff;
+                    e.mv.dstRemote = true; e.mv.dstOwner = algRank;   // 对端 algRank
+                    e.mv.dstOff = p.dstOff;
+                } else {
+                    e.mv.srcRemote = true; e.mv.srcOwner = algRank;   // 对端 algRank
+                    e.mv.srcOff = p.srcOff;
+                    e.mv.dstRemote = false; e.mv.dstOwner = ST_MOVE_SELF;
+                    e.mv.dstOff = p.dstOff;                           // scratch rankIdx 槽
+                }
+                e.mv.size = p.size;
+                e.mv.chanIdx = p.peer;       // 通道位降诊断字段（基线侧真值）
+                out.push_back(e);
+                break;
+            }
+            case StPrim::OP_LC:
+            case StPrim::OP_GC: {
+                StNormEvent e;
+                e.kind = StNormEvent::MOVE;
+                e.mv.srcOff = p.srcOff;
+                e.mv.dstOff = p.dstOff;
+                e.mv.size = p.size;
+                out.push_back(e);
+                break;
+            }
+            case StPrim::OP_GLR: {
+                StNormEvent e;
+                e.kind = StNormEvent::REDUCE;
+                e.mv.srcOff = p.srcOff;
+                e.mv.dstOff = p.dstOff;
+                e.mv.size = p.size;
+                out.push_back(e);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------
+// ④ v5 动词帧逐轮解包模拟器（镜像 SimulateKfcServerV3 风格 + 三防御）
+// ---------------------------------------------------------------------------
+VerbSimResult SimulateKfcServerVerb(const std::vector<u64>& serialized,
+                                    const std::vector<u64>& legalVerbIds)
+{
+    VerbSimResult out;
+    if (serialized.empty()) {
+        out.err = "empty payload (server would spin on garbage frame)";
+        return out;
+    }
+    // 防御①：载荷整帧对齐（32 槽/帧）
+    if (serialized.size() % ST_V5_SLOTS_PER_FRAME != 0U) {
+        out.err = "payload size " + std::to_string(serialized.size()) +
+                  " not a multiple of 32 slots per frame";
+        return out;
+    }
+    const u64 frameCount = serialized.size() / ST_V5_SLOTS_PER_FRAME;
+    for (u64 f = 0; f < frameCount; ++f) {
+        // 防御②：环形队列容量 64 帧（CCU_TASK_NUM_MAX）
+        if (f >= ST_V5_RING_CAPACITY) {
+            out.err = "frame " + std::to_string(f) + " exceeds circular queue capacity (64)";
+            out.rawFrameCount = f;
+            return out;
+        }
+        out.rawFrameCount = f + 1;
+        VerbFrameRecord rec;
+        rec.frameIndex = f;
+        rec.slots.assign(serialized.begin() + f * ST_V5_SLOTS_PER_FRAME,
+                         serialized.begin() + (f + 1) * ST_V5_SLOTS_PER_FRAME);
+        rec.verbId = rec.slots[0];
+        if (rec.verbId == ST_V5_SENTINEL) {
+            break;                       // 出口哨兵：本轮不派发（:389 同判定）
+        }
+        // verb ID 白名单（v5 第一级动词 = 0..7；caller 传生成方实际值）
+        bool legal = false;
+        for (u64 id : legalVerbIds) {
+            if (id == rec.verbId) { legal = true; break; }
+        }
+        if (!legal) {
+            out.err = "frame " + std::to_string(f) + ": unknown verb id " +
+                      std::to_string(rec.verbId) + " (v5 dispatch would fall through)";
+            return out;
+        }
+        out.frames.push_back(rec);
+    }
+    // 防御③：整圈无出口哨兵（满 64 帧全动作帧——回绕重放 0 号帧死循环）
+    if (frameCount >= ST_V5_RING_CAPACITY && out.err.empty() &&
+        out.frames.size() == ST_V5_RING_CAPACITY) {
+        out.wrapped = true;
+        out.err = "no exit sentinel in payload (server would spin on wrap, replaying frame 0)";
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------
+// ⑤ 逐动词参数抽取（server verb 分发循环读取序的 host 镜像，锚 [A6]）
+// ---------------------------------------------------------------------------
+StVerbParams ExtractVerbParams(const std::vector<u64>& frame, const StVerbFrameLayout& lo)
+{
+    StVerbParams p;
+    if (frame.size() < ST_V5_SLOTS_PER_FRAME) return p;   // 半帧防御
+    p.verbId = frame[0];
+    p.src = frame[lo.slotSrc];
+    p.dst = frame[lo.slotDst];
+    p.size = frame[lo.slotSize];
+    p.aux = frame[lo.slotAux];
+    p.xnMask = frame[lo.slotXnMask];
+    return p;
+}
+
+// ---------------------------------------------------------------------------
+// v5 帧 → 归一化事件流（等价判据的 verb 半边；规则见头注）
+// ---------------------------------------------------------------------------
+std::vector<StNormEvent> StExpandVerbFrames(const std::vector<VerbFrameRecord>& frames,
+                                            const StVerbFrameLayout& lo, u32 n, u32 me,
+                                            std::string& err)
+{
+    err.clear();
+    std::vector<StNormEvent> out;
+    u32 dataIdx = 0;                                // 段内数据帧计数（SYNC_PRE 重置）
+    const u32 nch = (n > 0U) ? n - 1U : 0U;
+    // R12-4 隐式映射：第 k 条数据帧 ↔ 升序通道表第 k 项 → 对端 algRank
+    //（通道表 = remoteRank 升序跳过 me：k < me ? k : k+1——与基线构造点的通道序
+    // 推进同源；"server 通道表真为升序"由生成方单源构造保证，host checker 只验
+    // "帧内容 ↔ checker 的 server 序模型"一致性，登记注见头文件 R12-4）
+    const auto algRankOf = [me](u32 k) -> u32 {
+        return (k < me) ? k : (k + 1U);
+    };
+    for (const VerbFrameRecord& fr : frames) {
+        const StVerbParams p = ExtractVerbParams(fr.slots, lo);
+        switch (p.verbId) {
+            case ST_V5_VERB_SYNC_PRE: {
+                StNormEvent e;
+                e.kind = StNormEvent::SYNC_PRE;
+                e.xnMask = static_cast<u32>(p.xnMask);
+                out.push_back(e);
+                dataIdx = 0;
+                break;
+            }
+            case ST_V5_VERB_SYNC_POST: {
+                StNormEvent e;
+                e.kind = StNormEvent::SYNC_POST;
+                e.xnMask = static_cast<u32>(p.xnMask);
+                out.push_back(e);
+                break;
+            }
+            case ST_V5_VERB_READ: {
+                if (dataIdx >= nch) {
+                    err = "data frame #" + std::to_string(dataIdx) +
+                          " exceeds channel count " + std::to_string(nch) +
+                          " (implicit mapping broken)";
+                    return {};
+                }
+                StNormEvent e;
+                e.kind = StNormEvent::MOVE;
+                e.mv.srcRemote = true; e.mv.srcOwner = algRankOf(dataIdx);   // 对端 algRank
+                e.mv.srcOff = p.src;
+                e.mv.dstRemote = false; e.mv.dstOwner = ST_MOVE_SELF;
+                e.mv.dstOff = p.dst;
+                e.mv.size = p.size;
+                e.mv.chanIdx = dataIdx;             // 隐式通道位（诊断）
+                out.push_back(e);
+                ++dataIdx;
+                break;
+            }
+            case ST_V5_VERB_WRITE: {
+                if (dataIdx >= nch) {
+                    err = "data frame #" + std::to_string(dataIdx) +
+                          " exceeds channel count " + std::to_string(nch) +
+                          " (implicit mapping broken)";
+                    return {};
+                }
+                StNormEvent e;
+                e.kind = StNormEvent::MOVE;
+                e.mv.srcRemote = false; e.mv.srcOwner = ST_MOVE_SELF;
+                e.mv.srcOff = p.src;
+                e.mv.dstRemote = true; e.mv.dstOwner = algRankOf(dataIdx);  // 对端 algRank
+                e.mv.dstOff = p.dst;
+                e.mv.size = p.size;
+                e.mv.chanIdx = dataIdx;             // 隐式通道位（诊断）
+                out.push_back(e);
+                ++dataIdx;
+                break;
+            }
+            case ST_V5_VERB_COPY:
+            case ST_V5_VERB_POST_COPY: {
+                StNormEvent e;
+                e.kind = StNormEvent::MOVE;
+                e.mv.srcOff = p.src;
+                e.mv.dstOff = p.dst;
+                e.mv.size = p.size;
+                out.push_back(e);
+                break;                                // 本地数据帧不占通道序位（通道映射
+                                                      // 只索引 READ/WRITE——COPY 无对端）
+            }
+            case ST_V5_VERB_BROADCAST: {
+                // 展开 MOVE×N：本地 1 + 机间 (N-1)（通道序隐式映射）
+                if (dataIdx != 0U && dataIdx + nch > nch) {
+                    // 广播整段独立占通道表（Emit 单动词段）——防御：广播后段内不得再混数据帧
+                }
+                StNormEvent local;
+                local.kind = StNormEvent::MOVE;
+                local.mv.srcOff = p.src;
+                local.mv.dstOff = p.dst;           // localDstOff
+                local.mv.size = p.size;
+                out.push_back(local);
+                for (u32 k = 0; k < nch; ++k) {
+                    StNormEvent e;
+                    e.kind = StNormEvent::MOVE;
+                    e.mv.srcRemote = false; e.mv.srcOwner = ST_MOVE_SELF;
+                    e.mv.srcOff = p.src;
+                    e.mv.dstRemote = true; e.mv.dstOwner = algRankOf(k);   // 对端 algRank
+                    e.mv.dstOff = p.aux;           // remoteDstOff（扇出目的）
+                    e.mv.size = p.size;
+                    e.mv.chanIdx = k;              // 隐式通道位（诊断）
+                    out.push_back(e);
+                }
+                dataIdx = nch;                     // 广播独占本段通道表
+                break;
+            }
+            case ST_V5_VERB_REDUCE: {
+                StNormEvent e;
+                e.kind = StNormEvent::REDUCE;
+                e.mv.srcOff = p.src;
+                e.mv.dstOff = p.dst;
+                e.mv.size = p.size;
+                out.push_back(e);
+                break;
+            }
+            default: {
+                err = "frame " + std::to_string(fr.frameIndex) + ": verb id " +
+                      std::to_string(p.verbId) + " not expandable";
+                return {};
+            }
+        }
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------
+// ⑥ 等价判据：基线归一化事件流 vs verb 帧展开事件流
+// ---------------------------------------------------------------------------
+namespace {
+// 同步窗切片：按 SYNC 标记切窗（SYNC_PRE 开新窗；SYNC_POST 关窗）。窗内只含
+// MOVE/REDUCE。kind 序列比较看全流（含 SYNC 标记本身）。
+struct StWindow {
+    std::vector<StNormEvent> events;
+};
+std::vector<StWindow> StSplitWindows(const std::vector<StNormEvent>& evs, std::string& err)
+{
+    err.clear();
+    std::vector<StWindow> out;
+    StWindow cur;
+    for (const StNormEvent& e : evs) {
+        if (e.kind == StNormEvent::SYNC_PRE) {
+            if (!cur.events.empty()) {
+                err = "SYNC_PRE closes an unterminated window (data before pre?)";
+                return {};
+            }
+            continue;                               // 开窗标记本身不进窗
+        }
+        if (e.kind == StNormEvent::SYNC_POST) {
+            if (cur.events.empty()) {
+                err = "SYNC_POST closes an empty window";
+                return {};
+            }
+            out.push_back(cur);
+            cur = StWindow();
+            continue;
+        }
+        cur.events.push_back(e);
+    }
+    if (!cur.events.empty()) {
+        err = "trailing data events without SYNC_POST";
+        return {};
+    }
+    return out;
+}
+} // namespace
+
+int CheckVerbSeqEquivalent(const std::vector<StPrim>& baseline,
+                           const std::vector<VerbFrameRecord>& frames,
+                           const StVerbFrameLayout& lo, u32 n, u32 me,
+                           const StEquivOptions& opt, std::string& err)
+{
+    err.clear();
+    StSetBaselineMe(me);   // R12-4：基线归一化的通道位→algRank 映射（见头注约定）
+    // verb 帧展开（含通道映射越界防御）
+    std::string xerr;
+    const std::vector<StNormEvent> verbEvs = StExpandVerbFrames(frames, lo, n, me, xerr);
+    if (!xerr.empty()) {
+        err = "[verb-expand] " + xerr;
+        return 1;
+    }
+    const std::vector<StNormEvent> baseEvs = StNormalizeBaseline(baseline);
+    // ① kind 序列（含 SYNC 标记）逐位相等
+    if (baseEvs.size() != verbEvs.size()) {
+        err = "event count mismatch: baseline " + std::to_string(baseEvs.size()) +
+              " vs verb " + std::to_string(verbEvs.size());
+        return 2;
+    }
+    for (size_t i = 0; i < baseEvs.size(); ++i) {
+        if (baseEvs[i].kind != verbEvs[i].kind) {
+            err = "event kind drift at #" + std::to_string(i) + ": baseline " +
+                  std::to_string(baseEvs[i].kind) + " vs verb " + std::to_string(verbEvs[i].kind);
+            return 3;
+        }
+    }
+    // ②③ 窗内逐窗比较
+    std::string berr, verr;
+    const std::vector<StWindow> bw = StSplitWindows(baseEvs, berr);
+    const std::vector<StWindow> vw = StSplitWindows(verbEvs, verr);
+    if (!berr.empty() || !verr.empty()) {
+        err = "[windows] baseline '" + berr + "' vs verb '" + verr + "'";
+        return 4;
+    }
+    if (bw.size() != vw.size()) {
+        err = "window count mismatch: " + std::to_string(bw.size()) + " vs " +
+              std::to_string(vw.size());
+        return 5;
+    }
+    for (size_t w = 0; w < bw.size(); ++w) {
+        // REDUCE：逐条严格（相对序一致）
+        std::vector<const StNormEvent*> br;
+        std::vector<const StNormEvent*> vr;
+        for (const auto& e : bw[w].events) { if (e.kind == StNormEvent::REDUCE) br.push_back(&e); }
+        for (const auto& e : vw[w].events) { if (e.kind == StNormEvent::REDUCE) vr.push_back(&e); }
+        if (br.size() != vr.size()) {
+            err = "window " + std::to_string(w) + ": reduce count " + std::to_string(br.size()) +
+                  " vs " + std::to_string(vr.size());
+            return 6;
+        }
+        for (size_t k = 0; k < br.size(); ++k) {
+            if (br[k]->mv.srcOff != vr[k]->mv.srcOff || br[k]->mv.dstOff != vr[k]->mv.dstOff ||
+                br[k]->mv.size != vr[k]->mv.size) {
+                err = "window " + std::to_string(w) + " reduce #" + std::to_string(k) +
+                      " geometry mismatch";
+                return 7;
+            }
+        }
+        // MOVE：multiset（allowBatchReorder）或逐条严格。键 = **合并键**
+        //（R12-4 裁定：(producer, consumer, srcOff, dstOff, size) 一把边级
+        // multiset）——owner 与几何绑同一条边内：配对敏感（两条 WRITE 换 peer
+        // 不换几何时键不同 → FAIL，纯几何键的盲区形态），同时保持 multiset 容差
+        //（合法批次乱序仍过——CCU 现行动词集对通道置换免疫：XN 基址+offset 恒
+        // peer 无关 + 规约交换律 + 双射前提，登记注见头文件 R12-4）。
+        // producer/consumer 取归一化 rank 对：remote ? owner : me（本地侧记
+        // ST_MOVE_SELF 哨兵——帧侧与基线侧同式，可比）。
+        std::vector<std::string> bkeys;
+        std::vector<std::string> vkeys;
+        auto keyOf = [me](const StNormEvent& e) -> std::string {
+            const u64 producer = e.mv.srcRemote ? e.mv.srcOwner : me;
+            const u64 consumer = e.mv.dstRemote ? e.mv.dstOwner : me;
+            std::string s;
+            s += std::to_string(producer) + "->" + std::to_string(consumer);
+            s += ":" + std::to_string(e.mv.srcOff) + "->" + std::to_string(e.mv.dstOff);
+            s += ":" + std::to_string(e.mv.size);
+            return s;
+        };
+        for (const auto& e : bw[w].events) { if (e.kind == StNormEvent::MOVE) bkeys.push_back(keyOf(e)); }
+        for (const auto& e : vw[w].events) { if (e.kind == StNormEvent::MOVE) vkeys.push_back(keyOf(e)); }
+        if (!opt.allowBatchReorder) {
+            if (bkeys != vkeys) {
+                err = "window " + std::to_string(w) + ": move sequence mismatch (strict mode)";
+                return 8;
+            }
+        } else {
+            if (bkeys.size() != vkeys.size()) {
+                err = "window " + std::to_string(w) + ": move count " + std::to_string(bkeys.size()) +
+                      " vs " + std::to_string(vkeys.size());
+                return 9;
+            }
+            std::vector<std::string> bs = bkeys;
+            std::vector<std::string> vs = vkeys;
+            std::sort(bs.begin(), bs.end());
+            std::sort(vs.begin(), vs.end());
+            if (bs != vs) {
+                err = "window " + std::to_string(w) + ": move multiset mismatch (batch reorder allowed)";
+                return 10;
+            }
+        }
+    }
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
+// ⑦ AICPU RS 段动词序独立基线（推导注见头文件 R12-⑦）
+// ---------------------------------------------------------------------------
+std::vector<StVerbCall> StBuildAicpuRsVerbBaseline(u32 n, u32 me, u64 slice, u64 tail,
+                                                   u64 inBase, u64 outBase, u64 scratchBase,
+                                                   bool buffsDiffer, u64 inStride)
+{
+    std::vector<StVerbCall> out;
+    // SYNC_PEER_PRE（threadNum>1 即 N>1——AICPU RS threadNum=N，PreSync 在场）
+    {
+        StVerbCall v;
+        v.verbId = ST_V5_VERB_SYNC_PRE;
+        out.push_back(v);
+    }
+    // WRITE×(N-1)：升序跳过 me（R12-9 修复轮 P1-2——四方统一升序；原环序
+    // (me+rankIdx)%N 是 AICPU 线程分配便利序，重锚点 [A8]-b）
+    for (u32 peerAlgRank = 0; peerAlgRank < n; ++peerAlgRank) {
+        if (peerAlgRank == me) continue;
+        const u32 nextRank = peerAlgRank;
+        const u64 sz = (nextRank == n - 1U && tail != 0ULL) ? tail : slice;   // :186-190
+        StVerbCall v;
+        v.verbId = ST_V5_VERB_WRITE;
+        // R12-7/R12-9 口径：src = inBase + inStride*nextRank（Compile 期布局
+        // inputSliceStride=0 → 三分支退 outputStride（=slice，BuildArgs
+        // rsInStride 同式）——两口径由 inStride 形参选择，基线不硬编码）
+        v.srcOff = inBase + inStride * static_cast<u64>(nextRank);
+        v.dstOff = scratchBase + static_cast<u64>(me) * slice;    // 对端 hcclBuff 我的槽
+        v.size = sz;
+        v.peer = nextRank;    // R12-4：对端 algRank 显式值（写侧配对负例可表达）
+        out.push_back(v);
+    }
+    // SYNC_PEER_POST
+    {
+        StVerbCall v;
+        v.verbId = ST_V5_VERB_SYNC_POST;
+        out.push_back(v);
+    }
+    // PostCopy（:104-172）：buffsDiffer 才有 COPY（:132-133 判定）
+    if (buffsDiffer) {
+        StVerbCall v;
+        v.verbId = ST_V5_VERB_COPY;
+        v.srcOff = inBase + inStride * static_cast<u64>(me);      // inputPtr 我的片（同 stride 口径）
+        v.dstOff = outBase + static_cast<u64>(me) * slice;        // outputPtr 落位
+        v.size = (me == n - 1U && tail != 0ULL) ? tail : slice;   // :121-129 末 rank 尾片
+        out.push_back(v);
+    }
+    // REDUCE×(N-1)：tmpRank≠me，hcclBuff 对端槽 → output 我的槽（:155-169）
+    for (u32 tmpRank = 0; tmpRank < n; ++tmpRank) {
+        if (tmpRank == me) continue;
+        StVerbCall v;
+        v.verbId = ST_V5_VERB_REDUCE;
+        v.srcOff = scratchBase + static_cast<u64>(tmpRank) * slice;
+        v.dstOff = outBase + static_cast<u64>(me) * slice;
+        v.size = slice;
+        v.peer = tmpRank;    // R12-4：本地槽来源 rank（诊断 + 配对敏感键）
+        out.push_back(v);
+    }
+    return out;
+}
+
+int CheckAicpuRsVerbSeq(const std::vector<StVerbCall>& actual, u32 n, u32 me, u64 slice,
+                        u64 tail, u64 inBase, u64 outBase, u64 scratchBase, bool buffsDiffer,
+                        std::string& err, u64 inStride)
+{
+    err.clear();
+    // 实际动词序 → 词面（kind 序 + 位置）；基线 multiset 对照
+    const std::vector<StVerbCall> base = StBuildAicpuRsVerbBaseline(
+        n, me, slice, tail, inBase, outBase, scratchBase, buffsDiffer, inStride);
+    if (actual.size() != base.size()) {
+        err = "verb count mismatch: actual " + std::to_string(actual.size()) + " vs baseline " +
+              std::to_string(base.size());
+        return 1;
+    }
+    // kind 序列严格相等
+    for (size_t i = 0; i < base.size(); ++i) {
+        if (actual[i].verbId != base[i].verbId) {
+            err = "verb kind drift at #" + std::to_string(i);
+            return 2;
+        }
+    }
+    // 基线各动词段 multiset（与 actual 同式构造——两列独立构造后排序比较）。
+    // R12-4 合并键：WRITE 的键含 peer（(peer,srcOff,dstOff,size)——配对敏感：
+    // 两条 WRITE 互换 (peer,srcOff) 而几何 multiset 不变时 FAIL）。REDUCE 的
+    // peer 不进键——真 Emit 面（backend_aicpu_reduce_slice.h :105-113 的
+    // VerbCall{REDUCE, src, dst, size} 四参构造）不携带 peer，它只是 ST 基线
+    // 构造器的诊断字段；配对敏感由 src 的槽几何承载（scratch+tmpRank*slice 逐
+    // 槽不同——两槽互换即 src multiset 漂移，R12-4(b) 负例的 REDUCE 半边同判）。
+    auto segOf = [](const std::vector<StVerbCall>& v, u64 verb) -> std::vector<std::string> {
+        std::vector<std::string> keys;
+        for (const auto& c : v) {
+            if (c.verbId == verb) {
+                if (verb == ST_V5_VERB_WRITE) {
+                    keys.push_back("peer" + std::to_string(c.peer) + ":" +
+                                   std::to_string(c.srcOff) + "->" + std::to_string(c.dstOff) +
+                                   ":" + std::to_string(c.size));
+                } else {
+                    keys.push_back(std::to_string(c.srcOff) + "->" + std::to_string(c.dstOff) +
+                                   ":" + std::to_string(c.size));
+                }
+            }
+        }
+        std::sort(keys.begin(), keys.end());
+        return keys;
+    };
+    // 严格元素：SYNC_PRE/POST/COPY 的位置与参数
+    std::vector<size_t> preIdx;
+    std::vector<size_t> postIdx;
+    std::vector<size_t> copyIdx;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i].verbId == ST_V5_VERB_SYNC_PRE) preIdx.push_back(i);
+        if (actual[i].verbId == ST_V5_VERB_SYNC_POST) postIdx.push_back(i);
+        if (actual[i].verbId == ST_V5_VERB_COPY) copyIdx.push_back(i);
+    }
+    if (preIdx.size() != 1 || preIdx[0] != 0) {
+        err = "SYNC_PRE must be the first verb exactly once";
+        return 3;
+    }
+    const size_t expectWrites = n - 1U;
+    if (postIdx.size() != 1 || postIdx[0] != expectWrites + 1U) {
+        err = "SYNC_POST position drift (expected after WRITE block)";
+        return 4;
+    }
+    const size_t copyPos = expectWrites + 2U;
+    if (buffsDiffer) {
+        if (copyIdx.size() != 1 || copyIdx[0] != copyPos) {
+            err = "COPY position drift (PostCopy after SYNC_POST)";
+            return 5;
+        }
+        if (actual[copyPos].srcOff != base[copyPos].srcOff ||
+            actual[copyPos].dstOff != base[copyPos].dstOff ||
+            actual[copyPos].size != base[copyPos].size) {
+            err = "COPY geometry mismatch";
+            return 6;
+        }
+    } else if (!copyIdx.empty()) {
+        err = "unexpected COPY (buff types identical — PostCopy must skip)";
+        return 7;
+    }
+    // WRITE/REDUCE 段 multiset（actual 内部乱序容许——环序 vs Emit peers 序声明差）
+    if (segOf(actual, ST_V5_VERB_WRITE) != segOf(base, ST_V5_VERB_WRITE)) {
+        err = "WRITE block multiset mismatch";
+        return 8;
+    }
+    if (segOf(actual, ST_V5_VERB_REDUCE) != segOf(base, ST_V5_VERB_REDUCE)) {
+        err = "REDUCE block multiset mismatch";
+        return 9;
+    }
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
+// ⑧ pull/push 边级等价（#10 证明件）
+// ---------------------------------------------------------------------------
+int CheckPullPushEdgeEquivalence(const std::vector<StMoveEdge>& pullSide,
+                                 const std::vector<StMoveEdge>& pushSide,
+                                 u32 me, std::string& err)
+{
+    err.clear();
+    // 边归一化：producer/consumer rank（remote 标志 + owner → 全局 rank 对）
+    auto edgeOf = [me](const StMoveEdge& e, bool flip) -> std::string {
+        const u64 producer = e.srcRemote ? e.srcOwner : me;
+        const u64 consumer = e.dstRemote ? e.dstOwner : me;
+        // flip：push 侧边是 (me→peer)，pull 侧是 (peer→me)——统一成 (producer,consumer)
+        const u64 a = flip ? consumer : producer;    // push 侧转置：出边 (me,p) 的
+        const u64 b = flip ? producer : consumer;    // 转置即 pull 侧入边 (p,me)
+        return std::to_string(a) + "->" + std::to_string(b) + ":" + std::to_string(e.size);
+    };
+    std::vector<std::string> pe;
+    std::vector<std::string> ve;
+    for (const auto& e : pullSide) pe.push_back(edgeOf(e, false));
+    for (const auto& e : pushSide) ve.push_back(edgeOf(e, true));
+    if (pe.size() != ve.size()) {
+        err = "edge count mismatch: pull " + std::to_string(pe.size()) + " vs push " +
+              std::to_string(ve.size());
+        return 1;
+    }
+    std::sort(pe.begin(), pe.end());
+    std::sort(ve.begin(), ve.end());
+    if (pe != ve) {
+        err = "edge multiset mismatch (pull-in vs push-out transpose)";
+        return 2;
+    }
+    return 0;
 }
 
 } // namespace mc2_ops_hccl::refactor::st

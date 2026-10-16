@@ -107,7 +107,7 @@ int main()
           "blob header: 7 slots, ReduceSpec at [4..6] (R6 ruling-1)");
     Check(KfcUnifiedBlobTotalSlots(1U) == 39U && KfcUnifiedBlobTotalSlots(63U) == 2023U,
           "KfcUnifiedBlobTotalSlots: 7 + segs*32 (39 / 2023 literals)");
-    Check(static_cast<int>(KfcServerRole::UNIFIED_PLAN) == 9, "KfcServerRole::UNIFIED_PLAN = 9 (pure append)");
+    Check(static_cast<int>(KfcServerRole::UNIFIED_PLAN) == 11, "KfcServerRole::UNIFIED_PLAN = 11 (PR rebase: upstream took 9/10, shifted)");
     Check(static_cast<int>(KfcServerRole::ALL_GATHER_MESH) == 1 &&
               static_cast<int>(KfcServerRole::REDUCE_SCATTER_SOLE_NHR) == 6,
           "v2 role enum values unchanged (1..8 zone)");

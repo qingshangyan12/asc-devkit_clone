@@ -90,6 +90,13 @@ enum class KfcServerRole : uint32_t {
     // 顺延 11——role 是 host 侧内部分派键（非跨进程协议值，GetKfcServerRole/前缀覆写
     // 同仓闭合），改值零外溢。
     UNIFIED_PLAN = 11,
+    // v5（R12，2026-10-09）：unified 动词序执行器——kernelFuncName 以 "CcuVerb" 前缀
+    //（KFC_UNIFIED_VERB_PREFIX，kfc_server_message.h 纯追加）命中覆写本 role，server
+    // 循环按逐帧 param[0] 动词 ID 分发（DispatchUnifiedVerbs：动词 ID → 原语组合，
+    // 整体流水 kernel 退役的设备边界机制重建）。值域与 UNIFIED_PLAN 由 role 分叉隔离
+    //（同 32 槽记录不会被两种解读消费——DispatchKfcSubKernel 的 role 判定先于帧解读）。
+    // PR rebase 勘误（2026-10-16）：顺延 10→12（上游占 9/10，UNIFIED_PLAN 已挪 11）。
+    UNIFIED_VERB = 12,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)

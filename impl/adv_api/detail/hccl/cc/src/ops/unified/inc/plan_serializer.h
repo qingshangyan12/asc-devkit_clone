@@ -104,6 +104,25 @@ enum UnifiedV3RsSlot : u32 {
 };
 // 段数上限：单圈队列 64 记录（CCU_TASK_NUM_MAX）− 1 出口哨兵（机制轮跨圈未放开）
 constexpr u32 UNIFIED_V3_MAX_SEGMENTS = 63U;
+// R15 · ① TierParams 承载槽位（方案甲，M0_R15_TRIPLE.md §一/§三；2026-10-11）：
+// 骨架段 0 帧未用槽 16..24——CCU 写入方/server 只读槽 0..15（写入方透传 hccl_ccu_v0_
+// prepare.h:1031-1035、server 分派 ccu_kernel_kfc_server.cc:205-268），16+ 落 HBM
+// 零影响；AICPU 路径 D2H 直取 host 序列化产物（unified_aicpu_exec.cc:87-98）不经
+// 写入方改写。非 tier Plan 槽 16..31 恒 0 是 SerializeSegmentV3 :151-153 清零的
+// 构造性事实 → 槽 16==1 天然判别（无反例，M0 §三穷举五路）。九值只写段 0 帧
+//（Plan 级数据挂首段——判别式只查帧 0）；不升 blob 版本。
+enum UnifiedV3TierSlot : u32 {
+    U_V3_TIER_HAS_TIER = 16,        // 1=tier 有效（布尔语义，非计数——多档位扩槽不破坏判别）
+    U_V3_TIER_THRESH_BYTES = 17,    // TierParams.threshBytes
+    U_V3_TIER_PART_RATIO_NUM = 18,  // TierInterleave.partRatioNum
+    U_V3_TIER_PART_RATIO_DEN = 19,  // TierInterleave.partRatioDen
+    U_V3_TIER_BW_FAST_NUM = 20,     // TierStepwise.bwFastNum
+    U_V3_TIER_BW_FAST_DEN = 21,     // TierStepwise.bwFastDen
+    U_V3_TIER_BW_SLOW_NUM = 22,     // TierStepwise.bwSlowNum
+    U_V3_TIER_BW_SLOW_DEN = 23,     // TierStepwise.bwSlowDen
+    U_V3_TIER_ALIGN_BYTES = 24,     // TierStepwise.alignBytes
+    U_V3_TIER_SLOT_END = 25,        // 区间尾（不含）——槽 25..31 保留恒 0
+};
 // 头部三槽槽位（R6/裁决一）：镜像 devkit 侧 KFC_UNIFIED_BLOB_HEADER_*_TYPE
 //（kfc_server_message.h——测试 static_assert 守门）
 enum UnifiedV3HeaderSlot : u32 {
@@ -141,8 +160,14 @@ enum UnifiedV3HeaderSlot : u32 {
 constexpr u64 PLAN_V3_MAGIC = 0x55504C33ULL;   // "UPL3"（Unified Plan v3，调试 dump 可辨识）
 constexpr u64 PLAN_V3_VERSION_FIELD = 4ULL;    // R6/裁决一：升 4（头部 4→7 槽）
 
-// 单段 → 32 槽记录（CollectAll 首发布局；未知动作拒绝，err 带动作值）
-inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& err)
+// 单段 → 32 槽记录（CollectAll 首发布局；未知动作拒绝，err 带动作值）。
+// R15 · allowNhrSkeleton（2026-10-11，主会话复核修正 A）：NHR RS 段的 v3 拒收改
+// 条件化——仅 AICPU 引擎消费的 blob 放行（tier 骨架 seg1 是 NHR 段，①的数据可达
+// 前提）。缺省 false = 现状拒收零变化（既有测试直调零改动）；CCU 降级路径
+//（verbPath=false 走 v3）恒拒——DispatchUnifiedPlanV3 只读槽 0..15，NHR 段按
+// mesh 布局错读是静默错跑面（M0_R15 §十-5 裁决 5）。
+inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& err,
+                               bool allowNhrSkeleton = false)
 {
     if (slots == nullptr) {
         err = "SerializeSegmentV3: null slots";
@@ -213,7 +238,18 @@ inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& e
             //  放开须 v5 blob（pattern 槽）+ 注册链三字段继承 + server NHR 分支三件
             //  联动（方案文档 R9 M0-④）。仅 MESH/AUTO 受理（AUTO 的 MESH 语义由
             //  BuildStage 的拓扑校验保证——CLOS 域已在 Compile 期被拒）。
-            if (seg.pattern == CommPattern::NHR) {
+            //  ★R13 状态更新（M0_R13_NHR_V5.md）：NHR 三件已按 v5 落地（pattern 槽 31
+            //  + NHR_RUN 动词 + server VerbNhrRun 公式重建三自持量）；本 v3 拒收**保留**
+            //  ——v3 帧仍无 pattern 载体，NHR 段只走 v5 verbPath（hccl_alloc_ctx_res.cc
+            //  ④段的 SerializeVerbPlan 分叉），双格式分野即灰度语义。
+            if (seg.pattern == CommPattern::NHR && !allowNhrSkeleton) {
+                // R15 · 条件化放行（M0_R15 §十-5 裁决 5）：allowNhrSkeleton=true 仅在
+                // AICPU 引擎 tier 骨架承载场景（唯一生产调用点 hccl_alloc_ctx_res.cc
+                // 传 engine==AICPU && UseUnifiedTierPath）——NHR 骨架段的帧值是 layout
+                // 驱动 pattern 无关（AICPU 消费方按帧 kind 分读槽 1..4，pattern 由
+                // tier 位置语义重建）。CCU 路径（含 verbPath=false 的 v3 降级）维持
+                // 拒收——DispatchUnifiedPlanV3 只读槽 0..15 会把 NHR 段当 mesh RS 段
+                // 错读（静默错跑面，主会话复核修正 A 指出的半边）。
                 err = "SerializeSegmentV3: ReduceSlice NHR not in delivery scope "
                       "(v3 frame has no pattern carrier; NHR dispatch needs v5 protocol, see R9 M0-4)";
                 return false;
@@ -229,7 +265,15 @@ inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& e
             slots[U_V3_RS_SCRATCH] = seg.layout.scratchBaseOff;   // scratch 中转基址（hcclBuff）
             // rankSliceOffset = 纯 rank 偏移（stride*me，不含 inBaseOff）——kernel 侧
             // myInput/remoteInput.addr = input[rankId] + offset（基址槽+偏移槽分列，
-            // 设备侧写入方 :551 同式）
+            // 设备侧写入方 :551 同式）。★P0-3 同步（R12-9 修复轮）：RS 布局的
+            // inputSliceStride 语义由 DataLayout::RsInStride 三分支承载（R16 · 8b
+            // 访问器化，Compile 期 0 → 退 outputSliceStride）——但**本槽维持裸值
+            // inputSliceStride 直乘**（R16 · 8b 裁决：此处改访问器会让 Compile 期
+            // blob 字节从 0 变 outputSliceStride*me——协议字节零变化优先，语义由
+            // AICPU 消费方弃读（aicpu_consumer (void)f.rsRankSliceOffset）+ 设备
+            // 写入方 :891-892 覆写双端中性承载）。双道防线分工：本槽值覆盖
+            // **host 序列化面**（v3 blob 的 AICPU 可读镜像），设备写入方按
+            // strideCount 现值覆写覆盖 **CCU server 路径**——两道各防一侧，非冗余。
             slots[U_V3_RS_RANK_SLICE_OFFSET] = seg.layout.inputSliceStride * me;
             slots[U_V3_RS_CHUNK_SIZE] = ch.chunkSize;
             slots[U_V3_RS_CHUNK_LOOP_NUM] = ch.chunkLoopNum;      // UINT64_MAX - chunkCount 倒计数
@@ -258,12 +302,35 @@ inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& e
 }
 
 // 整 Plan → v3 槽序列（destination 需 ≥ SerializedPlanV3Size(plan) 个 u64 槽）
+// R15 · ① tier 槽写入 + NHR 骨架条件放行（M0_R15 §一/§十-5）：tierPlan 有效（规范
+// 形态：hasTier && 2 段全 RS && seg0 MESH && seg1 NHR）时把九值写段 0 帧槽 16..24
+// + NHR 骨架段放行（allowNhrSkeleton 透传）。缺省参数形态（tierPlan=nullptr /
+// allowNhrSkeleton=false）= 现状逐字节行为零变化（既有测试直调零改动）。
 inline u32 SerializedPlanV3Size(const Plan& plan)
 {
     return UNIFIED_V3_HEADER_SLOTS + static_cast<u32>(plan.segments.size()) * UNIFIED_V3_SLOTS_PER_RECORD;
 }
 
-inline bool SerializePlanV3(const Plan& plan, std::vector<u64>& destination, std::string& err)
+// R15 · tier 骨架规范形态判别（写入 gate 的形态半边——门控半边在调用点
+// engine==AICPU && UseUnifiedTierPath，两半合取才是完整 gate，M0 §十-5）：
+// hasTier && 恰 2 段 && 全 ReduceSlice && seg0 MESH && seg1 NHR。非规范 tier 形态
+// （角色倒置/单段/混 kind）不写槽 → 消费方 slot16=0 不展开（骨架 NHR 段照旧被
+// 拒收 → 回退老路径，无静默错跑面）。
+inline bool TierSkeletonCanonical(const Plan& plan)
+{
+    if (!plan.tier.hasTier || plan.segments.size() != 2U) {
+        return false;
+    }
+    for (size_t i = 0; i < plan.segments.size(); ++i) {
+        if (plan.segments[i].kind != ActionKind::ReduceSlice) {
+            return false;
+        }
+    }
+    return plan.segments[0].pattern == CommPattern::MESH && plan.segments[1].pattern == CommPattern::NHR;
+}
+
+inline bool SerializePlanV3(const Plan& plan, std::vector<u64>& destination, std::string& err,
+                            const TierParams* tierPlan = nullptr)
 {
     if (plan.segments.size() > UNIFIED_V3_MAX_SEGMENTS) {
         err = "SerializePlanV3: segment count " + std::to_string(plan.segments.size()) +
@@ -299,11 +366,31 @@ inline bool SerializePlanV3(const Plan& plan, std::vector<u64>& destination, std
             break;
         }
     }
+    // R15 · ① NHR 骨架放行的透传：tierPlan 有效（规范形态 gate 在下方）时
+    // seg1（NHR 骨架段）放行序列化；否则缺省拒收（现状零变化）。
+    const bool tierCanonical = (tierPlan != nullptr) && TierSkeletonCanonical(plan);
     u64* segBase = destination.data() + UNIFIED_V3_HEADER_SLOTS;
     for (size_t i = 0; i < plan.segments.size(); ++i) {
-        if (!SerializeSegmentV3(plan.segments[i], segBase + i * UNIFIED_V3_SLOTS_PER_RECORD, err)) {
+        if (!SerializeSegmentV3(plan.segments[i], segBase + i * UNIFIED_V3_SLOTS_PER_RECORD, err,
+                                tierCanonical)) {
             return false;
         }
+    }
+    // R15 · ① tier 九值写段 0 帧槽 16..24（M0_R15 手算一锚：槽 16=1、17=thresh、
+    // 18/19=partRatio、20..23=四带宽值、24=alignBytes；段 0 帧槽 0..15 照 RS mesh
+    // 布局不变；段 1 帧槽 16..24 恒 0——tier 只写首段，判别式只查帧 0）。
+    // 非 tier Plan / 非规范形态不写（槽 16 恒 0 = 消费方不展开）。
+    if (tierCanonical) {
+        u64* f0 = segBase;
+        f0[U_V3_TIER_HAS_TIER] = 1ULL;
+        f0[U_V3_TIER_THRESH_BYTES] = tierPlan->threshBytes;
+        f0[U_V3_TIER_PART_RATIO_NUM] = tierPlan->interleave.partRatioNum;
+        f0[U_V3_TIER_PART_RATIO_DEN] = tierPlan->interleave.partRatioDen;
+        f0[U_V3_TIER_BW_FAST_NUM] = tierPlan->stepwise.bwFastNum;
+        f0[U_V3_TIER_BW_FAST_DEN] = tierPlan->stepwise.bwFastDen;
+        f0[U_V3_TIER_BW_SLOW_NUM] = tierPlan->stepwise.bwSlowNum;
+        f0[U_V3_TIER_BW_SLOW_DEN] = tierPlan->stepwise.bwSlowDen;
+        f0[U_V3_TIER_ALIGN_BYTES] = tierPlan->stepwise.alignBytes;
     }
     return true;
 }

@@ -159,6 +159,10 @@ private:
     // 从 OpResCtx.res[1] 读 v3 blob，逐段写 xn 消息区 + 哨兵帧 + 逐帧 commit 信号
     //（实现见 hccl_ccu_v0_prepare.h 尾部）。纯新增声明。
     __aicore__ inline void CcuPrepareForUnifiedPlan(__gm__ CommonPrepareParamCcu* commParam);
+    // R12 · WP-4（2026-10-09）：v5 动词帧 blob 的 device 写入方——读 UPL5 blob、
+    // 逐帧拷 32 槽（零覆写：verb 帧载荷全为资源期结构值，实例化点在 server 消费
+    // 侧）+ 哨兵帧 + 逐帧 commit 信号（实现见 hccl_ccu_v0_prepare.h）。纯新增声明。
+    __aicore__ inline void CcuPrepareForUnifiedVerbPlan(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;
