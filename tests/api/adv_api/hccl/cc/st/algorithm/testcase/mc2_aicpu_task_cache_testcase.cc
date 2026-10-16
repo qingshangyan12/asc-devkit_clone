@@ -174,7 +174,7 @@ TEST_F(Mc2AicpuTaskCacheTest, BuildsPlansForAllSupportedOperations)
         Mc2AicpuTaskCachePlan plan;
         ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, plan), HCCL_SUCCESS);
         EXPECT_TRUE(plan.enabled);
-        EXPECT_EQ(plan.tag.find("mc2tc:v1:"), 0U);
+        EXPECT_EQ(plan.tag.find("mc2tc:v2:"), 0U);
     }
 }
 
@@ -194,6 +194,20 @@ TEST_F(Mc2AicpuTaskCacheTest, ShapeAndAllToAllVArraysChangeTheTag)
     allToAllV.recvCounts[3] += 1U;
     ASSERT_EQ(BuildMc2AicpuTaskCachePlan(allToAllV.param, allToAllV.resCtx, second), HCCL_SUCCESS);
     EXPECT_NE(first.tag, second.tag);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, VolatileLaunchFieldsDoNotChangeTheTag)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    Mc2AicpuTaskCachePlan first;
+    Mc2AicpuTaskCachePlan second;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, first), HCCL_SUCCESS);
+    ASSERT_TRUE(first.enabled);
+    std::strncpy(inputs.param.algTag, "mc2-task-cache-ut-op2", sizeof(inputs.param.algTag) - 1U);
+    inputs.param.opThread = static_cast<ThreadHandle>(0xABCDU);
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, second), HCCL_SUCCESS);
+    ASSERT_TRUE(second.enabled);
+    EXPECT_EQ(first.tag, second.tag);
 }
 
 TEST_F(Mc2AicpuTaskCacheTest, MissingDynamicSymbolsBypassPlan)
