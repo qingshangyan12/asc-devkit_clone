@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id9 -->
+- Ascend 960PR&960DT系列产品：Ascend 960DT支持，Ascend 960PR不支持
+<!-- end id9 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -64,6 +67,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dty
 | `vector_fp4x2_e1m2_t` | `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
 | `vector_hifloat8_t` | `hifloat8_t` | `vector_hifloat8_t` |
 | `vector_fp8_e8m0_t` | `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
+| `vector_fp8_e6m2_t` | `fp8_e6m2_t` | `vector_fp8_e6m2_t` |
 | `vector_fp8_e5m2_t` | `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
 | `vector_fp8_e4m3fn_t` | `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
 | `vector_int16_t` | `int16_t` | `vector_int16_t` |
@@ -75,6 +79,8 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dty
 | `vector_float` | `float` | `vector_float` |
 | `vector_int64_t` | `int64_t` | 不支持 |
 | `vector_uint64_t` | `uint64_t` | 不支持 |
+
+两种模式中`fp8_e6m2_t`数据类型组合均要求Ascend C DevKit 9.2.0及以上版本。
 
 #### 函数原型典型示例
 
@@ -115,6 +121,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dty
 | `vector_fp4x2_e1m2_t` | `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
 | `vector_hifloat8_t` | `hifloat8_t` | `vector_hifloat8_t` |
 | `vector_fp8_e8m0_t` | `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
+| `vector_fp8_e6m2_t` | `fp8_e6m2_t` | `vector_fp8_e6m2_t` |
 | `vector_fp8_e5m2_t` | `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
 | `vector_fp8_e4m3fn_t` | `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
 | `vector_int16_t` | `int16_t` | `vector_int16_t` |

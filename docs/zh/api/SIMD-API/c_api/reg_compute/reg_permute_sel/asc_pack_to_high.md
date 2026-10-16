@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id9 -->
+- Ascend 960PR&960DT系列产品：Ascend 960DT支持，Ascend 960PR不支持
+<!-- end id9 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -28,8 +31,10 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
 
-将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。
+将源操作数中的元素选取低8位（b16）、低16位（b32）或低32位（b64）写入目的操作数的高半部分。
 当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。
+
+其中，b64重载仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 
 ![](../../../../figures/pack_high_draft.png)
 
@@ -63,6 +68,8 @@ dtype_src与dtype_dst支持的数据类型对如下：
 | int16_t | uint8_t |
 | uint32_t | uint16_t |
 | int32_t | uint16_t |
+| uint64_t | uint32_t |
+| int64_t | uint32_t |
 
 ### 函数原型典型示例
 
@@ -95,6 +102,7 @@ __simd_callee__ inline vector_uint8_t asc_pack_to_high(vector_uint16_t src)
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
+- `uint64_t`和`int64_t`源操作数对应的b64重载仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 
 ## 调用示例
 
@@ -153,9 +161,9 @@ __simd_vf__ inline void Pack(__ubuf__ uint8_t* low, __ubuf__ uint8_t* high, __ub
     asc_loadalign(src_reg, src);
     asc_duplicate_scalar(low_reg, static_cast<uint8_t>(0), dst_mask);
     asc_duplicate_scalar(high_reg, static_cast<uint8_t>(0), dst_mask);
-    
+
     asc_pack_to_high(high_reg, src_reg);
-    
+
     asc_storealign(high, high_reg, dst_mask);
 }
 
@@ -186,7 +194,7 @@ int main()
     std::vector<uint8_t> golden_high(DST_COUNT, 0);
     for (uint32_t i = 0; i < SRC_COUNT; ++i) {
         src[i] = static_cast<uint16_t>(0x1200U + i);
-        
+
         golden_high[SRC_COUNT + i] = static_cast<uint8_t>(src[i]);
     }
     aclInit(nullptr);
