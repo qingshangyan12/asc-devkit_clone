@@ -9,6 +9,7 @@
  */
 #include "../../../../common/mc2_perf_probe.h"
 #include <cstdint>
+#include <cstring>
 
 #include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
 #include "common/aicpu_kfc_def.h"
@@ -20,7 +21,14 @@ using namespace HcclApi;
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
-    Mc2PerfProbe::KernelScope perfScope;
+    // args[0] contains the descriptor value, not a descriptor pointer.
+    const uint64_t protocol = args == nullptr ? 0 : reinterpret_cast<uint64_t>(args[0]);
+    CommKfcParamDesc perfDesc{};
+    static_assert(sizeof(perfDesc) == sizeof(protocol), "descriptor size mismatch");
+    std::memcpy(&perfDesc, &protocol, sizeof(perfDesc));
+    Mc2PerfProbe::KernelScope perfScope(
+        args != nullptr && protocol != MC2_AICPU_SIMPLE_CTX_PROTOCOL &&
+        perfDesc.version == MC2_PERF_DESC_VERSION);
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");

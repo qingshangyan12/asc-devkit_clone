@@ -27,9 +27,7 @@ endif()
 add_subdirectory(tiling)
 
 if (BUILD_OPEN_PROJECT)
-  option(MC2_PERF_ACCEPTANCE "Enable buffered test-only AICPU performance probes" OFF)
-  add_cann_device_project(asc-devkit EXT_ARGS
-    "-DMC2_PERF_ACCEPTANCE:BOOL=${MC2_PERF_ACCEPTANCE}")
+  add_cann_device_project(asc-devkit)
 endif()
 
 

@@ -11,16 +11,13 @@
 #define MC2_PERF_PROBE_H
 
 #include <cstdint>
-#ifdef MC2_PERF_ACCEPTANCE
 #include <ctime>
 #include "log.h"
-#endif
 
-// Test-only buffered probe. Default build has no clocks, storage or output.
+// Runtime opt-in buffered probe. Disabled launches do not read clocks or record/output samples.
 // Durations share the AICPU thread's CLOCK_MONOTONIC domain; never subtract
 // these timestamps from Host or AICore timestamps.
 namespace Mc2PerfProbe {
-#ifdef MC2_PERF_ACCEPTANCE
 struct Record {
     const char* metric;
     uint64_t begin;
@@ -40,6 +37,7 @@ struct State {
     int cache = -1; // -1 unknown/disabled; 0 confirmed miss; 1 confirmed hit; 2 mixed
     bool firstCondition = true;
 };
+inline bool& Enabled() { static thread_local bool enabled = false; return enabled; }
 inline State& Get() { static thread_local State state; return state; }
 inline uint64_t Now()
 {
@@ -59,19 +57,22 @@ inline void Start()
     s.count = 0; s.dropped = 0; s.cache = -1; s.firstCondition = true;
     s.seq = 0; s.receive = 0; ++s.launch; s.entry = Now();
 }
-inline void Ready() { Add("server_ready", Get().entry, Now()); }
+inline void Ready() { if (!Enabled()) return; Add("server_ready", Get().entry, Now()); }
 inline void Receive(uint32_t seq)
 {
+    if (!Enabled()) return;
     auto& s = Get(); s.receive = Now(); s.seq = seq; s.cache = -1;
 }
 inline void Cache(bool hit)
 {
+    if (!Enabled()) return;
     auto& s = Get();
     const int value = hit ? 1 : 0;
     s.cache = s.cache == -1 || s.cache == value ? value : 2;
 }
 inline void Condition(int status)
 {
+    if (!Enabled()) return;
     auto& s = Get(); const auto end = Now();
     if (s.firstCondition) {
         Add("server_entry_to_condition", s.entry, end, status);
@@ -79,7 +80,7 @@ inline void Condition(int status)
     }
     Add("server_receive_to_condition", s.receive, end, status);
 }
-inline void Submitted(int status) { Add("server_receive_to_submit", Get().receive, Now(), status); }
+inline void Submitted(int status) { if (!Enabled()) return; Add("server_receive_to_submit", Get().receive, Now(), status); }
 inline void Dump()
 {
     auto& s = Get();
@@ -92,18 +93,17 @@ inline void Dump()
     HCCL_RUN_INFO("[MC2_PERF_END] launch=%llu records=%u dropped=%u",
         static_cast<unsigned long long>(s.launch), s.count, s.dropped);
 }
-#else
-inline void Start() {}
-inline void Ready() {}
-inline void Receive(uint32_t) {}
-inline void Cache(bool) {}
-inline void Condition(int) {}
-inline void Submitted(int) {}
-inline void Dump() {}
-#endif
 struct KernelScope {
-    KernelScope() { Start(); }
-    ~KernelScope() { Dump(); }
+    explicit KernelScope(bool enabled) {
+        Enabled() = enabled;
+        if (enabled) Start();
+    }
+    ~KernelScope() {
+        if (Enabled()) Dump();
+        Enabled() = false;
+    }
+    KernelScope(const KernelScope&) = delete;
+    KernelScope& operator=(const KernelScope&) = delete;
 };
 } // namespace Mc2PerfProbe
 #endif

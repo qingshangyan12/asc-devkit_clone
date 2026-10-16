@@ -27,7 +27,6 @@ BUILD_TYPE="Release"
 PACKAGE_TYPE="run"
 PACKAGE_TYPE_SET="false"
 ENABLE_BUILD_DEVICE=ON
-MC2_PERF_ACCEPTANCE=OFF
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
@@ -163,12 +162,6 @@ parse_cmake_extra_args() {
             "ENABLE_BUILD_DEVICE")
                 ENABLE_BUILD_DEVICE="$value"
                 echo "Set ENABLE_BUILD_DEVICE to ${ENABLE_BUILD_DEVICE}."
-                ;;
-            "MC2_PERF_ACCEPTANCE")
-                case "$value" in
-                    ON|OFF) MC2_PERF_ACCEPTANCE="$value" ;;
-                    *) echo "MC2_PERF_ACCEPTANCE must be ON or OFF"; return 1 ;;
-                esac
                 ;;
             "USE_CXX11_ABI")
                 USE_CXX11_ABI="$value"
@@ -645,7 +638,7 @@ function build()
 }
 
 function build_package(){
-  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE} -DMC2_PERF_ACCEPTANCE=${MC2_PERF_ACCEPTANCE} -DPACKAGE_TYPE=${PACKAGE_TYPE}"
+  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE} -DPACKAGE_TYPE=${PACKAGE_TYPE}"
   cmake_config
   build package
   collect_package_artifacts
