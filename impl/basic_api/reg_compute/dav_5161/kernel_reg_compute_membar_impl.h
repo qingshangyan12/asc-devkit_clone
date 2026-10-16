@@ -75,42 +75,6 @@ __simd_callee__ inline void LocalMemBarImpl()
 #endif
 
 } // namespace Reg
-
-namespace Reg {
-
-template <MemType src, MemType dst>
-__simd_callee__ inline void LocalMemBarImpl()
-{
-    if constexpr (src == MemType::VEC_STORE && dst == MemType::VEC_LOAD) {
-        mem_bar(VST_VLD);
-    } else if constexpr (src == MemType::VEC_LOAD && dst == MemType::VEC_STORE) {
-        mem_bar(VLD_VST);
-    } else if constexpr (src == MemType::VEC_STORE && dst == MemType::VEC_STORE) {
-        mem_bar(VST_VST);
-    } else if constexpr (src == MemType::VEC_STORE && dst == MemType::SCALAR_LOAD) {
-        mem_bar(VST_LD);
-    } else if constexpr (src == MemType::VEC_STORE && dst == MemType::SCALAR_STORE) {
-        mem_bar(VST_ST);
-    } else if constexpr (src == MemType::VEC_LOAD && dst == MemType::SCALAR_STORE) {
-        mem_bar(VLD_ST);
-    } else if constexpr (src == MemType::SCALAR_STORE && dst == MemType::VEC_LOAD) {
-        mem_bar(ST_VLD);
-    } else if constexpr (src == MemType::SCALAR_STORE && dst == MemType::VEC_STORE) {
-        mem_bar(ST_VST);
-    } else if constexpr (src == MemType::SCALAR_LOAD && dst == MemType::VEC_STORE) {
-        mem_bar(LD_VST);
-    } else if constexpr (src == MemType::VEC_ALL && dst == MemType::VEC_ALL) {
-        mem_bar(VV_ALL);
-    } else if constexpr (src == MemType::VEC_ALL && dst == MemType::SCALAR_ALL) {
-        mem_bar(VS_ALL);
-    } else if constexpr (src == MemType::SCALAR_ALL && dst == MemType::VEC_ALL) {
-        mem_bar(SV_ALL);
-    } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current MemType Combination is not supported!"); });
-    }
-}
-
-} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_MEMBAR_IMPL_H
 

@@ -43,25 +43,6 @@ __simd_callee__ inline void HistogramsImpl(RegU& dstReg, RegT& srcReg, MaskReg& 
     }
 }
 } // namespace Reg
-
-namespace Reg {
-template <
-    typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type, typename RegT,
-    typename RegU>
-__simd_callee__ inline void HistogramsImpl(RegU& dstReg, RegT& srcReg, MaskReg& mask)
-{
-    using ActualT = typename RegT::ActualT;
-    using ActualU = typename RegU::ActualT;
-    static_assert((SupportType<ActualT, uint8_t>()), "current data type is not supported on current device!");
-    static_assert((SupportType<ActualU, uint16_t>()), "current data type is not supported on current device!");
-    auto constexpr HistogramsMode = std::integral_constant<::Bin, static_cast<::Bin>(mode)>();
-    if constexpr (type == HistogramsType::FREQUENCY) {
-        dhistv2(dstReg, srcReg, mask, HistogramsMode);
-    } else if constexpr (type == HistogramsType::ACCUMULATE) {
-        chistv2(dstReg, srcReg, mask, HistogramsMode);
-    }
-}
-} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H
