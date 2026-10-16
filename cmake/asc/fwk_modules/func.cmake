@@ -229,12 +229,11 @@ function(simple_kernel_compile)
   set(kernel_spec_shell_options)
   if(kernel_spec_task_id)
     get_property(kernel_spec_mode GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_KERNEL_SPEC_MODE)
-    get_property(kernel_binary_path GLOBAL PROPERTY _ASC_TGT_KERNEL_${BINCMP_TARGET_NAME}_BINARY_DIR)
-    set(kernel_spec_root "${kernel_binary_path}/kernel_spec")
+    get_property(kernel_spec_work GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_KERNEL_SPEC_BUILD_DIR)
     set(kernel_spec_options "--kernel-spec-mode=${kernel_spec_mode}"
-      "--kernel-spec-dir=${kernel_spec_root}" "--kernel-spec-task=${kernel_spec_task_id}")
-    string(REPLACE "'" "'\\''" kernel_spec_root_shell "${kernel_spec_root}")
-    set(kernel_spec_shell_options "--kernel-spec-mode=${kernel_spec_mode} --kernel-spec-dir='${kernel_spec_root_shell}' --kernel-spec-task=${kernel_spec_task_id}")
+      "--kernel-spec-build=${kernel_spec_work}" "--kernel-spec-task=${kernel_spec_task_id}")
+    string(REPLACE "'" "'\\''" kernel_spec_work_shell "${kernel_spec_work}")
+    set(kernel_spec_shell_options "--kernel-spec-mode=${kernel_spec_mode} --kernel-spec-build='${kernel_spec_work_shell}' --kernel-spec-task=${kernel_spec_task_id}")
   endif()
   set(BINCMP_TILING_LIB_TMP ${BINCMP_TILING_LIB})
   set(BINCMP_TILING_LIB $<TARGET_FILE:${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB}>)
@@ -492,36 +491,36 @@ endfunction()
 
 function(_ascendc_add_kernel_spec_target package_name kernel_target)
   set(spec_target "${package_name}_kernel_spec")
-  set(reset_target "${package_name}_${kernel_target}_kernel_spec_reset")
+  set(prepare_target "${package_name}_kernel_spec_prepare")
+  set(source_target "${package_name}_${kernel_target}_kernel_spec_sources")
   get_property(spec_work GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_BUILD_DIR)
-  set(spec_output "${spec_work}/op_spec/libcust_compile_resource.so")
-  set(spec_status "${spec_work}/install_status.cmake")
-  set(spec_state "${spec_work}/${kernel_spec_task_id}.tasks.json")
+  set(spec_install_script "${spec_work}/install.cmake")
   set(spec_build_config "${spec_work}/kernel_spec_build_config.json")
   set(spec_script "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_build_kernel_spec.py")
-  set(spec_common --state "${spec_state}" --install-status "${spec_status}"
-    --kernel-spec-mode "${kernel_spec_mode}" --kernel-spec-dir "${kernel_spec_root}" --task-id "${kernel_spec_task_id}")
-  # A new configure must not install the previous configuration's result.
   file(MAKE_DIRECTORY "${spec_work}")
-  file(REMOVE "${spec_status}")
 
-  add_custom_target(${reset_target}
-    COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" reset ${spec_common} ${kernel_spec_tasks}
+  add_custom_target(${source_target}
     COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_copy_kernel_src.py"
       "--auto-gen-path=${auto_gen_path}" "--target-name=${kernel_target}"
       "--kernel-base-dir=${KERNEL_SRC_BASE}" "--copy-dst-dir=${KERNEL_DYNAMIC_PATH}"
     VERBATIM)
   # Serialize against the legacy timestamp-based copy, then refresh this batch's sources and headers.
-  add_dependencies(${reset_target} ${kernel_target}_copy_kernel_srcs)
+  add_dependencies(${source_target} ${kernel_target}_copy_kernel_srcs ${prepare_target})
   foreach(producer IN LISTS KERNEL_COMPILE_TARGETS)
-    add_dependencies(${producer} ${reset_target})
+    add_dependencies(${producer} ${source_target})
   endforeach()
 
   if(NOT TARGET ${spec_target})
     file(WRITE "${spec_build_config}" "[]")
+    # A reconfigure invalidates installation until the new configuration is built.
+    file(REMOVE "${spec_install_script}")
+    add_custom_target(${prepare_target}
+      COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" prepare
+        --build-config "${spec_build_config}" --work-dir "${spec_work}"
+      VERBATIM)
     set_property(GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_RESOURCE_DIR "${kernel_spec_install_dir}")
     # exporter and make run on the build host; the SO compiler targets the package consumer.
-    # Tools are required only when final scopes contain an effective export task.
+    # Tools are used only when this round contains effective export tasks.
     find_program(_ASC_KERNEL_SPEC_EXPORTER asc_compile_exporter
       HINTS "${ASCEND_CANN_PACKAGE_PATH}/tools/asc_compile_exporter" "${ASCEND_CANN_PACKAGE_PATH}/bin"
       NO_CMAKE_FIND_ROOT_PATH)
@@ -534,34 +533,22 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
 
     add_custom_target(${spec_target}
       COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" bundle
-        --build-config "${spec_build_config}" --install-status "${spec_status}"
-        --output "${spec_output}" --work-dir "${spec_work}/cache"
+        --build-config "${spec_build_config}" --work-dir "${spec_work}"
         --exporter "${_ASC_KERNEL_SPEC_EXPORTER}" --cxx "${_ASC_KERNEL_SPEC_CXX}" --make "${_ASC_KERNEL_SPEC_MAKE}"
-      BYPRODUCTS "${spec_output}" "${spec_status}"
+      BYPRODUCTS "${spec_install_script}"
       VERBATIM)
     add_dependencies(binary ${spec_target})
-    # Installation consumes a successful result of this build, including an explicit empty result.
-    # Reset removes this receipt before producers run, so a failed build cannot install an old SO.
+    # The bundle step writes installation commands only after this round succeeds.
     adapt_install_path(INPUT_PATH "${kernel_spec_install_dir}" INPUT_TARGET ${package_name} OUTPUT_PATH spec_install)
     install(CODE "
-      if(NOT EXISTS \"${spec_status}\")
+      if(NOT EXISTS \"${spec_install_script}\")
         message(FATAL_ERROR \"Kernel Spec resources have not been successfully built for ${package_name}\")
-      endif()
-      unset(ASCENDC_KERNEL_SPEC_READY)
-      unset(ASCENDC_KERNEL_SPEC_HAS_RESOURCES)
-      include(\"${spec_status}\")
-      if(NOT ASCENDC_KERNEL_SPEC_READY)
-        message(FATAL_ERROR \"Kernel Spec build result is unavailable for ${package_name}\")
       endif()
       set(spec_destination \"${spec_install}\")
       if(NOT IS_ABSOLUTE \"\${spec_destination}\")
         set(spec_destination \"\${CMAKE_INSTALL_PREFIX}/\${spec_destination}\")
       endif()
-      if(ASCENDC_KERNEL_SPEC_HAS_RESOURCES)
-        file(INSTALL DESTINATION \"\${spec_destination}\" TYPE FILE FILES \"${spec_output}\")
-      else()
-        file(REMOVE \"\$ENV{DESTDIR}\${spec_destination}/libcust_compile_resource.so\")
-      endif()
+      include(\"${spec_install_script}\")
     ")
   else()
     get_property(resource_dir GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_RESOURCE_DIR)
@@ -571,12 +558,17 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   endif()
 
   # CMake owns the engineering registration; no Python process is needed at configure time.
-  foreach(field IN ITEMS spec_state KERNEL_SRC_BASE KERNEL_DYNAMIC_PATH kernel_spec_source_destination)
+  foreach(field IN ITEMS kernel_spec_task_id KERNEL_SRC_BASE KERNEL_DYNAMIC_PATH kernel_spec_source_destination)
     _ascendc_kernel_spec_json_string(${field}_json "${${field}}")
   endforeach()
   _ascendc_kernel_spec_json_string(opc_config_json "${auto_gen_path}/custom_opc_options.ini")
+  string(JOIN "," spec_task_rows ${kernel_spec_tasks})
+  set(spec_tasks_json "[${spec_task_rows}]")
+  if(kernel_spec_mode STREQUAL "None")
+    set(spec_tasks_json "[]")
+  endif()
   string(CONCAT kernel_context
-    "{\"state\":${spec_state_json},\"opc_config\":${opc_config_json},"
+    "{\"task_id\":${kernel_spec_task_id_json},\"tasks\":${spec_tasks_json},\"opc_config\":${opc_config_json},"
     "\"source_root\":${KERNEL_SRC_BASE_json},\"copied_source_root\":${KERNEL_DYNAMIC_PATH_json},"
     "\"source_destination\":${kernel_spec_source_destination_json}}")
   file(READ "${spec_build_config}" kernel_contexts)
@@ -585,7 +577,7 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
     string(APPEND kernel_contexts ",")
   endif()
   file(WRITE "${spec_build_config}" "${kernel_contexts}${kernel_context}]")
-  add_dependencies(${spec_target} ${reset_target})
+  add_dependencies(${spec_target} ${source_target})
   foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
     add_dependencies(${spec_target} ${kernel_target}_ascendc_bin_${soc}_gen_ops_config)
   endforeach()
@@ -1350,7 +1342,6 @@ function(npu_op_package_add target_package_name)
       endif()
       string(SHA256 kernel_spec_task_id "${target_package_name}/${_ascendc_kernel_target}")
       set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_${_ascendc_kernel_target}_KERNEL_SPEC_TASK "${kernel_spec_task_id}")
-      set(kernel_spec_root "${KERNEL_BINARY_PATH}/kernel_spec")
     endif()
 
     set(kernel_spec_tasks)
@@ -1392,7 +1383,9 @@ function(npu_op_package_add target_package_name)
                                 PACKAGE_NAME ${target_package_name}
                                 OUT_DIR ${KERNEL_BINARY_PATH}/binary/)
 
-          list(APPEND kernel_spec_tasks --task "${op_type}" "${compute_unit}")
+          _ascendc_kernel_spec_json_string(task_op_json "${op_type}")
+          _ascendc_kernel_spec_json_string(task_soc_json "${compute_unit}")
+          list(APPEND kernel_spec_tasks "[${task_op_json},${task_soc_json}]")
           list(APPEND KERNEL_COMPILE_TARGETS ${op_type}_${compute_unit})
           math(EXPR KERNEL_COMPILE_TARGET_COUNT "${KERNEL_COMPILE_TARGET_COUNT} + 1")
         endif()

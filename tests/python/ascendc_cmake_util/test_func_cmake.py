@@ -198,7 +198,7 @@ set(HOST_NATIVE_TILING_LIB "${{CMAKE_BINARY_DIR}}/unused.so")
 set_property(GLOBAL PROPERTY _ASC_PKG_ERROR_FILE "${{CMAKE_BINARY_DIR}}/compile_error.log")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_MODE SK)
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_kernel_KERNEL_SPEC_TASK "{"a" * 64}")
-set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_kernel_BINARY_DIR "{root}")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_BUILD_DIR "{root}")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_CODE_GEN_DIRS "${{CMAKE_BINARY_DIR}}/autogen")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_BINARY_PACKAGE ON)
 add_library(demo_ascendc_tiling SHARED stub.cpp)
@@ -216,5 +216,5 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
         assert result.returncode == 0, result.stdout + result.stderr
     arguments = json.loads((scripts / "util/arguments.json").read_text())
     assert "--kernel-spec-mode=SK" in arguments
-    assert f"--kernel-spec-dir={root}/kernel_spec" in arguments
+    assert f"--kernel-spec-build={root}" in arguments
     assert "--kernel-spec-task=" + "a" * 64 in arguments

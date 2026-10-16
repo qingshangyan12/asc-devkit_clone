@@ -13,6 +13,8 @@
 import json
 import shlex
 import sys
+
+import pytest
 from collections import defaultdict
 from pathlib import Path
 
@@ -148,7 +150,8 @@ def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monk
     assert "_ascendc_custom_binary_json" not in split_json
 
 
-def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch):
+@pytest.mark.parametrize("mode", ["Normal", "SK", "None"])
+def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch, mode):
     cfg_file = tmp_path / "op_info.ini"
     cfg_file.write_text("")
     opc_file = tmp_path / "custom_opc_options.ini"
@@ -161,12 +164,31 @@ def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch):
         str(tmp_path),
         "ascend910b",
         str(opc_file),
-        kernel_spec_mode="SK",
-        kernel_spec_dir=str(tmp_path / "resources"),
+        kernel_spec_mode=mode,
+        kernel_spec_dir=str(tmp_path / "resources with spaces") if mode != "None" else None,
         kernel_spec_task=task_id,
     )
-    assert shlex.split(op_desc.kernel_spec_options) == [
-        "--kernel-spec=SK",
-        f"--kernel-spec-dir={tmp_path}/resources/ascend910b/.ascendc-{task_id}/ascend910b/AddCustomTemplate",
-    ]
+    assert shlex.split(op_desc.kernel_spec_options) == (
+        [
+            f"--kernel-spec={mode}",
+            f"--kernel-spec-dir={tmp_path}/resources with spaces/.ascendc-{task_id}/ascend910b/AddCustomTemplate",
+        ]
+        if mode != "None"
+        else []
+    )
     assert "kernel-spec" not in opc_file.read_text()
+
+
+@pytest.mark.parametrize(
+    "mode,root,message",
+    [("Invalid", "/tmp/resources", "None, Normal or SK"), ("Normal", None, "absolute"), ("SK", "relative", "absolute")],
+)
+def test_bin_param_validates_kernel_spec_mode_and_root(tmp_path, monkeypatch, mode, root, message):
+    cfg_file = tmp_path / "op_info.ini"
+    cfg_file.write_text("")
+    op_desc = _FakeOpDesc()
+    monkeypatch.setattr(ascendc_bin_param_build.opdesc_parser, "get_op_desc", lambda *_args, **_kwargs: [op_desc])
+    with pytest.raises(ValueError, match=message):
+        ascendc_bin_param_build.gen_bin_param_file(
+            str(cfg_file), str(tmp_path), "ascend910b", kernel_spec_mode=mode, kernel_spec_dir=root
+        )
