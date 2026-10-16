@@ -11,10 +11,12 @@
 #include "aicpu_fixture.h"
 
 #include <cstdlib>
+#include <fstream>
 #include <thread>
 
 #include "acl/acl_rt.h"
 #include "aicpu_dag_checker.h"
+#include "aicpu_kernel_runner.h"
 #include "checker_def.h"
 #include "hccl_alloc_ctx_res.h"
 #include "hccl_sim_pub.h"
@@ -28,6 +30,32 @@
 
 namespace HcclSim {
 namespace AicpuSt {
+namespace {
+// 执行日志 dump（AICPU_ST_DUMP_EXECLOG=<目录> 触发）：每用例一份 ExecEvent 序列。
+// 用途：驱动器收编/框架重构时的行为零漂移对照基线（同场景改前改后逐行 diff）
+void DumpExecutionLog(const std::vector<ExecEvent>& log)
+{
+    const char* dir = std::getenv("AICPU_ST_DUMP_EXECLOG");
+    if (dir == nullptr || *dir == '\0') {
+        return;
+    }
+    const auto* info = ::testing::UnitTest::GetInstance()->current_test_info();
+    const std::string name = info == nullptr ? "unknown" : std::string(info->test_suite_name()) + "." + info->name();
+    std::ofstream out(std::string(dir) + "/" + name + ".log");
+    if (!out.is_open()) {
+        return;
+    }
+    for (const auto& e : log) {
+        out << e.seq << " rank=" << e.rank << " stream=" << e.streamId << " task=" << e.taskIndex
+            << " type=" << e.type.Describe() << " notify=" << e.notifyId << " sat=" << e.satisfiedBySeq;
+        for (const auto& a : e.accesses) {
+            out << " acc[" << a.rank << "," << static_cast<int>(a.bufferType) << "," << a.offset << "," << a.size << ","
+                << (a.isWrite ? "W" : "R") << "]";
+        }
+        out << "\n";
+    }
+}
+} // namespace
 
 uint32_t AicpuStFixture::CountRanks(const TopoMeta& topoMeta)
 {
@@ -100,7 +128,7 @@ bool AicpuStFixture::CheckScenarioSupported(const AicpuStScenario& scenario, boo
     return false;
 }
 
-// 单 rank 全链路：内存分配 → OpParam 准备 → selector → 资源 → HcclExecOp（内部 launch+Orchestrate）
+// 单 rank 全链路：内存分配 → OpParam 准备 → selector → 资源 → AicpuStKernelRunner（kernel run 仿真）
 // RunRankInner 为实际执行体；RunRank 为异常保护包装（见下）——rank 线程内未捕获异常会
 // std::terminate 使整个测试进程崩溃、后续用例全丢，违背框架"优雅报告失败"的设计目标，
 // 故所有 THROW 点（如 SimNpu::AllocMemory 对超大 len 的 InvalidParamsException）必须在此兜住。
@@ -201,9 +229,8 @@ void AicpuStFixture::RunRankInner(
         return;
     }
 
-    ResPackGraphMode resPack{};
-    if (HcclExecOp(comm, opParam, topoInfo, algName, resPack) != HCCL_SUCCESS) {
-        result.error = "HcclExecOp failed";
+    if (AicpuStKernelRunner::Run(comm, opParam, topoInfo, algName) != HCCL_SUCCESS) {
+        result.error = "AicpuStKernelRunner::Run failed";
         (void)HcclCommDestroy(comm);
         return;
     }
@@ -320,7 +347,11 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
             expected[rank] = BuildExpectedOutput(rankSize, scenario, rank, actualAlgName);
         }
 
-        ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
+        // 执行日志 dump（调试/驱动器对照工具）：环境变量 AICPU_ST_DUMP_EXECLOG=<目录> 时
+        // 每用例落一份 ExecEvent 序列——驱动器收编/重构时用于行为零漂移对照
+        const ExecResult execRet = executor.Execute(queues, report);
+        DumpExecutionLog(executor.ExecutionLog());
+        ASSERT_EQ(execRet, ExecResult::SUCCESS) << report;
 
         // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）；封顶输出避免刷屏
         conflicts = AicpuDagChecker().Check(executor.ExecutionLog());

@@ -19,7 +19,7 @@
 using namespace HcclSim::AicpuSt;
 
 namespace {
-// 链路级冒烟：验证 fixture 全链（selector→资源→HcclExecOp→Orchestrate→任务图非空）
+// 链路级冒烟：验证 fixture 全链（selector→资源→AicpuStKernelRunner→Orchestrate→任务图非空）
 class AicpuStSmokeFixture : public AicpuStFixture {
 protected:
     void PrepareOpParam(

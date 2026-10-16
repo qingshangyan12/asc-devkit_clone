@@ -12,7 +12,7 @@
 # Target : AICPU ST（AllGather 首期）
 # 结构：utils 三库（aicpu_scenario=编排 / aicpu_executor=执行引擎 / aicpu_verifier=校验）
 #       + 本目录用例（framework/=框架自测，<原语>/=原语定制，依赖方向 mc2_aicpu → utils 单向）
-# 链路：InitOpParamByTiling → SelectAlgAndPrepareEngine → GetOpParamResCtx → HcclExecOp
+# 链路：InitOpParamByTiling → SelectAlgAndPrepareEngine → GetOpParamResCtx → AicpuStKernelRunner（kernel run 仿真）
 #       → HcclLaunchAicpuKernel → Orchestrate → 模板 KernelRun → Hcomm* stub → TaskStub → SimTaskQueue
 # 校验：静态检查 + 算法选择断言 + golden 逐字节比对 + TaskGraphExecutor 真执行/死锁定位 + DAG 内存冲突
 # ==========================================================================================================
@@ -32,6 +32,7 @@ add_executable(
     ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/aicpu_dag_checker_test.cpp
     ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/aicpu_fixture_test.cpp
     ${UTILS_DIR}/aicpu_scenario/aicpu_fixture.cc
+    ${UTILS_DIR}/aicpu_scenario/aicpu_kernel_runner.cc
     ${UTILS_DIR}/aicpu_executor/task_graph_executor.cc
     ${UTILS_DIR}/aicpu_verifier/aicpu_dag_checker.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/all_gather_testcase.cpp
