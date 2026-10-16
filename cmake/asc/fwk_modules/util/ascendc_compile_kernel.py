@@ -19,16 +19,17 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
-from kernel_spec_options import task_directory
+from ascendc_build_kernel_spec import KernelSpecBuildDirectory, task_directory
 from opdesc_parser import _trans_soc_ver_to_short
 
 
 class CompileKernel:
     def __init__(self: any, args: any):
         self.op_type = args.op_type
-        self.kernel_spec_task = getattr(args, "kernel_spec_task", None)
         self.kernel_spec_mode = getattr(args, "kernel_spec_mode", "None")
         self.kernel_spec_dir = getattr(args, "kernel_spec_dir", None)
+        if self.kernel_spec_mode != "None" and getattr(args, "kernel_spec_build", None):
+            self.kernel_spec_dir = str(KernelSpecBuildDirectory(args.kernel_spec_build).current_directory)
         self.op_cpp_file = os.path.realpath(args.src_file)
         self.impl_path = os.path.dirname(self.op_cpp_file)
         self.op_soc_ver = args.compute_unit
@@ -132,11 +133,7 @@ class CompileKernel:
         opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
         task_options = {}
         if self.kernel_spec_mode != "None":
-            task_options = {
-                "kernel_spec_task": self.kernel_spec_task,
-                "kernel_spec_mode": self.kernel_spec_mode,
-                "kernel_spec_dir": self.kernel_spec_dir,
-            }
+            task_options = {"kernel_spec_mode": self.kernel_spec_mode, "kernel_spec_dir": self.kernel_spec_dir}
         ascendc_bin_param_build.gen_bin_param_file(
             self.op_cfg_ini, bin_param_path, self.op_soc_ver, opc_config_file, [self.op_type], **task_options
         )
@@ -210,9 +207,9 @@ class CompileKernel:
 
     def record_kernel_spec_success(self):
         """Tell the package build that this producer completed, including its source selection."""
-        if not self.kernel_spec_task or self.kernel_spec_mode == "None":
+        if self.kernel_spec_mode == "None":
             return
-        directory = task_directory(self.kernel_spec_dir, self.op_type, self.op_soc_ver, self.kernel_spec_task)
+        directory = task_directory(self.kernel_spec_dir, self.op_type, self.op_soc_ver)
         directory.mkdir(parents=True, exist_ok=True)
         (directory / ".producer-success").write_text(self.op_cpp_file, encoding="utf-8")
 
@@ -240,7 +237,7 @@ def args_parse():
     parser.add_argument("-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path.")
     parser.add_argument("--kernel-spec-mode", choices=("None", "Normal", "SK"), default="None")
     parser.add_argument("--kernel-spec-dir", default=None)
-    parser.add_argument("--kernel-spec-task", default=None, help="Internal CMake producer namespace.")
+    parser.add_argument("--kernel-spec-build", default=None, help="Internal package build directory pointer.")
     return parser.parse_args()
 
 
@@ -258,5 +255,4 @@ if __name__ == "__main__":
         kernel_builder.ascendc_put_tiling()
         kernel_builder.ascendc_build()
         kernel_builder.clean()
-        if args.kernel_spec_task:
-            kernel_builder.record_kernel_spec_success()
+        kernel_builder.record_kernel_spec_success()

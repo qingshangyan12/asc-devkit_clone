@@ -33,9 +33,12 @@ class ResourceIdError(RuntimeError):
 
 
 def calculate_resource_id(object_path):
-    """SHA256 of the kernel object as it stands before the Resource ID is embedded."""
+    """SHA256 of the pre-ID kernel object, a NUL separator, and target SoC UTF-8 bytes."""
     if os.path.islink(object_path):
         raise ResourceIdError(f"link input must not be a symlink: {object_path}")
+    soc = global_var_storage.get_variable("ascendc_short_soc_version")
+    if not isinstance(soc, str) or not soc:
+        raise ResourceIdError("Kernel Spec requires a non-empty target SoC")
     digest = hashlib.sha256()
     try:
         with open(object_path, "rb") as file_obj:
@@ -45,6 +48,7 @@ def calculate_resource_id(object_path):
                 chunk = file_obj.read(_HASH_CHUNK_SIZE)
     except OSError as error:
         raise ResourceIdError(f"failed to read link input: {object_path}") from error
+    digest.update(b"\0" + soc.encode("utf-8"))
     return digest.hexdigest()
 
 

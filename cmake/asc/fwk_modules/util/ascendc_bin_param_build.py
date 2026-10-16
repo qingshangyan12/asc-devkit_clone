@@ -17,12 +17,13 @@ import json
 import hashlib
 import re
 import copy
+import shlex
 from collections import defaultdict
 from typing import Set, NamedTuple
 
 import const_var
 import opdesc_parser
-from kernel_spec_options import shell_options
+from ascendc_build_kernel_spec import task_directory
 from split_opc_json_with_op_list import split_json_files
 
 PYF_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -707,7 +708,6 @@ def gen_bin_param_file(
     soc: str,
     opc_config_file: str = "",
     ops: list = None,
-    kernel_spec_task: str = None,
     kernel_spec_mode: str = "None",
     kernel_spec_dir: str = None,
 ):
@@ -733,9 +733,14 @@ def gen_bin_param_file(
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
-        op_desc.kernel_spec_options = shell_options(
-            kernel_spec_mode, kernel_spec_dir, op_desc.op_type, soc, kernel_spec_task
-        )
+        if kernel_spec_mode not in {"None", "Normal", "SK"}:
+            raise ValueError("kernel-spec must be None, Normal or SK")
+        op_desc.kernel_spec_options = ""
+        if kernel_spec_mode != "None":
+            directory = task_directory(kernel_spec_dir, op_desc.op_type, soc)
+            op_desc.kernel_spec_options = " " + shlex.join(
+                ["--kernel-spec=" + kernel_spec_mode, "--kernel-spec-dir=" + str(directory)]
+            )
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])
         if all_soc_key in debug_config:

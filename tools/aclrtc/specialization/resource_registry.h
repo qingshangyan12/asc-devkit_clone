@@ -58,7 +58,6 @@ bool IsKernelMetaSavingEnabled() noexcept;
 struct ResourceData {
     nlohmann::json json;
     std::string resourceDir;
-    // Placeholder base: vendor/built-in root for op_spec, source parent for legacy kernel/jit.
     std::string sourceFilePath;
 };
 
