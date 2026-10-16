@@ -355,12 +355,33 @@ TEST_F(AscCompileExporterTest, RejectsSymlinkInResourceDirectory)
     ExpectCompileFailure(Request());
 }
 
+TEST_F(AscCompileExporterTest, BuildsBundleWithResourceLargerThanOneMiB)
+{
+    const std::string unit = JoinTestPath(root_, "collection/LargeKernel");
+    const std::string source(2U * 1024U * 1024U, 'x');
+    WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), source);
+    CreateManifest(unit, "LargeKernel");
+    const BuildCollectedBundleRequest request = Request();
+
+    ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
+    void* handle = dlopen(request.outputPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+    ASSERT_NE(handle, nullptr);
+    auto getter = reinterpret_cast<AscendcGetCompileResourceBundleFn>(dlsym(handle, "AscendcGetCompileResourceBundle"));
+    ASSERT_NE(getter, nullptr);
+    const auto* bundle = reinterpret_cast<const AcCompileResourceBundle*>(getter());
+    ASSERT_EQ(bundle->manifestCount, 1U);
+    ASSERT_EQ(bundle->manifests[0].fileCount, 1U);
+    const auto& file = bundle->manifests[0].files[0];
+    EXPECT_EQ(std::string(reinterpret_cast<const char*>(file.data), file.size), source);
+    EXPECT_EQ(dlclose(handle), 0);
+}
+
 TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
 {
     const std::string unit = JoinTestPath(root_, "collection/Large");
     const std::string resource = JoinTestPath(unit, "resources/kernel.cpp");
     WriteFile(resource, "");
-    ASSERT_EQ(truncate(resource.c_str(), 1U * 1024U * 1024U + 1U), 0);
+    ASSERT_EQ(truncate(resource.c_str(), 256U * 1024U * 1024U + 1U), 0);
     CreateManifest(unit, "Large");
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");

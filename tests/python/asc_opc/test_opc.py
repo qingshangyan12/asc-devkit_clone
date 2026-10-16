@@ -14,6 +14,7 @@ Opc test case
 """
 
 import unittest
+from unittest.mock import patch
 import os
 import sys
 import json
@@ -901,6 +902,16 @@ class TestOpc02(unittest.TestCase):
         assert do_check_input_args(["--deterministic", "false"]) == True
         assert do_check_input_args(["--deterministic", "other"]) == False
 
+    def test_kernel_spec_ignores_removed_environment_defaults(self):
+        with patch.dict(
+            os.environ, {"ASCENDC_KERNEL_SPEC_MODE": "Normal", "ASCENDC_KERNEL_SPEC_DIR": "/unrelated/package"}
+        ), RequiredValidArgs() as required:
+            sys.argv = required
+            _, parser = opc.parse_args()
+            self.assertTrue(parser.check_input_params())
+            self.assertEqual(parser.get_option(OpcOptions.KERNEL_SPEC), "None")
+            self.assertIsNone(parser.get_option(OpcOptions.KERNEL_SPEC_DIR))
+
     def test_kernel_spec_defaults_to_none(self):
         with RequiredValidArgs() as required_args:
             sys.argv = required_args
@@ -934,19 +945,33 @@ class TestOpc02(unittest.TestCase):
         self.assertTrue(result_parser.check_input_params())
         self.assertTrue(result_parser.get_option(OpcOptions.RELOCATABLE_BIN))
 
+    def test_kernel_spec_is_ignored_for_relocatable_binary(self):
+        for mode in ("Normal", "SK"):
+            for with_directory in (False, True):
+                with self.subTest(mode=mode, with_directory=with_directory):
+                    with tempfile.TemporaryDirectory() as temporary:
+                        output_dir = os.path.join(temporary, "unused_manifest_directory")
+                        with RequiredValidArgs() as required_args:
+                            sys.argv = required_args + ["--kernel-spec=" + mode, "--op_relocatable_kernel_binary=true"]
+                            if with_directory:
+                                sys.argv.append("--kernel-spec-dir=" + output_dir)
+                            _, result_parser = opc.parse_args()
+                        with patch.object(opc.logger, "info") as info:
+                            self.assertTrue(result_parser.check_input_params())
+                        options = result_parser.get_all_options()
+                        self.assertTrue(options[OpcOptions.RELOCATABLE_BIN])
+                        self.assertEqual(options[OpcOptions.KERNEL_SPEC], "None")
+                        self.assertIsNone(options[OpcOptions.KERNEL_SPEC_DIR])
+                        self.assertFalse(os.path.exists(output_dir))
+                        self.assertTrue(
+                            any("no manifest will be generated" in str(call) for call in info.call_args_list)
+                        )
+
     def test_kernel_spec_rejects_invalid_combinations(self):
         cases = (
             ("invalid mode", ["--kernel-spec=All"]),
             ("normal without dir", ["--kernel-spec=Normal"]),
             ("sk without dir", ["--kernel-spec=SK"]),
-            (
-                "normal with relocatable binary",
-                ["--kernel-spec=Normal", "--kernel-spec-dir={}", "--op_relocatable_kernel_binary=true"],
-            ),
-            (
-                "sk with relocatable binary",
-                ["--kernel-spec=SK", "--kernel-spec-dir={}", "--op_relocatable_kernel_binary=true"],
-            ),
         )
         for name, args in cases:
             with self.subTest(name=name):

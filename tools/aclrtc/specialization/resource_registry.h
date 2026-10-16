@@ -140,6 +140,7 @@ private:
     ResourceRegistry();
     ~ResourceRegistry();
 
+    static ResourceStatus LoadLinkedResource(StageState& stage);
     static AutomaticRoots AutomaticSearchRoots();
     static bool IsLibraryName(const std::string& path);
     static void AddLibrary(const std::string& path, std::set<std::string>& found);
@@ -155,6 +156,9 @@ private:
     static ResourceStatus AddSourceMatch(
         const boost::filesystem::path& candidate, const std::string& sourceFile, const std::string& canonicalRoot,
         const std::string& resourceId, std::set<std::string>& matches);
+    static ResourceStatus SearchSourceTrees(
+        const std::vector<boost::filesystem::path>& searchRoots, const boost::filesystem::path& packageRoot,
+        const std::string& resourceId, const std::string& sourceFile, std::string& located);
     static ResourceStatus LocateSourceFile(
         const LibrarySpec& spec, const std::string& resourceId, const std::string& sourceFile, std::string& located);
     static bool FindPathConflict(const std::set<std::string>& paths);
@@ -174,7 +178,6 @@ private:
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
     ResourceStatus Materialize(const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
     ResourceStatus Commit(StageState& stage);
-    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const;
 
     DirectoryCleanupGuard ownedMaterializationRoot_;
     ResourceStore externalResources_;

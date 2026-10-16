@@ -87,6 +87,7 @@ class ManifestInputSnapshot:
     sk_compile_info: Optional[object] = None
     constant_infos: Optional[Tuple[ConstantInfoRecord, ...]] = None
     constant_info_size_by_tiling_key: Optional[dict] = None
+    kernel_spec_mode: str = "SK"
 
 
 def _read_regular_file(path, description):
@@ -380,9 +381,6 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
                 source_include_added = True
             index += option_size
             continue
-        if os.path.isabs(include_path) and not os.path.exists(include_path):
-            index += option_size
-            continue
         normalized.extend(argv[index : index + option_size])
         index += option_size
     if replacement is not None and not source_include_added:
@@ -663,7 +661,7 @@ class ManifestPackageWriter:
                 (record for record in kernel.commands if record.object_type == "sk"),
                 key=lambda record: (0 if record.core_type == "cube" else 1),
             )
-            if sk_records:
+            if sk_records and self._snapshot.kernel_spec_mode != "Normal":
                 objects.append(self._build_sk_object(kernel, basic_records, sk_records))
             manifest_kernels.append(
                 {
@@ -888,6 +886,7 @@ class KernelSpecCompilation:
         self.kernel_spec_dir = context.get_addition("kernel_spec_dir")
         self.resource_id = None
         self._cleaned = False
+        self._manifest_path = None
         # Save process-global SK state before the record-only replay changes it.
         self._global_state = {name: global_var_storage.get_variable(name) for name in self._GLOBAL_STATE_NAMES}
         is_sk_double_compile = (
@@ -906,16 +905,35 @@ class KernelSpecCompilation:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if not self.record_sk_commands:
-            return False
-        global_var_storage = storage_module.global_var_storage
         try:
-            self.cleanup()
+            # A successful compile_op call must have published its requested manifest.
+            # Preserve the original error if kernel compilation or publication failed.
+            if exc_type is None and self.enabled:
+                self._check_manifest_published()
         finally:
-            # Restore the entry state even when replay or cleanup fails.
-            for name, value in self._global_state.items():
-                global_var_storage.set_variable(name, value)
+            if self.record_sk_commands:
+                try:
+                    self.cleanup()
+                finally:
+                    for name, value in self._global_state.items():
+                        storage_module.global_var_storage.set_variable(name, value)
         return False
+
+    def _manifest_error(self, reason):
+        utility_module.CommonUtility.ascendc_raise_python_err(
+            error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+            f"Kernel Spec manifest generation failed: kernel={self.compile_info.kernel_name}, "
+            f"mode={self._kernel_spec_mode}, output_dir={self.kernel_spec_dir}; {reason}",
+        )
+
+    def _check_manifest_published(self):
+        try:
+            if not self._manifest_path or not Path(self._manifest_path).is_file():
+                raise ManifestGenerationError("manifest was not generated")
+            if Path(self._manifest_path).stat().st_size == 0:
+                raise ManifestGenerationError(f"manifest is empty: {self._manifest_path}")
+        except (ManifestGenerationError, OSError) as error:
+            self._manifest_error(str(error))
 
     @classmethod
     def create(cls, compile_info, compile_option_tuple, tiling_info):
@@ -961,7 +979,7 @@ class KernelSpecCompilation:
             return
         # Publish after the Resource ID and all requested commands are available.
         try:
-            ManifestPackageWriter(
+            self._manifest_path = ManifestPackageWriter(
                 ManifestInputSnapshot(
                     soc_version=storage_module.global_var_storage.get_variable("ascendc_short_soc_version"),
                     kernel_spec_dir=self.kernel_spec_dir,
@@ -971,12 +989,11 @@ class KernelSpecCompilation:
                     tiling_info=tiling_info,
                     workspace_idx=workspace_idx,
                     sk_compile_info=self.sk_compile_info,
+                    kernel_spec_mode=self._kernel_spec_mode,
                 )
             ).write()
-        except ManifestGenerationError as error:
-            utility_module.CommonUtility.ascendc_raise_python_err(
-                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE, f"generate Manifest failed, reason is: {error}"
-            )
+        except (ManifestGenerationError, OSError) as error:
+            self._manifest_error(str(error))
 
     def cleanup(self):
         if self._cleaned:

@@ -32,7 +32,7 @@ namespace {
 namespace fs = boost::filesystem;
 
 constexpr uint32_t MAX_MANIFEST_BYTES = 8U * 1024U * 1024U;
-constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 1U * 1024U * 1024U;
+constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 256U * 1024U * 1024U;
 constexpr uint32_t MAX_BUNDLE_BYTES = 256U * 1024U * 1024U;
 constexpr size_t MAX_MANIFEST_COUNT = 4096U;
 constexpr size_t MAX_FILES_PER_MANIFEST = 4096U;

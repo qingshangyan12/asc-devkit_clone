@@ -13,6 +13,7 @@ import os
 import sys
 import shutil
 import unittest
+import tempfile
 from unittest import mock
 
 import hashlib
@@ -479,6 +480,10 @@ class TestCompileOp(unittest.TestCase):
                     mock_generate_manifest = stack.enter_context(
                         mock.patch.object(static_compile_resource_generator, "ManifestPackageWriter")
                     )
+                    manifest_directory = stack.enter_context(tempfile.TemporaryDirectory())
+                    manifest_path = Path(manifest_directory) / "manifest.json"
+                    manifest_path.write_text("{}")
+                    mock_generate_manifest.return_value.write.return_value = str(manifest_path)
                     compile_op_common_part("test.cpp", "test", op_info, CompileOptionTuple([], []), infered_info, {})
         finally:
             global_var_storage.set_variable("ascendc_enable_super_kernel", False)
@@ -671,12 +676,14 @@ class TestCompileOp(unittest.TestCase):
 
     def test_kernel_spec_reports_producer_errors_as_ascendc_errors(self):
         compile_info = CompileInfo()
+        compile_info.kernel_name = "TestKernel"
         compile_info.dst_file = "/tmp/kernel.o"
         kernel_spec = object.__new__(compile_op_module.KernelSpecCompilation)
         kernel_spec.enabled = True
         kernel_spec.compile_info = compile_info
         kernel_spec.kernel_spec_dir = "/tmp/kernel_spec"
         kernel_spec.resource_id = "resource-id"
+        kernel_spec._kernel_spec_mode = "Normal"
         kernel_spec.basic_compile_info = compile_info
         kernel_spec.sk_compile_info = None
 
@@ -689,7 +696,8 @@ class TestCompileOp(unittest.TestCase):
                     side_effect=static_compile_resource_generator.ManifestGenerationError("manifest failed"),
                 ),
                 lambda: kernel_spec.publish_manifest(TilingInfo(), 0),
-                "generate Manifest failed, reason is: manifest failed",
+                "Kernel Spec manifest generation failed: kernel=TestKernel, mode=Normal, "
+                "output_dir=/tmp/kernel_spec; manifest failed",
             ),
         )
         for stage, producer_patch, action, expected_message in cases:

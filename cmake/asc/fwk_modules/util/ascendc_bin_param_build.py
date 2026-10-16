@@ -13,6 +13,7 @@
 import argparse
 import sys
 import os
+from kernel_spec_options import shell_options
 import json
 import hashlib
 import re
@@ -485,6 +486,7 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
             kernel_template_input_str = self.kernel_template_input
             build_cmd_var += f" --kernel-template-input={kernel_template_input_str}"
 
+        build_cmd_var += getattr(self, "kernel_spec_options", "")
         build_cmd_var += ")\n"
         build_cmd_var += "\n"
 
@@ -696,6 +698,7 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str, opc_config_file: st
     all_soc_key = "ALL"
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
+        op_desc.kernel_spec_options = shell_options(opc_config_file, op_desc.op_type, soc)
         op_desc.set_out_path(out_dir)
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])

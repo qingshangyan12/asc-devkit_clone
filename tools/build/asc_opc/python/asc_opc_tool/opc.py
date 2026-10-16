@@ -453,7 +453,7 @@ class OpcOptionParser:
         if output_dir_valid_flag is not True:
             logger.debug("The dir %s is not exist.", abs_dir)
             try:
-                os.makedirs(abs_dir, 750)
+                os.makedirs(abs_dir, mode=0o750, exist_ok=True)
             except OSError as error:
                 logger.error("%s", str(error))
                 return False, ""
@@ -576,8 +576,13 @@ class OpcOptionParser:
             return True
 
         if self.get_option(OpcOptions.RELOCATABLE_BIN):
-            logger.error("kernel-spec cannot be used with op_relocatable_kernel_binary.")
-            return False
+            logger.info(
+                "kernel-spec={} is ignored when op_relocatable_kernel_binary is enabled; "
+                "no manifest will be generated.".format(kernel_spec)
+            )
+            self.set_option(OpcOptions.KERNEL_SPEC, "None")
+            self.set_option(OpcOptions.KERNEL_SPEC_DIR, None)
+            return True
 
         kernel_spec_dir = self.get_option(OpcOptions.KERNEL_SPEC_DIR)
         if not kernel_spec_dir:

@@ -67,7 +67,7 @@ namespace {
 namespace fs = boost::filesystem;
 using Json = nlohmann::json;
 
-constexpr char RELATIVE_JIT_ROOT[] = "op_impl/ai_core/tbe/kernel/jit";
+constexpr char RELATIVE_RESOURCE_ROOT[] = "op_impl/ai_core/tbe";
 constexpr char LIBRARY_NAME_SUFFIX[] = "_compile_database.so";
 constexpr uint64_t MAX_MANIFEST_SIZE = 8U * 1024U * 1024U;
 constexpr uint64_t MAX_PATH_SIZE = 4096U;
@@ -349,10 +349,10 @@ ResourceStatus ParseSourceFile(
         return ResourceStatus::InvalidResource;
     }
     ownership.sourceFile = document.at("source_file").get<std::string>();
-    if (!IsPlainName(ownership.sourceFile)) {
+    if (!FileUtils::IsSafeRelativePath(ownership.sourceFile)) {
         ASCENDLOGE(
             "Compile resource manifest has unsafe source file name: resource_id=%s source_type=%s so=%s "
-            "manifest=%" PRIu64 " source_file=%s expected=plain file name",
+            "manifest=%" PRIu64 " source_file=%s expected=safe package-relative path or file name",
             ownership.resourceId.c_str(), SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex,
             ownership.sourceFile.c_str());
         return ResourceStatus::InvalidResource;
@@ -552,19 +552,35 @@ bool CheckRegistryLimits(const StagedResources& staged, ResourceSourceType sourc
     return true;
 }
 
+std::string HostArchitecture()
+{
+#if defined(__aarch64__)
+    return "aarch64";
+#elif defined(__x86_64__)
+    return "x86_64";
+#else
+    return "";
+#endif
+}
+
+void RemoveRegisteredDuplicates(StagedResources& incoming, const ResourceStore& registered)
+{
+    for (auto item = incoming.resources.begin(); item != incoming.resources.end();) {
+        if (registered.find(item->first) == registered.end()) {
+            ++item;
+            continue;
+        }
+        for (const auto& file : item->second->files) {
+            incoming.bytes -= file.bytes.size();
+        }
+        incoming.files -= item->second->files.size();
+        item = incoming.resources.erase(item);
+    }
+}
+
 ResourceStatus MergeStagedLibrary(const LibrarySpec& spec, StagedResources& incoming, StagedResources& staged)
 {
-    for (const auto& item : incoming.resources) {
-        const auto existing = staged.resources.find(item.first);
-        if (existing != staged.resources.end()) {
-            ASCENDLOGW(
-                "Skipping compile resource SO because its resource conflicts with an earlier SO: resource_id=%s "
-                "source_type=%s incoming_so=%s existing_so=%s",
-                item.first.c_str(), SourceTypeName(spec.sourceType), spec.path.c_str(),
-                existing->second->sourceSoPath.c_str());
-            return ResourceStatus::Conflict;
-        }
-    }
+    RemoveRegisteredDuplicates(incoming, staged.resources);
     uint64_t bytes = staged.bytes;
     uint64_t files = staged.files;
     if (!TryAddWithinLimit(incoming.bytes, MAX_REGISTRY_RESOURCE_SIZE, bytes) ||
@@ -588,8 +604,18 @@ ResourceStatus MergeStagedLibrary(const LibrarySpec& spec, StagedResources& inco
 AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
 {
     AutomaticRoots roots;
+    const std::string hostArch = HostArchitecture();
+    auto appendRoots = [&hostArch](std::vector<std::string>& paths, const std::string& package, bool builtIn) {
+        const std::string tbe = FileUtils::JoinPath(package, RELATIVE_RESOURCE_ROOT);
+        paths.push_back(FileUtils::JoinPath(package, "op_spec"));
+        paths.push_back(FileUtils::JoinPath(tbe, "kernel"));
+        if (!hostArch.empty()) {
+            paths.push_back(
+                FileUtils::JoinPath(tbe, (builtIn ? "op_host/lib/linux/" : "op_tiling/lib/linux/") + hostArch));
+        }
+    };
     for (const std::string& path : SplitList(std::getenv("ASCEND_CUSTOM_OPP_PATH"), ':')) {
-        roots.custom.push_back(FileUtils::JoinPath(path, RELATIVE_JIT_ROOT));
+        appendRoots(roots.custom, path, false);
     }
     const char* environment = std::getenv("ASCEND_OPP_PATH");
     if (environment == nullptr || *environment == '\0') {
@@ -629,8 +655,7 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
             }
             for (const std::string& vendor : SplitList(line.substr(separator + 1U).c_str(), ',')) {
                 if (IsPlainName(vendor)) {
-                    roots.custom.push_back(
-                        FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors/" + vendor), RELATIVE_JIT_ROOT));
+                    appendRoots(roots.custom, FileUtils::JoinPath(oppRoot, "vendors/" + vendor), false);
                 } else {
                     ASCENDLOGW(
                         "Ignoring unsafe compile resource vendor name: path=%s vendor=%s expected=plain directory name",
@@ -640,7 +665,7 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
             break;
         }
     }
-    roots.builtIn.push_back(FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "built-in"), RELATIVE_JIT_ROOT));
+    appendRoots(roots.builtIn, FileUtils::JoinPath(oppRoot, "built-in"), true);
     ASCENDLOGD(
         "Automatic compile resource roots collected: custom_roots=%zu built_in_roots=%zu opp_root=%s",
         roots.custom.size(), roots.builtIn.size(), oppRoot.c_str());
@@ -650,6 +675,9 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
 bool ResourceRegistry::IsLibraryName(const std::string& path)
 {
     const std::string name = FileUtils::FileName(path);
+    if (name == "libcust_compile_db.so") {
+        return true;
+    }
     return name.size() > std::strlen("lib") + std::strlen(LIBRARY_NAME_SUFFIX) && name.rfind("lib", 0U) == 0U &&
            name.compare(
                name.size() - std::strlen(LIBRARY_NAME_SUFFIX), std::strlen(LIBRARY_NAME_SUFFIX), LIBRARY_NAME_SUFFIX) ==
@@ -881,56 +909,194 @@ ResourceStatus ResourceRegistry::AddSourceMatch(
 ResourceStatus ResourceRegistry::LocateSourceFile(
     const LibrarySpec& spec, const std::string& resourceId, const std::string& sourceFile, std::string& located)
 {
-    // Relative path example:
-    //   kernel/jit/ascend910b/libfoo_compile_database.so  <- resource SO
-    //   kernel/ascend910b/impl/foo.cpp                    <- source file
-    // Derive the SoC and kernel root from the SO path, then recursively search the sibling kernel/<soc> tree.
-    // Exactly one regular-file match is required; located is set to that file's parent directory.
     const fs::path soPath(spec.path);
-    const fs::path soc = soPath.parent_path().filename();
-    const fs::path jitRoot = soPath.parent_path().parent_path();
-    const fs::path kernelRoot = jitRoot.parent_path();
-    if (soc.empty() || jitRoot.filename() != "jit" || kernelRoot.filename() != "kernel") {
-        ASCENDLOGE(
-            "Compile resource SO is outside kernel/jit/<soc>: resource_id=%s source_type=%s so=%s", resourceId.c_str(),
-            SourceTypeName(spec.sourceType), spec.path.c_str());
+    fs::path linkedPackageRoot;
+    fs::path specRoot = soPath.parent_path();
+    while (!specRoot.empty() && specRoot != specRoot.parent_path()) {
+        if (specRoot.filename() == "op_spec") {
+            linkedPackageRoot = specRoot.parent_path();
+            break;
+        }
+        specRoot = specRoot.parent_path();
+    }
+    if (linkedPackageRoot.empty() &&
+        (soPath.parent_path().filename() == "lib" || soPath.parent_path().filename() == "lib64" ||
+         soPath.parent_path().filename() == "bin")) {
+        linkedPackageRoot = soPath.parent_path().parent_path();
+    }
+    if (!linkedPackageRoot.empty()) {
+        if (!FileUtils::IsSafeRelativePath(sourceFile)) {
+            return ResourceStatus::InvalidResource;
+        }
+        if (sourceFile.find('/') != std::string::npos) {
+            std::string canonicalRoot;
+            ResourceStatus status = ResolveSourceRoot(linkedPackageRoot, resourceId, canonicalRoot);
+            if (status != ResourceStatus::Success) {
+                return status;
+            }
+            std::set<std::string> matches;
+            status = AddSourceMatch(
+                linkedPackageRoot / sourceFile, fs::path(sourceFile).filename().string(), canonicalRoot, resourceId,
+                matches);
+            if (status != ResourceStatus::Success || matches.size() != 1U) {
+                ASCENDLOGE(
+                    "Cannot locate source_file=%s relative to package=%s", sourceFile.c_str(),
+                    linkedPackageRoot.c_str());
+                return ResourceStatus::InvalidResource;
+            }
+            located = *matches.begin();
+            return ResourceStatus::Success;
+        }
+        if (!specRoot.empty() && specRoot.filename() == "op_spec") {
+            const bool builtIn = linkedPackageRoot.filename() == "built-in";
+            const std::string owner =
+                builtIn ? soPath.parent_path().filename().string() : linkedPackageRoot.filename().string();
+            LibrarySpec legacy{
+                (linkedPackageRoot / "op_impl/ai_core/tbe" / (builtIn ? "op_host/lib/linux" : "op_tiling/lib/linux") /
+                 HostArchitecture() / ("lib" + owner + "_compile_database.so"))
+                    .string(),
+                spec.sourceType};
+            return LocateSourceFile(legacy, resourceId, sourceFile, located);
+        }
+        return SearchSourceTrees({linkedPackageRoot / "share"}, linkedPackageRoot, resourceId, sourceFile, located);
+    }
+    fs::path tbeRoot = soPath.parent_path();
+    while (!tbeRoot.empty() && tbeRoot.filename() != "tbe") {
+        const fs::path parent = tbeRoot.parent_path();
+        if (parent == tbeRoot) {
+            return ResourceStatus::InvalidResource;
+        }
+        tbeRoot = parent;
+    }
+    if (tbeRoot.empty()) {
         return ResourceStatus::InvalidResource;
     }
-    const fs::path searchRoot = kernelRoot / soc;
-    std::string canonicalRoot;
-    ResourceStatus status = ResolveSourceRoot(searchRoot, resourceId, canonicalRoot);
-    if (status != ResourceStatus::Success) {
-        return status;
+    std::vector<fs::path> searchRoots;
+    const fs::path kernelRoot = tbeRoot / "kernel";
+    boost::system::error_code relativeError;
+    const fs::path relative = fs::relative(soPath.parent_path(), tbeRoot, relativeError);
+    if (relativeError) {
+        return ResourceStatus::InvalidResource;
     }
-    std::set<std::string> matches;
-    boost::system::error_code error;
-    fs::recursive_directory_iterator current(canonicalRoot, fs::directory_options::none, error);
-    const fs::recursive_directory_iterator end;
-    while (!error && current != end) {
-        status = AddSourceMatch(current->path(), sourceFile, canonicalRoot, resourceId, matches);
+    auto component = relative.begin();
+    if (component != relative.end() && component->string() == "kernel") {
+        ++component;
+        if (component != relative.end() && component->string() == "jit") {
+            ++component;
+        }
+        if (component == relative.end() || !IsPlainName(component->string())) {
+            return ResourceStatus::InvalidResource;
+        }
+        searchRoots.push_back(kernelRoot / *component);
+    } else {
+        const std::string hostArch = HostArchitecture();
+        if (hostArch.empty() || (relative != fs::path("op_tiling/lib/linux") / hostArch &&
+                                 relative != fs::path("op_host/lib/linux") / hostArch)) {
+            return ResourceStatus::InvalidResource;
+        }
+    }
+    const fs::path packageRoot = tbeRoot.parent_path().parent_path().parent_path();
+    if (!FileUtils::IsSafeRelativePath(sourceFile)) {
+        return ResourceStatus::InvalidResource;
+    }
+    if (sourceFile.find('/') != std::string::npos) {
+        std::string canonicalRoot;
+        ResourceStatus status = ResolveSourceRoot(packageRoot, resourceId, canonicalRoot);
         if (status != ResourceStatus::Success) {
             return status;
         }
-        current.increment(error);
+        std::set<std::string> matches;
+        status = AddSourceMatch(
+            packageRoot / sourceFile, fs::path(sourceFile).filename().string(), canonicalRoot, resourceId, matches);
+        if (status != ResourceStatus::Success || matches.size() != 1U) {
+            ASCENDLOGE(
+                "Cannot locate explicit source_file: resource_id=%s package_root=%s source_file=%s; "
+                "no filename search fallback",
+                resourceId.c_str(), packageRoot.c_str(), sourceFile.c_str());
+            return ResourceStatus::InvalidResource;
+        }
+        located = *matches.begin();
+        return ResourceStatus::Success;
     }
-    if (error) {
-        ASCENDLOGE(
-            "Failed to search compile source: resource_id=%s root=%s error=%s", resourceId.c_str(), searchRoot.c_str(),
-            error.message().c_str());
-        return ResourceStatus::IoError;
+
+    if (tbeRoot.filename() == "tbe" && tbeRoot.parent_path().filename() == "ai_core" &&
+        tbeRoot.parent_path().parent_path().filename() == "op_impl" &&
+        packageRoot.parent_path().filename() == "vendors") {
+        const fs::path implRoot = tbeRoot / (packageRoot.filename().string() + "_impl");
+        searchRoots.push_back(implRoot / "ascendc");
+        searchRoots.push_back(implRoot / "dynamic");
     }
-    if (matches.size() != 1U) {
+    if (packageRoot.filename() == "built-in" && packageRoot.parent_path().filename() != "vendors" &&
+        tbeRoot.filename() == "tbe" && tbeRoot.parent_path().filename() == "ai_core" &&
+        tbeRoot.parent_path().parent_path().filename() == "op_impl") {
+        const std::string name = soPath.filename().string();
+        const std::string suffix = "_compile_database.so";
+        if (name.rfind("libops_", 0U) == 0U && name.size() > 3U + suffix.size() &&
+            name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
+            const std::string repository = name.substr(3U, name.size() - 3U - suffix.size());
+            if (!IsPlainName(repository)) {
+                return ResourceStatus::InvalidResource;
+            }
+            // A built-in resource bundle owns exactly one repository source tree.
+            searchRoots = {tbeRoot / "impl" / repository / "ascendc"};
+        }
+    }
+    return SearchSourceTrees(searchRoots, packageRoot, resourceId, sourceFile, located);
+}
+
+ResourceStatus ResourceRegistry::SearchSourceTrees(
+    const std::vector<fs::path>& searchRoots, const fs::path& packageRoot, const std::string& resourceId,
+    const std::string& sourceFile, std::string& located)
+{
+    std::set<std::string> matches;
+    for (const fs::path& searchRoot : searchRoots) {
+        boost::system::error_code error;
+        const fs::file_status rootStatus = fs::symlink_status(searchRoot, error);
+        if (error == boost::system::errc::no_such_file_or_directory || (!error && !fs::exists(rootStatus))) {
+            continue;
+        }
+        if (error) {
+            return ResourceStatus::IoError;
+        }
+        std::string canonicalRoot;
+        ResourceStatus status = ResolveSourceRoot(searchRoot, resourceId, canonicalRoot);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+        fs::recursive_directory_iterator current(canonicalRoot, fs::directory_options::none, error);
+        const fs::recursive_directory_iterator end;
+        while (!error && current != end) {
+            status = AddSourceMatch(current->path(), sourceFile, canonicalRoot, resourceId, matches);
+            if (status != ResourceStatus::Success) {
+                return status;
+            }
+            current.increment(error);
+        }
+        if (error) {
+            ASCENDLOGE(
+                "Failed to search compile source: resource_id=%s root=%s error=%s", resourceId.c_str(),
+                searchRoot.c_str(), error.message().c_str());
+            return ResourceStatus::IoError;
+        }
+    }
+    if (matches.size() > 1U) {
         ASCENDLOGE(
-            "Compile source file must have exactly one match: resource_id=%s root=%s source_file=%s actual_matches=%zu "
-            "expected_matches=1",
-            resourceId.c_str(), searchRoot.c_str(), sourceFile.c_str(), matches.size());
+            "Ambiguous source_file: resource_id=%s source_file=%s; set source_file to a path relative "
+            "to package root %s",
+            resourceId.c_str(), sourceFile.c_str(), packageRoot.c_str());
+        for (const auto& directory : matches) {
+            ASCENDLOGE("Matching source_file candidate: %s/%s", directory.c_str(), sourceFile.c_str());
+        }
         return ResourceStatus::InvalidResource;
     }
-    located = *matches.begin();
-    ASCENDLOGD(
-        "Located compile source file: resource_id=%s source_file=%s directory=%s", resourceId.c_str(),
-        sourceFile.c_str(), located.c_str());
-    return ResourceStatus::Success;
+    if (matches.size() == 1U) {
+        located = *matches.begin();
+        return ResourceStatus::Success;
+    }
+    ASCENDLOGE(
+        "Compile source file not found in package source trees: resource_id=%s source_file=%s package=%s",
+        resourceId.c_str(), sourceFile.c_str(), packageRoot.c_str());
+    return ResourceStatus::InvalidResource;
 }
 
 bool ResourceRegistry::FindPathConflict(const std::set<std::string>& paths)
@@ -1028,11 +1194,14 @@ ResourceStatus ResourceRegistry::LoadManifest(
     if (status != ResourceStatus::Success) {
         return status;
     }
+    StagedResources& staged = SelectStagedResources(stage, spec.sourceType);
+    if (staged.resources.find(ownership.resourceId) != staged.resources.end()) {
+        return ResourceStatus::Success;
+    }
     std::unique_ptr<ResourceEntry> entry(new ResourceEntry());
     if (ownership.hasSourceFile) {
         status = LocateSourceFile(spec, ownership.resourceId, ownership.sourceFile, entry->data.sourceFilePath);
     }
-    StagedResources& staged = SelectStagedResources(stage, spec.sourceType);
     if (status == ResourceStatus::Success) {
         status = CopyManifestFiles(unit, ownership.resourceId, *entry, staged);
     }
@@ -1042,15 +1211,6 @@ ResourceStatus ResourceRegistry::LoadManifest(
     entry->data.json = std::move(ownership.document);
     entry->sourceSoPath = spec.path;
     entry->sourceType = spec.sourceType;
-    const auto existing = staged.resources.find(ownership.resourceId);
-    if (existing != staged.resources.end()) {
-        ASCENDLOGE(
-            "Duplicate resource_id in load transaction: resource_id=%s incoming_source_type=%s incoming_so=%s "
-            "existing_source_type=%s existing_so=%s",
-            ownership.resourceId.c_str(), SourceTypeName(entry->sourceType), entry->sourceSoPath.c_str(),
-            SourceTypeName(existing->second->sourceType), existing->second->sourceSoPath.c_str());
-        return ResourceStatus::Conflict;
-    }
     const size_t fileCount = entry->files.size();
     staged.resources.emplace(ownership.resourceId, std::move(entry));
     ASCENDLOGI(
@@ -1222,23 +1382,6 @@ ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noe
     return builtIn == builtInResources_.end() ? nullptr : builtIn->second.get();
 }
 
-bool ResourceRegistry::HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const
-{
-    for (const auto& item : incoming) {
-        const auto existing = committed.find(item.first);
-        if (existing != committed.end()) {
-            ASCENDLOGW(
-                "Compile resource conflicts with an already registered resource and will not be added: "
-                "resource_id=%s incoming_source_type=%s incoming_so=%s "
-                "existing_source_type=%s existing_so=%s",
-                item.first.c_str(), SourceTypeName(item.second->sourceType), item.second->sourceSoPath.c_str(),
-                SourceTypeName(existing->second->sourceType), existing->second->sourceSoPath.c_str());
-            return true;
-        }
-    }
-    return false;
-}
-
 ResourceStatus ResourceRegistry::Commit(StageState& stage)
 {
     std::lock_guard<std::mutex> lock(registryMutex_);
@@ -1251,9 +1394,7 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
         if (!staged.discovered && !staged.conflict) {
             return;
         }
-        if (!staged.conflict && HasCommitConflict(staged.resources, committed)) {
-            staged.conflict = true;
-        }
+        RemoveRegisteredDuplicates(staged, committed);
         if (staged.conflict) {
             ASCENDLOGW(
                 "Compile resource category will not be committed because conflicts were detected: source_type=%s "
@@ -1293,6 +1434,40 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     return status;
 }
 
+ResourceStatus ResourceRegistry::LoadLinkedResource(StageState& stage)
+{
+    LibraryHandle process(dlopen(nullptr, RTLD_NOW | RTLD_LOCAL));
+    if (!process) {
+        return ResourceStatus::LoadError;
+    }
+    dlerror();
+    void* symbol = dlsym(process.get(), "AscendcGetCompileResourceBundle");
+    if (dlerror() != nullptr || symbol == nullptr) {
+        return ResourceStatus::Success;
+    }
+    Dl_info location{};
+    if (dladdr(symbol, &location) == 0 || location.dli_fname == nullptr) {
+        return ResourceStatus::InvalidResource;
+    }
+    LibrarySpec spec{location.dli_fname, ResourceSourceType::External};
+    if (!FileUtils::ResolveCanonicalPath(spec.path, spec.path)) {
+        return ResourceStatus::InvalidResource;
+    }
+    const AcCompileResourceBundle* bundle = nullptr;
+    ResourceStatus status = GetBundle(process, spec, bundle);
+    if (status != ResourceStatus::Success) {
+        return status;
+    }
+    for (uint64_t i = 0; i < bundle->manifestCount; ++i) {
+        status = LoadManifest(bundle->manifests[i], spec, i, stage);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+    }
+    stage.external.discovered = true;
+    return ResourceStatus::Success;
+}
+
 ResourceStatus ResourceRegistry::Load(const char* directory)
 {
     const bool automatic = directory == nullptr || *directory == '\0';
@@ -1307,7 +1482,15 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
         "Loading compile resources: mode=%s directory=%s", automatic ? "automatic" : "explicit",
         automatic ? "<environment>" : directory);
     std::vector<LibrarySpec> libraries;
-    ResourceStatus status = DiscoverLibraries(directory, libraries);
+    StageState stage;
+    ResourceStatus status = automatic ? LoadLinkedResource(stage) : ResourceStatus::Success;
+    if (status != ResourceStatus::Success) {
+        return status;
+    }
+    status = DiscoverLibraries(directory, libraries);
+    if (status == ResourceStatus::NotFound && !stage.external.resources.empty()) {
+        status = ResourceStatus::Success;
+    }
     if (status != ResourceStatus::Success) {
         ASCENDLOGE(
             "Compile resource load stopped during discovery: mode=%s path=%s status=%s(%d)",
@@ -1317,7 +1500,6 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
         ASCENDLOGI(
             "Compile resource discovery completed: mode=%s libraries=%zu", automatic ? "automatic" : "explicit",
             libraries.size());
-        StageState stage;
         status = LoadLibraries(libraries, stage);
         if (status == ResourceStatus::Success) {
             status = Commit(stage);

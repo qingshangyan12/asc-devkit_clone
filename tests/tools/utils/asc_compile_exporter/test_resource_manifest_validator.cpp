@@ -102,6 +102,9 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
 {
     EXPECT_TRUE(Validate(MakeValidManifest()));
 
+    Json relativeSource = MakeValidManifest();
+    relativeSource["source_file"] = "op_impl/impl/src/kernel.cpp";
+    EXPECT_TRUE(Validate(relativeSource));
     Json objcopyManifest = MakeValidManifest();
     Command(objcopyManifest)["type"] = "objcopy";
     EXPECT_TRUE(Validate(objcopyManifest));
@@ -182,8 +185,7 @@ TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 TEST_F(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
 {
     ExpectInvalid("source_file has wrong type", [](Json& manifest) { manifest["source_file"] = 1U; });
-    ExpectInvalid(
-        "source_file contains a directory", [](Json& manifest) { manifest["source_file"] = "src/kernel.cpp"; });
+    ExpectInvalid("source_file is absolute", [](Json& manifest) { manifest["source_file"] = "/src/kernel.cpp"; });
     ExpectInvalid("source_file traverses", [](Json& manifest) { manifest["source_file"] = "../kernel.cpp"; });
     ExpectInvalid("resource_path has wrong type", [](Json& manifest) { manifest["resource_path"] = 1U; });
     ExpectInvalid("resource_path is absolute", [](Json& manifest) { manifest["resource_path"] = "/resources"; });
