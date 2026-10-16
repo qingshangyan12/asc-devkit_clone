@@ -79,3 +79,11 @@ unsigned int __uhadd(unsigned int x, unsigned int y)
         dst[idx] = __uhadd(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 12, 23, 70
+y: 6, 0, 15, 7
+result: 3, 6, 19, 38
+```

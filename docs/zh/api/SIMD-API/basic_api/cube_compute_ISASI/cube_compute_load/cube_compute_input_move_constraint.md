@@ -29,7 +29,9 @@ LoadData（卷积数据搬运）主要用于对NC1HWC0格式的feature map完成
 LoadDataWithSparse主要用于搬运以512Byte为单位存放的稠密权重矩阵到L0B Buffer里，同时搬运以128Byte为单位的索引矩阵到内置的专用buffer空间（用于后续MmadWithSparse接口进行读取），因此源操作稠密权重矩阵和索引矩阵都需要按照Zn格式排布，其中稠密权重矩阵排布方式为32\*16\*8bit=512Byte，索引矩阵排布方式为32\*16\*2bit=128Byte。
 <!-- end id1 -->
 
+<!-- npu="910b,A3,950" id9 -->
 矩阵计算过程中，常用分形支持总结如下表：
+<!-- end id9 -->
     
 <!-- npu="910b,A3" id2 -->
 
@@ -227,6 +229,7 @@ LoadData（MX矩阵搬运）在搬运左右矩阵的时候，在不使能转置�
 
 <!-- end id3 -->
 
+<!-- npu="910b,A3,950" id10 -->
 ## 数据类型约束
 
 <!-- npu="910b,A3" id4 -->
@@ -272,12 +275,14 @@ LoadData（MX矩阵搬运）在搬运左右矩阵的时候，在不使能转置�
 <!-- npu="950" id6 -->
 - 针对Ascend 950PR&950DT系列产品，LoadData（2D矩阵搬运V2）以大小为512Byte的分形为单位进行搬运。LoadData（MX矩阵搬运）包含两种矩阵数据搬运，左右矩阵大小以512Byte的分形单位，左右量化系数矩阵大小以32Byte的分形为单位。
 <!-- end id6 -->
+<!-- end id10 -->
 
+<!-- npu="910b,A3,950" id11 -->
 ## 搬运指令总结
 
-<!-- npu="910b,A3" id7 -->
 结合上述数据类型与分形等约束条件，我们对数据搬入接口的使用场景进行了归纳总结，现提供如下，供开发者参考。
 
+<!-- npu="910b,A3" id7 -->
 针对Atlas A2系列产品和Atlas A3系列产品，**从L1 Buffer->L0A Buffer/L0B Buffer通路，常用的搬运指令有LoadData（2D矩阵搬运）、LoadDataWithTranspose和LoadData（卷积数据搬运），可以调用指令总结如表5所示：**
 
 **表5** L1 Buffer->L0A Buffer/L0B Buffer通路调用指令总结
@@ -299,3 +304,4 @@ LoadData（MX矩阵搬运）在搬运左右矩阵的时候，在不使能转置�
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，LoadData（2D矩阵搬运V2）可以支持b4（fp4）/b8/b16/b32数据类型以及转置场景搬运，通过配置mStep和kStep来完成多个方向的数据块搬运，并且相比LoadData（卷积数据搬运），指令的带宽延时更小，因此不带量化系数的矩阵乘法过程中L1 Buffer->L0A Buffer/L0B Buffer通路，都推荐使用LoadData（2D矩阵搬运V2）指令来实现数据搬运。而带量化系数的矩阵乘法过程中，需要使用LoadData（MX矩阵搬运）指令来实现数据搬运，不仅能完成L1 Buffer->L0A Buffer/L0B Buffer通路搬运，还能完成L1 Buffer->L0A\_MX/L0B\_MX Buffer通路的数据搬运。
 <!-- end id8 -->
+<!-- end id11 -->

@@ -75,7 +75,7 @@ Use the build option `SCENARIO_NUM` to select one of the following scenarios.
 
 - Sample Implementation:
 
-  - Call the `Compares` interface in GT (greater than) mode to compare the `src0_reg` vector with the scalar `0` and write the result to `mask_reg`. If an element of `src0_reg` is greater than `0`, the corresponding bit in `mask_reg` is set to 1; otherwise, it is set to 0.
+  - Call `operator>` to compare the `src0_reg` vector with the scalar `0` and write the result to `mask_reg`. If an element of `src0_reg` is greater than `0`, the corresponding bit in `mask_reg` is set to 1; otherwise, it is set to 0.
   - Call the `Select` interface with the comparison result `mask_reg`. If the corresponding bit in `mask_reg` is 1, the element from `src0_reg` is selected; otherwise, the element from `src1_reg` is selected.
   - For the `float` data type, each mask in `mask_reg` occupies four bits. `Compare` sequentially reads data from `src0_reg` and `src1_reg`, compares the elements, and writes each result to bit position `4 * N` in `mask_reg`. `Select` uses bit position `4 * N` in `mask_reg` to select data from either `src0_reg` or `src1_reg`.
   - Invoke the kernel function using the `<<<>>>` kernel launch syntax.
@@ -97,7 +97,7 @@ Perform the following steps in the sample root directory to build and run the sa
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510  -DCANN_ASC_USE_EXPERIMENTAL=ON..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
   ./demo

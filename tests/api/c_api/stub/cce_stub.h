@@ -22,6 +22,13 @@ using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
 using vector_fp8_e6m2_t = vector_f8e6m2;
 
+struct hifloat4x2_t {
+    uint8_t val = 0;
+};
+using hif4x2_t = hifloat4x2_t;
+
+using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
@@ -35,12 +42,6 @@ inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 
-struct hifloat4x2_t {
-    uint8_t val = 0;
-};
-using hif4x2_t = hifloat4x2_t;
-
-using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -299,6 +300,28 @@ using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
+
+inline void vcvt_e6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
+inline void vcvt_e8m02bf16(vector_bf16& dst, vector_f8e8m0 src, vector_bool mask, Literal part) {}
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+
+inline void vpack(vector_u32& dst, vector_u64 src, Literal part) {}
+inline void vpack(vector_u32& dst, vector_s64 src, Literal part) {}
+inline void vpackv2(vector_u16& dst, vector_u16 src) {}
+inline void vpackv2(vector_s16& dst, vector_s16 src) {}
+inline void vpackv2(vector_f16& dst, vector_f16 src) {}
+inline void vpackv2(vector_u32& dst, vector_u32 src) {}
+inline void vpackv2(vector_s32& dst, vector_s32 src) {}
+inline void vpackv2(vector_f32& dst, vector_f32 src) {}
+inline void vpackv2(vector_u64& dst, vector_u64 src) {}
+inline void vpackv2(vector_s64& dst, vector_s64 src) {}
+
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 
@@ -1254,6 +1277,45 @@ inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
 inline void wait_intra_block(pipe_t pipe, uint16_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint16_t sync_id) {}
+struct CopyGmToUbufAlignV2StubState {
+    uint32_t call_count = 0;
+    bool pre_allocation = false;
+    uint8_t l2_cache_mode = 0;
+    uint64_t src_stride = 0;
+    uint32_t dst_stride = 0;
+    bool non_eod_ctrl = false;
+};
+
+inline CopyGmToUbufAlignV2StubState g_copy_gm_to_ubuf_align_v2_stub_state;
+
+inline void reset_copy_gm_to_ubuf_align_v2_stub_state() { g_copy_gm_to_ubuf_align_v2_stub_state = {}; }
+
+inline void record_copy_gm_to_ubuf_align_v2(
+    bool pre_allocation, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride, bool non_eod_ctrl)
+{
+    ++g_copy_gm_to_ubuf_align_v2_stub_state.call_count;
+    g_copy_gm_to_ubuf_align_v2_stub_state.pre_allocation = pre_allocation;
+    g_copy_gm_to_ubuf_align_v2_stub_state.l2_cache_mode = l2_cache_mode;
+    g_copy_gm_to_ubuf_align_v2_stub_state.src_stride = src_stride;
+    g_copy_gm_to_ubuf_align_v2_stub_state.dst_stride = dst_stride;
+    g_copy_gm_to_ubuf_align_v2_stub_state.non_eod_ctrl = non_eod_ctrl;
+}
+
+struct CopyUbufToGmAlignV2StubState {
+    uint32_t call_count = 0;
+    bool rsw_ctrl = false;
+    bool rsw_packet_ctrl = false;
+    uint8_t rsw_buffset_size = 0;
+    uint8_t l2_cache_mode = 0;
+    uint64_t dst_stride = 0;
+    uint32_t src_stride = 0;
+    bool non_eod_ctrl = false;
+};
+
+inline CopyUbufToGmAlignV2StubState g_copy_ubuf_to_gm_align_v2_stub_state;
+
+inline void reset_copy_ubuf_to_gm_align_v2_stub_state() { g_copy_ubuf_to_gm_align_v2_stub_state = {}; }
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
 inline void wait_intra_block(pipe_t pipe, int flag_id) {}
 inline void set_intra_block(pipe_t pipe, int sync_id) {}
@@ -1284,6 +1346,21 @@ inline void copy_ubuf_to_gm_align_v2(
     __gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
 {}
+// npu_arch_9201 asc_copy_ub2gm_align uses void* with rsw/non_eod ctrl params.
+inline void copy_ubuf_to_gm_align_v2(
+    __gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len, bool rsw_ctrl,
+    bool rsw_packet_ctrl, uint8_t rsw_buffset_size, uint8_t l2_cache_mode, uint64_t burst_dst_stride,
+    uint32_t burst_src_stride, bool non_eod_ctrl)
+{
+    ++g_copy_ubuf_to_gm_align_v2_stub_state.call_count;
+    g_copy_ubuf_to_gm_align_v2_stub_state.rsw_ctrl = rsw_ctrl;
+    g_copy_ubuf_to_gm_align_v2_stub_state.rsw_packet_ctrl = rsw_packet_ctrl;
+    g_copy_ubuf_to_gm_align_v2_stub_state.rsw_buffset_size = rsw_buffset_size;
+    g_copy_ubuf_to_gm_align_v2_stub_state.l2_cache_mode = l2_cache_mode;
+    g_copy_ubuf_to_gm_align_v2_stub_state.dst_stride = burst_dst_stride;
+    g_copy_ubuf_to_gm_align_v2_stub_state.src_stride = burst_src_stride;
+    g_copy_ubuf_to_gm_align_v2_stub_state.non_eod_ctrl = non_eod_ctrl;
+}
 #endif
 
 // ==========asc_prefetch_l2cache stubs (match npu_arch_9201 impl arity)==========
@@ -1297,7 +1374,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1315,7 +1394,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1333,7 +1414,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1351,7 +1434,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1369,7 +1454,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1387,7 +1474,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1405,7 +1494,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1423,7 +1514,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1441,7 +1534,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1459,7 +1554,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1477,7 +1574,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
     uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
@@ -1495,7 +1594,9 @@ inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
-{}
+{
+    record_copy_gm_to_ubuf_align_v2(reserved, l2_cache_ctl, burst_src_stride, burst_dst_stride, reserved2);
+}
 inline void copy_gm_to_cbuf_multi_dn2nz(
     __cbuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)

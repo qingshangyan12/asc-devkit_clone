@@ -1,0 +1,16 @@
+# 技术附录
+
+- [概念原理和术语](./concepts_and_terms/concepts_and_terms.md)
+  - [术语表](./concepts_and_terms/glossary.md)
+  - [神经网络和算子](./concepts_and_terms/neural_networks_and_operators/neural_networks_and_operators.md)
+    - [算子基本概念](./concepts_and_terms/neural_networks_and_operators/operator_basics.md)
+    - [数据排布格式](./concepts_and_terms/neural_networks_and_operators/data_layout.md)
+  - [内存访问原理](./concepts_and_terms/memory_access/memory_access.md)
+    - [Scalar读写数据](./concepts_and_terms/memory_access/scalar_read_write.md)
+  - [性能优化技术原理](./concepts_and_terms/performance_optimization/performance_optimization.md)
+    - [Double Buffer](./concepts_and_terms/performance_optimization/double_buffer.md)
+- [C++标准支持](./cpp_standard_support/cpp_standard_support.md)
+  - [概述](./cpp_standard_support/overview.md)
+  - [Device侧C/C++语法限制](./cpp_standard_support/syntax_restrictions/syntax_restrictions.md)
+    - [特性](./cpp_standard_support/syntax_restrictions/features.md)
+    - [函数](./cpp_standard_support/syntax_restrictions/functions.md)

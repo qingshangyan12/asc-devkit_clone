@@ -62,7 +62,9 @@
 #define DT_FLOAT6_E2M3 39    // fp6_e2m3 type
 #define DT_FLOAT4_E2M1 40    // fp4_e2m1 type
 #define DT_FLOAT4_E1M2 41    // fp4_e1m2 type
-#define DT_MAX 42            // Mark the boundaries of AscendCData type
+#define DT_HIFLOAT4 42       // hif4 type
+#define DT_HIFLOAT4_SCALE 43 // hif4_scale type
+#define DT_MAX 44            // Mark the boundaries of AscendCData type
 
 #define FORMAT_NCHW 0                      // NCHW Tensor
 #define FORMAT_NHWC 1                      // NHWC Tensor
@@ -159,6 +161,8 @@ enum DataType {
     DT_FLOAT6_E2M3,    // fp6_e2m3 type
     DT_FLOAT4_E2M1,    // fp4_e2m1 type
     DT_FLOAT4_E1M2,    // fp4_e1m2 type
+    DT_HIFLOAT4,       // hif4 type
+    DT_HIFLOAT4_SCALE, // hif4_scale type
     DT_MAX,            // Mark the boundaries of AscendCData type
 };
 enum Format {

@@ -60,7 +60,7 @@ __aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | 输入GM的地址。 |
+| address | 输入/输出 | 输入GM的地址。 |
 | value1/value2 | 输入 | 标量值，支持数据类型和address指向的数据类型保持一致。 |
 
 ## 数据类型<a name="section832119018128"></a>

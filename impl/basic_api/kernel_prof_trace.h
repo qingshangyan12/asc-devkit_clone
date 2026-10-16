@@ -28,7 +28,7 @@ namespace AscendC {
 __aicore__ inline void ProfStartImpl()
 {
 #ifndef ASCENDC_CPU_DEBUG
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     asc_prof_start();
 #else
     ASCENDC_DEBUG_ASSERT(
@@ -40,7 +40,7 @@ __aicore__ inline void ProfStartImpl()
 __aicore__ inline void ProfStopImpl()
 {
 #ifndef ASCENDC_CPU_DEBUG
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     asc_prof_stop();
 #else
     ASCENDC_DEBUG_ASSERT(
@@ -49,7 +49,7 @@ __aicore__ inline void ProfStopImpl()
 #endif
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStampImpl()
 {

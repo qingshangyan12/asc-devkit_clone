@@ -30,7 +30,7 @@
 
 **`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
-对float类型数据进行精度转换处理,支持多种舍入模式：
+对float类型数据进行精度转换处理，支持多种舍入模式：
 
 - RINT舍入模式：四舍六入五成双舍入
 - ROUND舍入模式：四舍五入舍入

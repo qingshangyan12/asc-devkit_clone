@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。本接口按分形索引、重复次数、源侧步长、目的侧间隔与分形间间隔等参数组织搬运，适用于普通矩阵计算所需2D格式数据在L1 Buffer与L0B Buffer之间伴随转置的搬运场景。
 
 下面通过示例来讲解接口功能和关键参数：下文图中一个N形或者一个Z形代表一个分形。
@@ -154,7 +156,7 @@ PIPE_MTE1
 - 本接口非AIC调用直接返回。
 - src起始地址需32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
 - dst起始地址需512字节对齐（L0B Buffer对齐要求），否则触发地址对齐异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移与搬运大小之和不可越界，否则触发地址溢出异常。
 - L0B Buffer容量上限：L0B Buffer总容量64KB，dst偏移与搬运大小之和不可越界，否则触发地址溢出异常。
 - `repeat`为0时表示不执行搬运，本接口被视为NOP（空操作）。

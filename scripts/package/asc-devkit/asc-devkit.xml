@@ -181,11 +181,14 @@
         <file value="op_build" file_type= "executable"/>
     </file_info>
 
-    <!-- asc-comm CCU：动态库（数据面 + host-launch wrapper 合一）与公开 DSL 头，由 cmake install 落 staging 后经此处声明进 filelist.csv -->
+    <!-- asc-comm：CCU 动态库与 AICPU 公共头，由 cmake install 落 staging 后经此处声明进 filelist.csv -->
     <file_info value="asccomm_ccu" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440">
         <file value="libasccomm_ccu.so" file_type="shared"/>
     </file_info>
     <file_info value="asccomm_ccu_headers" copy_type="delivery" src_path="lib/host/asc/include/comm_api/ccu" dst_path="$(TARGET_ENV)/asc/include/comm_api/ccu" install_path="$(TARGET_ENV)/asc/include/comm_api/ccu" install_type="all" install_mod="440">
+        <file value="hcomm"/>
+    </file_info>
+    <file_info value="asccomm_aicpu_headers" copy_type="delivery" src_path="lib/host/asc/include/comm_api/aicpu" dst_path="$(TARGET_ENV)/asc/include/comm_api/aicpu" install_path="$(TARGET_ENV)/asc/include/comm_api/aicpu" install_type="all" install_mod="440">
         <file value="hcomm"/>
     </file_info>
     <file_info value="asc_compile_exporter" copy_type="delivery" src_path="lib/host/" dst_path="tools/asc_compile_exporter" install_path="tools/asc_compile_exporter" install_mod="555" feature="ascendc">

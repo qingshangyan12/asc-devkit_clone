@@ -1,0 +1,17 @@
+# 特性场景
+
+- [Matmul特性介绍](./matmul_features.md)
+- [多核对齐切分](./multi_core_aligned_split.md)
+- [多核非对齐切分](./multi_core_unaligned_split.md)
+- [异步场景处理](./async_scenario.md)
+- [矩阵乘输出的量化/反量化](./matmul_output_quant_dequant.md)
+- [矩阵乘输出的Channel拆分](./matmul_output_channel_split.md)
+- [矩阵向量乘](./matrix_vector_multiply.md)
+- [4:2稀疏矩阵乘](./4_2_sparse_matmul.md)
+- [TSCM输入的矩阵乘](./tscm_input_matmul.md)
+- [矩阵乘输出的N方向对齐](./matmul_output_n_alignment.md)
+- [单次矩阵乘局部输出](./single_matmul_local_output.md)
+- [AIC和AIV独立运行机制](./aic_aiv_independent_execution.md)
+- [MxMatmul场景](./mx_matmul_scenario.md)
+- [Batch Matmul基础功能](./batch_matmul_basics.md)
+- [Batch Matmul复用Bias矩阵](./batch_matmul_reuse_bias.md)
