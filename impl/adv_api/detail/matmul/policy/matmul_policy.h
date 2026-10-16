@@ -67,24 +67,11 @@ struct MatmulWithScalePolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE,
 public:
     // for scale
     using CubeInBufferScaleA =
-        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>, MM_CFG>;
-    using CopyCubeInScaleA =
-        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>, MM_CFG>;
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>, MM_CFG>;
+    using CopyCubeInScaleA = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>, MM_CFG>;
     using CubeInBufferScaleB =
-        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
-    using CopyCubeInScaleB =
-        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
-};
-
-// only B has scale matrix
-template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct MatmulWithOnlyScaleBPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
-public:
-    // for scaleB, here has no scaleA
-    using CubeInBufferScaleB =
-        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
-    using CopyCubeInScaleB =
-        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>, MM_CFG>;
+    using CopyCubeInScaleB = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>, MM_CFG>;
 };
 
 /*

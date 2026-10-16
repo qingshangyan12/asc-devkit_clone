@@ -85,8 +85,6 @@ class MatmulServiceAuxBase {
     using SrcBT = typename B_TYPE::T;
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
-    using SrcScaleAT = typename A_TYPE::SCALE_T;
-    using SrcScaleBT = typename B_TYPE::SCALE_T;
     template <class... Args>
     friend struct AscendC::GetCubeObjConfig;
     constexpr static bool enableMixDualMaster = ToMatmulConfig(MM_CFG).enableMixDualMaster;
@@ -144,27 +142,11 @@ public:
         }
     }
 
-    __aicore__ inline void SetTensorAWithCopy(
-        const GlobalTensor<SrcAT>& gm, const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorAWithCopy not supported when enableMixDualMaster is enabled");
-    }
-
     __aicore__ inline void SetTensorB(const GlobalTensor<SrcBT>& gm, bool isTransposeB = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
             cubeObj.cubeObj[0].mul.SetTensorB(gm, isTransposeB);
         }
-    }
-
-    __aicore__ inline void SetTensorBWithCopy(
-        const GlobalTensor<SrcBT>& gm, const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorBWithCopy not supported when enableMixDualMaster is enabled");
     }
 
     __aicore__ inline void SetBias(const GlobalTensor<BiasT>& biasGlobal)
@@ -502,25 +484,25 @@ public:
         }
     }
 #if defined(USE_SSBUF)
-    __aicore__ inline void SetTensorScaleA(const GlobalTensor<SrcScaleAT>& a, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const GlobalTensor<fp8_e8m0_t>& a, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleA not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleA(const LocalTensor<SrcScaleAT>& a, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const LocalTensor<fp8_e8m0_t>& a, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleA not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleB(const GlobalTensor<SrcScaleBT>& b, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const GlobalTensor<fp8_e8m0_t>& b, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleB not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleB(const LocalTensor<SrcScaleBT>& b, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const LocalTensor<fp8_e8m0_t>& b, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -537,18 +519,18 @@ private:
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
                 constexpr uint16_t l1SetIdV0 = static_cast<uint16_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB);
                 constexpr uint16_t l1SetIdV1 = static_cast<uint16_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB) + INTRA_NUM;
-                SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID0>(l1SetIdV0);
-                SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(l1SetIdV1);
+                CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV0);
+                CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV1);
             }
         }
     }
     __aicore__ inline void IterNotify()
     {
         if constexpr (GetPhyType(C_TYPE::pos) != Hardware::L1) {
-            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
+            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
                 GetIntraFlagId(cubeObj.cubeObj[0].instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), 0U));
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(GetIntraFlagId(
+                CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(GetIntraFlagId(
                     cubeObj.cubeObj[0].instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP),
                     1U)); // 1 means sub_block 1
             }

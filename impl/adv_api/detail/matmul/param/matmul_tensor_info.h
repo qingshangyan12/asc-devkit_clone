@@ -277,7 +277,7 @@ class MatmulTensorInfo<
     enable_if_t<
         HasScalePosition<INPUT_TYPE>::value &&
         (INPUT_TYPE::TAG == InputTypeTag::scaleA || INPUT_TYPE::TAG == InputTypeTag::scaleB)>> {
-    using SrcT = typename INPUT_TYPE::TRANS_T;
+    using SrcT = fp8_e8m0_t;
     MATMUL_USE_MODULE(MatmulShapeInfo);
 
 public:

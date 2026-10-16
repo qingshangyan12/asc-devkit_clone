@@ -40,17 +40,7 @@ template <
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<
     IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-    enable_if_t<
-        (IsTypeOneOfV<typename A_TYPE::T, half, bfloat16_t> &&
-         IsTypeOneOfV<typename C_TYPE::T, bfloat16_t, half, float>) ||
-        (!(IsTypeOneOfV<typename A_TYPE::T, half, bfloat16_t> &&
-           IsTypeOneOfV<typename C_TYPE::T, bfloat16_t, half, float>) &&
-         !AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>())>,
-#else
-    enable_if_t<!AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>,
-#endif
-    CopyOut> {
+    enable_if_t<!AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>, CopyOut> {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
 
@@ -100,15 +90,7 @@ template <
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<
     IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-    enable_if_t<
-        !(IsTypeOneOfV<typename A_TYPE::T, half, bfloat16_t> &&
-          IsTypeOneOfV<typename C_TYPE::T, bfloat16_t, half, float>) &&
-        AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>,
-#else
-    enable_if_t<AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>,
-#endif
-    CopyOut> {
+    enable_if_t<AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>, CopyOut> {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
 

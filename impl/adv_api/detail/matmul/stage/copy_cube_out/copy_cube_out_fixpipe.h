@@ -205,10 +205,6 @@ private:
     __aicore__ inline int64_t GetDstOffset(int32_t curRow, int32_t curCol, int32_t baseHeight, int32_t stride)
     {
         int64_t dstOffset = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-        dstOffset = static_cast<int64_t>(curRow * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM() * stride) +
-                    static_cast<int64_t>(curCol * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN());
-#else
         if constexpr (
             MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB() && PhyPosIsUB(C_TYPE::pos) &&
             (A_TYPE::ibShare && B_TYPE::ibShare)) {
@@ -235,7 +231,6 @@ private:
                     static_cast<int64_t>(curRow * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM()) * stride) +
                 static_cast<int64_t>(curCol * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN());
         }
-#endif
         return dstOffset;
     }
 
@@ -243,15 +238,11 @@ private:
     {
         if constexpr (PhyPosIsUB(C_TYPE::pos) && MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB()) {
             fixpipe.SetSubBlockId(MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx());
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-            fixpipe.SetMcgShfMode(McgShfMode::SINGLE_DST_MODE);
-#else
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare && FIXPIPE_MODE == McgShfMode::SINGLE_DST_MODE) {
                 fixpipe.SetMcgShfMode(McgShfMode::DUAL_DST_SPLIT_M);
             } else {
                 fixpipe.SetMcgShfMode(FIXPIPE_MODE);
             }
-#endif
         }
 #if __NPU_ARCH__ == 5102
         if constexpr (IsSameTypeV<typename A_TYPE::T, half> && IsSameTypeV<typename B_TYPE::T, half>) {
@@ -290,9 +281,7 @@ private:
                     PhyPosIsUB(C_TYPE::pos) &&
                     ((A_TYPE::ibShare && B_TYPE::ibShare) || FIXPIPE_MODE == McgShfMode::DUAL_DST_SPLIT_M ||
                      FIXPIPE_MODE == McgShfMode::DUAL_DST_SPLIT_N)) {
-#if __NPU_ARCH__ != 9201
                     dstOffset = dstOffset >> 1;
-#endif
                 }
             } else {
                 stride = static_cast<uint32_t>(CeilAlign(GetOrgM<isIntraBlock>(), BLOCK_CUBE) * DST_C0SIZE);

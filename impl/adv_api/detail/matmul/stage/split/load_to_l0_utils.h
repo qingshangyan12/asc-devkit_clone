@@ -115,19 +115,9 @@ __aicore__ inline constexpr auto GetAuxDataType()
         uint8_t auxData = 0;
         return auxData;
     } else if constexpr (HasScalePosition<INPUT_TYPE>::value) {
-        using ScaleT = typename INPUT_TYPE::SCALE_T;
-        if constexpr (IsSameTypeV<ScaleT, fp8_e8m0_t>) {
-#ifdef IS_AICORE
-            uint8_t mxData = get_imm(0);
-#else
-            uint8_t mxData = 0;
-#endif
-            fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
-            return mxType;
-        } else {
-            AscendC::hif4_scale mxType;
-            return mxType;
-        }
+        uint8_t mxData = get_imm(0);
+        fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
+        return mxType;
     } else {
         uint8_t defaultData = 0;
         return defaultData;

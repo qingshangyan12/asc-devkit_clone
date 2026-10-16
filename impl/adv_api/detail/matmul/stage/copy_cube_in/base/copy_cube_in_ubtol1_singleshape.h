@@ -45,8 +45,7 @@ class CopyCubeIn<
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     using SrcT = typename INPUT_TYPE::T;
 #else
-    using SrcT =
-        typename Conditional<SupportType<TransT, fp8_e8m0_t, hif4_scale>(), TransT, typename INPUT_TYPE::T>::type;
+    using SrcT = typename Conditional<IsSameType<TransT, fp8_e8m0_t>::value, fp8_e8m0_t, typename INPUT_TYPE::T>::type;
 #endif
 
 public:

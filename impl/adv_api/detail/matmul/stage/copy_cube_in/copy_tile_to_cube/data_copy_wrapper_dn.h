@@ -79,16 +79,12 @@ public:
         }
         dn2nzParams.dstNzNStride = 1;
         dn2nzParams.dstNzMatrixStride = dstNzMatrixStride;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-        DataCopy(dst, src[srcOffset], dn2nzParams, preAllocation);
-#else
+
         DataCopy(dst, src[srcOffset], dn2nzParams);
-#endif
     }
 
 private:
     constexpr static int32_t c0Size_ = AuxGetC0Size<SrcT>();
-    constexpr static bool preAllocation = NeedPreallocation<INPUT_TYPE, MM_CFG>();
 };
 } // namespace Detail
 } // namespace Impl

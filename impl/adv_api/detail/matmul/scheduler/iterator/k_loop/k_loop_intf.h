@@ -30,7 +30,7 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG, typename = void>
+template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG, typename = void>
 class KLoop {
 public:
     __aicore__ inline KLoop() = default;

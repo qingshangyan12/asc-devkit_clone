@@ -92,27 +92,19 @@ struct MatmulPrivateModules {
     using DataCopyWrapperScaleA = DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, A_TYPE>>;
     using DataCopyWrapperScaleB = DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, B_TYPE>>;
 #else
-    using CopyCubeInParamsScaleA =
-        CopyCubeInParams<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>>;
-    using CopyCubeInParamsScaleB =
-        CopyCubeInParams<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>>;
-    using MatmulTensorInfoScaleA =
-        MatmulTensorInfo<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>>;
-    using MatmulTensorInfoScaleB =
-        MatmulTensorInfo<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>>;
-    using DataCopyUtilsScaleA =
-        CopyTileToCubeWrapper<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>>;
-    using DataCopyUtilsScaleB =
-        CopyTileToCubeWrapper<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>>;
-    using DataCopyWrapperScaleA =
-        DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>>;
-    using DataCopyWrapperScaleB =
-        DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>>;
+    using CopyCubeInParamsScaleA = CopyCubeInParams<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>>;
+    using CopyCubeInParamsScaleB = CopyCubeInParams<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>>;
+    using MatmulTensorInfoScaleA = MatmulTensorInfo<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>>;
+    using MatmulTensorInfoScaleB = MatmulTensorInfo<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>>;
+    using DataCopyUtilsScaleA = CopyTileToCubeWrapper<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>>;
+    using DataCopyUtilsScaleB = CopyTileToCubeWrapper<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>>;
+    using DataCopyWrapperScaleA = DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>>;
+    using DataCopyWrapperScaleB = DataCopyWrapper<IMPL, MM_CFG, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>>;
 #endif
 
     using L1Manager = AscendC::Impl::Detail::L1Manager<IMPL, MM_CFG>;
     using LocalWorkspace = MatmulLocalWorkspace<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
-    using MatmulShapeInfo = AscendC::Impl::Detail::MatmulShapeInfo<IMPL, A_TYPE, B_TYPE, MM_CFG>;
+    using MatmulShapeInfo = AscendC::Impl::Detail::MatmulShapeInfo<IMPL, A_TYPE, MM_CFG>;
     using MatmulQuantProcessor = AscendC::Impl::Detail::MatmulQuantProcessor<IMPL, A_TYPE, C_TYPE, MM_CFG>;
     using MatmulAntiQuantProcessor = AscendC::Impl::Detail::MatmulAntiQuantProcessor<IMPL, A_TYPE, B_TYPE, MM_CFG>;
 
@@ -145,8 +137,8 @@ struct MatmulPrivateModules {
 
     // using MLoop, NLoop, KLoop modules
     using MLoop = AscendC::Impl::Detail::MLoop<IMPL, A_TYPE, MM_CFG>;
-    using NLoop = AscendC::Impl::Detail::NLoop<IMPL, A_TYPE, B_TYPE, MM_CFG>;
-    using KLoop = AscendC::Impl::Detail::KLoop<IMPL, typename A_TYPE::T, A_TYPE, B_TYPE, MM_CFG>;
+    using NLoop = AscendC::Impl::Detail::NLoop<IMPL, A_TYPE, MM_CFG>;
+    using KLoop = AscendC::Impl::Detail::KLoop<IMPL, typename A_TYPE::T, A_TYPE, MM_CFG>;
 };
 } // namespace Detail
 } // namespace Impl

@@ -45,7 +45,6 @@ struct MatmulType {
     constexpr static LayoutMode layout = LAYOUT;
     constexpr static bool ibShare = IBSHARE;
     constexpr static TPosition srcPos = SRCPOS;
-    using SCALE_T = fp8_e8m0_t;
 };
 
 template <class INPUT_TYPE, typename TRANS_TYPE = typename INPUT_TYPE::T>
@@ -114,20 +113,16 @@ struct HasScalePosition<INPUT_TYPE, voidT<decltype(&INPUT_TYPE::scalePosition)>>
 template <
     TPosition POSITION, TPosition SCALE_POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false,
     TPosition SRCPOS = TPosition::GM, CubeFormat SCALE_FORMAT = FORMAT, bool SCALE_ISTRANS = ISTRANS,
-    TPosition SCALE_SRCPOS = SRCPOS, typename SCALE_TYPE = fp8_e8m0_t>
+    TPosition SCALE_SRCPOS = SRCPOS>
 struct MatmulTypeWithScale : public MatmulType<POSITION, FORMAT, TYPE, ISTRANS, LayoutMode::NONE, false, SRCPOS> {
     constexpr static TPosition scalePosition = SCALE_POSITION;
     constexpr static CubeFormat scaleFormat = SCALE_FORMAT;
     constexpr static bool isScaleTrans = SCALE_ISTRANS;
     constexpr static TPosition srcScalePos = SCALE_SRCPOS;
-    using SCALE_T = fp8_e8m0_t;
 };
 
 template <typename A_TYPE, typename B_TYPE>
 constexpr bool isMxMatmul = HasScalePosition<A_TYPE>::value && HasScalePosition<B_TYPE>::value;
-
-template <typename A_TYPE, typename B_TYPE>
-constexpr bool isOnlyScaleBMxMatmul = !HasScalePosition<A_TYPE>::value && HasScalePosition<B_TYPE>::value;
 
 } // namespace AscendC
 #endif // _MATMUL_TYPE_DEF_H_
