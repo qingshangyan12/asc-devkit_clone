@@ -39,6 +39,10 @@
 #include "dav_m310/kernel_operator_vec_transpose_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_transpose_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_vec_transpose_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_vec_transpose_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_transpose_impl.h"
 #elif (__NPU_ARCH__ == 5162)
@@ -211,7 +215,8 @@ __aicore__ inline void Transpose(
 #endif
     if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
         (transposeParams.hSize == NCHW_CONV_ADDR_LIST_SIZE) && (transposeParams.wSize == NCHW_CONV_ADDR_LIST_SIZE)) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         ASCENDC_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()), {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "

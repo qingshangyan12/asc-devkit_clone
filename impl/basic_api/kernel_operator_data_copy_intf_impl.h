@@ -70,12 +70,14 @@ __aicore__ inline void __inout_pipe__(MTE2)
     }
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     const uint8_t cacheMode = ExtractCacheMode(src);
 #endif
     if (dstHWPos == Hardware::UB) {
         // gm -> ub
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         DataCopyGM2UBImpl(
             (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
 #else
@@ -83,7 +85,8 @@ __aicore__ inline void __inout_pipe__(MTE2)
 #endif
     } else if (dstHWPos == Hardware::L1) {
         // gm -> l1
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         DataCopyGM2L1Impl(
             (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
 #else
@@ -121,7 +124,41 @@ __aicore__ inline void CheckNd2NzParams(Nd2NzParams params, const __gm__ char* m
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+template <typename T, bool enableSmallC0>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
+    using PrimType = PrimT<T>;
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
+
+    // dav_3510 DataCopyGM2L1ND2NZ support small C0 mode and antiquant mode
+    if constexpr (enableSmallC0) {
+        DataCopyGM2L1ND2NZ<T, enableSmallC0>(dst, src, intriParams, enablePreReadIgnoreSync);
+        return;
+    }
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+        DataCopyGM2L1ND2NZImpl(
+            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else if (dstHWPos == Hardware::UB) {
+        DataCopyGM2UBND2NZImpl(
+            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)", "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+#endif
+}
+
 template <typename T, bool enableSmallC0>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
@@ -136,20 +173,23 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 
     // dav_3510 DataCopyGM2L1ND2NZ support small C0 mode and antiquant mode
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     if constexpr (enableSmallC0) {
         DataCopyGM2L1ND2NZ<T, enableSmallC0>(dst, src, intriParams);
         return;
     }
 #endif
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     const uint8_t cacheMode = ExtractCacheMode(src);
 #endif
     if (dstHWPos == Hardware::L1) {
         // gm -> l1
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         DataCopyGM2L1ND2NZImpl(
             (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 #else
@@ -157,7 +197,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #endif
     } else if (dstHWPos == Hardware::UB) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         DataCopyGM2UBND2NZImpl(
             (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 #else
@@ -200,10 +241,43 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 #endif
 
-#if (                                                                                                        \
-    defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)))
+/*
+ * @ingroup DataCopy Level 0
+ * @brief format transform(such as dn2nz) during data load from OUT to L1
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] intriParams.ndNum nd number of data to be moved
+ * @param [in] intriParams.nValue n value
+ * @param [in] intriParams.dValue d value in unit of element
+ * @param [in] intriParams.srcDnMatrixStride stride between DN matrixs at source DN matrix in unit of element
+ * @param [in] intriParams.srcDValue SRC_D value in unit of element
+ * @param [in] intriParams.dstNzC0Stride stride of nz between 2 C0 in L1 in unit of C0_size
+ * @param [in] intriParams.dstNzNStride stride of n between 2 C0 in L1
+ * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
+ */
+template <typename T, bool enableSmallC0>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    using PrimType = PrimT<T>;
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    if (dstHWPos == Hardware::L1) { // GM -> L1
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        DataCopyGM2L1DN2NZImpl(
+            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, enableSmallC0,
+            cacheMode, enablePreReadIgnoreSync);
+        return;
+    }
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
+#endif
+}
+
+#if (                                                                                                       \
+    defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)))
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
@@ -302,12 +376,14 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         isUsedProcessLock = true;
     }
 #endif // ASCENDC_CPU_DEBUG
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     const uint8_t cacheMode = ExtractCacheMode(dst);
 #endif
     if (srcHWPos == Hardware::UB) {
         // ub -> gm
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         DataCopyUB2GMImpl(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
 #else
@@ -315,7 +391,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif
     } else if (srcHWPos == Hardware::L1) {
         // l1 -> gm
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         DataCopyL12GMImpl(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
 #else
@@ -410,7 +487,8 @@ __aicore__ inline void DataCopy(
                 repeatParams);
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         } else if (dstHWPos == Hardware::FIXBUF) {
             CheckTensorAlign<T>(
                 dst, 128, "dst", "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 128B align
@@ -477,7 +555,8 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<U>(
                 src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
             if constexpr (
                 Std::is_same<PrimDstType, int32_t>::value &&
@@ -543,7 +622,7 @@ template <typename T, uint8_t subBlockId>
 __aicore__ inline void DataCopyL1ToUB(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 {
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+#if (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)))
     using PrimType = PrimT<T>;
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
     CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
@@ -612,7 +691,8 @@ __aicore__ inline __inout_pipe__(V) void Copy(
  * @param [in] src input LocalTensor
  * @param [in] count copy count
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask>
 __aicore__ inline __inout_pipe__(V) void Copy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
@@ -626,6 +706,76 @@ __aicore__ inline __inout_pipe__(V) void Copy(
     CopyImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 #endif
+
+/*
+ * @ingroup DataCopy Level 1
+ * @brief datacopy from src to dst, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] SliceInfo dstSliceInfo[] ub
+ * @param [in] SliceInfo srcSliceInfo[] gm
+ * @param [in] dimValue dim value also for length for dstSliceInfo[] and srcSliceInfo[]
+ */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[],
+    const SliceInfo srcSliceInfo[], const uint32_t dimValue, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    using PrimType = PrimT<T>;
+    static_assert(Std::is_same<PrimType, T>::value, "TensorTrait is not supported by DataCopy with SliceInfo!");
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncDataCopySlice(dst, src, dstSliceInfo, srcSliceInfo, dimValue, "DataCopy with SliceInfo")) {
+        ASCENDC_REPORT_CHECK_ERROR("DataCopy with SliceInfo", KernelFuncType::NONE_MODE);
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, dstSliceInfo, srcSliceInfo, dimValue)));
+#endif
+    uint32_t srcStartIndex = 0;
+    uint32_t dstStartIndex = 0;
+    uint32_t srcOffsetListSize = 0;
+    uint32_t dstOffsetListSize = 0;
+    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
+    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
+    bool useShapeValue = !(srcSliceInfo[0].shapeValue == 0);
+    for (int i = 0; i < dimValue; i++) {
+        srcShapeInfo[i] = useShapeValue ? srcSliceInfo[i].shapeValue : src.GetShapeInfo().shape[i];
+        dstShapeInfo[i] = useShapeValue ? dstSliceInfo[i].shapeValue : dst.GetShapeInfo().shape[i];
+    }
+
+    srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
+    dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
+    uint32_t srcOffsetList[MAX_SLICE_SIZE];
+    uint32_t dstOffsetList[MAX_SLICE_SIZE];
+    DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
+    DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = srcSliceInfo[0].burstLen;
+    uint32_t oneSliceLen = srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
+    repeatParams.blockCount =
+        (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
+    repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+
+    const uint8_t cacheMode = ExtractCacheMode(src);
+
+    if ((srcSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
+        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+            DataCopyGM2UBImpl(
+                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode,
+                enablePreReadIgnoreSync);
+        }
+    } else {
+        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T);
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+            DataCopySliceGm2UBImpl(
+                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode,
+                enablePreReadIgnoreSync);
+        }
+    }
+#endif
+}
 
 /*
  * @ingroup DataCopy Level 1
@@ -678,13 +828,15 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
         (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
     repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     const uint8_t cacheMode = ExtractCacheMode(src);
 #endif
     if ((srcSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
         repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
         for (uint32_t i = 0; i < offsetListSize; i++) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
             DataCopyGM2UBImpl(
                 (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
                 (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
@@ -697,7 +849,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     } else {
         repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T);
         for (uint32_t i = 0; i < offsetListSize; i++) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
             DataCopySliceGm2UBImpl(
                 (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
                 (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
@@ -759,13 +912,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
     repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     const uint8_t cacheMode = ExtractCacheMode(dst);
 #endif
     if ((dstSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
         repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
         for (uint32_t i = 0; i < offsetListSize; i++) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
             DataCopyUB2GMImpl(
                 (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
                 (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
@@ -778,7 +933,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     } else {
         repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T);
         for (uint32_t i = 0; i < offsetListSize; i++) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
             DataCopySliceUB2GMImpl(
                 (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
                 (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
@@ -823,7 +979,7 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
         });
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0), {
             KERNEL_LOG(
@@ -846,6 +1002,25 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
         });
         repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
     }
+}
+
+/*
+ * @ingroup DataCopy Level 2
+ * @brief datacopy from src to dst, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] count Number of operands
+ */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
+    struct DataCopyParams repeatParams;
+    DataCopyCheck<T>(count, repeatParams);
+    DataCopy(dst, src, repeatParams, enablePreReadIgnoreSync);
+#endif
 }
 
 /*
@@ -931,7 +1106,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 template <typename T, uint8_t subBlockId>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+#if (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)))
     using PrimType = PrimT<T>;
     ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), {
         KERNEL_LOG(
@@ -1005,7 +1180,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif
     }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     DataCopyUB2GMNZ2NDImpl(
         (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -1064,6 +1240,58 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& intriParams,
+    const DataCopyEnhancedParams& enhancedParams, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyInfo(dst, src, intriParams, "DataCopy");
+#endif
+    using PrimType = PrimT<T>;
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
+
+    if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1/C1)/UB(VECIN)",
+            "DataCopy from GlobalTensor to LocalTensor with DataCopyEnhancedParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+#endif
+}
+
+/* **************************************************************************************************
+ * DataCopy Enhanced                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup DataCopy
+ * @brief datacopy from src to dst, applicable to cube data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] intriParams.blockCount number of blocks
+ * @param [in] intriParams.blockLen Length of blocks
+ * @param [in] intriParams.srcGap src block gap
+ * @param [in] intriParams.dstGap dst block gap
+ * @param [in] enhancedParams.blockMode Basic fractal of data movement
+ * @param [in] enhancedParams.deqScale Auxiliary parameters for path accuracy conversion
+ * @param [in] enhancedParams.deqValue size of convert with path precision
+ * @param [in] enhancedParams.sidStoreMode Multiplex input
+ * @param [in] enhancedParams.isRelu Configure whether Relu can be performed along the circuit
+ */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& intriParams,
     const DataCopyEnhancedParams& enhancedParams)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
@@ -1078,7 +1306,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 
     if (dstHWPos == Hardware::UB) {
         // gm -> ub
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
         const uint8_t cacheMode = ExtractCacheMode(src);
         DataCopyGM2UBImpl(
             (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -1087,7 +1316,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #endif
     } else if (dstHWPos == Hardware::L1) {
         // gm -> l1
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
         const uint8_t cacheMode = ExtractCacheMode(src);
         DataCopyGM2L1Impl(
             (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -1114,13 +1344,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(dst);
 #endif
 
     if (srcHWPos == Hardware::UB) {
         // ub -> gm
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
         DataCopyUB2GMImpl(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 #else
@@ -1128,7 +1360,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif
     } else if (srcHWPos == Hardware::L1) {
         // l1 -> gm
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
         DataCopyL12GMImpl(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 #else
@@ -1422,7 +1655,8 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     DataCopyUB2L0CImpl((__cc__ float*)dst.GetPhyAddr(), (__ubuf__ half*)src.GetPhyAddr(), intriParams, enhancedParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
@@ -1619,10 +1853,47 @@ __aicore__ inline void DataCopyPad(
         (__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, nd2nzParams);
 }
 
+template <typename T, PaddingMode mode>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
+#endif
+
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to UB(VECIN/VECOUT)")) {
+        ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to UB(VECIN/VECOUT)", KernelFuncType::NONE_MODE);
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, padParams)));
+#endif
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    if (dstHWPos == Hardware::UB) {
+        DataCopyPadGm2UBImpl<T, mode>(
+            (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else if (dstHWPos == Hardware::L1) {
+        DataCopyPadGm2L1Impl<T, mode>(
+            (__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GM to UB(VECIN/VECOUT)",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+    }
+#endif
+}
+
 // override DataCopyPad, use new param DataCopyExtParams
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
@@ -1713,6 +1984,39 @@ template <
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && (!Std::is_same<T, U>::value), bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<U>& padParams, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
+#endif
+    using PrimType = PrimT<T>;
+    if ASCEND_IS_AIC {
+        return;
+    }
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
+        ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, padParams)));
+#endif
+    CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECOUT", "DataCopyPad from GM to VECIN / VECOUT");
+    DataCopyPadGm2UBImpl(
+        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams,
+        enablePreReadIgnoreSync);
+#endif
+}
+
+// override DataCopyPad, use new param DataCopyExtParams
+// T use TensorTrait while U is primitive type
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && (!Std::is_same<T, U>::value), bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<U>& padParams)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
@@ -1742,9 +2046,9 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
 }
 
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
@@ -1844,7 +2148,8 @@ __aicore__ inline void DataCopyPad(
 template <typename T, TPosition pos>
 __aicore__ inline void SetPadValue(T paddingValue)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     if (g_coreType == AIC) {
         return;
     }
@@ -1864,11 +2169,40 @@ __aicore__ inline void SetPadValue(T paddingValue)
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+template <typename T, uint8_t dim, const MultiCopyConfig& config>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    if ASCEND_IS_AIC {
+        return;
+    }
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    DataCopyWithNDDMAImpl<T, dim, config>(
+        (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
+        cacheMode, enablePreReadIgnoreSync);
+#endif
+}
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params)
 {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    if ASCEND_IS_AIC {
+        return;
+    }
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    DataCopyWithNDDMAImpl<T, dim, config>(
+        (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
+        cacheMode, false);
+#else
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
 #endif
@@ -1881,6 +2215,7 @@ __aicore__ inline void DataCopy(
     DataCopyWithNDDMAImpl<T, dim, config>(
         (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
         cacheMode);
+#endif
 }
 
 __aicore__ inline void NdDmaDci() { NdDmaDciImpl(); }
@@ -1901,6 +2236,211 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
         ResetOutLoopModeParaImpl();
     }
 }
+/*
+ * @ingroup DataCopy Level 0
+ * @brief datacopy from src to dst, applicable to vector data
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
+ */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
+#endif
+    using PrimType = PrimT<T>;
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor")) {
+        ASCENDC_REPORT_CHECK_ERROR("DataCopy from GlobalTensor to LocalTensor", KernelFuncType::NONE_MODE);
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
+#endif
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1/C1)/UB(VECIN)",
+            "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+#endif
+}
+
+/*
+ * @ingroup DataCopy Level 0
+ * @brief datacopy from src to dst0 and dst1, applicable to vector data
+ * @param [out] dst0 and dst1 output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
+ */
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
+    const DataCopyParams& repeatParams)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9202
+    using PrimType = PrimT<T>;
+
+    const Hardware dstHWPos0 = GetPhyType((TPosition)dst0.GetPosition());
+    const Hardware dstHWPos1 = GetPhyType((TPosition)dst1.GetPosition());
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst0, src, repeatParams));
+    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst1, src, repeatParams));
+    if (srcHWPos == Hardware::UB && dstHWPos0 == Hardware::L1 && dstHWPos1 == Hardware::L1) {
+        DataCopyUB2L1Impl(
+            (__cbuf__ PrimType*)dst0.GetPhyAddr(), (__cbuf__ PrimType*)dst1.GetPhyAddr(),
+            (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECCALC/VECOUT)",
+            "DataCopy from LocalTensor to LocalTensor with DataCopyParams only supports UB -> L1",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1/C1)",
+            "DataCopy from LocalTensor to LocalTensor with DataCopyParams only supports UB -> L1",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst0.GetPosition())));
+    }
+#endif
+}
+
+/*
+ * @ingroup DataCopy Level 2
+ * @brief datacopy from src to dst0 and dst1, applicable to vector data
+ * @param [out] dst0 and dst1 output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count Number of operands
+ */
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9202
+    using PrimType = PrimT<T>;
+    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B "
+            "align, "
+            "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count);
+    });
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst0, src, count)));
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst1, src, count)));
+    const Hardware dstHWPos0 = GetPhyType((TPosition)dst0.GetPosition());
+    const Hardware dstHWPos1 = GetPhyType((TPosition)dst1.GetPosition());
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+    repeatParams.srcStride = 0;
+    repeatParams.dstStride = 0;
+    DataCopy(dst0, dst1, src, repeatParams);
+#endif
+}
+
+/* **************************************************************************************************
+ * RemoteDataCopy
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const RemoteDataCopyParams& remoteParams)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    using PrimType = PrimT<T>;
+    if ASCEND_IS_AIC {
+        return;
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    if (srcHWPos == Hardware::UB) {
+        DataCopyRemoteUB2GMImpl(
+            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, remoteParams,
+            cacheMode);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECOUT)", "RemoteDataCopy from LocalTensor to GlobalTensor with DataCopyExtParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t calCount,
+    const RemoteDataCopyParams& remoteParams)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    using PrimType = PrimT<T>;
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, calCount)));
+    struct DataCopyExtParams dataCopyParams;
+
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    ASCENDC_ASSERT(srcHWPos == Hardware::UB, "RemoteDataCopy only support src HWPos is UB");
+    dataCopyParams.blockLen = calCount * sizeof(PrimType);
+    RemoteDataCopy(dst, src, dataCopyParams, remoteParams);
+#endif
+}
+
+template <typename T, PaddingMode mode>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
+    const DataCopyPadParams& padParams, const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
+#endif
+    using PrimType = PrimT<T>;
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
+        ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
+    }
+    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, padParams)));
+#endif
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    ASCENDC_ASSERT(((dstHWPos == Hardware::UB) || (dstHWPos == Hardware::L1)), {
+        KERNEL_LOG(KERNEL_ERROR, "DataCopyPad dst position must be VECIN/VECOUT/LCM/TSCM");
+    });
+    if (dstHWPos == Hardware::UB) {
+        DataCopyPadGm2UBImpl<PrimType, mode>(
+            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams,
+            cacheMode, enablePreReadIgnoreSync);
+    } else if (dstHWPos == Hardware::L1) {
+        DataCopyPadGm2L1Impl<PrimType, mode>(
+            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams,
+            cacheMode, enablePreReadIgnoreSync);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+#endif
+}
+
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H

@@ -20,11 +20,17 @@
 #include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 #include "impl/utils/debug/asc_debug_utils.h"
+#include "kernel_tensor.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 #if __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
+#elif __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_aicore_dump_utils.h"
+#elif __NPU_ARCH__ == 9202
+#include "impl/utils/debug/npu_arch_9202/asc_aicore_dump_utils.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_aicore_dump_utils.h"
 #elif __NPU_ARCH__ == 5162
@@ -232,7 +238,8 @@ __aicore__ inline void asc_dump_impl(
     const uint64_t alignDumpLen64 = ((tensorLength + dataBlockSize - 1U) / dataBlockSize) * dataBlockSize;
     const uint64_t tlvLen64 = sizeof(DumpTensorTlv) + alignDumpLen64;
     if (tlvLen64 > blockInfo->ringBufLen) {
-#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102 || \
+    __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
         if constexpr (is_super_tensor_hardware_supported<hardware>()) {
             asc_dump_super_tensor_impl<hardware, T>(src, desc, tensorLength, shape, shapeDim, blockInfo);
         }

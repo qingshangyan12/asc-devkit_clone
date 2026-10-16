@@ -31,6 +31,10 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_histograms_impl.h"
 #elif __NPU_ARCH__ == 5162
 #include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_histograms_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_histograms_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_histograms_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_histograms_impl.h"
 #endif
