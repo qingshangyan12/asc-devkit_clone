@@ -20,10 +20,6 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_COMPUTE_H
 
-#ifndef CANN_ASC_USE_EXPERIMENTAL
-#error "this is experimental feature, please set CANN_ASC_USE_EXPERIMENTAL = ON to use it."
-#endif
-
 #include "version/asc_devkit_version.h"
 #include "tensor_api/tensor.h"
 
