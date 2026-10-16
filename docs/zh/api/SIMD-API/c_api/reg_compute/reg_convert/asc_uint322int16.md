@@ -132,6 +132,16 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
+
+#define CHECK_ACL(call)                                                        \
+    do {                                                                       \
+        const aclError status = (call);                                        \
+        if (status != ACL_SUCCESS) {                                           \
+            std::cerr << #call << " failed: " << status << std::endl;            \
+            return 1;                                                          \
+        }                                                                      \
+    } while (false)
+
 namespace {
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
@@ -156,75 +166,89 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 }
 
 constexpr uint32_t BUFFER_BYTES = 256;
+constexpr uint32_t OUTPUT_BYTES = 2 * BUFFER_BYTES;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    vector_bool store_mask = asc_create_mask_b16(PAT_ALL);
     vector_int16_t dst_0;
     vector_uint32_t src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ int16_t*>(output));
     asc_loadalign(src_0, reinterpret_cast<__ubuf__ uint32_t*>(input));
     asc_uint322int16_sat(dst_0, src_0, mask, ASC_POSITION_EVEN);
-    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_0, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output + BUFFER_BYTES), dst_0, store_mask);
     vector_int16_t dst_1;
     vector_uint32_t src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ int16_t*>(output));
     asc_loadalign(src_1, reinterpret_cast<__ubuf__ uint32_t*>(input));
     asc_uint322int16(dst_1, src_1, mask, ASC_POSITION_EVEN);
-    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_1, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int16_t*>(output), dst_1, store_mask);
 }
 __global__ __vector__ void asc_uint322int16_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    const asc_override_strategy old_strategy = asc_get_saturation_strategy();
+    asc_set_saturation_strategy(asc_override_strategy::USE_API);
+    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
     __ubuf__ uint8_t input_local[BUFFER_BYTES];
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     convert(output_local, input_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
     asc_sync();
+    asc_set_saturation_strategy(old_strategy);
 }
 } // namespace
 int main()
 {
     constexpr uint8_t input_pattern[] = {0x05, 0x00, 0x01, 0x00};
     constexpr uint8_t golden_pattern[] = {0x05, 0x00, 0x00, 0x00};
+    constexpr uint8_t saturated_pattern[] = {0xff, 0x7f, 0x00, 0x00};
     std::vector<uint8_t> input(BUFFER_BYTES);
-    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
-    std::vector<uint8_t> golden(BUFFER_BYTES);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> golden(OUTPUT_BYTES);
     for (size_t i = 0; i < BUFFER_BYTES; ++i) {
         input[i] = input_pattern[i % sizeof(input_pattern)];
         golden[i] = golden_pattern[i % sizeof(golden_pattern)];
+        golden[BUFFER_BYTES + i] = saturated_pattern[i % sizeof(saturated_pattern)];
     }
-    aclInit(nullptr);
-    aclrtSetDevice(0);
+    CHECK_ACL(aclInit(nullptr));
+    CHECK_ACL(aclrtSetDevice(0));
     uint8_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
-        ACL_MEM_MALLOC_HUGE_FIRST);
+    CHECK_ACL(aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST));
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
-        ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
-        ACL_MEMCPY_HOST_TO_DEVICE);
+    CHECK_ACL(aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
+        ACL_MEMCPY_HOST_TO_DEVICE));
     asc_uint322int16_kernel<<<1, 0>>>(output_device, input_device);
-    aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
-        ACL_MEMCPY_DEVICE_TO_HOST);
+    CHECK_ACL(aclrtSynchronizeDevice());
+    CHECK_ACL(aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST));
     std::cout << "Conversion: vector_uint32_t -> vector_int16_t" << std::endl;
     print_data("Input (raw bytes)", input);
-    print_data("Output (raw bytes)", output);
-    print_data("Golden (raw bytes)", golden);
-    const bool passed = compare_data(output, golden);
+    const std::vector<uint8_t> truncated(output.begin(), output.begin() + BUFFER_BYTES);
+    const std::vector<uint8_t> saturated(output.begin() + BUFFER_BYTES, output.end());
+    const std::vector<uint8_t> truncated_golden(golden.begin(), golden.begin() + BUFFER_BYTES);
+    const std::vector<uint8_t> saturated_golden(golden.begin() + BUFFER_BYTES, golden.end());
+    print_data("Non-saturated output (raw bytes)", truncated);
+    print_data("Non-saturated golden (raw bytes)", truncated_golden);
+    print_data("Saturated output (raw bytes)", saturated);
+    print_data("Saturated golden (raw bytes)", saturated_golden);
+    const bool truncated_passed = compare_data(truncated, truncated_golden);
+    const bool saturated_passed = compare_data(saturated, saturated_golden);
+    std::cout << "Non-saturated: " << (truncated_passed ? "passed" : "failed") << std::endl;
+    std::cout << "Saturated: " << (saturated_passed ? "passed" : "failed") << std::endl;
+    const bool passed = truncated_passed && saturated_passed;
     std::cout << (passed ? "[Success] asc_uint322int16/asc_uint322int16_sat/ASC_POSITION_EVEN passed."
                           : "[Failed] asc_uint322int16/asc_uint322int16_sat/ASC_POSITION_EVEN failed.")
               << std::endl;
-    aclrtFree(input_device);
-    aclrtFree(output_device);
-    aclrtResetDevice(0);
-    aclFinalize();
+    CHECK_ACL(aclrtFree(input_device));
+    CHECK_ACL(aclrtFree(output_device));
+    CHECK_ACL(aclrtResetDevice(0));
+    CHECK_ACL(aclFinalize());
     return passed ? 0 : 1;
 }
 ```
