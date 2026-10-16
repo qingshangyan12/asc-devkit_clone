@@ -308,9 +308,7 @@ def _gen_set_workspace_codes(
     if "oom" in get_current_build_config("tir.op_debug_config"):
         source = add_op_param_to_workspace(opinfo, tiling_info, source, compile_options, compile_info)
 
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
-        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
-    )
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and CommonUtility.is_has_ffts_mode()
     # set ffts_addr for ascend910b mix op or is_single_and_using_hard_sync scene
     if needs_ffts:
         source += "    icache_preload(1);\n"
@@ -621,7 +619,7 @@ def gen_kernel_fun_with_tiling_key_slave(
     source_declare: str,
 ):
     source = ""
-    if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+    if CommonUtility.is_split_core_arch():
         chip_version = CommonUtility.get_chip_version().upper()
         cube_core_type = f"__DAV_{chip_version}_CUBE__"
         vec_core_type = f"__DAV_{chip_version}_VEC__"
@@ -915,7 +913,7 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
 
     DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
 
-    if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+    if CommonUtility.is_split_core_arch():
         if compile_info.no_set_kernel_type is True:
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
@@ -944,7 +942,7 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
         gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
         chip_version = CommonUtility.get_chip_version()
-        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+        if CommonUtility.is_split_core_arch():
             arch = f"dav-{chip_version}-vec"
         else:
             arch = f"dav-{chip_version}"

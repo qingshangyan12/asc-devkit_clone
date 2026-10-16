@@ -596,7 +596,7 @@ class CommonUtility:
             res: True means has ffts addr
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version not in ["Ascend950", "Ascend350", "Ascend960DT"]:
+        if short_soc_version not in ["Ascend950", "Ascend350", "Ascend960DT", "Ascend960PR"]:
             return True
         return False
 
@@ -609,6 +609,29 @@ class CommonUtility:
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
         if short_soc_version in ["MC62", "MC32DM11A"]:
+            return True
+        return False
+
+    @staticmethod
+    def is_default_vec_cube_ratio_1_to_1():
+        """return if current soc version default aic:aiv is 1:1
+
+        Returns:
+            res: True means default aic:aiv is 1:1
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Ascend960DT", "Ascend960PR"]:
+            return True
+        return False
+
+    @staticmethod
+    def is_split_core_arch():
+        """return if is split core arch
+
+        Returns:
+            res: True means is split core arch
+        """
+        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
             return True
         return False
 
