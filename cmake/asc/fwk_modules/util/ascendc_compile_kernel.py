@@ -19,7 +19,7 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
-from kernel_spec_options import task_directory
+from ascendc_build_kernel_spec import KernelSpecBuildDirectory, task_directory
 from opdesc_parser import _trans_soc_ver_to_short
 
 
@@ -29,6 +29,8 @@ class CompileKernel:
         self.kernel_spec_task = getattr(args, "kernel_spec_task", None)
         self.kernel_spec_mode = getattr(args, "kernel_spec_mode", "None")
         self.kernel_spec_dir = getattr(args, "kernel_spec_dir", None)
+        if self.kernel_spec_mode != "None" and getattr(args, "kernel_spec_build", None):
+            self.kernel_spec_dir = str(KernelSpecBuildDirectory(args.kernel_spec_build).current_directory)
         self.op_cpp_file = os.path.realpath(args.src_file)
         self.impl_path = os.path.dirname(self.op_cpp_file)
         self.op_soc_ver = args.compute_unit
@@ -240,6 +242,7 @@ def args_parse():
     parser.add_argument("-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path.")
     parser.add_argument("--kernel-spec-mode", choices=("None", "Normal", "SK"), default="None")
     parser.add_argument("--kernel-spec-dir", default=None)
+    parser.add_argument("--kernel-spec-build", default=None, help="Internal package build directory pointer.")
     parser.add_argument("--kernel-spec-task", default=None, help="Internal CMake producer namespace.")
     return parser.parse_args()
 
