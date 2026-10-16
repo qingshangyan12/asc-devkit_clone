@@ -539,6 +539,10 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         half initValue = *(half*)(&tmpValue);

@@ -65,8 +65,8 @@ struct Load2DBitModeConfig1 {
 };
 
 struct SetFMatrixBitModeConfig0 {
-    uint64_t l1H : 16;
     uint64_t l1W : 16;
+    uint64_t l1H : 16;
     uint64_t padList0 : 8;
     uint64_t padList1 : 8;
     uint64_t padList2 : 8;

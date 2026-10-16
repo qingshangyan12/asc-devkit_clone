@@ -490,19 +490,15 @@ __aicore__ inline void MmadCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
-        mad(c, a, b, mmadParams.GetConfig0());
-    }
+    mad(c, a, b, mmadParams.GetConfig0());
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
-        mmadParams.SetCmatrixInitVal(false);
-        mad(c, a, b, bias, mmadParams.GetConfig0());
-    }
+    mmadParams.SetCmatrixInitVal(false);
+    mad(c, a, b, bias, mmadParams.GetConfig0());
 }
 
 /* **************************************************************************************************
@@ -544,16 +540,12 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 
 __aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
 {
-    if ASCEND_IS_AIC {
-        set_fmatrix(regFMatrix);
-    }
+    set_fmatrix(regFMatrix);
 }
 
 __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 {
-    if ASCEND_IS_AIC {
-        set_fmatrix_b(regFMatrix);
-    }
+    set_fmatrix_b(regFMatrix);
 }
 
 template <typename T>
@@ -639,6 +631,10 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -660,6 +656,10 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -681,6 +681,10 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
