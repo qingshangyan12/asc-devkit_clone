@@ -34,6 +34,9 @@ struct AicpuStScenario {
 
     // per-rank 元素数（AllGather 语义）
     uint64_t count = 0;
+
+    // Reduce 系算子的归约类型（AllReduce/ReduceScatter 用；AllGather 忽略）
+    HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
 };
 
 } // namespace AicpuSt

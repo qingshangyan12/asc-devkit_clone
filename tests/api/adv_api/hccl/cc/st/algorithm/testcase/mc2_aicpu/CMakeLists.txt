@@ -19,6 +19,7 @@
 set(HCCL_AICPU_ST_TARGET ascendc_ut_adv_api_aicpu_st)
 set(HCCL_MC2_AICPU_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/framework)
 set(HCCL_MC2_AICPU_ALL_GATHER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_gather)
+set(HCCL_MC2_AICPU_REDUCE_SCATTER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/reduce_scatter)
 set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/src)
 set(CC_SRC ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc/src)
 
@@ -36,6 +37,8 @@ add_executable(
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/all_gather_testcase.cpp
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather_mesh1d_adapter.cc
+    ${HCCL_MC2_AICPU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
+    ${HCCL_MC2_AICPU_REDUCE_SCATTER_DIR}/aicpu_reduce_scatter.cc
     ${CC_SRC}/common/hccl_alloc_ctx_res.cc
     ${CC_SRC}/ops/op_common/external_alg/external_alg_rules.cc
     ${CC_SRC}/ops/op_common/external_alg/external_alg_resolver.cc
@@ -53,6 +56,7 @@ target_include_directories(
     ${UTILS_DIR}/aicpu_executor
     ${UTILS_DIR}/aicpu_verifier
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}
+    ${HCCL_MC2_AICPU_REDUCE_SCATTER_DIR}
     ${CC_SRC}/common
     ${CC_SRC}/ops/op_common
     ${CC_SRC}/ops/op_common/inc
@@ -82,6 +86,10 @@ target_link_libraries(
     -Wl,--whole-archive
     ${HCCL_CHECKER_SELECTOR_TARGET}
     ${HCCL_CHECKER_EXECUTOR_TARGET}
+    # model-proxy 需 whole-archive 拉入：hcomm_thread_join_stub 的强符号 HcommThreadJoin
+    # 否则因静态库按需拉取不进最终链接（KERNEL 库的弱兜底体先链入满足引用，
+    # PROD/64bit 归约路径会拿到返回 -1 的兜底体而中断）
+    ${HCCL_CHECKER_MODEL_PROXY_TARGET}
     -Wl,--no-whole-archive
     -Wl,--start-group
     ${HCCL_CHECKER_KERNEL_TARGET}
