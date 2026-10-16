@@ -27,7 +27,7 @@ __aicore__ inline void copy_gm_to_cbuf_align_v2_stub(
     EXPECT_EQ(left_padding_count, static_cast<uint8_t>(55));
     EXPECT_EQ(right_padding_count, static_cast<uint8_t>(66));
     EXPECT_EQ(data_select_bit, static_cast<bool>(true));
-    EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(77));
+    EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
     EXPECT_EQ(burst_src_stride, static_cast<uint64_t>(88));
     EXPECT_EQ(burst_dst_stride, static_cast<uint32_t>(99));
 }
@@ -57,12 +57,12 @@ protected:
         uint8_t left_padding_count = 55;                                                                          \
         uint8_t right_padding_count = 66;                                                                         \
         bool data_select_bit = true;                                                                              \
-        uint8_t l2_cache_ctl = 77;                                                                                \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                              \
         uint64_t burst_src_stride = 88;                                                                           \
         uint32_t burst_dst_stride = 99;                                                                           \
                                                                                                                   \
         asc_copy_gm2l1_align(                                                                                     \
-            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl, \
+            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_mode, \
             burst_src_stride, burst_dst_stride);                                                                  \
         GlobalMockObject::verify();                                                                               \
     }                                                                                                             \
@@ -84,7 +84,7 @@ protected:
         uint8_t left_padding_count = 55;                                                                          \
         uint8_t right_padding_count = 66;                                                                         \
         bool data_select_bit = true;                                                                              \
-        uint8_t l2_cache_ctl = 77;                                                                                \
+        uint8_t l2_cache_ctl = 4;                                                                                 \
         uint64_t burst_src_stride = 88;                                                                           \
         uint32_t burst_dst_stride = 99;                                                                           \
                                                                                                                   \
