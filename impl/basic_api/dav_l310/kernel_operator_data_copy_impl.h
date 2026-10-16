@@ -474,66 +474,81 @@ __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, co
 template <bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T>
 __simd_vf__ inline void VecCopyLevel0VFImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const BasicAPIMaskStruct maskArrayStruct, const uint64_t maskCount,
-    const uint8_t repeatTimes, const CopyRepeatParams repeatParams, __ubuf__ uint64_t* maskBuf)
+    const uint8_t repeatTime, const CopyRepeatParams repeatParams, __ubuf__ uint64_t* maskBuf)
 {
-    uint32_t count = Internal::VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(
-        maskArrayStruct.maskArray, maskCount, maskBuf);
+    uint32_t count =
+        Internal::VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
-    newRepeatTimes = Internal::VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTimes);
+    newRepeatTimes = Internal::VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
     Reg::MaskReg maskReg;
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
     if constexpr (isNormalMode) {
         maskReg = Internal::VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
         for (uint16_t index = 0; index < newRepeatTimes; ++index) {
             Reg::RegTensor<T> srcVreg;
+#ifndef NO_OVERLAP_IN_MULTI_REPEAT
             Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+#endif
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 srcVreg, src + index * repeatParams.srcRepeatSize * ElePerBlkT, repeatParams.srcStride, maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + index * repeatParams.dstRepeatSize * ElePerBlkT, srcVreg, repeatParams.dstStride, maskReg);
         }
     } else {
         Reg::RegTensor<T> srcReg;
         Reg::MaskReg maskReg;
+        uint32_t oneRepeatBlock = (count * sizeof(T) + GetDataBlockSizeInBytes() - 1) / GetDataBlockSizeInBytes();
+        uint32_t oneBlockElm = GetVecLen() / sizeof(T) / DEFAULT_BLK_NUM;
+        uint32_t innerRepeatTimes = (oneRepeatBlock + DEFAULT_BLK_NUM - 1) / DEFAULT_BLK_NUM;
         uint32_t sreg;
         __ubuf__ T* dstTmp = dst;
         __ubuf__ T* srcTmp = src;
         uint32_t srcRepeatStride = repeatParams.srcStride * DEFAULT_BLK_NUM;
         uint32_t dstRepeatStride = repeatParams.dstStride * DEFAULT_BLK_NUM;
-        sreg = static_cast<uint32_t>(count);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-            maskReg = Reg::UpdateMask<T>(sreg);
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
-                srcReg, src, repeatParams.srcStride, srcRepeatStride, maskReg);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
-                dst, srcReg, repeatParams.dstStride, dstRepeatStride, maskReg);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+            sreg = static_cast<uint32_t>(count);
+            for (uint16_t j = 0; j <= static_cast<uint16_t>(innerRepeatTimes); ++j) {
+                maskReg = Reg::UpdateMask<T>(sreg);
+#ifndef NO_OVERLAP_IN_MULTI_REPEAT
+                Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+#endif
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                    srcReg, src, repeatParams.srcStride, srcRepeatStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                    dst, srcReg, repeatParams.dstStride, dstRepeatStride, maskReg);
+            }
+            src = srcTmp + repeatParams.srcRepeatSize * oneBlockElm;
+            dst = dstTmp + repeatParams.dstRepeatSize * oneBlockElm;
+            srcTmp = src;
+            dstTmp = dst;
         }
     }
 }
 
 template <bool isSetMask, bool isMaskBitMode, typename T>
 __aicore__ inline void VecCopyLevel0Template(
-    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t maskArray[], const uint64_t maskCount, const uint8_t repeatTimes,
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t maskArray[], const uint64_t maskCount, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
+    BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(
+            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
+        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, {
+            KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false.");
+        });
     }
     __ubuf__ uint64_t* maskBuf = nullptr;
-    uint16_t maskArraySize = (maskArray == nullptr) ? 0 : MASK_ARRAY_SIZE;
-    BasicAPIMaskStruct maskArrayStruct;
-    for (uint16_t i = 0; i < maskArraySize; i++) {
-        maskArrayStruct.maskArray[i] = maskArray[i];
-    }
+
     if (Internal::IsCounterMode()) {
         if constexpr (!isSetMask) {
-            maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
+            maskBuf =
+                AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2); // maskReg 256bit PK-> 128bit
         }
         VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, false, T>(
-            dst, src, maskArrayStruct, maskCount, repeatTimes, repeatParams, maskBuf);
+            dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
         if constexpr (!isSetMask) {
             AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
         }
@@ -542,7 +557,7 @@ __aicore__ inline void VecCopyLevel0Template(
             SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
         }
         VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
-            dst, src, maskArrayStruct, maskCount, repeatTimes, repeatParams, maskBuf);
+            dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
     }
 }
 
@@ -558,11 +573,42 @@ __aicore__ inline void CopyImpl(
 
 template <typename T, bool isSetMask = true>
 __aicore__ inline void CopyImpl(
-    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTimes,
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
     static_assert(SupportBytes<T, 2, 4>(), "Copy from ubuf to ubuf only support type b16/b32 on current device");
-    VecCopyLevel0Template<isSetMask, false>(dst, src, nullptr, mask, repeatTimes, repeatParams);
+    VecCopyLevel0Template<isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+}
+
+// Copy::Level 2
+template <typename T>
+__simd_vf__ inline void CopyImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t calCount)
+{
+    static_assert(
+        SupportBytes<T, 1, 2, 4, 8>(), "Copy from ubuf to ubuf only support type b8/b16/b32/b64 on current device");
+    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE || sizeof(T) == B32_BYTE_SIZE) {
+        constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+        uint32_t sreg = calCount;
+        uint16_t repeatTime = CeilDivision(calCount, repeatElm);
+        Reg::RegTensor<T> vreg;
+        Reg::MaskReg preg;
+        for (uint16_t i = 0; i < repeatTime; ++i) {
+            preg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign(vreg, src + i * repeatElm);
+            Reg::StoreAlign(dst + i * repeatElm, vreg, preg);
+        }
+    } else if constexpr (sizeof(T) == B64_BYTE_SIZE) {
+        uint32_t sreg = calCount * 2;
+        uint32_t oneRepSize = GetVecLen() / sizeof(uint32_t);
+        uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(sreg, oneRepSize));
+        Reg::MaskReg preg;
+        Reg::RegTensor<uint32_t> srcReg;
+        for (uint16_t i = 0; i < repeatTime; ++i) {
+            preg = Reg::UpdateMask<uint32_t>(sreg);
+            Reg::LoadAlign(srcReg, (__ubuf__ uint32_t*)src + i * oneRepSize);
+            Reg::StoreAlign((__ubuf__ uint32_t*)dst + i * oneRepSize, srcReg, preg);
+        }
+    }
 }
 
 /* **************************************************************************************************
