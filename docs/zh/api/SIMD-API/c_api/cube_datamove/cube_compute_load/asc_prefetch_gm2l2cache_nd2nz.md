@@ -33,7 +33,7 @@
 
 将矩阵数据从Global Memory预加载到L2 Cache中，在此过程中执行ND->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。仅预加载到L2 Cache，不实际搬进L1 Buffer。仅Cube核支持。
 
-GM中的数据以ND类型存储；预加载后在L2 Cache中以NZ形式缓存。NZ为矩阵分形格式，ND、NZ等矩阵分形存储格式的定义及转换说明请参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)。
+GM中的数据以ND类型存储；预加载后在L2 Cache中以NZ形式缓存。ND、NZ等矩阵分形存储格式的定义及转换说明请参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)。
 
 ND->NZ的搬运形式参考[asc_copy_gm2l1_nd2nz](asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)。
 
