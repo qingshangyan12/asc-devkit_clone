@@ -706,7 +706,7 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams)
 {
     if (padParams.isPad) {
-        set_pad_val_outtoub(padParams.paddingValue);
+        set_pad_val_outtoub(GetScalarBitcodeValue((T)padParams.paddingValue));
     }
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
