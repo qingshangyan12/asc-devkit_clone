@@ -333,6 +333,6 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
     {
         if (threadIdx.x >= count) { return; }
-        out[threadIdx.x] = static_cast<float>(g_sq(6));      // 编译运行正常，输出36
+        out[threadIdx.x] = static_cast<float>(g_sq(6));      // 编译运行正常
     }
     ```
