@@ -152,67 +152,6 @@ __simd_callee__ inline void DeInterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0,
     }
 }
 } // namespace Reg
-
-namespace Reg {
-template <typename T = DefaultType, typename T1, typename RegT>
-__simd_callee__ inline void DuplicateImpl(RegT& dstReg, T1 scalarValue)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        (SupportType<ActualT, bool, int8_t, uint8_t, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "unsupported datatype on current device!");
-    vbr(dstReg, (ActualT)scalarValue);
-}
-
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename T1, typename RegT>
-__simd_callee__ inline void DuplicateImpl(RegT& dstReg, T1 scalarValue, MaskReg& mask)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        (SupportType<ActualT, bool, int8_t, uint8_t, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "unsupported datatype on current device!");
-
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
-}
-
-template <
-    typename T = DefaultType, HighLowPart pos = HighLowPart::LOWEST, MaskMergeMode mode = MaskMergeMode::ZEROING,
-    typename RegT>
-__simd_callee__ inline void DuplicateImpl(RegT& dstReg, RegT& srcReg, MaskReg& mask)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        (SupportType<ActualT, bool, int8_t, uint8_t, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "unsupported datatype on current device!");
-
-    constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-
-    vdup(dstReg, srcReg, mask, posValue, modeValue);
-}
-
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void InterleaveImpl(RegT& dstReg0, RegT& dstReg1, RegT& srcReg0, RegT& srcReg1)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "Interleave only support type b8/b16/b32 on current device!");
-    vintlv(dstReg0, dstReg1, srcReg0, srcReg1);
-}
-
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void DeInterleaveImpl(RegT& dstReg0, RegT& dstReg1, RegT& srcReg0, RegT& srcReg1)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DeInterleave only support type b8/b16/b32 on current device!");
-    vdintlv(dstReg0, dstReg1, srcReg0, srcReg1);
-}
-} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
 

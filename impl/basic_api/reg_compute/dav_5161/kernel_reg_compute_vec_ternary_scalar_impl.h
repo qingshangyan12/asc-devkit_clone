@@ -37,19 +37,6 @@ __simd_callee__ inline void AxpyImpl(RegT& dstReg, RegT& srcReg, const ScalarT s
     vaxpy(dstReg, srcReg, scalarValue, mask, modeValue);
 }
 } // namespace Reg
-
-namespace Reg {
-template <typename T, typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__simd_callee__ inline void AxpyImpl(RegT& dstReg, RegT& srcReg, const ScalarT scalarValue, const MaskReg& mask)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, half, float>(), "current Axpy data type is not supported on current device!");
-
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vaxpy(dstReg, srcReg, scalarValue, mask, modeValue);
-}
-} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H
 
