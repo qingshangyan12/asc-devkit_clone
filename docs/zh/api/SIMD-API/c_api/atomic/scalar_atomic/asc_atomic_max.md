@@ -61,7 +61,7 @@ __aicore__ inline int32_t asc_atomic_max(__gm__ int32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |
 
 ## 返回值说明
