@@ -69,30 +69,12 @@ __simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     punpack(dst, src, partValue);
 }
-} // namespace Reg
-
-namespace Reg {
-template <typename T, const RegTrait& regTrait = RegTraitNumOne>
-__simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
-{
-    static_assert(SupportBytes<T, 1, 2, 4>(), "UpdateMask only support type b8/b16/b32 on current device");
-    MaskReg reg;
-    if constexpr (sizeof(T) == 1) {
-        reg = plt_b8(scalarValue, POST_UPDATE);
-    } else if constexpr (sizeof(T) == 2) {
-        reg = plt_b16(scalarValue, POST_UPDATE);
-    } else if constexpr (sizeof(T) == 4) {
-        reg = plt_b32(scalarValue, POST_UPDATE);
-    }
-    return reg;
-}
 
 template <typename RegT>
 __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& srcReg, int16_t bitOffset)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MaskGenWithRegTensor is not supported on current device!"); });
 }
-
 template <typename T = DefaultType, int16_t Offset, typename RegT>
 __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& srcReg)
 {
@@ -107,55 +89,27 @@ __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& src
         movvp(dstMask, (RegTensor<uint32_t>&)srcReg, Offset);
     }
 }
-
-template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
-__simd_callee__ inline MaskReg CreateMaskImpl()
-{
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "CreateMask only support type b8/b16/b32/b64 on current device");
-    constexpr auto modeValue = std::integral_constant<::Pat, static_cast<::Pat>(mode)>();
-    MaskReg reg;
-    if constexpr (sizeof(T) == 1) {
-        reg = pset_b8(modeValue);
-    } else if constexpr (sizeof(T) == 2) {
-        reg = pset_b16(modeValue);
-    } else if constexpr (sizeof(T) == 4) {
-        reg = pset_b32(modeValue);
-    } else if constexpr (sizeof(T) == 8) {
-        reg = pset_b32(modeValue);
-        if constexpr (regTrait.REG_NUM == 1) {
-            punpack(reg, reg, LOWER);
-        }
-    }
-    return reg;
-}
-
 __simd_callee__ inline void MaskNotImpl(MaskReg& dstMask, MaskReg& srcMask, MaskReg& mask)
 {
     pnot(dstMask, srcMask, mask);
 }
-
 __simd_callee__ inline void MaskAndImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
 {
     pand(dstMask, srcMask0, srcMask1, mask);
 }
-
 __simd_callee__ inline void MaskOrImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
 {
     por(dstMask, srcMask0, srcMask1, mask);
 }
-
 __simd_callee__ inline void MaskXorImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
 {
     pxor(dstMask, srcMask0, srcMask1, mask);
 }
-
 __simd_callee__ inline void MaskMovImpl(MaskReg& dstMask, MaskReg& srcMask, MaskReg& mask)
 {
     pmov(dstMask, srcMask, mask);
 }
-
 __simd_callee__ inline void MaskMovImpl(MaskReg& dstMask, MaskReg& srcMask) { pmov(dstMask, srcMask); }
-
 template <typename T>
 __simd_callee__ inline void MaskInterleaveImpl(
     MaskReg& dstMask0, MaskReg& dstMask1, MaskReg& srcMask0, MaskReg& srcMask1)
@@ -169,7 +123,6 @@ __simd_callee__ inline void MaskInterleaveImpl(
         pintlv_b32(dstMask0, dstMask1, srcMask0, srcMask1);
     }
 }
-
 template <typename T>
 __simd_callee__ inline void MaskDeInterleaveImpl(
     MaskReg& dstMask0, MaskReg& dstMask1, MaskReg& srcMask0, MaskReg& srcMask1)
@@ -183,26 +136,10 @@ __simd_callee__ inline void MaskDeInterleaveImpl(
         pdintlv_b32(dstMask0, dstMask1, srcMask0, srcMask1);
     }
 }
-
 __simd_callee__ inline void MaskSelImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
 {
     psel(dstMask, srcMask0, srcMask1, mask);
 }
-
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskPackImpl(MaskReg& dstMask, MaskReg& srcMask)
-{
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    ppack(dstMask, srcMask, partValue);
-}
-
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskUnPackImpl(MaskReg& dstMask, MaskReg& srcMask)
-{
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    punpack(dstMask, srcMask, partValue);
-}
-
 template <typename T>
 __simd_callee__ inline MaskReg MoveMaskImpl()
 {
