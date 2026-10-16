@@ -33,7 +33,7 @@
 
 将矩阵数据从Global Memory预加载到L2 Cache中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。仅预加载到L2 Cache，不实际搬进L1 Buffer。仅Cube核支持。
 
-GM中的数据以DN类型存储；预加载后在L2 Cache中以NZ形式缓存。
+GM中的数据以DN类型存储；预加载后在L2 Cache中以NZ形式缓存。NZ为矩阵分形格式，DN、NZ等矩阵分形存储格式的定义及转换说明请参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)。
 
 DN->NZ的搬运形式参考[asc_copy_gm2l1_dn2nz](asc_copy_gm2l1_dn2nz.md)。
 
@@ -69,7 +69,7 @@ __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(__gm__ half* src,
 | 参数名 | 输入/输出 | 含义 |
 | --- | --- | --- |
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
-| loop1_src_stride | 输入 | 源操作数同一DN矩阵的相邻行起始地址间的偏移，单位字节。取值范围：[0, $2^{40}-1$]。 |
+| loop1_src_stride | 输入 | 源操作数同一DN矩阵的相邻行起始地址间的偏移，单位字节。取值范围：[0, $2^{40}-1$]，预加载模式下无需关注loop2_dst_stride和loop3_dst_stride。 |
 | n_value | 输入 | 源矩阵中DN矩阵的列数，单位为元素。取值范围：[1, 65535]。 |
 | d_value | 输入 | 源矩阵中DN矩阵的行数，单位为元素。取值范围：[1, $2^{21}-1$]。 |
 | loop4_src_stride | 输入 | 源矩阵相邻DN矩阵起始地址间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。<br>&nbsp;&nbsp;&nbsp;&bull; 源矩阵DN矩阵个数为1时，此参数无意义，设置为0即可。<br>&nbsp;&nbsp;&nbsp;&bull; 源矩阵DN矩阵个数大于1时，当`loop4_src_stride = 0`时，表示重复预取源矩阵的第一个DN矩阵。 |
