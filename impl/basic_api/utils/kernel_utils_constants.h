@@ -298,7 +298,8 @@ const uint16_t ONE_PARAM_SIZE = 8;
 const int32_t BLOCK_COUT = 16;
 const uint16_t TWO_BLK_SIZE = 64;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) &&                                                                               \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102))
 const uint16_t AIV_CORE_NUM = 72;
 #else
 const uint16_t AIV_CORE_NUM = 50;
@@ -328,7 +329,8 @@ const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) &&                                                                               \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102))
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
@@ -359,7 +361,8 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif (__NPU_ARCH__ == 3102)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5162))
+#elif defined(__NPU_ARCH__) &&                                                                               \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5162))
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
 constexpr size_t RESERVED_WORKSPACE = 1024;
