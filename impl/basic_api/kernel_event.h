@@ -436,7 +436,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::BIAS;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3103)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
