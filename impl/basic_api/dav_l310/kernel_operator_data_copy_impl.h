@@ -237,7 +237,6 @@ __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from ub to gm nd2nz on this version"); });
 }
 
-
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
@@ -262,8 +261,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
     ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
     ASCENDC_DEBUG_ASSERT(((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
         "dstNzMatrixStride should be 32B aligned \n");
-    ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0), "dstNzC0Stride should be gereater than 0 \n");
-    ASCENDC_DEBUG_ASSERT((dstNzNStride > 0), "dstNzNStride should be gereater than 0 \n");
+    ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0), "dstNzC0Stride should be greater than 0 \n");
+    ASCENDC_DEBUG_ASSERT((dstNzNStride > 0), "dstNzNStride should be greater than 0 \n");
 
     const uint32_t elementsPerBlock = ONE_BLK_SIZE / sizeof(T);
     const uint32_t dTotalBytes = static_cast<uint32_t>(dValue * sizeof(T));
@@ -282,11 +281,11 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
             }
             const bool isTailBlock = blockBytes < ONE_BLK_SIZE;
             const uint8_t tailPadCount = static_cast<uint8_t>((ONE_BLK_SIZE - blockBytes) / sizeof(T));
-            CopyGmToCbufAlignV2{
+            CopyGmToCbufAlignV2(
                 dstMatrix + static_cast<uint64_t>(blkIdx) * dstNzC0Stride * elementsPerBlock,
                 srcMatrix + blkIdx * elementsPerBlock, nValue, blockBytes, 0, tailPadCount, isTailBlock,
                 static_cast<uint32_t>(srcDValue * sizeof(T) - blockBytes), static_cast<uint32_t>(dstNzNStride - 1),
-                true};
+                true);
         }
     }
 }
