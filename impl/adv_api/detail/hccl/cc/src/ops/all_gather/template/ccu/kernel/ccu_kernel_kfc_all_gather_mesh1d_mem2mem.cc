@@ -78,6 +78,7 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 
     const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
     ctx.events.resize(AG_M2M_UNROLL_NUM * eventNumPerIter);
+    ctx.constVar1 = 1;
     ctx.repeatTimeFlag = 0;
     ctx.remoteRepeatTimeFlag = 0;
     ctx.resourceAllocated = false;
@@ -225,7 +226,6 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
 
 static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
 {
-    ctx.constVar1 = 1;
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.repeatTimeFlag = 0;
     ctx.remoteRepeatTimeFlag = 0;

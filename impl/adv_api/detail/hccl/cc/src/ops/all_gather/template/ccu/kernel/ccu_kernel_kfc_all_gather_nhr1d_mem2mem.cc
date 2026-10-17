@@ -74,6 +74,9 @@ CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
     ctx.output.push_back(ccu::Variable());
     ctx.token.push_back(ccu::Variable());
     ctx.outputSliceOffset.resize(ctx.rankSize);
+    ctx.myrankInputSliceOffset = 0;
+    ctx.repeatTimeflag = 0;
+    ctx.constVar1 = 1;
     return CCU_SUCCESS;
 }
 
@@ -374,9 +377,6 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(CcuKernelArg arg)
     static_assert(KFC_AG_SOLE_NHR_FUNC_TURN_END_INDEX < CCU_FUNC_TASK_ARG_MAX, "SoleNHR AG Func arguments overflow");
     ccu::Func func(
         [&ctx, kernelArg](ccu::Array<ccu::Variable>& args) {
-            ctx.myrankInputSliceOffset = 0;
-            ctx.repeatTimeflag = 0;
-            ctx.constVar1 = 1;
             const uint32_t goSizeBase =
                 kernelArg->axisId == 0U ? KFC_AG_SOLE_NHR_GO_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_D1_SIZE_0;
             LoadNhr1DArgs(
