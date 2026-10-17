@@ -31,6 +31,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
+<!-- npu="9020" id19 -->
+- Kirin 9020处理器系列产品：不支持
+<!-- end id19 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id1 -->
 
 ### 传入bias的原型
@@ -62,6 +65,9 @@
 <!-- npu="9030" id18 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
+<!-- npu="9020" id20 -->
+- Kirin 9020处理器系列产品：不支持
+<!-- end id20 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id2 -->
 
 ## 功能说明

@@ -27,8 +27,11 @@
 - Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
+<!-- npu="9020" id23 -->
+- Kirin 9020处理器系列产品：不支持
+<!-- end id23 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_res.md#id1 -->
 
 ## 功能说明

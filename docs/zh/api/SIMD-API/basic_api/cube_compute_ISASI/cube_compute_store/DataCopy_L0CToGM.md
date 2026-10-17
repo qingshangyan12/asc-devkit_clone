@@ -23,6 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="x90" id23 -->
+- Kirin X90处理器系列产品：支持
+<!-- end id23 -->
+<!-- npu="9030" id24 -->
+- Kirin 9030处理器系列产品：支持
+<!-- end id24 -->
+<!-- npu="9020" id25 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id25 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToGM_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>

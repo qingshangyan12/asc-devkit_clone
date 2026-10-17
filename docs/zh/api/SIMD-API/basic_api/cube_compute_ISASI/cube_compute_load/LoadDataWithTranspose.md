@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
+<!-- npu="9020" id21 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id21 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002543851571_section106841136114319"></a>
@@ -156,6 +159,9 @@ Kirin X90处理器系列产品，支持数据类型：int8_t、half。
 <!-- npu="950" id19 -->
 - 针对Ascend 950PR&950DT系列产品，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
 <!-- end id19 -->
+<!-- npu="9020" id22 -->
+- 针对Kirin 9020处理器系列产品，本接口仅支持L1 Buffer到L0B Buffer通路（不支持L1 Buffer->L0A Buffer通路），且仅支持V2参数原型（loadDataParams参数类型为LoadData2dTransposeParamsV2，不支持LoadData2dTransposeParams类型）。
+<!-- end id22 -->
 
 ## 关键特性说明<a id="zh-cn_topic_0000002543851571_section1891111310132"></a>
 
