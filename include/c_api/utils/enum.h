@@ -32,6 +32,38 @@ enum class asc_store_l2_cache_mode : uint8_t {
 
 enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
 
+enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
+
+enum class asc_relu_pre_mode : uint8_t {
+    NONE = 0,
+    NORMAL = 1,
+    SCALAR = 2,
+    VECTOR = 3,
+};
+
+enum class asc_channel_pad_mode : uint8_t {
+    // No padding; each 32-byte channel block passes through unchanged.
+    NONE = 0,
+    // Write path (expand): insert padding values within each 32-byte channel block.
+    // Expand: for every 1 source byte, insert 31 padding values.
+    EXPAND_1B = 1,
+    // Expand: for every 2 source bytes, insert 15 padding values.
+    EXPAND_2B = 2,
+    // Expand: for every 4 source bytes, insert 14 padding values.
+    EXPAND_4B = 3,
+    // Expand: for every 8 source bytes, insert 12 padding values.
+    EXPAND_8B = 4,
+    // Expand: for every 16 source bytes, insert 8 padding values.
+    EXPAND_16B = 5,
+    // Read path (compact): strip MSB bytes, keep the lowest valid region.
+    // Compact: per 32-byte source block, discard 28 MSB bytes, keep the lowest 4 bytes.
+    COMPACT_4B = 6,
+    // Compact: per 32-byte source block, discard 24 MSB bytes, keep the lowest 8 bytes.
+    COMPACT_8B = 7,
+    // Compact: per 32-byte source block, discard 16 MSB bytes, keep the lowest 16 bytes.
+    COMPACT_16B = 8,
+};
+
 enum class asc_position_mode { EVEN = 0, ODD };
 
 constexpr std::integral_constant<asc_position_mode, asc_position_mode::EVEN> ASC_POSITION_EVEN;

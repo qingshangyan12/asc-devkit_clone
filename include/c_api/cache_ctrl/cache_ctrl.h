@@ -29,6 +29,11 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h"
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+
+// A6(9201) reuses the arch-common cache control implementations provided for A5(3510).
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h"
+
 #endif
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);

@@ -31,6 +31,11 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+
+// A6(9201) reuses the arch-common vector datamove implementations provided for A5(3510).
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+
 #endif
 
 //===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
