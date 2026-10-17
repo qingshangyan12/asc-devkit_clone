@@ -31,6 +31,12 @@ constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX = 6U;
 constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = KFC_MAX_MISSION_NUM;
 constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
 
+// SoleNHR AG Func keeps the 13-slot queue payload, followed by server-supplied token and turn-end address.
+constexpr uint32_t KFC_AG_SOLE_NHR_FUNC_TOKEN_INDEX = KFC_AG_SOLE_NHR_PARAM_NUM;
+constexpr uint32_t KFC_AG_SOLE_NHR_FUNC_TURN_END_INDEX = KFC_AG_SOLE_NHR_FUNC_TOKEN_INDEX + 1U;
+constexpr char KFC_FUNC_ALL_GATHER_NHR1D_MEM2MEM_NAME[] = "CcuKernelKfcAllGatherNHR1DMem2Mem";
+constexpr char KFC_FUNC_REDUCE_SCATTER_NHR1D_2DIE_MEM2MEM_NAME[] = "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem";
+
 constexpr char KFC_FUNC_ALL_REDUCE_MESH1D_MEM2MEM_NAME[] = "CcuKernelAllReduceMesh1DMem2Mem";
 constexpr char KFC_FUNC_ALL_GATHER_MESH1D_MEM2MEM_NAME[] = "CcuKernelAllGatherMesh1DMem2Mem";
 constexpr char KFC_FUNC_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME[] = "CcuKernelAllGatherNHR1DMultiJettyMem2Mem";
@@ -45,7 +51,6 @@ constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuAllToAllMesh1
 constexpr char KFC_FUNC_ALL_TO_ALL_V_MESH1D_NAME[] = "CcuKernelAlltoAllVMesh1D";
 constexpr char KFC_FUNC_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuKernelKfcAllToAllMesh1DMultiJetty";
 constexpr char KFC_FUNC_KFC_ALL_TO_ALL_CLOS1D_MULTI_JETTY_NAME[] = "CcuKfcAllToAllClos1DMultiJetty";
-constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 constexpr char KFC_PARALLEL_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherParallelMeshNHRMultiLink";

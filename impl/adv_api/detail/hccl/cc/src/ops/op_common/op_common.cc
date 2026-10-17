@@ -59,6 +59,7 @@
 
 #if MC2_CLIENT_ENABLE_CCU
 #include "../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
+#include "../all_gather/template/ccu/ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #endif
 
 #ifdef __cplusplus
@@ -1525,7 +1526,7 @@ HcclResult HcclAllocAlgResourceCcu(
         uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
         if (resCtxHost->kfcServerArgs.size() < KFC_SERVER_ARG_NUM) {
             HCCL_WARNING(
-                "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < %zu, cannot update token",
+                "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < %u, cannot update token",
                 resCtxHost->kfcServerArgs.size(), KFC_SERVER_ARG_NUM);
         } else {
             for (size_t offset = 0; offset + KFC_SERVER_TOKEN_ARG_INDEX < resCtxHost->kfcServerArgs.size();
@@ -1887,9 +1888,6 @@ static HcclResult AccumulateKernelRes(
     }
     CHK_RET(AccumulateKernelFuncRes(
         kernelInfo, kernelInfo.kernelFuncName, kernelInfo.kernelFunc, kernelInfo.kernelArg, groupedResMap));
-    if (IsKfcInlineSubKernel(*static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg))) {
-        return HCCL_SUCCESS;
-    }
     CHK_PRT_RET(
         kernelInfo.subKernelFunc == nullptr || kernelInfo.subKernelArg == nullptr,
         HCCL_ERROR("[AccumulateKernelRes] KFC sub-kernel metadata is incomplete"), HCCL_E_PTR);
@@ -1971,6 +1969,8 @@ static HcclResult RegisterCcuKernels(
 {
     // 普通 Func 与子 Kernel 注册算法名对应；变体仍沿用注册名，但使用独立的 Func 名。
     static const std::map<std::string, const char*> kfcFuncNames = {
+        {KFC_FUNC_ALL_GATHER_NHR1D_MEM2MEM_NAME, KFC_FUNC_ALL_GATHER_NHR1D_MEM2MEM_NAME},
+        {KFC_FUNC_REDUCE_SCATTER_NHR1D_2DIE_MEM2MEM_NAME, KFC_FUNC_REDUCE_SCATTER_NHR1D_2DIE_MEM2MEM_NAME},
         {KFC_FUNC_ALL_REDUCE_MESH1D_MEM2MEM_NAME, KFC_FUNC_ALL_REDUCE_MESH1D_MEM2MEM_NAME},
         {KFC_FUNC_ALL_GATHER_MESH1D_MEM2MEM_NAME, KFC_FUNC_ALL_GATHER_MESH1D_MEM2MEM_NAME},
         {KFC_FUNC_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME, KFC_FUNC_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME},
@@ -2017,9 +2017,6 @@ static HcclResult RegisterCcuKernels(
                 if (kernelInfo.resGroup != currentResGroup) {
                     continue;
                 }
-                if (IsKfcInlineSubKernel(*static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg))) {
-                    continue;
-                }
                 CHK_PRT_RET(
                     kernelInfo.subKernelFunc == nullptr || kernelInfo.subKernelArg == nullptr,
                     HCCL_ERROR("KFC sub-kernel metadata is incomplete, kernel[%s]", kernelInfo.kernelFuncName),
@@ -2045,6 +2042,10 @@ static HcclResult RegisterCcuKernels(
             CcuResult regRet = HcommCcuKernelRegister(
                 insHandle, kernelInfo.dieId, kernelInfo.kernelFuncName, reinterpret_cast<void*>(kernelInfo.kernelFunc),
                 kernelArgs, 1, &kernelHandle);
+            if (regRet == CCU_E_UNAVAIL) {
+                HCCL_WARNING("[RegisterCcuKernels] kernel[%s] unavailable, fallback.", kernelInfo.kernelFuncName);
+                return HCCL_E_UNAVAIL;
+            }
             CHK_PRT_RET(
                 regRet != CCU_SUCCESS,
                 HCCL_ERROR("ccu kernel register failed: ccuRet -> %d, kernel[%s]", regRet, kernelInfo.kernelFuncName),
@@ -2062,9 +2063,6 @@ static HcclResult RegisterCcuKernels(
                     continue;
                 }
                 const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
-                if (IsKfcInlineSubKernel(*kfcArg)) {
-                    continue;
-                }
                 const auto* funcNames = &kfcFuncNames;
                 if (kfcArg->role == KfcServerRole::ALL_TO_ALL_CLOS) {
                     funcNames = &closAllToAllFuncNames;
@@ -2396,7 +2394,7 @@ static HcclResult CreateAndAssignNewCcuIns(
     return RegisterCcuKernels(newInsHandle, resRequest, resCtxHost, isKfc);
 }
 
-// CCU kernel 动态资源申请主流程：1.查询可复用 CcuIns -> 2.聚合资源需求
+// CCU kernel 动态资源申请主流程：1.聚合资源需求 -> 2.查询可复用 CcuIns
 // -> 3a.容量充足则复用并注册 / 3b.新建实例并绑定 comm 后注册。接口返回 CCU_E_UNAVAIL 时触发回退。
 static HcclResult HcclGetCcuKernelDynamic(
     HcclComm comm, OpExecuteConfig opMode, AlgResourceRequest& resRequest,
@@ -2406,7 +2404,17 @@ static HcclResult HcclGetCcuKernelDynamic(
         "[HcclGetCcuKernelDynamic] start, opMode[%u], kernelNum[%zu].", static_cast<uint32_t>(opMode),
         resRequest.ccuKernelInfos.size());
 
-    // 步骤1：查询当前 comm 的 CcuIns，同时确保 CCU 在 kernel 资源查询前已初始化
+    // 步骤1：聚合资源需求，按 dieId 分组
+    ResDescByDie reqDescs;
+    HcclResult buildRet = BuildAggregatedResReq(resRequest, reqDescs, isKfc);
+    if (buildRet != HCCL_SUCCESS) {
+        // 防御性清理：BuildAggregatedResReq 失败时契约上已清理，这里再清理一次防止内部契约被破坏
+        DestroyAllDescs(reqDescs);
+        return buildRet;
+    }
+
+    // 步骤2：查询当前 comm 是否已绑定 CcuIns 实例
+    // 接口语义：未绑定 CcuIns 时返回 HCCL_E_UNAVAIL（不是 insNum=0），需走新建路径
     CcuInsHandle insHandle = 0;
     uint32_t insNum = 0;
     HcclResult queryRet = HcclCommQueryAssignedCcuIns(comm, &insHandle, &insNum);
@@ -2421,16 +2429,8 @@ static HcclResult HcclGetCcuKernelDynamic(
                   "create new.");
     } else {
         HCCL_ERROR("[HcclGetCcuKernelDynamic] HcclCommQueryAssignedCcuIns failed: ret -> %d", queryRet);
-        return queryRet;
-    }
-
-    // 步骤2：聚合资源需求，按 dieId 分组
-    ResDescByDie reqDescs;
-    HcclResult buildRet = BuildAggregatedResReq(resRequest, reqDescs, isKfc);
-    if (buildRet != HCCL_SUCCESS) {
-        // 防御性清理：BuildAggregatedResReq 失败时契约上已清理，这里再清理一次防止内部契约被破坏
         DestroyAllDescs(reqDescs);
-        return buildRet;
+        return queryRet;
     }
 
     // 步骤3：有可复用实例走复用路径，否则新建；reqDescs 所有权转移给子函数

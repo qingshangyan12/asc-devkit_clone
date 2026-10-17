@@ -51,26 +51,6 @@ struct KfcAllGatherNhrContext : CcuKernelCtxBase {
     ccu::Event event;
 };
 
-struct KfcParallelAllGatherNhrContext : KfcAllGatherNhrContext {
-    uint32_t rankSizeLevel0 = 0;
-    uint32_t rankIdxLevel0 = 0;
-    ccu::Variable parallelInputBase;
-    ccu::Variable parallelOutputBase;
-    ccu::Variable parallelToken;
-    ccu::Variable outputStride;
-    ccu::Variable part0Size;
-    ccu::Variable part1Size;
-    ccu::Variable part1Offset;
-    ccu::Variable meshPhaseDoneAddr;
-    ccu::Variable nhrPhaseDoneAddr;
-    ccu::Variable part0SliceSizePerJetty;
-    ccu::Variable part0LastSliceSizePerJetty;
-    ccu::Variable part1SliceSizePerJetty;
-    ccu::Variable part1LastSliceSizePerJetty;
-    GroupOpSizeVars part0GoSize;
-    GroupOpSizeVars part1GoSize;
-};
-
 CcuResult InitResource(KfcAllGatherNhrContext& ctx)
 {
     if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U || ctx.rank2ChannelIdx == nullptr ||
@@ -110,32 +90,6 @@ CcuResult LoadArgs(KfcAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
     ctx.goSize.loopParam = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_1];
     ctx.goSize.parallelParam = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_2];
     ctx.goSize.residual = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_3];
-    return CCU_SUCCESS;
-}
-
-CcuResult LoadArgs(KfcParallelAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
-{
-    ctx.parallelInputBase = args[0];
-    ctx.parallelOutputBase = args[1];
-    ctx.parallelToken = args[2];
-    ctx.outputStride = args[KFC_PARALLEL_AG_OUTPUT_STRIDE];
-    ctx.part0Size = args[KFC_PARALLEL_AG_PART0_SIZE];
-    ctx.part1Size = args[KFC_PARALLEL_AG_PART1_SIZE];
-    ctx.part1Offset = args[KFC_PARALLEL_AG_PART1_OFFSET];
-    ctx.meshPhaseDoneAddr = args[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR];
-    ctx.nhrPhaseDoneAddr = args[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR];
-    ctx.part0SliceSizePerJetty = args[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY];
-    ctx.part0LastSliceSizePerJetty = args[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY];
-    ctx.part1SliceSizePerJetty = args[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY];
-    ctx.part1LastSliceSizePerJetty = args[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY];
-    ctx.part0GoSize.addrOffset = args[KFC_PARALLEL_AG_PART0_GO_SIZE_0];
-    ctx.part0GoSize.loopParam = args[KFC_PARALLEL_AG_PART0_GO_SIZE_1];
-    ctx.part0GoSize.parallelParam = args[KFC_PARALLEL_AG_PART0_GO_SIZE_2];
-    ctx.part0GoSize.residual = args[KFC_PARALLEL_AG_PART0_GO_SIZE_3];
-    ctx.part1GoSize.addrOffset = args[KFC_PARALLEL_AG_PART1_GO_SIZE_0];
-    ctx.part1GoSize.loopParam = args[KFC_PARALLEL_AG_PART1_GO_SIZE_1];
-    ctx.part1GoSize.parallelParam = args[KFC_PARALLEL_AG_PART1_GO_SIZE_2];
-    ctx.part1GoSize.residual = args[KFC_PARALLEL_AG_PART1_GO_SIZE_3];
     return CCU_SUCCESS;
 }
 
@@ -356,21 +310,42 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
 {
     const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
     const auto* parallelArg = static_cast<const KfcParallelAllGatherArg*>(kernelArg->algArg.get());
-    KfcParallelAllGatherNhrContext ctx;
+    KfcAllGatherNhrContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;
     ctx.rankSize = parallelArg->rankSizeLevel1;
     ctx.rankId = parallelArg->rankIdxLevel1;
-    ctx.rankSizeLevel0 = parallelArg->rankSizeLevel0;
-    ctx.rankIdxLevel0 = parallelArg->rankIdxLevel0;
     ctx.jettyNum = parallelArg->jettyNum;
     ctx.stepInfoVector = &parallelArg->stepInfoVector;
     ctx.rank2ChannelIdx = &parallelArg->rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func func(
-        [&ctx](ccu::Array<ccu::Variable>& args) {
-            LoadArgs(ctx, args);
+        [&ctx, parallelArg](ccu::Array<ccu::Variable>& args) {
+            auto& inputBase = args[0];
+            auto& outputBase = args[1];
+            auto& tokenInfo = args[2];
+            auto& outputStride = args[3];
+            auto& part0Size = args[4];
+            auto& part1Size = args[5];
+            auto& part1Offset = args[6];
+            auto& meshPhaseDoneAddr = args[7];
+            auto& nhrPhaseDoneAddr = args[8];
+            auto& part0SliceSizePerJetty = args[9];
+            auto& part0LastSliceSizePerJetty = args[10];
+            auto& part1SliceSizePerJetty = args[11];
+            auto& part1LastSliceSizePerJetty = args[12];
+            auto& part0GoSize0 = args[13];
+            auto& part0GoSize1 = args[14];
+            auto& part0GoSize2 = args[15];
+            auto& part0GoSize3 = args[16];
+            auto& part1GoSize0 = args[17];
+            auto& part1GoSize1 = args[18];
+            auto& part1GoSize2 = args[19];
+            auto& part1GoSize3 = args[20];
+            const uint32_t rankSizeLevel0 = parallelArg->rankSizeLevel0;
+            const uint32_t rankIdxLevel0 = parallelArg->rankIdxLevel0;
+            ctx.constVar1 = 1U;
             ccu::Variable zero;
             ccu::Variable one;
             ccu::Variable level1Stride;
@@ -381,35 +356,35 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
             ccu::Variable phase0RepeatNumInv;
             zero = 0U;
             one = 1U;
-            AddVariableNTimes(level1Stride, ctx.outputStride, ctx.rankSizeLevel0);
-            phase0Input = ctx.parallelInputBase + ctx.part1Offset;
-            AddVariableNTimes(phase0RankOffset, ctx.outputStride, ctx.rankIdxLevel0);
-            phase0Output = ctx.parallelOutputBase + phase0RankOffset;
-            phase0Output += ctx.part1Offset;
-            phase1RepeatNumInv = UINT64_MAX - ctx.rankSizeLevel0;
+            AddVariableNTimes(level1Stride, outputStride, rankSizeLevel0);
+            phase0Input = inputBase + part1Offset;
+            AddVariableNTimes(phase0RankOffset, outputStride, rankIdxLevel0);
+            phase0Output = outputBase + phase0RankOffset;
+            phase0Output += part1Offset;
+            phase1RepeatNumInv = UINT64_MAX - rankSizeLevel0;
             phase0RepeatNumInv = UINT64_MAX - 1U;
 
+            // Stage 0: NHR gathers part1 along the level-1 (CLOS) dimension.
             LoadNhrArgs(
-                ctx, phase0Input, phase0Output, ctx.parallelToken, ctx.part1Size, ctx.part1SliceSizePerJetty,
-                ctx.part1LastSliceSizePerJetty, phase0RepeatNumInv, zero, level1Stride, zero, zero, zero,
-                ctx.part1GoSize.addrOffset, ctx.part1GoSize.loopParam, ctx.part1GoSize.parallelParam,
-                ctx.part1GoSize.residual);
+                ctx, phase0Input, phase0Output, tokenInfo, part1Size, part1SliceSizePerJetty, part1LastSliceSizePerJetty,
+                phase0RepeatNumInv, zero, level1Stride, zero, zero, zero, part1GoSize0, part1GoSize1, part1GoSize2,
+                part1GoSize3);
             PreSync(ctx);
-            CCU_IF(ctx.part1Size != 0) { RunNhr(ctx); }
+            CCU_IF(part1Size != 0) { RunNhr(ctx); }
             PostSync(ctx);
 
-            ccu::Store(ctx.nhrPhaseDoneAddr, one);
+            ccu::Store(nhrPhaseDoneAddr, one);
             ccu::Variable meshDone;
             meshDone = 0U;
-            CCU_WHILE(meshDone != 1U) { ccu::Load(ctx.meshPhaseDoneAddr, meshDone); }
+            CCU_WHILE(meshDone != 1U) { ccu::Load(meshPhaseDoneAddr, meshDone); }
 
+            // Stage 1: NHR propagates part0, which stage-0 Mesh has already gathered.
             LoadNhrArgs(
-                ctx, ctx.parallelOutputBase, ctx.parallelOutputBase, ctx.parallelToken, ctx.part0Size,
-                ctx.part0SliceSizePerJetty, ctx.part0LastSliceSizePerJetty, phase1RepeatNumInv, level1Stride,
-                level1Stride, ctx.outputStride, ctx.outputStride, one, ctx.part0GoSize.addrOffset,
-                ctx.part0GoSize.loopParam, ctx.part0GoSize.parallelParam, ctx.part0GoSize.residual);
+                ctx, outputBase, outputBase, tokenInfo, part0Size, part0SliceSizePerJetty, part0LastSliceSizePerJetty,
+                phase1RepeatNumInv, level1Stride, level1Stride, outputStride, outputStride, one, part0GoSize0, part0GoSize1,
+                part0GoSize2, part0GoSize3);
             PreSync(ctx);
-            CCU_IF(ctx.part0Size != 0) { RunNhr(ctx); }
+            CCU_IF(part0Size != 0) { RunNhr(ctx); }
             PostSync(ctx);
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_PARALLEL_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME);

@@ -33,13 +33,6 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcReduceScatterMesh1DMem2Mem"));
     kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuReduceScatterMesh1DMem2MemKernel);
-    auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterMesh1DMem2Mem>();
-    kernelArg->rankSize = subCommRanks_[0].size();
-    kernelArg->rankId = mySubCommRank_;
-    kernelArg->opParam = param;
-    kernelArg->subCommRanks = subCommRanks_;
-    kernelInfo.setKernelArg(kernelArg);
-
     std::vector<HcclChannelDesc> channelDescs;
     // UBX（MESH_1D_CLOS，mesh/clos 同层）机型：CalcChannelRequestMesh1D 按协议逐链路建通道，会把每对端
     // 的全部 clos 链路收进 kernelInfo（实测每对 18 条，2P 即超 CCU_MAX_RANK_SIZE=16 上限），
@@ -57,6 +50,13 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
             }
         }
     }
+
+    auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterMesh1DMem2Mem>();
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelArg->opParam = param;
+    kernelArg->subCommRanks = subCommRanks_;
+    kernelInfo.setKernelArg(kernelArg);
 
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

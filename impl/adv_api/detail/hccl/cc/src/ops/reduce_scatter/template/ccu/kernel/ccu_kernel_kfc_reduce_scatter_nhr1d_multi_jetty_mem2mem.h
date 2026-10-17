@@ -18,6 +18,8 @@
 
 namespace mc2_ops_hccl {
 
+// KFC 版 ReduceScatter NHR MultiJetty Mem2Mem kernel：算法逻辑与 hccl
+// CcuReduceScatterNhrMem2Mem1DMultiJettyKernel 逐行对照，参数由命名 Func 接收。
 CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl

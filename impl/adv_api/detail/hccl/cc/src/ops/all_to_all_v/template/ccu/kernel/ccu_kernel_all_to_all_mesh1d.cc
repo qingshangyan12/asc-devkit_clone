@@ -50,20 +50,22 @@ static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
     return CCU_SUCCESS;
 }
 
-static CcuResult LoadArgs(AlltoAllMesh1DContext& ctx, ccu::Array<ccu::Variable>& args)
+static CcuResult LoadArgs(
+    AlltoAllMesh1DContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4)
 {
-    uint32_t argId = 0;
-    ctx.input[ctx.rankId] = args[argId++];
-    ctx.output[ctx.rankId] = args[argId++];
-    ctx.token[ctx.rankId] = args[argId++];
-    ctx.sliceSize = args[argId++];
-    ctx.srcStride = args[argId++];
-    ctx.srcOffset = args[argId++];
-    ctx.dstOffset = args[argId++];
-    ctx.goSize.addrOffset = args[argId++];
-    ctx.goSize.loopParam = args[argId++];
-    ctx.goSize.parallelParam = args[argId++];
-    ctx.goSize.residual = args[argId++];
+    ctx.input[ctx.rankId] = inputAddr;
+    ctx.output[ctx.rankId] = outputAddr;
+    ctx.token[ctx.rankId] = tokenInfo;
+    ctx.sliceSize = sliceSize;
+    ctx.srcStride = srcStride;
+    ctx.srcOffset = srcOffset;
+    ctx.dstOffset = dstOffset;
+    ctx.goSize.addrOffset = goSize1;
+    ctx.goSize.loopParam = goSize2;
+    ctx.goSize.parallelParam = goSize3;
+    ctx.goSize.residual = goSize4;
     ctx.srcOffset += ctx.input[ctx.rankId];
     return CCU_SUCCESS;
 }
@@ -155,6 +157,9 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
     return CCU_SUCCESS;
 }
 
+// ============================================================================
+// 主入口 Kernel 函数
+// ============================================================================
 CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
 {
     const auto* kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(arg);
@@ -165,13 +170,16 @@ CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
     ctx.rankId = kernelArg->rankId;
     ctx.loadFromMem = kernelArg->loadFromMem;
     InitCcuKernelCtxBase(ctx);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func func(
         [&ctx](ccu::Array<ccu::Variable>& args) {
-            LoadArgs(ctx, args);
+            LoadArgs(ctx, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8],
+                args[9], args[10]);
             PreSync(ctx);
             DoAlltoAll(ctx);
             PostSync(ctx);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_NAME);
     return CCU_SUCCESS;

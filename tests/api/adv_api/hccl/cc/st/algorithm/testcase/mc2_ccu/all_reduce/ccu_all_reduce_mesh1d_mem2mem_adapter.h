@@ -19,6 +19,17 @@
 namespace HcclSim {
 namespace CcuSt {
 
+constexpr uint32_t ALL_REDUCE_TASK_ARG_COUNT = 26;
+
+struct AllReduceKernelConfig {
+    uint32_t rankId{0};
+    uint32_t rankSize{0};
+    HcclDataType dataType{HCCL_DATA_TYPE_FP16};
+    HcclDataType outputType{HCCL_DATA_TYPE_RESERVED};
+    HcclReduceOp reduceOp{HCCL_REDUCE_SUM};
+    std::vector<ChannelHandle> channels;
+};
+
 struct AllReduceLaunchConfig {
     uint64_t inputAddress{0};
     uint64_t outputAddress{0};

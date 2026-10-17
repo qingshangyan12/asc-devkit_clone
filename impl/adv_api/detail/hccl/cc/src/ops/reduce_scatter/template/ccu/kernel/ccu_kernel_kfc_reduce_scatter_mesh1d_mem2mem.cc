@@ -428,12 +428,22 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
     ctx.reduceOp = kernelArg->opParam.reduceType;
     ctx.loadSoleArgs = kernelArg->opParam.algName == nullptr ||
                        std::strcmp(kernelArg->opParam.algName, KFC_CONCURRENT_REDUCE_SCATTER_ALG_NAME) != 0;
+    HCCL_INFO(
+        "[CcuKernelReduceScatterMesh1DMem2Mem] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
+        "outputDataType[%d], reduceOp[%d]",
+        ctx.rankId, ctx.rankSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp);
+
     ctx.resourceAllocated = false;
+    ctx.moConfig.msInterleave = 0;
+    ctx.moConfig.loopCount = 0;
+    ctx.moConfig.memSlice = 0;
+    ctx.moRes.eventCount = 0;
+    ctx.moRes.bufCount = 0;
     ctx.moConfig.msInterleave = CCU_MS_INTERLEAVE;
     ctx.moConfig.loopCount = CCU_LOOP_COUNT_M2M_RE;
     ctx.moConfig.memSlice = CCU_MS_SIZE;
-    ctx.moRes.eventCount = 0;
-    ctx.moRes.bufCount = 0;
+
+    HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func func(
         [&ctx](ccu::Array<ccu::Variable>& args) {
@@ -441,6 +451,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
             PreSync(ctx);
             DoRepeatReduceScatter(ctx);
             PostSync(ctx);
+            HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_REDUCE_SCATTER_MESH1D_MEM2MEM_NAME);
     return CCU_SUCCESS;

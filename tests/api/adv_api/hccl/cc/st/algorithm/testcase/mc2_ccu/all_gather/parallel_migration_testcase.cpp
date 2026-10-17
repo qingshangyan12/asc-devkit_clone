@@ -173,6 +173,7 @@ protected:
             arg.role =
                 mesh ? mc2_ops_hccl::KfcServerRole::ALL_GATHER_MESH : mc2_ops_hccl::KfcServerRole::ALL_GATHER_NHR;
             arg.missionIndex = mission;
+            mc2_ops_hccl::InitKfcSubKernelArgLayout(arg);
             parallel->rankSizeLevel0 = meshSize;
             parallel->rankIdxLevel0 = m;
             parallel->rankSizeLevel1 = nhrSize;

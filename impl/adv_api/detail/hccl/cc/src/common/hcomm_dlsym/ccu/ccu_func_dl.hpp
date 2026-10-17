@@ -29,6 +29,7 @@ namespace ccu {
 
 namespace internal {
 
+// ---- LambdaTraits：只支持非泛型 lambda / 普通成员函数指针 operator() ----
 template <typename T>
 struct FunctorTraits : FunctorTraits<decltype(&T::operator())> {};
 
@@ -65,7 +66,8 @@ inline std::function<void(Variable*)> MakeBody(Lambda body)
 
 class Func {
 public:
-    // 匿名 func：从 lambda 推导形参个数 N，形参全部为 ccu::Variable，只能被 ccu::CallFunc<Obj> 直接调用。
+    // ctor：从 lambda 推导形参个数 N，类型擦除到 body_。
+    // 要求 lambda 返回 void、形参全部为 ccu::Variable（运行期由 kernel 校验形参数量）。
     template <typename Lambda>
     explicit Func(Lambda body)
         : numIn_(internal::FunctorTraits<Lambda>::Arity),
@@ -83,7 +85,7 @@ public:
     //   1) 只能在 kernel 函数体内声明（声明点即绑定点，kernel 外没有可绑定的 kernel）；
     //   2) 被 lambda 捕获的资源必须在声明之前准备好，因为函数体就在构造时执行。
     // 构造函数无法回传错误码，失败走 CCU_THROW_IF_FAILED 抛出，由 kernel 注册路径的异常处理转成
-    // 注册失败（与 DefineFuncImpl 同一套机制）。
+    // 注册失败。
     template <typename Lambda>
     Func(Lambda body, uint32_t numIn, const char* name) : numIn_(numIn), usesArray_(true)
     {
@@ -118,46 +120,16 @@ public:
 
 private:
     uint32_t numIn_{0};
-    std::function<void(Variable*)> body_; // 仅匿名 func 使用；命名 func 在构造时就跑完了 body
+    std::function<void(Variable*)> body_;
     bool usesArray_{false};
 };
-
-namespace internal {
-
-// 匿名 func 的惰性合成：按 ccu::Func 对象地址在当前 kernel 内查重，已合成过就直接复用。
-// 只被 CallFunc<Obj> 调用 —— 匿名 func 没有名字、查不到 pc，除了同 kernel 内的 CallFunc<Obj>
-// 没有别的途径能调到它，所以不存在"只声明不调用"的合理用法，无需对外暴露。
-// 命名 func 不走这里，它在构造时已经把自己录进当前 kernel。
-inline CcuResult DefineFuncImpl(Func& obj)
-{
-    uint64_t handle = 0;
-    CCU_THROW_IF_FAILED(::CcuFuncBlockLookup(obj.Key(), &handle), "DefineFuncImpl: CcuFuncBlockLookup failed");
-    if (handle != 0) {
-        return CcuResult::CCU_SUCCESS;
-    }
-
-    // 第一次进入：合成 FuncBlock
-    CCU_THROW_IF_FAILED(::CcuFuncBlockBegin(obj.Key(), &handle), "DefineFuncImpl: CcuFuncBlockBegin failed");
-
-    std::vector<Variable> formals(obj.NumIn());
-    for (uint32_t i = 0; i < obj.NumIn(); i++) {
-        CCU_THROW_IF_FAILED(::CcuVariableAlloc(&formals[i].handle), "DefineFuncImpl: CcuVariableAlloc failed");
-        CCU_THROW_IF_FAILED(
-            ::CcuFuncDefineInArg(handle, formals[i].handle), "DefineFuncImpl: CcuFuncDefineInArg failed");
-    }
-    obj.RunBody(formals.empty() ? nullptr : formals.data());
-
-    return ::CcuFuncBlockEnd(handle);
-}
-
-} // namespace internal
 
 // ccu::CallFunc：global / static ccu::Func 引用 NTTP（C++14 合法）。
 // 用法：static ccu::Func MyAdd(lambda); ... ccu::CallFunc<MyAdd>(x, y);
 template <Func& Obj, typename... Args>
 inline CcuResult CallFunc(Args... args)
 {
-    // 命名 func 的形参绑定在跨 kernel 共用的传参寄存器上，只能按 pc 间接调用
+    // 命名 func 只能按 pc 跨 kernel 调用。
     if (Obj.UsesArrayArg()) {
         return CcuResult::CCU_E_NOT_SUPPORT;
     }
@@ -166,10 +138,24 @@ inline CcuResult CallFunc(Args... args)
         return CcuResult::CCU_E_PARA;
     }
 
-    CCU_THROW_IF_FAILED(internal::DefineFuncImpl(Obj), "CallFunc: DefineFuncImpl failed");
-
     uint64_t handle = 0;
     CCU_THROW_IF_FAILED(::CcuFuncBlockLookup(Obj.Key(), &handle), "CallFunc: CcuFuncBlockLookup failed");
+    if (handle == 0) {
+        // 第一次进入：合成 FuncBlock
+        CCU_THROW_IF_FAILED(::CcuFuncBlockBegin(Obj.Key(), &handle), "CallFunc: CcuFuncBlockBegin failed");
+
+        // 形参：按 lambda 形参个数 alloc，并注册为 FuncBlock 的 in args
+        std::vector<Variable> formals(Obj.NumIn());
+        for (uint32_t i = 0; i < Obj.NumIn(); i++) {
+            CCU_THROW_IF_FAILED(::CcuVariableAlloc(&formals[i].handle), "CallFunc: CcuVariableAlloc failed");
+            CCU_THROW_IF_FAILED(::CcuFuncDefineInArg(handle, formals[i].handle), "CallFunc: CcuFuncDefineInArg failed");
+        }
+
+        // 执行 lambda（在合成模式下 emit 到 FuncBlock）
+        Obj.RunBody(formals.empty() ? nullptr : formals.data());
+
+        CCU_THROW_IF_FAILED(::CcuFuncBlockEnd(handle), "CallFunc: CcuFuncBlockEnd failed");
+    }
 
     // emit 一条 FuncCall 跳转
     std::vector< ::CcuVariableHandle> actuals(kArgN);
@@ -194,6 +180,20 @@ inline CcuResult CallFunc(const Variable& funcPc, Array<Variable>& args)
     std::vector< ::CcuVariableHandle> actuals(args.size());
     for (uint32_t i = 0; i < args.size(); i++) {
         actuals[i] = args[i].handle;
+    }
+    return ::CcuFuncCallByAddr(funcPc.handle, actuals.empty() ? nullptr : actuals.data(), args.size());
+}
+
+// Use existing variable handles in host-selected order; the sources need not form an Array.
+inline CcuResult CallFunc(const Variable& funcPc, const std::vector<Variable>& args)
+{
+    if (args.size() > CCU_FUNC_TASK_ARG_MAX) {
+        return CcuResult::CCU_E_PARA;
+    }
+    std::vector< ::CcuVariableHandle> actuals;
+    actuals.reserve(args.size());
+    for (const auto& arg : args) {
+        actuals.push_back(arg.handle);
     }
     return ::CcuFuncCallByAddr(funcPc.handle, actuals.empty() ? nullptr : actuals.data(), args.size());
 }

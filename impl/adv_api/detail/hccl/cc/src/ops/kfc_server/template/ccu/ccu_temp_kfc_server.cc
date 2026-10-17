@@ -11,14 +11,66 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "alg_data_trans_wrapper.h"
-#include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
-#include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
+#include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
 #include "ccu_launch_dl.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
-static HcclResult InheritKfcServerKernelArg(
+void InitKfcSubKernelArgLayout(CcuKernelArgKfcServer& arg)
+{
+    static_assert(CCU_FUNC_TASK_ARG_MAX == CCU_PARAM_NUM_PER_DIE, "KFC Func ABI must match queue parameters");
+    arg.subKernelEmitsEarlyTurnEnd =
+        arg.opType == HcclCMDType::HCCL_CMD_ALLGATHER && arg.role == KfcServerRole::ALL_GATHER_SOLE_NHR;
+    arg.subKernelArgSources.clear();
+    arg.subKernelArgSources.reserve(CCU_FUNC_TASK_ARG_MAX);
+    for (uint32_t i = 0; i < CCU_FUNC_TASK_ARG_MAX; ++i) {
+        arg.subKernelArgSources.push_back({KfcSubKernelArgKind::QUEUE, i});
+    }
+    if (arg.subKernelEmitsEarlyTurnEnd) {
+        // SoleNHR AG keeps queue [0..12], then receives the server token and current WAIT-slot address.
+        arg.subKernelArgSources[KFC_AG_SOLE_NHR_FUNC_TOKEN_INDEX] = {KfcSubKernelArgKind::TOKEN, 0};
+        arg.subKernelArgSources[KFC_AG_SOLE_NHR_FUNC_TURN_END_INDEX] = {KfcSubKernelArgKind::TURN_END, 0};
+    } else {
+        arg.subKernelArgSources[0] = {KfcSubKernelArgKind::QUEUE, 1};
+        arg.subKernelArgSources[1] = {KfcSubKernelArgKind::QUEUE, 2};
+        arg.subKernelArgSources[2] = {KfcSubKernelArgKind::TOKEN, 0};
+    }
+}
+
+CcuResult CallKfcSubKernel(
+    ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, const ccu::Variable& turnEndAddr)
+{
+    if (ctx.arg->subKernelArgSources.size() != CCU_FUNC_TASK_ARG_MAX) {
+        return CCU_E_PARA;
+    }
+    std::vector<ccu::Variable> args;
+    args.reserve(ctx.arg->subKernelArgSources.size());
+    for (const auto& source : ctx.arg->subKernelArgSources) {
+        // Copy construction shares the source handle and emits no CCU variable assignment.
+        switch (source.kind) {
+            case KfcSubKernelArgKind::QUEUE:
+                if (source.queueIndex >= param.size()) {
+                    return CCU_E_PARA;
+                }
+                args.emplace_back(param[source.queueIndex]);
+                break;
+            case KfcSubKernelArgKind::TOKEN:
+                args.emplace_back(ctx.token);
+                break;
+            case KfcSubKernelArgKind::TURN_END:
+                args.emplace_back(turnEndAddr);
+                break;
+            default:
+                return CCU_E_PARA;
+        }
+    }
+    return ccu::CallFunc(ctx.subKernelPc, args);
+}
+
+// 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
+HcclResult InheritKfcServerKernelArg(
     const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, KfcServerRole role,
     uint32_t missionIndex)
 {
@@ -29,6 +81,7 @@ static HcclResult InheritKfcServerKernelArg(
     kfcArg->opType = param.opType;
     kfcArg->role = role;
     kfcArg->missionIndex = missionIndex;
+    InitKfcSubKernelArgLayout(*kfcArg);
     kfcArg->algSubType = srcArg->algSubType;
     kfcArg->algArg = srcArg->algArg;
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
@@ -36,33 +89,8 @@ static HcclResult InheritKfcServerKernelArg(
             kfcArg->algSubType != KFC_PARALLEL_ALL_GATHER_SUB_TYPE || !kfcArg->algArg,
             HCCL_ERROR("[ParallelAllGather] missing algorithm arguments"), HCCL_E_PARA);
     }
-    if (IsKfcInlineSubKernel(*kfcArg)) {
-        dstKernel.subKernelArg = nullptr;
-        dstKernel.subKernelFunc = nullptr;
-        dstKernel.subKernelFuncName[0] = '\0';
-        if (role == KfcServerRole::ALL_GATHER_SOLE_NHR) {
-            const auto* arg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMem2Mem*>(srcKernel.kernelArg);
-            kfcArg->rankSize = arg->rankSize;
-            kfcArg->rankId = arg->rankId;
-            kfcArg->axisId = arg->axisId;
-            kfcArg->axisSize = arg->axisSize;
-            kfcArg->opParam = arg->opParam;
-            kfcArg->nhrStepInfoVector = arg->stepInfoVector;
-            kfcArg->nhrRank2ChannelIdx = arg->rank2ChannelIdx;
-        } else {
-            const auto* arg = static_cast<const CcuKernelArgKfcReduceScatterNHR1D2Die*>(srcKernel.kernelArg);
-            kfcArg->rankSize = arg->rankSize;
-            kfcArg->rankId = arg->rankId;
-            kfcArg->axisId = arg->axisId;
-            kfcArg->axisSize = arg->axisSize;
-            kfcArg->opParam = arg->opParam;
-            kfcArg->nhrStepInfoVector = arg->stepInfoVector;
-            kfcArg->nhrRank2ChannelIdx = arg->rank2ChannelIdx;
-        }
-    } else {
-        CHK_PTR_NULL(srcKernel.kernelFunc);
-        dstKernel.setSubKernelFromKernel();
-    }
+    CHK_PTR_NULL(srcKernel.kernelFunc);
+    dstKernel.setSubKernelFromKernel();
     dstKernel.setKernelArg(kfcArg);
     CHK_SAFETY_FUNC_RET(strcpy_s(dstKernel.kernelFuncName, sizeof(dstKernel.kernelFuncName), "CcuKernelKfcServer"));
     dstKernel.kernelFunc = reinterpret_cast<void*>(CcuKfcServerKernel);

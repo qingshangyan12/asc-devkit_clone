@@ -9,22 +9,8 @@
  */
 
 #include "ccu_kernel_alg_base.h"
-#include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
-#include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
-#include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
-#include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
-#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
-#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
-#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.h"
-#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
-#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
-#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
-#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
-#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
-#include "ccu_func_dl.hpp"
 #include "mc2_type.h"
 #include "hccl_alloc_ctx_res.h"
 
@@ -183,72 +169,6 @@ CcuResult LoadFuncParamFromMemory(
     return CCU_SUCCESS;
 }
 
-static CcuResult CallKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
-{
-    static_assert(CCU_FUNC_TASK_ARG_MAX == CCU_PARAM_NUM_PER_DIE, "KFC Func ABI must match queue parameters");
-    ccu::Array<ccu::Variable> args(CCU_FUNC_TASK_ARG_MAX);
-    args[0] = param[HBM_PARAM_IDX_1];
-    args[1] = param[HBM_PARAM_IDX_2];
-    args[2] = ctx.token;
-    for (uint32_t i = HBM_PARAM_IDX_3; i < CCU_FUNC_TASK_ARG_MAX; ++i) {
-        args[i] = param[i];
-    }
-    return ccu::CallFunc(ctx.subKernelPc, args);
-}
-
-// SoleNHR AG emits turn-end before PostSync; each die writes its own WAIT slot.
-static bool KernelEmitsEarlyTurnEnd(const KfcServerContext& ctx)
-{
-    return ctx.arg->opType == HcclCMDType::HCCL_CMD_ALLGATHER &&
-           ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR;
-}
-
-static CcuResult DispatchKfcSubKernel(
-    ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, const ccu::Variable& turnEndAddr)
-{
-    if (KernelEmitsEarlyTurnEnd(ctx)) {
-        // SoleNHR（CcuSchedAllGatherSoleNHR）单帧布局见 KfcAllGatherSoleNhrParamIndex
-        // （D4：13 槽，[0]=INPUT 兼作哨兵，常量参数 kernel 内联，双 die 参数 die1Size/GO_D1，
-        //  goSize 组按 kernelArg.axisId 选档；token 由 server ctx 注入；turnEndAddr 由
-        //  server 传入，kernel 末步同步后、PostSync 前写 turn-end——D3）。
-        const uint32_t goSizeBase =
-            (ctx.arg->axisId == 0U) ? KFC_AG_SOLE_NHR_GO_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_D1_SIZE_0;
-        CcuKernelKfcAllGatherNHR1DMem2MemKernel(
-            param[KFC_AG_SOLE_NHR_INPUT], param[KFC_AG_SOLE_NHR_OUTPUT], ctx.token,
-            param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_DIE1_SIZE],
-            param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[goSizeBase], param[goSizeBase + 1U],
-            param[goSizeBase + 2U], param[goSizeBase + 3U], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->axisId, ctx.arg->nhrStepInfoVector,
-            ctx.arg->nhrRank2ChannelIdx, turnEndAddr);
-    } else if (IsKfcInlineSubKernel(*ctx.arg)) {
-        // SoleNHR 2Die 单帧布局见 KfcReduceScatterSoleNhr2DieParamIndex（[0]=opId，[1..20] 共 20 参数，
-        // token 走 ctx.token）；双 die 两 mission 共享区间，axisId/axisSize 来自 kernelArg 区分实例。
-        CcuKfcReduceScatterNHR1D2DieMem2MemKernel(
-            param[KFC_RS_SOLE_NHR_2DIE_INPUT], param[KFC_RS_SOLE_NHR_2DIE_OUTPUT], ctx.token,
-            param[KFC_RS_SOLE_NHR_2DIE_DIE0_SIZE], param[KFC_RS_SOLE_NHR_2DIE_DIE1_SIZE],
-            param[KFC_RS_SOLE_NHR_2DIE_DIE0_LAST_SLICE_SIZE], param[KFC_RS_SOLE_NHR_2DIE_DIE1_LAST_SLICE_SIZE],
-            param[KFC_RS_SOLE_NHR_2DIE_INPUT_SLICE_STRIDE],
-            param[KFC_RS_SOLE_NHR_2DIE_CURRENT_RANK_SLICE_OUTPUT_OFFSET],
-            param[KFC_RS_SOLE_NHR_2DIE_INPUT_REPEAT_STRIDE], param[KFC_RS_SOLE_NHR_2DIE_OUTPUT_REPEAT_STRIDE],
-            param[KFC_RS_SOLE_NHR_2DIE_REPEAT_NUM_VAR], param[KFC_RS_SOLE_NHR_2DIE_IS_INPUT_OUTPUT_EQUAL],
-            param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_0], param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_1],
-            param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_2], param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_3],
-            param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_0], param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_1],
-            param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_2], param[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_3],
-            param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_0], param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_1],
-            param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_2], param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_3],
-            param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_0], param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_1],
-            param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_2], param[KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_3],
-            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
-            ctx.arg->axisId, ctx.arg->axisSize, ctx.arg->opParam.DataDes.dataType,
-            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType, ctx.arg->nhrStepInfoVector,
-            ctx.arg->nhrRank2ChannelIdx);
-    } else {
-        return CallKfcSubKernel(param, ctx);
-    }
-    return CCU_SUCCESS;
-}
-
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
@@ -291,11 +211,11 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            CCU_CHK_RET(DispatchKfcSubKernel(param, ctx, recordAddr));
+            CCU_CHK_RET(CallKfcSubKernel(param, ctx, recordAddr));
             MissionPostSync(ctx);
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
-            if (!KernelEmitsEarlyTurnEnd(ctx)) {
+            if (!ctx.arg->subKernelEmitsEarlyTurnEnd) {
                 CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
             }
         }
@@ -334,7 +254,7 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
-            CCU_CHK_RET(DispatchKfcSubKernel(param, ctx, ctx.recordAddr));
+            CCU_CHK_RET(CallKfcSubKernel(param, ctx, ctx.recordAddr));
         }
         MissionPostSync(ctx);
     }
