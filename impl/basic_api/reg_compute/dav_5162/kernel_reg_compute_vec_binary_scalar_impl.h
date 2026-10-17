@@ -75,10 +75,13 @@ __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t,
+            complex32, complex64>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
+        SupportType<
+            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t,
+            complex32, complex64>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
@@ -89,6 +92,24 @@ __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
             AddsComplexTraitTwoImpl(dstReg, srcReg, scalarValue, mask);
         } else {
             AddsComplexTraitOneImpl(dstReg, srcReg, scalarValue, mask);
+        }
+    } else if constexpr (sizeof(ActualT) == 8) {
+        if constexpr (SupportType<ActualT, complex64>()) {
+            if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
+                AddsComplexTraitTwoImpl(dstReg, srcReg, scalarValue, mask);
+            } else {
+                MaskReg maskTrait2;
+                MaskPack(maskTrait2, mask);
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+                B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
+                AddsComplexTraitTwoImpl(traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
+                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
+            }
+        } else {
+            S srcReg1;
+            Duplicate(srcReg1, scalarValue, mask);
+            Add(dstReg, srcReg, srcReg1, mask);
         }
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
@@ -130,30 +151,52 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
+        SupportType<
+            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t, complex32, complex64>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<U, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
+        SupportType<U, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t, complex32, complex64>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Muls api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    if constexpr (SupportType<ActualT, complex32>()) {
-        if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(dstReg, srcReg, scalarValue, mask);
+    if constexpr (sizeof(ActualT) != 8) {
+        if constexpr (SupportType<ActualT, complex32>()) {
+            if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
+                MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(dstReg, srcReg, scalarValue, mask);
+            } else {
+                MaskReg maskTrait2;
+                MaskPack(maskTrait2, mask);
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+                B32TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
+                MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(
+                    traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
+                B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
+            }
         } else {
-            MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B32TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-            MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(
-                traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
-            B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
+            vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
         }
     } else {
-        vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
+        if constexpr (SupportType<ActualT, complex64>()) {
+            if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
+                MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(dstReg, srcReg, scalarValue, mask);
+            } else {
+                MaskReg maskTrait2;
+                MaskPack(maskTrait2, mask);
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
+                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+                B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
+                MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(
+                    traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
+                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
+            }
+        } else {
+            S srcReg1;
+            Duplicate(srcReg1, scalarValue, mask);
+            Mul(dstReg, srcReg, srcReg1, mask);
+        }
     }
 }
 
@@ -163,16 +206,25 @@ __simd_callee__ inline void MaxsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t,
+            int64_t>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<
+            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Maxs api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vmaxs(dstReg, srcReg, scalarValue, mask, modeValue);
+    if constexpr (sizeof(ActualT) != 8) {
+        vmaxs(dstReg, srcReg, scalarValue, mask, modeValue);
+    } else {
+        S srcReg1;
+        Duplicate(srcReg1, scalarValue, mask);
+        Max(dstReg, srcReg, srcReg1, mask);
+    }
 }
 
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
@@ -181,10 +233,13 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t,
+            int64_t>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<
+            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
