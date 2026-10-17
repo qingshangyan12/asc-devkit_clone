@@ -126,9 +126,23 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 
     uint32_t channelId = 0;
     uint16_t allBit = static_cast<uint16_t>(((1U << ctx.rankSize) - 1) & (~(1U << ctx.rankId)));
-
-    if (ctx.loadFromMem) {
-        HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
+    // Ascend960(CCU_V2) 使用逐 rank 的 LocalCopy/Write；Ascend950(CCU_V1) 保持 GroupCopy 老逻辑。
+    const CcuVersion ccuVersion = GetCcuVersion();
+    const bool useGroupCopy = (ccuVersion == CcuVersion::CCU_V1);
+    if (useGroupCopy) {
+        HCCL_INFO(
+            "[DoAlltoAll] useGroupCopy, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize, ctx.rankId,
+            allBit);
+        for (uint64_t r = 0; r < ctx.rankSize; r++) {
+            if (r != ctx.rankId) {
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
+                channelId++;
+            }
+        }
+        GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, ccuVersion);
+        ccu::EventWait(ctx.event, allBit);
+    } else {
+        HCCL_INFO("[DoAlltoAll] skip GroupCopy, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r == ctx.rankId) {
                 ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1U << r);
@@ -138,18 +152,6 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
             }
         }
         ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
-    } else {
-        HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize, ctx.rankId,
-            allBit);
-        for (uint64_t r = 0; r < ctx.rankSize; r++) {
-            if (r != ctx.rankId) {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
-                channelId++;
-            }
-        }
-        GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, GetCcuVersion());
-        ccu::EventWait(ctx.event, allBit);
     }
 
     return CCU_SUCCESS;
