@@ -450,15 +450,6 @@ __aicore__ inline void LoadData2DGM2L1Cal(
     }
 }
 
-template <typename T, typename U>
-__aicore__ inline void LoadData2DGM2L1Cal(
-    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
-{
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "LoadData 2dv2 with Nd2NzParamsV2 is not supported on current device!");
-    });
-}
-
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)

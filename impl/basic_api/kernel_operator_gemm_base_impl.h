@@ -171,22 +171,11 @@ __aicore__ inline void LoadL0B(
     if (tiling.nIterNum == 1) {
         uint32_t wSize = tiling.blockSize * tiling.c0Size;
         uint32_t wIdx = (i * tiling.kTileBlock * tiling.nBlockNum + j * tiling.nTileBlock) * wSize;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-        LoadData2DParamsV2 params;
-        params.mStartPosition = 0;
-        params.kStartPosition = 0;
-        params.mStep = 1;
-        params.kStep = kBlocks * nBlocks;
-        params.srcStride = 1;
-        params.dstStride = 1;
-        LoadDataImpl(l0b, src1[wIdx], params);
-#else
         LoadData2DParams params;
         params.startIndex = 0;
         params.repeatTimes = kBlocks * nBlocks;
         params.srcStride = 1;
         LoadDataImpl(l0b, src1[wIdx], params);
-#endif
     } else {
         // load data row by row
         for (size_t index = 0; index < kBlocks; ++index) {
@@ -194,22 +183,11 @@ __aicore__ inline void LoadL0B(
             uint32_t wIdx =
                 (i * tiling.kTileBlock + index) * tiling.nBlockNum * tiling.blockSize * tiling.c0Size + wSize;
             uint32_t l0bIdx = index * nBlocks * tiling.blockSize * tiling.c0Size;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-            LoadData2DParamsV2 params;
-            params.mStartPosition = 0;
-            params.kStartPosition = 0;
-            params.mStep = 1;
-            params.kStep = nBlocks;
-            params.srcStride = 1;
-            params.dstStride = 1;
-            LoadDataImpl(l0b[l0bIdx], src1[wIdx], params);
-#else
             LoadData2DParams params;
             params.startIndex = 0;
             params.repeatTimes = nBlocks;
             params.srcStride = 1;
             LoadDataImpl(l0b[l0bIdx], src1[wIdx], params);
-#endif
         }
     }
 }
@@ -222,44 +200,22 @@ __aicore__ inline void LoadL0A(
     if (kBlocks == 1) {
         uint32_t l1aSize = i * tiling.kTileBlock * tiling.mBlockNum * tiling.blockSize * tiling.c0Size;
         uint32_t l1aOffset = t * tiling.mTileBlock * tiling.blockSize * tiling.c0Size + l1aSize;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-        LoadData2DParamsV2 params;
-        params.mStartPosition = 0;
-        params.kStartPosition = 0;
-        params.mStep = 1;
-        params.kStep = mBlocks;
-        params.srcStride = 1;
-        params.dstStride = 1;
-        LoadDataImpl(l0a, src0[l1aOffset], params);
-#else
         LoadData2DParams params;
         params.startIndex = 0;
         params.repeatTimes = mBlocks;
         params.srcStride = 1;
         LoadDataImpl(l0a, src0[l1aOffset], params);
-#endif
     } else {
         // load data row by row
         for (size_t index = 0; index < mBlocks; index++) {
             uint32_t l0aOffset = index * kBlocks * tiling.blockSize * tiling.c0Size;
             uint32_t l1aOffset = (t * tiling.mTileBlock + index) * tiling.blockSize * tiling.c0Size +
                                  i * tiling.kTileBlock * tiling.mBlockNum * tiling.blockSize * tiling.c0Size;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-            LoadData2DParamsV2 params;
-            params.mStartPosition = 0;
-            params.kStartPosition = 0;
-            params.mStep = 1;
-            params.kStep = kBlocks;
-            params.srcStride = tiling.mBlockNum;
-            params.dstStride = 1;
-            LoadDataImpl(l0a[l0aOffset], src0[l1aOffset], params);
-#else
             LoadData2DParams params;
             params.startIndex = 0;
             params.repeatTimes = kBlocks;
             params.srcStride = tiling.mBlockNum;
             LoadDataImpl(l0a[l0aOffset], src0[l1aOffset], params);
-#endif
         }
     }
 }

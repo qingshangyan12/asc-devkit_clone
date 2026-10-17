@@ -530,7 +530,6 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 {
     set_fmatrix_b(regFMatrix);
 }
-}
 
 template <typename T>
 __aicore__ inline void Load3DSetPaddingCal(const T padValue)
