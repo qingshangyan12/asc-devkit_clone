@@ -237,12 +237,64 @@ __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from ub to gm nd2nz on this version"); });
 }
 
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+{
+    const uint16_t ndNum = intriParams.ndNum;
+    const uint16_t nValue = intriParams.nValue;
+    const uint16_t dValue = intriParams.dValue;
+    const uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    const uint16_t srcDValue = intriParams.srcDValue;
+    const uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;
+    const uint16_t dstNzNStride = intriParams.dstNzNStride;
+    const uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride;
+    if (ndNum == 0 || nValue ==0 || dValue == 0) {
+        return;
+    }
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
+    }
+
+    ASCENDC_DEBUG_ASSERT(((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
+        "srcNdMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
+        "dstNzMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0), "dstNzC0Stride should be gereater than 0 \n");
+    ASCENDC_DEBUG_ASSERT((dstNzNStride > 0), "dstNzNStride should be gereater than 0 \n");
+
+    const uint32_t elementsPerBlock = ONE_BLK_SIZE / sizeof(T);
+    const uint32_t dTotalBytes = static_cast<uint32_t>(dValue * sizeof(T));
+    const uint32_t dBlockNum = (dTotalBytes + ONE_BLK_SIZE - 1) / ONE_BLK_SIZE;
+    if (dTotalBytes % ONE_BLK_SIZE != 0) {
+        set_pad_val_outtol1(GetScalarBitcodeValue(static_cast<T>(0)));
+    }
+
+    for (uint32_t ndIdx = 0; ndIdx < ndNum; ++ndIdx) {
+        __gm__ T* srcMatrix = src + static_cast<uint64_t>(ndIdx) * srcNdMatrixStride;
+        __cbuf__ T* dstMatrix = dst + static_cast<uint64_t>(ndIdx) * dstNzMatrixStride;
+        for (uint32_t blkIdx = 0; blkIdx < dBlockNum; ++blkIdx) {
+            uint32_t blockBytes = dTotalBytes - blkIdx * ONE_BLK_SIZE;
+            if (blockBytes > ONE_BLK_SIZE) {
+                blockBytes = ONE_BLK_SIZE;
+            }
+            const bool isTailBlock = blockBytes < ONE_BLK_SIZE;
+            const uint8_t tailPadCount = static_cast<uint8_t>((ONE_BLK_SIZE - blockBytes) / sizeof(T));
+            CopyGmToCbufAlignV2{
+                dstMatrix + static_cast<uint64_t>(blkIdx) * dstNzC0Stride * elementsPerBlock,
+                srcMatrix + blkIdx * elementsPerBlock, nValue, blockBytes, 0, tailPadCount, isTailBlock,
+                static_cast<uint32_t>(srcDValue * sizeof(T) - blockBytes), static_cast<uint32_t>(dstNzNStride - 1),
+                true};
+        }
+    }
+}
+
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB16(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
-    });
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ half* dst, __gm__ half* src, const Nd2NzParams& intriParams)
@@ -265,9 +317,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB32(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
-    });
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ float* dst, __gm__ float* src, const Nd2NzParams& intriParams)
@@ -290,9 +340,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB8(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
-    });
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ int8_t* dst, __gm__ int8_t* src, const Nd2NzParams& intriParams)
