@@ -30,14 +30,12 @@ struct A2AsingleSendRecvInfo {
 };
 
 struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
-    const CcuKernelArgAlltoAllVMesh1D* arg;
+    const ChannelHandle* channels;
+    uint32_t channelCount;
+    uint32_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem = false;
 
-    uint64_t rankSize{0};
-    uint32_t rankId{0};
-    HcclDataType dataType;
-    HcclDataType outputDataType;
-    ccu::Variable repeatNum;
-    std::vector<ChannelHandle> channels;
     std::vector<ccu::Variable> input;
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
@@ -61,7 +59,6 @@ struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
     ccu::Event event;
     ccu::Variable flag; // 用以判断是否是第一次重复
     ccu::Variable xnConst1;
-    bool loadFromMem = false;
 };
 
 CcuResult CcuAlltoAllVMesh1DKernel(
