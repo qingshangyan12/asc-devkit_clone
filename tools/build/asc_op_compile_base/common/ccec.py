@@ -113,6 +113,7 @@ def check_is_regbase_v2():
     from .platform.platform_info import KIRIN_DEV_0001
     from .platform.platform_info import KIRIN_DEV_0002
     from .platform.platform_info import KIRIN_DEV_0003
+    from .platform.platform_info import KIRIN_9020
 
     if get_soc_spec("SHORT_SOC_VERSION") in [
         ASCEND_031,

@@ -30,6 +30,7 @@ SOC_MAP_EXT = {
     "ascend610lite": "Ascend610Lite",
     "ascend950": "Ascend950PR_9599",
     "kirinx90": "KirinX90",
+    "kirin9020": "Kirin9020",
     "kirin9030": "Kirin9030",
     "kirin9050": "Kirin9050",
     "kirindev0001": "KirinDev0001",
