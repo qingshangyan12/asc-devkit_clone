@@ -88,7 +88,7 @@ public:
             } else {
                 copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, src_shape_col_b,
                                                                     block_len, 0, 0, src.engine().get_cache_mode(),
-                                                                    src_stride, dst_stride);
+                                                                    src_stride, dst_stride, trait.pre_allocation);
             }
         }
     }
@@ -108,17 +108,18 @@ private:
         if constexpr (SrcTensor::layout_type::depth == five_dim_data) {
             auto src_layout = src.layout();
             auto dst_layout = dst.layout();
-            emit_copy(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), get<0>(src_layout.shape()),
-                      get<0>(src_layout.stride()), get<0>(dst_layout.stride()));
+            emit_copy<trait>(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout),
+                             get<0>(src_layout.shape()), get<0>(src_layout.stride()), get<0>(dst_layout.stride()));
         } else {
-            emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
+            emit_copy<trait>(dst, src, src.layout(), dst.layout(), 1, 0, 0);
         }
     }
 
-    template <typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout,
+              typename DstLayout>
     __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t batch_num, uint64_t src_batch_stride,
-                                            uint64_t dst_batch_stride)
+                                            const DstLayout& dst_layout, uint16_t batch_num,
+                                            uint64_t src_batch_stride, uint64_t dst_batch_stride)
     {
         using type = typename SrcTensor::element_type;
 
@@ -145,7 +146,8 @@ private:
             copy_gm_to_l1_align_v2_instr::data_copy(
                 reinterpret_cast<__cbuf__ half*>((dst.data() + batch_index * dst_batch_stride).get()),
                 reinterpret_cast<__gm__ half*>((src.data() + batch_index * src_batch_stride).get()), block_count,
-                block_len, left_padding_cnt, right_padding_cnt, cache_mode, src_stride, dst_stride);
+                block_len, left_padding_cnt, right_padding_cnt, cache_mode, src_stride, dst_stride,
+                trait.pre_allocation);
         }
     }
 };

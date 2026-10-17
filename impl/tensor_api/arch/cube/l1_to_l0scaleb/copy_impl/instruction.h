@@ -43,7 +43,8 @@ public:
                                             uint16_t k_start_position, uint8_t m_step, uint8_t k_step,
                                             int16_t src_stride, uint16_t dst_stride)
     {
-        asc_copy_l12l0b_mx(mx_dst_addr, src, m_start_position, k_start_position, m_step, k_step, src_stride,
+        auto raw_src = reinterpret_cast<__cbuf__ fp8_e8m0_t*>(src);
+        asc_copy_l12l0b_mx(mx_dst_addr, raw_src, m_start_position, k_start_position, m_step, k_step, src_stride,
                            dst_stride);
     }
 };

@@ -8873,12 +8873,15 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 }
 
 // ========== asc_set_gm2ub_pad ==========
+// asc_set_gm2ub_pad relies on the A5(3510) specific intrinsic set_pad_val_outtoub and is not available on A6(9201).
+#if !defined(__NPU_ARCH__) || __NPU_ARCH__ != 9201
 [[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
              "Please use asc_set_copy_pad_val instead for pad value setting")]] __aicore__ inline void
 asc_set_gm2ub_pad(uint32_t pad_val)
 {
     asc_set_gm2ub_pad_impl(pad_val);
 }
+#endif
 
 #endif
 

@@ -30,6 +30,10 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h"
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_compute_impl.h"
+
 #endif
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);

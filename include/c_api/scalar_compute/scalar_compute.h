@@ -25,6 +25,9 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/scalar_compute_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+// A6(9201) reuses the arch-common scalar compute implementations provided for A5(3510).
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
 __aicore__ inline int64_t asc_sflbits(int64_t value);

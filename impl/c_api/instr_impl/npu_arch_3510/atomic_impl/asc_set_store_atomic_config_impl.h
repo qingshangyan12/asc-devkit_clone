@@ -23,6 +23,8 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
+// set_st_atomic_cfg is an A5(3510) specific intrinsic and is not available on A6(9201).
+#if !defined(__NPU_ARCH__) || __NPU_ARCH__ != 9201
 __aicore__ inline void asc_set_store_atomic_config_v2_impl(uint16_t type, uint16_t op)
 {
     constexpr uint64_t type_mask = 0x15;
@@ -31,6 +33,7 @@ __aicore__ inline void asc_set_store_atomic_config_v2_impl(uint16_t type, uint16
     uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
     set_st_atomic_cfg(config);
 }
+#endif
 
 #endif
 
