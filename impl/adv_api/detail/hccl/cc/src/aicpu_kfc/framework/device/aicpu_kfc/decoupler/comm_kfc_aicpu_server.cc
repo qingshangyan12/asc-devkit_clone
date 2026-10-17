@@ -29,19 +29,9 @@
 
 using namespace HcclApi;
 namespace {
-static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL};
-
-#define MC2_TIMEOUT_LOG(isHardTimeout, format, ...) \
-    do {                                            \
-        if (isHardTimeout) {                        \
-            HCCL_ERROR(format, ##__VA_ARGS__);      \
-        } else {                                    \
-            HCCL_RUN_INFO(format, ##__VA_ARGS__);   \
-        }                                           \
-    } while (0)
 
 #ifndef MC2_SERVER_ONLY
 hccl::HcclCommAicpu* FindCommAicpuByName(const std::string& commName)
@@ -927,18 +917,15 @@ HcclResult CommKfcAicpuServer::CheckTimeOut(u32 msgPos)
     if (!IsTimeout()) {
         return HCCL_SUCCESS;
     }
-    const bool error = (timeout_ >= TIMEOUT_ERROR_THRESHOLD);
-    DumpTimeoutDfx(msgPos, error);
-    HcclResult ret;
-    if (error) {
-        HCCL_ERROR("Group %u: timeout %u seconds at message pos %u.", groupIdx_, timeout_, msgPos);
-        ret = HCCL_E_TIMEOUT;
-    } else {
-        HCCL_RUN_INFO("Group %u: timeout %u seconds at message pos %u.", groupIdx_, timeout_, msgPos);
-        ret = HCCL_E_AGAIN;
-    }
-    timeout_ *= 2U;
-    return ret;
+    DumpTimeoutDfx(msgPos);
+    AicpuKfcUtils::PrintAllHcclMsgArea(msgArea_, rankNum_, false);
+    HCCL_RUN_INFO(
+        "Group %u: timeout %llu seconds at message pos %u, continue waiting.", groupIdx_,
+        static_cast<unsigned long long>(timeout_), msgPos);
+    // Timeout is diagnostic only; saturate the backoff to avoid wrapping during an indefinite wait.
+    timeout_ = timeout_ <= std::numeric_limits<u64>::max() / 2U ?
+                   timeout_ * 2U : std::numeric_limits<u64>::max();
+    return HCCL_SUCCESS;
 }
 
 void CommKfcAicpuServer::UpdateProgress(
@@ -953,7 +940,7 @@ void CommKfcAicpuServer::UpdateProgress(
     lastProgress_.recordAddr = recordAddr;
 }
 
-void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
+void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos) const
 {
     const u32 commitCnt = (msgArea_ != nullptr && msgPos < HCCL_MSG_CNT) ?
                               msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt :
@@ -961,15 +948,12 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
     const u32 finishedCnt = (msgArea_ != nullptr && msgPos < HCCL_MSG_CNT) ?
                                 msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt :
                                 INVALID_UINT;
-    MC2_TIMEOUT_LOG(
-        isHardTimeout,
-        "[MC2_OPEN_TIMEOUT][Summary] group %u, msgPos %u, timeout %llu, threshold %llu, rankNum %u, "
+    HCCL_RUN_INFO(
+        "[MC2_OPEN_TIMEOUT][Summary] group %u, msgPos %u, timeout %llu, rankNum %u, "
         "msgArea %p, turnNumsAddr %#llx, commitCnt %u, finishedCnt %u.",
-        groupIdx_, msgPos, static_cast<unsigned long long>(timeout_),
-        static_cast<unsigned long long>(TIMEOUT_ERROR_THRESHOLD), rankNum_, msgArea_,
+        groupIdx_, msgPos, static_cast<unsigned long long>(timeout_), rankNum_, msgArea_,
         static_cast<unsigned long long>(turnNumsAddr_), commitCnt, finishedCnt);
-    MC2_TIMEOUT_LOG(
-        isHardTimeout,
+    HCCL_RUN_INFO(
         "[MC2_OPEN_TIMEOUT][Progress] group %u, stage[%s], progressMsgPos %u, repeatIdx %u, turnIdx %u, "
         "opParamKey %#llx, waitAddr %#llx, recordAddr %#llx.",
         groupIdx_, lastProgress_.stage, lastProgress_.msgPos, lastProgress_.repeatIdx, lastProgress_.turnIdx,
@@ -978,8 +962,7 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
         static_cast<unsigned long long>(lastProgress_.recordAddr));
 
     for (const auto& execCtx : execCtxList_) {
-        MC2_TIMEOUT_LOG(
-            isHardTimeout,
+        HCCL_RUN_INFO(
             "[MC2_OPEN_TIMEOUT][ExecCtx] group %u, commName[%s], opParamKey %#llx, resourceType %u, "
             "mainThread %#llx, mainStream %p, dispatcher %p.",
             groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
@@ -991,26 +974,33 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
 
         auto* thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
         if (thread == nullptr) {
-            MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
+            HCCL_RUN_INFO(
+                "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
                 execCtx.commName.c_str());
             continue;
         }
 
         auto* streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
         if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
-            MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.",
+            HCCL_RUN_INFO(
+                "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.",
                 groupIdx_, execCtx.commName.c_str(), streamLite);
             continue;
         }
         auto* rtsq = streamLite->GetRtsq();
         u32 queryHead = INVALID_UINT;
         u32 queryTail = INVALID_UINT;
-        EXECEPTION_CATCH(queryHead = rtsq->QuerySqHead(), queryHead = INVALID_UINT);
-        EXECEPTION_CATCH(queryTail = rtsq->QuerySqTail(), queryTail = INVALID_UINT);
-        MC2_TIMEOUT_LOG(
-            isHardTimeout,
+        try {
+            queryHead = rtsq->QuerySqHead();
+        } catch (const std::exception& e) {
+            HCCL_RUN_INFO("[MC2_OPEN_TIMEOUT][Rtsq] QuerySqHead failed: %s", e.what());
+        }
+        try {
+            queryTail = rtsq->QuerySqTail();
+        } catch (const std::exception& e) {
+            HCCL_RUN_INFO("[MC2_OPEN_TIMEOUT][Rtsq] QuerySqTail failed: %s", e.what());
+        }
+        HCCL_RUN_INFO(
             "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p, rtsq %p, cachedHead %u, "
             "cachedTail %u, depth %u, taskId %u, queryHead %u, queryTail %u.",
             groupIdx_, execCtx.commName.c_str(), streamLite, rtsq, rtsq->GetHead(), rtsq->GetTail(), rtsq->GetSqDepth(),
