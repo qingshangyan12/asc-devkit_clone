@@ -306,7 +306,9 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    const CcuVersion ccuVersion = GetCcuVersion();
+    const bool isUseGroupCopy = (ccuVersion == CcuVersion::CCU_V1);
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, isUseGroupCopy)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
