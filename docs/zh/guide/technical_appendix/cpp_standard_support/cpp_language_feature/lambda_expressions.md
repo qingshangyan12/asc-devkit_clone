@@ -1,6 +1,6 @@
 # Lambda表达式<a name="ZH-CN_TOPIC_000000253823119003"></a>
 
-本文介绍Lambda表达式在Ascend C中的使用方式。SIMT Device侧支持C++11 Lambda表达式的完整形态——值捕获、引用捕获、mutable、嵌套、立即调用（IIFE）、无捕获lambda转函数指针、捕获this、作为函数模板实参等均可直接使用；C++14泛型lambda与init-capture、C++17 constexpr lambda与`[*this]`按值捕获同样可用（见各标准章节）。
+本文介绍Lambda表达式在Ascend C中的使用方式。Device侧支持C++11 Lambda表达式的完整形态——值捕获、引用捕获、mutable、嵌套、立即调用（IIFE）、无捕获lambda转函数指针、捕获this、作为函数模板实参等均可直接使用；C++14泛型lambda与init-capture、C++17 constexpr lambda与`[*this]`按值捕获同样可用（见各标准章节）。
 
 Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/general_restrictions.md#section_kernel_function_argument_list_constraint)），不支持Host侧lambda传入核函数的使用方法，因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
 
@@ -27,62 +27,31 @@ __global__ __launch_bounds__(THREAD_COUNT) void kernel(float* output)
 }
 ```
 
-SIMT场景的限制如下：
+SIMT编程场景，**namespace-scope的lambda对象受全局变量规则约束**：非constexpr闭包对象属于Host变量，核函数内调用编译报错；constexpr闭包可用：
 
--   **lambda体内不可使用try/throw、动态分配、TLS等Device侧不支持的能力**：
+```cpp
+float g_arr[2] = {1.f, 2.f};
+auto g_lambda = []() { return g_arr[0]; };   // 非constexpr闭包对象：Host变量
 
-    ```cpp
-    __global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
-    {
-        float m = 1.f;
-        auto f = [m](float v) {
-            try {                            // ERROR: cannot use try in __host__ __device__ function
-                return v * m;
-            } catch (...) {
-                return -1.f;
-            }
-        };
-        output[threadIdx.x] = f(2.f);
-    }
-    ```
+__global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
+{
+    output[threadIdx.x] = static_cast<float>(g_lambda());
+    // ERROR: reference to __host__ variable g_lambda in __global__ function
+}
+```
 
-    **正确写法**：以错误码或返回值代替异常传播，错误处理在Host侧完成后重新启动核函数：
+**正确写法**：闭包对象声明为constexpr（编译期求值），或将lambda定义在核函数内部：
 
-    ```cpp
-    __global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
-    {
-        float m = 1.f;
-        // 以标志值代替异常：非法输入返回-1，Host侧回读后处理
-        auto f = [m](float v) { return v >= 0.f ? v * m : -1.f; };
-        output[threadIdx.x] = f(2.f);
-    }
-    ```
+```cpp
+constexpr auto g_sq = [](int32_t v) { return v * v; };   // constexpr闭包：可用
 
--   **namespace-scope的lambda对象受全局变量规则约束**：非constexpr闭包对象属于Host变量，核函数内调用编译报错；constexpr闭包可用：
+__global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
+{
+    output[threadIdx.x] = static_cast<float>(g_sq(6));   // 编译运行正常，输出36
+}
+```
 
-    ```cpp
-    float g_arr[2] = {1.f, 2.f};
-    auto g_lambda = []() { return g_arr[0]; };   // 非constexpr闭包对象：Host变量
-
-    __global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
-    {
-        output[threadIdx.x] = static_cast<float>(g_lambda());
-        // ERROR: reference to __host__ variable g_lambda in __global__ function
-    }
-    ```
-
-    **正确写法**：闭包对象声明为constexpr（编译期求值），或将lambda定义在核函数内部：
-
-    ```cpp
-    constexpr auto g_sq = [](int32_t v) { return v * v; };   // constexpr闭包：可用
-
-    __global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
-    {
-        output[threadIdx.x] = static_cast<float>(g_sq(6));   // 编译运行正常，输出36
-    }
-    ```
-
-Lambda捕获在实际算子开发中的用法请参考[Lambda捕获实战样例](../../../../../../examples/03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)。
+Lambda捕获在实际算子开发中的用法请参考[Lambda捕获样例](../../../../../../examples/03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)。
 
 ## SIMD与SIMT混合编程场景场景<a name="section_lambda_hybrid"></a>
 
@@ -114,7 +83,7 @@ __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_lambda_by_value(
 }
 ```
 
-Host侧通过`asc_vf_call`启动上述SIMT VF函数：
+通过`asc_vf_call`启动上述SIMT VF函数：
 
 ```cpp
 __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
@@ -129,7 +98,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 }
 ```
 
-混合编程下Lambda捕获的完整样例请参考[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
+混合编程下Lambda捕获的完整样例请参考[混合编程Lambda捕获样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
 
 
 ### VF函数内支持的Lambda能力<a name="section_lambda_hybrid_list"></a>

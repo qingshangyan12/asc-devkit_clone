@@ -1,9 +1,11 @@
 # 概述<a name="ZH-CN_TOPIC_0000002509891888"></a>
 
-本文介绍C/C++语言标准在Ascend C中的支持情况，包括语言标准的选择方式、Device侧的能力支持边界，以及本章节的组织结构。Ascend C源文件由bisheng编译器编译，Host侧与Device侧代码在同一编译单元内统一处理，整体支持情况如下：
+本文介绍C/C++语言标准在Ascend C中的支持情况，包括语言标准的选择方式、Device侧的语法特性支持情况与使用约束，以及本章节的组织结构。Ascend C源文件由bisheng编译器编译，Host侧与Device侧代码在同一编译单元内统一处理，整体支持情况如下：
 
 -   Host侧与clang15一致，支持完整的C/C++标准。
 -   Device侧支持C++11、C++14、C++17与C++20四档语言标准，默认按C++17编译。
+
+本章节所述语法特性与约束适用于CANN 9.3.0及后续版本；在此之前的版本编译器能力可能存在差异，实际支持情况以对应版本编译器的行为为准。
 
 ## 语言标准的选择<a name="section_selecting_cpp_standard"></a>
 
@@ -36,5 +38,4 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
     -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：不同编程场景下Lambda表达式的使用方式与注意事项。
 -   **[Device侧C/C++语法限制](./cpp_language_restrictions/cpp_language_restrictions.md)**：Device侧通用的语法与能力限制。
     -   [C/C++通用语法限制](./cpp_language_restrictions/general_restrictions.md)：指针与内存地址、变量、函数、类、模板五类语法使用限制，含核函数（Kernel）参数列表限制、SIMT VF函数限制、混合编程结构体使用限制。
-    -   [C++ 11语法约束限制](./cpp_language_restrictions/cpp11_restrictions.md)：auto类型推导约束、别名模板约束。
 
