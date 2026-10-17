@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace mc2_ops_hccl {
