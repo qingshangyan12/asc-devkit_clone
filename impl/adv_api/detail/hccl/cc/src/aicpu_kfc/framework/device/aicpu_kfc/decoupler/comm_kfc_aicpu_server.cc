@@ -923,8 +923,7 @@ HcclResult CommKfcAicpuServer::CheckTimeOut(u32 msgPos)
         "Group %u: timeout %llu seconds at message pos %u, continue waiting.", groupIdx_,
         static_cast<unsigned long long>(timeout_), msgPos);
     // Timeout is diagnostic only; saturate the backoff to avoid wrapping during an indefinite wait.
-    timeout_ = timeout_ <= std::numeric_limits<u64>::max() / 2U ?
-                   timeout_ * 2U : std::numeric_limits<u64>::max();
+    timeout_ = timeout_ <= std::numeric_limits<u64>::max() / 2U ? timeout_ * 2U : std::numeric_limits<u64>::max();
     return HCCL_SUCCESS;
 }
 
@@ -983,8 +982,8 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos) const
         auto* streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
         if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
             HCCL_RUN_INFO(
-                "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.",
-                groupIdx_, execCtx.commName.c_str(), streamLite);
+                "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.", groupIdx_,
+                execCtx.commName.c_str(), streamLite);
             continue;
         }
         auto* rtsq = streamLite->GetRtsq();
