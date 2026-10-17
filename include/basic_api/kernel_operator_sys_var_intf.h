@@ -88,10 +88,9 @@ __aicore__ inline constexpr uint32_t GetVecLen()
 
 __aicore__ inline uint32_t GetRuntimeUBSize()
 {
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
-     (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return TOTAL_UB_SIZE;
 #else
@@ -106,7 +105,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #else
     return TOTAL_UB_SIZE; // cube core not support get_shmem_sz
 #endif
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
     constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
     return get_shmem_sz() - RESERVED_UB_SIZE; // m510 aicore reserve 8KB
 #else
