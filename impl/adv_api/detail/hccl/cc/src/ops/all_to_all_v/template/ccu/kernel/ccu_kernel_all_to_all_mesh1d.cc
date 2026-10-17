@@ -126,8 +126,8 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 
     uint32_t channelId = 0;
     uint16_t allBit = static_cast<uint16_t>(((1U << ctx.rankSize) - 1) & (~(1U << ctx.rankId)));
-
-    if (ctx.loadFromMem) {
+    const CcuVersion ccuVersion = GetCcuVersion();
+    if (ctx.loadFromMem || ccuVersion == CcuVersion::CCU_V2) {
         HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r == ctx.rankId) {
