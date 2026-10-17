@@ -335,8 +335,9 @@ LoadDataWithStride(
     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <const IsResetLoad3dConfig& defaultConfig>
-[[deprecated("NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
-             " Please do not use it!")]] __aicore__ inline void
+[[deprecated(
+    "NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
+    " Please do not use it!")]] __aicore__ inline void
 LoadData(
     const LocalTensor<bfloat16_t>& dst, const LocalTensor<bfloat16_t>& src,
     const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
