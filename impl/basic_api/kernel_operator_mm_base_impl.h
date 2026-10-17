@@ -575,7 +575,7 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
-// Keep backend updates local to this call.
+    // Keep backend updates local to this call.
     MmadBitModeParams localMmadParams = mmadParams;
     localMmadParams.SetCmatrixSource(cmatrixSource);
     MmadCal(
@@ -664,7 +664,7 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
-// Keep backend updates local to this call.
+    // Keep backend updates local to this call.
     MmadBitModeParams localMmadParams = mmadParams;
     localMmadParams.SetCmatrixSource(cmatrixSource);
     MmadMxCal(
