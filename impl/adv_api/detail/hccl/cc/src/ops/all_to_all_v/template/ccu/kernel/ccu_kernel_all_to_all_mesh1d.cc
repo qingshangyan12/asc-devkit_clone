@@ -126,31 +126,17 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 
     uint32_t channelId = 0;
     uint16_t allBit = static_cast<uint16_t>(((1U << ctx.rankSize) - 1) & (~(1U << ctx.rankId)));
-
-    if (ctx.loadFromMem) {
-        HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
-        for (uint64_t r = 0; r < ctx.rankSize; r++) {
-            if (r == ctx.rankId) {
-                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1U << r);
-            } else {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
-                channelId++;
-            }
+    HCCL_INFO("[DoAlltoAll] Skip GroupCopy.");
+    HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
+    for (uint64_t r = 0; r < ctx.rankSize; r++) {
+        if (r == ctx.rankId) {
+            ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1U << r);
+        } else {
+            ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
+            channelId++;
         }
-        ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
-    } else {
-        HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize, ctx.rankId,
-            allBit);
-        for (uint64_t r = 0; r < ctx.rankSize; r++) {
-            if (r != ctx.rankId) {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
-                channelId++;
-            }
-        }
-        GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, GetCcuVersion());
-        ccu::EventWait(ctx.event, allBit);
     }
+    ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
 
     return CCU_SUCCESS;
 }

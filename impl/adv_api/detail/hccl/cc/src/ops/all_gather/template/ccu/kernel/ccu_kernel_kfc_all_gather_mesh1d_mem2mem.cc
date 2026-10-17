@@ -306,7 +306,10 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    const CcuVersion ccuVersion = GetCcuVersion();
+    const bool isUseCp = (ccuVersion == CcuVersion::CCU_V1);
+    HCCL_INFO("[KFC][AllGather][Kernel] isUseCp[%d]", isUseCp);
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, isUseCp)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
