@@ -20,27 +20,32 @@
 #include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
+struct CcuKernelArgKfcServer : CcuKernelArgBase {
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    KfcServerRole role = KfcServerRole::DEFAULT;
+    uint32_t missionIndex = 0;
+    // SoleNHR kernels retain their inline dispatch and per-die metadata.
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t axisId = 0;
+    uint32_t axisSize = 1;
+    OpParam opParam;
+    std::vector<KfcNhrStepInfo> nhrStepInfoVector;
+    std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
+};
+
+inline bool IsKfcInlineSubKernel(const CcuKernelArgKfcServer& arg)
+{
+    return (arg.opType == HcclCMDType::HCCL_CMD_ALLGATHER && arg.role == KfcServerRole::ALL_GATHER_SOLE_NHR) ||
+           (arg.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
+            arg.role == KfcServerRole::REDUCE_SCATTER_SOLE_NHR_2DIE);
+}
+
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 constexpr uint32_t CCU_PARAM_NUM_MAX = CCU_PARAM_NUM_PER_DIE * 2;
 constexpr uint32_t CCU_ONE_PARAM_SIZE = 8;
 constexpr uint32_t CCU_TASK_NUM_MAX = 64;
-
-// new---20260603
-struct CcuKernelArgKfcServer : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    bool loadFromMem = false;
-    KfcServerRole role = KfcServerRole::DEFAULT;
-    uint32_t jettyNum = 4;
-    // SoleNHR 2Die：die 维编号/总数（双 die 时每 mission 一个 die 实例，dispatch 转发给 kernel）
-    uint32_t axisId = 0;
-    uint32_t axisSize = 1;
-    OpParam opParam;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-    std::vector<KfcNhrStepInfo> nhrStepInfoVector;
-    std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
-};
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
 struct KfcServerContext : CcuKernelCtxBase {
@@ -56,6 +61,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;

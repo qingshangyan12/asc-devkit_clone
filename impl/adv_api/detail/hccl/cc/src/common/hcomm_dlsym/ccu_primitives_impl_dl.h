@@ -140,6 +140,8 @@ DECL_WEAK_FUNC(CcuResult, CcuFuncBlockBegin, const void* funcPtr, uint64_t* outH
 DECL_WEAK_FUNC(CcuResult, CcuFuncBlockEnd, uint64_t handle);
 DECL_WEAK_FUNC(CcuResult, CcuFuncDefineInArg, uint64_t handle, CcuVariableHandle formal);
 DECL_WEAK_FUNC(CcuResult, CcuFuncCall, uint64_t handle, const CcuVariableHandle* inArgs, uint32_t numIn);
+DECL_WEAK_FUNC(CcuResult, CcuFuncBlockBeginNamed, const char* name, uint64_t* outHandle);
+DECL_WEAK_FUNC(CcuResult, CcuFuncCallByAddr, CcuVariableHandle funcPc, const CcuVariableHandle* inArgs, uint32_t numIn);
 
 /*
  * 控制流宏内部使用的标签栈接口（以 _ 前缀标识为内部 API，

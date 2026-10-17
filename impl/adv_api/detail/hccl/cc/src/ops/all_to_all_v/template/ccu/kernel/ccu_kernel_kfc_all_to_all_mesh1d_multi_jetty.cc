@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "../ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -37,6 +39,8 @@ struct KfcAllToAllContext : CcuKernelCtxBase {
     ccu::Event localCopyEvent;
 };
 
+struct KfcAllToAllClosContext : KfcAllToAllContext {};
+
 CcuResult InitResource(KfcAllToAllContext& ctx)
 {
     if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize) {
@@ -57,6 +61,39 @@ CcuResult InitResource(KfcAllToAllContext& ctx)
         ++channelIdx;
     }
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllToAllContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input = args[argId++];
+    ctx.output = args[argId++];
+    ctx.token = args[argId++];
+    ctx.sliceSize = args[argId++];
+    ctx.srcStride = args[argId++];
+    ctx.srcOffset = args[argId++];
+    ctx.dstOffset = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllToAllClosContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    ctx.input = args[KFC_CONCURRENT_A2A_CLOS_INPUT];
+    ctx.output = args[KFC_CONCURRENT_A2A_CLOS_OUTPUT];
+    ctx.token = args[2];
+    ctx.sliceSize = args[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE];
+    ctx.srcStride = args[KFC_CONCURRENT_A2A_CLOS_SRC_STRIDE];
+    ctx.srcOffset = args[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET];
+    ctx.dstOffset = args[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET];
+    ctx.goSize.addrOffset = args[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0];
+    ctx.goSize.loopParam = args[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_1];
+    ctx.goSize.parallelParam = args[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_2];
+    ctx.goSize.residual = args[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_3];
     return CCU_SUCCESS;
 }
 
@@ -141,35 +178,46 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[],
-    uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllToAllMesh1DMultiJetty*>(arg);
     KfcAllToAllContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
 
-    ctx.input = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token = tokenInfo;
-    ctx.sliceSize = sliceSize;
-    ctx.srcStride = srcStride;
-    ctx.srcOffset = srcOffset;
-    ctx.dstOffset = dstOffset;
-    ctx.goSize.addrOffset = goSize0;
-    ctx.goSize.loopParam = goSize1;
-    ctx.goSize.parallelParam = goSize2;
-    ctx.goSize.residual = goSize3;
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            PreSync(ctx);
+            DoAllToAll(ctx);
+            PostSync(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME);
+    return CCU_SUCCESS;
+}
 
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(DoAllToAll(ctx));
-    CCU_CHK_RET(PostSync(ctx));
+CcuResult CcuKfcAllToAllClos1DMultiJettyKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllToAllMesh1DMultiJetty*>(arg);
+    KfcAllToAllClosContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            PreSync(ctx);
+            DoAllToAll(ctx);
+            PostSync(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_KFC_ALL_TO_ALL_CLOS1D_MULTI_JETTY_NAME);
     return CCU_SUCCESS;
 }
 

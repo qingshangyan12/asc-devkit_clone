@@ -19,6 +19,7 @@
 #include "alg_env_config.h"
 #include "param_check.h"
 #include "sal.h"
+#include "kfc_server_protocol.h"
 #include "hcomm/hccl/hccl_res.h"
 #include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include "acl/acl_rt.h"
@@ -65,6 +66,7 @@ HcclResult g_stubHcomCheckDataTypeResult = HCCL_SUCCESS;
 HcclResult g_stubHcomCheckReductionOpResult = HCCL_SUCCESS;
 // HcclCalcTopoInfo打桩返回值：置非SUCCESS模拟topo准备失败，供外部名定名链失败复位用例使用
 HcclResult g_stubCalcTopoInfoResult = HCCL_SUCCESS;
+constexpr uint64_t STUB_SUB_KERNEL_PC = 0x1000U;
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -386,8 +388,10 @@ HcclResult HcclGetAlgRes(
             uint64_t cclBufferAddr = reinterpret_cast<uint64_t>(cclBufferPtr);
             uint64_t token = hcomm::CcuRep::GetTokenInfo(cclBufferAddr, cclBufferSize);
 
-            if (resCtxHost->kfcServerArgs.size() >= 6U) {
-                resCtxHost->kfcServerArgs[5] = token;
+            for (size_t offset = 0; offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX < resCtxHost->kfcServerArgs.size();
+                 offset += KFC_SERVER_ARG_NUM) {
+                resCtxHost->kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
+                resCtxHost->kfcServerArgs[offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX] = STUB_SUB_KERNEL_PC;
             }
         }
         // Provide one valid launch pair so the public MC2 launch UT reaches HcommCcuKernelLaunch.
