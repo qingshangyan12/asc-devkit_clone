@@ -13,6 +13,56 @@
 #include "ccu_kernel_alg_base.h"
 
 namespace mc2_ops_hccl {
+struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
+    uint64_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
+struct A2AsingleSendRecvInfo {
+    ccu::Variable tailSize;
+    ccu::Variable loopNum;
+    ccu::Variable sendOffset;
+    ccu::Variable recvOffset;
+    GroupOpSizeVars tailGoSize;
+};
+
+struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
+    const CcuKernelArgAlltoAllVMesh1D* arg;
+
+    uint64_t rankSize{0};
+    uint32_t rankId{0};
+    HcclDataType dataType;
+    HcclDataType outputDataType;
+    ccu::Variable repeatNum;
+    std::vector<ChannelHandle> channels;
+    std::vector<ccu::Variable> input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable sliceSize;
+    ccu::Variable srcStride;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    ccu::Variable groupOpSize;
+    ccu::Variable a2avXnAddr;
+    ccu::Variable xnLength;
+    ccu::Variable completedRankCount;
+    ccu::Variable xnMaxTransportSize;
+    GroupOpSizeVars xnMaxTransportGoSize;
+    std::vector<A2AsingleSendRecvInfo> sendRecvInfo;
+    uint16_t selfBit{0};
+    uint16_t allBit{0};
+    uint16_t allOtherBit{0};
+    ccu::LocalAddr myDst;
+    std::vector<ccu::RemoteAddr> dst;
+    std::vector<ccu::LocalAddr> src;
+    ccu::Event event;
+    ccu::Variable flag; // 用以判断是否是第一次重复
+    ccu::Variable xnConst1;
+    bool loadFromMem = false;
+};
 
 CcuResult CcuAlltoAllVMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
