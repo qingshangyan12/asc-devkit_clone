@@ -183,9 +183,25 @@ __simd_callee__ inline void MaskPack(MaskReg& dst, MaskReg& src)
 template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void MaskUnPack(MaskReg& dst, MaskReg& src)
 {
+     MaskUnPackImpl<part>(dst, src);
+}
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+// 5101平台需要MaskPack/MaskUnPack接口
+template <HighLowPart part = HighLowPart::LOWEST>
+__simd_callee__ inline void MaskPack(MaskReg& dst, MaskReg& src)
+{
+    MaskPackImpl<part>(dst, src);
+}
+
+template <HighLowPart part = HighLowPart::LOWEST>
+__simd_callee__ inline void MaskUnPack(MaskReg& dst, MaskReg& src)
+{
     MaskUnPackImpl<part>(dst, src);
 }
 #endif
+
 } // namespace Reg
 } // namespace AscendC
 
