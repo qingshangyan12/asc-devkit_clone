@@ -77,7 +77,7 @@ public:
     template <typename PadType>
     __aicore__ inline static void set_padding(PadType pad_value)
     {
-        asc_set_l13d_padding(pad_value);
+        asc_set_l12l0a_3d_padding(pad_value);
     }
 
     __aicore__ inline static void set_repeat(uint16_t dst_stride)

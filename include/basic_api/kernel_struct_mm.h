@@ -152,7 +152,40 @@ struct LoadData2DMxParams {
     uint16_t dstStride = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+struct LoadData2DDecompParamsV2 {
+    __aicore__ LoadData2DDecompParamsV2() {}
+
+    __aicore__ LoadData2DDecompParamsV2(
+        const uint32_t mStartPositionIn, const uint32_t kStartPositionIn, const uint16_t mStepIn,
+        const uint16_t kStepIn, const int32_t srcStrideIn, const uint16_t dstStrideIn, const bool ifTransposeIn,
+        const uint8_t sidIn, const uint8_t decompIn)
+        : mStartPosition(mStartPositionIn),
+          kStartPosition(kStartPositionIn),
+          mStep(mStepIn),
+          kStep(kStepIn),
+          srcStride(srcStrideIn),
+          dstStride(dstStrideIn),
+          ifTranspose(ifTransposeIn),
+          sid(sidIn),
+          decomp(decompIn)
+    {}
+
+    uint32_t mStartPosition = 0;
+    uint32_t kStartPosition = 0;
+    uint16_t mStep = 0;
+    uint16_t kStep = 0;
+    int32_t srcStride = 0;
+    uint16_t dstStride = 0;
+    bool ifTranspose = false;
+    uint8_t sid = 0;
+    uint8_t decomp = 0;
+};
+#endif
+
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename TYPE>
 struct LoadData3DParamsV1 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -218,7 +251,8 @@ struct LoadData3DParamsV1 {
     int16_t leftTopH = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename TYPE>
 struct LoadData3DParamsV2 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -433,8 +467,14 @@ struct MmadParams {
     bool cmatrixSource = false;
     // Indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real number in C matrix
     bool cmatrixInitVal = true;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     bool disableGemv = false;
+#endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    bool hif4Amode = false;
+    bool hif4Bmode = false;
+    bool cScaleCtrl = false;
 #endif
 #ifdef CANN_ASC_ENABLE_FIX_SHIFT
     uint8_t fixShiftVal = 0;
@@ -497,7 +537,8 @@ struct LoadDataRepeatParam {
 #endif // Turing versions
 
 struct LoadDataRepeatParamWithStride {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     __aicore__ LoadDataRepeatParamWithStride() {}
 
     __aicore__ LoadDataRepeatParamWithStride(

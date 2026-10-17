@@ -92,6 +92,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
 ```
 
 <!-- npu="310p" id1 -->
+
 ## DataCopy（L0CToUB随路量化激活搬运）
 
 该接口主要实现将数据从L0C Buffer搬运至UB，并支持多种随路能力的组合，接口内包含了设置寄存器与数据搬运能力。
@@ -103,7 +104,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
 
 搬运的数据为[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)的结果，接口具体介绍请参考：[DataCopy（L0C到UB数据搬运）](../cube_compute_ISASI/cube_compute_store/DataCopy_L0CToUB.md)。
 
-该接口仅Atlas 推理系列产品AI Core支持。
+该接口仅Atlas推理系列产品AI Core支持。
 
 src和dst分别为源操作数和目的操作数；intriParams和enhancedParams为搬运参数。
 
@@ -131,7 +132,7 @@ src和dst分别为源操作数和目的操作数；intriParams和enhancedParams�
 - L0C Buffer -> UB
     - CO1 -> UB
 
-搬运的数据为[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)的结果，以Ascend 950PR/Ascend 950DT为例，接口示例如下：
+搬运的数据为[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)的结果，以Ascend 950PR&950DT系列产品为例，接口示例如下：
 
 注意，不同产品型号的接口原型可能不同，具体介绍请参考：[Fixpipe（L0C到UB数据搬运）](../cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md)。
 
@@ -152,6 +153,7 @@ src和dst分别为源操作数和目的操作数；intriParams为搬运参数，
     ```
 
 <!-- npu="950" id2 -->
+
 ## DataCopyL1ToUB（L1ToUB连续数据搬运）
 
 DataCopyL1ToUB能够实现L1 Buffer到UB的连续数据搬运，数据搬运时格式和内容保持不变。
@@ -163,7 +165,7 @@ DataCopyL1ToUB能够实现L1 Buffer到UB的连续数据搬运，数据搬运时�
 
 搬运的数据用于[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)，接口具体介绍请参考：[DataCopyL1ToUB（L1到UB数据搬运）](../cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB.md)。
 
-该接口仅Ascend 950PR/Ascend 950DT支持。
+该接口仅Ascend 950PR&950DT系列产品支持。
 
 src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
 
@@ -174,6 +176,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
+
 ## DataCopyL1ToUB（L1ToUB高维切分数据搬运）
 
 DataCopyL1ToUB能够实现L1 Buffer到UB的连续数据搬运和非连续数据搬运，数据搬运时格式和内容保持不变。
@@ -187,7 +190,7 @@ DataCopyL1ToUB能够实现L1 Buffer到UB的连续数据搬运和非连续数据�
 
 搬运的数据用于[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)，接口具体介绍请参考：[DataCopyL1ToUB（L1到UB数据搬运）](../cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB.md)。
 
-该接口仅Ascend 950PR/Ascend 950DT支持。
+该接口仅Ascend 950PR&950DT系列产品支持。
 
 src和dst分别为源操作数和目的操作数；repeatParams为搬运参数。
 

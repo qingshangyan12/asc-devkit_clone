@@ -11,13 +11,13 @@ SuperKernel是一种算子的二进制融合技术。与源码融合不同，它
 >[!NOTE]说明
 >SuperKernel适用于如下型号：
 > <!-- npu="A3" id1 -->
-> - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+> - Atlas A3系列产品
 > <!-- end id1 -->
 > <!-- npu="910b" id2 -->
-> - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+> - Atlas A2系列产品
 > <!-- end id2 -->
 > <!-- npu="950" id3 -->
-> - Ascend 950PR/Ascend 950DT，该型号下SuperKernel特性是试验特性，在后续版本中会调整或改进，不保证后续兼容性，请开发者在使用过程中关注后续版本更新。
+> - Ascend 950PR&950DT系列产品，该型号下SuperKernel特性是试验特性，在后续版本中会调整或改进，不保证后续兼容性，请开发者在使用过程中关注后续版本更新。
 > <!-- end id3 -->
 
 ## 性能收益来源
@@ -34,8 +34,8 @@ SuperKernel是一种算子的二进制融合技术。与源码融合不同，它
 
 | 开启方式 | 说明 |
 | --- | --- |
-| npugraph_ex后端 | 在`torch.compile`的`options`中传入`super_kernel_optimize=True`开启SuperKernel融合；如需控制融合范围，可通过`torch.npu.super_kernel_scope_begin/end`进行标定。具体请参考[SuperKernel功能](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/npugraph_ex/advanced/superkernel.md)。 |
-| GE图模式 | 通过`torchair.scope.super_kernel`作用域标定融合范围，配合TorchAir的CompilerConfig开启。具体请参考[图内标定SuperKernel范围](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)。 |
+| npugraph_ex后端 | 在`torch.compile`的`options`中传入`super_kernel_optimize=True`开启SuperKernel融合；如需控制融合范围，可通过`torch.npu.super_kernel_scope_begin/end`进行标定。具体请参考[SuperKernel功能](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/npugraph_ex/advanced/superkernel.md)。 |
+| GE图模式 | 通过`torchair.scope.super_kernel`作用域标定融合范围，配合TorchAir的CompilerConfig开启。具体请参考[图内标定SuperKernel范围](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)。 |
 
 ## 算子适配说明
 

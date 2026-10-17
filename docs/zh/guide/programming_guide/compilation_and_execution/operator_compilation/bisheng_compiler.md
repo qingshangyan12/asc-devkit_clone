@@ -4,16 +4,16 @@
 
 目前，编译器支持如下型号：
 <!-- npu="950" id1 -->
--   Ascend 950PR/Ascend 950DT
+-   Ascend 950PR&950DT系列产品
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
--   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+-   Atlas A3系列产品
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
--   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+-   Atlas A2系列产品
 <!-- end id3 -->
 <!-- npu="310p" id4 -->
--   Atlas 推理系列产品
+-   Atlas推理系列产品
 <!-- end id4 -->
 
 毕昇编译器支持的源码文件核头文件如下：
@@ -26,4 +26,4 @@
 |.asc | Ascend C源码文件| Device代码， Host代码， Host/Device混合代码 | 
 
 -   异构编译场景中的编程相关约束请参考[约束说明](constraints.md)。
--   如果需要了解更多的毕昇编译器的基础知识，详细内容请参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+-   如果需要了解更多的毕昇编译器的基础知识，详细内容请参考[《毕昇编译器》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/compiler/BishengCompiler/atlas_bisheng_10_0001.html)。

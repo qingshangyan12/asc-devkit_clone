@@ -683,3 +683,163 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_update_mask_b8;
     using ::asc_xor;
 }
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_20()
+{
+    using ::asc_bfloat162e4m3_rn;
+    using ::asc_bfloat162e4m3_rn_merge;
+    using ::asc_bfloat162e4m3_rn_sat;
+    using ::asc_bfloat162e4m3_rn_sat_merge;
+    using ::asc_bfloat162e5m2_rn;
+    using ::asc_bfloat162e5m2_rn_merge;
+    using ::asc_bfloat162e5m2_rn_sat;
+    using ::asc_bfloat162e5m2_rn_sat_merge;
+    using ::asc_bfloat162e6m2_rn;
+    using ::asc_bfloat162e8m0_ru;
+    using ::asc_bfloat162e8m0_ru_sat;
+    using ::asc_bfloat162e8m0_rz;
+    using ::asc_bfloat162e8m0_rz_sat;
+    using ::asc_cast;
+    using ::asc_cast_merge;
+    using ::asc_half2int4x2_rd_merge;
+    using ::asc_half2int4x2_rd_sat_merge;
+    using ::asc_half2int4x2_rn_merge;
+    using ::asc_half2int4x2_rn_sat_merge;
+    using ::asc_half2int4x2_rna_merge;
+    using ::asc_half2int4x2_rna_sat_merge;
+    using ::asc_half2int4x2_ru_merge;
+    using ::asc_half2int4x2_ru_sat_merge;
+    using ::asc_half2int4x2_rz_merge;
+    using ::asc_half2int4x2_rz_sat_merge;
+    using ::asc_half2int8_rd_merge;
+    using ::asc_half2int8_rd_sat_merge;
+    using ::asc_half2int8_rn_merge;
+    using ::asc_half2int8_rn_sat_merge;
+    using ::asc_half2int8_rna_merge;
+    using ::asc_half2int8_rna_sat_merge;
+    using ::asc_half2int8_ru_merge;
+    using ::asc_half2int8_ru_sat_merge;
+    using ::asc_half2int8_rz_merge;
+    using ::asc_half2int8_rz_sat_merge;
+}
+#endif
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_21()
+{
+    using ::asc_datablock_reduce_max_stride;
+    using ::asc_datablock_reduce_min_stride;
+    using ::asc_datablock_reduce_sum_stride;
+    using ::asc_deintlv_even;
+    using ::asc_deintlv_even_b16;
+    using ::asc_deintlv_even_b32;
+    using ::asc_deintlv_even_b8;
+    using ::asc_deintlv_odd;
+    using ::asc_deintlv_odd_b16;
+    using ::asc_deintlv_odd_b32;
+    using ::asc_deintlv_odd_b8;
+    using ::asc_fms;
+    using ::asc_fnma;
+    using ::asc_fnms;
+    using ::asc_intlv_half_high;
+    using ::asc_intlv_half_high_b16;
+    using ::asc_intlv_half_high_b32;
+    using ::asc_intlv_half_high_b8;
+    using ::asc_intlv_half_low;
+    using ::asc_intlv_half_low_b16;
+    using ::asc_intlv_half_low_b32;
+    using ::asc_intlv_half_low_b8;
+    using ::asc_pair_reduce_sum_stride;
+    using ::asc_reduce_max_last_elem;
+    using ::asc_reduce_min_last_elem;
+    using ::asc_reduce_sum_last_elem;
+}
+#endif
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_22()
+{
+    using ::asc_bfloat162e1m2x2_rd_merge;
+    using ::asc_bfloat162e1m2x2_rn_merge;
+    using ::asc_bfloat162e1m2x2_rna_merge;
+    using ::asc_bfloat162e1m2x2_ru_merge;
+    using ::asc_bfloat162e1m2x2_rz_merge;
+    using ::asc_bfloat162e2m1x2_rd_merge;
+    using ::asc_bfloat162e2m1x2_rn_merge;
+    using ::asc_bfloat162e2m1x2_rna_merge;
+    using ::asc_bfloat162e2m1x2_ru_merge;
+    using ::asc_bfloat162e2m1x2_rz_merge;
+    using ::asc_float2bfloat16_rd_merge;
+    using ::asc_float2bfloat16_rd_sat_merge;
+    using ::asc_float2bfloat16_rn_merge;
+    using ::asc_float2bfloat16_rn_sat_merge;
+    using ::asc_float2bfloat16_rna_merge;
+    using ::asc_float2bfloat16_rna_sat_merge;
+    using ::asc_float2bfloat16_ru_merge;
+    using ::asc_float2bfloat16_ru_sat_merge;
+    using ::asc_float2bfloat16_rz_merge;
+    using ::asc_float2bfloat16_rz_sat_merge;
+    using ::asc_float2e4m3_rn_merge;
+    using ::asc_float2e4m3_rn_sat_merge;
+    using ::asc_float2e5m2_rn_merge;
+    using ::asc_float2e5m2_rn_sat_merge;
+    using ::asc_float2hif8_rh_merge;
+    using ::asc_float2hif8_rh_sat_merge;
+    using ::asc_float2hif8_rna_merge;
+    using ::asc_float2hif8_rna_sat_merge;
+}
+#endif
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_23()
+{
+    using ::asc_float2half_rd_merge;
+    using ::asc_float2half_rd_sat_merge;
+    using ::asc_float2half_rn_merge;
+    using ::asc_float2half_rn_sat_merge;
+    using ::asc_float2half_rna_merge;
+    using ::asc_float2half_rna_sat_merge;
+    using ::asc_float2half_ro_merge;
+    using ::asc_float2half_ro_sat_merge;
+    using ::asc_float2half_ru_merge;
+    using ::asc_float2half_ru_sat_merge;
+    using ::asc_float2half_rz_merge;
+    using ::asc_float2half_rz_sat_merge;
+    using ::asc_rcpe6m22bfloat16;
+}
+#endif
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_24()
+{
+    using ::asc_add_merge;
+    using ::asc_max_merge;
+    using ::asc_min_merge;
+}
+#endif
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_25()
+{
+    using ::asc_e6m22bfloat16;
+    using ::asc_e6m22bfloat16_v2;
+    using ::asc_e8m02bfloat16;
+    using ::asc_e8m02bfloat16_v2;
+    using ::asc_half2e4m3_rn;
+    using ::asc_half2e4m3_rn_merge;
+    using ::asc_half2e4m3_rn_sat;
+    using ::asc_half2e4m3_rn_sat_merge;
+    using ::asc_half2e4m3_rn_sat_v2;
+    using ::asc_half2e4m3_rn_v2;
+    using ::asc_half2e5m2_rn;
+    using ::asc_half2e5m2_rn_merge;
+    using ::asc_half2e5m2_rn_sat;
+    using ::asc_half2e5m2_rn_sat_merge;
+    using ::asc_half2e5m2_rn_sat_v2;
+    using ::asc_half2e5m2_rn_v2;
+    using ::asc_pack_datablock;
+    using ::asc_pack_to_high;
+    using ::asc_pack_to_low;
+}
+#endif

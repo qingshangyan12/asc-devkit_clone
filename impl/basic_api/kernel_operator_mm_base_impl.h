@@ -36,10 +36,14 @@
 #include "dav_m310/kernel_operator_mm_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_mm_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_mm_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5162)
-#include "dav_v516/kernel_operator_mm_impl.h"
+#include "dav_5162/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -211,7 +215,7 @@ __aicore__ inline void LoadDataImpl(
                 "current api support dtype combination is src and dst both: half / bfloat16_t / float / "
                 "uint32_t / int32_t.\n"));
     }
-#elif __NPU_ARCH__ == 3510
+#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
         KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");
     });
@@ -262,7 +266,8 @@ __aicore__ inline void LoadDataImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
     typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
@@ -325,7 +330,9 @@ LoadDataWithStride(
 }
 #endif
 
-#if ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if (                                                                                                       \
+    (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <const IsResetLoad3dConfig& defaultConfig>
 [[deprecated("NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
@@ -338,7 +345,7 @@ LoadData(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
@@ -347,13 +354,21 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L1) {
         LoadData2DGM2L1Cal((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
-    } else {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    } else if (dstScope == Hardware::L0B) {
+        LoadData2DGM2L0BCal((__cb__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
+    }
+#else
+    }
+#endif
+    else {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only supports L1 Buffer(A1/B1)"); });
     }
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams)
@@ -501,12 +516,24 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9202
+    if (mmadParams.cScaleCtrl) {
+        MmadCal(
+            (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(),
+            (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadParams, mmadParams.cmatrixSource);
+    } else {
+        MmadCal(
+            (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(),
+            (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadParams, cmatrixSource);
+    }
+#else
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), mmadParams, cmatrixSource);
+#endif
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
@@ -548,9 +575,11 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), localMmadParams);
 }
 
 template <typename T, typename U, typename S>
@@ -602,9 +631,11 @@ __aicore__ inline void MmadMxImpl(
     }
     CheckMmadAlign(dst, fm, filter);
 #endif
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        mmadParams);
+        localMmadParams);
 }
 
 template <typename T, typename U, typename S, typename V>
@@ -632,9 +663,11 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), localMmadParams);
 }
 #endif
 
@@ -806,7 +839,8 @@ __aicore__ inline void SetFmatrixImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetFmatrixImpl(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     if (fmatrixMode == FmatrixMode::FMATRIX_LEFT) {
@@ -835,7 +869,8 @@ __aicore__ inline void SetLoadDataRepeatImpl(const LoadDataRepeatParam& repeatPa
     SetLoadDataRepeatCal(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetLoadDataRepeatWithStrideImpl(const LoadDataRepeatParamWithStride& repeatParams)
 {
     SetLoadDataRepeatWithStrideCal(repeatParams);

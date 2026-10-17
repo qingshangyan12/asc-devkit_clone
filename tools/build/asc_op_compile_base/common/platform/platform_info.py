@@ -37,6 +37,8 @@ ASCEND_910H = "Ascend910B"
 ASCEND_910B = "Ascend910B"
 ASCEND_910_93 = "Ascend910_93"
 ASCEND_950 = "Ascend950"
+ASCEND_960DT = "Ascend960DT"
+ASCEND_960PR = "Ascend960PR"
 ASCEND_350 = "Ascend350"
 ASCEND_910M = "Ascend910A"
 ASCEND_910P = "Ascend910ProA"
@@ -52,6 +54,7 @@ ASCEND_310P = "Ascend310P"
 BS9SX1A = "BS9SX1A"
 ASCEND_610B = "Ascend610B"
 ASCEND_SD = "SD3403"
+ASCEND_5162 = "Ascend5162A"
 KIRIN_X90 = "KirinX90"
 KIRIN_9030 = "Kirin9030"
 KIRIN_DEV_0000 = "KirinDev0000"
@@ -82,6 +85,7 @@ ASCEND_910BVEC = ASCEND_910B + _VEC_ENGINE
 ASCEND_910_93AIC = ASCEND_910_93 + _AIC_ENGINE
 ASCEND_910_93VEC = ASCEND_910_93 + _VEC_ENGINE
 ASCEND_SD_AIC = "SD3403" + _AIC_ENGINE
+AIC_5162 = ASCEND_5162 + _AIC_ENGINE
 
 # Example: pylint: disable=invalid-name
 scope_cbuf = "local.L1"
@@ -187,16 +191,12 @@ def get_soc_spec(key):
             assert 0 <= int_value <= 1
             value = int_value == 1
         except Exception as casting_error:
-            raise RuntimeError(
-                "return value %s cannot be interpret as 'bool' type" % value
-            ) from casting_error
+            raise RuntimeError("return value %s cannot be interpret as 'bool' type" % value) from casting_error
     return value
 
 
 # Example: pylint: disable=unused-argument
-def set_current_compile_soc_info(
-    soc_version, core_type="AiCore", aicore_num=None, l1_fusion=None
-):
+def set_current_compile_soc_info(soc_version, core_type="AiCore", aicore_num=None, l1_fusion=None):
     """
     set version info
 
@@ -288,13 +288,7 @@ def get_block_size():
 
 
 def te_update_version(
-    soc_version=None,
-    core_type=None,
-    aicore_num=None,
-    l1_fusion=None,
-    l2_mode=None,
-    l2_fusion=None,
-    kwargs=None,
+    soc_version=None, core_type=None, aicore_num=None, l1_fusion=None, l2_mode=None, l2_fusion=None, kwargs=None
 ):
     """
     set version info

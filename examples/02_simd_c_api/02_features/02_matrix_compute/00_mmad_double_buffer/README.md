@@ -10,7 +10,7 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | == CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | == CANN 9.2.0 |
 
 ## 目录结构
 
@@ -93,7 +93,7 @@
 
 MTE1读完某组L1 Buffer后，MTE2即可向该组写入后续K块，不必等待MMAD结束。由于L0只有一组，MTE1仍需等待前一轮MMAD读完L0后才能加载下一块。
 
-各场景均使用[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)控制Buffer复用依赖。这些Mutex保证数据在被读取前已写完、在被覆盖前已读完，不作为独立的性能优化项。
+各场景均使用[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md)控制Buffer复用依赖。这些Mutex保证数据在被读取前已写完、在被覆盖前已读完，不作为独立的性能优化项。
 
 **表6**  Buffer复用依赖
 
@@ -211,7 +211,7 @@ python3 ../scripts/verify_result.py output/output.bin output/golden.bin
 | 编译选项 | 可选值 | 说明 |
 | --- | --- | --- |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构 |
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式 |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式 |
 | `SCENARIO_NUM` | `0`、`1`（默认） | `0`为单缓冲基线，`1`为L1双缓冲。 |
 
 精度校验成功时输出：

@@ -6,7 +6,7 @@
 
 线程块数量与物理核数的关系会影响调度开销：当线程块数量 ≤ 物理核数时，所有线程块可以一次性占用全部物理核并行执行，需要启动调度的线程块较少、固定开销有限；当线程块数量 > 物理核数时，超出物理核数的线程块需等待前序线程块执行完成后再调度，需要启动和调度的线程块数量继续增加，多线程块启动和调度的固定开销开始明显累积，调度开销随线程块数量增大而上升。
 
-物理核数可以在运行期通过[aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_1867.html)查询。
+物理核数可以在运行期通过[aclrtGetDeviceInfo](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/04_device_management.md#aclrtGetDeviceInfo)查询。
 > 注：在下面的两个场景中，实测的物理核数均为64。
 
 确定物理核数后，还需结合数据规模来设置线程块数量。
@@ -19,6 +19,7 @@
 本优化方法对应的样例请参见[核函数（Kernel）的启动配置性能调优样例](../../../../../../examples/03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config/README.md)。
 
 ## 大数据量场景
+
 下面以Gather算子为例，对比大数据量场景（`1024*2048`，即2097152个元素）下不同线程块数量配置的性能差异。
 
 【反例】一个线程处理一个元素，随数据量增加线程块个数，导致需要启动和调度的线程块大幅增加。
