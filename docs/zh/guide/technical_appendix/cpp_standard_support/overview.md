@@ -36,5 +36,4 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
     -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：不同编程场景下Lambda表达式的使用方式与注意事项。
 -   **[Device侧C/C++语法限制](./cpp_language_restrictions/cpp_language_restrictions.md)**：Device侧通用的语法与能力限制。
     -   [C/C++通用语法限制](./cpp_language_restrictions/general_restrictions.md)：指针与内存地址、变量、函数、类、模板五类语法使用限制，含核函数（Kernel）参数列表限制、SIMT VF函数限制、混合编程结构体使用限制。
-    -   [C++ 11语法约束限制](./cpp_language_restrictions/cpp11_restrictions.md)：auto类型推导约束、别名模板约束。
 
