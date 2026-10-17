@@ -14,6 +14,46 @@
 
 namespace mc2_ops_hccl {
 
+struct A2AsingleSendRecvInfo {
+    ccu::Variable tailSize;
+    ccu::Variable loopNum;
+    ccu::Variable sendOffset;
+    ccu::Variable recvOffset;
+    GroupOpSizeVars tailGoSize;
+};
+
+struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
+    const ChannelHandle* channels;
+    uint32_t channelCount;
+    uint32_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem = false;
+
+    std::vector<ccu::Variable> input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable sliceSize;
+    ccu::Variable srcStride;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    ccu::Variable groupOpSize;
+    ccu::Variable a2avXnAddr;
+    ccu::Variable xnLength;
+    ccu::Variable completedRankCount;
+    ccu::Variable xnMaxTransportSize;
+    GroupOpSizeVars xnMaxTransportGoSize;
+    std::vector<A2AsingleSendRecvInfo> sendRecvInfo;
+    uint16_t selfBit{0};
+    uint16_t allBit{0};
+    uint16_t allOtherBit{0};
+    ccu::LocalAddr myDst;
+    std::vector<ccu::RemoteAddr> dst;
+    std::vector<ccu::LocalAddr> src;
+    ccu::Event event;
+    ccu::Variable flag; // 用以判断是否是第一次重复
+    ccu::Variable xnConst1;
+};
+
 CcuResult CcuAlltoAllVMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
     ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
