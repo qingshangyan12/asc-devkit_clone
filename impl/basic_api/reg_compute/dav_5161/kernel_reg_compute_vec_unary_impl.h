@@ -70,6 +70,26 @@ __aicore__ inline constexpr LogSpecificMode GetLogSpecificMode(const LogSpecific
 {
     return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
 }
+
+__aicore__ inline constexpr Log2SpecificMode GetLog2SpecificMode(MaskMergeMode mrgMode)
+{
+    return {.mrgMode = mrgMode, .algo = Log2Algo::INTRINSIC};
+}
+
+__aicore__ inline constexpr Log2SpecificMode GetLog2SpecificMode(const Log2SpecificMode* sprMode)
+{
+    return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
+}
+
+__aicore__ inline constexpr Log10SpecificMode GetLog10SpecificMode(MaskMergeMode mrgMode)
+{
+    return {.mrgMode = mrgMode, .algo = Log10Algo::INTRINSIC};
+}
+
+__aicore__ inline constexpr Log10SpecificMode GetLog10SpecificMode(const Log10SpecificMode* sprMode)
+{
+    return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
+}
 } // namespace Internal
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
