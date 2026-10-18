@@ -15,7 +15,7 @@
 
 - isSetMask参数情况：
 
-    - 模板参数有isSetMask，支持[接口外设置Mask](../SIMD-API/basic_api/memory_vector_compute/SIMD_compute/mask.md#接口外设置Mask)。
+    - 模板参数有isSetMask，支持[接口外设置Mask](../SIMD-API/basic_api/memory_vector_compute/SIMD_compute/mask.md#接口外设置mask)。
 
     - 模板参数无isSetMask，不支持接口外设置Mask。
 
