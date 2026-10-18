@@ -31,7 +31,7 @@ constexpr Reg::CastTrait swishFloat2HalfCastTrait0 = {
 constexpr Reg::CastTrait swishFloat2HalfCastTrait1 = {
     Reg::RegLayout::ONE, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 template <typename T>
 __simd_vf__ inline void SwishComputeVF(
     __ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const T scalarValue, const uint16_t repeatTimes)
@@ -78,8 +78,8 @@ __simd_vf__ inline void SwishComputeVF(
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<T>(count);
         Reg::LoadAlign(srcVreg, src + i * oneRepElm);
-        Reg::Muls(vreg0, srcVreg, scalarValue, mask);
-        Reg::Exp(vreg0, vreg0, mask);
+        Reg::Muls(dstVreg, srcVreg, scalarValue, mask);
+        Reg::Exp(vreg0, dstVreg, mask);
         Reg::Adds(vreg0, vreg0, 1.0f, mask);
         Reg::Div(dstVreg, srcVreg, vreg0, mask);
         Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
