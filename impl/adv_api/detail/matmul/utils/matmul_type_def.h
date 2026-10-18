@@ -120,7 +120,7 @@ struct MatmulTypeWithScale : public MatmulType<POSITION, FORMAT, TYPE, ISTRANS, 
     constexpr static CubeFormat scaleFormat = SCALE_FORMAT;
     constexpr static bool isScaleTrans = SCALE_ISTRANS;
     constexpr static TPosition srcScalePos = SCALE_SRCPOS;
-    using SCALE_T = fp8_e8m0_t;
+    using SCALE_T = SCALE_TYPE;
 };
 
 template <typename A_TYPE, typename B_TYPE>

@@ -144,27 +144,11 @@ public:
         }
     }
 
-    __aicore__ inline void SetTensorAWithCopy(
-        const GlobalTensor<SrcAT>& gm, const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorAWithCopy not supported when enableMixDualMaster is enabled");
-    }
-
     __aicore__ inline void SetTensorB(const GlobalTensor<SrcBT>& gm, bool isTransposeB = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
             cubeObj.cubeObj[0].mul.SetTensorB(gm, isTransposeB);
         }
-    }
-
-    __aicore__ inline void SetTensorBWithCopy(
-        const GlobalTensor<SrcBT>& gm, const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorBWithCopy not supported when enableMixDualMaster is enabled");
     }
 
     __aicore__ inline void SetBias(const GlobalTensor<BiasT>& biasGlobal)

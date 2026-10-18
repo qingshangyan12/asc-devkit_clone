@@ -351,26 +351,6 @@ public:
     }
 #endif
 
-    __aicore__ inline void SetTensorAWithCopy(
-        const GlobalTensor<SrcAT>& gm, const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorAWithCopy not support when enableMixDualMaster is enabled");
-        ASSERT(A_TYPE::pos != TPosition::TSCM);
-        kfcMsg_.body.isTransA = static_cast<uint32_t>(isTransposeA);
-        kfcMsg_.body.setTensorA = 1;
-        kfcMsg_.body.isFirstIter = 1;
-#if defined(USE_SSBUF)
-        // C220 using RTS to control cahce mode, C310 using hardware instructions to control.
-        kfcMsg_.body.aAddr = GetGMAddrAndCopyUB(gm.address_, leftMatrix); // cache mode switch hide in address
-        sizeAmatrix_ = leftMatrix.GetSize() * sizeof(SrcAT);
-#else
-        kfcMsg_.body.aAddr = GetGMAddrAndCopyUB(gm.GetPhyAddr(), leftMatrix);
-        kfcMsg_.body.sizeAmatrix = leftMatrix.GetSize() * sizeof(SrcAT);
-#endif
-    }
-
 #if defined(USE_SSBUF)
     __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
     {
@@ -425,25 +405,6 @@ public:
         }
     }
 #endif
-
-    __aicore__ inline void SetTensorBWithCopy(
-        const GlobalTensor<SrcBT>& gm, const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
-    {
-        ASSERT(
-            !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetTensorBWithCopy not support when enableMixDualMaster is enabled");
-        ASSERT(A_TYPE::pos != TPosition::TSCM);
-        kfcMsg_.body.isTransB = static_cast<uint32_t>(isTransposeB);
-        kfcMsg_.body.setTensorB = 1;
-        kfcMsg_.body.isFirstIter = 1;
-#if defined(USE_SSBUF)
-        kfcMsg_.body.bAddr = GetGMAddrAndCopyUB(gm.address_, rightMatrix);
-        sizeBmatrix_ = rightMatrix.GetSize() * sizeof(SrcBT);
-#else
-        kfcMsg_.body.bAddr = GetGMAddrAndCopyUB(gm.GetPhyAddr(), rightMatrix);
-        kfcMsg_.body.sizeBmatrix = rightMatrix.GetSize() * sizeof(SrcBT);
-#endif
-    }
 
 #if defined(USE_SSBUF)
     __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
