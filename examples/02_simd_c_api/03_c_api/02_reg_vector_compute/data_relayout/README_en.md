@@ -2,10 +2,10 @@
 
 ## Overview
 This example implements data relayout functionality based on the C API programming interface, primarily calling the [asc_intlv](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md)/[asc_pack_to_low](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md) API, supporting multiple scenarios. Select a scenario through the CMake build parameter `SCENARIO_NUM`.
-    | SCENARIO_NUM | Relayout Scenario |
-    | --- | --- |
-    | 1 | Interleave (interleave two uint16_t vectors) |
-    | 2 | Pack (extract lower 16 bits from a uint32_t vector to a uint16_t vector) |
+| SCENARIO_NUM | Relayout Scenario |
+| --- | --- |
+| 1 | Interleave (interleave two uint16_t vectors) |
+| 2 | Pack (extract lower 16 bits from a uint32_t vector to a uint16_t vector) |
 
 ## Supported Products and CANN Versions
 
