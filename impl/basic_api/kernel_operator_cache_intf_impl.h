@@ -92,41 +92,30 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
-template <UnitSize size>
 template <typename T>
-__aicore__ inline void ICachePreLoad(const int64_t preFetchLen)
 __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset)
 {
-{
-#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     DataCachePreloadImpl(src, cacheOffset);
-    if constexpr (size == UnitSize::UNIT_2048_BYTES) {
 }
-        PreLoad(preFetchLen * 4);
-    } else {
+
 template <typename T, CacheLine entireType, DcciDst dcciDst>
-        PreLoad(preFetchLen);
 __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
-    }
 {
-#else
     DcciGMImpl<T, entireType, dcciDst>(dst);
-    PreLoad(preFetchLen);
 }
-#endif
-}
+
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
 {
     DcciUBImpl<T, entireType, dcciDst>(dst);
 }
+
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
 {
     DcciGMImpl<T, entireType>(dst);
 }
 #endif
-__aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFetchLen); }
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
