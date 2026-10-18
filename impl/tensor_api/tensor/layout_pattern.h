@@ -174,7 +174,12 @@ struct make_nn_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        static_assert(c0_ele == 2 || c0_ele == 1,
+                      "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
+#else
         static_assert(c0_ele == 2, "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+#endif
         auto shape = make_shape(make_shape(c0_ele, row / c0_ele),
                                 make_shape(Std::Int<fractal_fixed>{}, Std::ceil_division(column, fractal_fixed)));
         auto stride = make_stride(make_stride(_1{}, c0_ele * Std::Int<fractal_fixed>{}),
@@ -195,7 +200,13 @@ struct make_scalea_nd_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        static_assert(
+            c0_ele == 2 || c0_ele == 1,
+            "scalea_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
+#else
         static_assert(c0_ele == 2, "scalea_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+#endif
         auto shape = make_shape(make_shape(_1{}, row), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_0{}, column), make_stride(_0{}, _1{}));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<scalea_nd_layout_ptn, TraitType>>;
@@ -214,7 +225,13 @@ struct make_scalea_dn_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        static_assert(
+            c0_ele == 2 || c0_ele == 1,
+            "scalea_dn_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
+#else
         static_assert(c0_ele == 2, "scalea_dn_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+#endif
         auto shape = make_shape(make_shape(_1{}, row), make_shape(c0_ele, column / c0_ele));
         auto stride = make_stride(make_stride(_0{}, c0_ele), make_stride(_1{}, c0_ele * row));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<scalea_dn_layout_ptn, TraitType>>;
@@ -233,7 +250,13 @@ struct make_scaleb_nd_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        static_assert(
+            c0_ele == 2 || c0_ele == 1,
+            "scaleb_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
+#else
         static_assert(c0_ele == 2, "scaleb_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+#endif
         auto shape = make_shape(make_shape(c0_ele, row / c0_ele), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_1{}, c0_ele * column), make_stride(_0{}, c0_ele));
         using layout_t = layout<decltype(shape), decltype(stride), Std::tuple<scaleb_nd_layout_ptn, TraitType>>;

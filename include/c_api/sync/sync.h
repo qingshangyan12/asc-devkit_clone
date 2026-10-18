@@ -25,6 +25,9 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/sync_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+// A6(9201) reuses the arch-common sync implementations provided for A5(3510).
+#include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
 #endif
 
 #define asc_sync_notify(pipe, tpipe, id) asc_sync_notify_impl(pipe, tpipe, id)

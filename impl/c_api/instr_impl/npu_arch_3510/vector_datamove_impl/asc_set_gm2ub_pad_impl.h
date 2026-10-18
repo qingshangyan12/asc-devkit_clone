@@ -23,12 +23,15 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
+// set_pad_val_outtoub is an A5(3510) specific intrinsic and is not available on A6(9201).
+#if !defined(__NPU_ARCH__) || __NPU_ARCH__ != 9201
 __aicore__ inline void asc_set_gm2ub_pad_impl(uint32_t pad_val)
 {
     if ASC_IS_AIV {
         set_pad_val_outtoub(pad_val);
     }
 }
+#endif
 
 #endif
 

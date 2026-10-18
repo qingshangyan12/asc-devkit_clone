@@ -78,7 +78,8 @@ public:
             auto sub_dst = dst(make_coord(0, d, 0, 0, 0, 0)); // NDC1HWC0: engine += d*(C1*H*W*C0)
             copy_gm_to_l1_multi_dn2nz_instr::data_copy(
                 sub_dst.data().get(), sub_src.data().get(), dn_num, loop2_dst_stride, loop3_dst_stride,
-                loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false);
+                loop4_dst_stride, loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false,
+                trait.pre_allocation);
         }
     }
 
@@ -115,7 +116,8 @@ public:
             copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(dst, src, depth_dst_offset, depth_src_offset, dn_num,
                                                                    loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
                                                                    loop1_src_stride, src.engine().get_cache_mode(),
-                                                                   n_value, d_value, loop4_src_stride, false);
+                                                                   n_value, d_value, loop4_src_stride, false,
+                                                                   trait.pre_allocation);
         }
     }
 };

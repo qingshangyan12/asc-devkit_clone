@@ -118,6 +118,8 @@ __aicore__ inline void asc_set_atomic_min_int32() { asc_set_atomic_min_int32_imp
 
 // ==================== Deprecated interfaces ====================
 
+// asc_set/get_store_atomic_config rely on A5(3510) specific intrinsics and are not available on A6(9201).
+#if !defined(__NPU_ARCH__) || __NPU_ARCH__ != 9201
 /// \deprecated Use asc_atomic_add for atomic add operation instead.
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
              "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
@@ -133,6 +135,7 @@ asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_get_store_atomic_config_impl(config);
 }
+#endif
 
 /// \deprecated Use asc_set_atomic_add_int32 instead.
 [[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]

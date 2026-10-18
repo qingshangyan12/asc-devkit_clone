@@ -58,10 +58,11 @@ public:
     // Extracts single-matrix parameters from the (batch-stripped) src/dst layouts and emits the
     // instruction. nd_num/src_nd_matrix_stride/dst_nz_matrix_stride carry the batch dimension (1/0/0 when
     // there is no batch). The src/dst pattern is read from the original tensor type SrcTensor/DstTensor.
-    template <typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout,
+              typename DstLayout>
     __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t nd_num, uint64_t src_nd_matrix_stride,
-                                            uint32_t dst_nz_matrix_stride)
+                                            const DstLayout& dst_layout, uint16_t nd_num,
+                                            uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
     {
         using type = typename SrcTensor::element_type;
 
@@ -98,10 +99,11 @@ public:
 
         copy_gm_to_l1_multi_dn2nz_instr::data_copy(dst.data().get(), src.data().get(), nd_num, loop2_dst_stride,
                                                    loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode,
-                                                   n_value, d_value, loop4_src_stride, false);
+                                                   n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 
-    template <typename DstTensor, typename SrcTensor, typename CopyShape, typename DstOffset, typename SrcOffset>
+    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename CopyShape,
+              typename DstOffset, typename SrcOffset>
     __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const CopyShape& copy_shape,
                                             uint16_t nd_num, uint64_t src_nd_matrix_stride,
                                             uint32_t dst_nz_matrix_stride, const DstOffset& dst_offset,
@@ -118,7 +120,7 @@ public:
         uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
         copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, nd_num, 1, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
-            src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false);
+            src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 };
 

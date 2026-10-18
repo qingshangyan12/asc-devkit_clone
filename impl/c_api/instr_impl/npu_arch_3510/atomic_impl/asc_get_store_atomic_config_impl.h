@@ -23,10 +23,13 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
+// get_st_atomic_cfg is an A5(3510) specific intrinsic and is not available on A6(9201).
+#if !defined(__NPU_ARCH__) || __NPU_ARCH__ != 9201
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
 }
+#endif
 
 #endif
 
