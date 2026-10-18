@@ -571,6 +571,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#include "kernel_operator_data_copy_ptr_intf.h"
+#endif
+
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_data_copy_intf_impl.h"
 #endif

@@ -64,3 +64,18 @@ extern "C" __global__ __aicore__ void KernelTestICachePreLoad1()
     int64_t preFetchLen = 0;
     AscendC::ICachePreLoad(preFetchLen);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+extern "C" __global__ __aicore__ void KernelTestDataCachePointerOverloads()
+{
+    __gm__ uint64_t* gm = nullptr;
+    __ubuf__ uint64_t* ub = nullptr;
+    int16_t cacheOffset = 0;
+    AscendC::DataCachePreload(gm, cacheOffset);
+    AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(
+        gm);
+    AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_UB>(
+        ub);
+    AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE>(gm);
+}
+#endif

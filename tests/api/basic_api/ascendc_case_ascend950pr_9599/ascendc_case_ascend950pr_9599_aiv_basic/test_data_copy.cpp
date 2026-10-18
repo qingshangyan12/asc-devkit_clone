@@ -109,3 +109,30 @@ TEST_F(DataCopyUB2L0CTestSuite, testCaseDataCopyUB2L0C)
     MOCKER(raise).stubs().will(returnValue(static_cast<int>(0)));
     DataCopyUB2L0CIntf(dstGm, srcGm, params, enhancedParams);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+TEST(DataCopyPointerSuite, GmUbRoundTrip)
+{
+    constexpr uint32_t elementCount = 32;
+    int32_t srcGm[elementCount];
+    int32_t dstGm[elementCount] = {0};
+    for (uint32_t i = 0; i < elementCount; ++i) {
+        srcGm[i] = static_cast<int32_t>(i * 3 + 1);
+    }
+
+    LocalTensor<int32_t> local;
+    TBuffAddr localAddr;
+    localAddr.logicPos = static_cast<uint8_t>(TPosition::VECIN);
+    local.SetAddr(localAddr);
+    local.InitBuffer(0, elementCount);
+    auto ub = reinterpret_cast<__ubuf__ int32_t*>(local.GetPhyAddr());
+    auto src = reinterpret_cast<__gm__ int32_t*>(srcGm);
+    auto dst = reinterpret_cast<__gm__ int32_t*>(dstGm);
+    DataCopy(ub, src, elementCount);
+    DataCopy(dst, ub, elementCount);
+
+    for (uint32_t i = 0; i < elementCount; ++i) {
+        EXPECT_EQ(dstGm[i], srcGm[i]);
+    }
+}
+#endif

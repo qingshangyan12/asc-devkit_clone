@@ -423,3 +423,111 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
     AscendC::ResetLoopModePara(type);
 }
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+extern "C" __global__ __aicore__ void KernelTestDataCopyPointerBasic()
+{
+    __gm__ half* gm = nullptr;
+    __ubuf__ half* ub = nullptr;
+    __cbuf__ half* l1 = nullptr;
+    AscendC::DataCopyParams params{1, 1, 0, 0};
+    AscendC::DataCopy(ub, gm, params);
+    AscendC::DataCopy(l1, gm, params);
+    AscendC::DataCopy(gm, ub, params);
+    AscendC::DataCopy(gm, l1, params);
+    AscendC::DataCopy(ub, ub, params);
+    AscendC::DataCopy(l1, ub, params);
+    AscendC::DataCopy(ub, l1, params);
+    AscendC::DataCopy(ub, gm, 16);
+    AscendC::DataCopy(l1, gm, 16);
+    AscendC::DataCopy(gm, ub, 16);
+    AscendC::DataCopy(gm, l1, 16);
+    AscendC::DataCopy(ub, ub, 16);
+    AscendC::DataCopy(l1, ub, 16);
+    AscendC::DataCopy(ub, l1, 16);
+    AscendC::DataCopyL1ToUB(ub, l1, params);
+    AscendC::DataCopyL1ToUB(ub, l1, 16);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPointerFormat()
+{
+    __gm__ half* gm = nullptr;
+    __ubuf__ half* ub = nullptr;
+    __cbuf__ half* l1 = nullptr;
+    AscendC::Nd2NzParams nd2nz{};
+    AscendC::Dn2NzParams dn2nz{};
+    AscendC::Nz2NdParamsFull nz2nd{};
+    AscendC::DataCopy(l1, gm, nd2nz);
+    AscendC::DataCopy(ub, gm, nd2nz);
+    AscendC::DataCopy(l1, ub, nd2nz);
+    AscendC::DataCopy(l1, gm, dn2nz);
+    AscendC::DataCopy(gm, ub, nz2nd);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPointerEnhanced()
+{
+    __gm__ half* gm = nullptr;
+    __ubuf__ half* ub = nullptr;
+    __cbuf__ half* l1 = nullptr;
+    __cc__ half* l0c = nullptr;
+    __cc__ float* l0cFloat = nullptr;
+    __cbuf__ float* l1Float = nullptr;
+    __ubuf__ int8_t* ubInt8 = nullptr;
+    __cc__ int32_t* l0cInt32 = nullptr;
+    AscendC::DataCopyParams params{1, 1, 0, 0};
+    AscendC::DataCopyEnhancedParams enhanced{};
+    AscendC::DataCopyCO12DstParams c012Dst{};
+    AscendC::DataCopy(ub, gm, params, enhanced);
+    AscendC::DataCopy(l1, gm, params, enhanced);
+    AscendC::DataCopy(gm, ub, params, enhanced);
+    AscendC::DataCopy(gm, l1, params, enhanced);
+    AscendC::DataCopy(l1, ub, params, enhanced);
+    AscendC::DataCopy(ub, ub, params, enhanced);
+    AscendC::DataCopy(ub, l1, params, enhanced);
+    AscendC::DataCopy(l0c, l1, params, enhanced);
+    AscendC::DataCopy(ub, l0c, params, enhanced);
+    AscendC::DataCopy(l0c, ub, params, enhanced);
+    AscendC::DataCopy((__cc__ half*)l0c, l1Float, params, enhanced);
+    AscendC::DataCopy(ub, l0cFloat, params, enhanced);
+    AscendC::DataCopy(ubInt8, l0cInt32, params, enhanced);
+    AscendC::DataCopy((__cc__ float*)l0cFloat, ub, params, enhanced);
+    AscendC::DataCopy(l1, l0cFloat, c012Dst);
+    AscendC::DataCopy(gm, l0cFloat, c012Dst);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPointerPad()
+{
+    __gm__ half* gm = nullptr;
+    __ubuf__ half* ub = nullptr;
+    __cbuf__ half* l1 = nullptr;
+    AscendC::DataCopyParams params{1, 1, 0, 0};
+    AscendC::DataCopyPadParams pad{};
+    AscendC::DataCopyExtParams ext{1, 2, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<half> extPad{};
+    AscendC::Nd2NzParams nd2nz{};
+    AscendC::DataCopyPad(ub, gm, params, pad);
+    AscendC::DataCopyPad(l1, gm, params, pad);
+    AscendC::DataCopyPad(gm, ub, params);
+    AscendC::DataCopyPad(l1, ub, params, nd2nz);
+    AscendC::DataCopyPad(ub, gm, ext, extPad);
+    AscendC::DataCopyPad(l1, gm, ext, extPad);
+    AscendC::DataCopyPad(gm, ub, ext);
+    AscendC::DataCopyPad(l1, ub, ext, nd2nz);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPointerSliceAndNdDma()
+{
+    __gm__ half* gm = nullptr;
+    __ubuf__ half* ub = nullptr;
+    AscendC::SliceInfo dstSlice[2]{};
+    AscendC::SliceInfo srcSlice[2]{};
+    dstSlice[0].shapeValue = 16;
+    srcSlice[0].shapeValue = 16;
+    AscendC::DataCopy(ub, gm, dstSlice, srcSlice, 2);
+    AscendC::DataCopy(gm, ub, dstSlice, srcSlice, 2);
+    AscendC::MultiCopyLoopInfo<2> loopInfo{};
+    AscendC::MultiCopyParams<half, 2> multiParams{loopInfo, half(0)};
+    static constexpr AscendC::NdDmaConfig config = {
+        false, AscendC::NdDmaConfig::unsetPad, AscendC::NdDmaConfig::unsetPad, false};
+    AscendC::DataCopy<half, 2, config>(ub, gm, multiParams);
+}
+#endif

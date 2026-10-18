@@ -62,6 +62,20 @@ enum class UnitSize {
 #endif
 };
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
+
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst);
+
+template <typename T, CacheLine entireType>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+#endif
+
 template <UnitSize size = UnitSize::UNIT_2048_BYTES>
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
 

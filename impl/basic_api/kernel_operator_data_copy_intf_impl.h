@@ -2442,6 +2442,9 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 }
 
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#include "kernel_operator_data_copy_ptr_intf_impl.h"
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)
