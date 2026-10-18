@@ -161,8 +161,12 @@ __aicore__ inline constexpr bool IsSupportB4()
     if (IsSameTypeV<SrcT, int4b_t>) {
         return true;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
+        return true;
+    }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+    if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat4x2_t>) {
         return true;
     }
 #endif
