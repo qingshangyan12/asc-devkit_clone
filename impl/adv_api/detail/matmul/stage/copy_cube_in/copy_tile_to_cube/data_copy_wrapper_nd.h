@@ -120,7 +120,7 @@ public:
                 DataCopy(dst, src[srcOffset], nd2nzParams);
             }
         }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         DataCopy(dst, src[srcOffset], nd2nzParams, preAllocation);
 #else
         DataCopy(dst, src[srcOffset], nd2nzParams); // stride scope has increased

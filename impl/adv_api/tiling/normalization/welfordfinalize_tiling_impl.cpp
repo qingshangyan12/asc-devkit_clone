@@ -28,7 +28,8 @@ void GetWelfordFinalizeMaxMinTmpSize(
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113 ||
+        npuArch == NpuArch::DAV_9202) {
         const uint32_t srcK = shapeDims.back();
         const uint32_t vecLenB32 = platform->GetVecRegLen() / sizeof(float);
         const uint32_t alignLen = vecLenB32 * 2;

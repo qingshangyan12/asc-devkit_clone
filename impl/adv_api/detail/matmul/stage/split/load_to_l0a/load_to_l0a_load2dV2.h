@@ -159,7 +159,7 @@ private:
         uint16_t aL1MOffset, uint16_t aL1KOffset, const LocalTensor<AuxDtype>& l1AAuxMatrix, uint16_t aAuxL1K,
         uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -187,7 +187,7 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
-#if __NPU_ARCH__ == 9201
+#if (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
             loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
             loadDataMxParams.yStep = kStep * FP4_TWO;
@@ -204,7 +204,7 @@ private:
         uint16_t aL1MOffset, uint16_t aL1KOffset, const LocalTensor<AuxDtype>& l1AAuxMatrix, uint16_t aAuxL1K,
         uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -231,7 +231,7 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
-#if __NPU_ARCH__ == 9201
+#if (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
             loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
             loadDataMxParams.yStep = kStep * FP4_TWO;
