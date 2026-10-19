@@ -240,7 +240,7 @@ void GetWelfordUpdateMaxMinTmpSize(
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_9202) {
         (void)typeSizeT;
         (void)isReuseSource;
         minValue = 0;
@@ -274,7 +274,7 @@ void GetLayerNormMaxMinTmpSize(
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_9202) {
         (void)isReuseSource;
         std::vector<int64_t> shapeDims = srcShape.GetDims();
         const uint32_t vecLenB32 = platform->GetVecRegLen() / LAYERNORM_SIZEOF_FLOAT;
@@ -335,7 +335,7 @@ void GetLayerNormNDTilingInfo(
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_9202) {
         (void)stackBufferSize;
         const uint32_t rLength = static_cast<uint32_t>(shapeDims.back());
         int32_t typeAignSize = 32 / typeSize;

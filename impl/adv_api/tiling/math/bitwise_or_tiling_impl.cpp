@@ -48,7 +48,7 @@ void GetBitwiseOrMaxMinTmpSize(
     const uint32_t inputSize = srcShape.GetShapeSize();
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_9202), return,
         "Unsupported NpuArch of BitwiseOr API.");
 
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<BITWISE_OR_GET_MAX_MIN>(inputSize, typeSize);
@@ -65,7 +65,7 @@ void GetBitwiseOrTmpBufferFactorSize(
 {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_9202), return,
         "Unsupported NpuArch of BitwiseOr API.");
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_OR_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
 
