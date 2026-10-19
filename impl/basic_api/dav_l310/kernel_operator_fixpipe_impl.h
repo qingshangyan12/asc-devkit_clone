@@ -28,14 +28,25 @@ namespace AscendC {
 
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
 {
-    (void)(config);
-    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeClipRelu");
+    set_fix_clip_relu(config);
 }
 
 template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeAddr");
+    static_assert(
+        SupportType<T, half>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half");
+    const Hardware eleWiseHWPos = GetPhyType((TPosition)eleWiseTensor.GetPosition());
+    if (eleWiseHWPos != Hardware::L1) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "eleWise", "L1 Buffer(A1/B1/C1)", "SetFixPipeAddr",
+            GetPositionDisplay(static_cast<TPosition>(eleWiseTensor.GetPosition())));
+    }
+    
+    uint64_t config = 0;
+    config = config | c0ChStride; // ELT_SRC_PARA[15:0], C0 channel stride Size.
+    config = config | ((static_cast<uint64_t>(eleWiseTensor.GetPhyAddr()) >> 5) << 16); // L1 address, ELT_SRC_PARA[31:16], align with 32bit.
+    set_elt_src_para(config);
 }
 
 /* **************************************************************************************************
