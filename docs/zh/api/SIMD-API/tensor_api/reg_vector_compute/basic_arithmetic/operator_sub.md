@@ -91,7 +91,7 @@ $$
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void sub_example(InputTensor input0, InputTensor input1, OutputTensor output)

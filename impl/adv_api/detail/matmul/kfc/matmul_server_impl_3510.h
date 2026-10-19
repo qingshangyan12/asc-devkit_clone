@@ -165,10 +165,10 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
                 mul.GetTensorC(cLocal[offset], (uint8_t)(enAtomic), enSequentialWrite);
             } else if constexpr (GetPhyType(C_TYPE::pos) == Hardware::UB) {
                 if (isFirstIterate) {
-                    CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(GetIntraFlagId(
+                    WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(GetIntraFlagId(
                         instID, static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
                     if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                        CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+                        WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(
                             instID + static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP) + INTRA_NUM);
                     }
                     isFirstIterate = false;
@@ -261,10 +261,10 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         const auto& cLocal = GetLocalTensor<typename C_TYPE::T, C_TYPE::pos>(msg->body.cAddr, size);
         // C310 direct l0c->ub need to sync pipe with AIV
         if constexpr (GetPhyType(C_TYPE::pos) == Hardware::UB) {
-            CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+            WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
                 GetIntraFlagId(instID, static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+                WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(
                     instID + static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP) + INTRA_NUM);
             }
         }
@@ -276,16 +276,16 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         (GetPhyType(C_TYPE::pos) == Hardware::GM)) {
         // L0c accumulation and async no need to wait copy out, so no need to set fixpipe
         if (isSyncIterate_) {
-            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
                 GetIntraFlagId(instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
-            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(
                 instID + static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP) + INTRA_NUM);
         }
     } else {
-        CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+        SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
             GetIntraFlagId(instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(
                 instID + static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP) + INTRA_NUM);
         }
     }
@@ -342,10 +342,10 @@ template <
 __aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::IterNotify()
 {
     if constexpr (GetPhyType(C_TYPE::pos) != Hardware::L1) {
-        CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+        SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
             GetIntraFlagId(instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(GetIntraFlagId(
+            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(GetIntraFlagId(
                 instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), 1U)); // 1 means sub_block 1
         }
     }
@@ -409,10 +409,10 @@ __aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         (GetPhyType(B_TYPE::pos) == Hardware::GM && GetPhyType(B_TYPE::srcPos) == Hardware::UB) ||
         (GetPhyType(BIAS_TYPE::pos) == Hardware::GM && GetPhyType(BIAS_TYPE::srcPos) == Hardware::UB)) {
         // GM->L1 wait UB->GM
-        CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(
+        WaitCVSync<INTRA_MODE, PIPE_MTE2, CV_SYNC_AIV_ID0>(
             GetIntraFlagId(0, static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::GM_L1_UB_GM), mul.GetSubBlockIdx()));
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(
+            WaitCVSync<INTRA_MODE, PIPE_MTE2, CV_SYNC_AIV_ID1>(
                 static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::GM_L1_UB_GM) + INTRA_NUM);
         }
     }
@@ -435,8 +435,8 @@ __aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
             // Only one mm obj in server
             constexpr uint16_t l1SetIdV0 = static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB);
             constexpr uint16_t l1SetIdV1 = static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB) + INTRA_NUM;
-            CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV0);
-            CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV1);
+            SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID0>(l1SetIdV0);
+            SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(l1SetIdV1);
         } else {
             CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(
                 GetIntraFlagId(0, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB), mul.GetSubBlockIdx()));
@@ -456,11 +456,11 @@ __aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         KfcSetIntraScaleAId(mul, body.quantAddr >> VALID_ADDR_BITS_NUM);
     }
     if constexpr (PhyMxScalePosIsGM<A_TYPE>()) {
-        GlobalTensor<fp8_e8m0_t> scaleAGlobal;
-        scaleAGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ fp8_e8m0_t*>(body.quantAddr), 0);
+        GlobalTensor<SrcScaleAT> scaleAGlobal;
+        scaleAGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ SrcScaleAT*>(body.quantAddr), 0);
         mul.SetTensorScaleA(scaleAGlobal, isTransScaleA);
     } else if constexpr (PhyMxScalePosIsUB<A_TYPE>() || PhyMxScalePosIsL1<A_TYPE>()) {
-        const auto& scaleALocal = GetLocalTensor<fp8_e8m0_t, A_TYPE::scalePosition>(body.quantAddr, 0);
+        const auto& scaleALocal = GetLocalTensor<SrcScaleAT, A_TYPE::scalePosition>(body.quantAddr, 0);
         mul.SetTensorScaleA(scaleALocal, isTransScaleA);
         return;
     }
@@ -478,11 +478,11 @@ __aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         KfcSetIntraScaleBId(mul, body.quantScalar >> VALID_ADDR_BITS_NUM);
     }
     if constexpr (PhyMxScalePosIsGM<B_TYPE>()) {
-        GlobalTensor<fp8_e8m0_t> scaleBGlobal;
-        scaleBGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ fp8_e8m0_t*>(body.quantScalar), 0);
+        GlobalTensor<SrcScaleBT> scaleBGlobal;
+        scaleBGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ SrcScaleBT*>(body.quantScalar), 0);
         mul.SetTensorScaleB(scaleBGlobal, isTransScaleB);
     } else if constexpr (PhyMxScalePosIsUB<B_TYPE>() || PhyMxScalePosIsL1<B_TYPE>()) {
-        const auto& scaleBLocal = GetLocalTensor<fp8_e8m0_t, B_TYPE::scalePosition>(body.quantScalar, 0);
+        const auto& scaleBLocal = GetLocalTensor<SrcScaleBT, B_TYPE::scalePosition>(body.quantScalar, 0);
         mul.SetTensorScaleB(scaleBLocal, isTransScaleB);
         return;
     }
@@ -522,10 +522,10 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
 
     if constexpr (GetPhyType(C_TYPE::pos) == Hardware::UB) {
         LocalTensor<DstT> cLocal = GetLocalTensor<typename C_TYPE::T, C_TYPE::pos>(body->cAddr, size);
-        CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+        WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
             GetIntraFlagId(instID, static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+            WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(
                 instID + static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP) + INTRA_NUM);
         }
         mul.IterateBatch(

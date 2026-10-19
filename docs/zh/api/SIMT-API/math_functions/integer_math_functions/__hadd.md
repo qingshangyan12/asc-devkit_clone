@@ -29,7 +29,7 @@
 
 获取int32类型数据x和y的平均值，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002555143760.png)
+![](../../../figures/formulaimage_0000002555143760.png)
 
 ## 函数原型
 

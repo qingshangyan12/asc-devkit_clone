@@ -39,7 +39,7 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ <dtype>*& dst,
-                                                             vector_store_unalign unalign_reg,
+                                                             vector_store_unalign src,
                                                              int32_t offset)
 ```
 
@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ <dtype>*& 
 
 ```c
 __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ uint8_t*& dst,
-                                                             vector_store_unalign unalign_reg,
+                                                             vector_store_unalign src,
                                                              int32_t offset)
 ```
 
@@ -62,7 +62,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ uint8_t*& 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输入/输出 | 目的操作数的UB地址，类型为`__ubuf__ <dtype>*&`。通常由前序`asc_storeunalign_postupdate`更新到搬出区间结束地址。 |
-| unalign_reg | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序接口使用同一个寄存器。 |
+| src | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序接口使用同一个寄存器。 |
 | offset | 输入 | 偏移量，类型为`int32_t`，单位为元素。指令搬出后，`dst`向后偏移`offset`个元素，若`dst`已指向结束地址时设置为0。 |
 
 非对齐寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
@@ -76,7 +76,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ uint8_t*& 
 ### 通用约束
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- 调用本接口前，须调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数偏移搬出模式**，并复用同一个`unalign_reg`。
+- 调用本接口前，须调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数偏移搬出模式**，并复用同一个`src`。
 - `dst`无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址更新后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
@@ -111,12 +111,12 @@ constexpr uint32_t OUTPUT_BYTES = START_OFFSET + ELEMENT_COUNT;
 
 __simd_vf__ inline void post_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_uint8_t src;
-    vector_store_unalign unalign_reg;
+    vector_uint8_t data;
+    vector_store_unalign src;
     __ubuf__ uint8_t* dst = output + START_OFFSET;
-    asc_loadalign(src, input);
-    asc_storeunalign_postupdate(dst, unalign_reg, src, ELEMENT_COUNT);
-    asc_storeunalign_post_postupdate(dst, unalign_reg, 0);
+    asc_loadalign(data, input);
+    asc_storeunalign_postupdate(dst, src, data, ELEMENT_COUNT);
+    asc_storeunalign_post_postupdate(dst, src, 0);
 }
 
 __global__ __vector__ void post_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)

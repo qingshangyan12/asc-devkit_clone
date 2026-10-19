@@ -51,9 +51,13 @@ generate_coverage() {
   REMOVE_ARGS=""
   EXTRA_ARGS=""
   # 版本比较，>=2.0，加参数忽略编译和运行行号不一致导致的lcov执行失败
+  # negative：同一产品源文件被多个 UT target 以不同宏组合编译（如 hccl_alloc_ctx_res.cc 分属
+  # aicpu_st(-DAICPU_COMPILE) / ccu_st(-DMC2_CLIENT_ENABLE_CCU=1) / external_alg），
+  # lcov 2.x 合并多份结构不同的 gcno 记录时个别行会算出负计数（gcc-14 环境实测），
+  # geninfo 官方 bypass 即 --ignore-errors negative；老 lcov(1.14) 无此错误类型且合并不触发，无需添加
   if [ -n "$LCOV_MAJOR" ] && [ "$LCOV_MAJOR" -ge 2 ]; then
     REMOVE_ARGS="--ignore-errors unused --ignore-errors mismatch --ignore-errors source"
-    EXTRA_ARGS="--ignore-errors mismatch --ignore-errors source"
+    EXTRA_ARGS="--ignore-errors mismatch --ignore-errors source --ignore-errors negative"
   fi
 
   lcov -c -d "${_source_dir}" -o "${_coverage_file}" $EXTRA_ARGS

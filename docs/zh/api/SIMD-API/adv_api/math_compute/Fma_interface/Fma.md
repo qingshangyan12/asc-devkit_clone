@@ -27,9 +27,9 @@
 
 按元素计算两个输入相乘后与第三个输入相加的结果。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002353015644.png)
+![](../../../../figures/formulaimage_0000002353015644.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002386692741.png)
+![](../../../../figures/formulaimage_0000002386692741.png)
 
 ## 函数原型
 

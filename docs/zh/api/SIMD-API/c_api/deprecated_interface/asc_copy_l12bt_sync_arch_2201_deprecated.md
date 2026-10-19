@@ -67,13 +67,10 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-constexpr uint16_t n_burst = 1;
-constexpr uint16_t len_burst = 1;
-constexpr uint16_t source_gap = 0;
-constexpr uint16_t dst_gap = 1;
-constexpr uint16_t conv_control = 0;
+// 同步接口按字节数连续搬运，此处搬运一个32字节数据块。
+constexpr uint32_t copy_size = 32;
 __cbuf__ half src[256];
 __biasbuf__ half dst[256];
 uint64_t dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
-asc_copy_l12bt_sync(dst_addr, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+asc_copy_l12bt_sync(dst_addr, src, copy_size);
 ```

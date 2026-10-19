@@ -29,7 +29,7 @@
 
 获取输入数据与π相乘的余弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816349.png)
+![](../../../figures/formulaimage_0000002516816349.png)
 
 ## 函数原型
 

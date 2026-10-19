@@ -102,7 +102,7 @@ __aicore__ inline void PipeBarrierImpl()
 #endif
 #if (                                                                                               \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-    __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
     if constexpr (pipe == PIPE_V) {
         return;
     }
@@ -118,7 +118,7 @@ __aicore__ inline void PipeBarrierImpl()
 #endif
     pipe_barrier(pipe);
 
-#if (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
     if constexpr (pipe == PIPE_ALL || pipe == PIPE_S) {
         dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     }

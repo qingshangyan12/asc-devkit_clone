@@ -29,7 +29,7 @@
 
 获取输入数据x的伽马函数值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816381.png)
+![](../../../figures/formulaimage_0000002516816381.png)
 
 ## 函数原型
 

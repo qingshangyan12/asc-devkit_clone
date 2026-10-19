@@ -86,9 +86,9 @@
 
 - **色域转换：** RGB格式转换为YUV格式，或YUV格式转换为RGB格式。
 
-    ![](../../../../figures/zh-cn_formulaimage_0000001938335310.png)
+    ![](../../../../figures/formulaimage_0000001938335310.png)
 
-    ![](../../../../figures/zh-cn_formulaimage_0000001938176178.png)
+    ![](../../../../figures/formulaimage_0000001938176178.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

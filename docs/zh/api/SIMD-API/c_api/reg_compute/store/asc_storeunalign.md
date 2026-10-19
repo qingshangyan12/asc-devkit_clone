@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/store/storeunalign.h"`。
 
-将矢量数据寄存器中的前`count`个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址。`unalign_reg` 为非对齐寄存器，按引用传入并在本接口调用后被更新为本次搬出尾部数据，供下一次本接口或非对齐搬出收尾接口继续拼接使用。每次调用后，用户需手动更新目的操作数在UB中的地址。
+将矢量数据寄存器中的前`count`个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址。`src0` 为非对齐寄存器，按引用传入并在本接口调用后被更新为本次搬出尾部数据，供下一次本接口或非对齐搬出收尾接口继续拼接使用。每次调用后，用户需手动更新目的操作数在UB中的地址。
 
 矢量数据寄存器搬运原理如下：
 记目的操作数的起始地址为`dst_start`，结束地址为`dst_end`，尾块元素个数为`unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)`。
@@ -45,8 +45,8 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign(__ubuf__ <dtype>* dst,
-                                             vector_store_unalign& unalign_reg,
-                                             vector_<dtype> src,
+                                             vector_store_unalign& src0,
+                                             vector_<dtype> src1,
                                              uint32_t count)
 ```
 
@@ -58,8 +58,8 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ <dtype>* dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t* dst,
-                                             vector_store_unalign& unalign_reg,
-                                             vector_uint8_t src,
+                                             vector_store_unalign& src0,
+                                             vector_uint8_t src1,
                                              uint32_t count)
 ```
 
@@ -70,8 +70,8 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t* dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`。地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。 |
-| unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。用于承接前一次搬出的尾块，并暂存本次搬出的尾块。首次调用前无需初始化。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。数据类型须与`dst`一致。 |
+| src0 | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。用于承接前一次搬出的尾块，并暂存本次搬出的尾块。首次调用前无需初始化。 |
+| src1 | 输入 | 源操作数（矢量数据寄存器）。数据类型须与`dst`一致。 |
 | count | 输入 | 本次搬出的元素个数，类型为`uint32_t`，最大值不超过单个矢量数据寄存器可容纳的元素个数。 |
 
 矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
@@ -90,7 +90,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t* dst,
 
 ### 指令约束
 
-- 连续调用时须复用同一个`unalign_reg`，并按已搬出的元素个数更新`dst`。
+- 连续调用时须复用同一个`src0`，并按已搬出的元素个数更新`dst`。
 - 调用该接口之后，需要调用[asc_storeunalign_post](asc_storeunalign_post.md)处理非对齐搬出的尾块，尾块数据使用同一个非对齐寄存器存储。
 - `count`最大值不超过单个矢量数据寄存器可容纳的元素个数，目的访问范围不可越过UB可用容量上限，否则会报错。
 
@@ -120,11 +120,11 @@ constexpr uint32_t OUTPUT_BYTES = START_OFFSET + ELEMENT_COUNT;
 
 __simd_vf__ inline void storeunalign_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_uint8_t src;
-    vector_store_unalign unalign_reg;
-    asc_loadalign(src, input);
-    asc_storeunalign(output + START_OFFSET, unalign_reg, src, ELEMENT_COUNT);
-    asc_storeunalign_post(output + START_OFFSET, unalign_reg, ELEMENT_COUNT);
+    vector_uint8_t src1;
+    vector_store_unalign src0;
+    asc_loadalign(src1, input);
+    asc_storeunalign(output + START_OFFSET, src0, src1, ELEMENT_COUNT);
+    asc_storeunalign_post(output + START_OFFSET, src0, ELEMENT_COUNT);
 }
 
 __global__ __vector__ void storeunalign_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)

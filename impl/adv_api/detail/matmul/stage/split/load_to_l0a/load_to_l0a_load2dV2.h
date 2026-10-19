@@ -187,6 +187,14 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
+#if __NPU_ARCH__ == 9201
+        else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
+            loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
+            loadDataMxParams.yStep = kStep * FP4_TWO;
+            loadDataMxParams.srcStride = aAuxL1K * FP4_TWO;
+            loadDataMxParams.dstStride = CeilDiv(madK, c0Size_) * FP4_TWO;
+        }
+#endif
         LoadData(dst, aMatrix, l1AAuxMatrix, loadDataParams, loadDataMxParams);
 #endif
     }
@@ -223,6 +231,14 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
+#if __NPU_ARCH__ == 9201
+        else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
+            loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
+            loadDataMxParams.yStep = kStep * FP4_TWO;
+            loadDataMxParams.srcStride = aAuxL1K * FP4_TWO;
+            loadDataMxParams.dstStride = CeilDiv(madK, c0Size_) * FP4_TWO;
+        }
+#endif
         LoadData(dst, aMatrix, l1AAuxMatrix, loadDataParams, loadDataMxParams);
 #endif
     }
