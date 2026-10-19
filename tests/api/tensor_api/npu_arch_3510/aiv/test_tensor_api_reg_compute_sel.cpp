@@ -89,9 +89,26 @@ void compress_stub(
     dst = src;
 }
 
+class AivCoreTypeGuard {
+public:
+    AivCoreTypeGuard() : previous_core_type(g_coreType)
+    {
+        g_coreType = AscendC::AIV_TYPE;
+    }
+
+    ~AivCoreTypeGuard()
+    {
+        g_coreType = previous_core_type;
+    }
+
+private:
+    int32_t previous_core_type;
+};
+
 template <typename T>
 __simd_vf__ inline void compile_reg_compress(vector_bool mask)
 {
+    AivCoreTypeGuard core_type_guard;
     using reg_type = typename asc::te::experimental::reg_tensor<T>::reg_type;
     asc::te::experimental::reg_tensor<T> src{};
     std::memset(&src.reg, 0x12, sizeof(src.reg));
