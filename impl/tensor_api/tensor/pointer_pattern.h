@@ -76,7 +76,7 @@ __aicore__ inline auto make_mem_ptr(Iterator iterator)
 template <typename T>
 __aicore__ inline constexpr size_t get_scale_divisor()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     if constexpr (Std::is_same_v<Std::remove_cvref_t<T>, hifloat4x2_t>) {
         return scale_divisor_hif4;
     } else {

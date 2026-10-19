@@ -45,6 +45,8 @@ struct arch_version {
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t v9201 = 9201;
     static constexpr uint32_t V9201 = 9201;
+    static constexpr uint32_t v9202 = 9202;
+    static constexpr uint32_t V9202 = 9202;
 };
 
 struct get_arch_version {
@@ -142,7 +144,7 @@ inline constexpr bool is_data_type =
     is_one_of_attr_v<
         Std::remove_cvref_t<DataType>, hifloat8_t, bfloat16_t, fp4x2_e1m2_t, fp4x2_e2m1_t, fp8_e5m2_t, fp8_e4m3fn_t,
         fp8_e8m0_t, int4b_t
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         ,
         hifloat4x2_t
 #endif
@@ -152,7 +154,7 @@ inline constexpr bool is_data_type =
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<
     DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, int4b_t
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     ,
     hifloat4x2_t
 #endif
