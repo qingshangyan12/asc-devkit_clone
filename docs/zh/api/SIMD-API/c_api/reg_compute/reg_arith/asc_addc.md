@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "根据掩码对两路矢量源操作数与输入进位按元素求和，并输出每个元素的进位标志。"
+tag:
+  - roles: [compute]
+  - operations: [add]
+  - traits: [carry_input, elementwise, supports_carry_output]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "运算输出完整计算结果（包含进位位）"
+version: ">=9.0.0"
+---
 # asc_addc
 
 ## 产品支持情况

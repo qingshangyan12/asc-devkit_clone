@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "按元素对源矢量做开方运算，即dst_i等于src_i的平方根，src只支持设置为正数。该接口已废弃，请改用非同步接口asc_sqrt与同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [sqrt]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_sqrt_sync（废弃）
 
 ## 产品支持情况

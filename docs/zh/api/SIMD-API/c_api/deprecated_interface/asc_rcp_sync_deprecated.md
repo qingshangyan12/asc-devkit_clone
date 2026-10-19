@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "执行矢量取倒数运算并将结果写入目的矢量，该同步复合接口已废弃，请改用对应的非同步接口 asc_rcp 和同步接口 asc_sync 替代。"
+tag:
+  - roles: [compute]
+  - operations: [reciprocal]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_rcp_sync（废弃）
 
 ## 产品支持情况

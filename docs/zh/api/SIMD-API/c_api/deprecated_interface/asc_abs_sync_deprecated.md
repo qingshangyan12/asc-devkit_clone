@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "按元素对源矢量取绝对值并写入目的矢量，接口已废弃，请通过asc_abs与asc_sync实现精细化调优，达成最优性能。"
+tag:
+  - roles: [compute]
+  - operations: [absolute]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md
+    kind: replaced_by
+    condition: "按元素取绝对值场景改用asc_abs实现"
+version: ">=9.0.0"
+---
 # asc_abs_sync（废弃）
 
 ## 产品支持情况

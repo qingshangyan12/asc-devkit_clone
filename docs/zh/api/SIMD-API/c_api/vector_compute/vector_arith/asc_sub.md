@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "执行两个矢量的减法运算，按dst_i = src0_i - src1_i逐元素计算，结果写入目的矢量，dst、src0、src1的起始地址需要32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [subtract]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_sub
 
 ## 产品支持情况

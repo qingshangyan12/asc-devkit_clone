@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对矢量输入按元素取自然指数并写入目的矢量，支持前n个数据计算与高维切分计算两种形式。"
+tag:
+  - roles: [compute]
+  - operations: [exponential]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_exp
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "对源矢量和标量value逐元素求积后累加到目的矢量，接口已废弃，请使用asc_axpy与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md
+    kind: replaced_by
+    condition: "矢量与标量乘加场景改用asc_axpy实现"
+version: ">=9.0.0"
+---
 # asc_axpy_sync（废弃）
 
 ## 产品支持情况

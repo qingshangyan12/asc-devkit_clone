@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素对矢量输入取自然指数并写入dst。接口已废弃，请使用对应的非同步接口asc_exp和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [exponential]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_exp_sync（废弃）
 
 ## 产品支持情况
