@@ -1,3 +1,24 @@
+---
+okftype: reference.enum
+description: "定义饱和控制策略枚举，供asc_set_saturation_strategy和asc_get_saturation_strategy使用，决定CAST类全局饱和配置是否生效，取值USE_API或USE_GLOBAL。"
+tag:
+  - roles: [configuration]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md
+    kind: related
+    condition: "USE_API配合单指令饱和时参见其SatMode与饱和生效配置表"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md
+    kind: related
+    condition: "作为调用该接口时的策略枚举类型"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: related
+    condition: "该策略影响其配置的CAST全局饱和是否生效"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
+    kind: configures
+    condition: "作为调用该接口时传入的策略枚举"
+version: ">=9.0.0"
+---
 # asc_override_strategy
 
 asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。该策略影响CAST类全局饱和配置是否生效。

@@ -1,3 +1,17 @@
+---
+okftype: reference.macro
+description: "定义ASC_DEPRECATED宏，为C API声明添加C++ deprecated属性，使编译调用被标记接口的代码时生成含废弃版本、计划移除日期与替代接口的告警，不阻止编译也不自动删除接口。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md
+    kind: related
+    condition: "使用本宏标记废弃接口声明时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
+    kind: related
+    condition: "作为推荐使用的替代接口"
+version: ">=9.0.0"
+---
 # ASC_DEPRECATED
 
 ## 功能说明

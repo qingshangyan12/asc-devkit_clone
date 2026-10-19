@@ -1,3 +1,15 @@
+---
+okftype: reference.enum
+description: "定义asc_hf32_round_mode枚举，管理Mmad计算开启HF32模式时将FP32舍入到HF32的舍入模式，在调用asc_set_hf32_round_mode接口时使用。"
+tag:
+  - roles: [configuration]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md
+    kind: configures
+    condition: "作为HF32舍入模式管理策略参数"
+version: ">=9.0.0"
+---
 # asc_hf32_round_mode
 
 asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md)时使用。

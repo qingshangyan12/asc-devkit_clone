@@ -1,3 +1,21 @@
+---
+okftype: reference.enum
+description: "定义饱和控制所作用的模式类型枚举，供asc_set_saturation_flag和asc_get_saturation_flag使用，涵盖FLOAT、FLOAT8、INT与CAST四种模式。"
+tag:
+  - roles: [configuration]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
+    kind: constrained_by
+    condition: "CAST模式仅在饱和策略为USE_GLOBAL时生效"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md
+    kind: related
+    condition: "作为调用该接口时使用的模式类型"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: configures
+    condition: "作为调用该接口时使用的模式类型"
+version: ">=9.0.0"
+---
 # asc_saturation_mode
 
 asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。

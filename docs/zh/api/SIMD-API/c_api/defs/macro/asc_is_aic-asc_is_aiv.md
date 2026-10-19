@@ -1,3 +1,14 @@
+---
+okftype: reference.macro
+description: "定义ASC_IS_AIC与ASC_IS_AIV宏，用于分离模式中对Cube Core（AIC）和Vector Core（AIV）代码路径进行条件编译和运行，可作为if语句条件判断当前代码路径属于哪个核。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md
+    kind: related
+    condition: "用于分离模式下对AIC与AIV代码路径进行条件编译和运行"
+version: ">=9.0.0"
+---
 # ASC_IS_AIC/ASC_IS_AIV
 
 ## 功能说明

@@ -1,3 +1,17 @@
+---
+okftype: reference.enum
+description: "定义asc_l13d_repeat_direction枚举，表示3D img2col搬运的repeat迭代方向，作为asc_set_l13d_rpt和asc_set_l13d_rpt_b接口的repeat_direction参数类型。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_rpt.md
+    kind: configures
+    condition: "作为repeat_direction参数类型"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_rpt_b.md
+    kind: configures
+    condition: "作为repeat_direction参数类型"
+version: ">=9.0.0"
+---
 # asc_l13d_repeat_direction
 
 `asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/cube_load_aux_config/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/cube_load_aux_config/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。

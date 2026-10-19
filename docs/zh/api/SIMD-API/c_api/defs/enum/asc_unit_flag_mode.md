@@ -1,3 +1,11 @@
+---
+okftype: reference.enum
+description: "定义asc_unit_flag_mode枚举，用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口unit_flag_mode参数的类型，包含DISABLE、ENABLE_KEEP与ENABLE_UPDATE三种取值。"
+tag:
+  - roles: [configuration]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_unit_flag_mode
 
 `asc_unit_flag_mode`用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口中`unit_flag_mode`参数的类型。
