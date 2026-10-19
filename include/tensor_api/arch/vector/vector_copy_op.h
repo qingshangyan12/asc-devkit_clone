@@ -35,9 +35,29 @@ struct gm_to_ub_params {
           enable_constant_pad(enable_constant_pad)
     {}
 
+    template <typename PadType>
+    __aicore__ constexpr gm_to_ub_params(
+        uint8_t left_padding_count, uint8_t right_padding_count, bool enable_constant_pad, PadType pad_value)
+        : left_padding_count(left_padding_count),
+          right_padding_count(right_padding_count),
+          enable_constant_pad(enable_constant_pad),
+          enable_constant_pad_value(true)
+    {
+        static_assert(
+            sizeof(PadType) == 1 || sizeof(PadType) == 2 || sizeof(PadType) == 4,
+            "GM-to-UB constant pad value must be 1, 2, or 4 bytes");
+        constant_pad_value = __builtin_bit_cast(
+            typename Std::conditional_t<
+                sizeof(PadType) == 1, uint8_t,
+                typename Std::conditional_t<sizeof(PadType) == 2, uint16_t, uint32_t>>,
+            pad_value);
+    }
+
     uint8_t left_padding_count = 0;
     uint8_t right_padding_count = 0;
     bool enable_constant_pad = true;
+    bool enable_constant_pad_value = false;
+    uint64_t constant_pad_value = 0;
 };
 
 struct copy_gm_to_ub {
