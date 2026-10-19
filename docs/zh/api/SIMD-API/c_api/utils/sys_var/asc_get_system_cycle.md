@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "读取只读系统cycle计数器，返回硬件运行以来的累计cycle数，常用于性能统计、耗时测量与执行序时序判断"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_get_system_cycle
 
 ## 产品支持情况

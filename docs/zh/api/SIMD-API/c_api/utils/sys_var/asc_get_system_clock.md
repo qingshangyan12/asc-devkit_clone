@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "读取当前系统时钟计数器并按芯片时钟频率换算，直接返回微秒级时间值，属只读查询接口，可在AIC与AIV上调用"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md
+    kind: related
+version: ">=9.2.0"
+---
 # asc_get_system_clock
 
 ## 产品支持情况
