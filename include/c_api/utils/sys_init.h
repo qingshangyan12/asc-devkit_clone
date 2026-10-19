@@ -27,6 +27,13 @@
 #include "impl/c_api/reg_base_impl/sys_init_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.utils.sys_init
+ * @brief Initializes global control state that may be left over from previous operators (atomic mode, Mask mode, CTRL register, copy loop counts) without clearing user data.
+ *
+ * @override_id asc_init__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_init();
 
 #endif

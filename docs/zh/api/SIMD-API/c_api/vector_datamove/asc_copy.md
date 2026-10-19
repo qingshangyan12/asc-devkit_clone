@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将数据从Unified Buffer（UB）搬运到UB，支持前n个数据计算与高维切分计算两种方式，源地址和目的地址均需32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠约束"
+version: ">=9.0.0"
+---
 
 # asc_copy
 

@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍Reg矢量计算C API的寄存器级矢量计算定位、基于寄存器的编程模型与使用流程，并给出通用约束和完整编程示例。"
+---
 # 概述
 
 Reg矢量计算C API提供面向Reg矢量计算架构的寄存器级矢量计算能力，用户可以通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。Reg矢量计算C API与Memory矢量计算C API功能相似，但与Memory矢量计算C API的输入和输出数据通常位于Unified Buffer（UB）不同，Reg矢量计算C API的输入或输出数据可使用矢量数据寄存器`vector_<dtype>`（`dtype`为占位符，表示`half`、`float`等C API支持的数据类型）和掩码寄存器`vector_bool`。对于计算类API，其功能是从给定的寄存器获取数据，进行计算，并将结果保存在给定的寄存器。对于搬运类API，其功能是实现UB和寄存器的数据搬运。由此可见，Reg矢量计算C API相较于Memory矢量计算C API，将数据搬运和Reg计算过程交给用户自主控制，从而实现更大的开发自由度。

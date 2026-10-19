@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "asc_copy_ub2ub_sync接口已废弃，请使用对应的非同步接口asc_copy_ub2ub和同步接口asc_sync替代，该接口将数据从Unified Buffer搬运到UB并要求搬运数据大小32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.1.0"
+---
 # asc_copy_ub2ub_sync（废弃）
 
 ## 产品支持情况
