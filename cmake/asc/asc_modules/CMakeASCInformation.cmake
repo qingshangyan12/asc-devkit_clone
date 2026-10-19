@@ -176,6 +176,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
         "dav-2201" "dav_2201"
         "dav-3510" "dav_3510"
         "dav-9201" "dav_9201"
+        "dav-9202" "dav_9202"
     )
     list(FIND _ARCH_TO_DIR_MAP "${CMAKE_ASC_ARCHITECTURES}" _index)
     if(_index GREATER -1)
@@ -207,6 +208,9 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         set(_CPU_MODEL_LIB "pem_davinci")
     elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-9201")
         set(_SOC_DIR "Ascend960DT_968B7")
+        set(_CPU_MODEL_LIB "pem_davinci")
+    elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-9202")
+        set(_SOC_DIR "Ascend960PR_963A1")
         set(_CPU_MODEL_LIB "pem_davinci")
     else()
         message(FATAL_ERROR "Unsupported ASC architecture for CPU mode: ${CMAKE_ASC_ARCHITECTURES}")
