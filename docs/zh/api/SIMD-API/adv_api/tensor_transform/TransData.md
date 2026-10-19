@@ -29,9 +29,9 @@
 
 本接口支持的数据格式转换场景包括以下四种，除维度顺序变换外，其中涉及到C轴和N轴的拆分，具体转换方式为，C轴拆分为C1轴、C0轴，N轴拆分为N1轴、N0轴。对于位宽为16的数据类型的数据，C0和N0固定为16，C1和N1的计算公式如下。
 
-![](../../../figures/zh-cn_formulaimage_0000002355948405.png)
+![](../../../figures/formulaimage_0000002355948405.png)
 
-![](../../../figures/zh-cn_formulaimage_0000002356028741.png)
+![](../../../figures/formulaimage_0000002356028741.png)
 
 -   场景1：NCDHW -\> NDC1HWC0
 

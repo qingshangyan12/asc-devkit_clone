@@ -29,7 +29,7 @@
 
 获取输入数据的反双曲正切值。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776374.png)
+![](../../../figures/formulaimage_0000002484776374.png)
 
 ## 函数原型
 

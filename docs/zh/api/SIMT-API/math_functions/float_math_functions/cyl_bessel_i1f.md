@@ -29,7 +29,7 @@
 
 获取输入数据x的1阶常规修正圆柱贝塞尔函数的值。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776426.png)
+![](../../../figures/formulaimage_0000002484776426.png)
 
 ## 函数原型
 

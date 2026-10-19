@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。任一输入为nan时结果为nan。
 
-![](../../../../figures/zh-cn_formulaimage_0000002545918676.png)
+![](../../../../figures/formulaimage_0000002545918676.png)
 
 ## 函数原型
 

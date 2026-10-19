@@ -33,11 +33,11 @@
 
 按元素做正切函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002182888708.png)
+![](../../../../figures/formulaimage_0000002182888708.png)
 
 Tan\(x\)的泰勒展开式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002228789689.png)
+![](../../../../figures/formulaimage_0000002228789689.png)
 
 其中B<sub>2n</sub>是伯努利数。
 

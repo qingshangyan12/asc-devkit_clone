@@ -6,7 +6,7 @@ Ascend C提供一组Conv3DBackpropFilter高阶API，便于用户快速实现卷�
 
 Conv3dBackpropFilter的计算公式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002067618970.png)
+![](../../../../figures/formulaimage_0000002067618970.png)
 
 -   X为卷积的特征矩阵Input。
 -   ∂L/∂Y为卷积正向损失函数对输出Y的梯度GradOutput，作为求反向传播误差∂L/∂W的输入，即卷积的输出反向GradOutput。

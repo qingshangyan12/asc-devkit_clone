@@ -29,7 +29,7 @@
 
 获取uint32类型数据x和y的向上取整平均值，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002585584765.png)
+![](../../../figures/formulaimage_0000002585584765.png)
 
 ## 函数原型
 

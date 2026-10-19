@@ -33,9 +33,9 @@
 
 在神经网络中，GELU是一个重要的激活函数，其灵感来源于Relu和Dropout，在激活中引入了随机正则的思想。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002316009816.png)
+![](../../../../figures/formulaimage_0000002316009816.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001750683329.png)，化简后可得![](../../../../figures/zh-cn_formulaimage_0000001702905034.png)
+![](../../../../figures/formulaimage_0000001750683329.png)，化简后可得![](../../../../figures/formulaimage_0000001702905034.png)
 
 ## 函数原型
 

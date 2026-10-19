@@ -29,7 +29,7 @@
 
 获取输入数据的三角函数正切值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816325.png)
+![](../../../figures/formulaimage_0000002516816325.png)
 
 ## 函数原型
 

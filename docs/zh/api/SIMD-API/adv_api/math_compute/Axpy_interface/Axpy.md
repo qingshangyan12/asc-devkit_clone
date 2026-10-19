@@ -27,9 +27,9 @@
 
 源操作数\(srcTensor\)中每个元素与标量求积后和目的操作数\(dstTensor\)中的对应元素相加，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002188267514.png)
+![](../../../../figures/formulaimage_0000002188267514.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188272234.png)
+![](../../../../figures/formulaimage_0000002188272234.png)
 
 该接口功能同基础API Axpy，区别在于此接口指令是通过Muls和Add组合计算，从而提供更优的精度。
 
