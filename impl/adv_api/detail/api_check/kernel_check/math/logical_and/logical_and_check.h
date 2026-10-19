@@ -22,8 +22,8 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_AND_LOGICAL_AND_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_AND_LOGICAL_AND_CHECK_H_
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 9202)
 #include "logical_and_check_common.h"
 #endif
 
@@ -34,8 +34,8 @@ __aicore__ inline void CheckFuncLogicalAnd(
     __gm__ const char* name, const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 9202)
     CheckFuncClassLogicalAnd<T, U, isReuseSource> checkFun(name);
     checkFun.VerifyingParameters(dst, src0, src1, count);
 #endif
