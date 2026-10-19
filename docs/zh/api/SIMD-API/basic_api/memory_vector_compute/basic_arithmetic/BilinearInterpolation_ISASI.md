@@ -23,6 +23,9 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+- Kirin 9020处理器系列产品：支持
+- Kirin 9030处理器系列产品：支持
+- Kirin X90处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/BilinearInterpolation_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
