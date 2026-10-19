@@ -270,6 +270,8 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 
     target_include_directories(mc2_client PRIVATE
         ${INCLUDE_LIST}
+        # TODO(T1临接): 正式依赖治理走 FetchContent TAG_ID bump（Q12），此路径穿刺期联调用
+        $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
     )
 
     target_compile_definitions(mc2_client PRIVATE

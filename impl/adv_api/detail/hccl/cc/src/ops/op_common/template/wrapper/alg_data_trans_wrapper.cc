@@ -9,8 +9,12 @@
  */
 #include "alg_data_trans_wrapper.h"
 #include "hcomm_primitives_dl.h"
+#include "asccomm_primitives.h"
 
 #include <atomic>
+
+// 消费侧 ABI 守护：asccomm 头自身无断言，dl.h 旧断言随 T2 退役后由此处接管（notes/24 存疑2裁决）
+static_assert(sizeof(AsccommBatchTransferDesc) == 64, "Asccomm batch transfer descriptor ABI size mismatch");
 
 namespace mc2_ops_hccl {
 
@@ -25,11 +29,11 @@ std::atomic<int> g_hcommBatchTransferSupportState{HCOMM_BATCH_TRANSFER_UNINIT};
 
 void* GetSliceAddr(const DataSlice& slice) { return static_cast<void*>(static_cast<s8*>(slice.addr_) + slice.offset_); }
 
-HcclHcommBatchTransferDesc MakeBatchTransDesc(HcclHcommTransferType transType, void* dst, void* src, u64 len)
+AsccommBatchTransferDesc MakeBatchTransDesc(AsccommTransferType transType, void* dst, void* src, u64 len)
 {
-    HcclHcommBatchTransferDesc desc = {};
+    AsccommBatchTransferDesc desc = {};
     desc.transType = transType;
-    if (transType == HCCL_HCOMM_TRANSFER_TYPE_READ) {
+    if (transType == ASCCOMM_TRANSFER_TYPE_READ) {
         desc.transferInfo.read.len = len;
         desc.transferInfo.read.dst = dst;
         desc.transferInfo.read.src = src;
@@ -41,28 +45,28 @@ HcclHcommBatchTransferDesc MakeBatchTransDesc(HcclHcommTransferType transType, v
     return desc;
 }
 
-HcclHcommBatchTransferDesc MakeBatchReduceDesc(
-    HcclHcommTransferType transType, void* dst, void* src, u64 count, HcclDataType dataType, HcclReduceOp reduceOp)
+AsccommBatchTransferDesc MakeBatchReduceDesc(
+    AsccommTransferType transType, void* dst, void* src, u64 count, HcclDataType dataType, HcclReduceOp reduceOp)
 {
-    HcclHcommBatchTransferDesc desc = {};
+    AsccommBatchTransferDesc desc = {};
     desc.transType = transType;
     desc.transferInfo.reduce.count = count;
     desc.transferInfo.reduce.dst = dst;
     desc.transferInfo.reduce.src = src;
-    desc.transferInfo.reduce.dataType = static_cast<HcommDataType>(dataType);
-    desc.transferInfo.reduce.reduceOp = static_cast<HcommReduceOp>(reduceOp);
+    desc.transferInfo.reduce.dataType = static_cast<AsccommDataType>(dataType);
+    desc.transferInfo.reduce.reduceOp = static_cast<AsccommReduceOp>(reduceOp);
     return desc;
 }
 
 // Only the final non-empty write carries DATA_SIGNAL: earlier writes must remain ordered before it.
-bool FuseNotifyToLastWriteReduceDesc(std::vector<HcclHcommBatchTransferDesc>& descs)
+bool FuseNotifyToLastWriteReduceDesc(std::vector<AsccommBatchTransferDesc>& descs)
 {
-    if (descs.empty() || descs.back().transType != HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE) {
+    if (descs.empty() || descs.back().transType != ASCCOMM_TRANSFER_TYPE_WRITE_REDUCE) {
         return false;
     }
     const auto reduce = descs.back().transferInfo.reduce;
-    HcclHcommBatchTransferDesc fused{};
-    fused.transType = HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY;
+    AsccommBatchTransferDesc fused{};
+    fused.transType = ASCCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY;
     fused.transferInfo.writeReduceWithNotify.count = reduce.count;
     fused.transferInfo.writeReduceWithNotify.dst = reduce.dst;
     fused.transferInfo.writeReduceWithNotify.src = reduce.src;
@@ -86,7 +90,7 @@ HcclResult RunBatchTransfer(
             srcSlices.size(), dstSlices.size()),
         HCCL_E_INTERNAL);
 
-    std::vector<HcclHcommBatchTransferDesc> transferDescs;
+    std::vector<AsccommBatchTransferDesc> transferDescs;
     transferDescs.reserve(srcSlices.size());
     for (size_t i = 0; i < srcSlices.size(); ++i) {
         const DataSlice& srcSlice = srcSlices[i];
@@ -106,7 +110,7 @@ HcclResult RunBatchTransfer(
         HCCL_DEBUG(
             "[MC2_BATCH_TRANSFER][Run] func[%s], descNum[%zu], channelHandle[%llu].", funcName, transferDescs.size(),
             static_cast<unsigned long long>(channel.handle));
-        CHK_RET(static_cast<HcclResult>(HcclHcommBatchTransferOnThread(
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_transfer_on_thread(
             thread, channel.handle, transferDescs.data(), static_cast<u32>(transferDescs.size()))));
     }
     return HCCL_SUCCESS;
@@ -124,18 +128,19 @@ HcclResult DoSendRecvBatchTx(
     const std::vector<DataSlice>& dstSlices = sendRecvInfo.sendRecvSlices_.txSlicesList_.dstSlices_;
     const ChannelInfo& sendChannel = sendRecvInfo.sendRecvChannels_.txChannel_;
     const ChannelInfo& recvChannel = sendRecvInfo.sendRecvChannels_.rxChannel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     bool notifyFused = false;
     CHK_RET(RunBatchTransfer(
         thread, sendChannel, srcSlices, dstSlices, funcName, processSlice, fusePostNotify, &notifyFused));
     if (!notifyFused) {
         CHK_RET(static_cast<HcclResult>(
-            HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+            asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     }
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -151,10 +156,10 @@ HcclResult DoSendBatchTx(
     const std::vector<DataSlice>& dstSlices = sendInfo.slices_.dstSlices_;
     const ChannelInfo& sendChannel = sendInfo.channel_;
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     CHK_RET(RunBatchTransfer(thread, sendChannel, srcSlices, dstSlices, funcName, processSlice));
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
@@ -170,10 +175,10 @@ HcclResult DoRecvBatchRx(
     const std::vector<DataSlice>& dstSlices = recvInfo.slices_.dstSlices_;
     const ChannelInfo& recvChannel = recvInfo.channel_;
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     CHK_RET(RunBatchTransfer(thread, recvChannel, srcSlices, dstSlices, funcName, processSlice));
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
@@ -189,14 +194,15 @@ HcclResult DoSendRecvBatchRx(
     const std::vector<DataSlice>& dstSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.dstSlices_;
     const ChannelInfo& sendChannel = sendRecvInfo.sendRecvChannels_.txChannel_;
     const ChannelInfo& recvChannel = sendRecvInfo.sendRecvChannels_.rxChannel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
-    CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
-    CHK_RET(RunBatchTransfer(thread, recvChannel, srcSlices, dstSlices, funcName, processSlice));
     CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+    CHK_RET(RunBatchTransfer(thread, recvChannel, srcSlices, dstSlices, funcName, processSlice));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 } // namespace
@@ -231,7 +237,7 @@ HcclResult SendWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
     const ChannelInfo& sendChannel = sendInfo.channel_;
     u32 sliceNum = srcSlices.size();
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < sliceNum; i++) {
         const DataSlice srcSlice = srcSlices[i];
         const DataSlice dstSlice = dstSlices[i];
@@ -241,19 +247,20 @@ HcclResult SendWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
         }
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommWriteOnThread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
+        CHK_RET(static_cast<HcclResult>(asccomm_write_on_thread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
     }
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
 HcclResult RecvWrite(const DataInfo& recvInfo, const ThreadHandle& thread)
 {
     const ChannelInfo& recvChannel = recvInfo.channel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -272,9 +279,10 @@ HcclResult SendRecvWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& t
     u32 repeatNum = srcSlices.size();
     // 向write rank发送tx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         // tx同步完成后准备将自己的userIn上的数据写到对方的hcclBuffer上
         const DataSlice srcSlice = srcSlices[i];
@@ -285,22 +293,22 @@ HcclResult SendRecvWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& t
         }
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommWriteOnThread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
+        CHK_RET(static_cast<HcclResult>(asccomm_write_on_thread(thread, sendChannel.handle, dst, src, srcSlice.size_)));
     }
     // 写完之后做后同步告诉对面写完了
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
 HcclResult SendBatchWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
 {
     auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                           std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
+            ASCCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
     };
     return DoSendBatchTx(sendInfo, thread, "SendBatchWrite", processSlice, SendWrite);
@@ -309,9 +317,9 @@ HcclResult SendBatchWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
 HcclResult SendRecvBatchWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread)
 {
     auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                           std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
+            ASCCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
     };
     return DoSendRecvBatchTx(sendRecvInfo, thread, "SendRecvBatchWrite", processSlice, SendRecvWrite);
@@ -324,7 +332,7 @@ HcclResult SendWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& t
     const ChannelInfo& sendChannel = sendInfo.channel_;
     u32 repeatNum = srcSlices.size();
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         const DataSlice srcSlice = srcSlices[i];
         const DataSlice dstSlice = dstSlices[i];
@@ -348,12 +356,12 @@ HcclResult SendWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& t
             HcclResult::HCCL_E_INTERNAL);
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommWriteReduceOnThread(
-            thread, sendChannel.handle, dst, src, srcSlice.count_, static_cast<HcommDataType>(sendInfo.dataType_),
-            static_cast<HcommReduceOp>(sendInfo.reduceType_))));
+        CHK_RET(static_cast<HcclResult>(asccomm_write_reduce_on_thread(
+            thread, sendChannel.handle, dst, src, srcSlice.count_, static_cast<AsccommDataType>(sendInfo.dataType_),
+            static_cast<AsccommReduceOp>(sendInfo.reduceType_))));
     }
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
@@ -361,7 +369,7 @@ HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHand
 {
     auto processSlice = [&sendInfo](
                             const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -379,7 +387,7 @@ HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHand
                 sendInfo.dataType_),
             HCCL_E_INTERNAL);
         transferDescs.push_back(MakeBatchReduceDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
+            ASCCOMM_TRANSFER_TYPE_WRITE_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
             sendInfo.dataType_, sendInfo.reduceType_));
         return HCCL_SUCCESS;
     };
@@ -389,9 +397,10 @@ HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHand
 HcclResult RecvWriteReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread)
 {
     const ChannelInfo& recvChannel = recvInfo.channel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -404,9 +413,10 @@ HcclResult SendRecvWriteReduce(const SendRecvReduceInfo& sendRecvInfo, const Thr
     u32 repeatNum = srcSlices.size();
     // 向write rank发送tx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         // tx同步完成后准备将自己的userIn上的数据写到对方的hcclBuffer上
         const DataSlice srcSlice = srcSlices[i];
@@ -431,15 +441,15 @@ HcclResult SendRecvWriteReduce(const SendRecvReduceInfo& sendRecvInfo, const Thr
             HcclResult::HCCL_E_INTERNAL);
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommWriteReduceOnThread(
-            thread, sendChannel.handle, dst, src, srcSlice.count_, static_cast<HcommDataType>(sendRecvInfo.dataType_),
-            static_cast<HcommReduceOp>(sendRecvInfo.reduceType_))));
+        CHK_RET(static_cast<HcclResult>(asccomm_write_reduce_on_thread(
+            thread, sendChannel.handle, dst, src, srcSlice.count_, static_cast<AsccommDataType>(sendRecvInfo.dataType_),
+            static_cast<AsccommReduceOp>(sendRecvInfo.reduceType_))));
     }
     // 写完之后做后同步告诉对面写完了
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -448,7 +458,7 @@ HcclResult SendRecvBatchWriteReduce(
 {
     auto processSlice = [&sendRecvInfo](
                             const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -466,7 +476,7 @@ HcclResult SendRecvBatchWriteReduce(
                 sendRecvInfo.dataType_),
             HCCL_E_INTERNAL);
         transferDescs.push_back(MakeBatchReduceDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
+            ASCCOMM_TRANSFER_TYPE_WRITE_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
             sendRecvInfo.dataType_, sendRecvInfo.reduceType_));
         return HCCL_SUCCESS;
     };
@@ -477,9 +487,10 @@ HcclResult SendRecvBatchWriteReduce(
 HcclResult SendRead(const DataInfo& sendInfo, const ThreadHandle& thread)
 {
     const ChannelInfo& sendChannel = sendInfo.channel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -490,7 +501,7 @@ HcclResult RecvRead(const DataInfo& recvInfo, const ThreadHandle& thread)
     const ChannelInfo& recvChannel = recvInfo.channel_;
     u32 repeatNum = srcSlices.size();
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         const DataSlice srcSlice = srcSlices[i];
         const DataSlice dstSlice = dstSlices[i];
@@ -500,19 +511,19 @@ HcclResult RecvRead(const DataInfo& recvInfo, const ThreadHandle& thread)
         }
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommReadOnThread(thread, recvChannel.handle, dst, src, srcSlice.size_)));
+        CHK_RET(static_cast<HcclResult>(asccomm_read_on_thread(thread, recvChannel.handle, dst, src, srcSlice.size_)));
     }
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
 HcclResult RecvBatchRead(const DataInfo& recvInfo, const ThreadHandle& thread)
 {
     auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                           std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
+            ASCCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
     };
     return DoRecvBatchRx(recvInfo, thread, "RecvBatchRead", processSlice, RecvRead);
@@ -527,9 +538,10 @@ HcclResult SendRecvRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& th
     u32 repeatNum = srcSlices.size();
     // 向read rank发送rx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         // rx同步完成后准备将数据从对方的hcclBuffer上读到自己的userIn上
         const DataSlice srcSlice = srcSlices[i];
@@ -540,22 +552,22 @@ HcclResult SendRecvRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& th
         }
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommReadOnThread(thread, recvChannel.handle, dst, src, srcSlice.size_)));
+        CHK_RET(static_cast<HcclResult>(asccomm_read_on_thread(thread, recvChannel.handle, dst, src, srcSlice.size_)));
     }
     // 写完之后做后同步告诉对面写完了
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
 HcclResult SendRecvBatchRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread)
 {
     auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                           std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
+            ASCCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
     };
     return DoSendRecvBatchRx(sendRecvInfo, thread, "SendRecvBatchRead", processSlice, SendRecvRead);
@@ -564,9 +576,10 @@ HcclResult SendRecvBatchRead(const SendRecvInfo& sendRecvInfo, const ThreadHandl
 HcclResult SendReadReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread)
 {
     const ChannelInfo& sendChannel = sendInfo.channel_;
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -577,7 +590,7 @@ HcclResult RecvReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& th
     const ChannelInfo& recvChannel = recvInfo.channel_;
     u32 repeatNum = srcSlices.size();
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         const DataSlice srcSlice = srcSlices[i];
         const DataSlice dstSlice = dstSlices[i];
@@ -601,12 +614,12 @@ HcclResult RecvReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& th
             HcclResult::HCCL_E_INTERNAL);
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommReadReduceOnThread(
-            thread, recvChannel.handle, dst, src, srcSlice.count_, static_cast<HcommDataType>(recvInfo.dataType_),
-            static_cast<HcommReduceOp>(recvInfo.reduceType_))));
+        CHK_RET(static_cast<HcclResult>(asccomm_read_reduce_on_thread(
+            thread, recvChannel.handle, dst, src, srcSlice.count_, static_cast<AsccommDataType>(recvInfo.dataType_),
+            static_cast<AsccommReduceOp>(recvInfo.reduceType_))));
     }
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
 }
 
@@ -614,7 +627,7 @@ HcclResult RecvBatchReadReduce(const DataReduceInfo& recvInfo, const ThreadHandl
 {
     auto processSlice = [&recvInfo](
                             const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[recvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -632,7 +645,7 @@ HcclResult RecvBatchReadReduce(const DataReduceInfo& recvInfo, const ThreadHandl
                 recvInfo.dataType_),
             HCCL_E_INTERNAL);
         transferDescs.push_back(MakeBatchReduceDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_READ_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
+            ASCCOMM_TRANSFER_TYPE_READ_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
             recvInfo.dataType_, recvInfo.reduceType_));
         return HCCL_SUCCESS;
     };
@@ -648,9 +661,10 @@ HcclResult SendRecvReadReduce(const SendRecvReduceInfo& sendRecvInfo, const Thre
     u32 repeatNum = srcSlices.size();
     // 向write rank发送tx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, sendChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, recvChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     for (int i = 0; i < repeatNum; i++) {
         // tx同步完成后准备将自己的userIn上的数据写到对方的hcclBuffer上
         const DataSlice srcSlice = srcSlices[i];
@@ -675,15 +689,15 @@ HcclResult SendRecvReadReduce(const SendRecvReduceInfo& sendRecvInfo, const Thre
             HcclResult::HCCL_E_INTERNAL);
         void* dst = static_cast<void*>(static_cast<s8*>(dstSlice.addr_) + dstSlice.offset_);
         void* src = static_cast<void*>(static_cast<s8*>(srcSlice.addr_) + srcSlice.offset_);
-        CHK_RET(static_cast<HcclResult>(HcommReadReduceOnThread(
-            thread, recvChannel.handle, dst, src, srcSlice.count_, static_cast<HcommDataType>(sendRecvInfo.dataType_),
-            static_cast<HcommReduceOp>(sendRecvInfo.reduceType_))));
+        CHK_RET(static_cast<HcclResult>(asccomm_read_reduce_on_thread(
+            thread, recvChannel.handle, dst, src, srcSlice.count_, static_cast<AsccommDataType>(sendRecvInfo.dataType_),
+            static_cast<AsccommReduceOp>(sendRecvInfo.reduceType_))));
     }
     // 写完之后做后同步告诉对面写完了
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
 }
 
@@ -691,7 +705,7 @@ HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const
 {
     auto processSlice = [&sendRecvInfo](
                             const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            std::vector<AsccommBatchTransferDesc>& transferDescs) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -709,7 +723,7 @@ HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const
                 sendRecvInfo.dataType_),
             HCCL_E_INTERNAL);
         transferDescs.push_back(MakeBatchReduceDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_READ_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
+            ASCCOMM_TRANSFER_TYPE_READ_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
             sendRecvInfo.dataType_, sendRecvInfo.reduceType_));
         return HCCL_SUCCESS;
     };
@@ -730,7 +744,7 @@ HcclResult LocalCopy(const ThreadHandle& thread, const DataSlice& srcSlice, cons
         HcclResult::HCCL_E_INTERNAL);
     void* srcIn = static_cast<void*>(static_cast<u8*>(srcSlice.addr_) + srcSlice.offset_);
     void* dstOut = static_cast<void*>(static_cast<u8*>(dstSlice.addr_) + dstSlice.offset_);
-    CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread, dstOut, srcIn, srcSlice.size_)));
+    CHK_RET(static_cast<HcclResult>(asccomm_local_copy_on_thread(thread, dstOut, srcIn, srcSlice.size_)));
     return HCCL_SUCCESS;
 }
 
@@ -755,9 +769,9 @@ HcclResult LocalReduce(
         HcclResult::HCCL_E_INTERNAL);
     void* src = static_cast<void*>(static_cast<u8*>(srcSlice.addr_) + srcSlice.offset_);
     void* dst = static_cast<void*>(static_cast<u8*>(dstSlice.addr_) + dstSlice.offset_);
-    CHK_RET(static_cast<HcclResult>(HcommLocalReduceOnThread(
-        thread, dst, src, srcSlice.count_, static_cast<HcommDataType>(dataType),
-        static_cast<HcommReduceOp>(reduceOp))));
+    CHK_RET(static_cast<HcclResult>(asccomm_local_reduce_on_thread(
+        thread, dst, src, srcSlice.count_, static_cast<AsccommDataType>(dataType),
+        static_cast<AsccommReduceOp>(reduceOp))));
     return HCCL_SUCCESS;
 }
 
@@ -793,7 +807,7 @@ HcclResult LocalCopySlices(
             // last slice
             void* src = static_cast<void*>(static_cast<u8*>(tmpSrcSlice.addr_) + tmpSrcSlice.offset_);
             void* dst = static_cast<void*>(static_cast<u8*>(tmpDstSlice.addr_) + tmpDstSlice.offset_);
-            CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread, dst, src, tmpSrcSlice.size_)));
+            CHK_RET(static_cast<HcclResult>(asccomm_local_copy_on_thread(thread, dst, src, tmpSrcSlice.size_)));
         } else if (
             IsContinuousSlice(srcSlices[sliceIdx + 1], tmpSrcSlice) &&
             IsContinuousSlice(dstSlices[sliceIdx + 1], tmpDstSlice)) {
@@ -805,7 +819,7 @@ HcclResult LocalCopySlices(
             // nxtSlice is not continuous with tmpSlice, copy tmpSlice, update tmpSlice with nxtSlice
             void* src = static_cast<void*>(static_cast<u8*>(tmpSrcSlice.addr_) + tmpSrcSlice.offset_);
             void* dst = static_cast<void*>(static_cast<u8*>(tmpDstSlice.addr_) + tmpDstSlice.offset_);
-            CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread, dst, src, tmpSrcSlice.size_)));
+            CHK_RET(static_cast<HcclResult>(asccomm_local_copy_on_thread(thread, dst, src, tmpSrcSlice.size_)));
 
             tmpSrcSlice = srcSlices[sliceIdx + 1];
             tmpDstSlice = dstSlices[sliceIdx + 1];
@@ -847,13 +861,13 @@ HcclResult PreSyncInterThreads(
     // 主thread向从thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
         CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyRecordOnThread(mainThread, subThreads[tidx], notifyIdxMainToSub[tidx])));
+            asccomm_thread_notify_record_on_thread(mainThread, subThreads[tidx], notifyIdxMainToSub[tidx])));
     }
 
     // 从thread等待主thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
         CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyWaitOnThread(subThreads[tidx], notifyIdxMainToSub[tidx], CUSTOM_TIMEOUT)));
+            asccomm_thread_notify_wait_on_thread(subThreads[tidx], notifyIdxMainToSub[tidx], CUSTOM_TIMEOUT)));
     }
 
     return HcclResult::HCCL_SUCCESS;
@@ -880,13 +894,13 @@ HcclResult PostSyncInterThreads(
     // 主thread等待所有从thread的record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
         CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyWaitOnThread(mainThread, notifyIdxSubToMain[tidx], CUSTOM_TIMEOUT)));
+            asccomm_thread_notify_wait_on_thread(mainThread, notifyIdxSubToMain[tidx], CUSTOM_TIMEOUT)));
     }
 
     // 从thread向主thread发送record
     for (u32 tidx = 0; tidx < subThreads.size(); tidx++) {
         CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyRecordOnThread(subThreads[tidx], mainThread, notifyIdxSubToMain[tidx])));
+            asccomm_thread_notify_record_on_thread(subThreads[tidx], mainThread, notifyIdxSubToMain[tidx])));
     }
 
     return HcclResult::HCCL_SUCCESS;
