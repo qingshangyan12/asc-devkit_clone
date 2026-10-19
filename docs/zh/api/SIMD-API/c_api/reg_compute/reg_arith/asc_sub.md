@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "根据掩码对两个源矢量逐元素求差并写入目的矢量，提供无借位输出与带借位输出两种形式，带借位形式按32位无符号数处理。"
+tag:
+  - roles: [compute]
+  - operations: [subtract]
+  - traits: [elementwise, supports_carry_output]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "带借位输出减法输出完整计算结果（包含无借位标志）时"
+version: ">=9.0.0"
+---
 # asc_sub
 
 ## 产品支持情况

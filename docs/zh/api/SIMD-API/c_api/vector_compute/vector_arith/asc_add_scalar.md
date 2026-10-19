@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "执行矢量加法运算，将源矢量的每个元素与标量相加并写入目的矢量，支持连续数据计算与高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [add]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_add_scalar
 
 ## 产品支持情况

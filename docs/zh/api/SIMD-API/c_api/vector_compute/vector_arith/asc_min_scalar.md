@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将源矢量逐元素与标量比较并取较小值写入目的矢量，支持前n个数据计算与高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [minimum]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠"
+version: ">=9.0.0"
+---
 # asc_min_scalar
 
 ## 产品支持情况

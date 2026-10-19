@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将src0与src1按元素相减，并计算以差值为指数的自然指数函数写入dst。接口已废弃，新接口请参见asc_exp_sub。"
+tag:
+  - roles: [compute]
+  - operations: [exponential, subtract]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md
+    kind: replaced_by
+    condition: "旧half原型迁移至asc_exp_sub新接口"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_exp_sub（废弃）
 
 ## 产品支持情况

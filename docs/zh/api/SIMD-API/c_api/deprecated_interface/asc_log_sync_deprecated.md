@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素计算自然对数并将结果写入目的操作数，dst与src起始地址需32字节对齐。该接口已废弃，请使用对应的非同步接口asc_log和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [natural_log]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_log.md
+    kind: replaced_by
+    condition: "非同步计算采用asc_log实现"
+version: ">=9.0.0"
+---
 # asc_log_sync（废弃）
 
 ## 产品支持情况

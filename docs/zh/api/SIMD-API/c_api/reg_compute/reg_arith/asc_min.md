@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码对两个矢量数据寄存器中的元素求最小值，结果写入目的寄存器，未筛选的元素在输出中置零。"
+tag:
+  - roles: [compute]
+  - operations: [minimum]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_min
 
 ## 产品支持情况
