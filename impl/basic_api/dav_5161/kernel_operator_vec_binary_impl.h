@@ -357,7 +357,7 @@ __simd_vf__ inline void AddDeqReluImpl(
         Reg::Muls<float>(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_LEFT_17_BIT), preg);
         Reg::Maxs<float>(tmpReg, tmpReg, scalarValue, preg);
         Reg::Cast<half, float, CastParam::float2halfCastTrait>(dstReg, tmpReg, preg);
-        Reg::DataCopy<half, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dstReg, preg);
+        Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dstReg, preg);
     }
 }
 
@@ -477,11 +477,11 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__
         Reg::MaskReg mask;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             mask = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(src0Reg, src0 + i * numPerRep);
-            Reg::DataCopy(src1Reg, src1 + i * numPerRep);
-            Reg::DataCopy(dstReg, dst + i * numPerRep);
+            Reg::LoadAlign(src0Reg, src0 + i * numPerRep);
+            Reg::LoadAlign(src1Reg, src1 + i * numPerRep);
+            Reg::LoadAlign(dstReg, dst + i * numPerRep);
             Reg::MulAddDst(dstReg, src0Reg, src1Reg, mask);
-            Reg::DataCopy(dst + i * numPerRep, dstReg, mask);
+            Reg::StoreAlign(dst + i * numPerRep, dstReg, mask);
         }
     }
 }
@@ -498,13 +498,13 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ float* dst, __ubuf__ half* src0, _
         Reg::MaskReg maskB32; // updated when float calculation
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskB32 = Reg::UpdateMask<float>(sregB32);
-            Reg::DataCopy<half, Reg::LoadDist::DIST_UNPACK_B16>(src0Reg, src0 + i * numPerRep); // 64 half
-            Reg::DataCopy<half, Reg::LoadDist::DIST_UNPACK_B16>(src1Reg, src1 + i * numPerRep); // 64 half
+            Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(src0Reg, src0 + i * numPerRep); // 64 half
+            Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(src1Reg, src1 + i * numPerRep); // 64 half
             Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg1, src0Reg, maskB32);      // 64 float
             Reg::Cast<float, half, CastParam::mulAddDstTrait>(castReg2, src1Reg, maskB32);      // 64 float
-            Reg::DataCopy(dstReg, dst + i * numPerRep);
+            Reg::LoadAlign(dstReg, dst + i * numPerRep);
             Reg::MulAddDst(dstReg, castReg1, castReg2, maskB32);
-            Reg::DataCopy(dst + i * numPerRep, dstReg, maskB32);
+            Reg::StoreAlign(dst + i * numPerRep, dstReg, maskB32);
         }
     }
 }
@@ -597,7 +597,7 @@ __aicore__ inline void FusedMulAddImpl(
     static_assert(
         SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
                                        "combination is src and dst both: half/float.");
-    constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
+    constexpr auto func = Reg::MulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecBinaryImplTemplate<func, isSetMask, true, Internal::BinaryFuncMode::DST_SRC_INPUT>(
         dst, src0, src1, mask, 0, repeatTime, repeatParams);
 }
@@ -610,7 +610,7 @@ __aicore__ inline void FusedMulAddImpl(
     static_assert(
         SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
                                        "combination is src and dst both: half/float.");
-    constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
+    constexpr auto func = Reg::MulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecBinaryImplTemplate<func, isSetMask, false, Internal::BinaryFuncMode::DST_SRC_INPUT>(
         dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
 }
@@ -634,12 +634,12 @@ __aicore__ inline void FusedMulAddImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf
             Reg::MaskReg mask;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-                Reg::DataCopy(vSrcReg0, src0 + i * sregLower);
-                Reg::DataCopy(vSrcReg1, src1 + i * sregLower);
-                Reg::DataCopy(vDstReg0, dst + i * sregLower);
+                Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+                Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
+                Reg::LoadAlign(vDstReg0, dst + i * sregLower);
                 Reg::Mul(vDstReg1, vSrcReg0, vDstReg0, mask);
                 Reg::Add(vDstReg0, vDstReg1, vSrcReg1, mask);
-                Reg::DataCopy(dst + i * sregLower, vDstReg0, mask);
+                Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
             }
         }
     } else {
@@ -653,11 +653,11 @@ __aicore__ inline void FusedMulAddImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf
             Reg::MaskReg mask;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = Reg::UpdateMask<T>(sreg);
-                Reg::DataCopy(src0Reg, src0 + i * repeatStride);
-                Reg::DataCopy(src1Reg, src1 + i * repeatStride);
-                Reg::DataCopy(dstReg, dst + i * repeatStride);
-                Reg::FusedMulDstAdd(dstReg, src0Reg, src1Reg, mask);
-                Reg::DataCopy(dst + i * repeatStride, dstReg, mask);
+                Reg::LoadAlign(src0Reg, src0 + i * repeatStride);
+                Reg::LoadAlign(src1Reg, src1 + i * repeatStride);
+                Reg::LoadAlign(dstReg, dst + i * repeatStride);
+                Reg::MulDstAdd(dstReg, src0Reg, src1Reg, mask);
+                Reg::StoreAlign(dst + i * repeatStride, dstReg, mask);
             }
         }
     }
@@ -671,7 +671,7 @@ namespace RegFusedMulAddRelu {
 template <typename T, typename RegT>
 __aicore__ inline void FusedMulAddRelu(RegT& dstReg, RegT& srcReg0, RegT& srcReg1, Reg::MaskReg& mask)
 {
-    Reg::FusedMulDstAdd(dstReg, srcReg0, srcReg1, mask);
+    Reg::MulDstAdd(dstReg, srcReg0, srcReg1, mask);
     Reg::Maxs(dstReg, dstReg, (T)0, mask);
 }
 } // namespace RegFusedMulAddRelu
@@ -743,7 +743,7 @@ __simd_vf__ inline void FusedMulAddReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, _
             Reg::LoadAlign(src0Reg, src0 + i * repeatStride);
             Reg::LoadAlign(src1Reg, src1 + i * repeatStride);
             Reg::LoadAlign(dstReg, dst + i * repeatStride);
-            Reg::FusedMulDstAdd(dstReg, src0Reg, src1Reg, mask);
+            Reg::MulDstAdd(dstReg, src0Reg, src1Reg, mask);
             Reg::Maxs(dstReg, dstReg, scalarValue, mask);
             Reg::StoreAlign(dst + i * repeatStride, dstReg, mask);
         }
@@ -812,11 +812,11 @@ __aicore__ inline void SubReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T
             Reg::MaskReg mask;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-                Reg::DataCopy(vSrcReg0, src0 + i * sregLower);
-                Reg::DataCopy(vSrcReg1, src1 + i * sregLower);
+                Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+                Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
                 Reg::Sub(vDstReg, vSrcReg0, vSrcReg1, mask);
                 Reg::Maxs(vDstReg, vDstReg, scalarValue, mask);
-                Reg::DataCopy(dst + i * sregLower, vDstReg, mask);
+                Reg::StoreAlign(dst + i * sregLower, vDstReg, mask);
             }
         }
     } else {
@@ -828,11 +828,11 @@ __aicore__ inline void SubReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T
             Reg::MaskReg mask;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = Reg::UpdateMask<T>(sreg);
-                Reg::DataCopy(src0Reg, src0 + i * numPerRep);
-                Reg::DataCopy(src1Reg, src1 + i * numPerRep);
+                Reg::LoadAlign(src0Reg, src0 + i * numPerRep);
+                Reg::LoadAlign(src1Reg, src1 + i * numPerRep);
                 Reg::Sub(dstReg, src0Reg, src1Reg, mask);
                 Reg::Maxs(dstReg, dstReg, scalarValue, mask);
-                Reg::DataCopy(dst + i * numPerRep, dstReg, mask);
+                Reg::StoreAlign(dst + i * numPerRep, dstReg, mask);
             }
         }
     }

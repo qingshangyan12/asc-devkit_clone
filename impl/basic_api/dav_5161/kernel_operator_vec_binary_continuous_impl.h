@@ -206,7 +206,7 @@ __simd_vf__ inline void FusedAbsSubImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubu
         mask = Reg::UpdateMask<T>(sreg);
         Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
         Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
-        Reg::FusedAbsSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+        Reg::AbsSub<T, Reg::MaskMergeMode::ZEROING>(vDstReg0, vSrcReg0, vSrcReg1, mask);
         Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
     }
 }
@@ -244,7 +244,7 @@ __simd_vf__ inline void FusedExpSubImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubu
             mask = Reg::UpdateMask<T>(sreg);
             Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
             Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
-            Reg::FusedExpSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+            Reg::ExpSub<T, U, Reg::RegLayout::ZERO, Reg::MaskMergeMode::ZEROING>(vDstReg0, vSrcReg0, vSrcReg1, mask);
             Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
         }
     }

@@ -48,7 +48,7 @@ __simd_callee__ inline void ReduceCommonCall(
         if constexpr (!isSetMask) {
             // get SPR.MASK in VF
             Reg::MaskReg sprLoadMaskReg = Reg::MoveMask<uint16_t>();
-            Reg::DataCopy<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+            Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
             // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
             Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
             countSreg = static_cast<uint32_t>(maskBuf[0]);
@@ -84,10 +84,10 @@ __simd_vf__ inline void ReduceAlignCall(
         if constexpr (isCounterMode) {
             mask = Reg::UpdateMask<T>(countSreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
             srcVreg, src, srcBlkStride, srcRepStride, mask);
         func(dstVreg, srcVreg, mask);
-        Reg::DataCopy(dst + i * dstRepOffset, dstVreg, stMask);
+        Reg::StoreAlign(dst + i * dstRepOffset, dstVreg, stMask);
     }
 }
 
@@ -107,16 +107,16 @@ __simd_vf__ inline void ReduceUnalignCall(
         if constexpr (isCounterMode) {
             mask = Reg::UpdateMask<T>(countSreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
             srcVreg, src, srcBlkStride, srcRepStride, mask);
         func(dstVreg, srcVreg, mask);
-        Reg::DataCopyUnAlign(dst, dstVreg, ureg, oneRepOffset);
+        Reg::LoadUnAlign(dst, dstVreg, ureg, oneRepOffset);
         if constexpr (withStride) {
-            Reg::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+            Reg::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
         }
     }
     if constexpr (!withStride) {
-        Reg::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+        Reg::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
     }
 }
 
@@ -140,7 +140,7 @@ __simd_vf__ inline void WholeReduceUnalignCall(
         if constexpr (isCounterMode) {
             mask = Reg::UpdateMask<T>(countSreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
             srcVreg, src, srcBlkStride, srcRepStride, mask);
         if (order == ReduceOrder::ORDER_VALUE_INDEX || order == ReduceOrder::ORDER_ONLY_VALUE) {
             func(dstVreg, srcVreg, mask);
@@ -153,13 +153,13 @@ __simd_vf__ inline void WholeReduceUnalignCall(
                 Reg::Interleave(dstVreg, tmpVreg1, dstVreg, tmpVreg2);
             }
         }
-        Reg::DataCopyUnAlign(dst, dstVreg, ureg, oneRepOffset);
+        Reg::LoadUnAlign(dst, dstVreg, ureg, oneRepOffset);
         if constexpr (withStride) {
-            Reg::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+            Reg::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
         }
     }
     if constexpr (!withStride) {
-        Reg::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+        Reg::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
     }
 }
 
@@ -595,11 +595,11 @@ __simd_callee__ inline void ReduceSumCount(
     Reg::UnalignReg ureg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = Reg::UpdateMask<T>(count);
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         Reg::ReduceSum(dstVreg, srcVreg, preg);
-        Reg::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
+        Reg::LoadUnAlign(dstLocal, dstVreg, ureg, 1);
     }
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T, bool isBitMask>
@@ -613,11 +613,11 @@ __simd_callee__ inline void ReduceSumMask(
     Reg::RegTensor<T> dstVreg;
     Reg::UnalignReg ureg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         Reg::ReduceSum(dstVreg, srcVreg, preg);
-        Reg::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
+        Reg::LoadUnAlign(dstLocal, dstVreg, ureg, 1);
     }
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T, int shapeScope>
@@ -739,13 +739,13 @@ __simd_vf__ inline void ReduceB64SumImpl(
 
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(vreg0, srcLocal + i * oneRepSize);
+        Reg::LoadAlign(vreg0, srcLocal + i * oneRepSize);
         Reg::Add(vregTmp, vregDup, vreg0, mask);
         Reg::Select(vregDup, vregTmp, vregDup, mask);
     }
     Reg::ReduceSum(vreg1, vregDup, fullMask);
     Reg::MaskReg maskFirstVal = Reg::CreateMask<T, Reg::MaskPattern::VL1, Reg::RegTraitNumTwo>();
-    Reg::DataCopy(dstLocal, vreg1, maskFirstVal);
+    Reg::LoadAlign(dstLocal, vreg1, maskFirstVal);
 }
 
 template <typename T>
@@ -838,7 +838,7 @@ __simd_vf__ inline void ReduceNoIndexTemplate(
     Reg::Duplicate(dstVreg, initValue);
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = Reg::UpdateMask<T>(count);
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(tmpVreg, dstVreg, srcVreg, preg);
         } else {
@@ -852,8 +852,8 @@ __simd_vf__ inline void ReduceNoIndexTemplate(
     } else {
         Reg::ReduceMin(dstVreg, dstVreg, pregFull);
     }
-    Reg::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::LoadUnAlign(dstLocal, dstVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T>
@@ -869,7 +869,7 @@ __simd_vf__ inline void ReduceB64NoIndexTemplate(
     Reg::Duplicate(b64DstVreg, initValue, pregFull);
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(count);
-        Reg::DataCopy(b64SrcVreg, srcLocal + i * oneRepSize);
+        Reg::LoadAlign(b64SrcVreg, srcLocal + i * oneRepSize);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(b64TmpVreg, b64DstVreg, b64SrcVreg, preg);
         } else {
@@ -883,8 +883,8 @@ __simd_vf__ inline void ReduceB64NoIndexTemplate(
     } else {
         Reg::ReduceMin(b64DstVreg, b64DstVreg, pregFull);
     }
-    Reg::DataCopyUnAlign(dstLocal, b64DstVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::LoadUnAlign(dstLocal, b64DstVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, bool isBitMask, typename T>
@@ -899,7 +899,7 @@ __simd_vf__ inline void ReduceNoIndexTemplate(
     Reg::Duplicate(dstVreg, initValue);
     int32_t postUpdateStride = srcRepStride * GetDataBlockSizeInBytes() / sizeof(T);
     for (uint16_t i = 0; i < repeat; ++i) {
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(dstVreg, dstVreg, srcVreg, preg);
         } else {
@@ -911,8 +911,8 @@ __simd_vf__ inline void ReduceNoIndexTemplate(
     } else {
         Reg::ReduceMin(dstVreg, dstVreg, preg);
     }
-    Reg::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::LoadUnAlign(dstLocal, dstVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T, typename IndexT>
@@ -941,7 +941,7 @@ __simd_vf__ inline void ReduceIndexTemplate(
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = Reg::UpdateMask<T>(count);
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(tmpValueVreg, dstValueVreg, srcVreg, preg);
         } else {
@@ -964,7 +964,7 @@ __simd_vf__ inline void ReduceIndexTemplate(
     } else {
         Reg::ReduceMin(tmpValueVreg, dstValueVreg, pregFull);
     }
-    Reg::DataCopyUnAlign(dstLocal, tmpValueVreg, ureg, 1); // store value
+    Reg::LoadUnAlign(dstLocal, tmpValueVreg, ureg, 1); // store value
     // get dst value mask and squeeze dst index
     Reg::Duplicate(tmpValueVreg, tmpValueVreg, pregFull);
     Reg::Compare<T, CMPMODE::EQ>(pregCond, dstValueVreg, tmpValueVreg, pregFull);
@@ -973,8 +973,8 @@ __simd_vf__ inline void ReduceIndexTemplate(
     Reg::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     Reg::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     Reg::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    Reg::DataCopyUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::StoreUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T, typename IndexT>
@@ -998,7 +998,7 @@ __simd_vf__ inline void ReduceB64IndexTemplate(
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(count);
-        Reg::DataCopy(b64SrcVreg, srcLocal + i * oneRepSize);
+        Reg::LoadAlign(b64SrcVreg, srcLocal + i * oneRepSize);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(b64TmpValueVreg, b64DstValueVreg, b64SrcVreg, preg);
         } else {
@@ -1021,7 +1021,7 @@ __simd_vf__ inline void ReduceB64IndexTemplate(
     } else {
         Reg::ReduceMin(b64TmpValueVreg, b64DstValueVreg, pregFull);
     }
-    Reg::DataCopyUnAlign(dstLocal, b64TmpValueVreg, ureg, 1); // store value
+    Reg::LoadUnAlign(dstLocal, b64TmpValueVreg, ureg, 1); // store value
     // get dst value mask and squeeze dst index
     Reg::Duplicate(b64TmpValueVreg, b64TmpValueVreg, pregFull);
     Reg::Compare<T, CMPMODE::EQ>(pregCond, b64DstValueVreg, b64TmpValueVreg, pregFull);
@@ -1031,10 +1031,10 @@ __simd_vf__ inline void ReduceB64IndexTemplate(
     Reg::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     Reg::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     Reg::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    Reg::DataCopyUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
+    Reg::StoreUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
     // for b64 type, pad 0 to b64 bytes, which is 4 bytes
-    Reg::DataCopyUnAlign((__ubuf__ IndexT*&)dstLocal, maskIndexVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::StoreUnAlign((__ubuf__ IndexT*&)dstLocal, maskIndexVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, bool isBitMask, typename T, typename IndexT>
@@ -1060,7 +1060,7 @@ __simd_vf__ inline void ReduceIndexTemplate(
     int32_t postUpdateStride = srcRepStride * GetDataBlockSizeInBytes() / sizeof(T);
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
-        Reg::DataCopy<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
+        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             Reg::Max(tmpValueVreg, dstValueVreg, srcVreg, preg);
         } else {
@@ -1081,7 +1081,7 @@ __simd_vf__ inline void ReduceIndexTemplate(
     } else {
         Reg::ReduceMin(tmpValueVreg, dstValueVreg, preg);
     }
-    Reg::DataCopyUnAlign(dstLocal, tmpValueVreg, ureg, 1); // store value
+    Reg::LoadUnAlign(dstLocal, tmpValueVreg, ureg, 1); // store value
     // get dst value mask and squeeze dst index
     Reg::Duplicate(tmpValueVreg, tmpValueVreg, preg);
     Reg::Compare<T, CMPMODE::EQ>(pregCond, dstValueVreg, tmpValueVreg, preg);
@@ -1091,8 +1091,8 @@ __simd_vf__ inline void ReduceIndexTemplate(
     Reg::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     Reg::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     Reg::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    Reg::DataCopyUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
-    Reg::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    Reg::StoreUnAlign((__ubuf__ IndexT*&)dstLocal, tmpIndexVreg, ureg, 1);
+    Reg::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T>
@@ -1461,7 +1461,7 @@ __aicore__ inline void GetReduceMaxMinCountImpl(T& maxMinValue, T& maxMinIndex)
             Reg::MaskReg packedMask;
             Reg::MaskPack(packedMask, mask);
             // write the maskreg to UB
-            Reg::DataCopy<uint64_t>(popBufferAddress, packedMask);
+            Reg::LoadAlign<uint64_t>(popBufferAddress, packedMask);
         }
         SetFlag<HardEvent::V_S>(eventID);
         WaitFlag<HardEvent::V_S>(eventID);

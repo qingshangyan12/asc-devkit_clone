@@ -44,8 +44,8 @@ __aicore__ inline void VfGatherApi0B16(
         if constexpr (!isNormalMode) {
             dstMask = Reg::UpdateMask<T>(sregPlt);
         }
-        DataCopy(offsetReg0, srcOffset + (2 * i) * u32OffsetRepeatCount);
-        DataCopy(offsetReg1, srcOffset + (2 * i + 1) * u32OffsetRepeatCount);
+        Reg::LoadAlign(offsetReg0, srcOffset + (2 * i) * u32OffsetRepeatCount);
+        Reg::LoadAlign(offsetReg1, srcOffset + (2 * i + 1) * u32OffsetRepeatCount);
         // convert addr offset into B16 element index: divide by 2 (implemented by ShiftRight 1 bit)
         ShiftRights(offsetReg0, offsetReg0, (int16_t)1, indexMask);
         ShiftRights(offsetReg1, offsetReg1, (int16_t)1, indexMask);
@@ -59,8 +59,8 @@ __aicore__ inline void VfGatherApi0B16(
         // Select the effective data in offsetReg0 and offsetReg1 and joint them into a complete uint16_t type
         // indexReg£º0xFFFEFD...111213...
         Select(indexReg, (Reg::RegTensor<uint16_t>&)offsetReg0, (Reg::RegTensor<uint16_t>&)offsetReg1, selectMask);
-        DataCopyGather(dstReg, (__ubuf__ uint16_t*)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint16_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);
+        Reg::Gather(dstReg, (__ubuf__ uint16_t*)src + srcBaseIndex, indexReg, dstMask);
+        Reg::StoreAlign((__ubuf__ uint16_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);
     }
 }
 
@@ -97,11 +97,11 @@ __aicore__ inline void VfGatherApi0B32(
         if constexpr (!isNormalMode) {
             dstMask = Reg::UpdateMask<T>(sregPlt);
         }
-        DataCopy(offsetReg, srcOffset + i * u32OffsetRepeatCount);
+        Reg::LoadAlign(offsetReg, srcOffset + i * u32OffsetRepeatCount);
         // convert addr offset into B32 element index: divide by 4 (implemented by ShiftRight 2 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)2, indexMask);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t*)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint32_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);
+        Reg::Gather(dstReg, (__ubuf__ uint32_t*)src + srcBaseIndex, indexReg, dstMask);
+        Reg::StoreAlign((__ubuf__ uint32_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);
     }
 }
 
@@ -138,9 +138,9 @@ __aicore__ inline void GatherImpl(
         MaskReg preg = CreatePredicate<T>(sreg);
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             AddrReg indexOffset = CreateAddrReg<uint32_t>(repeatStride);
-            DataCopy(vregIndex, offset, indexOffset);
-            DataCopyGatherB(vDst, src0, vregIndex, preg);
-            DataCopy(dst, vDst, dstBlkStd, i * dstRptStd, preg);
+            Reg::LoadAlign(vregIndex, offset, indexOffset);
+            Reg::GatherB(vDst, src0, vregIndex, preg);
+            Reg::StoreAlign(dst, vDst, dstBlkStd, i * dstRptStd, preg);
         }
     }
 }
