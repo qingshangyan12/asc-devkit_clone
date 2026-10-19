@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素对输入矢量做线性整流Relu计算，结果写入目的操作数，该接口已废弃，请改用对应的非同步接口asc_relu和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [relu]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md
+    kind: replaced_by
+    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
+version: ">=9.0.0"
+---
 # asc_relu_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按元素对矢量src0与src1求和，再与0比较取较大值完成Relu，并可转换最终结果数据类型，支持s162s8、f322f16、f162s8。"
+tag:
+  - roles: [compute]
+  - operations: [add, relu]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_add_relu
 
 ## 产品支持情况

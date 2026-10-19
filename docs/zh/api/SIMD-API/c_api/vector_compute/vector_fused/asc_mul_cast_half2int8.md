@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对源操作数按元素求积并将乘积结果转换为int8_t类型，转换采用RINT舍入模式（四舍六入五成双），溢出做饱和处理，操作数起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion, multiply]
+  - traits: [elementwise, rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 
 # asc_mul_cast_half2int8
 

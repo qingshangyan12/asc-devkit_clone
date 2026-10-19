@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码将两个源矢量数据寄存器按元素相减，并以差值为指数计算自然指数函数，结果可由返回值返回或写入目的寄存器，half输入变体支持提取偶数或奇数索引元素转为float后计算。"
+tag:
+  - roles: [compute]
+  - operations: [exponential, subtract]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_exp_sub
 
 ## 产品支持情况

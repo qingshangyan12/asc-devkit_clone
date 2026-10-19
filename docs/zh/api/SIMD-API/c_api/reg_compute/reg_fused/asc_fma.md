@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "根据掩码对两个源矢量数据寄存器按元素相乘后，与第三个源寄存器的对应元素相加，实现融合乘加计算，结果通过函数返回值返回。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+version: ">=9.1.0"
+---
 # asc_fma
 
 ## 产品支持情况
