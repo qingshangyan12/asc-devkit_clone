@@ -79,7 +79,7 @@ public:
         }
         dn2nzParams.dstNzNStride = 1;
         dn2nzParams.dstNzMatrixStride = dstNzMatrixStride;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         DataCopy(dst, src[srcOffset], dn2nzParams, preAllocation);
 #else
         DataCopy(dst, src[srcOffset], dn2nzParams);
