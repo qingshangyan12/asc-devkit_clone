@@ -337,7 +337,7 @@ __aicore__ inline void CopyNZ2NZImpl(
     }
     if (srcStride >= UINT16_MAX) {
         for (int32_t i = 0; i < Ceil(width, c0Size_); ++i) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
             DataCopy(
                 dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
                 src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
@@ -361,7 +361,7 @@ __aicore__ inline void CopyNZ2NZImpl(
                 }
             }
         }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         DataCopy(
             dst, src[srcOffset],
             {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),

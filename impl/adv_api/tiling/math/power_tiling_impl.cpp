@@ -237,10 +237,11 @@ void GetPowerMaxMinTmpSize(
     ASCENDC_HOST_ASSERT(
         (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002 || npuArch == NpuArch::DAV_3510 ||
          npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162 ||
-         npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113),
+         npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113 || npuArch == NpuArch::DAV_9202),
         return, "GetPowerMaxMinTmpSize is not supported on current device!");
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113 ||
+        npuArch == NpuArch::DAV_9202) {
         maxValue = GetPowerMaxTmpSizeArch3510(srcShape1, srcShape2, typeIsInt, isReuseSource);
         minValue = maxValue;
     } else {
@@ -260,11 +261,12 @@ void GetPowerTmpBufferFactorSize(
     ASCENDC_HOST_ASSERT(
         (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002 || npuArch == NpuArch::DAV_3510 ||
          npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162 ||
-         npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113),
+         npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113 || npuArch == NpuArch::DAV_9202),
         return, "GetPowerTmpBufferFactorSize is not supported on current device!");
 
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113) {
+        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_3113 ||
+        npuArch == NpuArch::DAV_9202) {
         GetPowerTmpBufferFactorSizeArch3510(typeIsInt, typeSize, maxLiveNodeCount, extraBuffer);
     } else {
         GetPowerTmpBufferFactorSize(

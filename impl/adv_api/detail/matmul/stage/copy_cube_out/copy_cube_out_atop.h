@@ -40,7 +40,7 @@ template <
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<
     IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     enable_if_t<
         (IsTypeOneOfV<typename A_TYPE::T, half, bfloat16_t> &&
          IsTypeOneOfV<typename C_TYPE::T, bfloat16_t, half, float>) ||
@@ -100,7 +100,7 @@ template <
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<
     IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     enable_if_t<
         !(IsTypeOneOfV<typename A_TYPE::T, half, bfloat16_t> &&
           IsTypeOneOfV<typename C_TYPE::T, bfloat16_t, half, float>) &&

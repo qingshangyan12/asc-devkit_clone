@@ -257,7 +257,7 @@ struct MatmulParams<
     using PARAMS = MatmulParamsMDLSparse<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 // MX_CFG_NORM
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 struct MatmulParams<
