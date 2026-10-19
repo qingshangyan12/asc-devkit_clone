@@ -18,6 +18,8 @@
 #include "topo_match_ubx.h"
 #include "ins_temp_all_gather_omnipipe_mesh_1D.h"
 #include "ins_temp_all_gather_omnipipe_nhr.h"
+#include "ins_temp_all_gather_omnipipe_nhr_dpu.h"
+#include "topo_match_two_level.h"
 #include "omnipipe_template_utils.h"
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
@@ -649,6 +651,14 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     }
     return HCCL_SUCCESS;
 }
+
+// 2级算法: TopoMatchTwoLevel 产出 2 级 infos，3 个模板中 L2 模板不执行（subCommRanks2 退化为单卡）
+REGISTER_EXEC_V2_MULTI(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, InsV2AllGatherOmniPipeExecutor, TopoMatchTwoLevel,
+    InsTempAllGatherOmniPipeMesh1D, InsTempAllGatherOmniPipeNHR, InsTempAllGatherOmniPipeNHRDPU);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, AlgEngine::AICPU, "pipeline[mesh,nhr]",
+    COND_NONE, FLAG_UBX, 0);
 
 REGISTER_EXEC_V2_MULTI(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLinePcie, InsV2AllGatherOmniPipeExecutor, TopoMatchPcieMix,
