@@ -231,8 +231,7 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
