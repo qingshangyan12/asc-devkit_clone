@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍矩阵计算的搬出接口，主要实现从L0C Buffer到Global Memory和L1 Buffer的数据传输，支持随路量化、随路ReLU、随路格式转换、通道拆分与合并等场景。"
+---
 # 矩阵搬出总体说明
 
 矩阵计算的搬出是Ascend C编程框架中用于数据搬运的一类核心接口，主要实现从L0C Buffer到Global Memory和L1 Buffer的数据传输。该接口系列提供了多种数据搬运模式，能够满足矩阵计算中的数据搬运需求，通常在asc_mmad接口后配合使用。

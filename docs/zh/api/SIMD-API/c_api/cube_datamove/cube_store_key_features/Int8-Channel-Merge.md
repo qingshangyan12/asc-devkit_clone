@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "矩阵计算搬出过程中，目标数据类型被转换为int8_t或uint8_t且Nz输出时自动启用，硬件将分形矩阵从16×16扩展为16×32，N为16的偶数倍时每两个相邻分形矩阵合并为一个。"
+---
 # Int8 Channel Merge
 
 ## 特性说明

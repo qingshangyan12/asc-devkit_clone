@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "矩阵计算搬出过程中对目标类型f32开启Channel Split后，硬件将16×16分形矩阵转换为16×8小z分形矩阵，每个16×16分形矩阵拆分为2个独立的16×8分形矩阵，开启时n_size须为8的倍数。"
+---
 # F32 Channel Split
 
 ## 特性说明

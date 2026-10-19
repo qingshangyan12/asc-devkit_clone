@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "已废弃接口，将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合，旧参数形式及asc_copy_l0c2gm_sync已废弃，替代接口为asc_copy_l0c2gm和asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_copy_l0c2gm（废弃）
 
 ## 产品支持情况

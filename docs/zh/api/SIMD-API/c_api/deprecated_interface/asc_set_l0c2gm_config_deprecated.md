@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的矩阵搬出配置接口，用于数据搬运随路量化时设置量化流程中的矢量量化参数，包括ReLU与量化前置地址及unit_flag开关，替代接口为asc_set_l0c_copy_config。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
+    kind: replaced_by
+    condition: "数据搬运随路量化参数设置的场景改用asc_set_l0c_copy_config"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_set_l0c2gm_config（废弃）
 
 ## 产品支持情况

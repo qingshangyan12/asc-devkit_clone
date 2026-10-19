@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "设置RELU_ALPHA寄存器值，提供fixpipe或cube指令进行Scalar ReLU时使用的alpha值。该接口已废弃，请使用asc_set_l0c_copy_relu_alpha替代。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md
+    kind: replaced_by
+    condition: "设置ReLU alpha值的场景改用asc_set_l0c_copy_relu_alpha"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l0c2gm_relu_alpha（废弃）
 
 ## 产品支持情况

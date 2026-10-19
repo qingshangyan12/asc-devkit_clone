@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "已废弃的矩阵搬出配置接口，用于设置asc_copy_l0c2l1或asc_copy_l0c2gm计算过程中使用的Leaky ReLU alpha值，仅支持half与float类型，替代接口为asc_set_l0c_copy_lrelu_alpha。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md
+    kind: replaced_by
+    condition: "设置数据搬运过程中Leaky ReLU alpha值的场景改用asc_set_l0c_copy_lrelu_alpha"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l0c2gm_lrelu_alpha（废弃）
 
 ## 产品支持情况

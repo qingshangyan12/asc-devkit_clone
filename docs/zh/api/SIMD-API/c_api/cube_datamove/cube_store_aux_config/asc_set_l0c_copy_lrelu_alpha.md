@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，需在搬出接口执行前调用并在其中配置对应的Scalar激活模式。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+    condition: "随路Scalar激活时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
+    condition: "随路Scalar激活时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md
+    kind: configures
+    condition: "随路Scalar激活时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_set_l0c_copy_lrelu_alpha
 
 ## 产品支持情况

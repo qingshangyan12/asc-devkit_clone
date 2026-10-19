@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将矩阵计算结果量化处理后从L0C Buffer搬运到GM，该同步接口已废弃，请使用对应的非同步接口asc_copy_l0c2gm和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_2201.md
+    kind: replaced_by
+    condition: "替代废弃同步接口的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "与替代接口配合使用的同步接口"
+version: ">=9.1.0"
+---
 # asc_copy_l0c2gm_sync_arch_2201（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "已废弃的同步接口，将数据从L1 Buffer搬运到Unified Buffer（UB），以DataBlock（32字节）为传输粒度，替代为对应非同步接口asc_copy_l12ub和asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l12ub.md
+    kind: replaced_by
+    condition: "接口已废弃，使用对应的非同步接口替代"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "接口已废弃，使用同步接口asc_sync替代"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_copy_l12ub_sync（废弃）
 
 ## 产品支持情况
