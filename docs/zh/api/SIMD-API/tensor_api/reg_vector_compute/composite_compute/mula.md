@@ -83,7 +83,10 @@ __simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_ops.h"
+#include "tensor_api/experimental/arch/vector/composite_compute.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename DstTensor, typename Src0Tensor, typename Src1Tensor>
 __simd_vf__ inline void mula_vf(

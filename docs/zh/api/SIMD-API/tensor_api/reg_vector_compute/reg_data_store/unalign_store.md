@@ -108,7 +108,8 @@ struct unalign_store {
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/vector_ops.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void CopyUnaligned(

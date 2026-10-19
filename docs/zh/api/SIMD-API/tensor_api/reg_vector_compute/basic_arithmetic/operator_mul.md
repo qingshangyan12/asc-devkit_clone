@@ -90,7 +90,10 @@ $$
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_ops.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void mul_example(InputTensor input, OutputTensor output)

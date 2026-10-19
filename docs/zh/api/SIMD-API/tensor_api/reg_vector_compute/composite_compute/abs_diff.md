@@ -77,7 +77,10 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_ops.h"
+#include "tensor_api/experimental/arch/vector/composite_compute.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
 __simd_vf__ inline void abs_diff_vf(
