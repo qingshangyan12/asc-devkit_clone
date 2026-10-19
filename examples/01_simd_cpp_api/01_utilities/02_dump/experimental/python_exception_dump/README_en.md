@@ -60,9 +60,7 @@ Configuration (environment variables):
 
 - Install prerequisites
 
-  ```bash
-  pip3 install ascend_ops    # pip package that provides the IFA operator called by the demo
-  ```
+  The IFA operator invoked by the demo is provided by the `ascend_ops` package, which is not published to any public pip index and thus cannot be installed with `pip3 install ascend_ops`. Obtain it according to your actual environment (for example, install an offline wheel with `pip3 install ./ascend_ops-<version>-py3-none-<platform>.whl`).
 
 - Configure environment variables
 
