@@ -62,11 +62,11 @@
 
 -   优化前的流水图如下，不开启IBShare模板，默认使用的Norm模板。黑框标识AIV0发起的MTE2搬运流水：MTE2总共搬运了12次，其中A矩阵搬运了6次（stepM\*stepKa=6），B矩阵搬运了6次（stepN\*stepKb=6）。红框标识的AIV1发起的MTE2搬运流水，跟AIV0基本一致。在该案例中，因为AIV1使用的B矩阵跟AIV0使用的B矩阵数据相同，且singleCoreN=baseN\*stepN，singleCoreK=baseK\*stepKb，即B矩阵可以在L1全载。考虑在AIV0搬入B矩阵到L1 Buffer后，将B矩阵数据缓存在L1 Buffer上等待AIV1进行复用，进而节省B矩阵的MTE2重复搬运开销。
 
-    ![](../../../figures/zh-cn_image_0000002404199037.png)
+    ![](../../../figures/image_0000002404199037.png)
 
 -   优化前的Profiling数据如下，C列的aic\_time是10.29us，K列的aic\_mte2\_time是5.56us。
 
-    ![](../../../figures/zh-cn_image_0000002411076626.png)
+    ![](../../../figures/image_0000002411076626.png)
 
 ## 设计优化方案<a name="section1875873847"></a>
 
@@ -99,11 +99,11 @@ Matmul API开启IBShare模板共享B矩阵的完整样例请参考[仅B矩阵开
 
 -   优化后的流水图如下，黑框标识的AIV0发起的MTE2搬运流水，与优化前一致。红框标识的AIV1发起的MTE2搬运流水，相较于优化前的A矩阵和B矩阵一共12次MTE2数据搬运，减少到了仅6次A矩阵的MTE2数据搬运，省去了B矩阵的6次MTE2数据搬运开销。
 
-    ![](../../../figures/zh-cn_image_0000002404200417.png)
+    ![](../../../figures/image_0000002404200417.png)
 
 -   优化后的Profiling数据如下，C列的aic\_time是9.93us，较优化前的10.29us提升了3.55%。K列的aic\_mte2\_time是4.71us，较优化前的5.56us提升了15.46%。
 
-    ![](../../../figures/zh-cn_image_0000002444817149.png)
+    ![](../../../figures/image_0000002444817149.png)
 
 ## 总结<a name="section8281219125011"></a>
 

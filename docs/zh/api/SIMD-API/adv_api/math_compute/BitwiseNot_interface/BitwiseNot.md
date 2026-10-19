@@ -27,7 +27,7 @@
 
 逐比特对输入进行取反。
 
-![](../../../../figures/zh-cn_formulaimage_0000002477048097.png)
+![](../../../../figures/formulaimage_0000002477048097.png)
 
 ## 函数原型
 

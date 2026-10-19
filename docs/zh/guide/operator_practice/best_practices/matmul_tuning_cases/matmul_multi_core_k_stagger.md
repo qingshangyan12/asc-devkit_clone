@@ -63,11 +63,11 @@
 
 优化前的Profiling数据（PipeUtilization.csv）如下所示，aic\_mte2\_ratio平均达到0.93，MTE2在算子整体执行时长中占比较高，算子当前为MTE2 Bound。本案例中，矩阵按M和N方向切分，单核shape\[singleCoreM，singleCoreN，singleCoreK\]为\[128, 512, 6144\]，基本块shape\[baseM，baseN，baseK\]为\[128, 256, 64\]，每次加载A矩阵的数据时，多核有概率同时访问同一GM地址，引发地址冲突，导致MTE2搬运效率降低，MTE2执行耗时增加。
 
-![](../../../figures/zh-cn_image_0000002414322380.png)
+![](../../../figures/image_0000002414322380.png)
 
 MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下图所示，通过分析Memory.csv，发现MTE2平均带宽利用率只有34.4%。
 
-![](../../../figures/zh-cn_image_0000002414480828.png)
+![](../../../figures/image_0000002414480828.png)
 
 查看OpBasicInfo.csv文件，优化前算子整体耗时为98.72us。
 
@@ -102,11 +102,11 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 算子Tiling参数不变，优化后的Profiling数据（PipeUtilization.csv）如下所示。可以看到，MTE2耗时显著降低，MTE2的平均耗时从90us降低到69.87us，最大耗时从91.94us降低到75.82us。
 
-![](../../../figures/zh-cn_image_0000002448122873.png)
+![](../../../figures/image_0000002448122873.png)
 
 MTE2的带宽利用率（Memory.csv）如下所示，平均带宽利用率提升到41.7%。
 
-![](../../../figures/zh-cn_image_0000002414329628.png)
+![](../../../figures/image_0000002414329628.png)
 
 查看OpBasicInfo.csv文件，优化后算子整体耗时为85.68us，耗时从98.72us降低到85.68us，性能提升13.2%。
 

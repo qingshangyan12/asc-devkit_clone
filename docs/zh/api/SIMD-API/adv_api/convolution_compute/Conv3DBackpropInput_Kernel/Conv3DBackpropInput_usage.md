@@ -4,7 +4,7 @@ Ascend C提供一组Conv3DBackpropInput高阶API，便于用户快速实现卷�
 
 Conv3DBackpropInput的计算公式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002073192576.png)
+![](../../../../figures/formulaimage_0000002073192576.png)
 
 -   ∂L/∂Y为卷积正向损失函数对输出Y的梯度GradOutput，作为求反向传播误差∂L/∂X的输入。
 -   W为卷积正向Weight权重，即矩阵核函数（Kernel），也是滤波器Filter，作为求反向传播误差∂L/∂X的输入，W<sup>T</sup>表示W的转置。

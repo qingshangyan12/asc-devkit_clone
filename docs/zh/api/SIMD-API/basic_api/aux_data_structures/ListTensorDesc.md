@@ -74,7 +74,7 @@ class ListTensorDesc {
 
 示例中待解析的srcGm内存排布如下图所示：
 
-![](../../../figures/zh-cn_image_0000001866617737.png)
+![](../../../figures/image_0000001866617737.png)
 
 ```cpp
 AscendC::ListTensorDesc listTensorDesc(reinterpret_cast<__gm__ void *>(srcGm)); // srcGm为待解析的gm地址

@@ -27,9 +27,9 @@
 
 按元素计算两个浮点数a, b相除后的余数。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002348879736.png)
+![](../../../../figures/formulaimage_0000002348879736.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188778220.png)
+![](../../../../figures/formulaimage_0000002188778220.png)
 
 其中，Trunc为向零取整操作。举例如下：
 

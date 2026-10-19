@@ -47,7 +47,7 @@ $f(x) = \begin{cases} x, & x \geq 0 \\ \alpha x, & x < 0 \end{cases}$
 
 和ReLU的区别是：ReLU是将所有的负值都设为零，而Leaky ReLU是给所有负值赋予一个斜率。下图表示了ReLU和Leaky ReLU的区别：
 
-![](../../../../figures/zh-cn_image_0000001475211729.png) ![](../../../../figures/zh-cn_image_0000001425411698.png)
+![](../../../../figures/image_0000001475211729.png) ![](../../../../figures/image_0000001425411698.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

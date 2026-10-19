@@ -33,9 +33,9 @@
 
 按元素做反正弦函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218213209.png)
+![](../../../../figures/formulaimage_0000002218213209.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002410546785.png)
+![](../../../../figures/formulaimage_0000002410546785.png)
 
 ## 函数原型
 

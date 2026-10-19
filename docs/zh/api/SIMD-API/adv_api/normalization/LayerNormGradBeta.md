@@ -29,9 +29,9 @@ LayerNormGradBeta接口用于获取反向beta/gamma的数值，和LayerNormGrad�
 
 算法公式为:
 
-![](../../../figures/zh-cn_formulaimage_0000001718651312.png)
+![](../../../figures/formulaimage_0000001718651312.png)
 
-![](../../../figures/zh-cn_formulaimage_0000001766331937.png)
+![](../../../figures/formulaimage_0000001766331937.png)
 
 ## 函数原型
 

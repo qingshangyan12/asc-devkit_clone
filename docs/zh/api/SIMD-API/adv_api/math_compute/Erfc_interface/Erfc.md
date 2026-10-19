@@ -33,13 +33,13 @@
 
 返回输入x的互补误差函数结果，积分区间为x到无穷大。原始的理论计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002217748513.png)
+![](../../../../figures/formulaimage_0000002217748513.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002377042796.png)
+![](../../../../figures/formulaimage_0000002377042796.png)
 
 由于Erfc函数没有初等函数表达方式，一般通过函数逼近的方式计算，近似计算公式如下所示：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218332193.png)
+![](../../../../figures/formulaimage_0000002218332193.png)
 
 其中，
 

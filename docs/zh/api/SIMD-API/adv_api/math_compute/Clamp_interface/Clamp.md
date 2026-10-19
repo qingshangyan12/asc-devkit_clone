@@ -27,9 +27,9 @@
 
 将输入中除nan值以外大于max的数替换为max，小于min的数替换为min，小于等于max和大于等于min的数保持不变，作为输出。当min大于max时，将除nan值外所有值替换为max。min和max可以为标量或LocalTensor。
 
-![](../../../../figures/zh-cn_formulaimage_0000002386121366.png)
+![](../../../../figures/formulaimage_0000002386121366.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002419939453.png)
+![](../../../../figures/formulaimage_0000002419939453.png)
 
 ## 函数原型
 

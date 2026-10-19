@@ -29,7 +29,7 @@
 
 获取输入数据的反余弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776390.png)
+![](../../../figures/formulaimage_0000002484776390.png)
 
 arccos\(x\)为反余弦函数的计算。
 

@@ -29,7 +29,7 @@
 
 获取输入int64类型数据x和y乘积的高64位。
 
-![](../../../figures/zh-cn_formulaimage_0000002562010435.png)
+![](../../../figures/formulaimage_0000002562010435.png)
 
 ## 函数原型
 

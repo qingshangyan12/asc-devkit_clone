@@ -29,7 +29,7 @@
 
 获取输入数据x的标准正态累积分布的逆函数。
 
-![](../../../figures/zh-cn_formulaimage_0000002533422599.png)
+![](../../../figures/formulaimage_0000002533422599.png)
 
 ## 函数原型
 

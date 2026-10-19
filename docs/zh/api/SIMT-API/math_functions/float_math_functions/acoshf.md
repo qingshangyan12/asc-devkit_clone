@@ -29,7 +29,7 @@
 
 获取输入数据的双曲反余弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816351.png)
+![](../../../figures/formulaimage_0000002516816351.png)
 
 ## 函数原型
 

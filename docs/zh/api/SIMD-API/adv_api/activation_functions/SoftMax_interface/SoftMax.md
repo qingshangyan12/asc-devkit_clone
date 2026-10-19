@@ -33,7 +33,7 @@
 
 将输入tensor\[m<sub>0</sub>, m<sub>1</sub>, ...m<sub>t</sub>, n\]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作\[m, n\]。对输入tensor\[m, n\]按行做如下SoftMax计算：
 
-![](../../../../figures/zh-cn_formulaimage_0000001901417037.png)
+![](../../../../figures/formulaimage_0000001901417037.png)
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式（以输入为ND格式为例）如下，其中src是源操作数（输入），dst、sum、max为目的操作数（输出）。
 

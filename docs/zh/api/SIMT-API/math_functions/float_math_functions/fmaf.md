@@ -29,7 +29,7 @@
 
 对输入数据x、y、z，计算x与y相乘加上z的结果。
 
-![](../../../figures/zh-cn_formulaimage_0000002531284496.png)
+![](../../../figures/formulaimage_0000002531284496.png)
 
 ## 函数原型
 

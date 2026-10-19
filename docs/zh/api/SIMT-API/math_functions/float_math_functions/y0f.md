@@ -29,7 +29,7 @@
 
 获取输入数据x的0阶第二类贝塞尔函数y0的值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816389.png)
+![](../../../figures/formulaimage_0000002516816389.png)
 
 ## 函数原型
 
