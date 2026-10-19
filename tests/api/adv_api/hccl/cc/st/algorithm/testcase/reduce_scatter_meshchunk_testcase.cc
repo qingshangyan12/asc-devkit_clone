@@ -18,6 +18,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "hcomm_primitives_dl.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
+#include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
@@ -127,6 +128,17 @@ extern "C" int32_t __wrap_HcommWriteReduceOnThread(
     tasks.push_back({Kind::REDUCE, t, c, 0, dst, src, count, dtype});
     return HCCL_SUCCESS;
 }
+extern "C" int32_t __wrap_HcommWriteOnThread(ThreadHandle t, ChannelHandle c, void* dst, const void* src, uint64_t len)
+{
+    tasks.push_back({Kind::COPY, t, c, 0, dst, src, len});
+    return HCCL_SUCCESS;
+}
+extern "C" int32_t __wrap_HcommLocalReduceOnThread(
+    ThreadHandle t, void* dst, const void* src, uint64_t count, HcommDataType dtype, HcommReduceOp)
+{
+    tasks.push_back({Kind::REDUCE, t, 0, 0, dst, src, count, dtype});
+    return HCCL_SUCCESS;
+}
 extern "C" int32_t __wrap_HcommReadReduceOnThread(
     ThreadHandle, ChannelHandle, void*, const void*, uint64_t, HcommDataType, HcommReduceOp)
 {
@@ -148,6 +160,9 @@ extern "C" int32_t __wrap_HcclHcommBatchTransferOnThread(
             __wrap_HcommWriteReduceOnThread(t, c, r.dst, r.src, r.count, r.dataType, r.reduceOp);
             // Model completion notification AFTER the payload, on the same ordered thread.
             __wrap_HcommChannelNotifyRecordOnThread(t, c, r.notifyIdx);
+        } else if (desc[i].transType == HCCL_HCOMM_TRANSFER_TYPE_WRITE) {
+            const auto& w = desc[i].transferInfo.write;
+            __wrap_HcommWriteOnThread(t, c, w.dst, w.src, w.len);
         } else {
             EXPECT_EQ(desc[i].transType, HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE);
             const auto& r = desc[i].transferInfo.reduce;
@@ -457,6 +472,58 @@ struct Scenario {
     }
 };
 } // namespace
+
+TEST_F(MeshChunkTest, SoleMeshConcurStridedMultiLoopTaskGraphAndPrecision)
+{
+    for (u32 ranks : {2U, 4U, 8U}) {
+        for (auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+            for (u64 count : {3ULL, 257ULL, 1031ULL}) {
+                for (u64 stride : {count, count + 7}) {
+                    tasks.clear();
+                    Scenario s(ranks, count, stride, dtype);
+                    for (auto& scratch : s.scratch) {
+                        scratch.assign(ranks * count * s.elementSize + 34, 0xD7);
+                    }
+                    constexpr u32 channelCount = 3;
+                    for (u32 rank = 0; rank < ranks; ++rank) {
+                        auto p = s.Param();
+                        p.inputPtr = s.In(rank);
+                        p.outputPtr = s.Out(rank);
+                        AlgResourceCtxSerializable ctx{};
+                        ctx.topoInfo.userRank = rank;
+                        ctx.topoInfo.userRankSize = ranks;
+                        ctx.algHierarchyInfo.infos = {{s.rankList}};
+                        ctx.cclMem.addr = s.Tmp(rank);
+                        ctx.cclMem.size = 129 * ranks * s.elementSize;
+                        for (u32 i = 0; i < 1 + (ranks - 1) * channelCount; ++i) {
+                            ctx.threads.push_back(1 + rank * 64 + i);
+                        }
+                        ctx.channels.resize(1);
+                        for (u32 peer = 0; peer < ranks; ++peer) {
+                            if (peer == rank) {
+                                continue;
+                            }
+                            for (u32 layer = 0; layer < channelCount; ++layer) {
+                                ChannelInfo c{};
+                                c.handle = 1 + layer * 4096 + rank * 64 + peer;
+                                c.remoteRank = peer;
+                                c.portGroupSize = layer == 2 ? 6 : (layer == 1 ? 2 : 1);
+                                c.remoteCclMem.addr = s.Tmp(peer);
+                                c.remoteCclMem.size = ctx.cclMem.size;
+                                ctx.channels[0].push_back(c);
+                            }
+                        }
+                        auto exec = CollAlgExecRegistryV2::Instance().GetAlgExec(
+                            HCCL_CMD_REDUCE_SCATTER, "AicpuReduceScatterSoleMeshConcur");
+                        ASSERT_NE(exec, nullptr);
+                        ASSERT_EQ(exec->Orchestrate(p, ctx), HCCL_SUCCESS);
+                    }
+                    s.ExecuteAndCheck();
+                }
+            }
+        }
+    }
+}
 
 TEST_F(MeshChunkTest, ChunkBoundariesConserveDataAndPreserveStridedMultiLoopAddresses)
 {
