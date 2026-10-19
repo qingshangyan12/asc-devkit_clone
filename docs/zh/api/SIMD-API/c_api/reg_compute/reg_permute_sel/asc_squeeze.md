@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将被掩码选中的有效元素按原顺序压缩到结果低位并置零剩余位置，返回压缩结果或写入目的寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_squeeze
 
 ## 产品支持情况

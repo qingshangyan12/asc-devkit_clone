@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "将标量广播写入目的操作数中被掩码筛选的位置，未被筛选的元素保留原值，采用合并模式区别于asc_duplicate_scalar。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+  - traits: [scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本接口与前后Reg数据搬运接口之间，不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖时"
+version: ">=9.0.0"
+---
 # asc_duplicate_scalar_merge
 
 ## 产品支持情况

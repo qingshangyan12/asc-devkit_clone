@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "asc_squeeze_v2将源矢量中被mask选择的有效元素依次复制到目的矢量并连续排列，目的矢量剩余位置元素置0。该接口已废弃，请改用asc_squeeze_and_storeunalign实现筛选并连续搬出有效元素。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_squeeze_v2 (废弃)
 
 ## 产品支持情况

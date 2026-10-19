@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据索引位置按DataBlock粒度从Unified Buffer收集数据到目的矢量数据寄存器，每个DataBlock长32字节，索引仅前8个元素有效，支持掩码控制。"
+tag:
+  - roles: [data_movement]
+  - operations: [gather]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_gather_datablock
 
 ## 产品支持情况

@@ -25,78 +25,276 @@
 #include "impl/c_api/reg_base_impl/ub_scatter_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters int8_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUi8_vi8_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters uint8_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUu8_vu8_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ uint8_t* dst, vector_uint8_t src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters int16_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUi16_vi16_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ int16_t* dst, vector_int16_t src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters uint16_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUu16_vu16_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ uint16_t* dst, vector_uint16_t src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters int32_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUi32_vi32_vu32_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ int32_t* dst, vector_int32_t src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters uint32_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUu32_vu32_vu32_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters bfloat16_t elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUbf16_vbf16_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters half elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUf16_vf16_vu16_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.scatter
+ * @brief Scatters float elements of vector register src into the UB buffer dst at element positions given by index; mask=1 elements are written, mask=0 keep original data (void return, PIPE_V).
+ *
+ * @override_id asc_scatter__PUf32_vf32_vu32_vb
+ * @archs 3510
+ * @param [out] dst 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。
+ * @param [in] src 源操作数（矢量数据寄存器），数据类型须与`dst`指向的数据类型一致。
+ * @param [in] index 数据索引（矢量数据寄存器），单位为元素。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与搬运。对应位置为1时参与计算，为0时不参与计算，保留目的地址原数据。
+ */
 __simd_callee__ inline void asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters int8_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvi8_PUi8_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ uint8_t* dst, vector_uint8_t src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters uint8_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvu8_PUu8_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ int16_t* dst, vector_int16_t src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters int16_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvi16_PUi16_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ uint16_t* dst, vector_uint16_t src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters uint16_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvu16_PUu16_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ int32_t* dst, vector_int32_t src, vector_uint32_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters int32_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvi32_PUi32_vu32_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters uint32_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvu32_PUu32_vu32_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters bfloat16_t elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvbf16_PUbf16_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters half elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvf16_PUf16_vu16_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_bool mask);
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask))
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @brief Deprecated: scatters float elements of vector register src into UB dst at positions given by index, with mask selecting active elements (void return, PIPE_V); use asc_scatter.
+ *
+ * @override_id asc_scatter__Rvf32_PUf32_vu32_vb
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] index 数据索引（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_scatter(
     vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask);
 

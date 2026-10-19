@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "执行数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat可处理512Byte数据（16个DataBlock）并支持多次Repeat。"
+tag:
+  - roles: [compute]
+  - operations: [layout_transform, transpose]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
+    kind: requires
+    condition: "为dst和src配置地址寄存器时"
+version: ">=9.2.0"
+---
 # asc_transto5hd
 
 ## 产品支持情况

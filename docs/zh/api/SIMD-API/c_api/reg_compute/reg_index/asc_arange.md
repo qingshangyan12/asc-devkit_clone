@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "以传入标量为起始值生成递增或递减的索引序列并保存到矢量数据寄存器，整型结果超出可表示范围时回绕，仅在AIV上生效。"
+tag:
+  - roles: [compute]
+  - operations: [fill]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_arange
 
 ## 产品支持情况

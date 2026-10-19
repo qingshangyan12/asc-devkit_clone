@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将src中被掩码筛选的有效元素或bit复制到函数返回值对应位置，支持矢量数据寄存器间和掩码寄存器间两种复制模式，仅在AIV上生效。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
+    kind: related
+version: ">=9.2.0"
+---
 # asc_mask
 
 ## 产品支持情况
