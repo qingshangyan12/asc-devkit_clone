@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "用于同一核内所有流水之间的全部流水同步，阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: related
+    condition: "PIPE_ALL 阻塞全部流水的等价行为"
+version: ">=9.0.0"
+---
 # asc_sync
 
 ## 产品支持情况

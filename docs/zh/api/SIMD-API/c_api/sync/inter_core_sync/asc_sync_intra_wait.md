@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "单AI Core内AIC与单个AIV之间的核间同步等待接口，阻塞流水后续指令直到对应sync_id计数器非0，需与asc_sync_intra_arrive配对且遵守跨核ID映射。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
+    kind: related
+    condition: "配对使用，且arrive与wait的sync_id须符合跨核ID映射关系"
+version: ">=9.1.0"
+---
 # asc_sync_intra_wait
 
 ## 产品支持情况

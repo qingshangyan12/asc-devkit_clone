@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "单AI Core内AIC与全部AIV间的核间同步到达接口，在某条流水的前序指令执行完成后向调度模块发送通知，需与asc_sync_block_wait配对使用，不阻塞后续指令。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
+    kind: related
+    condition: "配对使用，flag_id必须完全一致"
+version: ">=9.0.0"
+---
 # asc_sync_block_arrive
 
 ## 产品支持情况
