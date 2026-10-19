@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍Cube计算辅助数据的矩阵分形格式，MX量化系数矩阵scaleA采用Zz、scaleB采用Nn排布，4选2稀疏场景的索引矩阵采用Zn排布。"
+---
 # 辅助矩阵分形格式详解
 
 <!-- npu="950" id1 -->

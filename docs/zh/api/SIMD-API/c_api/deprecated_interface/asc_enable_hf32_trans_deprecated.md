@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "用于设置HF32模式舍入方式，FP32可向最接近值舍入且平局向偶数或远离零舍入，使用前需先开启HF32模式，该接口已废弃，请使用asc_set_hf32_round_mode替代。"
+tag:
+  - roles: [configuration]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md
+    kind: replaced_by
+    condition: "接口已废弃"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_enable_hf32_trans（废弃）
 
 ## 产品支持情况

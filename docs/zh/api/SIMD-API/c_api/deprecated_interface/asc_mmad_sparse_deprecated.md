@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "完成稀疏矩阵乘加操作，左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵，矩阵A在计算时稠密化，仅在AIC上生效。该接口已废弃，请使用新asc_mmad_sparse接口替代，原同步功能由asc_sync实现。"
+tag:
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+  - traits: [sparse_input]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_sparse.md
+    kind: replaced_by
+    condition: "unit_flag为uint8_t的旧asc_mmad_sparse形态改用新asc_mmad_sparse接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "asc_mmad_sparse_sync的同步功能改由asc_sync实现"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_mmad_sparse（废弃）
 
 ## 产品支持情况

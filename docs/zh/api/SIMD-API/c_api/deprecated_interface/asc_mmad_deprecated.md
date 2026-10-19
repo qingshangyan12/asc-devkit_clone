@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "面向昇腾AI芯片的矩阵乘加核心计算接口，完成结果矩阵等于左矩阵乘右矩阵并与初始矩阵相加的计算。unit_flag为uint8_t或带feat_offset的旧形态已废弃，请改用入参unit_flag_mode为asc_unit_flag_mode的新asc_mmad接口，同步功能由asc_sync实现。"
+tag:
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: replaced_by
+    condition: "unit_flag为uint8_t或带feat_offset参数的旧形态改用新asc_mmad接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_mmad（废弃）
 
 ## 产品支持情况
