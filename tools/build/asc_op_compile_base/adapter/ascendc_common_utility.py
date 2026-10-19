@@ -486,7 +486,7 @@ class CommonUtility:
             res: True means current soc support super kernel
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950", "Ascend310n"]:
+        if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950"]:
             return True
         return False
 
@@ -498,7 +498,7 @@ class CommonUtility:
             res: True means soc version support workspace offset way
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend950", "Ascend310n", "Ascend350", "MC62", "MC32DM11A"]:
+        if short_soc_version in ["Ascend950", "Ascend350", "MC62", "MC32DM11A"]:
             return True
         return False
 
@@ -558,7 +558,7 @@ class CommonUtility:
             res: True means c310
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend950", "Ascend310n", "Ascend350"]:
+        if short_soc_version in ["Ascend950", "Ascend350"]:
             return True
         return False
 
@@ -570,7 +570,7 @@ class CommonUtility:
             res: True means 920r1
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend960DT"]:
+        if short_soc_version in ["Ascend960DT", "Ascend310n"]:
             return True
         return False
 
