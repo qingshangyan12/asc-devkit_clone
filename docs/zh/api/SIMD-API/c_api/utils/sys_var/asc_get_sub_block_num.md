@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "在分离模式下读取当前AI Core上Cube Core（AIC）或Vector Core（AIV）的数量；该值保存在只读特殊寄存器中并由系统控制器在核函数启动前配置，运行期间不可修改。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md
+    kind: constrained_by
+    condition: "仅在分离模式下有意义"
+version: ">=9.1.0"
+---
 # asc_get_sub_block_num
 
 ## 产品支持情况

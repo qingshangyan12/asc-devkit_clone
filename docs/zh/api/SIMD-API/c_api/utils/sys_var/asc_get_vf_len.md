@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "获取当前芯片矢量寄存器位宽VL，即矢量计算单元单次Repeat可处理的元素个数，可用于推导mask长度、循环次数与单次搬运元素数"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+version: ">=9.1.0"
+---
 # asc_get_vf_len
 
 ## 产品支持情况

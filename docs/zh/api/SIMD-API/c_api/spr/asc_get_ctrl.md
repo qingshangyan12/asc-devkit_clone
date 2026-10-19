@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "读取CTRL控制寄存器特定比特位上的值，返回int64_t类型寄存器值，具体含义参见asc_set_ctrl的描述。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "理解返回值含义时"
+version: ">=9.0.0"
+---
 # asc_get_ctrl
 
 ## 产品支持情况

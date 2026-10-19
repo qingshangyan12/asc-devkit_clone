@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "获取当前AI处理器架构版本号，不同型号服务器对应不同取值，可用于确认算子编译产物的目标架构。"
+tag:
+  - roles: [query]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_get_arch_ver
 
 ## 产品支持情况

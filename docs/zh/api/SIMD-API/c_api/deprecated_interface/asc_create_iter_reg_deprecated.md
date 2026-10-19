@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "该接口已废弃，请改用asc_update_addr_reg实现，它用于初始化地址寄存器以在循环中存储地址偏移量，支持1-4个offset参数与b8、b16、b32位宽，适配1-4维Tensor并自动计算多维循环地址偏移。"
+tag:
+  - roles: [configuration]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: replaced_by
+    condition: "使用asc_update_addr_reg实现此功能"
+version: ">=9.0.0"
+---
 # asc_create_iter_reg (废弃)
 
 ## 产品支持情况
