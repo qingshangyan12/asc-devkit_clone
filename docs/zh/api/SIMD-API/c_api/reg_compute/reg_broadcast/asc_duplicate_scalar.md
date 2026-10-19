@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将标量广播写入矢量数据寄存器目的操作数的全部元素或掩码筛选位置，未选中位置置0，支持带掩码与不带掩码两类重载，仅在AIV上生效。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+  - traits: [scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本接口与前后Reg数据搬运接口之间，不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖时"
+version: ">=9.0.0"
+---
 # asc_duplicate_scalar
 
 ## 产品支持情况

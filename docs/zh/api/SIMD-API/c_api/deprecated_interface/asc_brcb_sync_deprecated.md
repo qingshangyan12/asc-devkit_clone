@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "给定输入矢量，每次取其中8个数分别填充到结果矢量的8个DataBlock（32Bytes）中，每个数对应一个DataBlock。该接口已废弃，请使用对应的非同步接口asc_brcb和asc_sync同步接口替代。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_brcb_sync（废弃）
 
 ## 产品支持情况

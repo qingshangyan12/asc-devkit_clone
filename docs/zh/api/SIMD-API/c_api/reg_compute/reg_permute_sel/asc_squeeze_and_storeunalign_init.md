@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "对AR特殊寄存器执行清零，用于配合asc_squeeze_and_storeunalign及收尾接口使用，每组连续搬出操作开始前需调用一次，首次调用主接口前须先清零。"
+tag:
+  - roles: [compute]
+  - operations: [store]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: related
+    condition: "配合主接口使用"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: related
+    condition: "开始新一组操作前"
+version: ">=9.0.0"
+---
 # asc_squeeze_and_storeunalign_init
 
 ## 产品支持情况

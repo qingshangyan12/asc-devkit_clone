@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将源矢量按src_offset给定的字节偏移按元素收集到目的矢量，偏移量取值需保证元素类型位宽对齐。"
+tag:
+  - roles: [compute]
+  - operations: [gather]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 
 # asc_gather
 

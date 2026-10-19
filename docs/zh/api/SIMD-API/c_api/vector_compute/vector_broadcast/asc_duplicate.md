@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "执行矢量复制（Duplicate）操作，将标量值复制填充到目的矢量中，要求dst的起始地址32字节对齐。"
+tag:
+  - roles: [data_initialization]
+  - operations: [fill]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_duplicate
 
 ## 产品支持情况

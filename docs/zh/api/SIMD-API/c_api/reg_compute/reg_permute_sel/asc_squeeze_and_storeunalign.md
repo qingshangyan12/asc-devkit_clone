@@ -1,3 +1,29 @@
+---
+okftype: reference.api
+description: "将掩码选中的元素压缩到目的寄存器并连续非对齐搬出到Unified Buffer，多次连续搬出需配合收尾接口。"
+tag:
+  - roles: [compute, data_movement]
+  - operations: [compression, store]
+  - traits: [unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: requires
+    condition: "完成一次或多次连续搬出后"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
+    kind: requires
+    condition: "首次调用本接口前"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_squeeze_and_storeunalign
 
 ## 产品支持情况

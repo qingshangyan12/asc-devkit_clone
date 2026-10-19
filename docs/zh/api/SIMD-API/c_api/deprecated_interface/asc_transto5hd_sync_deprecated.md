@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，已废弃，请使用asc_transto5hd和asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [layout_transform]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
+    kind: replaced_by
+    condition: "数据格式转换场景改用asc_transto5hd实现"
+version: ">=9.0.0"
+---
 # asc_transto5hd_sync（废弃）
 
 ## 产品支持情况
