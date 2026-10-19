@@ -14,7 +14,7 @@
 
 #include "tensor_api/stub/cce_stub.h"
 
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 #include "tensor_api/tensor.h"
 
 namespace {
