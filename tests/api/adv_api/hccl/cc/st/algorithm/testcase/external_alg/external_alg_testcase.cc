@@ -16,10 +16,14 @@
 #include "alg_param.h"
 #include "auto_selector_base.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "channel.h"
 #include "external_alg_parser.h"
 #include "external_alg_resolver.h"
 #include "external_alg_rules.h"
 #include "gtest/gtest.h"
+#include "sim_communicator.h"
+#include "sim_world.h"
+#include "topo_match_one_level.h"
 
 using namespace mc2_ops_hccl;
 
@@ -142,6 +146,166 @@ TEST(ExtAlgClassify, FourStates)
     EXPECT_FALSE(errMsg.empty());
 }
 
+TEST(ExtAlgChannel, LinksAreDeduplicatedByDie)
+{
+    CommLink sameDieLink0{};
+    sameDieLink0.linkAttr.linkProtocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    sameDieLink0.srcEndpointDesc.loc.device.devPhyId = 0U;
+    sameDieLink0.srcEndpointDesc.protocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    sameDieLink0.dstEndpointDesc.protocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    CommLink sameDieLink1 = sameDieLink0;
+    sameDieLink1.srcEndpointDesc.loc.device.devPhyId = 1U;
+    CommLink otherDieLink = sameDieLink0;
+    otherDieLink.srcEndpointDesc.loc.device.devPhyId = 4U;
+
+    const std::vector<CommProtocol> protocols = {CommProtocol::COMM_PROTOCOL_UBC_CTP};
+    std::vector<HcclChannelDesc> channels;
+    bool protocolFound = false;
+    ASSERT_EQ(
+        ProcessLinkForProtocol(nullptr, protocols, {sameDieLink0, sameDieLink1, otherDieLink}, 0U, 1U, 0U, channels,
+            protocolFound, "LinksAreDeduplicatedByDie"),
+        HcclResult::HCCL_SUCCESS);
+    EXPECT_TRUE(protocolFound);
+    ASSERT_EQ(channels.size(), 2U);
+    EXPECT_EQ(channels[0].remoteRank, 1U);
+    EXPECT_EQ(channels[1].remoteRank, 1U);
+}
+
+TEST(ExtAlgChannel, MissingLevel1LayerSkipsLevel1Request)
+{
+    const TopoMeta topoMeta{{{0U, 1U}}};
+    HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
+    HcclComm comm = nullptr;
+    ASSERT_EQ(HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, 0U, &comm), HcclResult::HCCL_SUCCESS);
+    ASSERT_NE(comm, nullptr);
+
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = 2U;
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    const std::vector<std::vector<u32>> subCommRanks = {{0U, 1U}};
+
+    std::vector<HcclChannelDesc> channels;
+    ASSERT_EQ(CalcChannelRequestMesh1DLevel0(comm, param, &topo, subCommRanks, channels), HcclResult::HCCL_SUCCESS);
+    EXPECT_FALSE(channels.empty());
+
+    // A single-server rank graph exposes only layer 0. Level 1 is absent and must
+    // return successfully without creating any channel request.
+    ASSERT_EQ(CalcChannelRequestMesh1DLevel1(comm, param, &topo, subCommRanks, channels), HcclResult::HCCL_SUCCESS);
+    EXPECT_TRUE(channels.empty());
+
+    EXPECT_EQ(HcclCommDestroy(comm), HcclResult::HCCL_SUCCESS);
+    HcclSim::SimWorld::Global()->Deinit();
+}
+
+namespace {
+PhysicalLevelInfo MakePhysicalLevel(
+    std::vector<u32> ranks, CommTopo topoType, EndpointLocType locType = EndpointLocType::ENDPOINT_LOC_TYPE_DEVICE,
+    std::vector<CommProtocol> protocols = {})
+{
+    PhysicalLevelInfo level{};
+    level.localRanks = std::move(ranks);
+    level.view = PhysicalLevelView::GLOBAL;
+    level.hasTopoInst = true;
+    level.topoType = topoType;
+    level.locType = locType;
+    level.protocols = std::move(protocols);
+    return level;
+}
+
+TopoInfoWithNetLayerDetails MakePhysicalLevelTopo(
+    u32 rankSize, std::vector<PhysicalLevelInfo> levels, OpExecuteConfig engine = OpExecuteConfig::AICPU_TS)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 1U;
+    topo.physicalLevels = std::move(levels);
+    (void)engine;
+    return topo;
+}
+} // namespace
+
+TEST(ExtAlgTopoMatchOneLevel, MeshConcurPicksFullRankMeshAndUpperLayer)
+{
+    TopoInfoWithNetLayerDetails topo = MakePhysicalLevelTopo(
+        8U,
+        {MakePhysicalLevel({0U, 1U, 2U, 3U}, CommTopo::COMM_TOPO_1DMESH),
+            MakePhysicalLevel({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U}, CommTopo::COMM_TOPO_1DMESH),
+            MakePhysicalLevel({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U},
+                CommTopo::COMM_TOPO_CLOS)});
+
+    TopoMatchOneLevel matcher{OpExecuteConfig::AICPU_TS};
+    AlgHierarchyInfoForAllLevel hierarchy;
+    ASSERT_EQ(matcher.MatchTopo(nullptr, &topo, hierarchy), HcclResult::HCCL_SUCCESS);
+    ASSERT_EQ(hierarchy.infos.size(), 1U);
+    ASSERT_EQ(hierarchy.infos[0].size(), 1U);
+    EXPECT_EQ(hierarchy.infos[0][0], std::vector<u32>({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U}));
+    ASSERT_EQ(hierarchy.physicalIdxForAlgoLevels.size(), 1U);
+    ASSERT_EQ(hierarchy.physicalIdxForAlgoLevels[0].size(), 2U);
+    EXPECT_EQ(hierarchy.physicalIdxForAlgoLevels[0][0], PhysicalLevelIndex::PHYSICAL_LEVEL_IDX_1);
+    EXPECT_EQ(hierarchy.physicalIdxForAlgoLevels[0][1], PhysicalLevelIndex::PHYSICAL_LEVEL_IDX_2);
+}
+
+TEST(ExtAlgTopoMatchOneLevel, RejectsMissingFullRankMeshLayer)
+{
+    TopoInfoWithNetLayerDetails topo = MakePhysicalLevelTopo(
+        16U,
+        {MakePhysicalLevel({0U, 1U, 2U, 3U}, CommTopo::COMM_TOPO_1DMESH),
+            MakePhysicalLevel({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U},
+                CommTopo::COMM_TOPO_CLOS)});
+
+    TopoMatchOneLevel matcher{OpExecuteConfig::AICPU_TS};
+    AlgHierarchyInfoForAllLevel hierarchy;
+    EXPECT_EQ(matcher.MatchTopo(nullptr, &topo, hierarchy), HcclResult::HCCL_E_NOT_SUPPORT);
+}
+
+TEST(ExtAlgTopoMatchOneLevel, RejectsMeshWithoutUpperLayer)
+{
+    TopoInfoWithNetLayerDetails topo = MakePhysicalLevelTopo(
+        8U, {MakePhysicalLevel({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U}, CommTopo::COMM_TOPO_1DMESH)});
+
+    TopoMatchOneLevel matcher{OpExecuteConfig::AICPU_TS};
+    AlgHierarchyInfoForAllLevel hierarchy;
+    EXPECT_EQ(matcher.MatchTopo(nullptr, &topo, hierarchy), HcclResult::HCCL_E_NOT_SUPPORT);
+}
+
+TEST(ExtAlgTopoMatchOneLevel, RejectsNonMeshLayer)
+{
+    TopoInfoWithNetLayerDetails topo = MakePhysicalLevelTopo(
+        8U, {MakePhysicalLevel({0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U}, CommTopo::COMM_TOPO_CLOS)});
+
+    TopoMatchOneLevel matcher{OpExecuteConfig::AICPU_TS};
+    AlgHierarchyInfoForAllLevel hierarchy;
+    EXPECT_EQ(matcher.MatchTopo(nullptr, &topo, hierarchy), HcclResult::HCCL_E_NOT_SUPPORT);
+}
+
+TEST(ExtAlgTopoMatchOneLevel, EngineFiltersHostLayers)
+{
+    const std::vector<u32> meshRanks = {0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U};
+    const std::vector<u32> upperRanks = {0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U};
+    TopoInfoWithNetLayerDetails aicpuTopo = MakePhysicalLevelTopo(
+        8U,
+        {MakePhysicalLevel(upperRanks, CommTopo::COMM_TOPO_1DMESH, EndpointLocType::ENDPOINT_LOC_TYPE_HOST),
+            MakePhysicalLevel(meshRanks, CommTopo::COMM_TOPO_1DMESH),
+            MakePhysicalLevel(upperRanks, CommTopo::COMM_TOPO_CLOS)});
+    TopoMatchOneLevel aicpuMatcher{OpExecuteConfig::AICPU_TS};
+    AlgHierarchyInfoForAllLevel hierarchy;
+    ASSERT_EQ(aicpuMatcher.MatchTopo(nullptr, &aicpuTopo, hierarchy), HcclResult::HCCL_SUCCESS);
+    EXPECT_EQ(hierarchy.physicalIdxForAlgoLevels[0][0], PhysicalLevelIndex::PHYSICAL_LEVEL_IDX_1);
+
+    TopoInfoWithNetLayerDetails hostDpuTopo = MakePhysicalLevelTopo(
+        8U,
+        {MakePhysicalLevel(meshRanks, CommTopo::COMM_TOPO_1DMESH),
+            MakePhysicalLevel(meshRanks, CommTopo::COMM_TOPO_1DMESH, EndpointLocType::ENDPOINT_LOC_TYPE_HOST)},
+        OpExecuteConfig::HOSTCPU);
+    TopoMatchOneLevel hostMatcher{OpExecuteConfig::HOSTCPU};
+    EXPECT_EQ(hostMatcher.MatchTopo(nullptr, &hostDpuTopo, hierarchy), HcclResult::HCCL_E_NOT_SUPPORT);
+}
+
 TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
 {
     auto& registry = CollAlgExecRegistryV2::Instance();
@@ -179,7 +343,7 @@ const HcclCMDType COLL_CMDS[] = {
 
 // 不变量：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
-// 52 行 sidecar——按 cmd 分布：AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3。
+// 53 行 sidecar——按 cmd 分布：AG 16 / RS 18 / AR 9 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 {
     for (HcclCMDType cmd : COLL_CMDS) {
@@ -194,13 +358,13 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
-    // 各 cmd 精确分布锚（AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3 = 52），失败时定位更直接
-    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 15U);
+    // 各 cmd 精确分布锚（AG 16 / RS 18 / AR 9 / A2A 7 / A2AV 3 = 53），失败时定位更直接
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 16U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 18U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLREDUCE).size(), 9U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALL).size(), 7U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALLV).size(), 3U);
-    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：52 行精确锚
+    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：53 行精确锚
     size_t total = 0;
     for (HcclCMDType cmd : COLL_CMDS) {
         for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
@@ -209,7 +373,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
             }
         }
     }
-    EXPECT_EQ(total, 52U);
+    EXPECT_EQ(total, 53U);
 }
 
 // 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
@@ -218,7 +382,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
-    ASSERT_FALSE(rows.empty()); // 全量编译目标：51 行产品 sidecar + 测试夹具
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：52 行产品 sidecar + 测试夹具
     for (const AlgMetaRow& row : rows) {
         ExternalAlgSpec spec;
         std::string errMsg;
@@ -429,6 +593,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh.multi_channel]", &twoLevel,
+         CommEngine::COMM_ENGINE_AICPU_TS, "AicpuAllGatherSoleMeshConcur"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
@@ -651,8 +817,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         }
         comboCount += engines.size();
     }
-    EXPECT_EQ(keyCount, 32U);
-    EXPECT_EQ(comboCount, 42U);
+    EXPECT_EQ(keyCount, 33U);
+    EXPECT_EQ(comboCount, 43U);
 }
 
 TEST(ExtAlgResolver, SpecificityOrdering)

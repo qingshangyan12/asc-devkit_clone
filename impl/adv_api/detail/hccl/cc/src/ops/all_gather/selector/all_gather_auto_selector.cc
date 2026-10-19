@@ -27,6 +27,8 @@ constexpr u32 AG_CCU_MAX_RANK_SIZE = 64;
 constexpr u32 AG_CCU_RANK_SIZE = 32;
 constexpr u64 AG_AICPU_SMALL_DATA_SIZE = 1 * 1024 * 1024;
 constexpr u64 AG_AICPU_SEQUENCE_DATA_SIZE = 4ULL * 1024 * 1024 * 1024;
+constexpr u64 AG_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD = 1ULL * 1024 * 1024 * 1024;
+constexpr u64 AG_2P_DETOUR_DATA_SIZE = 4ULL * 1024 * 1024;
 
 SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
@@ -281,7 +283,13 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         }
     } else {
         if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            selectAlgName = "InsAllGatherMesh1D";
+            if (IsTwoLevelNetLayer(topoInfo)
+                && (dataSize * topoInfo->userRankSize > AG_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD
+                    || (topoInfo->userRankSize == 2 && dataSize >= AG_2P_DETOUR_DATA_SIZE))) {
+                selectAlgName = "AicpuAllGatherSoleMeshConcur";
+            } else {
+                selectAlgName = "InsAllGatherMesh1D";
+            }
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，选择适配算法
             if (topoInfo->level0PcieMix) {
@@ -331,11 +339,12 @@ SelectorStatus AllGatherAutoSelector::SelectAivAlgo(
 {
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start, topoInfo topoLevelNums[%u]", __func__, topoInfo->topoLevelNums);
     (void)configAlgMap;
+    // HCCL's AIV algorithm is AivAllGatherSoleMesh. It has not been migrated to
+    // this target yet, so reporting a match here would produce a dangling algName.
     (void)opParam;
-
-    selectAlgName = "AivAllGatherMesh1D";
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
-    return SelectorStatus::MATCH;
+    (void)selectAlgName;
+    HCCL_DEBUG("[AllGatherAutoSelector][%s] AivAllGatherSoleMesh is not registered in this target.", __func__);
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllGatherAutoSelector::SelectDPUAlgo(

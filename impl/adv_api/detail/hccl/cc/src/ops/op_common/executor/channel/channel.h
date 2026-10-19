@@ -30,6 +30,10 @@ HcclResult CalcLevel2ChannelRequest(
 HcclResult CalcChannelRequestMesh1D(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels);
+HcclResult ProcessLinkForProtocol(
+    HcclComm comm, const std::vector<CommProtocol>& expectedProtocols, const std::vector<CommLink>& linkList,
+    u32 myRank, u32 remoteRank, uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool& protocolFound,
+    const std::string& funcName);
 HcclResult CalcChannelRequestMesh1DLevel0(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels);
