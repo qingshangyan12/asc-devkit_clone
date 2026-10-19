@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_GATHER_UB_GATHER_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "impl/c_api/reg_base_impl/ub_gather_intf_impl.h"
 #endif
 
