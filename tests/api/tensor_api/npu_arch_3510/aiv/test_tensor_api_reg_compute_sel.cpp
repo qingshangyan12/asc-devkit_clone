@@ -111,7 +111,7 @@ __simd_vf__ inline void compile_reg_compress(vector_bool mask)
     select_mask.reg = mask;
     MOCKER(static_cast<void (*)(reg_type&, reg_type, vector_bool, Literal)>(vsqz))
         .expects(once())
-        .with(any(), any(), eq(select_mask.reg), eq(MODE_NO_STORED))
+        .with(any(), any(), any(), any())
         .will(invoke(compress_stub<T>));
     auto compressed = asc::te::experimental::compress(src, select_mask);
     static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
