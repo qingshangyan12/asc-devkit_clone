@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "完成数据在寄存器间的搬运，支持矢量数据寄存器间复制、掩码寄存器间复制以及矢量数据寄存器复制到掩码寄存器三种模式，仅在AIV上生效。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_copy
 
 ## 产品支持情况

@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对矢量每个Repeat内的全部元素求和，源操作数按二叉树方式两两相加，计算结果大于65504时保存为65504，单次Repeat可计算128个half类型数据。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [high_dimensional, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_repeat_reduce_sum
 
 ## 产品支持情况

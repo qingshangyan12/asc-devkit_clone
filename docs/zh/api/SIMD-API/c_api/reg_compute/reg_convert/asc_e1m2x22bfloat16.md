@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码将源寄存器中参与计算的fp4x2_e1m2_t元素转换为bfloat16_t并写入目的寄存器，按四分之一位置标签每隔四个元素离散读取。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_e1m2x22bfloat16
 
 ## 产品支持情况

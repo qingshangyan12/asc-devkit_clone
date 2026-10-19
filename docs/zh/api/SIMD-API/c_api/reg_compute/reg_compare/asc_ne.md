@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "逐元素比较两个矢量源操作数是否不相等，将比较结果以掩码比特位输出或作为返回值返回。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_ne
 
 ## 产品支持情况

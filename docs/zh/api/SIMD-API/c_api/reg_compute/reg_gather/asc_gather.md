@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据index寄存器中保存的逐元素索引，从src矢量数据寄存器收集对应位置元素写入dst对应位置，不使用掩码，索引超出寄存器容量时按矢量长度取模处理。"
+tag:
+  - roles: [compute]
+  - operations: [gather]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器详细说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_gather
 
 ## 产品支持情况

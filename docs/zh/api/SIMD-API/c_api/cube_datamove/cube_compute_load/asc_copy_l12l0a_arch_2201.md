@@ -1,3 +1,34 @@
+---
+okftype: reference.api
+description: "用于搬运存放在L1 Buffer里的512B大小矩阵到L0A Buffer，包含2D格式搬运与3D格式搬运，3D模式Feature Map描述与填充值需通过配套配置接口预先设置。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "查看搬入前的数据排布"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md
+    kind: requires
+    condition: "进行3D格式搬运时配置填充值"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix.md
+    kind: related
+    condition: "进行3D格式搬运时配置Feature Map描述"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix_b.md
+    kind: related
+    condition: "进行3D格式搬运时配置Feature Map描述"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_size.md
+    kind: requires
+    condition: "进行3D格式搬运时配置L1边界"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
+version: ">=9.0.0"
+---
 # asc_copy_l12l0a
 
 ## 产品支持情况

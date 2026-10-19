@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据索引矢量寄存器中的逐元素索引，从Unified Buffer源地址按元素收集数据写入目的矢量数据寄存器，受掩码控制，未选中位置在输出中置零。"
+tag:
+  - roles: [data_movement]
+  - operations: [gather]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_gather
 
 ## 产品支持情况

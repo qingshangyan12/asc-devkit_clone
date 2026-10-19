@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将int8_t类型数据转换为int32_t类型。该接口的无显式位置参数原型已废弃，请改用asc_int82int32的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载替代"
+version: ">=9.0.0"
+---
 # asc_int82int32（废弃）
 
 ## 产品支持情况

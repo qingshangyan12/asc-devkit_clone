@@ -1,3 +1,33 @@
+---
+okftype: reference.api
+description: "在L0C Buffer搬出过程中配置随路Scalar量化所需的缩放系数、偏移量和量化结果符号，仅在AIC生效，实际量化由后续矩阵搬出接口按所选Scalar量化模式执行。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_2201.md
+    kind: configures
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+    condition: "Ascend 950PR&950DT系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_2201.md
+    kind: configures
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
+    condition: "Ascend 950PR&950DT系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md
+    kind: configures
+    condition: "Ascend 950PR&950DT系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_set_l0c_copy_prequant
 
 ## 产品支持情况

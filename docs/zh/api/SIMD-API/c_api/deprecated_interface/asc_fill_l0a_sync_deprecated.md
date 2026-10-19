@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。接口已废弃，请使用对应的非同步接口asc_fill_l0a和同步接口asc_sync替代。"
+tag:
+  - roles: [data_initialization]
+  - operations: [fill]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_fill_l0a.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+version: ">=9.0.0"
+---
 # asc_fill_l0a_sync（废弃）
 
 ## 产品支持情况

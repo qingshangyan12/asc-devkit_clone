@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "比较src0与src1在对应索引位置的元素大小，比较结果为真时输出结果对应比特位设为1，否则设为0，该接口已废弃，请使用对应的非同步接口asc_eq和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "接口已废弃，配合同步接口asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
+    kind: replaced_by
+    condition: "接口已废弃，使用对应非同步接口替代"
+version: ">=9.0.0"
+---
 # asc_eq_sync（废弃）
 
 ## 产品支持情况

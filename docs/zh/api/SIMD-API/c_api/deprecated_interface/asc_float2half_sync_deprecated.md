@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "asc_float2half_sync系列同步接口已废弃，原用于将float类型数据转换为half类型并支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，替代方案为对应的非同步接口asc_float2half配合同步接口asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_float2half_sync（废弃）
 
 ## 产品支持情况

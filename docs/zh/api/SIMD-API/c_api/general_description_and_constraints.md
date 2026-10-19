@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "通用说明与约束页，汇总AI Core多级存储单元用途与规格、高维切分计算的地址重叠约束和repeatTime/mask/dataBlockStride/repeatStride配置方法，并说明以数组方式申请内存的限制。"
+---
 # 通用说明和约束
 
 ## 存储单元说明<a name="存储单元说明"></a>

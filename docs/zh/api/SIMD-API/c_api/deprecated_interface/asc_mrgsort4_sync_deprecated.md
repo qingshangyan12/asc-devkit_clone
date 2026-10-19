@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将最多4条已排好序的队列归并成1条队列，结果按score域由大到小排序，输入一般来自asc_bitsort指令输出。该同步接口已废弃，请使用asc_mrgsort4与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [sort]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: replaced_by
+    condition: "归并排序场景改用asc_mrgsort4实现"
+version: ">=9.1.0"
+---
 # asc_mrgsort4_sync（废弃）
 
 ## 产品支持情况

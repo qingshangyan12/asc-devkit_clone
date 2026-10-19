@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将half类型转化为float类型，无舍入模式，要求dst、src起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_half2float
 
 ## 产品支持情况

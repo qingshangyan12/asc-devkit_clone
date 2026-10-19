@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码按元素计算矢量源操作数的自然对数，并将结果写入目的操作数。"
+tag:
+  - roles: [compute]
+  - operations: [natural_log]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_log
 
 ## 产品支持情况

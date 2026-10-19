@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "读取指定特殊寄存器的值，返回int64_t类型数值。该接口已废弃，请使用asc_get_squeeze_status实现此功能。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
+    kind: replaced_by
+    condition: "使用asc_get_squeeze_status实现此功能"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_get_ar_spr (废弃)
 
 ## 产品支持情况

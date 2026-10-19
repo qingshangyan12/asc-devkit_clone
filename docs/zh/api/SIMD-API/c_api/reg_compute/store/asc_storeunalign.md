@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器中前count个元素连续搬出到非32字节对齐的Unified Buffer地址，尾块暂存非对齐寄存器并由后处理接口收尾，每次调用后需手动更新目的地址。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
+    kind: requires
+    condition: "调用该接口之后处理尾块时"
+version: ">=9.0.0"
+---
 # asc_storeunalign
 
 ## 产品支持情况

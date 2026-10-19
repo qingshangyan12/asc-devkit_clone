@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "阻塞后续的指令执行，直到此前已发出但尚未完成的内存访问指令全部执行完成，可通过arg参数指定DSB_ALL或DSB_DDR等阻塞内存范围。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_sync_data_barrier
 
 ## 产品支持情况

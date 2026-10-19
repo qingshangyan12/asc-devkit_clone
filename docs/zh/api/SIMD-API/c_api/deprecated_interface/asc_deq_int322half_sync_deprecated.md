@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "对输入的int32_t类型数据按元素做量化并转换为half类型，需配合asc_set_deq_scale的非向量模式使用，接口已废弃，替代方案为asc_deq_int322half与asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
+    kind: replaced_by
+    condition: "非同步计算场景改用asc_deq_int322half实现"
+version: ">=9.0.0"
+---
 # asc_deq_int322half_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,6 @@
+---
+okftype: reference.index
+---
 # 矩阵计算搬运
 
 - **[矩阵计算的搬入](cube_compute_load/cube_compute_load.md)**

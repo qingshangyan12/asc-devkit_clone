@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对两个矢量按元素求差后与0取较大值完成Relu计算，并可转换最终结果的数据类型输出。"
+tag:
+  - roles: [compute]
+  - operations: [relu, subtract]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_sub_relu
 
 ## 产品支持情况

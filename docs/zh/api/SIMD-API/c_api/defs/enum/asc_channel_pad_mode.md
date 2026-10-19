@@ -1,3 +1,21 @@
+---
+okftype: reference.enum
+description: "定义asc_channel_pad_mode枚举，表示从GM搬运到L1 Buffer时每个32字节通道块的填充或压缩模式，用于asc_copy_gm2l1高维切分数据搬运接口。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_highdim_split_arch_3510.md
+    kind: configures
+    condition: "作为高维切分数据搬运的通道填充或压缩模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md
+    kind: related
+    condition: "对比配置左右填充"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_padding.md
+    kind: related
+    condition: "设置通道填充值"
+version: ">=9.0.0"
+---
 # asc_channel_pad_mode
 
 头文件路径为：`"c_api/defs/enum.h"`。

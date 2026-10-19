@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将源矢量src的每个元素与标量value比较大小，元素大于value时输出结果dst的对应比特位为1，否则为0，dst按小端顺序排列为二进制结果。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_gt_scalar
 
 ## 产品支持情况

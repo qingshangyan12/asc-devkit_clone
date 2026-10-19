@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码对两路矢量数据寄存器或两路掩码寄存器执行按位异或，结果写入目的寄存器或通过函数返回值返回，未被掩码筛选的位置置零。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_xor]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_xor
 
 ## 产品支持情况

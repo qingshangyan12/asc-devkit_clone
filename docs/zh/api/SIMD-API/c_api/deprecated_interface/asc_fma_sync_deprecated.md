@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "按元素将src0和src1相乘并与dst相加，结果存入dst。该接口已废弃，请使用非同步接口asc_fma和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md
+    kind: replaced_by
+    condition: "非同步计算场景使用asc_fma替代"
+version: ">=9.0.0"
+---
 # asc_fma_sync（废弃）
 
 ## 产品支持情况

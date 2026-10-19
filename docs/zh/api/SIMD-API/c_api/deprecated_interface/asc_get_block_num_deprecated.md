@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "已废弃接口，用于获取当前任务配置的核数，供代码内部多核逻辑控制使用，可直接改用内置变量block_num替代。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: replaced_by
+    condition: "直接使用内置变量block_num，其值与接口返回值一致"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_get_block_num（废弃）
 
 ## 产品支持情况

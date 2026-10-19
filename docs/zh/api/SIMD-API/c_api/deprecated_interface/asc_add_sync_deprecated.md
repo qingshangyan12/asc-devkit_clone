@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "执行矢量逐元素加法运算，接口已废弃，请使用asc_add与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [add]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md
+    kind: replaced_by
+    condition: "矢量相加场景改用asc_add实现"
+version: ">=9.0.0"
+---
 # asc_add_sync（废弃）
 
 ## 产品支持情况

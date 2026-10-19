@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码对源寄存器元素执行PReLU运算，负半轴斜率由alpha寄存器对应元素指定，src0大于0时直接输出，否则与alpha相乘后输出，掩码为0的元素置零。"
+tag:
+  - roles: [compute]
+  - operations: [prelu]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器详细说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_prelu
 
 ## 产品支持情况

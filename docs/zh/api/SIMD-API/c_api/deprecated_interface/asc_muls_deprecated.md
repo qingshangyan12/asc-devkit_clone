@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对源矢量src与标量value进行乘法运算并按ROUND舍入模式转换为half类型，再按mask将结果写入dst；该接口已废弃，请使用asc_mul_scalar_float2half_rn替代。"
+tag:
+  - roles: [compute]
+  - operations: [multiply]
+  - traits: [rounding_mode, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
+    kind: replaced_by
+    condition: "改用asc_mul_scalar_float2half_rn实现乘法与舍入转换"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_muls (废弃)
 
 ## 产品支持情况

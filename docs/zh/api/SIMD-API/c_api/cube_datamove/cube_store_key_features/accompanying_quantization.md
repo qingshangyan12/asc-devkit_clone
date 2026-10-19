@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "L0C Buffer搬出过程中完成的随路类型转换与带系数量化特性，量化模式由搬出接口的quant_pre_mode选择，Scalar与Tensor/Vector量化的参数准备方式不同。"
+---
 # 随路量化
 
 ## 特性说明

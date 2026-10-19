@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "设置矢量计算使用的Mask值，用于指示哪些元素参与计算，支持Normal与Counter两种模式，需先设置Mask模式。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
+    kind: related
+    condition: "针对Ascend 950PR&950DT系列产品，在VF场景外设置掩码寄存器并在Reg矢量计算配置中读取掩码值"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+    kind: requires
+    condition: "针对Atlas A3系列产品、Atlas A2系列产品，使用前需先调用asc_set_mask_count或asc_set_mask_norm之一设置Mask模式"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+    kind: requires
+    condition: "针对Atlas A3系列产品、Atlas A2系列产品，使用前需先调用asc_set_mask_count或asc_set_mask_norm之一设置Mask模式"
+version: ">=9.0.0"
+---
 # asc_set_vector_mask
 
 ## 产品支持情况

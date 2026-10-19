@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对源矢量每个元素按value指定的位数执行右移，有符号整型做算术右移，无符号整型做逻辑右移。该接口已废弃，请改用非同步接口asc_shiftright与同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_shift]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_shiftright_sync（废弃）
 
 ## 产品支持情况

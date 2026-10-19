@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "与asc_sync_subblock_arrive配对使用，实现同一AI Core内全部AIV（subblock）之间的同步，等待对应flag_id的计数器非0后解除阻塞并将计数器减1。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md
+    kind: requires
+    condition: "必须与asc_sync_subblock_arrive成对使用且flag_id完全一致"
+version: ">=9.1.0"
+---
 # asc_sync_subblock_wait
 
 ## 产品支持情况

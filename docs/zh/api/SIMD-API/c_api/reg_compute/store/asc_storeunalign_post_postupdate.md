@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "将非对齐寄存器中暂存的尾块写入Unified Buffer，作为asc_storeunalign_postupdate立即数偏移搬出模式的后处理接口，启用Post Update后目的地址自动偏移offset个元素。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [post_update, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+    kind: requires
+    condition: "须先以立即数偏移搬出模式调用并复用同一非对齐寄存器"
+version: ">=9.0.0"
+---
 # asc_storeunalign_post_postupdate
 
 ## 产品支持情况

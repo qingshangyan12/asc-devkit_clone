@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码对每个DataBlock（32B）内的元素求最大值，各DataBlock归约结果依次写入dst前8个元素、其余置0，仅输出最大值不输出索引。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_reduce_max_datablock
 
 ## 产品支持情况

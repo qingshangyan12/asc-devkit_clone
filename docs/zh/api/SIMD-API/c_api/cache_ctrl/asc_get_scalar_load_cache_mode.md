@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "读取当前标量读（load）路径的L2 Cache管理策略，返回asc_load_l2_cache_mode枚举值，可用于临时切换策略前保存原配置或设置后回读校验。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: related
+    condition: "读取由asc_set_scalar_cache_mode设置的策略"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+    condition: "返回的枚举值类型"
+version: ">=9.2.0"
+---
 # asc_get_scalar_load_cache_mode
 
 ## 产品支持情况

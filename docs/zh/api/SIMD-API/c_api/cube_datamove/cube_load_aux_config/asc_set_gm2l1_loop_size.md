@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "设置asc_copy_gm2l1_align循环填充模式的内层与外层循环次数，需与内外层循环步长设置接口配合使用，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: configures
+    condition: "循环填充模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop1_stride.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop2_stride.md
+    kind: requires
+version: ">=9.0.0"
+---
 # asc_set_gm2l1_loop_size
 
 ## 产品支持情况

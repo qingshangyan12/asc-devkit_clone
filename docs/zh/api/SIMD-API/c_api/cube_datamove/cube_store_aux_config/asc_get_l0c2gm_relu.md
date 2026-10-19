@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "数据搬运随路量化时，获取ReLU操作前矢量的起始地址，返回FPC寄存器中的配置字段，该字段由asc_set_l0c_copy_config的relu_pre_addr配置。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
+    kind: related
+    condition: "读取由asc_set_l0c_copy_config的relu_pre_addr配置的状态时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+    kind: related
+    condition: "随路ReLU与量化同时使用时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
+    kind: related
+    condition: "了解激活模式及随路ReLU配套配置时"
+version: ">=9.0.0"
+---
 # asc_get_l0c2gm_relu
 
 ## 产品支持情况

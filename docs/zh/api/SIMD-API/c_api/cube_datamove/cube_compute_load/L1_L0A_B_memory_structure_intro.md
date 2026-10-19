@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "说明Cube侧L1 Buffer与L0A/L0B Buffer的Bank结构、容量、地址编码格式及读写并发限制，用于理解矩阵计算输入搬运的内存约束。"
+---
 # L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
 
 为提升数据访问效率和吞吐量，Buffer采用了等容量的内存模块（Bank）结构设计。内存空间被划分为多个Bank，并以Bank为单位进一步分组形成多个Bank Group（BG）；每个Bank Group包含若干Bank，每个Bank都是一个可独立操作的存储单元子模块。

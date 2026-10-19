@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "设置QUANT_POST寄存器值，用于存储Fixpipe后处理阶段的量化信息，量化参数不能为inf/nan和非规格化数。该接口已废弃，暂无替代接口。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [quantization]
+dependencies: []
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l0c2gm_quant_post（废弃）
 
 ## 产品支持情况

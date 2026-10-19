@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按元素将源操作数src0与目的操作数dst相乘并加上src1，再进行Relu线性整流，结果与0比较取较大值后写回dst，支持前n个数据计算和高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add, relu]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_mul_add_relu
 
 ## 产品支持情况

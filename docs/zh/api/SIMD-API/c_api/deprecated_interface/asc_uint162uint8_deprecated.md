@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将uint16_t类型数据转化为uint8_t类型的转换接口，无舍入模式且支持饱和/非饱和模式，已废弃，请使用asc_uint162uint8的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md
+    kind: replaced_by
+    condition: "通过接口后缀控制目的操作数写入位置的场景改用asc_uint162uint8的显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_uint162uint8（废弃）
 
 ## 产品支持情况

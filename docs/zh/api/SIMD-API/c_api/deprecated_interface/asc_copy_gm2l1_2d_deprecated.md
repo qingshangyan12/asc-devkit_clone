@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory搬运到L1 Buffer，以512字节分形为单位按行列起始位置与步长切分提取多个分形矩阵，搬运过程中不支持分形格式转换。该旧常规重载及asc_copy_gm2l1_sync接口已废弃，请使用带asc_load_l2_cache_mode参数的asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）接口。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_2d_arch_3510.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）
 
 ## 产品支持情况

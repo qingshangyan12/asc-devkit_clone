@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据mask将src中参与计算的int8_t元素转换为int32_t类型并写入dst，因位宽比为1:4，需通过src_quarter_pos离散选取每隔4个元素的索引位置读取数据。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int82int32
 
 ## 产品支持情况

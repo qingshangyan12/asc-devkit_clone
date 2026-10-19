@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将float类型数据转化为int16_t类型并支持多种舍入模式与饱和/非饱和模式，因源与目的位宽比2:1需按索引分两部分写入，通过接口后缀控制写入位置的原型已废弃，请使用asc_float2int16的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_float2int16（废弃）
 
 ## 产品支持情况

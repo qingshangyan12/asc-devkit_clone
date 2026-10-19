@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器类型转换接口，按掩码将src中的int32_t元素饱和或非饱和转化为int16_t并按偶或奇索引写入dst，请改用asc_int322int16的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int16.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_int322int16（废弃）
 
 ## 产品支持情况

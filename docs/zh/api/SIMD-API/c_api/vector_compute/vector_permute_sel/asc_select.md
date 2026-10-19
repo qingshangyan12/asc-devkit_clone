@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "执行矢量选择操作，按sel_mask比特位从src0和src1中选择元素写入dst，比特位为1取src0、为0取src1，需配合asc_set_cmp_mask使用且操作数起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [selection]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: requires
+    condition: "使用asc_select前需先设置选择掩码"
+version: ">=9.0.0"
+---
 # asc_select
 
 ## 产品支持情况

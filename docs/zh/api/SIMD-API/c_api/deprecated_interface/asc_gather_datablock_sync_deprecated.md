@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据地址偏移矢量按DataBlock粒度将输入矢量收集到目的矢量中。该接口已废弃，请使用非同步接口asc_gather_datablock和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [gather]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+    kind: replaced_by
+    condition: "非同步计算场景使用asc_gather_datablock替代"
+version: ">=9.0.0"
+---
 # asc_gather_datablock_sync（废弃）
 
 ## 产品支持情况

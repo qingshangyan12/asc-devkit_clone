@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "通过比较掩码src1将源矢量src0压缩成更短的向量并存储到dst，支持uint16_t与uint32_t类型，操作数起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_squeeze
 
 ## 产品支持情况

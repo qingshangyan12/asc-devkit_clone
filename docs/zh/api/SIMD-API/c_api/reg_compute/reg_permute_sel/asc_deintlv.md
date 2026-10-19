@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将两个源矢量数据寄存器中的元素按奇偶索引解交织，分别写入两个目的寄存器，支持矢量数据与掩码两种解交织模式。"
+tag:
+  - roles: [compute]
+  - operations: [deinterleave]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_deintlv
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将float类型标量转换为half类型并返回，舍入模式固定为ODD（最近邻奇数舍入），饱和与非饱和模式可通过接口配置。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入与饱和模式规则"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: requires
+    condition: "配置饱和/非饱和模式时"
+version: ">=9.0.0"
+---
 # asc_float2half
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器中的数据按掩码压缩搬出到Unified Buffer，仅写入有效32位元素的低8位，写入后硬件自动累加目的地址指针，起始地址与更新后地址均需32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [compression, store]
+  - traits: [aligned_transfer, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.2.0"
+---
 # asc_storealign_pack_quarter_postupdate
 
 ## 产品支持情况

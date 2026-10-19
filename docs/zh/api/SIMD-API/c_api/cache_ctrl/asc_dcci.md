@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "清理并失效DCache，将脏数据写回Global Memory并将指定地址范围的Cache Line标记为无效，解决Scalar访问GM时的缓存一致性问题。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
+    kind: related
+    condition: "Scalar单元调用asc_load_dev与asc_store_dev读写GM时不经过DCache，无需调用asc_dcci"
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+    kind: related
+    condition: "Scalar单元调用asc_load_dev与asc_store_dev读写GM时不经过DCache，无需调用asc_dcci"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: constrained_by
+    condition: "Scalar单元读写UB是否经过DCache由CTRL[49]位控制"
+  - path: docs/zh/guide/programming_guide/advanced_programming/memory_model/cache_coherence.md
+    kind: related
+    condition: "Scalar单元访问GM经过DCache时"
+version: ">=9.0.0"
+---
 # asc_dcci
 
 ## 产品支持情况

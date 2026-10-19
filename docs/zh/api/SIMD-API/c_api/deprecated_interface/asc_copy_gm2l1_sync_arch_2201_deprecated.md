@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "接口asc_copy_gm2l1_sync及asc_copy_gm2l1_pad1_sync至asc_copy_gm2l1_pad8_sync系列同步接口已废弃，请使用非同步接口asc_copy_gm2l1_arch_2201和同步接口asc_sync替代，该接口将矩阵数据从Global Memory搬运到L1 Buffer并支持不同pad模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_arch_2201.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+version: ">=9.1.0"
+---
 # asc_copy_gm2l1_sync_arch_2201（废弃）
 
 ## 产品支持情况

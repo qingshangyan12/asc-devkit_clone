@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "设置Pad属性描述，在调用asc_copy_l12l0a接口时配置填充数值。该接口已废弃，请使用asc_set_l12l0a_3d_padding替代。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md
+    kind: replaced_by
+    condition: "设置Pad填充值的场景改用asc_set_l12l0a_3d_padding"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l13d_padding（废弃）
 
 ## 产品支持情况

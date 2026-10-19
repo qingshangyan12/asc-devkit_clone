@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "根据传入的pat_mode生成对应位宽模式的掩码寄存器，支持b8、b16、b32三种位宽，用于指定矢量计算中哪些位置的元素参与计算。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_create_mask
 
 ## 产品支持情况

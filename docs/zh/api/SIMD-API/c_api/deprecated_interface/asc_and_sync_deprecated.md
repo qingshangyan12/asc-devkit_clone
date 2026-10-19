@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "执行矢量按位与运算，接口已废弃，请使用asc_and与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_and]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+    kind: replaced_by
+    condition: "矢量按位与场景改用asc_and实现"
+version: ">=9.0.0"
+---
 # asc_and_sync（废弃）
 
 ## 产品支持情况

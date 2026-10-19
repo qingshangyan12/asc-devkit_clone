@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将图像数据从Global Memory搬运到L1 Buffer，支持指定裁剪起始位置、尺寸以及四周填充。该接口已废弃，请改用对应的非同步接口asc_load_image_to_cbuf和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_load_image_to_cbuf.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_load_image_to_cbuf_sync（废弃）
 
 ## 产品支持情况

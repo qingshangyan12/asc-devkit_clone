@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将所有元素左移distance位，该同步接口已废弃，请改用对应的非同步接口asc_shiftleft和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_shift]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+    kind: replaced_by
+    condition: "非同步计算场景改用asc_shiftleft实现"
+version: ">=9.0.0"
+---
 # asc_shiftleft_sync（废弃）
 
 ## 产品支持情况

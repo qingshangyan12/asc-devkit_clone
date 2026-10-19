@@ -1,3 +1,34 @@
+---
+okftype: reference.api
+description: "提供GM到UB的非对齐搬运，支持前n个与高维切分两种方式，非32字节对齐的数据会补齐，填充值可手动配置或由硬件自动生成。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [high_dimensional, padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间与对齐要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+    kind: requires
+    condition: "采用手动填充方式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: requires
+    condition: "采用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+    kind: requires
+    condition: "采用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+    kind: requires
+    condition: "采用循环搬运模式时"
+version: ">=9.0.0"
+---
 # asc_copy_gm2ub_align
 
 ## 产品支持情况

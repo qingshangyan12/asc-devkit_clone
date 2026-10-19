@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将数据从L1 Buffer搬运到Unified Buffer，按数据块个数、单个数据块长度及源目间隔实现连续与非连续搬运，源和目的地址均需32字节对齐，且仅在AIC上执行有效。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_l12ub
 
 ## 产品支持情况

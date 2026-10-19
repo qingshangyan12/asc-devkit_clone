@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "Ascend 950PR&950DT系列产品（NPU架构版本3510）的C API提供矢量数据寄存器、掩码寄存器、非对齐搬运寄存器和地址寄存器，介绍各类寄存器的用途、长度及在AIV Vector Function中的使用方式。"
+---
 # 寄存器类型
 
 Ascend 950PR&950DT系列产品（NPU架构版本3510）的C API提供矢量数据寄存器、掩码寄存器、非对齐搬运寄存器和地址寄存器类型。寄存器类型主要在AIV的Vector Function（`__simd_vf__`标记的函数）内使用，最细粒度公共头文件为`c_api/defs/type.h`。

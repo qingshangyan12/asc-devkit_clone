@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将源矢量数据寄存器首个元素写入Unified Buffer，目的地址需按dtype对齐，采用Post Update模式在搬运完成后由硬件自动更新目的地址。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [aligned_transfer, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_storealign_1st_postupdate
 
 ## 产品支持情况

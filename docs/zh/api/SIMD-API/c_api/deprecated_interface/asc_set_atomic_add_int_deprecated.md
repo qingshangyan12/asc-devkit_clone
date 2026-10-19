@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的原子操作配置接口，设置后续从Unified Buffer、L0C Buffer或L1 Buffer到Global Memory的数据传输开启int32_t原子累加，请使用asc_set_atomic_add_int32替代。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: replaced_by
+    condition: "改用asc_set_atomic_add_int32开启原子累加"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_set_atomic_add_int（废弃）
 
 ## 产品支持情况

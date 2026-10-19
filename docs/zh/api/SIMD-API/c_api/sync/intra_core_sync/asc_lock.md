@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据mutex_id获取Mutex，若Mutex已被锁定则阻塞指定流水上的后续指令，直到所有具有相同mutex_id的Mutex被asc_unlock释放，与asc_unlock配对实现核内异步流水同步。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: related
+    condition: "单流水内不同指令之间的同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    kind: requires
+    condition: "必须严格成对使用，相同的pipe、mutex_id、mode，且asc_unlock写在asc_lock之后"
+version: ">=9.1.0"
+---
 # asc_lock
 
 ## 产品支持情况

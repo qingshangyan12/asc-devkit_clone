@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "asc_datablock_reduce_max_sync接口已废弃，请使用对应的非同步接口asc_datablock_reduce_max和同步接口asc_sync替代，该接口执行数据块内的求最大值规约（Reduce Max）操作，dst与src起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_datablock_reduce_max_sync（废弃）
 
 ## 产品支持情况

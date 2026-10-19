@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "给定输入矢量，每次取其中8个数分别填充到结果矢量的8个32字节DataBlock中，每个数对应一个DataBlock，且src与dst不能为同一块内存地址。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+  - traits: [datablock_granularity]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_brcb
 
 ## 产品支持情况

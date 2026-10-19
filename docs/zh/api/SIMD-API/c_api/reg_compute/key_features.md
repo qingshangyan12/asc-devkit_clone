@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍Reg矢量计算的关键特性，涵盖硬件循环编码规范、指令双发优化、VF融合及数据搬运优化等性能优化方法。"
+---
 # 关键特性说明
 
 ## 硬件循环（HardwareLoop）

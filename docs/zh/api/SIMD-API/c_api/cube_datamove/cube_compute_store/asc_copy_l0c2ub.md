@@ -1,3 +1,64 @@
+---
+okftype: reference.api
+description: "将L0C Buffer矩阵计算结果搬运至Unified Buffer，支持随路量化、激活与Nz2ND或Nz2DN格式转换组合，并可向两个Vector Core的UB分半写入结果。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+  - traits: [aligned_transfer, quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
+    kind: related
+    condition: "unit_flag_mode与计算指令配合"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md
+    kind: requires
+    condition: "开启Nz2DN转换时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
+    kind: requires
+    condition: "随路tensor量化模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md
+    kind: requires
+    condition: "随路激活模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md
+    kind: requires
+    condition: "开启Nz2ND或Nz2DN格式转换时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_prequant.md
+    kind: requires
+    condition: "随路scalar量化模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md
+    kind: requires
+    condition: "随路激活模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md
+    kind: related
+    condition: "开启enable_channel_split时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/L0C_to_UB_dual_target_mode.md
+    kind: related
+    condition: "启用双目标模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
+    kind: related
+    condition: "开启enable_nz2dn时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
+    kind: related
+    condition: "开启enable_nz2nd时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
+    kind: related
+    condition: "不开启格式转换时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
+    kind: related
+    condition: "随路量化模式选择、系数准备及限制"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+    kind: related
+    condition: "量化与ReLU组合使用场景"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
+    kind: related
+    condition: "随路ReLU模式与配置"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_l0c2ub
 
 ## 产品支持情况

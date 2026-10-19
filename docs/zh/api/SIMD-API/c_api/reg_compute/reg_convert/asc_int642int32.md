@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "将int64_t类型源操作数转换为int32_t类型，支持饱和与非饱和模式，因位宽比为2:1，需按dst_pos将结果写入目的寄存器偶数或奇数索引位置，饱和模式需配置ctrl寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "饱和/非饱和模式规则"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: ">=9.0.0"
+---
 # asc_int642int32
 
 ## 产品支持情况

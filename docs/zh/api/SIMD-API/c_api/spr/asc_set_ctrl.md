@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对CTRL控制寄存器的特定比特位进行设置，用于控制浮点计算饱和模式、MASK模式以及标量单元访问UB是否经过DCache等配置。"
+tag:
+  - roles: [control]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md
+    kind: requires
+    condition: "修改CTRL寄存器bit位前"
+version: ">=9.0.0"
+---
 # asc_set_ctrl
 
 ## 产品支持情况

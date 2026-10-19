@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "设置Mask模式为Counter模式，可直接传入参与计算的元素数量，由Vector计算单元自动推断迭代次数，前n个数据计算类接口内部会自动设置该模式。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: configures
+    condition: "需和asc_set_vector_mask配合使用"
+version: ">=9.0.0"
+---
 # asc_set_mask_count
 
 ## 产品支持情况

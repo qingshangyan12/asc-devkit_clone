@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的填补数据配置接口，用于源数据从GM非对齐搬运到Unified Buffer时设置连续搬运数据块左右两侧需要填补的数据值，替代接口为asc_set_copy_pad_val。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+    kind: replaced_by
+    condition: "GM非对齐搬运到UB时设置填补数据值的场景改用asc_set_copy_pad_val"
+version: ">=9.0.0,<=9.1.0"
+---
 # asc_set_gm2ub_pad（废弃）
 
 ## 产品支持情况 

@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "执行矢量Leaky ReLU运算，src大于0时输出src，否则输出alpha与src的乘积。该接口已废弃，请改用对应的非同步接口asc_leakyrelu和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [leaky_relu]
+  - traits: [scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_leakyrelu_sync（废弃）
 
 ## 产品支持情况

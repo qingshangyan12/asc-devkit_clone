@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "从Unified Buffer对齐起始地址读取连续数据并作2倍上采样，目标为矢量数据寄存器时按32字节对齐读取VL/2数据并将每个源元素重复两次，目标为掩码寄存器时按16字节对齐读取VL/16数据并将每个bit重复两次。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md
+    kind: related
+    condition: "对齐搬入模式中通过函数返回值返回掩码寄存器时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_upsample
 
 ## 产品支持情况

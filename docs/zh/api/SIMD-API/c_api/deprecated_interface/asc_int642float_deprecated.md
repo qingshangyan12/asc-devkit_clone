@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将int64_t类型数据转换为float并支持多种舍入模式，因源与目的位宽比2:1需按奇偶索引写入目的寄存器，替代为asc_int642float的显式位置参数重载。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md
+    kind: replaced_by
+    condition: "通过接口后缀控制写入位置的原型已废弃，改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_int642float（废弃）
 
 ## 产品支持情况

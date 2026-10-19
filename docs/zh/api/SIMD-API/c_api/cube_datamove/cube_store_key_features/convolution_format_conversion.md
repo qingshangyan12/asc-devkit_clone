@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍卷积运算中L0C Buffer上NC1HWC0格式的转换能力：Fixpipe通过Nz2ND转为NHWC输出，Ascend 950PR&950DT系列产品还可通过Nz2DN转为NCHW输出。"
+---
 # 卷积格式转换
 
 在卷积运算中，L0C Buffer上存放的数据格式为NC1HWC0格式，Fixpipe指令通过[Nz2ND](NZ2ND.md)能力，支持将L0C Buffer上数据转为NHWC格式输出。转换示意图如下所示：

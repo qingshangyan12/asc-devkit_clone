@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "UnitFlag 机制为 asc_mmad 和 L0C Buffer 搬出接口提供以内存块为粒度的单元标志同步，通过 ENABLE_KEEP 与 ENABLE_UPDATE 模式控制标志位读写，从而降低同步延迟并提升性能，两侧接口需同步开启才能正常生效。"
+---
 # UnitFlag
 
 **特性说明：**

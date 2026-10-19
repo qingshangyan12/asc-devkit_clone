@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "设置asc_copy_gm2l1_arch_3510高维切分数据搬运padding模式使用的填充值，该值也用于asc_copy_l12l0a_3d搬运，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_highdim_split_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_3d_arch_3510.md
+    kind: configures
+    condition: "共用相同寄存器"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md
+    kind: related
+version: ">=9.2.0"
+---
 # asc_set_gm2l1_padding
 
 ## 产品支持情况

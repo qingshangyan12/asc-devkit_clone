@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "统计64位无符号整数二进制表示中值为1的位数，返回取值在0到64之间的整数结果。"
+tag:
+  - roles: [compute]
+  - operations: [bit_manipulation]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_popc
 
 ## 产品支持情况

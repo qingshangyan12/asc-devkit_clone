@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按元素将src0与src1相乘后累加到dst，实现融合乘加计算，支持前n个数据计算与高维切分计算，要求起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.1.0"
+---
 # asc_fma
 
 ## 产品支持情况

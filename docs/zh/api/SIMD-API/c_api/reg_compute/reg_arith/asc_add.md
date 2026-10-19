@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "按mask选择元素，对两个矢量数据寄存器源操作数执行加法并写入目的寄存器，支持带进位输出形式，整型溢出回绕、浮点遵循IEEE 754。"
+tag:
+  - roles: [compute]
+  - operations: [add]
+  - traits: [elementwise, supports_carry_output]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
+    kind: related
+    condition: "carry输出的适用场景"
+version: ">=9.0.0"
+---
 # asc_add
 
 ## 产品支持情况

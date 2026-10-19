@@ -1,3 +1,15 @@
+---
+okftype: reference.union
+description: "包含原子操作启用位atomic_type与原子操作类型atomic_op的参数结构体，用于asc_get_store_atomic_config接口获取原子配置，atomic_type用于指定参与原子操作的数据类型，atomic_op当前仅支持求和操作。"
+tag:
+  - roles: [configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
+    kind: related
+    condition: "作为查询接口的输出参数类型"
+version: ">=9.0.0"
+---
 # asc_store_atomic_config
 
 头文件路径为：`"c_api/defs/union.h"`。

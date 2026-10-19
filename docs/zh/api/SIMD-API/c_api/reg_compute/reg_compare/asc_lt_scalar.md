@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码将矢量源操作数按元素与标量进行小于比较，结果位取1或0并写入掩码目的寄存器或通过返回值返回。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_lt_scalar
 
 ## 产品支持情况

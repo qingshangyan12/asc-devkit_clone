@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "在单次迭代内对32个元素按score降序排列，并将score与索引index以8字节结果结构写入dst，repeat控制的各次迭代相互独立排序。"
+tag:
+  - roles: [compute]
+  - operations: [sort]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.1.0"
+---
 # asc_bitsort
 
 ## 产品支持情况

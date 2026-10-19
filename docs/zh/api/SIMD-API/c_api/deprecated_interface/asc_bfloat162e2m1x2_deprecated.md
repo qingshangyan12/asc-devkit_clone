@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将bfloat16_t类型转换为fp4x2_e2m1_t类型并支持多种舍入模式，按4:1位宽比将结果写入VL的对应索引部分，该无显式位置参数原型已废弃，请使用asc_bfloat162e2m1x2的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md
+    kind: replaced_by
+    condition: "bfloat16转换为fp4x2_e2m1场景改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_bfloat162e2m1x2（废弃）
 
 ## 产品支持情况

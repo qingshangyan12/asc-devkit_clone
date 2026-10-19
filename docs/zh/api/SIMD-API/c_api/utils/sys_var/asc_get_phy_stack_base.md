@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "获取当前核的物理堆栈基地址，用于调试时定位堆栈在物理内存中的位置；接口无入参、无特殊约束，读取结果在核内保持稳定。"
+tag:
+  - roles: [query]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_get_phy_stack_base
 
 ## 产品支持情况

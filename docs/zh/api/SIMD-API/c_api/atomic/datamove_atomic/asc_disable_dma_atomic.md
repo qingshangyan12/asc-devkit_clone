@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "关闭由asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min等接口开启的DMA原子操作，避免原子模式继续影响后续数据搬运。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    kind: related
+version: ">=9.2.0"
+---
 # asc_disable_dma_atomic
 
 ## 产品支持情况
