@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "为后续目的地址为GM的数据搬运指令开启原子累加，将搬运数据与GM已有数据求和后写入GM。"
+tag:
+  - roles: [data_movement_configuration]
+  - operations: [add]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/atomic/key_features.md
+    kind: related
+    condition: "需要保证后续搬运指令确定性的执行顺序时"
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+    kind: related
+version: ">=9.2.0"
+---
 # asc_set_atomic_add
 
 ## 产品支持情况

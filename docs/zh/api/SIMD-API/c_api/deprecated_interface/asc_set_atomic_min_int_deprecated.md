@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的原子比较配置接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM已有数据逐元素比较并写入最小值，请使用asc_set_atomic_min_int32替代。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    kind: replaced_by
+    condition: "改用asc_set_atomic_min_int32实现原子最小值传输"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_set_atomic_min_int（废弃）
 
 ## 产品支持情况

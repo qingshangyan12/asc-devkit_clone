@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "获取原子操作启用位与原子操作类型的值，用于校验asc_set_store_atomic_config_v1等接口设置的原子配置是否符合预期，该接口在Ascend 950PR&950DT系列产品上已废弃。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md
+    kind: replaced_by
+    condition: "在Ascend 950PR&950DT系列产品上该接口已废弃，原子加操作可直接改用asc_atomic_add实现"
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md
+    kind: related
+    condition: "读取并校验asc_set_store_atomic_config_v1设置的原子操作配置"
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md
+    kind: related
+    condition: "获取配置的输出参数类型"
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md
+    kind: related
+    condition: "读取并校验asc_set_store_atomic_config_v2（废弃）设置的原子操作配置"
+version: ">=9.0.0"
+---
 # asc_get_store_atomic_config
 
 ## 产品支持情况
