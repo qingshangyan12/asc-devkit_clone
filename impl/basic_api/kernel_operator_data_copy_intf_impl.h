@@ -2404,8 +2404,6 @@ __aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
 #endif
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
-    (__NPU_ARCH__ == 9202)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
@@ -2442,7 +2440,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     }
 #endif
 }
-#endif
 
 #endif
 } // namespace AscendC
