@@ -1,4 +1,4 @@
-# Lambda捕获外部参数实战样例（LeakyReLU-Affine融合与Clamp算子）
+# Lambda捕获外部参数样例（LeakyReLU-Affine融合与Clamp算子）
 
 ## 概述
 
