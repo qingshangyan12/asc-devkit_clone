@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "将2、3或4条已按score从大到小排列的队列归并为一条有序队列，输入通常来自asc_bitsort的输出，单次迭代内排序而不同迭代间不排序。"
+tag:
+  - roles: [compute]
+  - operations: [sort]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+    kind: related
+version: ">=9.1.0"
+---
 # asc_mrgsort4
 
 ## 产品支持情况
