@@ -129,7 +129,7 @@ public:
 } // namespace AscendC
 
 #include "copy_cube_in_params_base.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "copy_cube_in_params_mx.h"
 #endif
 

@@ -65,7 +65,7 @@ public:
         if (srcStride >= UINT16_MAX) {
             for (int i = 0; i < static_cast<int>(Ceil(height, BLOCK_CUBE)); ++i) {
                 DataCopyParams params = {1, static_cast<uint16_t>(blockLen), 0, 0};
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
                 DataCopy(dst[i * BLOCK_CUBE * width], src[srcOffset + i * gRow * BLOCK_CUBE], params, preAllocation);
 #else
                 DataCopy(dst[i * BLOCK_CUBE * width], src[srcOffset + i * gRow * BLOCK_CUBE], params);
@@ -77,7 +77,7 @@ public:
             DataCopyParams params = {
                 nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
                 static_cast<uint16_t>(dstStride)};
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
             DataCopy(dst, src[srcOffset], params, preAllocation);
 #else
             DataCopy(dst, src[srcOffset], params);
@@ -110,7 +110,7 @@ public:
             dn2nzParams.dstNzC0Stride = width * MM_NUM_TWO;
             dn2nzParams.dstNzNStride = 1;
             dn2nzParams.dstNzMatrixStride = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
             DataCopy(workLocal, aScaleGlobalB16[srcOffset], dn2nzParams, preAllocation);
 #else
             DataCopy(workLocal, aScaleGlobalB16[srcOffset], dn2nzParams);
@@ -131,7 +131,7 @@ public:
             GlobalTensor<half> aScaleGlobalB16;
             aScaleGlobalB16.SetGlobalBuffer(((__gm__ half*)(src.GetPhyAddr())), height * width / MM_NUM_TWO);
             auto workLocal = dst.template ReinterpretCast<half>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
             DataCopy(workLocal, aScaleGlobalB16[srcOffset / MM_NUM_TWO], dn2nzParams, preAllocation);
 #else
             DataCopy(workLocal, aScaleGlobalB16[srcOffset / MM_NUM_TWO], dn2nzParams);
@@ -162,7 +162,7 @@ public:
         nd2nzParams.dstNzC0Stride = Ceil(height, MM_NUM_TWO);
         nd2nzParams.dstNzNStride = 1;
         nd2nzParams.dstNzMatrixStride = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         DataCopy(dstTensor, srcTensor, nd2nzParams, preAllocation);
 #else
         DataCopy(dstTensor, srcTensor, nd2nzParams);
