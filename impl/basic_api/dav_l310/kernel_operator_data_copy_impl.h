@@ -252,7 +252,7 @@ __aicore__ inline void CopyGmToCbufAlignV1(
     uint32_t dstGap = dstStride;
     uint64_t actSrcStride = static_cast<uint64_t>(srcGap) + burstLength;
     uint32_t actDstStride = AlignUp(dstStride * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
-    constexpr uint32_t V1_MAX_NBURST = 4096; //Xm[15:4], 12bit
+    constexpr uint32_t V1_MAX_NBURST = 4095; //Xm[15:4], 12bit
     uint32_t burstLeft = blockCount;
     __cbuf__ uint8_t* tmpDst = reinterpret_cast<__cbuf__ uint8_t*>(dst);
     __gm__ uint8_t* tmpSrc = reinterpret_cast<__gm__ uint8_t*>(src);
@@ -321,7 +321,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
 
     for (uint32_t ndIdx = 0; ndIdx < ndNum; ++ndIdx) {
         __gm__ T* srcMatrix = src + static_cast<uint64_t>(ndIdx) * srcNdMatrixStride;
-        const uint32_t mBlkStride = static_case<uint32_t>(dstNzMatrixStride) * sizeof(T) / ONE_BLK_SIZE;
+        const uint32_t mBlkStride = static_cast<uint32_t>(dstNzMatrixStride) * sizeof(T) / ONE_BLK_SIZE;
         __cbuf__ T* dstMatrix = dst + static_cast<uint64_t>(ndIdx) * mBlkStride * (ONE_BLK_SIZE / sizeof(T));
         for (uint32_t blkIdx = 0; blkIdx < dBlockNum; ++blkIdx) {
             uint32_t blockBytes = dTotalBytes - blkIdx * ONE_BLK_SIZE;
