@@ -351,8 +351,6 @@ static void DispatchKfcSubKernel(
                 ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
         }
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-        HCCL_INFO("[DispatchKfcSubKernel] skip CcuKfcAllReduceMesh1DMem2MemKernel");
-        /*
         CcuKfcAllReduceMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
@@ -363,7 +361,6 @@ static void DispatchKfcSubKernel(
             param[HBM_PARAM_IDX_25], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
             ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType,
             ctx.arg->opParam.reduceType);
-        */
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         CcuAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
@@ -451,7 +448,8 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            DispatchKfcSubKernel(param, ctx, recordAddr);
+            HCCL_INFO("[KfcServerGenCircularQueue] skip DispatchKfcSubKernel");
+            // DispatchKfcSubKernel(param, ctx, recordAddr);
             MissionPostSync(ctx);
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
