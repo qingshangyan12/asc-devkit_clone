@@ -29,9 +29,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
+等待核间同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，等待核（消费者）在访问依赖数据前调用本接口。本接口持续读取同步标志，直到其值为1时将其清零并返回，以保证被等待核（生产者）已经完成相关操作，避免因核间执行顺序不确定而产生数据读写错误。
 
-调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。
+本接口须与[IBSet](IBSet.md)成对使用。被等待核（生产者）在完成相关操作后调用IBSet，IBSet和IBWait用于同一个同步事件时，相关参数配置须保持一致。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -46,22 +46,26 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 
 | 参数名 | 描述 |
 | --- | --- |
-| isAIVOnly | 控制是否为AIVOnly模式，默认为true。 |
+| isAIVOnly | 控制同步标志在`gmWorkspace`中的存储位置计算方式。取值为true（默认值）时，按AIVOnly模式计算同步标志的存储位置；取值为false时，按MIX模式计算同步标志的存储位置。MIX模式下须显式配置为false。 |
 
 **表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。 |
-| ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| blockIdx | 输入 | 表示等待核的idx号，取值范围：[0,核数-1]。 |
-| eventID | 输入 | 用来控制当前核的set、wait事件。 |
+| gmWorkspace | 输入 | 多个AIV共享的全局内存，用于存储核间同步标志，位于Global Memory，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。首次进行核间同步前，必须将其中的核间同步标志初始化为0。 |
+| ubWorkspace | 输入 | 当前AIV的核内缓存，用于将`gmWorkspace`中的核间同步标志搬运到Unified Buffer后读取和修改，并将修改后的同步标志写回`gmWorkspace`。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的[TPosition](../../aux_data_structures/TPosition.md)为VECIN/VECCALC/VECOUT。 |
+| blockIdx | 输入 | 同步标志对应的逻辑AIV索引，即被等待核（生产者，调用IBSet的核）的逻辑AIV索引。取值范围由算子调用时设置的逻辑AI Core核数`numBlocks`和AIV配比决定，例如`__mix__(1, 2)`修饰核函数且`numBlocks`为4时，`blockIdx`取值范围为`[0, 7]`。 |
+| eventID | 输入 | 同步事件的逻辑编号，与`blockIdx`共同确定`gmWorkspace`中的同步标志，用于区分同一对生产者和消费者之间的不同软件同步事件。<br>该参数与[SetFlag/WaitFlag](../intra_core_sync/SetFlag_WaitFlag_ISASI.md)的入参名称相同，但含义不同：本接口的`eventID`用于定位软件同步标志，SetFlag/WaitFlag的`eventID`用于硬件指令中的核内流水同步事件。<br>因此，本接口的`eventID`不适用SetFlag/WaitFlag中0-7的取值限制。取值为非负整数，建议从0开始连续编号。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
 ## 约束说明<a name="section633mcpsimp"></a>
+
+- 首次调用IBSet和IBWait进行核间同步前，必须将共享的`gmWorkspace`中的核间同步标志初始化为0：
+    - 若同步标志的初始值为1，IBWait可能将其误判为生产者已完成操作并提前结束等待，导致同步结果错误；
+    - 若初始值为其他非预期值，IBSet和IBWait可能持续等待，导致程序卡死。
 
 - `gmWorkspace`申请的空间须满足以下公式：
 
@@ -80,9 +84,8 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
-- 分离模式下，使用该接口进行两个核间的同步时，仅对AIV核生效。
-- IBSet接口的gmWorkspace缓存的值需要初始化为0。
+- [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，该接口仅对AIV核生效。在AIC核中调用时，接口直接返回，不等待同步标志，也不执行核间同步。
 
 ## 调用示例<a name="section177231425115410"></a>
 
-完整样例请参考[调用示例](IBSet.md#section177231425115410)。
+完整样例请参考[IBSet调用示例](IBSet.md#调用示例)。

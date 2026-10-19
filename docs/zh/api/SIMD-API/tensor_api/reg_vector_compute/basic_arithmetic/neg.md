@@ -80,7 +80,7 @@ __simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src)
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void neg_vf(

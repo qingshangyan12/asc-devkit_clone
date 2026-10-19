@@ -111,8 +111,10 @@
 | [load](reg_vector_compute/reg_data_load/load.md) | 将UB中的数据搬入`reg_tensor`，支持多种数据排列方式。 |
 | [load_broadcast](reg_vector_compute/reg_data_load/load_broadcast.md) | 从UB搬入数据，并按指定模式广播到`reg_tensor`。 |
 | [load_gather](reg_vector_compute/reg_data_load/load_gather.md) | 根据索引从UB Tensor的离散位置收集数据到`reg_tensor`。 |
+| [unalign_load](reg_vector_compute/reg_data_load/unalign_load.md) | 将非32字节对齐的UB数据搬入`reg_tensor`，支持连续搬入。 |
 | [store](reg_vector_compute/reg_data_store/store.md) | 将`reg_tensor`中的数据搬出到UB，支持多种数据排列方式。 |
 | [store_scatter](reg_vector_compute/reg_data_store/store_scatter.md) | 根据索引将`reg_tensor`中的有效元素分散写入UB Tensor。 |
+| [unalign_store](reg_vector_compute/reg_data_store/unalign_store.md) | 将`reg_tensor`中的指定数量元素连续搬出到非32字节对齐的UB地址，并提供收尾操作。 |
 | [cast](reg_vector_compute/type_conversion/cast.md) | 转换寄存器数据类型，支持配置数据排布、舍入和饱和模式。 |
 | [trunc](reg_vector_compute/type_conversion/trunc.md) | 将Mask选中的浮点元素向零取整，并保留原数据类型。 |
 | [abs](reg_vector_compute/basic_arithmetic/abs.md) | 对源操作数逐元素计算绝对值。 |

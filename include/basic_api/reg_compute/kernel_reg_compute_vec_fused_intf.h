@@ -44,12 +44,45 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+#if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void MulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void NegMulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void NegMulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void FusedMulSubDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void FusedNegMulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void FusedNegMulSubDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <
+    typename T = DefaultType, typename U = DefaultType, const CastTrait& trait = castTrait, typename S, typename V>
+__simd_callee__ inline void ReciprocalCast(S& dstReg, V& srcReg, MaskReg& mask);
+#endif
+
+#if __NPU_ARCH__ == 9202
+template <CMPMODE mode, typename T, typename U>
+__simd_callee__ inline void MulCompares(MaskReg& dst, T& srcReg0, T& srcReg1, U scalarValue, MaskReg& mask);
+
+template <const CastTrait& trait, typename T, typename U>
+__simd_callee__ inline void MulCast(T& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
+#endif
 } // namespace Reg
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
-                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)) || \
+#if defined(__NPU_ARCH__) &&                                                                                     \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+         (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
+         (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)
 #include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_fused_intf_impl.h"
 #endif

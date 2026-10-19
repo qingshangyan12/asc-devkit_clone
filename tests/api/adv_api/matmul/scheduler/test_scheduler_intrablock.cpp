@@ -40,8 +40,8 @@ public:
     using CopyCubeInB = CustomCopyCubeIn<IMPL, MatmulInputBType<B_TYPE, typename A_TYPE::T>, MM_CFG>;
     using Scheduler = Impl::Detail::MatmulScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
     using MLoop = Impl::Detail::MLoop<IMPL, A_TYPE, MM_CFG>;
-    using NLoop = Impl::Detail::NLoop<IMPL, B_TYPE, MM_CFG>;
-    using KLoop = Impl::Detail::KLoop<IMPL, typename A_TYPE::T, A_TYPE, MM_CFG>;
+    using NLoop = Impl::Detail::NLoop<IMPL, A_TYPE, B_TYPE, MM_CFG>;
+    using KLoop = Impl::Detail::KLoop<IMPL, typename A_TYPE::T, A_TYPE, B_TYPE, MM_CFG>;
     using LoadToA2 = CustomLoadToL0<IMPL, A_TYPE, MM_CFG>;
     using LoadToB2 = CustomLoadToL0<IMPL, MatmulInputBType<B_TYPE, typename A_TYPE::T>, MM_CFG>;
     using TBufPoolL0 = CustomTBufPoolL0<IMPL, A_TYPE, B_TYPE, MM_CFG>;

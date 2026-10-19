@@ -30,6 +30,29 @@
 
 namespace AscendC {
 namespace Internal {
+constexpr Reg::CastTrait geluFloat2HalfCastTrait0 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
+constexpr Reg::CastTrait geluFloat2HalfCastTrait1 = {
+    Reg::RegLayout::ONE, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
+template <typename T, bool highPrecision>
+__simd_callee__ inline void GeluExpTrans(
+    Reg::RegTensor<T>& dstVreg, Reg::RegTensor<T>& srcVreg, Reg::MaskReg& mask, Reg::RegTensor<T>& tmpReg)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+    Reg::RegTensor<float> tmpCastReg0;
+    Reg::RegTensor<float> tmpCastReg1;
+    if constexpr (!highPrecision && IsSameType<T, half>::value) {
+        Reg::ExpSub<float, T, Reg::RegLayout::ZERO>(tmpCastReg0, srcVreg, tmpReg, mask);
+        Reg::ExpSub<float, T, Reg::RegLayout::ONE>(tmpCastReg1, srcVreg, tmpReg, mask);
+        Reg::Cast<half, float, geluFloat2HalfCastTrait0>(dstVreg, tmpCastReg0, mask);
+        Reg::Cast<half, float, geluFloat2HalfCastTrait1>(dstVreg, tmpCastReg1, mask);
+    } else {
+        Reg::Exp(dstVreg, srcVreg, mask);
+    }
+#else
+    Reg::Exp(dstVreg, srcVreg, mask);
+#endif
+}
 
 template <typename T, bool highPrecision>
 __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const uint16_t repeatTimes)
@@ -43,7 +66,14 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
     Reg::RegTensor<T> tmpReg1;
     Reg::RegTensor<T> tmpReg2;
     Reg::RegTensor<T> tmpReg3;
+    Reg::RegTensor<T> tmpReg4;
     Reg::MaskReg mask;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+    if constexpr (!highPrecision && IsSameType<T, half>::value) {
+        mask = Reg::CreateMask<T>();
+        Reg::Duplicate(tmpReg4, 0, mask);
+    }
+#endif
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<T>(count);
         if constexpr (highPrecision) {
@@ -61,11 +91,11 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
         Reg::Muls(tmpReg0, tmpReg0, coefficientsB, mask);
         // exp(min(y, 0))
         Reg::Mins(tmpReg2, tmpReg0, 0.0f, mask);
-        Reg::Exp(tmpReg1, tmpReg2, mask);
+        GeluExpTrans<T, highPrecision>(tmpReg1, tmpReg2, mask, tmpReg4);
         // x / (exp^(-abs(y)) + 1)
         Reg::Abs(tmpReg2, tmpReg0, mask);
         Reg::Muls(tmpReg2, tmpReg2, -1.0f, mask);
-        Reg::Exp(tmpReg3, tmpReg2, mask);
+        GeluExpTrans<T, highPrecision>(tmpReg3, tmpReg2, mask, tmpReg4);
         Reg::Adds(tmpReg3, tmpReg3, 1.0f, mask);
         Reg::Div(tmpReg3, srcVreg, tmpReg3, mask);
         // x / (exp^(-abs(y)) + 1) * exp(min(y, 0))
@@ -130,6 +160,44 @@ __aicore__ inline void FastGeluHighPrecisionAlg(
     FastGeluHighPrecisionAlgVF<T>(dst, src, dataSize);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+template <typename T>
+__simd_vf__ inline void FastGeluAlgVF(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t dataSize)
+{
+    constexpr float coefficients = -1.702f;
+    constexpr float oneFloatScalar = 1.0f;
+    Reg::RegTensor<T> srcVreg;
+    Reg::RegTensor<T> dstVreg;
+    constexpr uint32_t stackSize = GetVecLen() / sizeof(T);
+    uint32_t sreg = dataSize;
+    Reg::RegTensor<T> stackVreg;
+    Reg::RegTensor<T> tmpVreg;
+    Reg::RegTensor<float> tmpCastReg0;
+    Reg::RegTensor<float> tmpCastReg1;
+    Reg::MaskReg mask;
+    if constexpr (IsSameType<T, half>::value) {
+        mask = Reg::CreateMask<T>();
+        Reg::Duplicate(tmpVreg, 0, mask);
+    }
+    uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(dataSize, stackSize));
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign<T>(srcVreg, src + i * stackSize);
+        Reg::Muls(stackVreg, srcVreg, coefficients, mask);
+        if constexpr (IsSameType<T, half>::value) {
+            Reg::ExpSub<float, T, Reg::RegLayout::ZERO>(tmpCastReg0, stackVreg, tmpVreg, mask);
+            Reg::ExpSub<float, T, Reg::RegLayout::ONE>(tmpCastReg1, stackVreg, tmpVreg, mask);
+            Reg::Cast<half, float, geluFloat2HalfCastTrait0>(stackVreg, tmpCastReg0, mask);
+            Reg::Cast<half, float, geluFloat2HalfCastTrait1>(stackVreg, tmpCastReg1, mask);
+        } else {
+            Reg::Exp(stackVreg, stackVreg, mask);
+        }
+        Reg::Adds(stackVreg, stackVreg, oneFloatScalar, mask);
+        Reg::Div(dstVreg, srcVreg, stackVreg, mask);
+        Reg::StoreAlign<T>(dst + i * stackSize, dstVreg, mask);
+    }
+}
+#else
 template <typename T>
 __simd_vf__ inline void FastGeluAlgVF(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t dataSize)
 {
@@ -147,6 +215,7 @@ __simd_vf__ inline void FastGeluAlgVF(__ubuf__ T* dst, __ubuf__ T* src, const ui
         Reg::StoreAlign<T>(dst + i * stackSize, dstVreg, mask);
     }
 }
+#endif
 
 template <typename T>
 __aicore__ inline void FastGeluAlg(

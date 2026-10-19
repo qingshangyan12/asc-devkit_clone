@@ -35,7 +35,7 @@
     <span style="font-weight: bold; font-size: 1.2em;">📌 表1：样例规格</span></caption>
 <tr><td rowspan="1" align="center">参数</td><td align="center">取值</td><td align="center">说明</td></tr>
 <tr><td align="center">FeatureMap</td><td align="center">[N, H, W, C] = [4, 9, 9, 32]</td><td>Global Memory输入为half类型，按场景选择NC1HWC0/NCHW/NHWC排布</td></tr>
-<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory输入为half类型，按[K, Cout]二维排布展开</td></tr>
+<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory输入为half类型，按[k, Cout]二维排布展开</td></tr>
 <tr><td align="center">卷积参数</td><td align="center">stride = [2, 2]，dilation = [2, 2]，padding = [2, 2, 2, 2]，padValue = 1</td><td>padding顺序为[top, bottom, left, right]</td></tr>
 <tr><td align="center">Output</td><td align="center">[N, HOut, WOut, Cout] = [4, 5, 5, 16]</td><td>Global Memory输出为half类型，格式与输入一致</td></tr>
 </table>
@@ -48,7 +48,7 @@ $$
 K_{\text{effective}} = dilation \times (K_h - 1) + 1 = 2 \times (3 - 1) + 1 = 5
 $$
 
-输出H/W计算如下：
+输出h/w计算如下：
 
 $$
 \begin{aligned}
@@ -57,7 +57,7 @@ W_{out} &= \frac{W + pad_{left} + pad_{right} - K_{\text{effective}}}{stride_w} 
 \end{aligned}
 $$
 
-矩阵乘规格为`M = HOut * WOut = 25`，`K = C * Kh * Kw = 288`，`N = Cout = 16`。
+矩阵乘规格为`m = HOut * WOut = 25`，`k = C * Kh * Kw = 288`，`n = Cout = 16`。
 
 ## 场景详细说明
 
@@ -68,23 +68,23 @@ $$
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 表2：SCENARIO_NUM不同取值的含义</span></caption>
 <tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">FeatureMap输入布局</td><td align="center">Output输出布局</td><td align="center">Global Memory→L1 Buffer转换</td><td align="center">L0C Buffer→Global Memory转换</td></tr>
-<tr><td align="center">0</td><td align="center">NC1HWC0 [1, C1, H, W, C0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, C0]</td><td align="center">NC1HWC0直搬</td><td align="center">NC1HWC0直搬</td></tr>
-<tr><td align="center">1</td><td align="center">NCHW [1, C, H, W]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW→NC1HWC0（dn2nz）</td><td align="center">NC1HWC0→NCHW（nz2dn）</td></tr>
-<tr><td align="center">2</td><td align="center">NHWC [1, H, W, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC→NC1HWC0（nd2nz）</td><td align="center">NC1HWC0→NHWC（nz2nd）</td></tr>
+<tr><td align="center">0</td><td align="center">NC1HWC0 [1, c1, h, w, c0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, c0]</td><td align="center">NC1HWC0直搬</td><td align="center">NC1HWC0直搬</td></tr>
+<tr><td align="center">1</td><td align="center">NCHW [1, C, h, w]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW→NC1HWC0（dn2nz）</td><td align="center">NC1HWC0→NCHW（nz2dn）</td></tr>
+<tr><td align="center">2</td><td align="center">NHWC [1, h, w, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC→NC1HWC0（nd2nz）</td><td align="center">NC1HWC0→NHWC（nz2nd）</td></tr>
 </table>
 
 **场景0：NC1HWC0输入输出**
-- 输入：FeatureMap [1, 2, 9, 9, 16] half类型，NC1HWC0格式；Weight [K, Cout] half类型
+- 输入：FeatureMap [1, 2, 9, 9, 16] half类型，NC1HWC0格式；Weight [k, Cout] half类型
 - 输出：Output [1, 1, 5, 5, 16] half类型，NC1HWC0格式
 - 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`直搬NC1HWC0数据，L0C Buffer→Global Memory使用`copy_l0c_to_gm`直搬
 
 **场景1：NCHW输入输出**
-- 输入：FeatureMap [1, 32, 9, 9] half类型，NCHW格式；Weight [K, Cout] half类型
+- 输入：FeatureMap [1, 32, 9, 9] half类型，NCHW格式；Weight [k, Cout] half类型
 - 输出：Output [1, 16, 5, 5] half类型，NCHW格式
 - 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`将NCHW随路转换为NC1HWC0（dn2nz），L0C Buffer→Global Memory使用`copy_l0c_to_gm`将NC1HWC0转换为NCHW（nz2dn）
 
 **场景2：NHWC输入输出**
-- 输入：FeatureMap [1, 9, 9, 32] half类型，NHWC格式；Weight [K, Cout] half类型
+- 输入：FeatureMap [1, 9, 9, 32] half类型，NHWC格式；Weight [k, Cout] half类型
 - 输出：Output [1, 5, 5, 16] half类型，NHWC格式
 - 实现：Global Memory→L1 Buffer使用`copy_gm_to_l1`将NHWC随路转换为NC1HWC0（nd2nz），L0C Buffer→Global Memory使用`copy_l0c_to_gm`将NC1HWC0转换为NHWC（nz2nd）
 

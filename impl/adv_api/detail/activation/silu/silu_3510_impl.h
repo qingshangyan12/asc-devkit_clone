@@ -28,6 +28,45 @@
 
 namespace AscendC {
 namespace Internal {
+constexpr Reg::CastTrait siluFloat2HalfCastTrait0 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
+constexpr Reg::CastTrait siluFloat2HalfCastTrait1 = {
+    Reg::RegLayout::ONE, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+template <typename T>
+__simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const uint16_t repeatTimes)
+{
+    constexpr uint32_t oneRepElm = static_cast<uint32_t>(GetVecLen() / sizeof(T));
+    Reg::RegTensor<T> srcVreg;
+    Reg::RegTensor<T> tmpReg0;
+    Reg::RegTensor<T> dstVreg;
+    Reg::RegTensor<T> tmpReg1;
+    Reg::RegTensor<float> tmpCastReg0;
+    Reg::RegTensor<float> tmpCastReg1;
+    Reg::MaskReg mask;
+    if constexpr (IsSameType<T, half>::value) {
+        mask = Reg::CreateMask<T>();
+        Reg::Duplicate(tmpReg1, 0, mask);
+    }
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<T>(count);
+        Reg::LoadAlign(srcVreg, src + i * oneRepElm);
+        Reg::Muls(tmpReg0, srcVreg, -1.0f, mask);
+        if constexpr (IsSameType<T, half>::value) {
+            Reg::ExpSub<float, T, Reg::RegLayout::ZERO>(tmpCastReg0, tmpReg0, tmpReg1, mask);
+            Reg::ExpSub<float, T, Reg::RegLayout::ONE>(tmpCastReg1, tmpReg0, tmpReg1, mask);
+            Reg::Cast<half, float, siluFloat2HalfCastTrait0>(tmpReg0, tmpCastReg0, mask);
+            Reg::Cast<half, float, siluFloat2HalfCastTrait1>(tmpReg0, tmpCastReg1, mask);
+        } else {
+            Reg::Exp(tmpReg0, tmpReg0, mask);
+        }
+        Reg::Adds(tmpReg0, tmpReg0, 1.0f, mask);
+        Reg::Div(dstVreg, srcVreg, tmpReg0, mask);
+        Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
+    }
+}
+#else
 template <typename T>
 __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const uint16_t repeatTimes)
 {
@@ -46,6 +85,7 @@ __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t
         Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
+#endif
 } // namespace Internal
 
 template <typename T, bool isReuseSource = false>

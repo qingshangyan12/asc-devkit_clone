@@ -22,44 +22,16 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/vector_datamove_intf_impl.h"
 #endif
-
-__aicore__ inline void asc_copy_gm2ub(
-    __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride,
-    uint16_t dst_stride)
-{
-    if ASC_IS_AIV {
-        copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, burst_count, burst_len, 0, 0, false, 0, src_stride,
-            dst_stride);
-    }
-}
-
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-{
-    asc_copy_gm2ub(dst, src, 1, size, 0, 0);
-}
-
-__aicore__ inline void asc_copy_ub2gm(
-    __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t dst_stride,
-    uint16_t src_stride)
-{
-    if ASC_IS_AIV {
-        copy_ubuf_to_gm_align_v2(dst, src, 0, burst_count, burst_len, 0, dst_stride, src_stride);
-    }
-}
-
-__aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
-{
-    asc_copy_ub2gm(dst, src, 1, size, 0, 0);
-}
 
 __aicore__ inline void asc_copy_ub2l1(
     __cbuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
 {
     if ASC_IS_AIV {
-        copy_ubuf_to_cbuf(dst, src, static_cast<uint8_t>(0), burst_count, burst_len, src_gap, dst_gap);
+        copy_ubuf_to_cbuf(dst, src, 0, burst_count, burst_len, src_gap, dst_gap);
     }
 }
 

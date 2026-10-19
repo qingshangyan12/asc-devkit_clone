@@ -29,7 +29,7 @@
 
 获取输入uint32类型数据x和y乘积的高32位。
 
-![](../../../figures/zh-cn_formulaimage_0000002531050526.png)
+![](../../../figures/formulaimage_0000002531050526.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ unsigned int __umulhi(unsigned int x, unsigned int y)
         dst[idx] = __umulhi(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 65536, 65536, 131072, 262144, 4294967295, 3, 5, 0
+y: 65536, 131072, 65536, 65536, 4294967295, 3, 5, 0
+result: 1, 2, 2, 4, 4294967294, 0, 0, 0
+```

@@ -255,7 +255,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 源操作数为矢量数据寄存器或掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
 - UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。目的操作数地址偏移后对应的UB范围不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 矢量数据寄存器搬出场景
 

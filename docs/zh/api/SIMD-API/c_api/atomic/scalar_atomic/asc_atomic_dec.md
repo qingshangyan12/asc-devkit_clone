@@ -61,7 +61,7 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | val | 输入 | 源操作数。 |
 
 ## 返回值说明

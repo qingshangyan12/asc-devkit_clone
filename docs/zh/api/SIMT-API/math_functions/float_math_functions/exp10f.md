@@ -29,7 +29,7 @@
 
 指定输入x，获取10的x次方。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816335.png)
+![](../../../figures/formulaimage_0000002516816335.png)
 
 ## 函数原型
 

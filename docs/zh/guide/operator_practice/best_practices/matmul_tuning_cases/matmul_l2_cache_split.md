@@ -53,7 +53,7 @@
 
 当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](matmul_tiling_constant.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
 
-![](../../../figures/zh-cn_image_0000002410305297.png)
+![](../../../figures/image_0000002410305297.png)
 
 ## 设计优化方案<a name="section6251134218311"></a>
 
@@ -170,7 +170,7 @@ Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 
 优化后的Profiling数据如下，C列的aic\_time为805.6us，相比于优化前，总执行时间降低了约7.1%，MTE2搬运时间降低了约10.7%。
 
-![](../../../figures/zh-cn_image_0000002376979814.png)
+![](../../../figures/image_0000002376979814.png)
 
 ## 总结<a name="section1593812115413"></a>
 

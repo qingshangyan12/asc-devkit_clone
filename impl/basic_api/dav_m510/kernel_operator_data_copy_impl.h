@@ -178,8 +178,7 @@ __aicore__ inline void CopyUbufToCbuf(
     __cbuf__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
     const uint16_t dstStride)
 {
-    copy_ubuf_to_cbuf(
-        (__cbuf__ void*)dst, (__ubuf__ void*)src, static_cast<uint8_t>(0), blockCount, blockLen, srcStride, dstStride);
+    copy_ubuf_to_cbuf((__cbuf__ void*)dst, (__ubuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
 }
 
 // only support CubeCore   PIPE_MTE1
@@ -189,8 +188,7 @@ __aicore__ inline void CopyCbufToUbuf(
     __ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
     const uint16_t dstStride)
 {
-    copy_cbuf_to_ubuf(
-        (__ubuf__ void*)dst, (__cbuf__ void*)src, static_cast<uint8_t>(0), blockCount, blockLen, srcStride, dstStride);
+    copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
 }
 
 // only support CubeCore   PIPE_MTE1

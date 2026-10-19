@@ -139,7 +139,7 @@ host侧自动获取Tiling参数的关键步骤介绍如下：<a name="zh-cn_topi
 
 除此之外，单核的Matmul Tiling时，实际参与Matmul计算的shape可以是原始shape中的一部分，singleM, singleN, singleK用于表达实际参与Matmul计算的shape，如下图所示。在单核的情况下，singleM, singleN, singleK会透传给singleCoreM, singleCoreN, singleCoreK。
 
-![](../../../figures/zh-cn_image_0000002533171617.png)
+![](../../../figures/image_0000002533171617.png)
 
 -   核函数（Kernel）运行时设置
     -   [SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)、[SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSingleShape.md)都是运行时修改singleCoreM、singleCoreN、singleCoreK，处理尾块时使用[SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)，Matmul复用（多个Matmul计算复用一个Matmul对象）的场景可以使用SetSingleShape重新设置。

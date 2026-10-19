@@ -33,7 +33,8 @@ struct TBufHandleAux<1> {
     using T = TBufHandle;
 };
 constexpr TEventID INVALID_TEVENTID = (static_cast<TEventID>(-1));
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 constexpr uint8_t INVALID_STATIC_ENQUE_HEAD = 0xff;
 constexpr int32_t MIN_BUFFER_BLOCK_SIZE = 32 * 1024;
 constexpr uint8_t TSCM_BUFID_MAX = 20;
@@ -76,7 +77,7 @@ struct GlobalManageQueConfig<Hardware::L0C> {
 template <Hardware hardType>
 __aicore__ constexpr bool EnableGlobalManageQue(const TQueConfig& config)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     return config.bufferLen > 0 && config.bufferNumber > 0 &&
            config.bufferLen * config.bufferNumber == GlobalManageQueConfig<hardType>::totalSize;
 #else
@@ -144,7 +145,8 @@ struct TPipeImpl {
     SpmInfo spmInfo_;
     // the tscm buffer addr
     uint32_t tscmBufferPtr_;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     TBufId bufIdPool_;
     TBufId tscmBufIdPool_;
     TBufId sharedEvtId_;
@@ -163,7 +165,8 @@ struct TBufPoolImpl {
     uint32_t maxAddr_;
     uint32_t maxLen_;
     uint8_t curBufSize_;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     uint32_t bufIdPool_;
     uint32_t availableIdMask_;
 #endif
@@ -205,7 +208,8 @@ __aicore__ inline void TPipeBase::InitShareBufStart(
     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
     // v100 Shouldn't Use Bias Table
     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     Internal::g_sharedEvtId = Internal::g_bufId;
 #endif
 
@@ -224,7 +228,8 @@ __aicore__ inline void TPipeBase::InitShareBufEnd()
         g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     Internal::g_bufId = Internal::g_sharedEvtId;
 #endif
 

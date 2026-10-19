@@ -57,8 +57,8 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_<dtype> src,
+                                                        vector_store_unalign& src0,
+                                                        vector_<dtype> src1,
                                                         uint32_t count)
 ```
 
@@ -70,8 +70,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_uint8_t src,
+                                                        vector_store_unalign& src0,
+                                                        vector_uint8_t src1,
                                                         uint32_t count)
 ```
 
@@ -80,8 +80,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_<dtype> src,
+                                                        vector_store_unalign& src0,
+                                                        vector_<dtype> src1,
                                                         addr_reg& count)
 ```
 
@@ -93,8 +93,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_uint8_t src,
+                                                        vector_store_unalign& src0,
+                                                        vector_uint8_t src1,
                                                         addr_reg& count)
 ```
 
@@ -103,8 +103,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_bool src)
+                                                        vector_store_unalign& src0,
+                                                        vector_bool src1)
 ```
 
 #### dtype支持数据类型
@@ -115,8 +115,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
-                                                        vector_store_unalign& unalign_reg,
-                                                        vector_bool src)
+                                                        vector_store_unalign& src0,
+                                                        vector_bool src1)
 ```
 
 ## 参数说明
@@ -128,8 +128,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。 |
-| unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
-| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
+| src0 | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
+| src1 | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
 | count | 输入 | 本次搬出的元素个数，类型为`uint32_t`。 |
 
 ### 地址寄存器偏移搬出模式
@@ -139,8 +139,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`。 |
-| unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
-| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
+| src0 | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
+| src1 | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
 | count | 输入/输出 | 目的地址的迭代偏移，类型为`addr_reg&`，由配套的地址寄存器构造接口预先构造。该参数用于更新目的地址，不控制单次搬出的数据量；指令执行后，地址寄存器中的偏移累加一个VL（256字节）。 |
 
 ### 掩码寄存器搬出模式
@@ -150,8 +150,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
-| unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
-| src | 输入 | 源操作数（掩码寄存器），类型为`vector_bool`。 |
+| src0 | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
+| src1 | 输入 | 源操作数（掩码寄存器），类型为`vector_bool`。 |
 
 矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -165,14 +165,14 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址更新后不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 指令约束
 
-- 连续调用时须复用同一个`unalign_reg`。
-- 掩码寄存器连续搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`unalign_reg`。
-- 立即数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
-- 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
+- 连续调用时须复用同一个`src0`。
+- 掩码寄存器连续搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`src0`。
+- 立即数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`src0`。
+- 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`src0`及地址寄存器。
 - 立即数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
 - 矢量数据寄存器搬出场景目的地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
 - 掩码寄存器搬出场景，`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。
@@ -203,12 +203,12 @@ constexpr uint32_t OUTPUT_BYTES = START_OFFSET + ELEMENT_COUNT;
 
 __simd_vf__ inline void storeunalign_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_uint8_t src;
-    vector_store_unalign unalign_reg;
+    vector_uint8_t src1;
+    vector_store_unalign src0;
     __ubuf__ uint8_t* dst = output + START_OFFSET;
-    asc_loadalign(src, input);
-    asc_storeunalign_postupdate(dst, unalign_reg, src, ELEMENT_COUNT);
-    asc_storeunalign_post_postupdate(dst, unalign_reg, 0);
+    asc_loadalign(src1, input);
+    asc_storeunalign_postupdate(dst, src0, src1, ELEMENT_COUNT);
+    asc_storeunalign_post_postupdate(dst, src0, 0);
 }
 
 __global__ __vector__ void storeunalign_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)

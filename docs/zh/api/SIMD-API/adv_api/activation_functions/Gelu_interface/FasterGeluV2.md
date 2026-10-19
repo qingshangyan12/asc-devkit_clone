@@ -27,11 +27,11 @@
 
 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGeluV2版本。本接口实现了FastGeluV2，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002318972564.png)
+![](../../../../figures/formulaimage_0000002318972564.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001949671120.png)
+![](../../../../figures/formulaimage_0000001949671120.png)
 
-其中，![](../../../../figures/zh-cn_formulaimage_0000001980770629.png)
+其中，![](../../../../figures/formulaimage_0000001980770629.png)
 
 ## 函数原型
 

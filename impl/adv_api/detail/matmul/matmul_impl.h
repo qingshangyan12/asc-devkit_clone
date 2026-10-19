@@ -32,7 +32,8 @@ template <
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
 class MatmulImpl<
     A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY,
-    enable_if_t<A_TYPE::layout == LayoutMode::NONE && !isMxMatmul<A_TYPE, B_TYPE>>>
+    enable_if_t<
+        A_TYPE::layout == LayoutMode::NONE && !isMxMatmul<A_TYPE, B_TYPE> && !isOnlyScaleBMxMatmul<A_TYPE, B_TYPE>>>
     : public MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> {
 private:
     using SrcT = typename A_TYPE::T;

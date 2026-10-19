@@ -101,9 +101,9 @@
 
     Leaky ReLU（带泄露线性整流函数）激活函数，是人工神经网络中一种常用的激活函数，其数学表达式和函数图像如下所示：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002501251774.png)
+    ![](../../../../figures/formulaimage_0000002501251774.png)
 
-    ![](../../../../figures/zh-cn_image_0000002501411624.png)
+    ![](../../../../figures/image_0000002501411624.png)
 
 5.  将输出结果搬运到Global Memory。
 

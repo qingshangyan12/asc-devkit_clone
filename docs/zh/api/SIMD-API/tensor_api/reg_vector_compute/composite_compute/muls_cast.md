@@ -81,7 +81,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void muls_cast_vf(

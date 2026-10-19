@@ -29,7 +29,7 @@
 
 获取输入数据a、b、c、d的平方和（a^2 + b^2 + c^2 + d^2）的平方根。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776408.png)
+![](../../../figures/formulaimage_0000002484776408.png)
 
 ## 函数原型
 

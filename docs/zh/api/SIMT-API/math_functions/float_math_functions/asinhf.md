@@ -29,7 +29,7 @@
 
 获取输入数据的双曲反正弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776396.png)
+![](../../../figures/formulaimage_0000002484776396.png)
 
 ## 函数原型
 

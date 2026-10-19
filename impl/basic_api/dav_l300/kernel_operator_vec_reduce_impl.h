@@ -1362,7 +1362,7 @@ __aicore__ inline void ReduceMinImpl(
 // check if a index in a single repeat is part of the calculation
 __aicore__ inline bool isMasked(uint32_t inRepeatIndex, uint64_t mask0, uint64_t mask1)
 {
-    uint32_t bit_to_check = (1 << (inRepeatIndex % 64));
+    uint64_t bit_to_check = (1ull << (inRepeatIndex % 64));
     uint32_t one_mask_length = 63;
     if (inRepeatIndex > one_mask_length) {
         return (mask1 & bit_to_check) != 0;

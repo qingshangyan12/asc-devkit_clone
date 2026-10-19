@@ -27,9 +27,9 @@
 
 对输入tensor做LogSoftmax计算。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002315199128.png)
+![](../../../../figures/formulaimage_0000002315199128.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001773726766.png)
+![](../../../../figures/formulaimage_0000001773726766.png)
 
 为方便理解，通过Python脚本实现的方式表达计算公式如下，其中src是源操作数（输入），dst、sum、max为目的操作数（输出）。
 

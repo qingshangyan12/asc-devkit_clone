@@ -29,7 +29,7 @@
 
 获取输入数据x、y的平方和（即x^2 + y^2）的平方根。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816363.png)
+![](../../../figures/formulaimage_0000002516816363.png)
 
 ## 函数原型
 

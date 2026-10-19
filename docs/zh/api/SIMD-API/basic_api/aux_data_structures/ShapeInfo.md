@@ -18,8 +18,8 @@ ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。
         __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[]);
         uint8_t shapeDim;
         uint8_t originalShapeDim;
-        uint32_t shape[K_MAX_DIM];
-        uint32_t originalShape[K_MAX_DIM];
+        uint32_t shape[K_MAX_SHAPE_DIM];
+        uint32_t originalShape[K_MAX_SHAPE_DIM];
         DataFormat dataFormat;
     };
     ```
@@ -27,7 +27,7 @@ ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。
 -   获取Shape中所有dim的累乘结果
 
     ```cpp
-    __aicore__ inline int GetShapeSize(const ShapeInfo& shapeInfo)
+    __aicore__ inline uint64_t GetShapeSize(const ShapeInfo& shapeInfo)
     ```
 
 ## 函数说明<a name="zh-cn_topic_0000001441184464_section622mcpsimp"></a>

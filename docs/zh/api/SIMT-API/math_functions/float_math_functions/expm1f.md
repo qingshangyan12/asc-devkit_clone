@@ -29,7 +29,7 @@
 
 指定输入x，获取e的x次方减1。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776378.png)
+![](../../../figures/formulaimage_0000002484776378.png)
 
 ## 函数原型
 

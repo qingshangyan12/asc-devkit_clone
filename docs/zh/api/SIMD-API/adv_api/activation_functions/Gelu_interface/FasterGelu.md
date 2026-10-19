@@ -33,9 +33,9 @@
 
 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGelu等版本。本接口FasterGelu是针对FastGelu的化简版本，公式化简可以大幅度提升计算性能。计算公式如下:
 
-![](../../../../figures/zh-cn_formulaimage_0000002353089833.png)
+![](../../../../figures/formulaimage_0000002353089833.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001697647873.png)，化简后可得![](../../../../figures/zh-cn_formulaimage_0000001649291696.png)
+![](../../../../figures/formulaimage_0000001697647873.png)，化简后可得![](../../../../figures/formulaimage_0000001649291696.png)
 
 ## 函数原型
 

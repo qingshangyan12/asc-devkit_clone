@@ -35,11 +35,11 @@ SoftmaxFlash增强版本，对应FlashAttention-2算法。将输入tensor\[m<sub
 
 -   update为false：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002023909837.png)
+    ![](../../../../figures/formulaimage_0000002023909837.png)
 
 -   update为true：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002023912661.png)
+    ![](../../../../figures/formulaimage_0000002023912661.png)
 
 当输入shape为ND格式时，内部的reduce过程按last轴进行；当输入shape为NZ格式时，内部的reduce过程按照last轴和first轴进行，reduce过程可以参考[SoftMax](SoftMax.md)中的图示说明。
 
