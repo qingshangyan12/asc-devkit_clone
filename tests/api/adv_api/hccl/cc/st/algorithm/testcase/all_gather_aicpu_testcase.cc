@@ -18,6 +18,7 @@
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
+#include "template_utils.h"
 
 using namespace mc2_ops_hccl;
 
@@ -126,6 +127,21 @@ TopoInfoWithNetLayerDetails MakeSequenceTopo(u32 level0Size = 4U, u32 level1Size
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeSingleLevelTwoLayerNetTopo(u32 rankSize = 16U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 1U;
+    topo.netLayerDetails.netLayerNum = 2U;
+    topo.netLayerDetails.netLayers = {0U, 1U};
+    topo.netLayerDetails.localNetInsSizeOfLayer = {2U, 1U};
+    topo.topoInstDetailsOfLayer.resize(2U);
+    topo.topoInstDetailsOfLayer[1].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSize};
+    return topo;
+}
+
 } // namespace
 
 class ST_ALL_GATHER_AICPU_TEST : public ::testing::Test {
@@ -149,6 +165,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_all_gather_algorithms)
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHRMultiLink"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSequenceMeshConcurNHR"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleMeshConcur"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRMultiJetty"), nullptr);
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "CcuSchedAllGatherParallelMeshNHRMultiLink"), nullptr);
@@ -295,6 +312,83 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_o
     param.DataDes.count = 300U * 1024U;
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_selects_sole_mesh_concur_for_large_data_on_two_layer_net)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSingleLevelTwoLayerNetTopo();
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    // 16 ranks, 96MiB + 4B per rank gives a total size greater than 1GiB.
+    param.DataDes.count = 24U * 1024U * 1024U + 1U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSoleMeshConcur");
+
+    param.DataDes.count = 1U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "InsAllGatherMesh1D");
+
+    topo = MakeSingleLevelTwoLayerNetTopo(2U);
+    param.DataDes.count = 1024U * 1024U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSoleMeshConcur");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aiv_selector_does_not_return_unregistered_algorithm)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam();
+    param.opExecuteConfig = OpExecuteConfig::AIV_ONLY;
+    param.engine = CommEngine::COMM_ENGINE_AIV;
+    std::string algName = "stale-alg-name";
+
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+    EXPECT_EQ(algName, "stale-alg-name");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sole_mesh_concur_executor_calculates_two_layer_resources)
+{
+    OpParam param = MakeAicpuParam();
+    ASSERT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllGatherSoleMeshConcur"), 0);
+
+    TopoInfoWithNetLayerDetails topo = MakeSingleLevelTwoLayerNetTopo(4U);
+    AlgHierarchyInfoForAllLevel hierarchy;
+    hierarchy.infos = {{{0U, 1U, 2U, 3U}}};
+    std::unique_ptr<InsCollAlgBase> executor =
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLGATHER, param.algName);
+    ASSERT_NE(executor, nullptr);
+
+    AlgResourceRequest request;
+    ASSERT_EQ(executor->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_SUCCESS);
+    ASSERT_EQ(request.channels.size(), 1U);
+    EXPECT_EQ(request.channels[0].size(), 6U);
+    EXPECT_EQ(request.slaveThreadNum, 5U);
+    EXPECT_EQ(request.notifyNumOnMainThread, 5U);
+    EXPECT_EQ(request.notifyNumPerThread, std::vector<u32>({1U, 1U, 1U, 1U, 1U}));
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sole_mesh_concur_bandwidth_split_prefers_alignment)
+{
+    ChannelInfo level0{};
+    level0.portGroupSize = 1U;
+    ChannelInfo level1{};
+    level1.portGroupSize = 3U;
+    const std::vector<ChannelInfo> channels = {level0, level1};
+
+    std::vector<u64> elemCount;
+    std::vector<u64> size;
+    std::vector<u64> offset;
+    ASSERT_EQ(
+        CalcDataSplitByBandwidthZAxisDetour(
+            1024U, sizeof(float), channels, elemCount, size, offset, MESH_CHANNELS_NUM, 1U, 4U),
+        HcclResult::HCCL_SUCCESS);
+    // Level0 weight is 3 and level1 weight is 3; both slices stay 4KiB aligned.
+    EXPECT_EQ(elemCount, std::vector<u64>({512U, 512U}));
+    EXPECT_EQ(size, std::vector<u64>({2048U, 2048U}));
+    EXPECT_EQ(offset, std::vector<u64>({0U, 2048U}));
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_calculates_two_level_resources)

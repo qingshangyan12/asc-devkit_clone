@@ -60,7 +60,6 @@ private:
     static bool isNew;
     u32 level0ChannelNumPerRank_{1};
     u32 level1ChannelNumPerRank_{0};
-    float level0DataRatio_{1.0f};
     std::vector<u64> elemCountOut_;
     std::vector<u64> sizeOut_;
     std::vector<u64> elemOffset_;

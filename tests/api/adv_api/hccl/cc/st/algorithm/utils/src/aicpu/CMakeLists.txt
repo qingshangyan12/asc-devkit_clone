@@ -168,6 +168,7 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_base.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_pcie_mix.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_one_level.cc
     topo_match_aicpu_stub.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_ubx_1d.cc
 

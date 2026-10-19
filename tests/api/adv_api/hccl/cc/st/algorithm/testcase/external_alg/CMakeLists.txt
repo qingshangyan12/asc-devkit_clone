@@ -152,6 +152,7 @@ set(EXT_ALG_FIXED_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_host.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_1d.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_one_level.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_multilevel.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_ubx.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_ubx_1d.cc

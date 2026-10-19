@@ -10,7 +10,9 @@
 #include "ins_v2_all_gather_sole_executor.h"
 #include "topo_match_1d.h"
 #include "ins_temp_all_gather_mesh_1D.h"
+#include "ins_temp_all_gather_mesh_1D_Z_axis_detour.h"
 #include "ins_temp_all_gather_nhr.h"
+#include "topo_match_one_level.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
@@ -218,6 +220,13 @@ REGISTER_EXEC_V2(
     InsTempAllGatherMesh1D);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleMeshConcur, InsV2AllGatherSoleExecutor, TopoMatchOneLevel,
+    InsTempAllGatherMesh1D1DZAxisDetour);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleMeshConcur, AlgEngine::AICPU, "sole[mesh.multi_channel]",
+    COND_NONE, FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,

@@ -24,6 +24,9 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     HCCL_INFO("[InsTempAllGatherMesh1D1DZAxisDetour][CalcRes] start");
+    CHK_PRT_RET(
+        topoInfo == nullptr, HCCL_ERROR("[InsTempAllGatherMesh1D1DZAxisDetour][CalcRes] topoInfo is nullptr"),
+        HcclResult::HCCL_E_PARA);
     std::vector<HcclChannelDesc> level0Channels;
     CHK_RET(CalcChannelRequestMesh1DLevel0(comm, param, topoInfo, subCommRanks_, level0Channels));
     std::vector<HcclChannelDesc> level1Channels;
@@ -32,17 +35,20 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::CalcRes(
     level1ChannelNumPerRank_ = level1Channels.empty() ? 0 : CalcChannelsPerRank(level1Channels);
     channelsPerRank_ = level0ChannelNumPerRank_ + level1ChannelNumPerRank_;
     std::vector<HcclChannelDesc> mergedChannels;
-    HCCL_INFO("level0Channels[%d]level1Channels[%d]\n", level0Channels.size(), level1Channels.size());
+    HCCL_INFO("level0Channels[%zu]level1Channels[%zu]\n", level0Channels.size(), level1Channels.size());
     mergedChannels.insert(mergedChannels.end(), level0Channels.begin(), level0Channels.end());
     mergedChannels.insert(mergedChannels.end(), level1Channels.begin(), level1Channels.end());
     resourceRequest.channels.push_back(mergedChannels);
-    HCCL_INFO("mergedChannels[%d]\n", mergedChannels.size());
+    HCCL_INFO("mergedChannels[%zu]\n", mergedChannels.size());
     channelsSize = mergedChannels.size();
 
     if (subCommRanks_.size() <= COMM_LEVEL0) {
         return HCCL_E_PARA;
     }
-    GetRes(resourceRequest);
+    CHK_PRT_RET(
+        channelsPerRank_ == 0,
+        HCCL_ERROR("[InsTempAllGatherMesh1D1DZAxisDetour][CalcRes] channelsPerRank_ is 0"), HcclResult::HCCL_E_INTERNAL);
+    CHK_RET(GetRes(resourceRequest));
     return HCCL_SUCCESS;
 }
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::GetRes(AlgResourceRequest& resourceRequest) const
@@ -69,11 +75,14 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::CalcDataSplitByPortGroup(
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset)
 {
     HCCL_INFO(
-        "[InsTempAllGatherMesh1D1DZAxisDetour][CalcDataSplitByPortGroup] Run Start[%u][%u][%f]\n",
-        level0ChannelNumPerRank_, level1ChannelNumPerRank_, level0DataRatio_);
-    return CalcDataSplitByPortGroupZAxisDetour(
+        "[InsTempAllGatherMesh1D1DZAxisDetour][CalcDataSplitByPortGroup] Run Start[%u][%u][%u]\n",
+        level0ChannelNumPerRank_, level1ChannelNumPerRank_, templateRankSize_);
+    // Thread resources use the maximum channel count; split data by this peer's actual channels.
+    const u32 level1ChannelNum
+        = channels.size() > level0ChannelNumPerRank_ ? static_cast<u32>(channels.size()) - level0ChannelNumPerRank_ : 0;
+    return CalcDataSplitByBandwidthZAxisDetour(
         totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset, level0ChannelNumPerRank_,
-        level1ChannelNumPerRank_, level0DataRatio_);
+        level1ChannelNum, templateRankSize_);
 }
 
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::SetchannelsPerRank(
@@ -81,15 +90,12 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::SetchannelsPerRank(
 {
     CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
     channelsPerRank_ = CalcChannelsPerRank(channels);
-    if (channelsPerRank_ > 1) {
-        level0ChannelNumPerRank_ = MESH_CHANNELS_NUM;
-        level1ChannelNumPerRank_ = channelsPerRank_ - level0ChannelNumPerRank_;
-        level0DataRatio_ = 0.5f;
-    }
+    level0ChannelNumPerRank_ = MESH_CHANNELS_NUM;
+    level1ChannelNumPerRank_ = channelsPerRank_ - level0ChannelNumPerRank_;
     HCCL_INFO(
         "[InsTempAllGatherMesh1D1DZAxisDetour][SetchannelsPerRank], channelsPerRank_[%u], "
-        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u], level0DataRatio_[%.2f]",
-        channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_, level0DataRatio_);
+        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u], templateRankSize_[%u]",
+        channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_, templateRankSize_);
     return HCCL_SUCCESS;
 }
 
