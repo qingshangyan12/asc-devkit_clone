@@ -67,7 +67,7 @@ operator>之类的比较接口一般与select接口配合使用，该样例仅�
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">compare</td></tr>
   </table>
 - 样例实现：  
-  - 调用Compares接口的GT（大于）模式比较src0_reg向量和标量0，输出至mask_reg：若src0_reg大于0，则mask_reg相应比特位写入1，否则写入0
+  - 调用operator>比较src0_reg向量和标量0，输出至mask_reg：若src0_reg大于0，则mask_reg相应比特位写入1，否则写入0
   - 调用Select接口，传入上一步比较结果mask_reg选择：若mask_reg比特位为1，则对应位置选择src0_reg的元素，否则选择src1_reg中的元素
   - float数据类型的mask_reg格式为每4bits保存一个mask，所以Compare从src0_reg、src1_reg依次读取数据，比较后依次写入至mask_reg的4 * N的bit位置；Select根据mask_reg的4 * N的bit决定从src0_reg还是src1_reg选择数据。
   - 调用实现：使用内核调用符<<<>>>调用核函数。
@@ -86,7 +86,7 @@ operator>之类的比较接口一般与select接口配合使用，该样例仅�
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510  -DCANN_ASC_USE_EXPERIMENTAL=ON..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
   ./demo
@@ -109,7 +109,7 @@ operator>之类的比较接口一般与select接口配合使用，该样例仅�
   | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
   | `CANN_ASC_USE_EXPERIMENTAL` | 实验性ASC接口开关，本样例必须设为 `ON`，默认值为 `OFF`。 |
-  | `SCENARIO_NUM` | 类型转换场景编号，必选，取值范围为1至2。 |
+  | `SCENARIO_NUM` | 比较场景编号，必选，取值范围为1至2。 |
 
 
 - 执行结果

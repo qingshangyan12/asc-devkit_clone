@@ -29,7 +29,7 @@
 
 指定输入x，对x的各元素，获取e的该元素次方。
 
-![](../../../../figures/zh-cn_formulaimage_0000002545900876.png)
+![](../../../../figures/formulaimage_0000002545900876.png)
 
 ## 函数原型
 

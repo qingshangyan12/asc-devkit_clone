@@ -36,7 +36,7 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyGmToUbufAlignV2(
     __ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
     const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
-    const uint8_t cacheMode = 0, const bool isPad = true)
+    const uint8_t cacheMode = 0, const bool isPad = true, const uint8_t sid = 1)
 {
     // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
@@ -56,19 +56,19 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     }
     if constexpr (sizeof(T) == B64_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
+            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCnt * 2,
             rigntPaddingCnt * 2, isPad, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            isPad, actSrcStride, actDstStride);
+            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCnt,
+            rigntPaddingCnt, isPad, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            isPad, actSrcStride, actDstStride);
+            (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, sid, blockCount, burstLength, leftPaddingCnt,
+            rigntPaddingCnt, isPad, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
+            (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, sid, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
             isPad, actSrcStride, actDstStride);
     }
 }
@@ -78,7 +78,7 @@ __aicore__ inline void CopyGmToUbufAlignV2(
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyUbufToGmAlignV2(
     __gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const int64_t srcStride,
-    const int64_t dstStride, const bool isDataCopyPad, const uint8_t cacheMode = 0)
+    const int64_t dstStride, const bool isDataCopyPad, const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
@@ -94,7 +94,7 @@ __aicore__ inline void CopyUbufToGmAlignV2(
     }
     uint64_t actDstStride = dstStride * unitOfBytes + burstLength; // GM   DataCopy:32Bytes, DataCopyPad:1Byte
     copy_ubuf_to_gm_align_v2(
-        (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, actDstStride, actSrcStride);
+        (__gm__ void*)dst, (__ubuf__ void*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
 }
 
 // only support CubeCore   PIPE_MTE2
@@ -104,7 +104,7 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyGmToCbufAlignV2(
     __cbuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
     const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 3)
 {
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
     uint32_t burstLength = blockLen * unitOfBytes;
@@ -125,19 +125,19 @@ __aicore__ inline void CopyGmToCbufAlignV2(
 
     if constexpr (sizeof(T) == B64_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
+            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCnt * 2,
             rigntPaddingCnt * 2, true, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            true, actSrcStride, actDstStride);
+            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCnt,
+            rigntPaddingCnt, true, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            true, actSrcStride, actDstStride);
+            (__cbuf__ uint16_t*)dst, (__gm__ uint16_t*)src, sid, blockCount, burstLength, leftPaddingCnt,
+            rigntPaddingCnt, true, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
+            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, sid, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
             true, actSrcStride, actDstStride);
     }
 }
@@ -207,7 +207,8 @@ __aicore__ inline void SmallC0Checker(bool enableSmallC0, uint16_t dValue)
 // SRC: GM
 template <typename T>
 __aicore__ inline void DataCopyGM2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -217,11 +218,11 @@ __aicore__ inline void DataCopyGM2UBImpl(
         if constexpr (SupportType<T, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
             CopyGmToUbufAlignV2(
                 (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, intriParams.blockCount, intriParams.blockLen, 0, 0,
-                intriParams.srcStride, intriParams.dstStride, false, cacheMode, true);
+                intriParams.srcStride, intriParams.dstStride, false, cacheMode, true, sid);
         } else {
             CopyGmToUbufAlignV2(
                 dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride,
-                intriParams.dstStride, false, cacheMode, true);
+                intriParams.dstStride, false, cacheMode, true, sid);
         }
     }
 }
@@ -229,14 +230,15 @@ __aicore__ inline void DataCopyGM2UBImpl(
 // Keep for compile
 template <>
 __aicore__ inline void DataCopyGM2UBImpl(
-    __ubuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams, const uint8_t cacheMode)
+    __ubuf__ void* dst, __gm__ void* src, const DataCopyParams& intriParams, const uint8_t cacheMode, const uint8_t sid)
 {
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopyGM2UBImpl not support type void*"); });
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 3)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -245,17 +247,17 @@ __aicore__ inline void DataCopyGM2L1Impl(
     if constexpr (SupportType<T, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         CopyGmToCbufAlignV2(
             (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, intriParams.blockCount, intriParams.blockLen, 0, 0,
-            intriParams.srcStride, intriParams.dstStride, false, cacheMode);
+            intriParams.srcStride, intriParams.dstStride, false, cacheMode, sid);
     } else {
         CopyGmToCbufAlignV2(
             dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride, intriParams.dstStride,
-            false, cacheMode);
+            false, cacheMode, sid);
     }
 }
 
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZImplBase(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0, const uint8_t sid = 4)
 {
     SmallC0Checker(enableSmallC0, intriParams.dValue);
 
@@ -282,24 +284,24 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(
     uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
     if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_cbuf_multi_nd2nz(
-            (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, 0, loop1SrcStride, cacheMode, intriParams.nValue,
+            (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, sid, loop1SrcStride, cacheMode, intriParams.nValue,
             intriParams.dValue, loop4SrcStride, enableSmallC0);
     }
     if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_cbuf_multi_nd2nz(
-            (__cbuf__ half*)dst, (__gm__ half*)src, 0, loop1SrcStride, cacheMode, intriParams.nValue,
+            (__cbuf__ half*)dst, (__gm__ half*)src, sid, loop1SrcStride, cacheMode, intriParams.nValue,
             intriParams.dValue, loop4SrcStride, enableSmallC0);
     }
     if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_cbuf_multi_nd2nz(
-            (__cbuf__ float*)dst, (__gm__ float*)src, 0, loop1SrcStride, cacheMode, intriParams.nValue,
+            (__cbuf__ float*)dst, (__gm__ float*)src, sid, loop1SrcStride, cacheMode, intriParams.nValue,
             intriParams.dValue, loop4SrcStride, enableSmallC0);
     }
 }
 
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0, const uint8_t sid = 4)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -308,15 +310,16 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
     if constexpr (SupportType<T, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         // data is transferred based on the b8 type, and parameters are set based on the b8 type.
         DataCopyGM2L1ND2NZImplBase<uint8_t, enableSmallC0>(
-            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, intriParams, cacheMode);
+            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, intriParams, cacheMode, sid);
     } else {
-        DataCopyGM2L1ND2NZImplBase<T, enableSmallC0>((__cbuf__ T*)dst, (__gm__ T*)src, intriParams, cacheMode);
+        DataCopyGM2L1ND2NZImplBase<T, enableSmallC0>((__cbuf__ T*)dst, (__gm__ T*)src, intriParams, cacheMode, sid);
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImplBase(
-    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0,
+    const uint8_t sid = 8)
 {
     SmallC0Checker(enableSmallC0, intriParams.dValue);
 
@@ -343,13 +346,14 @@ __aicore__ inline void DataCopyGM2L1DN2NZImplBase(
     uint64_t loop4SrcStride = intriParams.srcDnMatrixStride * sizeof(T);
 
     copy_gm_to_cbuf_multi_dn2nz(
-        (__cbuf__ T*)dst, (__gm__ T*)src, 0, loop1SrcStride, cacheMode, intriParams.nValue, intriParams.dValue,
+        (__cbuf__ T*)dst, (__gm__ T*)src, sid, loop1SrcStride, cacheMode, intriParams.nValue, intriParams.dValue,
         loop4SrcStride, enableSmallC0);
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImpl(
-    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0,
+    const uint8_t sid = 8)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -360,16 +364,17 @@ __aicore__ inline void DataCopyGM2L1DN2NZImpl(
             KERNEL_LOG(KERNEL_ERROR, "if src datatype is 4bit, the inner axis must be an even number.");
         });
         // data is transferred based on the b8 type, and parameters are set based on the b8 type
-        DataCopyGM2L1DN2NZImplBase((__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, intriParams, enableSmallC0, cacheMode);
+        DataCopyGM2L1DN2NZImplBase(
+            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, intriParams, enableSmallC0, cacheMode, sid);
     } else {
-        DataCopyGM2L1DN2NZImplBase((__cbuf__ T*)dst, (__gm__ T*)src, intriParams, enableSmallC0, cacheMode);
+        DataCopyGM2L1DN2NZImplBase((__cbuf__ T*)dst, (__gm__ T*)src, intriParams, enableSmallC0, cacheMode, sid);
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2UBSingleImpl(
     __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const int copyTime, const int computeNum,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     const uint16_t& nValue = intriParams.nValue;
     const uint16_t& dValue = intriParams.dValue;
@@ -390,20 +395,20 @@ __aicore__ inline void DataCopyGM2UBSingleImpl(
     for (int repeatTime = 0; repeatTime < repeatCount; ++repeatTime) {
         DataCopyPadGm2UBImpl(
             (__ubuf__ T*)(dst + dstCopyStartOffset + repeatTime * maxC0Count),
-            (__gm__ T*)(src + srcCopyStartOffset + repeatTime * maxdValue), copyParams, padParams, cacheMode);
+            (__gm__ T*)(src + srcCopyStartOffset + repeatTime * maxdValue), copyParams, padParams, cacheMode, sid);
     }
     copyParams.blockCount = repeatTail;
     if (repeatTail != 0) {
         int dstOffset = (dstCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * c0Count);
         int srcOffset = (srcCopyStartOffset + repeatCount * MAX_REPEAT_TIMES * dValue);
         DataCopyPadGm2UBImpl(
-            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams, cacheMode);
+            (__ubuf__ T*)(dst + dstOffset), (__gm__ T*)(src + srcOffset), copyParams, padParams, cacheMode, sid);
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2UBND2NZImpl(
-    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -419,7 +424,7 @@ __aicore__ inline void DataCopyGM2UBND2NZImpl(
         for (int copyTime = 0; copyTime < copyNum; ++copyTime) {
             int computeCount = (dValue >= (copyTime + 1) * c0Count) ? c0Count : (dValue % c0Count);
             DataCopyGM2UBSingleImpl(
-                dst + dstNzMatrixStride, src + srcNdMatrixStride, intriParams, copyTime, computeCount, cacheMode);
+                dst + dstNzMatrixStride, src + srcNdMatrixStride, intriParams, copyTime, computeCount, cacheMode, sid);
         }
     }
 }
@@ -510,7 +515,8 @@ __aicore__ inline void ResetOutLoopModeParaImpl(void)
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -518,7 +524,7 @@ __aicore__ inline void DataCopyUB2GMImpl(
     }
     CopyUbufToGmAlignV2(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, false,
-        cacheMode);
+        cacheMode, sid);
 }
 
 template <typename T>
@@ -539,7 +545,7 @@ __aicore__ inline __in_pipe__(MTE3)
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
     __gm__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, uint16_t srcNStride, uint16_t dstDStride,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     const uint16_t highBlock = MAX_REPEAT_TIMES;
     const uint16_t highBlocks = high / highBlock;
@@ -556,7 +562,8 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
                 srcAddr + i * srcNStride * BLOCK_CUBE + j * highBlock * BLOCK_CUBE,
                 DataCopyExtParams{
                     highBlock, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
-                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0},
+                sid);
         }
         if (highTail) {
             DataCopyPadUB2GMImpl(
@@ -564,14 +571,16 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImplBase(
                 srcAddr + i * srcNStride * BLOCK_CUBE + highBlocks * highBlock * BLOCK_CUBE,
                 DataCopyExtParams{
                     highTail, static_cast<uint32_t>(leftLen * sizeof(T)), srcLeftLen,
-                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0});
+                    static_cast<uint32_t>((dstDStride - leftLen) * sizeof(T)), 0},
+                sid);
         }
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyUB2GMNZ2NDImpl(
-    __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams, const uint8_t cacheMode = 0)
+    __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     const uint16_t ndNum = intriParams.ndNum;
     const uint16_t nValue = intriParams.nValue;
@@ -584,7 +593,7 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(
     for (int i = 0; i < ndNum; ++i) {
         DataCopyUB2GMNZ2NDImplBase(
             dst + i * dstNdMatrixStride, src + i * srcNdMatrixStride * BLOCK_CUBE * BLOCK_CUBE, nValue, dValue,
-            srcNStride, dstDStride, cacheMode);
+            srcNStride, dstDStride, cacheMode, sid);
     }
 }
 
@@ -893,22 +902,24 @@ __aicore__ inline void CopyImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t
 
 template <typename T>
 __aicore__ inline void DataCopySliceGm2UBImpl(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     DataCopyPadExtParams<T> padParams{false, 0, 0, 0};
     // DataCopyParams: unit of 32Bytes(DataCopy) / Bytes(DataCopyPad)
     uint16_t burstLen = intriParams.blockLen * ONE_BLK_SIZE;
     DataCopyExtParams extParams{intriParams.blockCount, burstLen, intriParams.srcStride, intriParams.dstStride, 0};
-    DataCopyPadGm2UBImpl(dst, src, extParams, padParams, cacheMode);
+    DataCopyPadGm2UBImpl(dst, src, extParams, padParams, cacheMode, sid);
 }
 
 template <typename T>
 __aicore__ inline void DataCopySliceUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     uint32_t burstLen = intriParams.blockLen * ONE_BLK_SIZE;
     DataCopyExtParams extParams{intriParams.blockCount, burstLen, intriParams.srcStride, intriParams.dstStride, 0};
-    DataCopyPadUB2GMImpl(dst, src, extParams, cacheMode);
+    DataCopyPadUB2GMImpl(dst, src, extParams, cacheMode, sid);
 }
 
 /* **************************************************************************************************
@@ -935,7 +946,7 @@ __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams&
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     if (padParams.isPad == true) {
         set_pad_val_outtoub(padParams.paddingValue);
@@ -951,13 +962,13 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
     }
     CopyGmToUbufAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-        intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad); // padding is 0
+        intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad, sid); // padding is 0
 }
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 1)
 {
     if (padParams.isPad == true) {
         set_pad_val_outtoub(GetScalarBitcodeValue(padParams.paddingValue));
@@ -975,13 +986,13 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
     CheckSrcGmDataCopyExtParamsRange(intriParams);
     CopyGmToUbufAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-        intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad);
+        intriParams.srcStride, intriParams.dstStride, true, cacheMode, padParams.isPad, sid);
 }
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2L1Impl(
     __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 3)
 {
     if (padParams.isPad == true) {
         set_pad_val_outtol1(padParams.paddingValue);
@@ -997,13 +1008,13 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
     }
     CopyGmToCbufAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-        intriParams.srcStride, intriParams.dstStride, true, cacheMode);
+        intriParams.srcStride, intriParams.dstStride, true, cacheMode, sid);
 }
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2L1Impl(
     __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 3)
 {
     if (padParams.isPad == true) {
         set_pad_val_outtol1(GetScalarBitcodeValue((T)padParams.paddingValue));
@@ -1021,13 +1032,14 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
     CheckSrcGmDataCopyExtParamsRange(intriParams);
     CopyGmToCbufAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
-        intriParams.srcStride, intriParams.dstStride, true, cacheMode);
+        intriParams.srcStride, intriParams.dstStride, true, cacheMode, sid);
 }
 
 // UB -> GM   DataCopyPad with DataCopyParams
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0)
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -1035,13 +1047,14 @@ __aicore__ inline void DataCopyPadUB2GMImpl(
     }
     CopyUbufToGmAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true,
-        cacheMode);
+        cacheMode, sid);
 }
 
 // UB -> GM   DataCopyPad with DataCopyExtParams
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadUB2GMImpl(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& intriParams, const uint8_t cacheMode = 0)
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& intriParams, const uint8_t cacheMode = 0,
+    const uint8_t sid = 1)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -1061,7 +1074,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(
     });
     CopyUbufToGmAlignV2<T, mode>(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, true,
-        cacheMode);
+        cacheMode, sid);
 }
 
 template <typename T>
@@ -1216,7 +1229,7 @@ __aicore__ inline void DataCopyWithNDDMAB64Impl(
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAImpl(
     __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue,
-    const uint8_t cacheMode = 0)
+    const uint8_t cacheMode = 0, const uint8_t sid = 7)
 {
     static_assert(dim <= 5, "nddma only support dim <= 5");
     static_assert(
@@ -1226,13 +1239,12 @@ __aicore__ inline void DataCopyWithNDDMAImpl(
         config.loopRpSize <= 0xff || config.loopRpSize == NdDmaConfig::unsetPad,
         "loopRpSize in config must be either <= 255 or unset");
     if constexpr (sizeof(T) == 8) {
-        DataCopyWithNDDMAB64Impl<T, dim, config>(dst, src, params, constValue, cacheMode);
+        DataCopyWithNDDMAB64Impl<T, dim, config>(dst, src, params, constValue, cacheMode, sid);
         return;
     }
     if constexpr (g_gm_overflow_check) {
         AscendCUtils::CheckGmMemOverflowNddma(src, params);
     }
-    constexpr uint8_t sid{0};
     constexpr uint8_t dim0Idx{0}, dim1Idx{1}, dim2Idx{2}, dim3Idx{3}, dim4Idx{4};
     uint32_t loop0Size{params.loopSize[dim0Idx]}, loop1Size{1}, loop2Size{1}, loop3Size{1}, loop4Size{1};
     uint64_t padCount{0};
@@ -1288,7 +1300,8 @@ __aicore__ inline void DataCopyWithNDDMAImpl(
 
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAB64Impl(
-    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue, const uint8_t cacheMode)
+    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue, const uint8_t cacheMode,
+    const uint8_t sid = 7)
 {
     static_assert(!config.isNearestValueMode, "nddma b64 only supports constant value mode");
     ASCENDC_ASSERT((constValue == 0), { KERNEL_LOG(KERNEL_ERROR, "nddma b64 only support const pad value 0"); });
@@ -1296,20 +1309,20 @@ __aicore__ inline void DataCopyWithNDDMAB64Impl(
         auto newParams = BuildLoopInfoByFuseAxis<dim, dim + 1, true>(params);
         DataCopyWithNDDMAImpl<uint32_t, dim + 1, config>(
             reinterpret_cast<__ubuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), newParams, 0u,
-            cacheMode);
+            cacheMode, sid);
     } else if constexpr (config.loopLpSize == 0 && config.loopRpSize == 0 && !config.ascOptimize) {
         if (params.loopSize[dim - 1] == 1) {
             auto newParams = BuildLoopInfoByFuseAxis<dim, dim, false>(params);
             DataCopyWithNDDMAImpl<uint32_t, dim, config>(
                 reinterpret_cast<__ubuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), newParams, 0u,
-                cacheMode);
+                cacheMode, sid);
         } else {
             auto newParams = BuildLoopInfoForTwiceB32(params);
             // Do NDDMA B32 twice, one for odd index, one for even index. ND DMA Instr allows ub addr byte align.
             for (uint32_t i = 0; i < 2; i++) {
                 DataCopyWithNDDMAImpl<uint32_t, dim, config>(
                     reinterpret_cast<__ubuf__ uint32_t*>(dst) + i, reinterpret_cast<__gm__ uint32_t*>(src) + i,
-                    newParams, 0u, cacheMode);
+                    newParams, 0u, cacheMode, sid);
             }
         }
     } else {
@@ -1318,7 +1331,7 @@ __aicore__ inline void DataCopyWithNDDMAB64Impl(
         for (uint32_t i = 0; i < 2; i++) {
             DataCopyWithNDDMAImpl<uint32_t, dim, config>(
                 reinterpret_cast<__ubuf__ uint32_t*>(dst) + i, reinterpret_cast<__gm__ uint32_t*>(src) + i, newParams,
-                0u, cacheMode);
+                0u, cacheMode, sid);
         }
     }
 }

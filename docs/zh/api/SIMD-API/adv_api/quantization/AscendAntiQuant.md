@@ -52,7 +52,7 @@
 
 -   PER\_TOKEN场景（按token量化）
 
-    ![](../../../figures/zh-cn_formulaimage_0000002069677288.png)
+    ![](../../../figures/formulaimage_0000002069677288.png)
 
 -   PER\_GROUP场景（按组量化）
 
@@ -89,11 +89,11 @@
 
         -   k为m方向，即公式中i轴为group的计算方向：（kDim=0同时isTranspose=False）或者（kDim=1同时isTranspose= True）
 
-            ![](../../../figures/zh-cn_formulaimage_0000002106594713.png)
+            ![](../../../figures/formulaimage_0000002106594713.png)
 
         -   k为n方向，即公式中j轴为group的计算方向：（kDim=0同时isTranspose=True）或者（kDim=1同时isTranspose =False）
 
-            ![](../../../figures/zh-cn_formulaimage_0000002106474749.png)
+            ![](../../../figures/formulaimage_0000002106474749.png)
 
 ## 实现原理
 

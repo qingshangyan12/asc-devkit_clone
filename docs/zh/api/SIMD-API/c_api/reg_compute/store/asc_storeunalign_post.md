@@ -42,7 +42,7 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ <dtype>* dst,
-                                                  vector_store_unalign unalign_reg,
+                                                  vector_store_unalign src,
                                                   int32_t offset)
 ```
 
@@ -54,7 +54,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ <dtype>* dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
-                                                  vector_store_unalign unalign_reg,
+                                                  vector_store_unalign src,
                                                   int32_t offset)
 ```
 
@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ <dtype>* dst,
-                                                  vector_store_unalign unalign_reg,
+                                                  vector_store_unalign src,
                                                   addr_reg offset)
 ```
 
@@ -75,7 +75,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ <dtype>* dst,
 
 ```c
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
-                                                  vector_store_unalign unalign_reg,
+                                                  vector_store_unalign src,
                                                   addr_reg offset)
 ```
 
@@ -88,7 +88,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的基地址，类型为`__ubuf__ <dtype>*`。地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。 |
-| unalign_reg | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序主搬出接口使用同一个寄存器。 |
+| src | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序主搬出接口使用同一个寄存器。 |
 | offset | 输入 | 目的操作数结束地址的偏移，类型为`int32_t`，单位为元素。 |
 
 ### 地址寄存器偏移搬出模式
@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的基地址，类型为`__ubuf__ <dtype>*`。地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。 |
-| unalign_reg | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序主搬出接口使用同一个寄存器。 |
+| src | 输入 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。须与前序主搬出接口使用同一个寄存器。 |
 | offset | 输入 | 目的操作数结束地址的偏移，类型为`addr_reg`。须与前序主搬出接口使用同一个寄存器。 |
 
 非对齐寄存器和地址寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
@@ -119,12 +119,12 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 
 ### 立即数偏移搬出模式
 
-- 与[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**配套使用，需要复用同一个`unalign_reg`。
+- 与[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**配套使用，需要复用同一个`src`。
 - 需要保证目的地址加上偏移后的地址，等于[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**搬运的结束地址，否则无法正确收尾。
 
 ### 地址寄存器偏移搬出模式
 
-- 与[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**地址寄存器偏移搬出模式**配套使用，需要复用同一个非对齐寄存器`unalign_reg`及地址寄存器。
+- 与[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**地址寄存器偏移搬出模式**配套使用，需要复用同一个非对齐寄存器`src`及地址寄存器。
 
 ## 调用示例
 
@@ -152,11 +152,11 @@ constexpr uint32_t OUTPUT_BYTES = START_OFFSET + ELEMENT_COUNT;
 
 __simd_vf__ inline void storeunalign_post_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_uint8_t src;
-    vector_store_unalign unalign_reg;
-    asc_loadalign(src, input);
-    asc_storeunalign(output + START_OFFSET, unalign_reg, src, ELEMENT_COUNT);
-    asc_storeunalign_post(output + START_OFFSET, unalign_reg, ELEMENT_COUNT);
+    vector_uint8_t data;
+    vector_store_unalign src;
+    asc_loadalign(data, input);
+    asc_storeunalign(output + START_OFFSET, src, data, ELEMENT_COUNT);
+    asc_storeunalign_post(output + START_OFFSET, src, ELEMENT_COUNT);
 }
 
 __global__ __vector__ void storeunalign_post_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)

@@ -22,8 +22,8 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_CHECK_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_CHECK_H
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #include "kernel_check.h"
 #include "kernel_npu_debug.h"
 #include "kernel_log.h"

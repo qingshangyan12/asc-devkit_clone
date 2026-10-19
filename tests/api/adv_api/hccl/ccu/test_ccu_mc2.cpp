@@ -49,7 +49,9 @@ extern bool g_stubHcommIsSupportCcuV2;
 
 // 夹具：本目标不编 executor 文件（-DAICPU_COMPILE 裁掉产品 CCU sidecar 注册行），
 // 按产品现场同款注册供 EXTERNAL 用例使用。
-// (AR, sole[mesh]) 键三候选：两个白名单真名 + 一个白名单外假名（验证过滤 wiring）。
+// (AR, sole[mesh]) 键两条 CCU 候选；闸门 B 全量校验用例
+// （GateBRejectsDriftedExternalCandidate）以按名桩把其中一条打成双名单不过，
+// 验证"任一候选未过即整体拒绝"（D8）。
 namespace mc2_ops_hccl {
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
@@ -59,12 +61,11 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
-REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, UtDriftProbeCcuFake, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 } // namespace mc2_ops_hccl
 
 // hccl_mc2.cc 的 CheckCcuAlgorithmsRegistered（非 static 自由函数，须在全局作用域声明）
 bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
+HcclResult CheckMc2CcDeviceType(const char* apiName);
 
 namespace {
 
@@ -861,19 +862,6 @@ TEST_F(CcuMc2TestSuite, GateBRejectsDriftedExternalCandidate)
 
     // 桩清除后全部候选过双名单 → 放行（证明前一次拒绝源于坏候选而非全局开关）
     EXPECT_TRUE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
-}
-
-// 白名单过滤 wiring：(AR, sole[mesh]) 键注册了两个白名单真名 + 一个白名单外假名，
-// 候选表须含真名、不含假名
-TEST_F(CcuMc2TestSuite, ExtAlgWhitelistFiltersCandidates)
-{
-    const auto& cands = GetExternalCandidates(HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]");
-    ASSERT_EQ(cands.size(), 2U);
-    EXPECT_STREQ(cands[0].registeredName.c_str(), "CcuSchedAllGatherSoleMesh");
-    EXPECT_STREQ(cands[1].registeredName.c_str(), "CcuSchedAllReduceSoleMesh");
-    for (const auto& cand : cands) {
-        EXPECT_STRNE(cand.registeredName.c_str(), "UtDriftProbeCcuFake");
-    }
 }
 
 // EXTERNAL 资源失败回退（与裸名同路）：定名成功 → 资源失败（按名桩限定）→
@@ -1766,6 +1754,15 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_PropagatesOpResCtxCopyFailure)
     EXPECT_EQ(ccResCtx, nullptr);
     EXPECT_EQ(ccResCtxSize, 0U);
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckMc2CcDeviceType_Supports950And960)
+{
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_950;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
+
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_960;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_NullContext)

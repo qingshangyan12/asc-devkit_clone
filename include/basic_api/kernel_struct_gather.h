@@ -79,6 +79,46 @@ struct GatherMaskParams {
     uint16_t src0RepeatStride = DEFAULT_REPEAT_STRIDE;
     uint8_t src1RepeatStride = DEFAULT_REPEAT_STRIDE;
 };
+
+enum class GatherPaddingMode : uint8_t { FIRST_ELEM_EVERY_BRUST = 0, CONSTANT_PADDING_MODE = 1, INVALID = 2 };
+
+template <typename T>
+struct GatherPadParams {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+    using TYPE = typename GetPadValueType<T>::Type;
+    __aicore__ GatherPadParams() : padSel(GatherPaddingMode::FIRST_ELEM_EVERY_BRUST), paddingValue(0) {}
+
+    __aicore__ GatherPadParams(const GatherPaddingMode padSelect, const T padValue)
+        : padSel(padSelect), paddingValue(*(reinterpret_cast<const TYPE*>(&padValue)))
+    {}
+
+    GatherPaddingMode padSel;
+    TYPE paddingValue;
+#endif
+};
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+struct GatherParams {
+    __aicore__ GatherParams() {}
+
+    __aicore__ GatherParams(const uint16_t offsetCount, const uint32_t len, const uint32_t stride)
+        : offsetNum(offsetCount), burstLen(len), dstStride(stride) {};
+
+    uint16_t offsetNum = DEFAULT_DATA_COPY_NBURST;
+    uint32_t burstLen = 0;
+    uint32_t dstStride = DEFAULT_DATA_COPY_STRIDE;
+};
+
+struct ScatterParams {
+    __aicore__ ScatterParams() {};
+
+    __aicore__ ScatterParams(const uint16_t offsetCount, const uint32_t len, const uint32_t stride)
+        : offsetNum(offsetCount), burstLen(len), srcStride(stride) {};
+    uint16_t offsetNum = DEFAULT_DATA_COPY_NBURST;
+    uint32_t burstLen = 0;
+    uint32_t srcStride = DEFAULT_DATA_COPY_STRIDE;
+};
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_GATHER_H
 

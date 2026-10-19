@@ -216,9 +216,9 @@ struct DataCopyPadParams {
 struct DataCopyExtParams {
     __aicore__ DataCopyExtParams(){}
 
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     __aicore__ __callee__ DataCopyExtParams(
         const uint16_t count, const uint32_t len, const int64_t srcStrideIn, const int64_t dstStrideIn,
         const uint32_t rsvIn)
@@ -232,9 +232,9 @@ struct DataCopyExtParams {
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
 #else
@@ -249,9 +249,9 @@ struct DataCopyExtParams {
 
 template <typename T>
 struct DataCopyPadExtParams {
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     using TYPE = typename GetPadValueType<T>::Type;
     __aicore__ DataCopyPadExtParams()
     {
@@ -290,9 +290,9 @@ struct DataCopyPadExtParams {
 struct Nd2NzParams {
     __aicore__ Nd2NzParams(){}
 
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     __aicore__ Nd2NzParams(
         const uint16_t ndNumIn, const uint16_t nValueIn, const uint32_t dValueIn, const uint64_t srcNdMatrixStrideIn,
         const uint64_t srcDValueIn, const uint16_t dstNzC0StrideIn, const uint16_t dstNzNStrideIn,
@@ -518,6 +518,34 @@ struct CopyRepeatParams {
     uint16_t srcStride = DEFAULT_DATA_COPY_STRIDE;
     uint16_t dstRepeatSize = DEFAULT_REPEAT_STRIDE;
     uint16_t srcRepeatSize = DEFAULT_REPEAT_STRIDE;
+};
+
+enum class WritePacketSize : uint8_t { NORMAL, SIZE_4K_BYTES };
+
+enum class RemoteBufferPage : uint8_t {
+    SIZE_16K_BYTES,
+    SIZE_32K_BYTES,
+    SIZE_64K_BYTES,
+    SIZE_128K_BYTES,
+    SIZE_256K_BYTES,
+    SIZE_512K_BYTES,
+    SIZE_1024K_BYTES,
+    SIZE_2048K_BYTES
+};
+
+struct RemoteDataCopyParams {
+    __aicore__ RemoteDataCopyParams() {}
+
+    __aicore__ RemoteDataCopyParams(
+        const bool enableRemoteSyncWrite, const WritePacketSize writePacketSize, const RemoteBufferPage bufferPage,
+        const bool retry)
+        : enableRSW(enableRemoteSyncWrite), writeSize(writePacketSize), remoteBufferPage(bufferPage), enableRetry(retry)
+    {}
+
+    bool enableRSW = false;
+    WritePacketSize writeSize = WritePacketSize::NORMAL;
+    RemoteBufferPage remoteBufferPage = RemoteBufferPage::SIZE_16K_BYTES;
+    bool enableRetry = false;
 };
 
 } // namespace AscendC

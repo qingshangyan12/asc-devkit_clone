@@ -27,9 +27,9 @@
 
 将srcTensor中大于scalar的数替换为scalar，小于等于scalar的数保持不变，作为dstTensor输出。
 
-![](../../../../figures/zh-cn_formulaimage_0000002195200232.png)
+![](../../../../figures/formulaimage_0000002195200232.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002218338769.png)
+![](../../../../figures/formulaimage_0000002218338769.png)
 
 ## 函数原型
 

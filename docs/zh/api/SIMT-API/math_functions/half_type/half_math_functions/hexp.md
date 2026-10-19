@@ -29,7 +29,7 @@
 
 指定输入x，获取e的x次方。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533292167.png)
+![](../../../../figures/formulaimage_0000002533292167.png)
 
 ## 函数原型
 

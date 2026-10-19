@@ -29,7 +29,7 @@
 
 获取以e为底，输入数据的对数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533360281.png)
+![](../../../../figures/formulaimage_0000002533360281.png)
 
 ## 函数原型
 

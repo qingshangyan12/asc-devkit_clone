@@ -36,7 +36,7 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false)
+__aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false, const bool enableL1BankConflictOptimise = false)
 ```
 
 ## 参数说明
@@ -59,6 +59,7 @@ __aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = fals
 | enableL1CacheUB | 输入 | 用于设置参数enableL1CacheUB 。<br><br>是否开启L1 Buffer缓存UB计算块。建议在MTE3和MTE2流水串行较多的场景使用。参数取值如下：<br>true：开启L1 Buffer缓存UB计算块。<br>false：不开启L1 Buffer缓存UB计算块。<br><br>若要开启L1 Buffer缓存UB计算块，必须在Tiling实现中调用[SetMatmulConfigParams](../Matmul_Tiling/SetMatmulConfigParams.md)接口将参数enableL1CacheUBIn设置为true。<!-- npu="950" id25 --><br><br>包括MxMatmul场景，Ascend 950PR&950DT系列产品不支持该参数。<!-- end id25 --><!-- npu="A3" id26 --><br><br>Atlas A3系列产品不支持该参数。<!-- end id26 --><!-- npu="910b" id27 --><br><br>Atlas A2系列产品不支持该参数。<!-- end id27 --><!-- npu="310p" id28 --><br><br>Atlas推理系列产品AI Core支持该参数。<!-- end id28 --><!-- npu="310b" id29 --><br><br>Atlas 200I/500 A2推理产品不支持该参数。<!-- end id29 --><!-- npu="x90" id4 --><br><br>Kirin X90处理器系列产品不支持此参数。<!-- end id4 --> |
 | enableMixDualMaster | 输入 | 用于设置参数enableMixDualMaster。<br><br>是否开启MixDualMaster（双主模式）。区别于MIX模式（包含矩阵计算和矢量计算）通过消息机制驱动AIC运行，双主模式为AIC和AIV独立运行代码，不依赖消息驱动，用于提升性能。该参数默认值为false，仅能在以下场景设置为true：<br>核函数（Kernel）的类型为MIX，同时AIC核数 : AIV核数为1:1。<br>核函数（Kernel）的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时开启[IBSHARE](Matmul_usage.md#table1188045714378)参数。<br><br>注意，开启MixDualMaster场景，需要满足：<br>同一算子中所有Matmul对象的该参数取值必须保持一致。<br>A/B/Bias矩阵只支持从GM搬入。<br>获取矩阵计算结果只支持调用[IterateAll](IterateAll.md)接口输出到GlobalTensor或者LocalTensor，即计算结果放置于Global Memory或者Local Memory的地址，不能调用[GetTensorC](GetTensorC.md)等接口获取结果。<!-- npu="950" id30 --><br><br>除MxMatmul场景外，Ascend 950PR&950DT系列产品支持该参数。<!-- end id30 --><!-- npu="A3" id31 --><br><br>Atlas A3系列产品支持该参数。<!-- end id31 --><!-- npu="910b" id32 --><br><br>Atlas A2系列产品支持该参数。<!-- end id32 --><!-- npu="310p" id33 --><br><br>Atlas推理系列产品AI Core不支持该参数。<!-- end id33 --><!-- npu="310b" id34 --><br><br>Atlas 200I/500 A2推理产品不支持该参数。<!-- end id34 --><!-- npu="x90" id5 --><br><br>Kirin X90处理器系列产品不支持此参数。<!-- end id5 --> |
 | enableKdimReorderLoad | 输入 | 用于设置参数enableKdimReorderLoad。<br><br>是否开启K轴错峰加载数据。基于相同Tiling参数，执行Matmul计算时，如果多核的左矩阵或者右矩阵相同，且存储于Global Memory，多个核一般会同时访问相同地址以加载矩阵数据，引发同地址访问冲突，影响性能。开启K轴错峰加载数据后，多核执行Matmul时，将尽量在相同时间访问矩阵的不同Global Memory地址，减少地址访问冲突概率，提升性能。该参数功能只支持MDL模板，建议K轴较大且左矩阵和右矩阵均非全载场景开启该功能。参数取值如下。<br>false：默认值，关闭K轴错峰加载数据的功能。<br>true：开启K轴错峰加载数据的功能。<!-- npu="950" id35 --><br><br>除MxMatmul场景外，Ascend 950PR&950DT系列产品支持该参数。<!-- end id35 --><!-- npu="A3" id36 --><br><br>Atlas A3系列产品支持该参数。<!-- end id36 --><!-- npu="910b" id37 --><br><br>Atlas A2系列产品支持该参数。<!-- end id37 --><!-- npu="310p" id38 --><br><br>Atlas推理系列产品AI Core不支持该参数。<!-- end id38 --><!-- npu="310b" id39 --><br><br>Atlas 200I/500 A2推理产品不支持该参数。<!-- end id39 --><!-- npu="x90" id6 --><br><br>Kirin X90处理器系列产品支持此参数。<!-- end id6 --> |
+| enableL1BankConflictOptimise | 输入 | 用于设置MatmulConfig中的同名参数，是否开启L1 Bank冲突优化，默认false。启用条件与产品支持范围参见[MatmulConfig参数说明](MatmulConfig.md#p84588523128)。 |
 
 ## 返回值说明
 
@@ -86,7 +87,8 @@ constexpr MatmulConfig MM_CFG = GetMDLConfig(
     /* enableUBReuse        */ true,
     /* enableL1CacheUB      */ false,
     /* enableMixDualMaster  */ false,
-    /* enableKdimReorderLoad*/ false);
+    /* enableKdimReorderLoad*/ false,
+    /* enableL1BankConflictOptimise */ false);
 // 常规Matmul计算，最后输出使用自定义MDL模板的计算结果
 AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> mm;
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);

@@ -29,7 +29,7 @@
 
 获取输入数据x的n阶第二类贝塞尔函数yn的值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816391.png)
+![](../../../figures/formulaimage_0000002516816391.png)
 
 ## 函数原型
 

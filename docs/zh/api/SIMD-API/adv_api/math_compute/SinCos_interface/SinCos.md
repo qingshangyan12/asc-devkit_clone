@@ -27,9 +27,9 @@
 
 按元素进行正弦计算和余弦计算，分别获得正弦和余弦的结果。
 
-![](../../../../figures/zh-cn_formulaimage_0000002386793361.png)
+![](../../../../figures/formulaimage_0000002386793361.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002352873228.png)
+![](../../../../figures/formulaimage_0000002352873228.png)
 
 ## 函数原型
 

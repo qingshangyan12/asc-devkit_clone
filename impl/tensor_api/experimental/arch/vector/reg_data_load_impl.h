@@ -9,6 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/vector/reg_data_load_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_data_load.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_IMPL_H
 #endif
@@ -114,7 +116,7 @@ struct load_from_ptr_impl<load_sideband_mode::deintlv> {
 template <load_sideband_mode sideband_mode, typename DataType, typename Pointer>
 __simd_callee__ inline decltype(auto) load_from_ptr(Pointer src)
 {
-    return load_from_ptr_impl<sideband_mode>::template run<DataType>(src);
+    return load_from_ptr_impl<sideband_mode>::template run<get_reg_data_type<DataType>>(src);
 }
 
 template <broadcast_mode brc_mode>
@@ -163,9 +165,9 @@ struct load_broadcast_from_ptr_impl<broadcast_mode::elem2datablock> {
 };
 
 template <broadcast_mode brc_mode, typename DataType, typename Pointer>
-__simd_callee__ inline reg_tensor<DataType> load_broadcast_from_ptr(Pointer src)
+__simd_callee__ inline reg_tensor<get_reg_data_type<DataType>> load_broadcast_from_ptr(Pointer src)
 {
-    return load_broadcast_from_ptr_impl<brc_mode>::template run<DataType>(src);
+    return load_broadcast_from_ptr_impl<brc_mode>::template run<get_reg_data_type<DataType>>(src);
 }
 
 } // namespace detail

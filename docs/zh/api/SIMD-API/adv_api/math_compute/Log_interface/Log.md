@@ -33,17 +33,17 @@
 
 按元素以e、2、10为底做对数运算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002182888036.png)
+![](../../../../figures/formulaimage_0000002182888036.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188813710.png)
+![](../../../../figures/formulaimage_0000002188813710.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002218328397.png)
+![](../../../../figures/formulaimage_0000002218328397.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188654338.png)
+![](../../../../figures/formulaimage_0000002188654338.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002182888172.png)
+![](../../../../figures/formulaimage_0000002182888172.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188814822.png)
+![](../../../../figures/formulaimage_0000002188814822.png)
 
 ## 函数原型
 

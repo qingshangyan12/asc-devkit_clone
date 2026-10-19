@@ -29,7 +29,7 @@
 
 获取输入数据x的平方根的倒数。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776402.png)
+![](../../../figures/formulaimage_0000002484776402.png)
 
 ## 函数原型
 

@@ -84,15 +84,26 @@ CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
 // 0 字节计算 goSize，GroupCopy 内部 CCU_IF 块均不触发），kernel 无需该参数。
 void LoadNhr1DArgs(
     KfcAllGatherNhr1DContext& ctx, ccu::Variable input, ccu::Variable output, ccu::Variable token,
-    ccu::Variable die0Size, ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3)
+    ccu::Variable die0Size, ccu::Variable die1Size, ccu::Variable outputSliceStride, ccu::Variable goSize0,
+    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, uint32_t axisId)
 {
     const uint32_t localIdx = ctx.channelCount;
     ctx.input = input;
     ctx.output[localIdx] = output;
     ctx.token[localIdx] = token;
-    ctx.die0Size = die0Size;
-    ctx.die0LastSize = die0Size;
+    // D4 双 die（hccl axisId 语义）：axis0 处理 [0, die0Size)、axis1 处理 [die0Size, +die1Size)。
+    // die0Size/die0LastSize 字段复用为"本 die 档"（下游 IssueSendSlice/GroupCopy 档位选择零改动）；
+    // axis1 将 die0Size 基偏移烘焙进 input/output[localIdx]——直发/转发源、拷贝源、以及 PreSync
+    // 交换给对端同 die 内核的输出基均随之带偏移（对端 die1 内核写本端 [die0Size,+die1Size) 半区）。
+    if (axisId == 0U) {
+        ctx.die0Size = die0Size;
+        ctx.die0LastSize = die0Size;
+    } else {
+        ctx.die0Size = die1Size;
+        ctx.die0LastSize = die1Size;
+        ctx.input += die0Size;
+        ctx.output[localIdx] += die0Size;
+    }
     ctx.repeatNum = UINT64_MAX - 1ULL;
     ctx.inputSliceStride = 0;
     ctx.outputSliceStride = outputSliceStride;
@@ -147,7 +158,8 @@ CcuResult IssueSendSlice(
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatSendRecvSlices（axisId==0 语义：sliceSize 取 die0 档）。
+// 对应 hccl DoRepeatSendRecvSlices（串行回退路径；sliceSize 取"本 die 档"——D4 经 LoadNhr1DArgs
+// 复用 die0Size/die0LastSize 字段实现，轴语义见其注释）。
 // 串行回退路径：发射单个 slice 并立即等待其完成。
 CcuResult DoRepeatSendRecvSlices(
     KfcAllGatherNhr1DContext& ctx, const u32& toRank, ccu::LocalAddr& src, ccu::RemoteAddr& dst, u32 signalIndex,
@@ -298,15 +310,16 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
         }
     }
 
-    if (!isLastStep) {
-        CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-        CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-    }
+    // D3：末步也做步间同步——turn-end 提前到 PostSync 前的前置条件（末步接收分片的到达
+    // 保证由此承担，与 hccl 仅末步跳过同步不同）；record 先于 wait 且不阻塞，无死锁。
+    CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+    CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
 
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatAllGatherNHR（axisId==1 的 die0 偏移分支不迁移）。
+// 对应 hccl DoRepeatAllGatherNHR（axisId==1 的 die0 偏移经 LoadNhr1DArgs 烘焙进 input/output 基址，
+// 本函数零改动——D4）。
 // GroupCopy 移至末步内与通信并发提交（见 DoRepeatAllGatherNHRSingleStep），
 // 本 rank 贡献在各步均由 input 直发，step 循环前不再需要先落位。
 CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
@@ -348,9 +361,10 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
 
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
-    ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    ccu::Variable die1Size, ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1,
+    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, uint32_t axisId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx, ccu::Variable turnEndAddr)
 {
     KfcAllGatherNhr1DContext ctx;
     ctx.channels = channels;
@@ -363,11 +377,18 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     CCU_CHK_RET(InitResource(ctx));
 
     LoadNhr1DArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, die0Size, outputSliceStride, goSize0, goSize1, goSize2, goSize3);
+        ctx, inputAddr, outputAddr, tokenInfo, die0Size, die1Size, outputSliceStride, goSize0, goSize1, goSize2,
+        goSize3, axisId);
 
     CCU_CHK_RET(PreSync(ctx));
 
     CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
+
+    // D3：末步同步完成后本 mission 半区输出已完整（各步接收分片到达 + GroupCopy 阻塞落位 +
+    // 本 rank 写 EventWait；双 die 两 mission 数据不相交，AIV 等齐两个 turn-end 即全量完整），
+    // 在 PostSync 前写 turn-end，AIV 提前返回；PostSync 仍在 server 指令流中先于下一轮
+    // PreSync 执行，跨轮 XN 保护不变。
+    CCU_CHK_RET(ccu::Store(turnEndAddr, ctx.constVar1));
 
     CCU_CHK_RET(PostSync(ctx));
 

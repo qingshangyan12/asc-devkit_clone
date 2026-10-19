@@ -29,7 +29,7 @@
 
 获取输入数据y/x的反正切值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816331.png)
+![](../../../figures/formulaimage_0000002516816331.png)
 
 ## 函数原型
 

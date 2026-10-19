@@ -982,11 +982,8 @@ For a detailed example, refer to [ReduceMax Sample](../../examples/01_simd_cpp_a
  
  
  [Level] Mandatory 
- 
- 
- [Description] Sample code must not include non-standard usage such as `using namespace AscendC`. When calling interfaces and enumerations, namespace qualifiers must be added.
 
- [Level] Mandatory
+ [Description] Sample code must not include non-standard usage such as `using namespace AscendC`. When calling interfaces and enumerations, namespace qualifiers must be added.
 
  [Positive Example] Both enumeration values and interface names have the AscendC namespace added.
 

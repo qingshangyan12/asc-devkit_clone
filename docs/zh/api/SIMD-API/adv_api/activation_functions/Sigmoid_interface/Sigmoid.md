@@ -33,9 +33,9 @@
 
 按元素做逻辑回归Sigmoid，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002353088881.png)
+![](../../../../figures/formulaimage_0000002353088881.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001539852417.png)
+![](../../../../figures/formulaimage_0000001539852417.png)
 
 ## 函数原型
 

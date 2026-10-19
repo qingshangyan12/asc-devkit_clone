@@ -33,21 +33,21 @@
 
     本接口实现了对shape大小为\[B，S，H\]输入数据的LayerNorm归一化，其计算公式如下，其中γ为缩放系数，β为平移系数，ε为防除零的权重系数：
 
-    ![](../../../figures/zh-cn_formulaimage_0000001729631329.png)
+    ![](../../../figures/formulaimage_0000001729631329.png)
 
     其中，如下两个参数分别代表输入在H轴的均值和方差。
 
-    ![](../../../figures/zh-cn_formulaimage_0000001729515829.png)
+    ![](../../../figures/formulaimage_0000001729515829.png)
 
 -   对shape为\[A，R\]的输入数据，输出归一化结果、均值、标准差的倒数或方差
 
     本接口实现了对shape为\[A，R\]输入数据的LayerNorm归一化，其计算公式如下，其中γ为缩放系数，β为平移系数，ε为防除零的权重系数：
 
-    ![](../../../figures/zh-cn_formulaimage_0000002045806762.png)
+    ![](../../../figures/formulaimage_0000002045806762.png)
 
     其中，如下三个参数分别代表输入在R轴的均值，方差和标准差的倒数。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002081933649.png)
+    ![](../../../figures/formulaimage_0000002081933649.png)
 
 ## 实现原理
 

@@ -63,7 +63,7 @@ __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | compare | 输入 | 源操作数，做比较的值。 |
 | val | 输入 | 源操作数，用于赋值的值。 |
 

@@ -11,7 +11,6 @@
 
 #include <algorithm>
 
-#include "alg_whitelist.h"
 #include "external_alg_rules.h"
 #include "log.h"
 
@@ -53,29 +52,12 @@ const char* EngineName(CommEngine engine)
 }
 
 // 进程级候选表（首次使用时聚合一次；static-init 已全部完成后才可能被调用）。
-// 聚合时套用算法白名单，白名单外注册名不进入候选表。
+// 全量注册构建：外部名候选面 = 注册面（算法选用白名单机制已移除，漏斗确定性兜底）。
 const std::map<ExtAlgKey, std::vector<AlgCandidate>>& CandidateTable()
 {
     static const std::map<ExtAlgKey, std::vector<AlgCandidate>> table = [] {
-        const bool whitelistEnabled = IsAlgWhitelistEnabled();
-        std::vector<AlgMetaRow> rows;
-        std::string excluded;
-        size_t total = 0U;
-        for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
-            total++;
-            if (whitelistEnabled && !IsAlgAllowed(row.registeredName)) {
-                excluded += excluded.empty() ? "" : ", ";
-                excluded += row.registeredName;
-                continue;
-            }
-            rows.push_back(row);
-        }
-        if (whitelistEnabled) {
-            HCCL_INFO(
-                "[MC2_EXT_ALG] alg whitelist: %zu/%zu kept, excluded: [%s].", rows.size(), total, excluded.c_str());
-        } else {
-            HCCL_INFO("[MC2_EXT_ALG] alg whitelist disabled: %zu/%zu kept.", rows.size(), total);
-        }
+        const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
+        HCCL_INFO("[MC2_EXT_ALG] alg candidate table built: %zu registrations.", rows.size());
         return BuildCandidateTable(rows);
     }();
     return table;

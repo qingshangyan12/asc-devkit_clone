@@ -29,7 +29,7 @@
 
 获取输入数据的反正弦值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816355.png)
+![](../../../figures/formulaimage_0000002516816355.png)
 
 arcsin\(x\)为反正弦函数的计算。
 

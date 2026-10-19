@@ -30,6 +30,10 @@
 #include "dav_c100/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_list_tensor_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_list_tensor_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3113
