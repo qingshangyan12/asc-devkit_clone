@@ -128,7 +128,7 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend310b3", "Ascend310B3"},
         {"ascend310b4", "Ascend310B4"},
         {"ascend5162a", "Ascend5162A"},
-        {"ascend310n", "Ascend310N"},
+        {"ascend310n", "Ascend310n"},
         {"kirinx90", "KirinX90"},
         {"kirin9030", "Kirin9030"},
         {"kirindev0000", "KirinDev0000"},
