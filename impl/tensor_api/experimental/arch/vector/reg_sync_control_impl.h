@@ -95,7 +95,7 @@ struct mem_bar_mapping<mem_type::scalar_all, mem_type::vec_all> {
 template <mem_type src, mem_type dst>
 __simd_callee__ inline void mem_bar()
 {
-    ::asc_mem_bar(detail::mem_bar_mapping<src, dst>::value);
+    asc_mem_bar(detail::mem_bar_mapping<src, dst>::value);
 }
 
 } // namespace experimental

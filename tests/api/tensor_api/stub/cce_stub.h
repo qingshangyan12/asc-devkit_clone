@@ -14,6 +14,21 @@
 
 using float8_e8m0_t = fp8_e8m0_t;
 
+enum MEM_TYPE {
+    VST_VLD,
+    VLD_VST,
+    VST_VST,
+    VST_LD,
+    VLD_ST,
+    VST_ST,
+    ST_VLD,
+    LD_VST,
+    ST_VST,
+    VV_ALL,
+    VS_ALL,
+    SV_ALL,
+};
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
 using vector_uint8_t = uint8_t;
 using vector_uint16_t = uint8_t;
