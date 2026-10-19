@@ -94,10 +94,7 @@ __simd_callee__ inline reg_tensor<DataType> reduce_min(const reg_tensor<DataType
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/reduction_compute.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void reduce_min_example(InputTensor input, OutputTensor output)

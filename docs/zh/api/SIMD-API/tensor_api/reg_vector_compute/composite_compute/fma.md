@@ -79,10 +79,7 @@ __simd_callee__ inline reg_tensor<T> fma(const reg_tensor<T>& src0, const reg_te
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/composite_compute.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename Src0Tensor, typename Src1Tensor, typename Src2Tensor, typename DstTensor>
 __simd_vf__ inline void fma_vf(

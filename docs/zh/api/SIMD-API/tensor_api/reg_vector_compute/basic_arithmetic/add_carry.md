@@ -89,10 +89,7 @@ __simd_callee__ inline reg_pair<T, bool> add_carry(
 ### 不带输入进位
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void add_carry_vf(
@@ -116,10 +113,7 @@ __simd_vf__ inline void add_carry_vf(
 ### 带输入进位
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void add_carry_with_carry_vf(

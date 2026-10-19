@@ -74,10 +74,7 @@ __simd_callee__ inline reg_tensor<T> operator|(
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/logical_compute.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void or_example(InputTensor input0, InputTensor input1, OutputTensor output)
