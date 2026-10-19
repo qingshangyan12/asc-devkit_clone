@@ -180,7 +180,7 @@ struct make_nn_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         static_assert(
             c0_ele == 2 || c0_ele == 1,
             "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
@@ -208,7 +208,7 @@ struct make_scalea_nd_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         static_assert(
             c0_ele == 2 || c0_ele == 1,
             "scalea_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
@@ -233,7 +233,7 @@ struct make_scalea_dn_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         static_assert(
             c0_ele == 2 || c0_ele == 1,
             "scalea_dn_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
@@ -258,7 +258,7 @@ struct make_scaleb_nd_frame_layout {
     __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         static_assert(
             c0_ele == 2 || c0_ele == 1,
             "scaleb_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2 or hif4_scale and ShapeColumn0 as 1.");
