@@ -254,6 +254,27 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     }
 }
 
+template <typename T, typename U>
+constexpr bool ShiftScalarSupported() {
+    return SupportType<U, int16_t>() || 
+           (SupportType<T, uint8_t, int8_t>() && SupportType<U, uint8_t>()) ||
+           (SupportType<T, uint16_t, int16_t>() && SupportType<U, uint16_t>()) ||
+           (SupportType<T, uint32_t, int32_t>() && SupportType<U, uint32_t>());
+}
+
+template <typename T>
+using ShiftScalarT = Std::conditional_t<SupportType<T, uint8_t, int8_t>(), uint8_t,
+                     Std::conditional_t<SupportType<T, uint16_t, int16_t>(), uint16_t,
+                     Std::conditional_t<SupportType<T, uint32_t, int32_t>(), uint32_t>>>;
+
+template <typename T, typename U>
+__simd__callee__ inline ShiftScalar<T> GetShiftScalarValue(U scalarValue) {
+    if constexpr (SupportType<T, uint8_t, int8_t>() && !std::is_same_v<U, uint8_t>) {
+        scalarValue = scalarValue > 255 ? 255 : scalarValue;
+    }
+    return (ShiftScalarT<T>) scalarValue;
+}
+
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void ShiftLeftsImpl(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
 {
@@ -262,23 +283,24 @@ __simd_callee__ inline void ShiftLeftsImpl(S& dstReg, S& srcReg, U scalarValue, 
     static_assert(
         SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
-    static_assert(SupportType<U, int16_t>(), "current scalarValue data type is not supported on current device!");
+    static_assert(ShiftScalarSupported<ActualT, U>(), "current scalarValue data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftLefts api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
+    auto shiftScalar = GetShiftScalarValue<ActualT>(scalarValue);
     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
         RegTensor<int32_t> srcReg0, srcReg1;
         vintlv(srcReg0, srcReg1, (RegTensor<int32_t>&)srcReg.reg[0], (RegTensor<int32_t>&)srcReg.reg[1]);
         MaskReg maskTrait2Tmp0, maskTrait2Tmp1;
         pintlv_b32(maskTrait2Tmp0, maskTrait2Tmp1, mask, mask);
-        vshls(dstReg.reg[0], (RegTensor<ActualT>&)srcReg0, (uint16_t)scalarValue, maskTrait2Tmp0, modeValue);
-        vshls(dstReg.reg[1], (RegTensor<ActualT>&)srcReg1, (uint16_t)scalarValue, maskTrait2Tmp1, modeValue);
+        vshls(dstReg.reg[0], (RegTensor<ActualT>&)srcReg0, shiftScalar, maskTrait2Tmp0, modeValue);
+        vshls(dstReg.reg[1], (RegTensor<ActualT>&)srcReg1, shiftScalar, maskTrait2Tmp1, modeValue);
         vdintlv(
             (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)dstReg.reg[0],
             (RegTensor<int32_t>&)dstReg.reg[1]);
     } else {
-        vshls(dstReg, srcReg, (uint16_t)scalarValue, mask, modeValue);
+        vshls(dstReg, srcReg, shiftScalar, mask, modeValue);
     }
 }
 
@@ -321,23 +343,24 @@ __simd_callee__ inline void ShiftRightsImpl(S& dstReg, S& srcReg, U scalarValue,
     static_assert(
         SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
-    static_assert(SupportType<U, int16_t>(), "current scalarValue data type is not supported on current device!");
+    static_assert(ShiftScalarSupported<ActualT, U>(), "current scalarValue data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftRights api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
+    auto shiftScalar = GetShiftScalarValue<ActualT>(scalarValue);
     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
         RegTensor<int32_t> srcReg0, srcReg1;
         vintlv(srcReg0, srcReg1, (RegTensor<int32_t>&)srcReg.reg[0], (RegTensor<int32_t>&)srcReg.reg[1]);
         MaskReg maskTrait2Tmp0, maskTrait2Tmp1;
         pintlv_b32(maskTrait2Tmp0, maskTrait2Tmp1, mask, mask);
-        vshrs(dstReg.reg[0], (RegTensor<ActualT>&)srcReg0, (uint16_t)scalarValue, maskTrait2Tmp0, modeValue);
-        vshrs(dstReg.reg[1], (RegTensor<ActualT>&)srcReg1, (uint16_t)scalarValue, maskTrait2Tmp1, modeValue);
+        vshrs(dstReg.reg[0], (RegTensor<ActualT>&)srcReg0, shiftScalar, maskTrait2Tmp0, modeValue);
+        vshrs(dstReg.reg[1], (RegTensor<ActualT>&)srcReg1, shiftScalar, maskTrait2Tmp1, modeValue);
         vdintlv(
             (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)dstReg.reg[0],
             (RegTensor<int32_t>&)dstReg.reg[1]);
     } else {
-        vshrs(dstReg, srcReg, (uint16_t)scalarValue, mask, modeValue);
+        vshrs(dstReg, srcReg, shiftScalar, mask, modeValue);
     }
 }
 
