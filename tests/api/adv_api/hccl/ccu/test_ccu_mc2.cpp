@@ -103,6 +103,7 @@ static void StubCleanup()
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchFail = false;
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount = 0U;
     mc2_ops_hccl::g_stubHcommIsSupportCcuV2 = true;
+    (void)Mc2ClearCcuLaunchCtxCache();
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 

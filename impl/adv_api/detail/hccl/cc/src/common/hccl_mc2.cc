@@ -27,6 +27,9 @@
 #include "hcomm_host_profiling_dl.h"
 #include "runtime/rt.h"
 #include <cmath>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
 
 using namespace mc2_ops_hccl;
 
@@ -104,6 +107,36 @@ struct Mc2CcuBuiltinCtx {
 
 static_assert(
     sizeof(OpResCtx) == sizeof(HcclApi::OpResCtx), "Host and device OpResCtx layouts must have the same size.");
+
+namespace {
+struct Mc2CcuLaunchCtx {
+    HcclComm comm = nullptr;
+    bool opResReady = false;
+    OpResCtx opResHost{};
+    bool opParamReady = false;
+    OpParam opParamHost{};
+    bool resCtxReady = false;
+    AlgResourceCtxSerializable resourceCtx{};
+};
+using Mc2CcuLaunchCtxPtr = std::shared_ptr<Mc2CcuLaunchCtx>;
+std::mutex g_mc2CcuLaunchCtxMutex;
+std::unordered_map<const void*, Mc2CcuLaunchCtxPtr> g_mc2CcuLaunchCtxMap;
+
+void RegisterMc2CcuLaunchCtx(const void* ccResCtx, HcclComm comm)
+{
+    if (ccResCtx == nullptr || comm == nullptr) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(g_mc2CcuLaunchCtxMutex);
+    auto it = g_mc2CcuLaunchCtxMap.find(ccResCtx);
+    if (it != g_mc2CcuLaunchCtxMap.end() && it->second->comm == comm) {
+        return;
+    }
+    Mc2CcuLaunchCtxPtr entry = std::make_shared<Mc2CcuLaunchCtx>();
+    entry->comm = comm;
+    g_mc2CcuLaunchCtxMap[ccResCtx] = std::move(entry);
+}
+} // namespace
 
 bool IsSupportedMc2OpType(HcclCMDType opType)
 {
@@ -215,6 +248,7 @@ HcclResult CreateMc2DeviceOpResCtx(Mc2CcuBuiltinCtx& builtinCtx)
 
     builtinCtx.deviceOpResCtx = opResCtxPtr;
     builtinCtx.deviceOpResCtxSize = static_cast<uint32_t>(opResCtxSize);
+    RegisterMc2CcuLaunchCtx(builtinCtx.deviceOpResCtx, builtinCtx.comm);
     HCCL_INFO(
         "[CreateMc2DeviceOpResCtx] opResCtx[%p], size[%u], workspace[0x%llx], workspaceSize[%llu], "
         "rank[%llu/%llu], xnAddr[0x%llx], ckeAddr[0x%llx], scratch[0x%llx].",
@@ -579,6 +613,7 @@ HcclResult AllocComResourceByTilingCcu(
         opResCtx, *opResCtx, opResCtxSize, resCtx.workSpace, resCtx.workSpaceSize, resCtx.xnAddr, resCtx.ckeAddr,
         resCtx.rankId, resCtx.rankSize);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+    RegisterMc2CcuLaunchCtx(*opResCtx, comm);
     HCCL_INFO("[AllocComResourceByTilingCcu]end AllocComResourceByTilingCcu!");
     return HCCL_SUCCESS;
 }
@@ -956,7 +991,7 @@ void LogKernelLaunchArgs(
 {
     const size_t offset = missionIndex * KFC_SERVER_ARG_NUM;
     if (resourceCtx.kfcServerArgs.size() >= offset + KFC_SERVER_ARG_NUM) {
-        HCCL_INFO(
+        HCCL_DEBUG(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "mission[%u], threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
             "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
@@ -969,29 +1004,101 @@ void LogKernelLaunchArgs(
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 4]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 5]));
     } else {
-        HCCL_INFO(
+        HCCL_DEBUG(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], kfcServerArgsSize[%zu]",
             static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
             resourceCtx.kfcServerArgSize, resourceCtx.kfcServerArgs.size());
     }
 }
+
+CcuResult GetMc2CcuLaunchCtx(const void* ccResCtx, uint32_t ccResCtxSize, Mc2CcuLaunchCtxPtr& entryOut)
+{
+    if (ccResCtx == nullptr || ccResCtxSize < sizeof(OpResCtx)) {
+        return CCU_E_PARA;
+    }
+    std::lock_guard<std::mutex> lock(g_mc2CcuLaunchCtxMutex);
+    auto it = g_mc2CcuLaunchCtxMap.find(ccResCtx);
+    Mc2CcuLaunchCtxPtr entry;
+    bool cached = it != g_mc2CcuLaunchCtxMap.end();
+    if (cached) {
+        entry = it->second;
+    } else {
+        entry = std::make_shared<Mc2CcuLaunchCtx>();
+    }
+    if (!entry->opResReady) {
+        CcuResult ret = CopyOpResCtxToHost(ccResCtx, entry->opResHost);
+        if (ret != CCU_SUCCESS) {
+            return ret;
+        }
+        entry->opResReady = true;
+    }
+    if (!cached) {
+        g_mc2CcuLaunchCtxMap[ccResCtx] = entry;
+    }
+    entryOut = entry;
+    return CCU_SUCCESS;
+}
+
+CcuResult EnsureMc2CcuOpParamCtx(Mc2CcuLaunchCtx& entry)
+{
+    if (entry.opParamReady) {
+        return CCU_SUCCESS;
+    }
+    std::lock_guard<std::mutex> lock(g_mc2CcuLaunchCtxMutex);
+    if (entry.opParamReady) {
+        return CCU_SUCCESS;
+    }
+    CcuResult ret = CopyOpParamToHost(entry.opResHost, entry.opParamHost);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    entry.opParamReady = true;
+    if (entry.comm == nullptr) {
+        entry.comm = static_cast<HcclComm>(entry.opParamHost.hcclComm);
+    }
+    return CCU_SUCCESS;
+}
+
+CcuResult EnsureMc2CcuResourceCtx(Mc2CcuLaunchCtx& entry)
+{
+    if (entry.resCtxReady) {
+        return CCU_SUCCESS;
+    }
+    std::lock_guard<std::mutex> lock(g_mc2CcuLaunchCtxMutex);
+    if (entry.resCtxReady) {
+        return CCU_SUCCESS;
+    }
+    CcuResult ret = LoadResourceCtx(entry.opParamHost, entry.resourceCtx);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    entry.resCtxReady = true;
+    HCCL_INFO(
+        "[Mc2CcKernelLaunch] host launch ctx cached, comm[%p], ctxSize[%llu], missionArgs[%zu].", entry.comm,
+        static_cast<unsigned long long>(entry.opParamHost.ctxSize), entry.resourceCtx.kfcServerArgs.size());
+    return CCU_SUCCESS;
+}
+
+CcuResult EnsureMc2CcuFullLaunchCtx(Mc2CcuLaunchCtx& entry)
+{
+    CcuResult ret = EnsureMc2CcuOpParamCtx(entry);
+    if (ret != CCU_SUCCESS) {
+        return ret;
+    }
+    return EnsureMc2CcuResourceCtx(entry);
+}
 } // namespace
 
-CcuResult LaunchCcuKernel(const HcclComm comm, const OpParam& opParamHost)
+CcuResult LaunchCcuKernel(const HcclComm comm, const AlgResourceCtxSerializable& resourceCtx)
 {
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
-    AlgResourceCtxSerializable resourceCtx;
-    CcuResult ret = LoadResourceCtx(opParamHost, resourceCtx);
-    if (ret != CCU_SUCCESS) {
-        return ret;
-    }
     uint32_t missionNum = 0;
-    ret = GetLaunchMissionNum(resourceCtx, missionNum);
+    CcuResult ret = GetLaunchMissionNum(resourceCtx, missionNum);
     if (ret != CCU_SUCCESS) {
         return ret;
     }
-    HCCL_INFO("[CcuKernelLaunch] start [%u] KFC server missions.", missionNum);
+    HCCL_DEBUG("[CcuKernelLaunch] start [%u] KFC server missions.", missionNum);
     for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
         const ThreadHandle threadHandle = resourceCtx.threads[missionIndex];
         const CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[missionIndex];
@@ -1124,18 +1231,18 @@ CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
-    // HcclEngineCtxCreate分配的OpResCtx、OpParam和序列化资源均位于device，需逐层拷贝到host。
-    OpResCtx opResHost{};
-    CcuResult ret = CopyOpResCtxToHost(opResCtx, opResHost);
+    // HcclEngineCtxCreate分配的OpResCtx、OpParam和序列化资源位于device，host侧按ccResCtx缓存，
+    // 仅首个周期逐层D2H构建快照，后续周期直接复用。
+    Mc2CcuLaunchCtxPtr entry;
+    CcuResult ret = GetMc2CcuLaunchCtx(opResCtx, sizeof(OpResCtx), entry);
     if (ret != CCU_SUCCESS) {
         return ret;
     }
-    OpParam opParamHost{};
-    ret = CopyOpParamToHost(opResHost, opParamHost);
+    ret = EnsureMc2CcuFullLaunchCtx(*entry);
     if (ret != CCU_SUCCESS) {
         return ret;
     }
-    return LaunchCcuKernel(comm, opParamHost);
+    return LaunchCcuKernel(comm, entry->resourceCtx);
 }
 
 HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
@@ -1269,8 +1376,8 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
         return HCCL_E_PARA;
     }
 
-    OpResCtx opResHost{};
-    CcuResult loadRet = CopyOpResCtxToHost(ccResCtx, opResHost);
+    Mc2CcuLaunchCtxPtr entry;
+    CcuResult loadRet = GetMc2CcuLaunchCtx(ccResCtx, ccResCtxSize, entry);
     if (loadRet != CCU_SUCCESS) {
         HCCL_ERROR("[Mc2CcKernelLaunch] failed to load OpResCtx, ret[%d].", loadRet);
         return HCCL_E_INTERNAL;
@@ -1278,19 +1385,25 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
 
     CHK_RET(CheckMc2CcDeviceType(__func__));
 
-    const CommEngine commEngine = static_cast<CommEngine>(opResHost.commEngine);
+    const CommEngine commEngine = static_cast<CommEngine>(entry->opResHost.commEngine);
     switch (commEngine) {
         case COMM_ENGINE_CCU: {
-            OpParam opParamHost{};
-            loadRet = CopyOpParamToHost(opResHost, opParamHost);
+            loadRet = EnsureMc2CcuOpParamCtx(*entry);
             if (loadRet != CCU_SUCCESS) {
                 HCCL_ERROR("[Mc2CcKernelLaunch] failed to load OpParam, ret[%d].", loadRet);
                 return HCCL_E_INTERNAL;
             }
-            const HcclComm comm = static_cast<HcclComm>(opParamHost.hcclComm);
+            const HcclComm comm = static_cast<HcclComm>(entry->opParamHost.hcclComm);
+            CHK_PRT_RET(
+                comm == nullptr, HCCL_ERROR("[Mc2CcKernelLaunch] invalid comm in ccu context."), HCCL_E_INTERNAL);
+            loadRet = EnsureMc2CcuResourceCtx(*entry);
+            if (loadRet != CCU_SUCCESS) {
+                HCCL_ERROR("[Mc2CcKernelLaunch] failed to load resource ctx, ret[%d].", loadRet);
+                return HCCL_E_INTERNAL;
+            }
             // The CCU launch stream is carried by the thread handles in the resource context.
             (void)stream;
-            CcuResult launchRet = LaunchCcuKernel(comm, opParamHost);
+            CcuResult launchRet = LaunchCcuKernel(comm, entry->resourceCtx);
             if (launchRet != CCU_SUCCESS) {
                 HCCL_ERROR("[Mc2CcKernelLaunch] CcuKernelLaunch failed, ret[%d].", launchRet);
                 return HCCL_E_INTERNAL;
@@ -1306,5 +1419,12 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
             HCCL_ERROR("[Mc2CcKernelLaunch] unsupported commEngine[%d].", static_cast<int>(commEngine));
             return HCCL_E_NOT_SUPPORT;
     }
+}
+
+Mc2Result __attribute__((visibility("default"))) Mc2ClearCcuLaunchCtxCache(void)
+{
+    std::lock_guard<std::mutex> lock(g_mc2CcuLaunchCtxMutex);
+    g_mc2CcuLaunchCtxMap.clear();
+    return HCCL_SUCCESS;
 }
 } // extern "C"

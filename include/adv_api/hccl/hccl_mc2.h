@@ -190,6 +190,14 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
     void* stream, void* ccResCtx, uint32_t ccResCtxSize);
 
+/**
+ * @brief Reset the host-side CCU launch context cache used by Mc2CcKernelLaunch.
+ * @return HCCL_SUCCESS on success.
+ * @note Maintenance hook: the next Mc2CcKernelLaunch call rebuilds its host
+ *       snapshot (OpResCtx / OpParam / resource ctx) from device memory.
+ */
+extern Mc2Result __attribute__((visibility("default"))) Mc2ClearCcuLaunchCtxCache(void);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
