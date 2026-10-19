@@ -82,11 +82,11 @@ private:
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000000UL;
 #endif
     HcclResult GetServerInfoForSync(HcclHandle handle, u32& msgPos, u32& repeat) const;
-    void DumpTimeoutDfx(u32 msgPos) const;
+    void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
     void UpdateProgress(
         const char* stage, u32 msgPos, u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr, u64 recordAddr);
     void KeepAlive() { lastMsgTimestamp_ = GetCurCpuTimestamp(); }
-    bool IsTimeout() const { return (GetCurCpuTimestamp() - lastMsgTimestamp_) / KFC_NSEC_PER_SEC >= timeout_; }
+    bool IsTimeout() const { return GetCurCpuTimestamp() - lastMsgTimestamp_ >= timeout_ * KFC_NSEC_PER_SEC; }
     void SetMsgPosByHandle(HcclHandle handle, u32 msgPos) { handleIdToMsgPos_[handle] = msgPos; }
     void SetRepeatByHandle(HcclHandle handle, u32 repeat) { handleIdToRepeat_[handle] = repeat; }
 
@@ -98,7 +98,7 @@ private:
     const ServerExecCtx* syncExecCtx_{nullptr};
     HcclApi::HcclMsgArea* msgArea_{nullptr};
     u64 lastMsgTimestamp_{0UL};
-    u64 timeout_{120UL};
+    u64 timeout_{30UL};
     u64 turnNumsAddr_{0UL};
     u32 groupIdx_;
     u32 rankNum_{0U};
