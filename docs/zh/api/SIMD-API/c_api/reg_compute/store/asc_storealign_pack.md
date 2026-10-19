@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器或掩码寄存器中的数据按掩码压缩搬出到Unified Buffer，有效元素的低半部分bit数据写入压缩后的目的位置，目的地址需按32字节或16字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [compression, store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移压缩搬出模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_storealign_pack
 
 ## 产品支持情况

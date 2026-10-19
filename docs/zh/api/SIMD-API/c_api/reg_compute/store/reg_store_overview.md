@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "概述将矢量数据寄存器、掩码寄存器与非对齐寄存器数据写入Unified Buffer的各类搬出接口，按对齐与非对齐、Post Update等方式分类，并说明目的地址对齐要求及配套后处理接口。"
+---
 # Reg数据搬出概述
 
 Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB）。接口在Vector Function（`__simd_vf__`标记的函数）内使用，仅在AIV上生效。

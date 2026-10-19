@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "已废弃的同步搬运接口，将数据从Unified Buffer（UB）搬运到Global Memory（GM）并支持8位/16位/32位分块拷贝，非32字节对齐数据会自动补齐至32字节，替代接口为非同步接口asc_copy_ub2gm_align和同步接口asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_copy_ub2gm_align_sync_arch_2201（废弃）
 
 ## 产品支持情况

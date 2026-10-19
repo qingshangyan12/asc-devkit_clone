@@ -1,3 +1,31 @@
+---
+okftype: reference.api
+description: "在AIV上将UB数据非对齐搬出至GM，支持连续与高维切分搬运；按src_stride选择Normal或Compact模式，非32字节对齐部分以dummy假数据补齐后丢弃。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, high_dimensional, padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+version: ">=9.0.0"
+---
 # asc_copy_ub2gm_align
 
 ## 产品支持情况

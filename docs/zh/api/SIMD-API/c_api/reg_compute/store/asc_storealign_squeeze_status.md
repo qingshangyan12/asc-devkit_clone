@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer，支持dst基地址或加字节偏移位置写入，实际目的地址需4字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: requires
+    condition: "调用本接口前"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_storealign_squeeze_status
 
 ## 产品支持情况

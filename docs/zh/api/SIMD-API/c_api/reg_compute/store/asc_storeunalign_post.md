@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "将非对齐寄存器中暂存的尾块写入Unified Buffer完成非对齐搬运收尾，支持立即数偏移与地址寄存器偏移两种模式，目的地址无需32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬出模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
+    kind: related
+    condition: "立即数偏移搬出模式收尾"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+    kind: related
+    condition: "掩码寄存器与地址寄存器偏移搬出模式收尾"
+version: ">=9.0.0"
+---
 # asc_storeunalign_post
 
 ## 产品支持情况

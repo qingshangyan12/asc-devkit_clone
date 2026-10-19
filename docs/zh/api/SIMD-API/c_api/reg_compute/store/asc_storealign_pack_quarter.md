@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器中每个32bit元素的低8bit数据按掩码压缩搬出到Unified Buffer，目的地址需32字节对齐，支持对齐、立即数与地址寄存器偏移模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [compression, store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬出模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.2.0"
+---
 # asc_storealign_pack_quarter
 
 ## 产品支持情况
