@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码将源矢量各元素左移标量立即数指定的位数，无符号做逻辑左移、有符号做算术左移，未筛选元素输出置零。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_shift]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_shiftleft_scalar
 
 ## 产品支持情况

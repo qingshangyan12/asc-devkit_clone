@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对两个矢量执行按位与运算并将结果写入目的矢量，操作数起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_and]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_and
 
 ## 产品支持情况
