@@ -369,6 +369,12 @@ CcuResult HcommCcuKernelRegister(
 
 CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) { return CCU_SUCCESS; }
 
+CcuResult HcommCcuFunctionGet(CcuKernelHandle kernelHandle, const char* funcName, uint64_t* pc)
+{
+    *pc = 0x1000U;
+    return CCU_SUCCESS;
+}
+
 CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
 {
