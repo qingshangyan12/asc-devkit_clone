@@ -35,6 +35,7 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+- Kirin 9020处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Relu_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -76,6 +77,8 @@ __simd_callee__ inline void Relu(U& dstReg, U& srcReg, MaskReg& mask)
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：half、int32_t、float、int64_t。
 
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int32_t、half、float。
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
@@ -101,4 +104,3 @@ __simd_vf__ inline void ReluVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_
     }
 }
 ```
-

@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+- Kirin 9020处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Ln_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -63,6 +64,8 @@ __simd_callee__ inline void Ln(U& dstReg, U& srcReg, MaskReg& mask)
 ## 数据类型
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：half、float。
+
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

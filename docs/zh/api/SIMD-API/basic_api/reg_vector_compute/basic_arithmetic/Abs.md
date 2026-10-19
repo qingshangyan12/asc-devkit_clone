@@ -35,6 +35,7 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+- Kirin 9020处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Abs_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -123,6 +124,7 @@
     - --cce-ftz=false时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
     - --cce-ftz=true时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id8 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int8_t、int16_t、int32_t、half、float。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

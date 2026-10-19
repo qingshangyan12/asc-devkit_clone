@@ -31,6 +31,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+- Kirin 9020处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id1 -->
 
 ### 传入config的原型
@@ -62,6 +63,7 @@
 <!-- npu="9030" id18 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
+- Kirin 9020处理器系列产品：不支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id2 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -146,6 +148,8 @@ $dst_i = \sqrt{src_i}$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

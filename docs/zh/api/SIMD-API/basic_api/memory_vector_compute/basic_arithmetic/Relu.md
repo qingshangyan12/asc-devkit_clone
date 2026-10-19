@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+- Kirin 9020处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Relu_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -113,6 +114,7 @@ $dst_i = \max(0, src_i)$
 <!-- npu="9030" id17 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、int32_t、float。
 <!-- end id17 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、int32_t、float。
 
 ## 返回值说明<a name="section38228281712"></a>
 
