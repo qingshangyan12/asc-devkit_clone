@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "用于在Kernel中启动Vector Function子任务，使VF函数内可调用Reg矢量计算C API完成寄存器级搬运和计算，入口函数须使用__simd_vf__修饰宏。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "Vector Function内部存在UB地址重叠或跨流水依赖时"
+version: ">=9.0.0"
+---
 # asc\_vf\_call
 
 ## 产品支持情况

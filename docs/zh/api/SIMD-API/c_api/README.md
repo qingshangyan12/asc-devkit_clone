@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "C API总览页，介绍C API作为Ascend C三层梯度化编程接口中语言扩展层SIMD API的定位与特性，并给出头文件asc_simd.h、API类型、关键字、流水类型及完整API列表导览。"
+---
 # C API
 
 C API开放芯片完备编程能力，支持[以数组形式分配内存](general_description_and_constraints.md#以数组方式申请内存)，一般基于指针编程。提供与业界一致的C语言编程体验。
