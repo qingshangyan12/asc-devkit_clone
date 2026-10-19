@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "从Unified Buffer连续对齐搬入目的操作数，支持UNPACKV2、BRCV2、BRCV3等模式。该接口已废弃，brc_v2、brc_v3、unpack_v2分别改用asc_loadalign_brc_datablock、asc_loadalign_brc_elem2datablock、asc_loadalign_unpack4实现。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md
+    kind: replaced_by
+    condition: "用于替换asc_loadalign_brc_v2"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md
+    kind: replaced_by
+    condition: "用于替换asc_loadalign_brc_v3"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md
+    kind: replaced_by
+    condition: "用于替换asc_loadalign_unpack_v2"
+version: ">=9.0.0"
+---
 # asc_loadalign (废弃)
 
 ## 产品支持情况

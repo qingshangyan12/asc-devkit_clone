@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "从32字节对齐的UB起始地址读取VL/8长度数据，通过函数返回值返回掩码寄存器，连续搬入时需手动更新源地址。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+    condition: "连续对齐搬入模式中目的操作数为掩码寄存器"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_mask
 
 ## 产品支持情况

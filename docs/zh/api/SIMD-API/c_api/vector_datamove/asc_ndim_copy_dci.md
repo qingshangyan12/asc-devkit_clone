@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "刷新NDDMA DataCache，避免多核场景下多个AI Core读取同一块GM地址时命中旧缓存数据导致读取错误，需在调用asc_ndim_copy_gm2ub前使用。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+    condition: "多核场景下多个AI Core可能读取同一块GM地址时"
+version: ">=9.1.0"
+---
 # asc_ndim_copy_dci
 
 ## 产品支持情况

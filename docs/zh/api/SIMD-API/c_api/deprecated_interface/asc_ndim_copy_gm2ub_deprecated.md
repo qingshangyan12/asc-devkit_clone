@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "多维数据搬运接口，将数据从Global Memory搬运到Unified Buffer，最多支持5维且每维可单独配置Stride并支持随路Padding；该接口已废弃，请使用asc_load_l2_cache_mode配置缓存策略并参见新版asc_ndim_copy_gm2ub。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [high_dimensional, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: replaced_by
+    condition: "新接口形式改用asc_ndim_copy_gm2ub"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_ndim_copy_gm2ub（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "本接口用于设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时loop0至loop4各循环维度的源操作数步长和目的操作数步长，包含5个函数，各维步长配置持续生效至重新配置。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+    condition: "调用asc_ndim_copy_gm2ub前"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: related
+    condition: "使用填充时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: related
+    condition: "使用常数填充模式时"
+version: ">=9.0.0"
+---
 # asc_set_ndim_loop_stride
 
 ## 产品支持情况

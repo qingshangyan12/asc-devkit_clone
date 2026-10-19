@@ -27,70 +27,351 @@
 
 // ========== return-value load APIs ==========
 // ========== asc_load ==========
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int4b_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUi4x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int8_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUi8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_int8_t asc_load(__ubuf__ int8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint8_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUu8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_uint8_t asc_load(__ubuf__ uint8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp4x2_e2m1_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf4e2m1x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_load(__ubuf__ fp4x2_e2m1_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp4x2_e1m2_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf4e1m2x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_load(__ubuf__ fp4x2_e1m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length hifloat8_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUhf8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_hifloat8_t asc_load(__ubuf__ hifloat8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e8m0_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf8e8m0
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_load(__ubuf__ fp8_e8m0_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e5m2_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf8e5m2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_load(__ubuf__ fp8_e5m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e4m3fn_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf8e4m3
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_load(__ubuf__ fp8_e4m3fn_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int16_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUi16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_int16_t asc_load(__ubuf__ int16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint16_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUu16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_uint16_t asc_load(__ubuf__ uint16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length half data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_half asc_load(__ubuf__ half* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length bfloat16_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUbf16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_load(__ubuf__ bfloat16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int32_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUi32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_int32_t asc_load(__ubuf__ int32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint32_t data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUu32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_uint32_t asc_load(__ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length float data from a dtype-aligned Unified Buffer address and returns the resulting vector register (non-void return), keeping format and content unchanged.
+ *
+ * @override_id asc_load__PUf32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline vector_float asc_load(__ubuf__ float* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int8_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvi8_PUi8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_int8_t& dst, __ubuf__ int8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint8_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvu8_PUu8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_uint8_t& dst, __ubuf__ uint8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int16_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvi16_PUi16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_int16_t& dst, __ubuf__ int16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint16_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvu16_PUu16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_uint16_t& dst, __ubuf__ uint16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int32_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvi32_PUi32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_int32_t& dst, __ubuf__ int32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length uint32_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvu32_PUu32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_uint32_t& dst, __ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length half data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf16_PUf16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_half& dst, __ubuf__ half* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length float data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf32_PUf32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_float& dst, __ubuf__ float* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int64_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvi64_PUi64
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length bfloat16_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvbf16_PUbf16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e4m3fn_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf8e4m3_PUf8e4m3
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length hifloat8_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvhf8_PUhf8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e5m2_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf8e5m2_PUf8e5m2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp8_e8m0_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf8e8m0_PUf8e8m0
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp4x2_e2m1_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf4e2m1x2_PUf4e2m1x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length fp4x2_e1m2_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvf4e1m2x2_PUf4e1m2x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads VL-length int4b_t data from a dtype-aligned Unified Buffer source address into the destination vector register passed by reference (void return).
+ *
+ * @override_id asc_load__Rvi4x2_PUi4x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按dtype对齐。
+ */
 __simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
 
 #endif
