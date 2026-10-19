@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_LOGIC_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #include "impl/c_api/reg_base_impl/reg_logic_intf_impl.h"
 #endif
 
@@ -145,7 +145,7 @@ __simd_callee__ inline vector_int8_t asc_xor(vector_int8_t src0, vector_int8_t s
 
 __simd_callee__ inline vector_bool asc_xor(vector_bool src0, vector_bool src1, vector_bool mask);
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 9201)
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 9201 && (__NPU_ARCH__ != 9202))
 //=================asc_shiftleft (signed shift overloads, 3510)==================
 __simd_callee__ inline void asc_shiftleft(
     vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask);
@@ -269,7 +269,7 @@ __simd_callee__ inline vector_uint32_t asc_shiftright_scalar(vector_uint32_t src
 
 __simd_callee__ inline vector_int32_t asc_shiftright_scalar(vector_int32_t src, int16_t shift, vector_bool mask);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 //=================asc_shiftleft (unsigned shift overloads, 9201)==================
 __simd_callee__ inline void asc_shiftleft(
