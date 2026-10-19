@@ -146,7 +146,8 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 
 template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L1Cal(
-    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams,
+    const uint8_t sid = 6)
 {
     static_assert(
         ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
@@ -169,7 +170,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(
     }
     load_gm_to_cbuf_2dv2(
         (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-        loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, 0, decompressMode, 0);
+        loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, sid, decompressMode, 0);
 }
 
 template <typename T, typename U = T>
@@ -222,23 +223,25 @@ __aicore__ inline void LoadData2DGM2L0ACal(
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0BCal(
-    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const uint8_t cacheMode = 0)
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const uint8_t cacheMode = 0,
+    const uint8_t sid = 0)
 {
     set_mte2_src_para(uint64_t(loadDataParam.srcStride));
     if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         load_gm_to_cb_2dv2_s4(
             (__cb__ void*)dst, (__gm__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
+            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, sid, 0, cacheMode);
     } else {
         load_gm_to_cb_2dv2(
             dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
+            loadDataParam.mStep, loadDataParam.kStep, sid, 0, cacheMode);
     }
 }
 
 template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L0BCal(
-    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams,
+    const uint8_t sid = 0)
 {
     static_assert(
         ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
@@ -261,13 +264,14 @@ __aicore__ inline void LoadData2DGM2L0BCal(
     }
     load_gm_to_cb_2dv2(
         reinterpret_cast<__cbuf__ int8_t*>(dst), reinterpret_cast<__gm__ int8_t*>(src), loadDataParam.mStartPosition,
-        loadDataParam.kStartPosition, loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, 0,
+        loadDataParam.kStartPosition, loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, sid,
         decompressMode, 0);
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(
-    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const uint8_t cacheMode = 0)
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const uint8_t cacheMode = 0,
+    const uint8_t sid = 6)
 {
     static_assert(
         SupportType<
@@ -280,11 +284,11 @@ __aicore__ inline void LoadData2DGM2L1Cal(
     if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         load_gm_to_cbuf_2dv2_s4(
             (__cbuf__ void*)dst, (__gm__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
+            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, sid, 0, cacheMode);
     } else {
         load_gm_to_cbuf_2dv2(
             dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
+            loadDataParam.mStep, loadDataParam.kStep, sid, 0, cacheMode);
     }
 }
 
