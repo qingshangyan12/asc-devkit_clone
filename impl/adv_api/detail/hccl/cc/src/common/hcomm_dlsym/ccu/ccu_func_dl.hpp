@@ -97,7 +97,7 @@ public:
             "ccu::Func: named func lambda must take exactly one ccu::Array<ccu::Variable>& parameter");
 
         uint64_t handle = 0;
-        CCU_THROW_IF_FAILED(::CcuFuncBlockBeginNamed(name, &handle), "ccu::Func: CcuFuncBlockBeginNamed failed");
+        CCU_THROW_IF_FAILED(::CcuFuncNamedBlockBegin(name, &handle), "ccu::Func: CcuFuncNamedBlockBegin failed");
         // 形参走连续块分配，下标与调用方 Array 的实参一一对应
         Array<Variable> formals(numIn);
         for (uint32_t i = 0; i < numIn; i++) {
