@@ -49,9 +49,11 @@ Matmul API在默认的MIX模式下，通过消息机制由AIV驱动AIC运行；�
 - 编译选项说明
 
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
-  | ----------------| -----------------------------| ---------------------------------------------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2系列产品和 Atlas A3系列产品，dav-3510 对应 Ascend 950PR&950DT系列产品 |
+  | ----------------| ----------------------------- | ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`、`dav-9201` | NPU 架构：dav-2201 对应 Atlas A2系列产品和 Atlas A3系列产品，dav-3510 对应 Ascend 950PR&950DT系列产品，dav-9201 对应 A6（Ascend 9201/960）系列产品 |
+
+  > **注意（dav-9201）：** A6（dav-9201/Ascend960）为开发中架构，当前 CANN 9.3.0 尚未随包发布其仿真模型库（`tools/simulator/dav_9201` 下仅有 runtime 库）及 CPU 调试模拟实现（tikicpulib 无 960 条目），因此 `sim`/`cpu` 模式下仅能完成编译链接，kernel 无法在仿真器中执行（camodel 加载后 launch 报 107000）。使用 dav-9201 编译前，需将仓内（asc-devkit）最新 `include/`、`impl/` 头文件合入 CANN 包 `x86_64-linux/asc/` 目录（安装版缺少 `__NPU_ARCH__ == 9201` 分支），并参考 `impl/basic_api/utils/kernel_utils_constants.h` 补充 9201 芯片常量。
 
 - 执行结果
 
