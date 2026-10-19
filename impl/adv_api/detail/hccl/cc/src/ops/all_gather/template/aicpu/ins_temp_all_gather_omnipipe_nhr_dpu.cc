@@ -48,7 +48,6 @@ HcclResult InsTempAllGatherOmniPipeNHRDPU::KernelRun(
     }
 
     DPURunInfo dpuRunInfo;
-    dpuRunInfo.execTimeout = param.opConfig.execTimeout;
     dpuRunInfo.templateName = "InsTempAllGatherOmniPipeNHRDPU";
     dpuRunInfo.tempAlgParams = tempAlgParams;
     dpuRunInfo.channels = templateResource.channels;
