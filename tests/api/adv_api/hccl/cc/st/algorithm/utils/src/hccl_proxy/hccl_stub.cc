@@ -1079,6 +1079,75 @@ HcclResult HcommSymWinGetPeerPointer(HcclCommSymWindow winHandle, size_t offset,
     return HcclSymWinGetPeerPointer(winHandle, offset, peerRank, ptr);
 }
 
+// asccomm (T1) dataplane simulations. Each entry delegates to the mirrored
+// Hcomm*OnThread simulation above so both symbol families share one simulation
+// implementation. The reduce/batch parameters use the ABI-identical Hcomm types
+// because the asccomm public header is not on the ST include path; C linkage
+// keeps these definitions interchangeable with the asccomm declarations consumed
+// by the wrapper. Covers every asccomm dataplane symbol the wrapper references.
+int32_t asccomm_channel_notify_record_on_thread(ThreadHandle thread, ChannelHandle channel, uint32_t remoteNotifyIdx)
+{
+    return HcommChannelNotifyRecordOnThread(thread, channel, remoteNotifyIdx);
+}
+
+int32_t asccomm_channel_notify_wait_on_thread(
+    ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t timeOut)
+{
+    return HcommChannelNotifyWaitOnThread(thread, channel, localNotifyIdx, timeOut);
+}
+
+int32_t asccomm_write_on_thread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len)
+{
+    return HcommWriteOnThread(thread, channel, dst, src, len);
+}
+
+int32_t asccomm_read_on_thread(ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t len)
+{
+    return HcommReadOnThread(thread, channel, dst, src, len);
+}
+
+int32_t asccomm_local_copy_on_thread(ThreadHandle thread, void* dst, const void* src, uint64_t len)
+{
+    return HcommLocalCopyOnThread(thread, dst, src, len);
+}
+
+int32_t asccomm_thread_notify_record_on_thread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx)
+{
+    return HcommThreadNotifyRecordOnThread(thread, dstThread, dstNotifyIdx);
+}
+
+int32_t asccomm_thread_notify_wait_on_thread(ThreadHandle thread, uint32_t notifyIdx, uint32_t timeOut)
+{
+    return HcommThreadNotifyWaitOnThread(thread, notifyIdx, timeOut);
+}
+
+int32_t asccomm_write_reduce_on_thread(
+    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, HcommDataType dataType,
+    HcommReduceOp reduceOp)
+{
+    return HcommWriteReduceOnThread(thread, channel, dst, src, count, dataType, reduceOp);
+}
+
+int32_t asccomm_read_reduce_on_thread(
+    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, HcommDataType dataType,
+    HcommReduceOp reduceOp)
+{
+    return HcommReadReduceOnThread(thread, channel, dst, src, count, dataType, reduceOp);
+}
+
+int32_t asccomm_local_reduce_on_thread(
+    ThreadHandle thread, void* dst, const void* src, uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+{
+    return HcommLocalReduceOnThread(thread, dst, src, count, dataType, reduceOp);
+}
+
+int32_t asccomm_batch_transfer_on_thread(
+    ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
+    uint32_t transferDescNum)
+{
+    return HcclHcommBatchTransferOnThread(thread, channel, transferDescs, transferDescNum);
+}
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
