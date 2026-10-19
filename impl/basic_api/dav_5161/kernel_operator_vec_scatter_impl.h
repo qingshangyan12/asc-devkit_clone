@@ -62,16 +62,16 @@ __aicore__ inline void ScatterImplB16(
         uint16_t repeatTime = CeilDivision(count, srcRep128);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             preg = Reg::UpdateMask<T>(sregPlt);
-            Reg::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            Reg::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            Reg::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            Reg::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             Reg::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b16ShiftVal, indexMask);
             Reg::ShiftRights<uint32_t, int16_t>(indexRegSec, indexRegSec, b16ShiftVal, indexMask);
             Reg::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16Reg, indexReg, indexMask);
             Reg::Cast<uint16_t, uint32_t, castTraitOdd>(highU16Reg, indexRegSec, indexMask);
             Reg::DeInterleave(lowerU16Reg, highU16Reg, lowerU16Reg, highU16Reg);
             Reg::Select(indexU16, lowerU16Reg, highU16Reg, selectMask);
-            Reg::DataCopy<T>(srcReg, srcLocal + i * srcRep128);
-            Reg::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
+            Reg::LoadAlign<T>(srcReg, srcLocal + i * srcRep128);
+            Reg::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
         }
     }
 }
@@ -106,16 +106,16 @@ __aicore__ inline void ScatterImplB16(
             if constexpr (!isNormalMode) {
                 b16SrcMask = Reg::UpdateMask<T>(maskV);
             }
-            Reg::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            Reg::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            Reg::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            Reg::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             Reg::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b16ShiftVal, indexMask);
             Reg::ShiftRights<uint32_t, int16_t>(indexRegSec, indexRegSec, b16ShiftVal, indexMask);
             Reg::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16, indexReg, indexMask);
             Reg::Cast<uint16_t, uint32_t, castTraitOdd>(highU16, indexRegSec, indexMask);
             Reg::DeInterleave(lowerU16, highU16, lowerU16, highU16);
             Reg::Select(indexU16, lowerU16, highU16, selectMask);
-            Reg::DataCopy<T>(srcReg, srcLocal + i * srcRepStride * b16BlkElems);
-            Reg::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, b16SrcMask);
+            Reg::LoadAlign<T>(srcReg, srcLocal + i * srcRepStride * b16BlkElems);
+            Reg::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, b16SrcMask);
         }
     }
 }
@@ -136,10 +136,10 @@ __aicore__ inline void ScatterImplB32(
 
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             preg = Reg::UpdateMask<T>(sregPlt);
-            Reg::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
+            Reg::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
             Reg::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b32ShiftVal, indexMask);
-            Reg::DataCopy<T>(srcReg, srcLocal + i * srcRepElems);
-            Reg::DataCopyScatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, preg);
+            Reg::LoadAlign<T>(srcReg, srcLocal + i * srcRepElems);
+            Reg::Scatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, preg);
         }
     }
 }
@@ -169,10 +169,10 @@ __aicore__ inline void ScatterImplB32(
             if constexpr (!isNormalMode) {
                 b32SrcMask = Reg::UpdateMask<T>(maskV);
             }
-            Reg::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
+            Reg::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
             Reg::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b32ShiftVal, indexMask);
-            Reg::DataCopy<T>(srcReg, srcLocal + i * srcRepStride * b32BlkElems);
-            Reg::DataCopyScatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, b32SrcMask);
+            Reg::LoadAlign<T>(srcReg, srcLocal + i * srcRepStride * b32BlkElems);
+            Reg::Scatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, b32SrcMask);
         }
     }
 }

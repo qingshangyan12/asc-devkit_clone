@@ -53,7 +53,7 @@ __simd_callee__ inline uint32_t VecMicroGetCount(
     if constexpr (!isSetMask) {
         // get SPR.MASK in VF
         Reg::MaskReg sprLoadMaskReg = Reg::MoveMask<uint16_t>();
-        Reg::DataCopy<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
         // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         count = static_cast<uint32_t>(maskBuf[0]);
@@ -86,7 +86,7 @@ __simd_callee__ inline Reg::MaskReg VecMicroGetMaskReg(__ubuf__ uint64_t* maskBu
         }
     } else if constexpr (isNormalMode && isMaskBitMode) {
         if constexpr (SupportBytes<T, 1>()) {
-            Reg::DataCopy(maskReg, (__ubuf__ uint32_t*)maskBuf);
+            Reg::LoadAlign(maskReg, (__ubuf__ uint32_t*)maskBuf);
         } else {
             maskReg = Reg::MoveMask<T>();
         }
@@ -148,16 +148,16 @@ __aicore__ inline void VecBinaryVFImpl(
         Reg::RegTensor<T> dstVreg;
         Reg::RegTensor<U> srcVreg0, srcVreg1;
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        Reg::DataCopy<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             srcVreg0, src0 + index * repeatParams.src0RepStride * ElePerBlkU, repeatParams.src0BlkStride, maskRegSrc);
-        Reg::DataCopy<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             srcVreg1, src1 + index * repeatParams.src1RepStride * ElePerBlkU, repeatParams.src1BlkStride, maskRegSrc);
         if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 dstVreg, dst + index * repeatParams.dstRepStride * ElePerBlkT, repeatParams.dstBlkStride, maskRegDst);
         }
         func(dstVreg, srcVreg0, srcVreg1, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskRegDst);
     }
 }

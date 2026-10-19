@@ -67,7 +67,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * dstRepeatStride * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
     }
 }
@@ -193,43 +193,43 @@ __simd_vf__ inline void InterleaveImplNormal(
     uint32_t sreg = calCount;
     // first process dst0Local
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + i * sregLower);
+        Reg::LoadAlign(src0Reg, src0Local + i * sregLower);
+        Reg::LoadAlign(src1Reg, src1Local + i * sregLower);
         Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         // two dst reg all need update mask
         preg = Reg::UpdateMask<T>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower, dst0Reg, preg);
+        Reg::StoreAlign(dst0Local + i * 2 * sregLower, dst0Reg, preg);
         preg = Reg::UpdateMask<T>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+        Reg::StoreAlign(dst0Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
     }
     // second process dst1Local, second element num is same as first element num
     if constexpr (!hasUnalign) {
         sreg = calCount;
         for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + halfCount + i * sregLower);
+            Reg::LoadAlign(src0Reg, src0Local + halfCount + i * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + halfCount + i * sregLower);
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             // two dst reg all need update mask
             preg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower, dst0Reg, preg);
             preg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
         }
     } else {
         sreg = calCount;
         Reg::UnalignReg ureg;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             // unalign process, copy element is sregeLower
-            Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src0Reg, ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src1Reg, ureg, src1Local + halfCount + i * sregLower);
+            Reg::LoadUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
+            Reg::LoadUnAlign(src0Reg, ureg, src0Local + halfCount + i * sregLower);
+            Reg::LoadUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
+            Reg::LoadUnAlign(src1Reg, ureg, src1Local + halfCount + i * sregLower);
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             // two dst reg all need update mask
             preg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower, dst0Reg, preg);
             preg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
         }
     }
 }
@@ -247,40 +247,40 @@ __simd_vf__ inline void InterleaveImplB64(
     uint32_t sreg = calCount;
     // first process dst0Local
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + i * sregLower);
+        Reg::LoadAlign(src0Reg, src0Local + i * sregLower);
+        Reg::LoadAlign(src1Reg, src1Local + i * sregLower);
         Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower, dst0Reg, preg);
+        Reg::StoreAlign(dst0Local + i * 2 * sregLower, dst0Reg, preg);
         preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+        Reg::StoreAlign(dst0Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
     }
     // second process dst1Local, second element num is same as first element num
     sreg = calCount;
     if constexpr (!hasUnalign) {
         for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + halfCount + i * sregLower);
+            Reg::LoadAlign(src0Reg, src0Local + halfCount + i * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + halfCount + i * sregLower);
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower, dst0Reg, preg);
             preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
         }
     } else {
         Reg::UnalignReg ureg;
         Reg::RegTensor<T> src0RegTmp0, src0RegTmp1, src1RegTmp0, src1RegTmp1;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             // unalign process, copy element is sregeLower
-            Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src0RegTmp0, ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlign(
+            Reg::LoadUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
+            Reg::LoadUnAlign(src0RegTmp0, ureg, src0Local + halfCount + i * sregLower);
+            Reg::LoadUnAlignPre(ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
+            Reg::LoadUnAlign(
                 src0RegTmp1, ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src1RegTmp0, ureg, src1Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlign(
+            Reg::LoadUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
+            Reg::LoadUnAlign(src1RegTmp0, ureg, src1Local + halfCount + i * sregLower);
+            Reg::LoadUnAlignPre(ureg, src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
+            Reg::LoadUnAlign(
                 src1RegTmp1, ureg, src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
             // simulate dual intlv to combine two regs
             Reg::DeInterleave(
@@ -292,9 +292,9 @@ __simd_vf__ inline void InterleaveImplB64(
             // dual intlv
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower, dst0Reg, preg);
             preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
+            Reg::StoreAlign(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
         }
     }
 }
@@ -335,12 +335,12 @@ __simd_vf__ inline void DeInterleaveImplNormal(
     uint32_t sreg = halfCount;
     // first process src0Local
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src0Local + i * 2 * sregLower + sregLower);
+        Reg::LoadAlign(src0Reg, src0Local + i * 2 * sregLower);
+        Reg::LoadAlign(src1Reg, src0Local + i * 2 * sregLower + sregLower);
         Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         preg = Reg::UpdateMask<T>(sreg);
-        Reg::DataCopy(dst0Local + i * sregLower, dst0Reg, preg);
-        Reg::DataCopy(dst1Local + i * sregLower, dst1Reg, preg);
+        Reg::StoreAlign(dst0Local + i * sregLower, dst0Reg, preg);
+        Reg::StoreAlign(dst1Local + i * sregLower, dst1Reg, preg);
     }
     if constexpr (!hasSrc1) {
         return;
@@ -349,39 +349,39 @@ __simd_vf__ inline void DeInterleaveImplNormal(
     if constexpr (!hasUnalign) {
         sreg = halfCount;
         for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
+            Reg::LoadAlign(src0Reg, src1Local + i * 2 * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + i * 2 * sregLower + sregLower);
             Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             preg = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(dst0Local + halfCount + i * sregLower, dst0Reg, preg);
-            Reg::DataCopy(dst1Local + halfCount + i * sregLower, dst1Reg, preg);
+            Reg::StoreAlign(dst0Local + halfCount + i * sregLower, dst0Reg, preg);
+            Reg::StoreAlign(dst1Local + halfCount + i * sregLower, dst1Reg, preg);
         }
     } else {
         Reg::UnalignReg ureg;
         // split main and tail, because dst copy element is diffrent with main block
         for (uint16_t i = 0; i < repeatTime - 1; ++i) {
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
+            Reg::LoadAlign(src0Reg, src1Local + i * 2 * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + i * 2 * sregLower + sregLower);
             Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + i * sregLower;
             __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + i * sregLower;
             // unalign process, copy element is sregeLower
-            Reg::DataCopyUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
-            Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
-            Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
+            Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
+            Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
         }
-        Reg::DataCopy(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
+        Reg::LoadAlign(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
+        Reg::LoadAlign(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
         Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         // cal tail num
         uint32_t tailNum = halfCount - (repeatTime - 1) * sregLower;
         __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + (repeatTime - 1) * sregLower;
         __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + (repeatTime - 1) * sregLower;
-        Reg::DataCopyUnAlign(dst0LocalTmp, dst0Reg, ureg, tailNum);
-        Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-        Reg::DataCopyUnAlign(dst1LocalTmp, dst1Reg, ureg, tailNum);
-        Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
+        Reg::LoadUnAlign(dst0LocalTmp, dst0Reg, ureg, tailNum);
+        Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
+        Reg::LoadUnAlign(dst1LocalTmp, dst1Reg, ureg, tailNum);
+        Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
     }
 }
 
@@ -398,12 +398,12 @@ __simd_vf__ inline void DeInterleaveImplB64(
     // first process src0Local
     uint32_t sreg = halfCount;
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src0Local + i * 2 * sregLower + sregLower);
+        Reg::LoadAlign(src0Reg, src0Local + i * 2 * sregLower);
+        Reg::LoadAlign(src1Reg, src0Local + i * 2 * sregLower + sregLower);
         Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         b64Preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * sregLower, dst0Reg, b64Preg);
-        Reg::DataCopy(dst1Local + i * sregLower, dst1Reg, b64Preg);
+        Reg::StoreAlign(dst0Local + i * sregLower, dst0Reg, b64Preg);
+        Reg::StoreAlign(dst1Local + i * sregLower, dst1Reg, b64Preg);
     }
     if constexpr (!hasSrc1) {
         return;
@@ -412,12 +412,12 @@ __simd_vf__ inline void DeInterleaveImplB64(
     if constexpr (!hasUnalign) {
         sreg = halfCount;
         for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
+            Reg::LoadAlign(src0Reg, src1Local + i * 2 * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + i * 2 * sregLower + sregLower);
             Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             b64Preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst0Local + halfCount + i * sregLower, dst0Reg, b64Preg);
-            Reg::DataCopy(dst1Local + halfCount + i * sregLower, dst1Reg, b64Preg);
+            Reg::StoreAlign(dst0Local + halfCount + i * sregLower, dst0Reg, b64Preg);
+            Reg::StoreAlign(dst1Local + halfCount + i * sregLower, dst1Reg, b64Preg);
         }
     } else {
         Reg::UnalignReg ureg;
@@ -425,8 +425,8 @@ __simd_vf__ inline void DeInterleaveImplB64(
         Reg::RegTensor<T> dst0RegTmp0, dst0RegTmp1, dst1RegTmp0, dst1RegTmp1;
         for (uint16_t i = 0; i < repeatTime - 1; ++i) {
             // main block process
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
+            Reg::LoadAlign(src0Reg, src1Local + i * 2 * sregLower);
+            Reg::LoadAlign(src1Reg, src1Local + i * 2 * sregLower + sregLower);
             // dual deintlv
             Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
             __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + i * sregLower;
@@ -439,19 +439,19 @@ __simd_vf__ inline void DeInterleaveImplB64(
                 (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
                 (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
             // unalign process, copy element is sregeLower / 2
-            Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
+            Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
+            Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
+            Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
+            Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
+            Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
         }
         // tail block process, because dst copy element is diffrent with main block
         // vld dual src
-        Reg::DataCopy(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
+        Reg::LoadAlign(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
+        Reg::LoadAlign(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
         // dual deintlv
         Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
         uint32_t tailNum = halfCount - (repeatTime - 1) * sregLower;
@@ -473,12 +473,12 @@ __simd_vf__ inline void DeInterleaveImplB64(
             (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
             (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
         // unalign vst dst0 and dst1 same time and split main and remain
-        Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, tailNumMain);
-        Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, tailNumRemain);
-        Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-        Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, tailNumMain);
-        Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, tailNumRemain);
-        Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
+        Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, tailNumMain);
+        Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, tailNumRemain);
+        Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
+        Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, tailNumMain);
+        Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, tailNumRemain);
+        Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
     }
 }
 

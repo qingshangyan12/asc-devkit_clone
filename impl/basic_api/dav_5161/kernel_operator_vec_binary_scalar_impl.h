@@ -179,9 +179,9 @@ __simd_vf__ inline void VecBinaryScalarLevel2VFImpl(
     uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, repeatStride));
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<T, RegType::trait>(count);
-        Reg::DataCopy(srcReg, src + i * repeatStride);
+        Reg::LoadAlign(srcReg, src + i * repeatStride);
         func(dstReg, srcReg, scalarValue, mask);
-        Reg::DataCopy(dst + i * repeatStride, dstReg, mask);
+        Reg::StoreAlign(dst + i * repeatStride, dstReg, mask);
     }
 }
 
@@ -216,10 +216,10 @@ __aicore__ inline void VecBinaryScalarLevel0VFImpl(
         Reg::RegTensor<T> dstVreg;
         Reg::RegTensor<T> srcVreg;
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             srcVreg, src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
         func(dstVreg, srcVreg, scalarValue, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
     }
 }
@@ -297,16 +297,16 @@ __aicore__ inline void VecBinaryScalarLevel0VFImpl(
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
         if constexpr (scalarIdx == 0) {
-            Reg::DataCopy<T, pattern>(vSrcReg0, src0);
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::LoadAlign<T, pattern>(vSrcReg0, src0);
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 vSrcReg1, src1 + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
         } else if constexpr (scalarIdx == 1) {
-            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 vSrcReg0, src0 + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
-            Reg::DataCopy<T, pattern>(vSrcReg1, src1);
+            Reg::LoadAlign<T, pattern>(vSrcReg1, src1);
         }
         func(vDstReg0, vSrcReg0, vSrcReg1, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, vDstReg0, repeatParams.dstBlkStride, maskReg);
     }
 }
@@ -925,12 +925,12 @@ __simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __u
     Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U>(sreg);
-        Reg::DataCopy(vSrcReg, src0 + i * sregLower);
+        Reg::LoadAlign(vSrcReg, src0 + i * sregLower);
         Reg::MulsImpl<U, U, Reg::MaskMergeMode::ZEROING>(vSrcReg, vSrcReg, scalar, mask);
         Reg::CastImpl<
             T, U, RoundMode::CAST_RINT, Reg::SatMode::NO_SAT, Reg::RegLayout::ZERO, Reg::MaskMergeMode::ZEROING>(
             vDstReg, vSrcReg, mask);
-        Reg::DataCopy<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
+        Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
     }
 }
 
@@ -949,12 +949,12 @@ __simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src, U sc
     Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U>(sreg);
-        Reg::DataCopy(vSrcReg, src + i * sregLower);
+        Reg::LoadAlign(vSrcReg, src + i * sregLower);
         Reg::MulsImpl<U, U, Reg::MaskMergeMode::ZEROING>(vSrcReg, vSrcReg, scalar, mask);
         Reg::CastImpl<
             T, U, RoundMode::CAST_RINT, Reg::SatMode::NO_SAT, Reg::RegLayout::ZERO, Reg::MaskMergeMode::ZEROING>(
             vDstReg, vSrcReg, mask);
-        Reg::DataCopy<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
+        Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
     }
 }
 
@@ -974,15 +974,15 @@ __simd_vf__ inline void BinaryScalarOpTemplateCntB64(
     Reg::Duplicate(zeroReg, 0, maskFull);
 
     if constexpr (scalarIdx == 0) {
-        Reg::DataCopyUnAlignPre(ureg, (__ubuf__ T*)src0);
-        Reg::DataCopyUnAlign(preReg, ureg, (__ubuf__ T*)src0);
+        Reg::LoadUnAlignPre(ureg, (__ubuf__ T*)src0);
+        Reg::LoadUnAlign(preReg, ureg, (__ubuf__ T*)src0);
         Reg::DeInterleave(
             (Reg::RegTensor<uint32_t>&)dupReg.reg[0], (Reg::RegTensor<uint32_t>&)dupReg.reg[1],
             (Reg::RegTensor<uint32_t>&)preReg, zeroReg);
         Reg::Duplicate(srcReg0, dupReg, maskFull);
     } else if (scalarIdx == 1) {
-        Reg::DataCopyUnAlignPre(ureg, (__ubuf__ T*)src1);
-        Reg::DataCopyUnAlign(preReg, ureg, (__ubuf__ T*)src1);
+        Reg::LoadUnAlignPre(ureg, (__ubuf__ T*)src1);
+        Reg::LoadUnAlign(preReg, ureg, (__ubuf__ T*)src1);
         Reg::DeInterleave(
             (Reg::RegTensor<uint32_t>&)dupReg.reg[0], (Reg::RegTensor<uint32_t>&)dupReg.reg[1],
             (Reg::RegTensor<uint32_t>&)preReg, zeroReg);
@@ -992,9 +992,9 @@ __simd_vf__ inline void BinaryScalarOpTemplateCntB64(
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         mask = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
         if constexpr (scalarIdx == 0) {
-            Reg::DataCopy<T>(srcReg1, src1 + i * repeatStride);
+            Reg::LoadAlign<T>(srcReg1, src1 + i * repeatStride);
         } else if (scalarIdx == 1) {
-            Reg::DataCopy<T>(srcReg0, src0 + i * repeatStride);
+            Reg::LoadAlign<T>(srcReg0, src0 + i * repeatStride);
         }
         if constexpr (op == BinaryScalarOp::ADDS) {
             Reg::Add(dstReg, srcReg0, srcReg1, mask);
@@ -1013,7 +1013,7 @@ __simd_vf__ inline void BinaryScalarOpTemplateCntB64(
         } else if constexpr (op == BinaryScalarOp::ORS) {
             Reg::Or(dstReg, srcReg0, srcReg1, mask);
         }
-        Reg::DataCopy<T>(dst + i * repeatStride, dstReg, mask);
+        Reg::StoreAlign<T>(dst + i * repeatStride, dstReg, mask);
     }
 }
 
@@ -1033,11 +1033,11 @@ __simd_vf__ inline void BinaryScalarOpTemplateCnt(
         preg = Reg::UpdateMask<T>(sreg);
 
         if constexpr (scalarIdx == 0) {
-            Reg::DataCopy<T, pattern>(vSrcReg0, src0);
-            Reg::DataCopy(vSrcReg1, src1 + i * sregLower);
+            Reg::LoadAlign<T, pattern>(vSrcReg0, src0);
+            Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
         } else if constexpr (scalarIdx == 1) {
-            Reg::DataCopy(vSrcReg0, src0 + i * sregLower);
-            Reg::DataCopy<T, pattern>(vSrcReg1, src1);
+            Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+            Reg::LoadAlign<T, pattern>(vSrcReg1, src1);
         }
 
         if constexpr (op == BinaryScalarOp::ADDS) {
@@ -1058,7 +1058,7 @@ __simd_vf__ inline void BinaryScalarOpTemplateCnt(
             Reg::Or(vDstReg0, vSrcReg0, vSrcReg1, preg);
         }
 
-        Reg::DataCopy(dst + i * sregLower, vDstReg0, preg);
+        Reg::StoreAlign(dst + i * sregLower, vDstReg0, preg);
     }
 }
 

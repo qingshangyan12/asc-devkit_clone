@@ -535,13 +535,6 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen) {}
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen) {}
 
-__aicore__ __gm__ inline BlockInfo* GetBlockInfo()
-{
-    uint8_t core = GetDumpBlockIdx();
-    uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
-    __gm__ BlockInfo* blockInfo = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
-    return blockInfo;
-}
 } // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)

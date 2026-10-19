@@ -37,9 +37,9 @@ __simd_vf__ inline void VecUnaryLevel2VFImpl(__ubuf__ T* dst, __ubuf__ T* src, c
     uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(sreg, repeatStride));
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<T, RegType::trait>(sreg);
-        Reg::DataCopy(srcReg, src + i * repeatStride);
+        Reg::LoadAlign(srcReg, src + i * repeatStride);
         func(dstReg, srcReg, mask);
-        Reg::DataCopy(dst + i * repeatStride, dstReg, mask);
+        Reg::StoreAlign(dst + i * repeatStride, dstReg, mask);
     }
 }
 
@@ -73,10 +73,10 @@ __aicore__ inline void VecUnaryLevel0VFImpl(
         Reg::RegTensor<T> dstVreg;
         Reg::RegTensor<T> srcVreg;
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             srcVreg, src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
         func(dstVreg, srcVreg, maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
     }
 }

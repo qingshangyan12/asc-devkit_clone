@@ -64,7 +64,7 @@ __aicore__ inline void VecCreateVecIndexLevel0VFImpl(
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, true, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * dstRepStride * ElePerBlkT, dstVreg, dstBlkStride, maskReg);
         Reg::Adds(dstVreg, dstVreg, static_cast<int32_t>(sreg), maskReg);
     }
