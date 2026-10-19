@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "将图像数据从Global Memory搬运到L1 Buffer，加载时可指定水平与垂直的尺寸及起始位置，并支持对目的图片上、下、左、右四边填充像素。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
+    kind: related
+    condition: "了解图像搬入在卷积计算流程中的位置时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_arch_2201.md
+    kind: related
+    condition: "后续进行L1到L0的3D搬运时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_arch_2201.md
+    kind: related
+    condition: "后续进行L1到L0的3D搬运时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "各存储单元的空间大小和对齐要求"
+version: ">=9.0.0"
+---
 # asc_load_image_to_cbuf
 
 ## 产品支持情况

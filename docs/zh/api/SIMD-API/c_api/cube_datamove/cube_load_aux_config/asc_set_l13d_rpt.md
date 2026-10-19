@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "配置3D img2col搬运模式下使用repeat模式搬运左矩阵所需参数，包括相邻迭代起始距离、迭代次数与方向、目的K方向步长及M方向起始位置，供f_matrix_ctrl取值为false的asc_copy_l12l0a 3D矩阵搬运接口使用。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_3d_arch_3510.md
+    kind: configures
+    condition: "f_matrix_ctrl取值为false时"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md
+    kind: related
+    condition: "作为repeat_direction参数类型"
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md
+    kind: related
+    condition: "位域参数形式"
+version: ">=9.0.0"
+---
 # asc_set_l13d_rpt
 
 ## 产品支持情况

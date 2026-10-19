@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "设置asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值，单位字节，非0边界值不能小于1024，取0表示无边界可使用整个L1 Buffer。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_arch_2201.md
+    kind: configures
+    condition: "3D格式搬运接口的L1 Buffer边界值"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_arch_2201.md
+    kind: configures
+    condition: "3D格式搬运接口的L1 Buffer边界值"
+version: ">=9.0.0"
+---
 # asc_set_l13d_size
 
 ## 产品支持情况

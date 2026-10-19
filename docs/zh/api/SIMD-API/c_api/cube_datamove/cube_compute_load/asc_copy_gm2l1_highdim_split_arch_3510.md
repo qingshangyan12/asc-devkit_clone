@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory按高维切分方式搬运到L1 Buffer，搬运时格式和内容保持不变，支持按通道padding模式对32字节粒度数据插入或移除padding。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, high_dimensional, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_padding.md
+    kind: requires
+    condition: "搬运过程中按通道padding模式插入或移除padding时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+version: ">=9.0.0"
+---
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）
 
 ## 产品支持情况

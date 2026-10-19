@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "将矩阵由L1 Buffer搬运到L0C Buffer，支持half、bfloat16_t、float、int32_t等数据类型及float到half或bfloat16_t的转换，按连续传输数据块组织搬运。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: related
+    condition: "L0C中的数据作为累加初始值参与矩阵乘加时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_copy_l12l0c
 
 ## 产品支持情况

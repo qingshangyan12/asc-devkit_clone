@@ -1,3 +1,40 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory非32B对齐搬入L1 Buffer，支持手动或自动填充，提供Normal、Compact与左右填充模式，并支持循环填充。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解搬入前的数据排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop1_stride.md
+    kind: requires
+    condition: "使用循环填充模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop2_stride.md
+    kind: requires
+    condition: "使用循环填充模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop_size.md
+    kind: requires
+    condition: "使用循环填充模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md
+    kind: requires
+    condition: "enable_data_select设置为true或使用左右填充模式时"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+    condition: "l2_cache_mode参数取值"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_gm2l1_align
 
 ## 产品支持情况

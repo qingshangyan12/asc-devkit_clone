@@ -1,3 +1,28 @@
+---
+okftype: reference.api
+description: "将GM数据以512字节分形为单位、按行列起始位置与步长切分提取多个分形矩阵搬入L1 Buffer，不进行格式转换，用于矩阵计算2D数据加载。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解搬入前的数据排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+    condition: "l2_cache_mode参数取值"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+version: ">=9.0.0"
+---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将L1 Buffer中的Bias数据搬运到BiasTable Buffer，支持前n个数据搬运与高维切分搬运，前n个方式要求搬运数据大小32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
+version: ">=9.1.0"
+---
 # asc_copy_l12bt
 
 ## 产品支持情况

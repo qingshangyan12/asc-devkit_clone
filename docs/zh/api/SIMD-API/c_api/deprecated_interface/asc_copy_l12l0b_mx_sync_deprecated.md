@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "接口asc_copy_l12l0b_mx_sync已废弃，原用于将L1 Buffer中右矩阵的量化系数按32字节数据分形搬入L0B_MX Buffer，替代方案为非同步接口asc_copy_l12l0b_mx配合同步接口asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_mx.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+version: ">=9.1.0"
+---
 # asc_copy_l12l0b_mx_sync（废弃）
 
 ## 产品支持情况

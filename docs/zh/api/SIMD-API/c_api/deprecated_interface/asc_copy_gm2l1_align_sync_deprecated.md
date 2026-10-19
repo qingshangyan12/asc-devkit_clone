@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力并在搬运过程中进行padding，非32字节对齐时补齐至32字节对齐。该同步接口已废弃，请使用对应的非同步接口asc_copy_gm2l1_align和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.1.0"
+---
 # asc_copy_gm2l1_align_sync（废弃）
 
 ## 产品支持情况

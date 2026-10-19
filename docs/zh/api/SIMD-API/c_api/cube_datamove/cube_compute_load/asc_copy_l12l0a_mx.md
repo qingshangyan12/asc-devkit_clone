@@ -1,3 +1,34 @@
+---
+okftype: reference.api
+description: "负责MX矩阵计算中左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，以32字节fp8_e8m0_t数据分形为单位，需与asc_copy_l12l0a配合使用，仅在AIC上有效。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
+    kind: related
+    condition: "查看Scale矩阵分形布局"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "查看搬入前的数据排布"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md
+    kind: related
+    condition: "MX矩阵计算流程"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_2d_arch_3510.md
+    kind: requires
+    condition: "MX矩阵计算量化系数搬运场景"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+version: ">=9.0.0"
+---
 # asc_copy_l12l0a_mx
 
 ## 产品支持情况

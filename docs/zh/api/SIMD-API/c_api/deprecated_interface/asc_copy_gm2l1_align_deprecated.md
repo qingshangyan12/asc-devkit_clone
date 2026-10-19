@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory搬运到L1 Buffer，提供非32字节对齐搬运与padding能力，支持Normal与Compact填充模式。旧常规重载及asc_copy_gm2l1_align_sync已废弃，请使用带asc_load_l2_cache_mode参数的asc_copy_gm2l1_align接口，同步场景调用asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_copy_gm2l1_align（废弃）
 
 ## 产品支持情况

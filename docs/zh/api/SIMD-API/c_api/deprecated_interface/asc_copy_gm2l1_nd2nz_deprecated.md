@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "接口asc_copy_gm2l1_nd2nz的旧常规重载和asc_copy_gm2l1_nd2nz_sync已废弃，请改用带asc_load_l2_cache_mode参数的asc_copy_gm2l1_nd2nz接口并在同步场景额外调用asc_sync，该接口将数据从Global Memory搬运到L1 Buffer并将ND格式转换为Nz分形排布。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_3510.md
+    kind: replaced_by
+    condition: "使用带asc_load_l2_cache_mode l2_cache_mode参数的asc_copy_gm2l1_nd2nz接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景额外调用asc_sync"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_copy_gm2l1_nd2nz_arch_3510（废弃）
 
 ## 产品支持情况
