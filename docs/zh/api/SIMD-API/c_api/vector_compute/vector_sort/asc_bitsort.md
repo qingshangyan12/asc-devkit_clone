@@ -45,17 +45,23 @@ src1固定为uint32\_t类型，无论src0是float还是half类型，dst中的（
 
 ```cpp
 // 占位符形式
-__aicore__ inline void asc_bitsort(__ubuf__ <dtype>* dst, __ubuf__ <dtype>* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+__aicore__ inline void asc_bitsort(__ubuf__ <dtype>* dst,
+                                   __ubuf__ <dtype>* src0,
+                                   __ubuf__ uint32_t* src1,
+                                   int32_t repeat)
 ```
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`half`、`float`。
+`dtype`取值为：`half`、`float`。
 
 ### 函数原型典型示例
 
 ```cpp
-__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+__aicore__ inline void asc_bitsort(__ubuf__ float* dst,
+                                   __ubuf__ float* src0,
+                                   __ubuf__ uint32_t* src1,
+                                   int32_t repeat)
 ```
 
 ## 参数说明

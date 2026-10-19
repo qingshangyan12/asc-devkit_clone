@@ -9,6 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/vector/reg_data_store_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_data_store.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL_H
 #endif
@@ -113,7 +115,9 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+        "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
@@ -127,7 +131,9 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+        "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src);
 }
@@ -140,7 +146,9 @@ __simd_callee__ inline void store(
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+        "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
@@ -155,9 +163,101 @@ __simd_callee__ inline void store(
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+        "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);
+}
+
+template <typename Tensor, typename T, typename Index>
+__simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_scatter only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, T>, "store_scatter requires matching tensor and register element types");
+    asc_scatter(tensor.engine().begin().get(), src.reg, index.reg, src.mask);
+}
+
+template <typename Tensor, typename Coord, typename T, typename Index>
+__simd_callee__ inline void store_scatter(
+    Tensor& tensor, const Coord& coord, const reg_tensor<T>& src, const reg_tensor<Index>& index)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_scatter only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, T>, "store_scatter requires matching tensor and register element types");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store_scatter");
+
+    auto dst_engine = tensor.engine() + tensor.layout()(coord);
+    asc_scatter(dst_engine.begin().get(), src.reg, index.reg, src.mask);
+}
+
+template <typename Tensor, typename RegDataType>
+__simd_callee__ inline void unalign_store::store(Tensor dst_tile, const reg_tensor<RegDataType>& src, uint32_t count)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<reg_data_type, RegDataType>,
+        "unalign_store requires matching tensor and register element types");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    asc_storeunalign(dst_tile.engine().begin().get(), ureg, src.reg, count);
+}
+
+template <typename Tensor, typename Coord, typename RegDataType>
+__simd_callee__ inline void unalign_store::store(
+    Tensor dst_tile, const Coord& coord, const reg_tensor<RegDataType>& src, uint32_t count)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<reg_data_type, RegDataType>,
+        "unalign_store requires matching tensor and register element types");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, dst_tile.layout(), coord, "unalign_store::store");
+
+    asc_storeunalign((dst_tile.data() + dst_tile.layout()(coord)).get(), ureg, src.reg, count);
+}
+
+template <typename Tensor>
+__simd_callee__ inline void unalign_store::flush(Tensor dst_base, int32_t coord)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    asc_storeunalign_post(dst_base.engine().begin().get(), ureg, coord);
 }
 
 } // namespace experimental

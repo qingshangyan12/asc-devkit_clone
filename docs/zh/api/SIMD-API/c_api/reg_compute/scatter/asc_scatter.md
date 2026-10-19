@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_scatter(__ubuf__ int8_t* dst,
 - 源操作数和索引为矢量数据寄存器，目的操作数为UB地址。
 - `dst`起始地址需32字节对齐。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD与SIMT混合编程时再划分32KB～128KB作为Data Cache，可用容量进一步减少）。`index`索引后的实际写入地址不可超过实际可用容量。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 分散搬出约束
 
@@ -112,7 +112,7 @@ __simd_callee__ inline void asc_scatter(__ubuf__ int8_t* dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

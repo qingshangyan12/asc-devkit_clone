@@ -85,3 +85,10 @@ inline half __float2half_rna(const float x)
         dst[idx] = __float2half_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 128, 128.0625, 128.1875, -128.1875, inf, -inf, nan
+result: 128, 128.125, 128.25, -128.25, inf, -inf, nan
+```

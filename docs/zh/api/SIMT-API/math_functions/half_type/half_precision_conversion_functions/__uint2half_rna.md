@@ -92,3 +92,10 @@ inline half __uint2half_rna(const unsigned int x)
         dst[idx] = __uint2half_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 1, 2049, 4097, 65535
+result: 0, 1, 2050, 4096, inf
+```

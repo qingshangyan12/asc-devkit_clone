@@ -76,3 +76,10 @@ inline long int labs(long int x)
         dst[idx] = labs(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+result: 12, 0, 23, 7
+```

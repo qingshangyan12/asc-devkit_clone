@@ -24,10 +24,10 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/And_res.md#id1 -->
 
@@ -110,10 +110,10 @@ $dst_i = src0_i \& src1_i$
 - 针对Atlas训练系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id15 -->
 <!-- npu="x90" id16 -->
-- 针对Kirin X90，T支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id16 -->
 <!-- npu="9030" id17 -->
-- 针对Kirin 9030，T支持的数据类型为：int16_t、uint16_t。
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id17 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -165,6 +165,7 @@ $dst_i = src0_i \& src1_i$
   - 针对Ascend 950PR&950DT系列产品，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id30 -->
 <!-- end id26 -->
+
 ## 调用示例<a name="section642mcpsimp"></a>
 
 - tensor高维切分计算样例-mask连续模式

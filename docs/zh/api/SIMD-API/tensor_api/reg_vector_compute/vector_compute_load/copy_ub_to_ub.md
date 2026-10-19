@@ -96,7 +96,7 @@ UB到UB通路使用`copy_ub_to_ub{}`作为搬运操作对象，默认trait为`ub
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
+| ND、DN、NZ、ZN | `int4b_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 
@@ -142,6 +142,8 @@ ZN Layout将逻辑二维Shape拆分为`((C0, ceil_div(M, C0)), (16, ceil_div(N, 
 源Tensor和目的Tensor必须均为ZN Layout，接口只在相同分形格式之间搬运，不改变分形排布。
 
 ## 调用示例
+
+以下示例在UB内完成数据搬运：源与目的张量位于同一UB地址空间，搬运参数（blockCount、blockLen、srcGap、dstGap）由layout的shape与stride自动推导，无需显式配置。完整Tensor搬运形式如下：
 
 ```cpp
 #include "tensor_api/tensor.h"

@@ -63,15 +63,14 @@ def asc_half2int32_rd_v2(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_half2int32_<round_mode><position_mode>(vector_int32_t& dst,
                                                                        vector_half src,
                                                                        vector_bool mask)
 ```
 
-### 占位符说明
+**占位符说明如下：**
 
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<position_mode>`表示`src`读取的位置，为空时，结果读取`src`的偶数索引位置；取值为`_v2`时，结果读取`src`的奇数索引位置。

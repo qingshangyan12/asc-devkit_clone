@@ -34,7 +34,7 @@
     xGm(0) = (float)(1.0); // 在获取值时，SuperKernel能够保证自动刷新cache line，但是写值时，相当于普通变量直接赋值，SuperKernel无法插入DataCacheCleanAndInvalid，需要用户保证数据缓存的一致性。
     ```
 
-对于频繁调用`GetValue`和`SetValue`的算子，建议使用`dcci_before_kernel_start`、`dcci_after_kernel_end`关闭指定算子内`GetValue`/`SetValue`中自动插入的缓存刷新指令，而改为算子调用前后插入整个DCache刷新，避免性能劣化。具体option说明，请参考各自PyTorch图模式SuperKernel文档option说明章节：GE入图参考[图内标定SuperKernel范围](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)，npugraph_ex后端参考[SuperKernel功能](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/npugraph_ex/advanced/superkernel.md)中`super_kernel_optimize_options`参数说明。
+对于频繁调用`GetValue`和`SetValue`的算子，建议使用`dcci_before_kernel_start`、`dcci_after_kernel_end`关闭指定算子内`GetValue`/`SetValue`中自动插入的缓存刷新指令，而改为算子调用前后插入整个DCache刷新，避免性能劣化。具体option说明，请参考各自PyTorch图模式SuperKernel文档option说明章节：GE入图参考[图内标定SuperKernel范围](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)，npugraph_ex后端参考[SuperKernel功能](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/npugraph_ex/advanced/superkernel.md)中`super_kernel_optimize_options`参数说明。
 
 Cache刷新机制示意图如下图所示：
 
@@ -52,6 +52,7 @@ Cache刷新机制示意图如下图所示：
 | [AscendC::GetBlockNum()](../../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的核数 |
 
 <!-- npu="A3,910b" id1 -->
+
 ## TPipe析构约束
 
 针对Atlas A2系列产品、Atlas A3系列产品，在GE入图及npugraph_ex后端aclnn调用场景，子算子TPipe对象析构（[TPipe::Destroy](../../../../api/SIMD-API/basic_api/resource_management/TPipe/Destroy.md)）接口内部的`AscendC::PipeBarrier<PIPE_ALL>()`指令会被去除，如果算子内部使用了多个TPipe对象或手动调用Destroy函数时开发者需自行保障TPipe对象间流水的同步。

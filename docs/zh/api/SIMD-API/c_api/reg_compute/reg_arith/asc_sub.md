@@ -86,9 +86,10 @@ __simd_callee__ inline vector_float asc_sub(vector_float src0,
                                             vector_bool mask)
 ```
 
-### 带借位输出减法（占位符形式）
+### 带借位输出减法
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_sub(vector_bool& carry,
                                     vector_<dtype>& dst,
                                     vector_<dtype> src0,
@@ -110,6 +111,7 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
                                     vector_int32_t src1,
                                     vector_bool mask)
 ```
+
 ## 参数说明
 
 ### 无借位输出减法
@@ -165,7 +167,7 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

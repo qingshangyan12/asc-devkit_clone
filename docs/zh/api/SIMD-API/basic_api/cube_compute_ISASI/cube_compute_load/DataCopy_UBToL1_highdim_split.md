@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_highdim_split_res.md#id1 -->
 
@@ -98,6 +98,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- npu="310p" id13 -->
 针对Atlas推理系列产品AI Core，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
 <!-- end id13 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_highdim_split_res.md#id2 -->
 
 ## 返回值说明
 

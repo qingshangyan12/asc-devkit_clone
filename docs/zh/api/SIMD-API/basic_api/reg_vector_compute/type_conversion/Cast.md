@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -92,7 +104,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 | uint16_t | uint8_t、uint32_t |
 | half | int4x2_t、int8_t、uint8_t、hifloat8_t、int16_t、bfloat16_t、int32_t、float |
 | bfloat16_t | fp4x2_e2m1_t、fp4x2_e1m2_t、fp8_e8m0_t、half、int32_t、float |
-| int32_t | uint8_t、int16_t、float、int64_t |
+| int32_t | uint8_t、int16_t、uint16_t、float、int64_t |
 | uint32_t | uint8_t、int16_t、uint16_t |
 | float | hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、half、bfloat16_t、int32_t、int64_t |
 | int64_t | int32_t、float |
@@ -103,7 +115,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 当目的操作数位宽比源操作数小时，再MaskReg和RegLayout作用下，目的操作数中的无效元素均为0。
+- 当目的操作数位宽比源操作数小时，MaskMergeMode::ZEROING模式下，MaskReg和RegLayout对应的目的操作数无效元素均为0；MaskMergeMode::MERGING模式下，mask未选中的目的操作数元素保留dstReg原值。
 - 该指令需配合SetCtrlSpr指令使用，通过设置寄存器的值控制Cast的不饱和模式和饱和模式。
 - 舍入模式仅在可能导致精度损失且支持该舍入模式的转换中生效，具体支持情况请参考[关键特性说明](#关键特性说明)。
 - 不同类型转换的不饱和与饱和模式的描述有所区别，全局或单指令生效配置方法也不同，具体内容参考[表4 不同类型转换场景的不饱和模式和饱和模式](#表4-不同类型转换场景的不饱和模式和饱和模式)、[表5 饱和模式全局或单指令生效配置表](#表5-饱和模式全局或单指令生效配置表)。
@@ -112,7 +124,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
     - 不饱和模式：当输出类型为fp8_e4m3fn_t时，由于fp8_e4m3fn_t没有inf表示格式，所以输出为nan。
     - 饱和模式：当输出类型为fp8_e5m2_t/fp8_e4m3fn_t时，输入nan，默认输出为0。如果CTRL\[50\] = 1'b1，则输出为nan。
     - fp4x2_e2m1_t/fp4x2_e1m2_t数据类型没有inf和nan的定义。对于bfloat16到float4的数据类型转换，输入bfloat16类型的值为inf或超出fp4x2_e2m1_t/fp4x2_e1m2_t数据最值范围时，会返回对应符号的fp4x2_e2m1_t/fp4x2_e1m2_t最值；输入nan时，fp4x2_e2m1_t/fp4x2_e1m2_t输出0。
-    - 对于fp8_e8m0_t类型：输入bfloat16_t +/-inf或绝对值超出fp8_e8m0_t类型最大值，则返回fp8_e8m0_t最大值0b11111110；输入bfloat16_t nan输出fp8_e8m0_t nan = 0b11111111。
+    - 对于fp8_e8m0_t类型：输入bfloat16_t绝对值超出fp8_e8m0_t类型最大值，返回fp8_e8m0_t最大值0b11111110；输入bfloat16_t +/-inf或nan，输出fp8_e8m0_t nan = 0b11111111。
 
 - 整数转整数
 
@@ -164,79 +176,80 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
 | src dtype | dst dtype | layoutMode | satMode | mrgMode | roundMode |
 | --- | --- | --- | --- | --- | --- |
-| half | int4x2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| half | int8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| half | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| half | int16_t | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| half | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| float | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| float | int32_t | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| float | int64_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| half | int4x2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| half | int8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| half | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| half | int16_t | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| half | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| float | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| float | int32_t | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| float | int64_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
 
 <a id="表7-浮点转浮点"></a>
 **表 7**  浮点转浮点
 
 | src dtype | dst dtype | layoutMode | satMode | mrgMode | roundMode |
 | --- | --- | --- | --- | --- | --- |
-| hifloat8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| hifloat8_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp8_e4m3fn_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp8_e5m2_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp8_e8m0_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp4x2_e2m1_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp4x2_e1m2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| half | hifloat8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_ROUND,  RoundMode::HYBRID |
-| half | bfloat16_t | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | half | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | fp4x2_e2m1_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | fp4x2_e1m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | fp8_e8m0_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| bfloat16_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| float | hifloat8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_ROUND,  RoundMode::HYBRID |
-| float | fp8_e4m3fn_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT |
-| float | fp8_e5m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT |
-| float | half | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_ODD, RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| float | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| hifloat8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| hifloat8_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| fp8_e4m3fn_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| fp8_e5m2_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| fp8_e8m0_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| fp4x2_e2m1_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| fp4x2_e1m2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| half | hifloat8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_ROUND,  RoundMode::CAST_HYBRID |
+| half | bfloat16_t | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | half | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | fp4x2_e2m1_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | fp4x2_e1m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | fp8_e8m0_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| half | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| bfloat16_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| float | hifloat8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_ROUND,  RoundMode::CAST_HYBRID |
+| float | fp8_e4m3fn_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT |
+| float | fp8_e5m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT |
+| float | half | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_ODD, RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| float | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
 
 <a id="表8-整数转浮点"></a>
 **表 8**  整数转浮点
 
 | src dtype | dst dtype | layoutMode | satMode | mrgMode | roundMode |
 | --- | --- | --- | --- | --- | --- |
-| int4x2_t | half | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int4x2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int16_t | half | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| int16_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int32_t | float | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| int64_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| int4x2_t | half | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int4x2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int16_t | half | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| int16_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int32_t | float | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| int64_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
 
 <a id="表9-整数转整数"></a>
 **表 9**  整数转整数
 
 | src dtype | dst dtype | layoutMode | satMode | mrgMode | roundMode |
 | --- | --- | --- | --- | --- | --- |
-| int4x2_t | int16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int8_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int8_t | int32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint8_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint8_t | uint32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int16_t | int4x2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int16_t | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int16_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int16_t | uint32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint16_t | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint16_t | uint32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int32_t | int64_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int64_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
+| int4x2_t | int16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int8_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int8_t | int32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint8_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint8_t | uint32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int16_t | int4x2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int16_t | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int16_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int16_t | uint32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint16_t | uint8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint16_t | uint32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int32_t | int64_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| uint32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
+| int64_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING, MaskMergeMode::MERGING | RoundMode::UNKNOWN |
 
 ### float转hifloat8_t转换规则
 
@@ -288,6 +301,7 @@ result[i][7 :0] = saturation(tmp[7 : 0]) according to control bit;
 ```
 
 ### half转hifloat8_t转换规则
+
 ```
 tmp2[15 : 0] = f16_src_data[i][15 : 0];
 Ev = tmp2[14 : 10] - 5'b01111, thr = {tmp2[0], 1’b1};

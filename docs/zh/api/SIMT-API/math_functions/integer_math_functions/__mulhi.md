@@ -79,3 +79,11 @@ int __mulhi(int x, int y)
         dst[idx] = __mulhi(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 23, -7, 6
+y: 6, 3, 4, 15
+result: -1, 0, -1, 0
+```

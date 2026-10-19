@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE_H
 #endif
 
 /**
@@ -30,6 +30,8 @@
 #include "tensor_api/experimental/arch/vector/type_conversion.h"
 #include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
+#include "tensor_api/experimental/arch/vector/composite_compute.h"
+#include "tensor_api/experimental/arch/vector/histogram_compute.h"
 #include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
@@ -40,7 +42,7 @@
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_COMPUTE_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_COMPUTE_H
 #endif

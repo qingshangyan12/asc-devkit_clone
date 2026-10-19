@@ -3,13 +3,13 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2推理产品：不支持
@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`tensor_api/tensor.h`。
+头文件路径为：`tensor_api/utils/print.h`。
 
 Tensor API提供三个调试打印接口：
 
@@ -95,8 +95,8 @@ __aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true
 ## 约束说明
 
 - 只有开启调试打印时才会产生输出。定义`ASCENDC_DUMP=0`时，三个接口均不输出数据。
-- `print_layout`只支持Shape在顶层包含两个元素的Layout。顶层元素可以是整数或嵌套Shape结构；顶层元素数量不为两个时会触发编译期校验。
-- `print_tensor`只支持Shape在顶层包含1到4个元素的Tensor。顶层元素可以是整数或嵌套Shape结构。顶层元素数量超出范围时会触发编译期校验。元素按逻辑坐标顺序访问，实际物理地址由Tensor的Layout决定；ND、NZ等Layout的内部对齐区域不会作为额外逻辑元素打印。
+- `print_layout`支持的场景：Layout的Shape和Stride在顶层只包含两个维度。顶层维度可以是整数或嵌套结构。顶层维度数量不为两个时会触发编译期校验。
+- `print_tensor`支持的场景：Tensor的Shape和Stride在顶层只包含1到4个维度。顶层维度可以是整数或嵌套结构。顶层维度数量超出范围时会触发编译期校验。
 - `print_tensor`支持打印的Tensor存储位置如下：
 
   | 存储位置 | 是否支持 |
@@ -113,6 +113,9 @@ __aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true
   | `location::fixbuf` | 不支持 |
   | `location::ssbuf` | 不支持 |
 - 打印功能会增加算子运行时间和调试输出量。打印Tensor前应控制Tensor的逻辑元素数量。多个核或多个线程同时打印时，日志可能交错或受输出缓存大小限制。
+- 使用`print_tensor`接口时，在每个核上打印的数据总量不能大于30KB，请开发者自行控制打印的内容数据量。
+- `print_tensor`接口支持打印的元素数据类型：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。
+- 由于在SIMD VF中不能直接访问GM地址，因此不能在SIMD VF中使用。
 
 ## 输出格式
 
@@ -160,6 +163,7 @@ ptr[<element_bits>b](<address>) o layout(shape=<shape>, stride=<stride>)
 
 ```cpp
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 using namespace asc::te;
 
@@ -183,6 +187,7 @@ NPU模式下的输出示例：
 
 ```cpp
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 using namespace asc::te;
 
@@ -203,6 +208,7 @@ __aicore__ inline void print_layout_description_example()
 
 ```cpp
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 using namespace asc::te;
 
@@ -229,6 +235,7 @@ __aicore__ inline void print_layout_table_example()
 
 ```cpp
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 using namespace asc::te;
 
@@ -255,6 +262,7 @@ __aicore__ inline void print_gm_tensor_example(__gm__ int32_t* data)
 
 ```cpp
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 using namespace asc::te;
 

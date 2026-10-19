@@ -78,6 +78,9 @@ HcclResult PostSyncInterThreads(
     const ThreadHandle& mainThread, const std::vector<ThreadHandle>& subThreads,
     const std::vector<u32>& notifyIdxSubToMain);
 
+float Fp16ToFp32(uint16_t fp16Bits);
+uint16_t Fp32ToFp16(float value);
+
 HcclResult AicpuReduce(
     const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice, const HcclDataType dataType,
     const HcclReduceOp reduceOp);

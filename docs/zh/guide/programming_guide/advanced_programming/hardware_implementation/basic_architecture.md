@@ -61,7 +61,7 @@ AI Core负责执行矩阵、矢量计算密集的任务，其包括以下组成�
 >[!NOTE]说明 
 >Ascend C编程中，不同产品的工作模式如下：
 ><!-- npu="310p" id1 -->
->- Atlas 推理系列产品：耦合模式
+>- Atlas推理系列产品：耦合模式
 ><!-- end id1 -->
 ><!-- npu="910" id2 -->
 >- Atlas训练系列产品：耦合模式
@@ -123,9 +123,8 @@ AI处理器中的计算资源要想发挥强劲算力，必要条件是保证输
 **图6**  存储单元<a name="fig2032418113610"></a>  
 ![](../../../figures/storage_unit.png "存储单元")
 
-**表1**  存储单元介绍
+**表1**  存储单元介绍<a name="table1692510612218"></a>
 
-<a name="table1692510612218"></a>
 <table><thead align="left"><tr id="row1692576132110"><th class="cellrowborder" valign="top" width="30.11%" id="mcps1.2.3.1.1"><p id="p189252069218"><a name="p189252069218"></a><a name="p189252069218"></a>存储单元</p>
 </th>
 <th class="cellrowborder" valign="top" width="69.89%" id="mcps1.2.3.1.2"><p id="p17925161215"><a name="p17925161215"></a><a name="p17925161215"></a>描述</p>
@@ -165,9 +164,8 @@ AI处理器中的计算资源要想发挥强劲算力，必要条件是保证输
 </tbody>
 </table>
 
-**表2**  搬运单元介绍
+**表2**  搬运单元介绍<a name="table288493152012"></a>
 
-<a name="table288493152012"></a>
 <table><thead align="left"><tr id="row19884103142012"><th class="cellrowborder" valign="top" width="30.049999999999997%" id="mcps1.2.3.1.1"><p id="p288473114204"><a name="p288473114204"></a><a name="p288473114204"></a>搬运单元</p>
 </th>
 <th class="cellrowborder" valign="top" width="69.95%" id="mcps1.2.3.1.2"><p id="p8884531162011"><a name="p8884531162011"></a><a name="p8884531162011"></a>描述</p>
@@ -230,7 +228,7 @@ AI处理器中的计算资源要想发挥强劲算力，必要条件是保证输
 **图7**  指令分类处理机制<a name="fig1993349810"></a>  
 ![](../../../figures/instr_class.png "指令分类处理机制")
 
-各指令队列存在队列深度限制。队列深度表示同一指令队列中可缓存的待执行指令数量。当其中任一待执行指令（Vector指令队列、Cube指令队列、MTE1/MTE2/MTE3指令队列等）数量达到队列深度时，对应的Scalar单元如果再次向该指令队列发射指令会被阻塞，导致Scalar单元无法继续顺序发射后续指令，可能影响整体流水并行效率，[NPU架构版本2201](../../language_extension/simd_builtin_keywords.md)各指令队列深度参数参考[指令队列深度](./architecture_spec/npu_arch_2201.md#指令序列深度)，[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)各指令队列深度参数参考[指令队列深度](./architecture_spec/npu_arch_3510.md#指令序列深度)。其中各待执行指令队列一般包含三类指令：流水线待执行指令、流水线同步指令、搭配指令使用的寄存器设置指令。若待执行指令队列满影响到后续流水并行效率，可尝试减少对应指令队列里的指令数，缓解Scalar单元发射指令的阻塞状态；或者尝试重新编排受影响的并行流水线，将受影响的流水线指令发射提前。
+各指令队列存在队列深度限制。队列深度表示同一指令队列中可缓存的待执行指令数量。当其中任一待执行指令（Vector指令队列、Cube指令队列、MTE1/MTE2/MTE3指令队列等）数量达到队列深度时，对应的Scalar单元如果再次向该指令队列发射指令会被阻塞，导致Scalar单元无法继续顺序发射后续指令，可能影响整体流水并行效率，[NPU架构版本2201](../../language_extension/simd_builtin_keywords.md)各指令队列深度参数参考[指令队列深度](./architecture_spec/npu_arch_2201.md#指令队列深度)，[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)各指令队列深度参数参考[指令队列深度](./architecture_spec/npu_arch_3510.md#指令队列深度)。其中各待执行指令队列一般包含三类指令：流水线待执行指令、流水线同步指令、搭配指令使用的寄存器设置指令。若待执行指令队列满影响到后续流水并行效率，可尝试减少对应指令队列里的指令数，缓解Scalar单元发射指令的阻塞状态；或者尝试重新编排受影响的并行流水线，将受影响的流水线指令发射提前。
 
 同一个指令队列中的指令是按照进入指令队列的顺序执行的，不同指令队列之间可以并行执行，通过多个指令队列的并行执行可以提升整体执行效率。对于并行执行过程中可能出现的数据依赖，通过事件同步模块插入同步指令来控制流水线的同步，提供PipeBarrier、SetFlag/WaitFlag两种API，保证队列内部以及队列之间按照逻辑关系执行。
 

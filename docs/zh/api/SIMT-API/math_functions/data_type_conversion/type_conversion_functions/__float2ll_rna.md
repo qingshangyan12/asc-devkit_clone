@@ -91,3 +91,10 @@ inline long long int __float2ll_rna(const float x)
         dst[idx] = __float2ll_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -4.5, -1.25, 1.25, 4.5, inf, -inf, nan
+result: -5, -1, 1, 5, 9223372036854775807, -9223372036854775808, 0
+```

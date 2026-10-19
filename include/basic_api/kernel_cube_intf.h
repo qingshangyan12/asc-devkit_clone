@@ -37,6 +37,9 @@
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_fixpipe_intf.h"
 #include "kernel_operator_dump_tensor_intf.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#include "kernel_operator_mem_intf.h"
+#endif
 #include "kernel_operator_mm_intf.h"
 #include "kernel_operator_gemm_intf.h"
 #include "kernel_operator_conv2d_intf.h"

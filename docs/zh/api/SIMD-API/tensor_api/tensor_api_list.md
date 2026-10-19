@@ -110,19 +110,25 @@
 | [deinterleave（掩码寄存器解交织）](reg_vector_compute/mask_reg_compute/deinterleave.md) | 将两个Mask寄存器按指定元素宽度解交织，返回偶数组和奇数组结果。 |
 | [load](reg_vector_compute/reg_data_load/load.md) | 将UB中的数据搬入`reg_tensor`，支持多种数据排列方式。 |
 | [load_broadcast](reg_vector_compute/reg_data_load/load_broadcast.md) | 从UB搬入数据，并按指定模式广播到`reg_tensor`。 |
+| [load_gather](reg_vector_compute/reg_data_load/load_gather.md) | 根据索引从UB Tensor的离散位置收集数据到`reg_tensor`。 |
+| [unalign_load](reg_vector_compute/reg_data_load/unalign_load.md) | 将非32字节对齐的UB数据搬入`reg_tensor`，支持连续搬入。 |
 | [store](reg_vector_compute/reg_data_store/store.md) | 将`reg_tensor`中的数据搬出到UB，支持多种数据排列方式。 |
+| [store_scatter](reg_vector_compute/reg_data_store/store_scatter.md) | 根据索引将`reg_tensor`中的有效元素分散写入UB Tensor。 |
+| [unalign_store](reg_vector_compute/reg_data_store/unalign_store.md) | 将`reg_tensor`中的指定数量元素连续搬出到非32字节对齐的UB地址，并提供收尾操作。 |
 | [cast](reg_vector_compute/type_conversion/cast.md) | 转换寄存器数据类型，支持配置数据排布、舍入和饱和模式。 |
 | [trunc](reg_vector_compute/type_conversion/trunc.md) | 将Mask选中的浮点元素向零取整，并保留原数据类型。 |
 | [abs](reg_vector_compute/basic_arithmetic/abs.md) | 对源操作数逐元素计算绝对值。 |
-| [addc](reg_vector_compute/basic_arithmetic/addc.md) | 对源操作数逐元素执行带进位加法。 |
+| [add_carry](reg_vector_compute/basic_arithmetic/add_carry.md) | 对源操作数逐元素执行带进位加法。 |
 | [exp](reg_vector_compute/basic_arithmetic/exp.md) | 对源操作数中的有效元素逐元素计算指数。 |
 | [leaky_relu](reg_vector_compute/basic_arithmetic/leaky_relu.md) | 对源操作数逐元素执行Leaky ReLU计算。 |
 | [log](reg_vector_compute/basic_arithmetic/log.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
+| [ln](reg_vector_compute/basic_arithmetic/ln.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
 | [log10](reg_vector_compute/basic_arithmetic/log10.md) | 对源操作数中的有效元素逐元素计算以10为底的对数。 |
 | [log2](reg_vector_compute/basic_arithmetic/log2.md) | 对源操作数中的有效元素逐元素计算以2为底的对数。 |
 | [max](reg_vector_compute/basic_arithmetic/max.md) | 对两个源操作数逐元素计算最大值。 |
 | [min](reg_vector_compute/basic_arithmetic/min.md) | 对两个源操作数逐元素计算最小值。 |
 | [mull](reg_vector_compute/basic_arithmetic/mull.md) | 对两个源操作数逐元素执行高低位乘法计算。 |
+| [neg](reg_vector_compute/basic_arithmetic/neg.md) | 对源操作数逐元素取相反数。 |
 | [+](reg_vector_compute/basic_arithmetic/operator_add.md) | 对两个源操作数逐元素执行加法计算。 |
 | [-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对两个源操作数逐元素执行减法计算。 |
 | [*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
@@ -130,7 +136,7 @@
 | [prelu](reg_vector_compute/basic_arithmetic/prelu.md) | 对源操作数逐元素执行PReLU计算。 |
 | [relu](reg_vector_compute/basic_arithmetic/relu.md) | 对源操作数逐元素执行ReLU计算。 |
 | [sqrt](reg_vector_compute/basic_arithmetic/sqrt.md) | 对源操作数逐元素计算平方根。 |
-| [subc](reg_vector_compute/basic_arithmetic/subc.md) | 对源操作数逐元素执行带借位减法。 |
+| [sub_carry](reg_vector_compute/basic_arithmetic/sub_carry.md) | 对源操作数逐元素执行带借位减法。 |
 | [not](reg_vector_compute/logical_compute/not.md) | 对源操作数逐元素执行逻辑非计算。 |
 | [&](reg_vector_compute/logical_compute/and.md) | 对两个源操作数逐元素执行按位与计算。 |
 | [\|](reg_vector_compute/logical_compute/or.md) | 对两个源操作数逐元素执行按位或计算。 |

@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -96,7 +96,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -106,7 +106,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
                                                         addr_reg offset,
                                                         vector_bool mask)
 ```
-
 
 ## 参数说明
 
@@ -156,7 +155,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
 - `dst`起始地址需32字节对齐，否则会报错。
 - `mask`必须为`vector_bool`类型掩码寄存器，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。`dst`偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### int32_t偏移压缩搬出场景
 
@@ -174,7 +173,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

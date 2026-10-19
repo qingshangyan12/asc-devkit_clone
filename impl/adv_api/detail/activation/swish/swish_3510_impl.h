@@ -26,7 +26,46 @@
 
 namespace AscendC {
 namespace Internal {
+constexpr Reg::CastTrait swishFloat2HalfCastTrait0 = {
+    Reg::RegLayout::ZERO, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
+constexpr Reg::CastTrait swishFloat2HalfCastTrait1 = {
+    Reg::RegLayout::ONE, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+template <typename T>
+__simd_vf__ inline void SwishComputeVF(
+    __ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const T scalarValue, const uint16_t repeatTimes)
+{
+    constexpr uint32_t oneRepElm = static_cast<uint32_t>(GetVecLen() / sizeof(T));
+    Reg::RegTensor<T> srcVreg;
+    Reg::RegTensor<T> vreg0;
+    Reg::RegTensor<T> dstVreg;
+    Reg::RegTensor<T> vreg1;
+    Reg::RegTensor<float> tmpVreg0;
+    Reg::RegTensor<float> tmpVreg1;
+    Reg::MaskReg mask;
+    if constexpr (IsSameType<T, half>::value) {
+        mask = Reg::CreateMask<T>();
+        Reg::Duplicate(vreg1, 0, mask);
+    }
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = Reg::UpdateMask<T>(count);
+        Reg::LoadAlign(srcVreg, src + i * oneRepElm);
+        Reg::Muls(vreg0, srcVreg, scalarValue, mask);
+        if constexpr (IsSameType<T, half>::value) {
+            Reg::ExpSub<float, T, Reg::RegLayout::ZERO>(tmpVreg0, vreg0, vreg1, mask);
+            Reg::ExpSub<float, T, Reg::RegLayout::ONE>(tmpVreg1, vreg0, vreg1, mask);
+            Reg::Cast<half, float, swishFloat2HalfCastTrait0>(vreg0, tmpVreg0, mask);
+            Reg::Cast<half, float, swishFloat2HalfCastTrait1>(vreg0, tmpVreg1, mask);
+        } else {
+            Reg::Exp(vreg0, vreg0, mask);
+        }
+        Reg::Adds(vreg0, vreg0, 1.0f, mask);
+        Reg::Div(dstVreg, srcVreg, vreg0, mask);
+        Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
+    }
+}
+#else
 template <typename T>
 __simd_vf__ inline void SwishComputeVF(
     __ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const T scalarValue, const uint16_t repeatTimes)
@@ -46,6 +85,7 @@ __simd_vf__ inline void SwishComputeVF(
         Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
+#endif
 } // namespace Internal
 
 template <typename T, bool isReuseSource = false>

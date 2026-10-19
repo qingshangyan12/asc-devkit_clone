@@ -12,6 +12,7 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_DEV_BASE}/src/common
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 
     ${HCCL_DEV_BASE}/src/ops
     ${HCCL_DEV_BASE}/src/ops/op_common
@@ -22,6 +23,7 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/op_common/executor/registry
 
     ${HCCL_DEV_BASE}/src/ops/op_common/selector
+    ${HCCL_DEV_BASE}/src/ops/op_common/external_alg
 
     ${HCCL_DEV_BASE}/src/ops/op_common/template
     ${HCCL_DEV_BASE}/src/ops/op_common/template/registry
@@ -57,6 +59,7 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu
 
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 )
 
 list(APPEND INCLUDE_LIST
@@ -105,7 +108,9 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor_aicpu.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D_Z_axis_detour.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
@@ -178,8 +183,10 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D_Z_axis_detour.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor_aicpu.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
@@ -202,6 +209,7 @@ target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/external_alg/alg_meta_registry.cc
 )
 
 target_include_directories(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE

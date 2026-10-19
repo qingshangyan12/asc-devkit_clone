@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1_res.md#id1 -->
 
@@ -42,13 +42,13 @@
 下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id11 -->
-**图1** L0C2L1流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**图1** L0C2L1流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**图2** L0C2L1流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
+**图2** L0C2L1流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>
 
 ![](../../../../figures/L0C2L1_Function_Combination_950.png)
 <!-- end id13 -->
@@ -143,6 +143,7 @@
 | srcNdStride | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路无需额外设置。 |
 | dstNdStride | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路无需额外设置。 |
 
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1_res.md#id2 -->
 ## 数据类型<a id="zh-cn_topic_0000002511188540_section4219135304818"></a>
 
 **源矩阵与目的矩阵支持的数据类型组合**
@@ -178,7 +179,7 @@
 <!-- end id24 -->
 
 <!-- npu="x90" id25 -->
-针对Kirin X90，支持的数据类型组合如下：
+针对Kirin X90处理器系列产品，支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
 | ---------- | ---------- |
@@ -188,7 +189,7 @@
 <!-- end id25 -->
 
 <!-- npu="9030" id26 -->
-针对Kirin 9030，支持的数据类型组合如下：
+针对Kirin 9030处理器系列产品，支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
 | ---------- | ---------- |
@@ -252,6 +253,7 @@
 
     对于整数类型只有饱和模式。
 <!-- end id31 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1_res.md#id3 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
@@ -262,7 +264,7 @@ Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](../../../../../../../example
 
     ```cpp
         AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
-    
+
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         uint16_t c0Size = 32;
         AscendC::FixpipeParamsV220 fixpipeParams;
@@ -278,7 +280,7 @@ Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](../../../../../../../example
         deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
         fixpipeParams.deqScalar = deqScalar;
         AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(c1Local, c, fixpipeParams);
-    
+
     #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         uint16_t c0Size = 32;
         AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::NZ> fixpipeParams;

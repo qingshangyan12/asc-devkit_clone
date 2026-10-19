@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
 
-提供数据非对齐搬运的功能，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。
+将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持搬运长度不是32字节整数倍的数据。搬运过程中按32字节的整数倍进行补齐处理，写入GM时丢弃补齐数据，仅写入指定长度的有效数据。该接口支持8位/16位/32位数据类型搬运，搬运数据长度仍需满足对应数据类型的字节对齐要求；源、目的起始地址的对齐要求请参见[参数说明](#参数说明)。
 
 本接口支持以下两种数据搬运方式，均不支持设置填充值：
 
@@ -153,7 +153,7 @@ PIPE_MTE3
 
 - 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 连续数据搬运约束
 
@@ -196,7 +196,7 @@ asc_set_ub2gm_loop_size(1, 1);
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

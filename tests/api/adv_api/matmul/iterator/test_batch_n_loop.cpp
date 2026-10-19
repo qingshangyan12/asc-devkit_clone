@@ -32,7 +32,7 @@ namespace {
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
 class CustomMatmulPolicy : public Impl::Detail::MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
-    using NLoop = Impl::Detail::NLoop<IMPL, B_TYPE, MM_CFG>;
+    using NLoop = Impl::Detail::NLoop<IMPL, A_TYPE, B_TYPE, MM_CFG>;
 };
 
 template <

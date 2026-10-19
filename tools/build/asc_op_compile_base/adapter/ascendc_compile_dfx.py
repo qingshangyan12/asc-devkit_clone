@@ -113,7 +113,12 @@ class DFXSectionGenerator:
     def is_support_dfx(op_info: OpInfo) -> bool:
         # only support david and ascend910B and ascend310p dex section now
         arch_support = (
-            CommonUtility.is_v200() or CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_v300()
+            CommonUtility.is_v200()
+            or CommonUtility.is_v220()
+            or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+            or CommonUtility.is_v300()
         )
         option_support = True
         # dfx do not support, because of custom framework is too old or enable super kernel
@@ -194,7 +199,7 @@ class DFXSectionGenerator:
     def _tran_dfx_info_to_string(self, string_value: str):
         if "oom" in get_current_build_config("tir.op_debug_config"):
             return [
-                f"(((((sizeof({string_value}) + 7) / 8) * 8 + 8 + 8 * {self.param_placeholder_num} ) >> \
+                f"(((((sizeof({string_value}) + 7) / 8) * 8 + 8 + 8 * {self.param_placeholder_num} + 2) >> \
 {int((7 - i) * 8)}) & 0xff)"
                 for i in range(8)
             ]
@@ -203,7 +208,7 @@ class DFXSectionGenerator:
 
     def _tran_dfx_info_to_value_string(self, size_value: int):
         if "oom" in get_current_build_config("tir.op_debug_config"):
-            total_size = ((size_value + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num
+            total_size = ((size_value + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
         else:
             total_size = size_value + 8
         return [str((total_size >> ((7 - i) * 8)) & 0xFF) for i in range(8)]
@@ -230,8 +235,8 @@ class DFXSectionGenerator:
                 tiling_size = tiling_info.tiling_key_data_size[tiling_key]
             if "oom" in get_current_build_config("tir.op_debug_config"):
                 # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
-                # oom need allocate 8 * (input + output + shape_tensor+ workspace)
-                tiling_size = ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num
+                # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
+                tiling_size = ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
             else:
                 tiling_size = tiling_size + 8
             parameter.args_dfx_info[-8:] = self._tran_dfx_info_to_uint8_t(tiling_size, ArgTypeSize.U64)
@@ -279,15 +284,19 @@ class DFXSectionGenerator:
 
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = ""
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
             short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
             if compile_info.code_channel == CORE_TYPE_MIX:
                 section_var += (
                     f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
                 )
                 section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
-            {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 2} };\n"
+                if CommonUtility.is_920r1() or CommonUtility.is_920r2():
+                    section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
+                        {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 1} };\n"
+                else:
+                    section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
+                        {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 2} };\n"
             elif compile_info.hard_sync:
                 if compile_info.code_channel in [CORE_TYPE_VEC]:
                     section_var += (
@@ -385,7 +394,7 @@ class DFXSectionGenerator:
                 section_content += f"{binary}, "
             section_content += "} "
             section_content += "};\n"
-        if CommonUtility.is_c310():
+        if CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2():
             section_content += self.generate_meta_info_func_section(tiling_key, compile_info, kernel_name)
         return section_content
 
@@ -404,13 +413,19 @@ class DFXSectionGenerator:
             self._generate_binary_for_tiling(tiling_key, tiling_info, compile_info)
 
         section_content = f"// generate dfx section for tiling_key:{tiling_key}"
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
             if CommonUtility.is_v220():
                 cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
                 vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"
             elif CommonUtility.is_c310():
                 cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)"
                 vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)"
+            elif CommonUtility.is_920r1():
+                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9201)"
+                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9201)"
+            elif CommonUtility.is_920r2():
+                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9202)"
+                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9202)"
         else:
             # for v200 cube_core_type is aicore type
             cube_core_marco = "defined(__DAV_M200__)"

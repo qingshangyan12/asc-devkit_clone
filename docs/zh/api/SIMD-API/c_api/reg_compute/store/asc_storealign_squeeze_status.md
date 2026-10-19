@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/store/storealign.h"`。
+
 将[asc_squeeze_and_storeunalign](../reg_permute_sel/asc_squeeze_and_storeunalign.md)操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB）。调用无`offset`参数的重载时，写入`dst`；调用带`offset`参数的重载时，写入`dst`加字节偏移`offset`的位置。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
@@ -57,14 +59,14 @@ __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 实际目的地址需4字节对齐，且不得超出实际可用UB范围；无`offset`参数时实际目的地址为`dst`，带`offset`参数时为`dst`加`offset`字节。
 - 调用本接口前，需使用[asc_squeeze_and_storeunalign](../reg_permute_sel/asc_squeeze_and_storeunalign.md)完成squeeze操作；写入的值是其当前累计的有效数据字节数。
-- 如果本接口与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
