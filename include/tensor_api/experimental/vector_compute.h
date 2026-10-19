@@ -35,6 +35,7 @@
 #include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #include "tensor_api/experimental/arch/vector/reg_sync_control.h"
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
