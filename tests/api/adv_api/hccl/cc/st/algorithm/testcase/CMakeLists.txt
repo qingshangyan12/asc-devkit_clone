@@ -12,6 +12,7 @@ set(src_list
     main.cc
     all_gather_nhr_testcase.cc
     all_gather_aicpu_testcase.cc
+    reduce_scatter_concur_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
 )
@@ -174,8 +175,11 @@ target_link_libraries(${MESHCHUNK_TEST_TARGET} PRIVATE ${MESHCHUNK_TEST_LIBS})
 foreach(primitive HcommIsSupportHcommBatchTransferOnThread HcclHcommBatchTransferOnThread
         HcommChannelNotifyRecordOnThread HcommChannelNotifyWaitOnThread HcommWriteReduceOnThread HcommReadReduceOnThread
         HcommThreadNotifyRecordOnThread HcommThreadNotifyWaitOnThread HcommLocalCopyOnThread)
+    # Primitive wrappers are local to this test executable.
     target_link_options(${MESHCHUNK_TEST_TARGET} PRIVATE "-Wl,--wrap=${primitive}")
 endforeach()
+target_link_options(${MESHCHUNK_TEST_TARGET} PRIVATE
+    "-Wl,--wrap=HcommWriteOnThread" "-Wl,--wrap=HcommLocalReduceOnThread")
 add_custom_command(TARGET ${MESHCHUNK_TEST_TARGET} POST_BUILD
     COMMAND $<TARGET_FILE:${MESHCHUNK_TEST_TARGET}>
     COMMENT "Run isolated MeshChunk primitive and data-semantics tests")
