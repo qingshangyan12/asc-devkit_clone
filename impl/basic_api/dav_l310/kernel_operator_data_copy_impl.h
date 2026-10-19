@@ -238,6 +238,54 @@ __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
 }
 
 template <typename T>
+__aicore__ inline void CopyGmToCbufAlignV1(
+    __cbuf__ T* dst, __gm__ T* src, const uint32_t blockCount, const uint32_t blockLen, const uint8_t leftPadding,
+    const uint8_t rightPadding, const bool isPad, const uint32_t srcStride, const uint32_t dstStride,
+    const bool isDataCopyPad, const uint8_t sid = 0)
+{
+    const uint8_t lp = isPad ? leftPadding : 0;
+    const uint8_t rp = isPad ? rightPadding : 0;
+    uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
+    uint32_t burstLength = blockLen * unitOfBytes;
+    uint32_t padLength = lp * sizeof(T) + rp * sizeof(T);
+    uint32_t srcGap = srcStride * unitOfBytes;
+    uint32_t dstGap = dstStride;
+    uint64_t actSrcStride = static_cast<uint64_t>(srcGap) + burstLength;
+    uint32_t actDstStride = AlignUp(dstStride * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
+    constexpr uint32_t V1_MAX_NBURST = 4095; //Xm[15:4], 12bit
+    uint32_t burstLeft = blockCount;
+    __cbuf__ uint8_t* tmpDst = reinterpret_cast<__cbuf__ uint8_t*>(dst);
+    __gm__ uint8_t* tmpSrc = reinterpret_cast<__gm__ uint8_t*>(src);
+    while (burstLeft > 0) {
+        uint32_t nb = (burstLeft > V1_MAX_NBURST) ? V1_MAX_NBURST : burstLeft;
+        if constexpr (sizeof(T) == B64_BYTE_SIZE) {
+            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), 
+                reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp * 2, rp *2,
+                srcGap, dstGap);
+        } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
+            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), 
+                reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
+                srcGap, dstGap);
+        } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint16_t*>(tmpDst), 
+                reinterpret_cast<__gm__ uint16_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
+                srcGap, dstGap);
+        } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
+            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint8_t*>(tmpDst), 
+                reinterpret_cast<__gm__ uint8_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
+                srcGap, dstGap);
+        } else {
+            ASCENDC_ASSERT(
+                false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data type of copy from gm to cbuf on current device"); });
+        }
+        burstLeft -= nb;
+        tmpSrc += static_cast<uint64_t>(nb) * actSrcStride;
+        tmpDst += static_cast<uint64_t>(nb) * actDstStride;
+
+    }
+}
+
+template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
     const uint16_t ndNum = intriParams.ndNum;
@@ -273,7 +321,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
 
     for (uint32_t ndIdx = 0; ndIdx < ndNum; ++ndIdx) {
         __gm__ T* srcMatrix = src + static_cast<uint64_t>(ndIdx) * srcNdMatrixStride;
-        __cbuf__ T* dstMatrix = dst + static_cast<uint64_t>(ndIdx) * dstNzMatrixStride;
+        const uint32_t mBlkStride = static_cast<uint32_t>(dstNzMatrixStride) * sizeof(T) / ONE_BLK_SIZE;
+        __cbuf__ T* dstMatrix = dst + static_cast<uint64_t>(ndIdx) * mBlkStride * (ONE_BLK_SIZE / sizeof(T));
         for (uint32_t blkIdx = 0; blkIdx < dBlockNum; ++blkIdx) {
             uint32_t blockBytes = dTotalBytes - blkIdx * ONE_BLK_SIZE;
             if (blockBytes > ONE_BLK_SIZE) {
@@ -281,7 +330,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
             }
             const bool isTailBlock = blockBytes < ONE_BLK_SIZE;
             const uint8_t tailPadCount = static_cast<uint8_t>((ONE_BLK_SIZE - blockBytes) / sizeof(T));
-            CopyGmToCbufAlignV2(
+            CopyGmToCbufAlignV1(
                 dstMatrix + static_cast<uint64_t>(blkIdx) * dstNzC0Stride * elementsPerBlock,
                 srcMatrix + blkIdx * elementsPerBlock, nValue, blockBytes, 0, tailPadCount, isTailBlock,
                 static_cast<uint32_t>(srcDValue * sizeof(T) - blockBytes), static_cast<uint32_t>(dstNzNStride - 1),
