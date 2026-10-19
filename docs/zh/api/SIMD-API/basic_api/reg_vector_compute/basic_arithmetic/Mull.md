@@ -35,6 +35,7 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+- Kirin 9020处理器系列产品：不支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Mull_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
