@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码将源矢量每两个相邻元素相加，结果连续保存在目的寄存器低半部分、高半部分置0，未参与计算的元素按0处理。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_pair_reduce_sum
 
 ## 产品支持情况

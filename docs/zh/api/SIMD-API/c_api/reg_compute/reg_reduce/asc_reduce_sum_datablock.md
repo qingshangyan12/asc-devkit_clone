@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码将每个DataBlock（32字节）内参与计算的元素按二叉树方式逐层归约求和，结果连续写入目的寄存器低位，其余元素置0。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_reduce_sum_datablock
 
 ## 产品支持情况

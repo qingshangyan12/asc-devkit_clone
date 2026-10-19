@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "获取asc_repeat_reduce_min执行后产生的最小值及第一个最小值所在的索引，需在其执行完成并同步后再调用本接口读取结果。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md
+    kind: requires
+    condition: "需先执行asc_repeat_reduce_min并同步完成后再调用本接口"
+version: ">=9.0.0"
+---
 # asc_get_reduce_min_cnt
 
 ## 产品支持情况

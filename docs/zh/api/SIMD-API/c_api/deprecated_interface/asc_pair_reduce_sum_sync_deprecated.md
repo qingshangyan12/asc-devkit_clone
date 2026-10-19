@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "对输入数据做归约，将相邻两个奇偶元素求和得到数据总和，该同步复合接口已废弃，请改用对应的非同步接口 asc_pair_reduce_sum 和同步接口 asc_sync 替代。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_pair_reduce_sum_sync（废弃）
 
 ## 产品支持情况

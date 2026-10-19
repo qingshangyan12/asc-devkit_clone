@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "获取asc_reduce执行后剩余的元素数量，需与asc_reduce配合并在其执行完成并通过同步后再调用本接口读取结果。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+    kind: requires
+    condition: "需先执行asc_reduce并同步完成后再调用本接口"
+version: ">=9.0.0"
+---
 # asc_get_rsvd_count
 
 ## 产品支持情况
