@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对两个矢量源操作数逐元素执行按位或运算，结果写入目的矢量，支持前n个数据计算与高维切分计算，源与目的起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_or]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_or
 
 ## 产品支持情况

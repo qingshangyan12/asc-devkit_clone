@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对源矢量各元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，并提供带舍入处理的asc_shiftright_round变体。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_shift]
+  - traits: [elementwise, rounding_mode, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 
 # asc_shiftright
 

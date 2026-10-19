@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码对两个矢量数据寄存器或掩码寄存器逐元素执行按位或，结果写入目的操作数，未通过掩码筛选的元素在输出中置零。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_or]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_or
 
 ## 产品支持情况

@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "根据掩码对源操作数执行按位或并将结果写入目的操作数，该接口的浮点类型重载已废弃，需按数据类型改用等位宽的 asc_or 整数重载。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_or]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md
+    kind: replaced_by
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_or（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "对源矢量按元素执行按位取反并写入目的矢量，该同步复合接口已废弃，请改用对应的非同步接口 asc_not 和同步接口 asc_sync 替代。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_not]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_not_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对输入矢量按元素做按位取反并写入目的矢量，操作数起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_not]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_not
 
 ## 产品支持情况
