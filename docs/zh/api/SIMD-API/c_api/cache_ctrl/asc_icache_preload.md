@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "从当前Global Memory地址手动预加载指令到ICache以避免后续取指未命中，预取地址需通过asc_get_program_counter获取PC值并经掩码处理。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md
+    kind: requires
+    condition: "预取地址需获取当前PC值并掩码为有效48位GM地址"
+version: ">=9.0.0"
+---
 # asc_icache_preload
 
 ## 产品支持情况

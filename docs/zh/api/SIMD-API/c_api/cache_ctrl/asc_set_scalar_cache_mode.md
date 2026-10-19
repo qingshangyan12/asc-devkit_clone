@@ -1,3 +1,32 @@
+---
+okftype: reference.api
+description: "配置Scalar单元访问Global Memory时的L2 Cache管理策略，分别设置标量load与store路径策略，设置后后续标量GM读写按该策略访问L2 Cache。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md
+    kind: configures
+    condition: "配置标量store接口的L2 Cache管理策略重载"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md
+    kind: configures
+    condition: "配置标量load接口的L2 Cache管理策略重载"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
+    kind: configures
+    condition: "配置标量load接口的L2 Cache管理策略重载"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+    condition: "配置标量load策略时传入的枚举值"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
+    kind: related
+    condition: "配置标量store策略时传入的枚举值"
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
+    kind: configures
+    condition: "配置标量load接口的L2 Cache管理策略重载"
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+    kind: configures
+    condition: "配置标量store接口的L2 Cache管理策略重载"
+version: ">=9.2.0"
+---
 # asc_set_scalar_cache_mode
 
 ## 产品支持情况

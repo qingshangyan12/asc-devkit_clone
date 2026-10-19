@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "从Global Memory指定地址预取一个64字节Cache Line的数据到DCache，为后续Scalar单元读取该地址提前填充缓存以降低首次访问延迟。"
+tag:
+  - roles: [control]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_datacache_preload
 
 ## 产品支持情况
