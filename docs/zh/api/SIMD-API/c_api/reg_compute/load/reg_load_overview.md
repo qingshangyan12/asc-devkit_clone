@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "概述Reg数据搬入接口的分类与选择，涵盖矢量数据寄存器与掩码寄存器的对齐、非对齐搬入原理及b64数据类型搬运约束。"
+---
 # Reg数据搬入概述
 
 Reg数据搬入接口用于将Unified Buffer（UB）中的数据搬入矢量数据寄存器、掩码寄存器或非对齐寄存器。接口均仅在AIV上生效，且需在Vector Function（`__simd_vf__`标记的函数）内调用。

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "从UB中16字节或32字节对齐的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个DataBlock（32字节）中，保持数据格式和内容。"
+tag:
+  - roles: [data_movement]
+  - operations: [broadcast, load]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_brc_elem2datablock
 
 ## 产品支持情况

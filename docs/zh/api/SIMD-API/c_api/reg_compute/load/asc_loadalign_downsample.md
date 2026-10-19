@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "从Unified Buffer中32字节对齐地址读取连续数据并进行2倍下采样，可将结果写入矢量数据寄存器或掩码寄存器，支持多种偏移搬入模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md
+    kind: related
+    condition: "对齐搬入模式下通过函数返回值返回掩码寄存器时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本指令与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_downsample
 
 ## 产品支持情况

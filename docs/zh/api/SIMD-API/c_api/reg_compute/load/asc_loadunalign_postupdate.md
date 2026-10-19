@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "从Unified Buffer按dtype对齐起始地址读取VL长度数据，与前置缓存拼接后搬入矢量数据寄存器，并在搬入后自动更新源地址或地址寄存器偏移。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [post_update, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
+    kind: requires
+    condition: "首次搬入前初始化前置缓存"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadunalign_postupdate
 
 ## 产品支持情况

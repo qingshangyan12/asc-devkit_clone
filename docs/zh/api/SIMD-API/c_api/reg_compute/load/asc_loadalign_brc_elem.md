@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "从UB中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，支持对齐、立即数偏移及地址寄存器偏移三种搬入模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [broadcast, load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_brc_elem
 
 ## 产品支持情况

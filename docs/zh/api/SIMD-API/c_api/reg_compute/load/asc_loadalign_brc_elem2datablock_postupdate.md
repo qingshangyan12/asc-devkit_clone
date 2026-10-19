@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "从Unified Buffer按16或32字节对齐地址连续读取8个元素，将每个元素广播到矢量数据寄存器对应的一个DataBlock（32字节）中，采用Post Update模式自动更新源地址指针。"
+tag:
+  - roles: [data_movement]
+  - operations: [broadcast, load]
+  - traits: [aligned_transfer, datablock_granularity, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本指令与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_brc_elem2datablock_postupdate
 
 ## 产品支持情况

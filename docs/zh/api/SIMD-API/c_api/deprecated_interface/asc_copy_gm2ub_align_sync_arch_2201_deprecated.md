@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "已废弃的同步搬运接口，提供Global Memory到Unified Buffer的非对齐数据搬运，支持8位、16位、32位数据类型，非32字节对齐数据补齐至32字节，替代接口为对应的非同步接口asc_copy_gm2ub_align和同步接口asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_copy_gm2ub_align_sync_arch_2201（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "从Unified Buffer中32字节对齐地址读取2×VL长度数据，将偶数与奇数下标元素分别写入两个矢量数据寄存器，采用Post Update模式自动更新源地址。"
+tag:
+  - roles: [data_movement]
+  - operations: [deinterleave, load]
+  - traits: [aligned_transfer, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本指令与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_deintlv_postupdate
 
 ## 产品支持情况

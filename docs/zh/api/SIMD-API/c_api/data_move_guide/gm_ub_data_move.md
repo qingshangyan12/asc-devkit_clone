@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "GM与UB数据搬运是Vector侧加载与回写的主要通路，GM到UB由PIPE_MTE2执行、UB到GM由PIPE_MTE3执行，涵盖连续、高维切分、非对齐与NDDMA多维搬运及对齐补齐和同步约束。"
+---
 # GM与UB数据搬运
 
 GM与UB数据搬运是Vector侧加载输入和回写结果的主要通路。GM到UB由PIPE_MTE2执行，UB到GM由PIPE_MTE3执行，相关接口仅在AIV生效。NPU架构版本3510支持连续、高维切分、非对齐以及GM到UB的NDDMA多维搬运。

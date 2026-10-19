@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "从32字节对齐的UB起始地址读取连续数据并进行2倍下采样，采用Post Update模式在搬运后自动更新源地址，可搬入矢量数据寄存器或掩码寄存器。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_downsample_postupdate
 
 ## 产品支持情况

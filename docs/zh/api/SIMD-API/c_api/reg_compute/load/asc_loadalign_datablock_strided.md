@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "从Unified Buffer中32字节对齐地址非连续搬入8个DataBlock，通过函数返回值返回矢量数据寄存器，支持配置相邻数据块之间的地址步长与起始读取位置。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本指令与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_datablock_strided
 
 ## 产品支持情况

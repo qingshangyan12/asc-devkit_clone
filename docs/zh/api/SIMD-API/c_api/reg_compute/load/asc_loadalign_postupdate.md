@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "从32字节对齐的UB起始地址搬入矢量或掩码寄存器并自动更新源地址，支持立即数偏移与非连续对齐两种搬入模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
+    kind: requires
+    condition: "dtype为int64_t时生成b32掩码"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
+    kind: requires
+    condition: "dtype为int64_t时将b32掩码展开为b64掩码"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_postupdate
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "从32字节对齐的UB起始地址读取VL/4长度数据，保留偶数下标bit得到VL/8掩码数据并通过函数返回值返回。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md
+    kind: related
+    condition: "对齐搬入模式中目的操作数为掩码寄存器"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_mask_downsample
 
 ## 产品支持情况
