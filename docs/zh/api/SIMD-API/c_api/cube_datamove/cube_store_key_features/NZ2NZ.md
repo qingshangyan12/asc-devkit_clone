@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "矩阵计算结果搬出前后保持Nz大分形排布的格式转换特性，输出类型转换及Channel Split/Channel Merge可能改变小分形宽度，小z分形大小应为512B。"
+---
 # NZ2NZ
 
 ## 特性说明

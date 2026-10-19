@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "配置L0C Buffer搬出时随路NZ转ND格式转换的参数，包括ND矩阵数量、源与目的ND步长，供asc_copy_l0c2gm和asc_copy_l0c2l1搬出接口使用。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_2201.md
+    kind: configures
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_2201.md
+    kind: configures
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md
+    kind: replaced_by
+    condition: "Ascend 950PR&950DT系列产品"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
+    kind: related
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+version: ">=9.0.0"
+---
 # asc_set_l0c_copy_params
 
 ## 产品支持情况

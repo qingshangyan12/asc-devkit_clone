@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "3510上启用的L0C Buffer到UB双目标模式，同一AI Core内的M×N矩阵被分成两半分别写入两个Vector Core的Unified Buffer，可按M维度或N维度拆分，不支持随路功能场景。"
+---
 # L0C Buffer到UB双目标模式
 
 ## 特性说明

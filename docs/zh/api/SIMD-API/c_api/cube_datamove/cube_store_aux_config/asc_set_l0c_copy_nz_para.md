@@ -1,3 +1,27 @@
+---
+okftype: reference.api
+description: "在L0C Buffer搬出接口启用随路Nz转ND/DN格式功能时，配置矩阵数量、源Nz矩阵间隔和目的矩阵间隔等格式转换参数，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+    condition: "启用随路Nz转ND/DN格式功能时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
+    condition: "启用随路Nz转ND/DN格式功能时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md
+    kind: configures
+    condition: "启用随路Nz转ND/DN格式功能时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md
+    kind: requires
+    condition: "Nz2DN场景"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_set_l0c_copy_nz_para
 
 ## 产品支持情况

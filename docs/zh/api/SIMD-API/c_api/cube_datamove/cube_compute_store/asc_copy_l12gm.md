@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将数据从L1 Buffer搬运到Global Memory，以连续传输数据块组织搬运，块长度及目的间隔以32字节为单位，支持源与目的迭代间隔控制。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小和对齐要求"
+version: ">=9.0.0"
+---
 # asc_copy_l12gm
 
 ## 产品支持情况
