@@ -798,8 +798,7 @@ __aicore__ inline void CastImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    CastImplMaskCommonDavL311<T, U, isSetMask>(
-        dst, src, roundMode, mask, repeatTime, repeatParams);
+    CastImplMaskCommonDavL311<T, U, isSetMask>(dst, src, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, RoundMode roundMode, bool isSetMask>
@@ -972,8 +971,7 @@ __aicore__ inline void CastImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    CastImplMaskCommonDavL311<T, U, isSetMask>(
-        dst, src, roundMode, mask, repeatTime, repeatParams);
+    CastImplMaskCommonDavL311<T, U, isSetMask>(dst, src, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename U, typename T, bool isVecDeq, bool halfBlock>

@@ -947,8 +947,8 @@ __aicore__ inline void CastIntrinsicsImpl(
 
 template <typename DST_TYPE, typename SRC_TYPE, bool isSetMask, typename MaskT>
 __aicore__ inline void CastImplMaskCommonDavL300(
-    __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, MaskT mask,
-    uint8_t repeatTimes, const UnaryRepeatParams& repeatParams);
+    __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, MaskT mask, uint8_t repeatTimes,
+    const UnaryRepeatParams& repeatParams);
 
 // Cast::Level 0 - mask bit mode
 template <typename DST_TYPE, typename SRC_TYPE, bool isSetMask = true>
@@ -956,8 +956,7 @@ __aicore__ inline void CastImpl(
     __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, const uint64_t mask[],
     uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)
 {
-    CastImplMaskCommonDavL300<DST_TYPE, SRC_TYPE, isSetMask>(
-        dst, src, roundMode, mask, repeatTimes, repeatParams);
+    CastImplMaskCommonDavL300<DST_TYPE, SRC_TYPE, isSetMask>(dst, src, roundMode, mask, repeatTimes, repeatParams);
 }
 
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
@@ -1122,8 +1121,8 @@ __aicore__ inline void CastIntrinsicsImpl(
 // Cast::Level 0 - shared mask dispatcher
 template <typename DST_TYPE, typename SRC_TYPE, bool isSetMask, typename MaskT>
 __aicore__ inline void CastImplMaskCommonDavL300(
-    __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, MaskT mask,
-    uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)
+    __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, MaskT mask, uint8_t repeatTimes,
+    const UnaryRepeatParams& repeatParams)
 {
     constexpr bool cast_round_all = SupportType<
         Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<int32_t, float>, Tuple<int16_t, float>,
@@ -1217,8 +1216,7 @@ __aicore__ inline void CastImpl(
     __ubuf__ DST_TYPE* dst, __ubuf__ SRC_TYPE* src, const RoundMode& roundMode, const uint64_t mask,
     uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)
 {
-    CastImplMaskCommonDavL300<DST_TYPE, SRC_TYPE, isSetMask>(
-        dst, src, roundMode, mask, repeatTimes, repeatParams);
+    CastImplMaskCommonDavL300<DST_TYPE, SRC_TYPE, isSetMask>(dst, src, roundMode, mask, repeatTimes, repeatParams);
 }
 
 template <typename U, typename T, bool isVecDeq, bool halfBlock>
