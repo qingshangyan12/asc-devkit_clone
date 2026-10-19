@@ -37,3 +37,11 @@
 - **[asc_copy_l12bt](asc_copy_l12bt.md)**
 
 - **[asc_copy_l12fb](asc_copy_l12fb.md)**
+
+- **[asc_prefetch_gm2l2cache](asc_prefetch_gm2l2cache.md)**
+
+- **[asc_prefetch_gm2l2cache_dn2nz](asc_prefetch_gm2l2cache_dn2nz.md)**
+
+- **[asc_prefetch_gm2l2cache_nd2nz](asc_prefetch_gm2l2cache_nd2nz.md)**
+
+- **[asc_prefetch_stop](asc_prefetch_stop.md)**

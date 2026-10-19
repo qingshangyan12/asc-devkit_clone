@@ -160,6 +160,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_copy_l12l0a](cube_datamove/cube_compute_load/asc_copy_l12l0a.md)|用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0b](cube_datamove/cube_compute_load/asc_copy_l12l0b.md)|用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0b_trans](cube_datamove/cube_compute_load/asc_copy_l12l0b_trans.md)|该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache](cube_datamove/cube_compute_load/asc_prefetch_gm2l2cache.md)|将GM中的数据预加载到L2 Cache中，不实际搬进内核。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache_dn2nz](cube_datamove/cube_compute_load/asc_prefetch_gm2l2cache_dn2nz.md)|将GM中的矩阵数据预加载到L2 Cache中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache_nd2nz](cube_datamove/cube_compute_load/asc_prefetch_gm2l2cache_nd2nz.md)|将GM中的矩阵数据预加载到L2 Cache中，在此过程中执行ND->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_stop](cube_datamove/cube_compute_load/asc_prefetch_stop.md)|删除尚未执行的Prefetch指令，用于预加载流程变化时清理未生效的预加载。|`c_api/cube_datamove/cube_datamove.h`|
 
 ## Memory矢量计算
 
