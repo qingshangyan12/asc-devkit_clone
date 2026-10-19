@@ -1,12 +1,8 @@
-# C++11语言特性<a name="ZH-CN_TOPIC_000000253823119001"></a>
+# C++11语言特性
 
-本文介绍C++11语言特性在Ascend C SIMT Device侧的支持情况。语言特性样例请参考[语言特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/README.md)。
+本文介绍C++11语言特性在Ascend C Device侧的支持情况。下表列出C++11核心语言特性在Device侧的支持情况。
 
-## 核心语言特性支持列表<a name="section_cpp11_core_features"></a>
-
-下表列出C++11核心语言特性在SIMT Device侧的支持情况。其中大部分特性在核函数内直接使用即可；个别特性的注意事项见[使用注意事项](#section_cpp11_notes)。
-
-**表1**  C++11核心语言特性支持列表
+**表1**  C++11核心语言特性列表
 
 | C++11特性 | C++11 Proposal | 支持情况 | 说明 |
 | --- | --- | --- | --- |
@@ -35,14 +31,14 @@
 | 扩展sizeof（Extending sizeof） | [N2253](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2253.html)、[DR850](https://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#850) | ✅ | 支持类成员sizeof（无需实例）与`sizeof...`参数包。 |
 | 定义移动特殊成员函数（Defining move special member functions） | [N3053](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3053.html) | ✅ | 支持移动构造/移动赋值的定义与使用。 |
 
-## C++11收录的C99特性支持列表<a name="section_cpp11_c99_features"></a>
+下表汇总了Device侧对C++11收录的C99特性的支持情况
 
-**表2**  C99特性支持列表
+**表2**  C99特性列表
 
 | C99特性 | C++11 Proposal | 支持情况 | 说明 |
 | --- | --- | --- | --- |
 | \_\_func\_\_预定义标识符 | [N2340](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2340.htm) | ✅ | 函数内隐式静态字符串数组可用。 |
 | C99预处理器（C99 preprocessor） | [N1653](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1653.htm) | ✅ | 支持可变参数宏`__VA_ARGS__`、记号粘贴`##`、字符串化`#`。GNU扩展`##__VA_ARGS__`空参吞并在可变参数为空时不可用，需以函数重载等方式替代。 |
-| long long | [N1811](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1811.pdf) | ✅ | 至少64位，支持LL/ULL后缀与宽位数算术。 |
+| long long | [N1811](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1811.pdf) | ✅ | 至少64位，支持LL、ULL后缀与宽位数算术。 |
 | 扩展整型（Extended integral types） | [N1988](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1988.pdf) | ✅ | `<stdint.h>`/`<cinttypes>`的intmax\_t/uintmax\_t/INT64\_C等在Device侧可用。 |
 

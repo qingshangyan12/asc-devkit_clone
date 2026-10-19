@@ -1,7 +1,5 @@
 # C/C++通用语法限制
 
-本文介绍Ascend C Device侧的通用语法限制，包含不支持的语法特性，以及指针与内存地址、变量、函数、类、模板等语法使用限制。
-
 ## 不支持的特性
 
 -   不支持虚函数
@@ -15,7 +13,7 @@
 
 ## 指针与内存地址
 
-指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM/UB指针不能在Host侧解引用，Host栈/全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
+指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM/UB指针不能在Host侧解引用，Host栈或全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
 
 ### 取Device函数的地址
 
@@ -31,7 +29,9 @@
     }
     ```
 
-- SIMT VF/SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识：`__simt_callee__`/`__simd_callee__`标记使函数类型带上函数属性，向**普通**函数指针转换时报错：
+- SIMT VF/SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识。
+
+    `__simt_callee__`和`__simd_callee__`标记使函数类型带上函数属性，向普通函数指针转换时报错：
 
     ```cpp
     __simt_callee__ float scale2(float v) { return v * 2.f; }
@@ -44,7 +44,7 @@
     }
     ```
 
-    函数指针类型加上callee标识后即可正常转换与调用（SIMT VF内用`__simt_callee__`，SIMD VF内用`__simd_callee__`）：
+    函数指针类型加上callee标识后即可正常转换与调用。SIMT VF内函数指针使用用`__simt_callee__`标识，SIMD VF内则使用`__simd_callee__`：
 
     ```cpp
     __simt_callee__ float scale2(float v) { return v * 2.f; }
@@ -56,9 +56,9 @@
     }
     ```
 
-- SIMT VF/SIMD VF函数不支持经函数指针调用或启动，只支持使用`asc_vf_call()`接口进行调用。
+- SIMT VF和SIMD VF函数不支持经函数指针调用或启动，只支持使用`asc_vf_call()`接口进行调用。
 
-- 不允许引用Host函数的地址：核函数内引用Host函数（含直接调用与函数指针）编译报错：
+- 不允许引用Host函数的地址：核函数内引用Host函数，包括直接调用和函数指针均会编译报错：
 
     ```cpp
     float host_fn(float v) { return v + 100.f; }
@@ -87,7 +87,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### 指针运算与字节重解释
 
-不支持不同地址空间的指针不支持大小比较和`reinterpret_cast`字节重解释，只支持同一地址空间内（如GM同一数组）的指针大小比较、`reinterpret_cast`字节重解释，使用示例如下：
+不支持不同地址空间的指针不支持大小比较和`reinterpret_cast`字节重解释，只支持同一地址空间内的指针大小比较、`reinterpret_cast`字节重解释，使用示例如下：
 
 ```cpp
 __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
@@ -102,7 +102,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 跨地址空间的指针运算和`reinterpret_cast`字节重解释将触发编译报错：
 
--   不同地址空间指针比较大小（如`__gm__`与`__ubuf__`、`__gm__`与栈地址）：
+-   不同地址空间指针比较大小，如`__gm__`、`__ubuf__`与栈地址不能比较大小：
 
     ```cpp
     __simt_vf__ __launch_bounds__(128) inline void vf_func(__gm__ float* in, __ubuf__ float* out, uint32_t count)
@@ -121,7 +121,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
--   不同地址空间指针`reinterpret_cast`字节重解释（如`__gm__`指针重解释为`__ubuf__`指针或普通栈空间指针）：
+-   不同地址空间指针`reinterpret_cast`字节重解释：
 
     ```cpp
     __simt_vf__ __launch_bounds__(128) inline void vf_func(__gm__ float* in, __ubuf__ float* out, uint32_t count)
@@ -364,21 +364,29 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 -   VF内部禁止访问MainScalar的栈空间。
 
-    以下为使用内层栈地址指针访问MainScalar栈空间的错误示例：
+    MainScalar的栈地址传入VF函数后（如经`__ubuf__`指针携带），VF内对其解引用属于无效访问：**编译可以通过，但运行期读不到MainScalar栈上的数据、写入也不会落到MainScalar栈**（属于难以定位的静默错误），以下为实测验证过的示例：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void foo(__gm__ int* a, __gm__ int* b, __gm__ int* c, __ubuf__ uint64_t* s) {
-        int idx = blockIdx.x * blockDim.x + threadIdx.x;
-        int* stack = (int*)(s[0]);
-        a[idx] = b[idx] + c[idx] + *stack; // error: *stack表示从MainScalar的栈中读取，不允许使用
+    __simt_vf__ __launch_bounds__(1024) inline void foo(__gm__ int* out, __ubuf__ uint64_t* s, uint32_t count) {
+        if (threadIdx.x >= count) {
+            return;
+        }
+        int* stack = (int*)(s[0]);          // 编译通过：从多级指针取出MainScalar栈地址
+        out[threadIdx.x] = *stack;          // 运行期读到的是无关内存内容，并非栈上的stack值
     }
-    __global__ __aicore__ void foo(__gm__ int* a, __gm__ int* b, __gm__ int* c) {
-        int stack = 0;
-        __ubuf__ uint64_t* s = ...;
-        s[0] = &stack;
-        asc_vf_call<foo>(dim3{256}, a, b, c, s);
+
+    __global__ __vector__ void kernel_func(__gm__ int* output, uint32_t count)
+    {
+        int stack = 123;                    // MainScalar栈变量
+        __ubuf__ uint64_t sbuf[1];
+        sbuf[0] = (uint64_t)&stack;         // 栈地址经UB指针传入VF
+        asc_vf_call<foo>(dim3(1024), output, sbuf, count);
+        asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     }
     ```
+
+    实测表现（CANN 9.3.0，Ascend 950PR）：VF内读取得到的是无关内存的内容（实测读到的是其他数据区的字节，且多轮运行稳定复现）；VF内写入后MainScalar侧回读自己的栈变量，值未被修改。VF函数内需要的数据应经参数（标量值传、`__gm__`/`__ubuf__`指针）显式传入，VF自身的局部变量（VF自己的栈）访问正常。
 
 -   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定（VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取device函数的地址)）。
 -   函数的inline行为由编译器决定，添加的always\_inline或noinline将被忽略。
