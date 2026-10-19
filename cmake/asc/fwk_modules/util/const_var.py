@@ -41,6 +41,7 @@ SOC_MAP_EXT = {
     "ascend350": "Ascend350_354f",
     "ascend960dt": "Ascend960DT_968B7",
     "ascend960pr": "Ascend960PR_963A1",
+    "ascend310n": "Ascend310n",
 }
 BIN_CMD = "opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
 --output=$2 --impl_mode={impl} --simplified_key_mode=0 --op_mode=dynamic\n"

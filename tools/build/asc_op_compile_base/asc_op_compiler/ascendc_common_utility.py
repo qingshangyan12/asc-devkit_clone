@@ -572,7 +572,7 @@ class CommonUtility:
             res: True means has ffts addr
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version not in ["Ascend950", "Ascend350", "Ascend960DT"]:
+        if short_soc_version not in ["Ascend950", "Ascend310n", "Ascend350", "Ascend960DT"]:
             return True
         return False
 
@@ -584,7 +584,7 @@ class CommonUtility:
             res: True means 920r1
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend960DT"]:
+        if short_soc_version in ["Ascend960DT", "Ascend310n"]:
             return True
         return False
 
@@ -877,6 +877,7 @@ def is_enable_sanitizer(compile_options):
                     "${ASCEND_HOME_PATH}/tools/mssanitizer/lib64/libsanitizer_stub_dav-m200-vec.a",
                 ],
                 "Ascend950": [],
+                "Ascend310n": [],
                 "Ascend960DT": [],
                 "Ascend960PR": [],
             }
