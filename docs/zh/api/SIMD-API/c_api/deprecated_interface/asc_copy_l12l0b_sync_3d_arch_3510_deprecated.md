@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "已废弃的3D卷积同步搬运接口，将NC1HWC0格式Feature Map完成Image to Column展开，以512字节数据分形为单位从L1 Buffer搬运到L0B Buffer并自动转置，替代为对应非同步接口asc_copy_l12l0b_3d_arch_3510和asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_3d_arch_3510.md
+    kind: replaced_by
+    condition: "接口已废弃，使用对应的非同步接口替代"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "接口已废弃，使用同步接口asc_sync替代"
+version: ">=9.0.0"
+---
 # asc_copy_l12l0b_sync_3d_arch_3510（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中完成DN到Nz格式转换，满足矩阵计算对分形列连续性的要求。该同步接口已废弃，请使用对应的非同步接口asc_copy_gm2l1_dn2nz和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [layout_transform]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.1.0"
+---
 # asc_copy_gm2l1_dn2nz_sync（废弃）
 
 ## 产品支持情况

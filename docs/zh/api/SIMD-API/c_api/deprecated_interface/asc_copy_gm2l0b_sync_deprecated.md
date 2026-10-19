@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将矩阵数据从Global Memory搬运到L0B Buffer，以分块ID指定起始分块，支持配置迭代次数及相邻迭代的源步长与目的间隔。该接口已废弃，请使用对应的非同步接口asc_copy_gm2l0b和asc_sync同步接口替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l0b.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_copy_gm2l0b_sync（废弃）
 
 ## 产品支持情况

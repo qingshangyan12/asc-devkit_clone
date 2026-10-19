@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将一个标量填充值写入L1 Buffer的目的地址并广播到多个32字节分形块，可用于L1 Buffer的内存初始化。接口已废弃，请使用对应的非同步接口asc_fill_l1和同步接口asc_sync替代。"
+tag:
+  - roles: [data_initialization]
+  - operations: [fill]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_fill_l1.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+version: ">=9.1.0"
+---
 # asc_fill_l1_sync（废弃）
 
 ## 产品支持情况

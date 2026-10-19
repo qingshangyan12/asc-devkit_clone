@@ -1,3 +1,43 @@
+---
+okftype: reference.api
+description: "将NC1HWC0格式Feature Map完成Image to Column展开并生成img2col二维矩阵，再选取数据块从L1 Buffer搬运到L0B Buffer，用于3D卷积场景的矩阵计算数据加载。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+  - traits: [aligned_transfer, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解搬入前的数据排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md
+    kind: related
+    condition: "f_matrix_ctrl为false时从左矩阵获取属性描述"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0b_3d_padding.md
+    kind: requires
+    condition: "3D img2col搬运模式下使用右矩阵Feature Map属性描述时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix.md
+    kind: related
+    condition: "f_matrix_ctrl为false时从左矩阵获取属性描述"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix_b.md
+    kind: requires
+    condition: "3D img2col搬运模式下使用右矩阵Feature Map属性描述时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_rpt.md
+    kind: related
+    condition: "f_matrix_ctrl为false时从左矩阵获取属性描述"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l13d_rpt_b.md
+    kind: requires
+    condition: "3D img2col搬运模式下"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+version: ">=9.0.0"
+---
 # asc_copy_l12l0b_arch_3510（3D矩阵搬运）
 
 ## 产品支持情况

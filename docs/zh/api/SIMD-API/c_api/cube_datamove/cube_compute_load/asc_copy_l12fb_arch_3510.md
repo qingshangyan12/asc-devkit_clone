@@ -1,3 +1,28 @@
+---
+okftype: reference.api
+description: "将L1 Buffer中的随路Vector量化与随路ReLU参数搬运到Fixpipe Buffer，两类参数各自独立存储并通过dst地址高4位区分，支持高维切分与前n个数据搬运，仅在AIC上有效。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
+    kind: related
+    condition: "将量化参数搬入后配置参数区起始地址索引"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
+    kind: related
+    condition: "查看每列量化参数编码及Scalar/Vector区别"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+    kind: related
+    condition: "同时启用激活时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本指令与其他指令存在目的地址重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_l12fb
 
 ## 产品支持情况

@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍L1到L0A/L0B的二维分形、转置、三维img2col和MX量化系数搬运，以及L0C到L1随路处理搬出，说明由PIPE_MTE1装载、PIPE_FIX搬出的方向性通路与容量对齐约束。"
+---
 # L1与L0数据搬运
 
 L1到L0A/L0B用于为Cube矩阵计算装载左、右矩阵，由PIPE_MTE1执行；矩阵计算结果位于L0C，可由PIPE_FIX搬到L1。NPU架构版本3510的通路具有方向性，不提供L0A/L0B到L1或L1到L0C的通用复制。

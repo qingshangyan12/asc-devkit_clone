@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将value的二进制值赋值给目的地址，对L0A Buffer的Local Memory进行初始化，用于准备矩阵输入缓冲区，填充参数通过asc_fill_value_config配置。"
+tag:
+  - roles: [data_initialization]
+  - operations: [fill]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
+    kind: related
+    condition: "了解填充后的矩阵计算衔接时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/L1_L0A_B_memory_structure_intro.md
+    kind: related
+    condition: "了解输入缓冲区布局时"
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
+    kind: requires
+    condition: "使用config参数配置填充行为时"
+version: ">=9.0.0"
+---
 # asc_fill_l0a
 
 ## 产品支持情况
