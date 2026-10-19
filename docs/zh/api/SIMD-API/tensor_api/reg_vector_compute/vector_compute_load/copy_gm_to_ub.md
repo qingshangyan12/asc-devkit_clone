@@ -111,6 +111,8 @@ struct gm_to_ub_params {
     uint8_t left_padding_count = 0;
     uint8_t right_padding_count = 0;
     bool enable_constant_pad = true;
+    bool enable_constant_pad_value = false;
+    uint64_t constant_pad_value = 0;
 };
 ```
 
@@ -119,11 +121,36 @@ struct gm_to_ub_params {
 | left_padding_count | `0` | 每个搬运块左侧的Padding元素个数。 |
 | right_padding_count | `0` | 每个搬运块右侧的Padding元素个数。 |
 | enable_constant_pad | `true` | 是否使能常量Padding控制。 |
+| enable_constant_pad_value | `false` | 是否携带常量填充值配置。 |
+| constant_pad_value | `0` | 常量填充值的原始位模式。 |
+
+除原有三参数构造函数外，`gm_to_ub_params`提供四参数构造函数，用于显式配置常量填充值：
+
+```cpp
+template <typename PadType>
+__aicore__ constexpr gm_to_ub_params(
+    uint8_t left_padding_count,
+    uint8_t right_padding_count,
+    bool enable_constant_pad,
+    PadType pad_value);
+```
+
+`PadType`的大小必须为1、2或4字节。构造时按原始位模式保存填充值，不做数值转换，保证`float`、`half`和`bfloat16_t`等类型的填充值语义正确。底层搬运前，Tensor API根据元素大小调用对应的`asc_set_copy_pad_val`重载，并继承该C API的寄存器状态约束。
+
+8字节元素类型不支持常量填充值；如果配置常量填充值，运行期触发trap。
 
 通过以下方式绑定运行时搬运参数：
 
 ```cpp
 asc::te::gm_to_ub_params params{left_padding, right_padding, true};
+auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
+asc::te::copy(atom, dst, src);
+```
+
+以下示例配置常量填充值：
+
+```cpp
+constexpr asc::te::gm_to_ub_params params{left_padding, right_padding, true, static_cast<int8_t>(-9)};
 auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
 asc::te::copy(atom, dst, src);
 ```
