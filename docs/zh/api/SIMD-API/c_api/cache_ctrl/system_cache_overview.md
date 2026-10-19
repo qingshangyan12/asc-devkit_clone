@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍AI Core中L2 Cache、DCache、ICache等缓存类型的层次与功能，说明Prefetch、Preload、Invalid、Clean四种缓存操作、延迟写回与直写策略、多核缓存一致性问题及缓存控制接口汇总。"
+---
 # 系统缓存概述
 
 ## Cache类型
