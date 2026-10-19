@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_INDEX_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/reg_index_intf_impl.h"
 #endif
 __simd_callee__ inline vector_int8_t asc_arange(int8_t value);
