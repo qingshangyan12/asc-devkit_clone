@@ -26,6 +26,9 @@
 <!-- npu="9050" id8 -->
 - Kirin 9050处理器系列产品：支持
 <!-- end id8 -->
+- Kirin 9020处理器系列产品：支持
+- Kirin 9030处理器系列产品：支持
+- Kirin X90处理器系列产品：支持
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
 <!-- end id9 -->
@@ -102,6 +105,7 @@ $$
 目的操作数与源操作数的数据类型需要保持一致。
 - 计算结果不保留进位时，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
 - 计算结果保留进位时，支持的数据类型为：int32_t、uint32_t。
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int16_t、half、int32_t、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

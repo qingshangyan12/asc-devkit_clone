@@ -23,6 +23,9 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+- Kirin 9020处理器系列产品：支持
+- Kirin 9030处理器系列产品：支持
+- Kirin X90处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Subs_flexible_scalar_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -88,6 +91,7 @@ $dst_i = scalar - src_i$
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为int16_t、half、bfloat16_t、int32_t、float、complex32、int64_t、uint64_t、complex64。其中complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int16_t、half、int32_t、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
