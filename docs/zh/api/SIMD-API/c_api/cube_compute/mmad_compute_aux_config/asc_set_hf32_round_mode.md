@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "设置HF32模式的舍入方式，可选平局远离零或平局向偶数两种模式，用于控制矩阵乘加计算中的精度行为，需先开启HF32模式并在矩阵乘加指令执行前调用。"
+tag:
+  - roles: [configuration]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: configures
+    condition: "需在矩阵乘加指令执行前调用，且配置仅在HF32模式开启期间生效"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hf32.md
+    kind: requires
+    condition: "使用本接口前需先开启HF32模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
+    kind: related
+    condition: "了解HF32格式、舍入模式及对计算精度的影响时"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md
+    kind: related
+    condition: "hf32_round_mode参数取值"
+version: ">=9.2.0"
+---
 # asc_set_hf32_round_mode
 
 ## 产品支持情况

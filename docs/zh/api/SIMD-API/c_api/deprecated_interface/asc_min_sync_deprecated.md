@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "执行矢量逐元素取最小值运算，接口已废弃，请使用asc_min与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [minimum]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min.md
+    kind: replaced_by
+    condition: "矢量取最小值场景改用asc_min实现"
+version: ">=9.0.0"
+---
 # asc_min_sync（废弃）
 
 ## 产品支持情况

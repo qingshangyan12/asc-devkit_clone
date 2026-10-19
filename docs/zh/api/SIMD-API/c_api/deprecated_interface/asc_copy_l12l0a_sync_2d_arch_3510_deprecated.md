@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "负责矩阵计算所需2D格式数据从L1 Buffer到L0A Buffer的搬运，搬运粒度为512字节数据分形，支持转置模式，接口已废弃，请使用对应的非同步接口asc_copy_l12l0a_2d_arch_3510和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_2d_arch_3510.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_copy_l12l0a_sync_2d_arch_3510（废弃）
 
 ## 产品支持情况

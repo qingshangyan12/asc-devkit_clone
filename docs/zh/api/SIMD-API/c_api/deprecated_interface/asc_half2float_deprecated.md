@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃接口，按掩码将src中参与计算的half类型元素转换为float类型写入dst，请改用显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载替代"
+version: ">=9.0.0"
+---
 # asc_half2float（废弃）
 
 ## 产品支持情况

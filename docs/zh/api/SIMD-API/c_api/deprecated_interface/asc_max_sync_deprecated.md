@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "执行矢量逐元素取最大值运算，接口已废弃，请使用asc_max与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [maximum]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md
+    kind: replaced_by
+    condition: "矢量取最大值场景改用asc_max实现"
+version: ">=9.0.0"
+---
 # asc_max_sync（废弃）
 
 ## 产品支持情况

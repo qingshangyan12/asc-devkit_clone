@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "设置asc_copy_l12l0b_arch_3510的3D格式分形矩阵搬运（im2col展开）填充值，f_matrix_ctrl为true时生效，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_3d_arch_3510.md
+    kind: configures
+    condition: "f_matrix_ctrl为true时"
+version: ">=9.0.0"
+---
 # asc_set_l12l0b_3d_padding
 
 ## 产品支持情况

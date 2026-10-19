@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "设置asc_copy_gm2l1_align接口的常量填充值，在Normal填充、Compact填充及左右填充模式下生效，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: configures
+version: ">=9.0.0"
+---
 # asc_set_gm2l1_pad
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将src按照src_offset给定的偏移按元素收集到dst中。该接口已废弃，请使用非同步接口asc_gather和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [gather]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+    kind: replaced_by
+    condition: "非同步计算场景使用asc_gather替代"
+version: ">=9.0.0"
+---
 # asc_gather_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的同步接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，支持int4b_t等位宽数据的分形合并转置与源分形间隔参数，替代为对应非同步接口asc_copy_l12l0b_trans_arch_3510和asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_trans_arch_3510.md
+    kind: replaced_by
+    condition: "接口已废弃，使用对应的非同步接口替代"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "接口已废弃，使用同步接口asc_sync替代"
+version: ">=9.1.0"
+---
 # asc_copy_l12l0b_trans_sync_arch_3510（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对每个DataBlock内的所有元素按二叉树方式两两求和，结果写入目的操作数，计算结果大于65504时保存为65504，起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_datablock_reduce_sum
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将数据从Unified Buffer搬运到Unified Buffer，支持连续搬运和高维切分搬运，源与目的地址需32字节对齐且有效搬运DataBlock不得重叠。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "Atlas A2系列产品和Atlas A3系列产品执行多条本接口指令且目的地址存在重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_ub2ub
 
 ## 产品支持情况

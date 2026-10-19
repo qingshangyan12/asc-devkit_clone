@@ -1,3 +1,57 @@
+---
+okftype: reference.api
+description: "Ascend C矩阵乘加核心计算接口，完成结果矩阵等于左矩阵乘右矩阵后与初始矩阵相加的计算，支持Bias初始化，仅在AIC上生效。"
+tag:
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
+    kind: related
+    condition: "了解输入矩阵与Bias矩阵的排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解输入矩阵与Bias矩阵的排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hf32.md
+    kind: related
+    condition: "需要关闭FP32输入的HF32计算模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hf32.md
+    kind: related
+    condition: "需要开启FP32输入的HF32计算模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_m.md
+    kind: requires
+    condition: "开启UnitFlag的其他场景"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_n.md
+    kind: requires
+    condition: "开启UnitFlag且矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md
+    kind: related
+    condition: "了解GEMV向量布局与使用场景时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
+    kind: related
+    condition: "了解FP32输入的计算模式及精度时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
+    kind: related
+    condition: "了解UnitFlag同步机制和迭代场景时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md
+    kind: related
+    condition: "转置输入场景"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
+    kind: related
+    condition: "了解数据准备、计算和结果搬出的衔接时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12bt_arch_3510.md
+    kind: requires
+    condition: "显式传入Bias起始地址的重载，调用本接口前"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
+    kind: related
+    condition: "需要清除UnitFlag产生的残留状态时"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "浮点类型的输入或输出包含inf/nan时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "输入矩阵沿K轴分块计算并将结果累加到同一块L0C Buffer、且(m/16)*(n/16)小于10时"
+version: ">=9.1.0"
+---
 # asc_mmad
 
 ## 产品支持情况

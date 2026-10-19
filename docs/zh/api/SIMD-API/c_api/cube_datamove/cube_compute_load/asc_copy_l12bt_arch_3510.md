@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将L1 Buffer中的偏置数据搬运到BiasTable Buffer供Mmad读取，支持高维切分与连续两种模式，bfloat16_t自动转换为float，half可开启转换。"
+tag:
+  - roles: [data_movement]
+  - operations: [conversion, copy]
+  - traits: [aligned_transfer, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在目的地址重叠时"
+version: ">=9.1.0"
+---
 # asc_copy_l12bt
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "按元素判断src >= value是否成立，成立输出1否则输出0，每个元素的比较结果占1个bit。该接口已废弃，请使用非同步接口asc_ge_scalar和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md
+    kind: replaced_by
+    condition: "非同步计算场景使用asc_ge_scalar替代"
+version: ">=9.0.0"
+---
 # asc_ge_scalar_sync（废弃）
 
 ## 产品支持情况

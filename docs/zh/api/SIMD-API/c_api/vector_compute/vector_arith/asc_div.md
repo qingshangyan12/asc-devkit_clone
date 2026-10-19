@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "执行矢量除法运算，对两个源矢量的对应元素逐元素相除并写入目的矢量，使用时需注意除0错误。"
+tag:
+  - roles: [compute]
+  - operations: [divide]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_div
 
 ## 产品支持情况

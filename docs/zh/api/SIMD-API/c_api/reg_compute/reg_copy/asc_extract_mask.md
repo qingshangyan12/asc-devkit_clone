@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "从矢量数据寄存器指定数据块中提取掩码寄存器，将其中每个bit广播成2bit或4bit后形成32B输出，part须在编译期确定并通过函数返回值返回结果。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_extract_mask
 
 ## 产品支持情况

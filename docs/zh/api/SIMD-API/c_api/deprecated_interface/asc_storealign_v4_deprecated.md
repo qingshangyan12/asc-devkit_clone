@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的reg计算数据搬运接口，将矢量数据寄存器中掩码指示的有效32bit元素低8bit数据压缩搬出到Unified Buffer，并启用Post Update模式自动更新目的地址，请改用asc_storealign_pack_quarter_postupdate。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md
+    kind: replaced_by
+    condition: "接口整体已废弃"
+version: ">=9.0.0"
+---
 # asc_storealign_pack_postupdate_v2（废弃）
 
 ## 产品支持情况

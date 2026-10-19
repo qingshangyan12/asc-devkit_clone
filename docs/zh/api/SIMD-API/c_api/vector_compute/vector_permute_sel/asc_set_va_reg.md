@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "用于设置转置所需的16个DataBlock地址，将操作数地址序列与地址寄存器关联，前8个和后8个地址序列分别关联，每个地址寄存器只能关联8个地址。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.1.0"
+---
 # asc_set_va_reg
 
 ## 产品支持情况

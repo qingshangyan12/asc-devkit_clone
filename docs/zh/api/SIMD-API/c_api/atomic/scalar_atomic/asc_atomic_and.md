@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对Global Memory中指定地址的单个元素执行标量原子按位与操作，返回计算前的旧值，并需保证DCache一致性。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_and]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "Scalar原子操作绕过DCache时"
+version: ">=9.1.0"
+---
 # asc_atomic_and
 
 ## 产品支持情况

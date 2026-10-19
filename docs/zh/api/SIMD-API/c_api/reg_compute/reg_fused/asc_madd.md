@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码将目的矢量数据寄存器与第一个源寄存器按元素相乘后与第二个源寄存器相加，目的寄存器既参与输入又存储最终结果。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_madd
 
 ## 产品支持情况

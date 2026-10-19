@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "根据掩码将源寄存器中参与计算的bfloat16_t元素转换为fp4x2_e2m1_t，结果按四分之一位置标签离散写入目的寄存器对应索引组，其余位置置零，支持五种舍入模式。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入与饱和模式规则"
+version: ">=9.0.0"
+---
 # asc_bfloat162e2m1x2
 
 ## 产品支持情况

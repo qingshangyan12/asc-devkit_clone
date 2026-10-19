@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "本接口用于设置asc_copy_ub2gm_align循环搬运模式下的两层循环迭代次数，loop1_size为内层循环次数，loop2_size为外层循环次数，复位后可避免影响下一次搬运。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md
+    kind: configures
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: related
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+    condition: "使用循环搬运模式时"
+version: ">=9.0.0"
+---
 # asc_set_ub2gm_loop_size
 
 ## 产品支持情况

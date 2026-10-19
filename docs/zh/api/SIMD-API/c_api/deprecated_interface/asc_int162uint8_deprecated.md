@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "asc_int162uint8（废弃）将src中int16_t类型的元素转换为uint8_t类型并写入dst，支持非饱和与饱和两种模式，源与目的操作数位宽比为2:1。该原型已废弃，替代为asc_int162uint8的显式位置参数重载。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md
+    kind: replaced_by
+    condition: "通过接口后缀控制目的操作数写入位置的原型已废弃"
+version: ">=9.0.0"
+---
 # asc_int162uint8（废弃）
 
 ## 产品支持情况

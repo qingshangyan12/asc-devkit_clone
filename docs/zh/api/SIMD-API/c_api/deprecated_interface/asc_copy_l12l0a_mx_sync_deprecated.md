@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "负责MX矩阵计算中左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，以32字节fp8_e8m0_t数据分形为单位，接口已废弃，请使用对应的非同步接口asc_copy_l12l0a_mx和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_mx.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_copy_l12l0a_mx_sync（废弃）
 
 ## 产品支持情况

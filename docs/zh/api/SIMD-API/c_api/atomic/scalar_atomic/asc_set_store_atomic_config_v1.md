@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "设置原子操作启用位与原子操作类型的值，开启原子操作并指定参与运算的数据类型，当前操作类型仅支持求和。"
+tag:
+  - roles: [configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+    kind: related
+    condition: "使用完成后清空原子操作状态以免影响后续指令功能"
+version: ">=9.0.0"
+---
 # asc_set_store_atomic_config_v1
 
 ## 产品支持情况

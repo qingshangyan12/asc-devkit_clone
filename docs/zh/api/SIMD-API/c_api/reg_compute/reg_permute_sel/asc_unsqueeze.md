@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码对矢量数据寄存器执行解压缩，dst第0个元素置0，第i个元素等于mask前i位中1的数量，最高位不参与统计，结果可写出或返回。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_unsqueeze
 
 ## 产品支持情况

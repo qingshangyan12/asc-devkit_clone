@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将uint16_t类型数据转为uint32_t类型的转换接口，按奇偶索引选择VL数据的一半读取，已废弃，请使用asc_uint162uint32的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md
+    kind: replaced_by
+    condition: "通过接口后缀控制目的操作数写入位置的场景改用asc_uint162uint32的显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_uint162uint32（废弃）
 
 ## 产品支持情况

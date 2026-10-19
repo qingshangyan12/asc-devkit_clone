@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "根据掩码将half元素转为int4x2，每两个连续元素打包进同一存储单元，按四分之一位置标签离散写入目的寄存器，支持五种舍入模式和饱和及非饱和模式。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入与饱和模式规则"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式或非饱和模式时"
+version: ">=9.0.0"
+---
 # asc_half2int4x2
 
 ## 产品支持情况

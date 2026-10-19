@@ -1,3 +1,32 @@
+---
+okftype: reference.api
+description: "设置矩阵乘加计算时逐列生成矩阵结果分形，仅改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，需在矩阵乘加指令执行前调用。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: configures
+    condition: "需在矩阵乘加指令执行前调用"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md
+    kind: configures
+    condition: "需在矩阵乘加指令执行前调用"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_n.md
+    kind: related
+    condition: "切换为逐行生成矩阵计算结果分形时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
+    kind: related
+    condition: "结果分形生成方向与搬出顺序配合时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
+    kind: related
+    condition: "了解不同结果生成方向对应的输出布局差异时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
+    kind: related
+    condition: "了解不同结果生成方向对应的输出布局差异时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
+    kind: related
+    condition: "了解不同结果生成方向对应的输出布局差异时"
+version: ">=9.1.0"
+---
 # asc_set_mmad_direction_m
 
 ## 产品支持情况

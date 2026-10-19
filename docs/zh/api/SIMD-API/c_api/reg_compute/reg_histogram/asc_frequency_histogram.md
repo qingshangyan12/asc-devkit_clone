@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "对输入寄存器中的元素进行频率统计生成直方图，结果在dst原有数据基础上累加，支持低位与高位两种模式，掩码控制参与统计的元素。"
+tag:
+  - roles: [compute]
+  - operations: [histogram]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器详细说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_frequency_histogram
 
 ## 产品支持情况

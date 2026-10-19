@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "执行矢量与标量的减法运算，按dst_i = src_i - value逐元素计算，dst、src的起始地址需要32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [subtract]
+  - traits: [scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_sub_scalar
 
 ## 产品支持情况

@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "设置Mmad计算关闭HF32模式，关闭后L0A Buffer与L0B Buffer中的float数据参与计算前不做舍入处理，需在矩阵乘加指令执行前调用。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: configures
+    condition: "执行矩阵乘加计算前"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hf32.md
+    kind: related
+    condition: "与asc_enable_hf32不同时生效"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
+    kind: related
+    condition: "了解HF32格式、舍入模式及对计算精度的影响时"
+version: ">=9.2.0"
+---
 # asc_disable_hf32
 
 ## 产品支持情况

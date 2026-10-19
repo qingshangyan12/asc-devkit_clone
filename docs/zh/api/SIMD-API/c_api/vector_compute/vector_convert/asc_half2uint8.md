@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将half类型数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC等舍入模式，要求dst、src起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_half2uint8
 
 ## 产品支持情况

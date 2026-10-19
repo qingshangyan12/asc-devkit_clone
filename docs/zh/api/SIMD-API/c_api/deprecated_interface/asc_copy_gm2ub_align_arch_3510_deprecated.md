@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的高维切分搬运接口，将数据从Global Memory非对齐搬运到Unified Buffer，支持8位、16位、32位数据类型，非32字节对齐数据会补齐至32字节，可通过dst_stride选择Normal或Compact模式，替代接口为asc_copy_gm2ub_align高维切分数据搬运。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: replaced_by
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_copy_gm2ub_align_arch_3510（废弃）
 
 ## 产品支持情况

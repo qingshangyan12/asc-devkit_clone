@@ -1,3 +1,24 @@
+---
+okftype: reference.api
+description: "将两个矢量数据寄存器中的数据按元素顺序交织后连续对齐搬出到Unified Buffer，单次搬出量为2×VL共512字节，目的地址需32字节对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [interleave, store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬出模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_storealign_intlv
 
 ## 产品支持情况

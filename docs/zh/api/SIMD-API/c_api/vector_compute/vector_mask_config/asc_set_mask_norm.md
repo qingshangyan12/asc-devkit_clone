@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "设置Mask模式为系统默认的Normal模式，使Mask参数控制高维切分计算单次迭代内参与计算的元素，需与asc_set_vector_mask配合使用。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: configures
+    condition: "需和asc_set_vector_mask配合使用"
+version: ">=9.0.0"
+---
 # asc_set_mask_norm
 
 ## 产品支持情况

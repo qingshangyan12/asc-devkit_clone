@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将fp8_e4m3fn_t类型转化为float类型，读取数据时按1:4位宽比分四部分选取索引，无显式位置参数原型已废弃，请使用asc_e4m32float的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，使用显式位置参数重载替代"
+version: ">=9.0.0"
+---
 # asc_e4m32float（废弃）
 
 ## 产品支持情况

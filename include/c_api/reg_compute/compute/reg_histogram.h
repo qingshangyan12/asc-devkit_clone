@@ -25,12 +25,52 @@
 #include "impl/c_api/reg_base_impl/reg_histogram_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @brief Accumulates a cumulative histogram into dst: dst[n] adds the count of uint8 src values not greater than n (low-range mode, thresholds 0-127), with mask selecting counted elements.
+ *
+ * @override_id asc_cumulative_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @brief Accumulates a cumulative histogram into dst: dst[n] adds the count of uint8 src values not greater than 128+n (high-range mode, thresholds 128-255), with mask selecting counted elements.
+ *
+ * @override_id asc_cumulative_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @brief Counts occurrences of uint8 src values in [0, 127] and accumulates those frequencies into dst (low-range mode), with mask selecting which src elements are counted.
+ *
+ * @override_id asc_frequency_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @brief Counts occurrences of uint8 src values in [128, 255] and accumulates those frequencies into dst (high-range mode), with mask selecting which src elements are counted.
+ *
+ * @override_id asc_frequency_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 #endif

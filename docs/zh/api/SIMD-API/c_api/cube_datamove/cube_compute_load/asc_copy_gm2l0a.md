@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将数据从GM搬运到L0A Buffer，按分形矩阵ID指定起始位置，每次迭代处理512B，可配置相邻迭代的源步长与目的间隔。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解搬入前的数据排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "各存储单元的空间大小和对齐要求"
+version: ">=9.0.0"
+---
 # asc_copy_gm2l0a
 
 ## 产品支持情况

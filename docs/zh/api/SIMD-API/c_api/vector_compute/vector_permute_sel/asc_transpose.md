@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "用于实现16*16的二维矩阵数据块转置，支持int16_t和uint16_t两种数据类型，要求dst与src的起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [transpose]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.1.0"
+---
 # asc_transpose
 
 ## 产品支持情况

@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "将整个DCache的所有Cache Line标记为无效并直接丢弃脏数据、不执行回写，调用后再次访问相关内存地址会从Global Memory重新加载数据。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: "调用asc_dci前必须将参数设置为mem_dsb_t::DSB_ALL"
+version: ">=9.1.0"
+---
 # asc_dci
 
 ## 产品支持情况

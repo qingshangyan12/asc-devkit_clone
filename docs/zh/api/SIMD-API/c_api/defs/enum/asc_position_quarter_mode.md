@@ -1,3 +1,11 @@
+---
+okftype: reference.enum
+description: "定义源或目的操作数四分之一位置枚举，供Reg类型转换接口选择数据位置，包含四个DISPERSE四分之一取值并配套ASC_DISPERSE系列常量。"
+tag:
+  - roles: [configuration]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_position_quarter_mode
 
 `asc_position_quarter_mode`用于表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。对应的`ASC_DISPERSE_*_QUARTER`常量可直接作为接口参数。

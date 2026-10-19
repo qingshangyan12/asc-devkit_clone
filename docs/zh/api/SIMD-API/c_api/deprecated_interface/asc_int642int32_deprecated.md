@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将int64_t源操作数转换为int32_t并支持饱和或非饱和模式，因位宽比2:1需按奇或偶索引写入目的寄存器，请使用asc_int642int32的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md
+    kind: replaced_by
+    condition: "通过接口后缀控制写入位置的原型改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_int642int32（废弃）
 
 ## 产品支持情况

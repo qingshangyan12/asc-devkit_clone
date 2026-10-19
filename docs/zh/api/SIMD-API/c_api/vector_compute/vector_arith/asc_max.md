@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "执行逐元素取最大值运算，比较两个源矢量的对应元素并将较大者写入目的矢量，支持两种计算形式。"
+tag:
+  - roles: [compute]
+  - operations: [maximum]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_max
 
 ## 产品支持情况

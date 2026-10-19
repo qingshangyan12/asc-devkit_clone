@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "读取当前核STATUS特殊寄存器的64位整体值并返回，记录核运行中各类告警事件，状态位一经置位即保持至复位或被读取清除；只读查询，可在AIC与AIV中调用。"
+tag:
+  - roles: [query]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_get_status
 
 ## 产品支持情况

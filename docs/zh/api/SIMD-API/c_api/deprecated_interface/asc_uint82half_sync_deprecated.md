@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将uint8_t类型数据同步转换为half类型，要求dst与src起始地址32字节对齐。该接口已废弃，请使用对应的非同步接口asc_uint82half和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
+    kind: replaced_by
+    condition: "非同步转换场景改用asc_uint82half实现"
+version: ">=9.0.0"
+---
 # asc_uint82half_sync（废弃）
 
 ## 产品支持情况

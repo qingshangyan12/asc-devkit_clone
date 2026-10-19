@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "介绍标量原子操作在GM指定地址上完成单元素原子读-改-写的能力与适用场景，并汇总各接口功能及其支持的数据类型。"
+---
 # 标量原子操作概述
 
 标量原子操作接口用于在Global Memory（GM）的指定地址上完成单个元素的原子读-改-写操作：读取该地址的旧值`old_value`，按接口语义计算新值并写回该地址，同时返回`old_value`。整个过程由硬件保证为原子操作，其他原子更新无法插入其中，因此多个AI Core或同一AI Core内的多条指令并发访问同一GM地址时不会相互覆盖，最终结果符合预期。不使用原子操作与使用原子操作的效果对比如[标量原子累加效果示意图](../atomic_operations_overview.md#scalar_atomic_operation_diagram)所示。

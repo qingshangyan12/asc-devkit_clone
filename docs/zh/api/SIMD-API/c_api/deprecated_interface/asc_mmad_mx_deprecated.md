@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "完成带有量化系数的矩阵乘加计算（MmadMx），左矩阵与右矩阵分别与对应的量化系数矩阵相乘后再做矩阵乘法。unit_flag为uint8_t的旧形态已废弃，请改用入参unit_flag_mode为asc_unit_flag_mode的asc_mmad_mx接口，同步功能由asc_sync实现。"
+tag:
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md
+    kind: replaced_by
+    condition: "unit_flag为uint8_t的旧形态改用新asc_mmad_mx接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_mmad_mx（废弃）
 
 ## 产品支持情况

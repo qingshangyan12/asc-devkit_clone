@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "根据掩码将源矢量中参与计算的bfloat16_t元素转换为float并写入目的矢量，按位宽比1:2读取偶数或奇数索引位置，该通过接口后缀控制读取位置的原型已废弃，请使用asc_bfloat162float的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md
+    kind: replaced_by
+    condition: "通过接口后缀控制读取位置场景改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_bfloat162float（废弃）
 
 ## 产品支持情况

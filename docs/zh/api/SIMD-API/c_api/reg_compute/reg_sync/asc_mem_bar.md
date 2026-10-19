@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "Reg矢量计算内不同流水线间的同步指令，指定源与目的流水线，使目的流水线等待源流水线上所有指令完成后才执行，用于读写保序。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_mem_bar
 
 ## 产品支持情况

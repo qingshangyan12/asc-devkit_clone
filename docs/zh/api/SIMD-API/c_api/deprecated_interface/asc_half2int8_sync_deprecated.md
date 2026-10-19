@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "已废弃的同步转换接口，将half类型数据转换为int8_t并支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请改用对应的非同步接口asc_half2int8和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口替代"
+version: ">=9.0.0"
+---
 # asc_half2int8_sync（废弃）
 
 ## 产品支持情况

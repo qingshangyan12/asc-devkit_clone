@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "asc_int162half_sync（废弃）将int16_t类型数据同步转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC等多种舍入模式，dst与src起始地址需32字节对齐。该接口已废弃，替代为非同步接口asc_int162half和同步接口asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "asc_int162half_sync等接口已废弃，由同步接口替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md
+    kind: replaced_by
+    condition: "asc_int162half_sync等接口已废弃，由非同步接口替代"
+version: ">=9.0.0"
+---
 # asc_int162half_sync（废弃）
 
 ## 产品支持情况

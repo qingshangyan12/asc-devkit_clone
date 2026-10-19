@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "更新地址寄存器用于迭代寻址，支持1至4维偏移量及b8、b16、b32位宽模式，常配合对齐搬入搬出接口在循环中自动递增UB地址。"
+tag:
+  - roles: [configuration]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+    condition: "地址寄存器迭代寻址场景"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+    kind: related
+    condition: "地址寄存器迭代寻址场景"
+version: ">=9.0.0"
+---
 # asc_update_addr_reg
 
 ## 产品支持情况

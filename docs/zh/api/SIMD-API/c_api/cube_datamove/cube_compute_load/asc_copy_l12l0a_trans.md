@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "实现带转置的2D格式数据从L1 Buffer到L0A Buffer的高维切分搬运，先把连续分形合并为方块矩阵做转置再分裂，支持迭代次数、源步长与目的分形间隔等参数配置。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, load]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+    condition: "了解搬入前的数据排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "各存储单元的空间大小和对齐要求"
+version: ">=9.0.0"
+---
 # asc_copy_l12l0a_trans
 
 ## 产品支持情况

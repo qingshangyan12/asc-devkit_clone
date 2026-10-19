@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将两个源矢量数据寄存器中的数据交替交织后写入两个目的寄存器，掩码模式支持按1bit、2bit、4bit粒度交织。"
+tag:
+  - roles: [compute]
+  - operations: [interleave]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_intlv
 
 ## 产品支持情况

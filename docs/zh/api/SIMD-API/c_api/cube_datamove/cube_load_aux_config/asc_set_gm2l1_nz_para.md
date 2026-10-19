@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "配置GM搬运至L1 Buffer过程中ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量与相邻行、Z分形、Nz矩阵步长，供后续搬运接口使用。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md
+    kind: configures
+    condition: "DN2Nz搬运时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_3510.md
+    kind: configures
+    condition: "ND2Nz搬运时"
+version: ">=9.1.0"
+---
 # asc_set_gm2l1_nz_para
 
 ## 产品支持情况

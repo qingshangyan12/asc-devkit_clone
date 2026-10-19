@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将vector_fp8_e5m2_t源操作数以256B为单位分为四部分，读取其中一部分元素转换为vector_float类型并写入目的操作数，无显式位置参数原型已废弃，请使用asc_e5m22float的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，使用显式位置参数重载替代"
+version: ">=9.0.0"
+---
 # asc_e5m22float（废弃）
 
 ## 产品支持情况

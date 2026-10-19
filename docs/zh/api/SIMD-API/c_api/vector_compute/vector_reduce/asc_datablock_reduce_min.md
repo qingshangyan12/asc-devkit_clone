@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "执行数据块内的求最小值规约，将每个数据块中的元素聚合为最小值，支持前n个数据连续计算与高维切分计算两种形式，dst和src起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+version: ">=9.0.0"
+---
 # asc_datablock_reduce_min
 
 ## 产品支持情况

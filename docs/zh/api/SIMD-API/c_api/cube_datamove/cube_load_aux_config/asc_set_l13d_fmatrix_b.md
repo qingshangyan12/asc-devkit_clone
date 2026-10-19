@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，包括宽高与四边padding大小，该配置供f_matrix_ctrl取值为true的asc_copy_l12l0b 3D矩阵搬运接口使用，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_3d_arch_3510.md
+    kind: configures
+    condition: "f_matrix_ctrl取值为true时"
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md
+    kind: related
+    condition: "位域参数形式"
+version: ">=9.1.0"
+---
 # asc_set_l13d_fmatrix_b
 
 ## 产品支持情况

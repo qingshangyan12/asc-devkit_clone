@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "从Unified Buffer按dtype对齐起始地址读取VL长度数据，与预处理缓存的前置数据拼接后搬入矢量数据寄存器，连续搬入需手动更新源地址。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
+    kind: requires
+    condition: "每次搬入前先初始化非对齐寄存器"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadunalign
 
 ## 产品支持情况

@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "不经过DCache直接从GM地址读取整型数据，用于避免多核操作无法对齐到Cache Line时的数据覆盖问题。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+dependencies: []
+version: ">=9.2.0"
+---
 # asc_load_dev
 
 ## 产品支持情况

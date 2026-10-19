@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将源矢量最高位元素广播到目的矢量中被掩码筛选的位置，未筛选位置置零，与asc_duplicate的区别在于广播数据来源为最高位元素。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖"
+version: ">=9.2.0"
+---
 # asc_duplicate_highest
 
 ## 产品支持情况

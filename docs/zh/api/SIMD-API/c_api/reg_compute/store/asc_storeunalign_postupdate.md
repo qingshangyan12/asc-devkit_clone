@@ -1,3 +1,30 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器或掩码寄存器中的数据搬出到非32字节对齐的UB地址，提供立即数偏移、地址寄存器偏移和掩码三种模式，Post Update模式搬出后自动更新目的地址，尾块暂存至非对齐寄存器。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [post_update, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬出模式的addr_reg须预先构造"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
+    kind: requires
+    condition: "掩码寄存器连续搬出模式与地址寄存器偏移搬出模式须使用其后处理接口收尾"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
+    kind: requires
+    condition: "立即数偏移搬出模式须使用其后处理接口收尾"
+version: ">=9.0.0"
+---
 # asc_storeunalign_postupdate
 
 ## 产品支持情况

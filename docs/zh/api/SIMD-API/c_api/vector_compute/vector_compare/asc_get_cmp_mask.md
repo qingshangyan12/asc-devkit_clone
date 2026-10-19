@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "用于获取Compare操作的比较结果，将比较得到的掩码结果写入dst指向的地址，需和Compare操作配合使用。"
+tag:
+  - roles: [query]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_get_cmp_mask
 
 ## 产品支持情况

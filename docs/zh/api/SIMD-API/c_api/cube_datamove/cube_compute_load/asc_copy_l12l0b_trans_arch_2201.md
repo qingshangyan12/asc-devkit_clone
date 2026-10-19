@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按分形索引、重复次数与源目的步长间隔组织搬运，支持高维切分以及uint8、half、float等数据类型。"
+tag:
+  - roles: [data_movement]
+  - operations: [layout_transform, load]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.1.0"
+---
 # asc_copy_l12l0b_trans
 
 ## 产品支持情况

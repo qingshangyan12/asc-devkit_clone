@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，按掩码将src中每个参与计算的half元素转换为hifloat8_t写入dst，依据接口后缀写入偶数或奇数索引位置，请使用asc_half2hif8的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md
+    kind: replaced_by
+    condition: "通过接口后缀控制目的操作数写入位置的原型，改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_half2hif8（废弃）
 
 ## 产品支持情况

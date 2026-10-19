@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "根据掩码将源矢量中参与计算的bfloat16_t元素转换为int32_t并写入目的矢量，支持舍入与饱和或非饱和模式并按后缀读取偶数或奇数索引，该原型已废弃，请使用asc_bfloat162int32的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md
+    kind: replaced_by
+    condition: "通过接口后缀控制读取位置场景改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_bfloat162int32（废弃）
 
 ## 产品支持情况

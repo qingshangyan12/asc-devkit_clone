@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码对源矢量逐元素求平方根并写入目的矢量，支持half与float类型，输入为负数时结果为nan，输入为-0时结果为-0。"
+tag:
+  - roles: [compute]
+  - operations: [sqrt]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_sqrt
 
 ## 产品支持情况

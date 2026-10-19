@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将源操作数中的元素选取低8位、低16位或低32位写入目的操作数的低半部分或高半部分，该接口已废弃，请改用 asc_pack_to_low 和 asc_pack_to_high 替代。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md
+    kind: replaced_by
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_pack (废弃)
 
 ## 产品支持情况

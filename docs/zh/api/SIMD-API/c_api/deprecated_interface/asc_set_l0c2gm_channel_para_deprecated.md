@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "已废弃的矩阵搬出配置接口，用于L0C Buffer搬出执行Nz2DN格式转换时配置源Nz矩阵中相邻行的地址偏移，供后续开启Nz2DN功能的搬出接口使用，替代接口为asc_set_l0c_copy_channel_para。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md
+    kind: replaced_by
+    condition: "L0C Buffer搬出执行Nz2DN转换时配置源Nz相邻行地址偏移的场景改用asc_set_l0c_copy_channel_para"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l0c2gm_channel_para（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer，接口已废弃，请使用对应的非同步接口asc_copy_l12bt_arch_3510和同步接口asc_sync替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12bt_arch_3510.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+version: ">=9.1.0"
+---
 # asc_copy_l12bt_sync_arch_3510（废弃）
 
 ## 产品支持情况

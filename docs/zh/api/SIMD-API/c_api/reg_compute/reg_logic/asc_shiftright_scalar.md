@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码对源矢量数据寄存器中的元素执行右移，位移量由int16_t标量立即数指定，无符号整数执行逻辑右移、有符号整数执行算术右移。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_shift]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_shiftright_scalar
 
 ## 产品支持情况

@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "对齐搬入接口，从UB连续对齐搬入目的操作数，经int32_t传入偏移并自动Post Update。该接口已废弃，替代方案为asc_loadalign_brc_datablock_postupdate、asc_loadalign_brc_elem2datablock_postupdate与asc_loadalign_unpack4_postupdate。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity, post_update]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md
+    kind: replaced_by
+    condition: "BRCV2搬入模式替代实现"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md
+    kind: replaced_by
+    condition: "BRCV3搬入模式替代实现"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md
+    kind: replaced_by
+    condition: "UNPACKV2搬入模式替代实现"
+version: ">=9.0.0"
+---
 # asc_loadalign (废弃)
 
 ## 产品支持情况

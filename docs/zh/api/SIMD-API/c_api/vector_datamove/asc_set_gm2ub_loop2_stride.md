@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "设置asc_copy_gm2ub_align循环搬运模式下外层循环loop2相邻迭代源与目的操作数数据块起始地址的偏移量，步长须32字节对齐。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: related
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+    kind: related
+    condition: "使用循环搬运模式时"
+version: ">=9.0.0"
+---
 # asc_set_gm2ub_loop2_stride
 
 ## 产品支持情况

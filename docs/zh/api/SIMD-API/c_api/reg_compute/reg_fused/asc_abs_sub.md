@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码对两个源矢量寄存器逐元素相减后取绝对值，结果通过函数返回值或dst输出，掩码位为0时对应元素置0。"
+tag:
+  - roles: [compute]
+  - operations: [absolute, subtract]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_abs_sub
 
 ## 产品支持情况

@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "已废弃接口，用于获取当前运行核（逻辑核）的索引，建议改用内置变量block_idx结合asc_get_sub_block_num与asc_get_sub_block_id接口替代。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
+    kind: replaced_by
+    condition: "替代时结合内置变量block_idx计算逻辑核索引"
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
+    kind: replaced_by
+    condition: "替代时结合内置变量block_idx计算逻辑核索引"
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: replaced_by
+    condition: "非Mix场景可直接使用内置变量block_idx，Mix场景需结合子块信息计算"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_get_block_idx（废弃）
 
 ## 产品支持情况

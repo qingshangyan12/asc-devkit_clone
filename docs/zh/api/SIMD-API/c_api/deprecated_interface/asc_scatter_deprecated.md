@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的矢量分散接口，根据索引值index将源操作数src中的元素分散到目的操作数dst中，要求dst首地址32B对齐且index值唯一，请使用asc_scatter实现此功能。"
+tag:
+  - roles: [compute]
+  - operations: [scatter]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
+    kind: replaced_by
+    condition: "改用asc_scatter实现矢量分散功能"
+version: ">=9.0.0,<=9.1.0"
+---
 # asc_scatter（废弃）
 
 ## 产品支持情况

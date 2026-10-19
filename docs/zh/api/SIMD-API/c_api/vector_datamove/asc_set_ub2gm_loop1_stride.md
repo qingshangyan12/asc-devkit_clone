@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "本接口用于设置asc_copy_ub2gm_align循环搬运模式下内层循环相邻两次迭代的源操作数与目的操作数数据块起始地址偏移量，源步长必须32字节对齐。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md
+    kind: configures
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: related
+    condition: "使用循环搬运模式时"
+version: ">=9.0.0"
+---
 # asc_set_ub2gm_loop1_stride
 
 ## 产品支持情况

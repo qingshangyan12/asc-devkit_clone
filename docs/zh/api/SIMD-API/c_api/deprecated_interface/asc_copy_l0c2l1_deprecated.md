@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将矩阵计算结果从L0C Buffer搬运至L1 Buffer，支持随路量化、ReLU与格式转换等能力，旧参数形式及asc_copy_l0c2l1_sync已废弃，请使用asc_copy_l0c2l1接口和asc_sync接口替代。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer, quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md
+    kind: replaced_by
+    condition: "替代废弃旧参数形式和非同步用法的asc_copy_l0c2l1接口"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "与替代接口配合使用的同步接口"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_copy_l0c2l1（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "矩阵搬出时将Nz格式转换为ND格式的特性，Atlas A3/A2系列通过nz2nd_en启用，Ascend 950系列通过enable_nz2nd启用，矩阵数量及间隔由对应配置接口设置。"
+---
 # NZ2ND
 
 ## 特性说明

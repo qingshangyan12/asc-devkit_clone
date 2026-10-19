@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "结束一组asc_squeeze_and_storeunalign连续搬出操作，将暂存在非对齐寄存器中的32B尾块写入Unified Buffer，dst与src需与同组主接口调用保持一致。"
+tag:
+  - roles: [compute]
+  - operations: [store]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: requires
+    condition: "调用本接口前"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_squeeze_and_storeunalign_finalize
 
 ## 产品支持情况

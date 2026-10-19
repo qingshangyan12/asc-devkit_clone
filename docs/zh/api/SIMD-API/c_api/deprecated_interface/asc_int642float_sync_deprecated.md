@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将int64_t类型数据同步转换为float类型，包含rd、rn、rna、ru、rz五种变体，接口已废弃，请使用对应的非同步接口asc_int642float和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md
+    kind: replaced_by
+    condition: "非同步转换场景改用asc_int642float实现"
+version: ">=9.0.0"
+---
 # asc_int642float_sync（废弃）
 
 ## 产品支持情况

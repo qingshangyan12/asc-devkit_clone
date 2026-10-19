@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式。该同步系列接口已废弃，请使用对应的非同步接口asc_bfloat162int32和asc_sync同步接口替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_bfloat162int32_sync（废弃）
 
 ## 产品支持情况

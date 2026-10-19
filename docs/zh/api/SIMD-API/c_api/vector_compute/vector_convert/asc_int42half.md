@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将int4_t类型数据转换为half类型，支持前n个数据计算与高维切分计算，要求dst、src起始地址32字节对齐，且src为int4b_t时count必须为偶数。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int42half
 
 ## 产品支持情况

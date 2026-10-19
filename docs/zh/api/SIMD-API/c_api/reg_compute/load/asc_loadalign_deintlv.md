@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "从Unified Buffer中32字节对齐地址读取2×VL长度数据，将偶数与奇数下标元素分别写入两个矢量数据寄存器，提供对齐、立即数与地址寄存器偏移三种搬入模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [deinterleave, load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移搬入模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "本指令与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign_deintlv
 
 ## 产品支持情况

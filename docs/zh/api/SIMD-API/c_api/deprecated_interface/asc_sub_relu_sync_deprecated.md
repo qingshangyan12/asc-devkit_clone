@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的复合同步计算接口，按元素求差后进行Relu计算，并支持s162s8、f322f16、f162s8的结果类型转换，请拆分使用asc_sub_relu与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [relu, subtract]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步复合接口已废弃"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md
+    kind: replaced_by
+    condition: "同步复合接口已废弃"
+version: ">=9.0.0"
+---
 # asc_sub_relu_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "为DEQSCALE寄存器配置量化参数，支持通过临时内存与scale、offset、sign_mode数组批量设置，也支持float和half标量形式，用于cast_deq等接口的int32_t转化为half场景。"
+tag:
+  - roles: [configuration]
+  - traits: [quantization]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_set_deq_scale
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "根据mask将src中的float类型数据转换为bfloat16_t并支持多种舍入与饱和模式，结果按后缀写入dst偶数或奇数索引。接口已废弃，请使用asc_float2bfloat16的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_float2bfloat16（废弃）
 
 ## 产品支持情况

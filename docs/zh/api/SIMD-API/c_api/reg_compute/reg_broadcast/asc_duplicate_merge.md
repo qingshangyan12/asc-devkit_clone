@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将源矢量最低位元素广播到目的矢量中被掩码筛选的位置，未筛选元素保留原值，采用合并模式且调用前需初始化目的寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [broadcast]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
+    kind: related
+version: ">=9.0.0"
+---
 # asc_duplicate_merge
 
 ## 产品支持情况

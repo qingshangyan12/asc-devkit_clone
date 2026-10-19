@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "本接口用于设置asc_ndim_copy_gm2ub在常数填充模式下使用的填充值，填充值数据类型须与搬运数据类型一致，仅在AIV上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+    condition: "使用常数填充模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: related
+    condition: "常数填充模式下"
+version: ">=9.0.0"
+---
 # asc_set_ndim_pad_value
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将数据从Global Memory搬运到L1，支持在搬运时完成ND格式到NZ格式的转换，并可传输多个ND矩阵并配置相应步长参数。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy, layout_transform]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
+    kind: constrained_by
+    condition: "地址对齐与搬运粒度要求"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
+version: ">=9.1.0"
+---
 # asc_copy_gm2l1_nd2nz
 
 ## 产品支持情况

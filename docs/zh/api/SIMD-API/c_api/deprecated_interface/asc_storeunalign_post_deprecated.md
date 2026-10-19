@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的reg计算数据搬运接口，用于将非对齐寄存器中缓存的尾块数据搬出到Unified Buffer，请改用asc_squeeze_and_storeunalign_finalize。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: replaced_by
+    condition: "接口整体已废弃"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_storeunalign_post（废弃）
 
 ## 产品支持情况

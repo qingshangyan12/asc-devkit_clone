@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对Global Memory中uint32_t或uint64_t元素执行原子递减，旧值为0或大于val时置为val，否则减1，并返回旧值。"
+tag:
+  - roles: [compute]
+  - operations: [subtract]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "Scalar原子操作绕过DCache时需保证GM与DCache的一致性"
+version: ">=9.1.0"
+---
 # asc_atomic_dec
 
 ## 产品支持情况

@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "获取输入uint64_t数据二进制表示中值为0的位数，返回int64_t类型结果，取值范围为0到64。"
+tag:
+  - roles: [compute]
+  - operations: [bit_manipulation]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_zero_bits_cnt
 
 ## 产品支持情况

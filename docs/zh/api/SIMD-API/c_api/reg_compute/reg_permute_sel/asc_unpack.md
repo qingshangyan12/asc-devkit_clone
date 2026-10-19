@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将源矢量或掩码寄存器中低半段或高半段元素按扩充位宽的方式解压缩后写入dst或通过返回值返回，无符号补0、有符号保号、掩码每bit展开为2bit。"
+tag:
+  - roles: [compute]
+  - operations: [compression]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_unpack
 
 ## 产品支持情况

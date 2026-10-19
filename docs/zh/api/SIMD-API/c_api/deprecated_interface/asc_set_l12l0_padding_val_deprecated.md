@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "设置PADDING_B寄存器值，存储搬运过程中使用的padding值及padding模式。该接口已废弃，请使用asc_set_l12l0b_3d_padding替代。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_l12l0b_3d_padding.md
+    kind: replaced_by
+    condition: "PADDING_B寄存器配置场景改用asc_set_l12l0b_3d_padding"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_l12l0_padding_val（废弃）
 
 ## 产品支持情况

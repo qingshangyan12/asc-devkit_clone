@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "对两个源矢量逐元素执行除法运算并写入目的矢量，要求地址32字节对齐并注意除0错误，接口已废弃，替代方案为asc_div与asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [divide]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
+    kind: replaced_by
+    condition: "非同步计算场景改用asc_div实现"
+version: ">=9.0.0"
+---
 # asc_div_sync（废弃）
 
 ## 产品支持情况

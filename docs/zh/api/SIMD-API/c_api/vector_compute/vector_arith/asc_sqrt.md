@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按元素对输入矢量执行开方运算，结果写入目的矢量。计算要求src只支持设置为正数，且dst、src的起始地址需要32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [sqrt]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_sqrt
 
 ## 产品支持情况

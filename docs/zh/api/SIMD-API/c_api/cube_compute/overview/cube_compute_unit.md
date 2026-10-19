@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "Cube计算单元专用于执行矩阵运算，直接访问的专用缓存包括存储左矩阵的L0A Buffer、存储右矩阵的L0B Buffer以及存储初始化累加值和计算结果的L0C Buffer，输入数据一般需从GM搬运到L1 Buffer再分发。"
+---
 # 矩阵计算单元
 
 Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。

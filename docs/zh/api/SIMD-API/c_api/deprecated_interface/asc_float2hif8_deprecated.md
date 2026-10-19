@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将float类型转化为hifloat8_t类型并支持多种舍入模式与饱和/非饱和模式，因源与目的位宽比4:1需按索引分四部分写入，无显式位置参数原型已废弃，请使用asc_float2hif8的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_float2hif8（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的复合同步计算接口，执行矢量减法运算，请拆分使用asc_sub与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [subtract]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步复合接口已废弃"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md
+    kind: replaced_by
+    condition: "同步复合接口已废弃"
+version: ">=9.0.0"
+---
 # asc_sub_sync（废弃）
 
 ## 产品支持情况

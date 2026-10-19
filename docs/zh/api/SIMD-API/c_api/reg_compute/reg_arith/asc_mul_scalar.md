@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将源矢量数据寄存器中的元素与标量按元素相乘，结果通过返回值或目的寄存器输出，掩码位为0的元素置0。"
+tag:
+  - roles: [compute]
+  - operations: [multiply]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_mul_scalar
 
 ## 产品支持情况

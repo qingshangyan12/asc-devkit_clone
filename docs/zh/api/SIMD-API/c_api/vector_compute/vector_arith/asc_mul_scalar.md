@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "执行矢量与标量的乘法运算，每个源元素乘以标量值后写入目的矢量，支持前n个数据与高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [multiply]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠"
+version: ">=9.0.0"
+---
 
 # asc_mul_scalar
 

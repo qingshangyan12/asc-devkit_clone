@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "调试用状态查询接口，在asc_icache_preload之后调用，返回ICache预取是否完成，0表示已完成、1表示未完成。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
+    kind: requires
+    condition: "在asc_icache_preload之后调用"
+version: ">=9.0.0"
+---
 # asc_get_icache_preload_status
 
 ## 产品支持情况

@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码比特位从两个源操作数中逐位置选择元素，mask为1时选取src0，为0时选取src1。"
+tag:
+  - roles: [compute]
+  - operations: [selection]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_select
 
 ## 产品支持情况

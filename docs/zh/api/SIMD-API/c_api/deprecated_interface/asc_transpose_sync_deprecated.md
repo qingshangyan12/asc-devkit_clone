@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "用于实现16*16的二维矩阵数据块转置的同步接口，已废弃，请使用对应的非同步接口asc_transpose和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [transpose]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md
+    kind: replaced_by
+    condition: "非同步转置计算场景改用asc_transpose实现"
+version: ">=9.1.0"
+---
 # asc_transpose_sync（废弃）
 
 ## 产品支持情况

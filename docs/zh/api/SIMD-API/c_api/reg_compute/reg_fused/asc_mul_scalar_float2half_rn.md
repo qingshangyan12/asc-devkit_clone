@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码将float源寄存器的元素与标量value按元素相乘，并按ROUND舍入模式转换为half写入偶数或奇数索引位置，其余位置置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion, multiply]
+  - traits: [elementwise, rounding_mode, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.2.0"
+---
 # asc_mul_scalar_float2half_rn
 
 ## 产品支持情况

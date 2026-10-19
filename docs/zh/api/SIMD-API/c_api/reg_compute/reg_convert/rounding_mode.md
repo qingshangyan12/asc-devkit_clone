@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "说明Ascend C数据类型转换中的舍入模式与饱和及非饱和模式，涵盖RINT、ROUND、FLOOR、CEIL、TRUNC、ODD、HYBRID舍入方式及数值溢出的处理规则。"
+---
 # 舍入模式与饱和模式
 
 ## 概述

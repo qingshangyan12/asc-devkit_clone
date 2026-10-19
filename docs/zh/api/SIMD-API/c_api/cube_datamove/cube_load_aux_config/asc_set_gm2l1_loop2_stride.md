@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "在GM到L1 Buffer搬运场景中，设置asc_copy_gm2l1_align循环填充模式外层循环相邻迭代数据块的源地址与目的L1间隔，目的间隔必须32字节对齐，仅在AIC上生效。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: configures
+    condition: "循环填充模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop1_stride.md
+    kind: requires
+    condition: "循环填充模式配置"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop_size.md
+    kind: requires
+    condition: "循环填充模式配置"
+version: ">=9.0.0"
+---
 # asc_set_gm2l1_loop2_stride
 
 ## 产品支持情况

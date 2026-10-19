@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码对源操作数按元素相乘后与目的操作数对应元素累加，dst既作为输入累加器参与计算又存储最终结果，掩码位为0时对应元素置0。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器详细说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.2.0"
+---
 # asc_mula
 
 ## 产品支持情况

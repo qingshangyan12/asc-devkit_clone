@@ -26,11 +26,51 @@
 #include "impl/c_api/reg_base_impl/scalar_convert_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @brief Converts a float scalar to a half value with the rounding mode fixed to ODD (round to nearest odd) and returns the half result.
+ *
+ * @override_id asc_float2half_ro__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline half asc_float2half_ro(float value);
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @brief Converts the float scalar value to int32_t using the rd (FLOOR) rounding mode and returns the int32_t result (non-void return, PIPE_S).
+ *
+ * @override_id asc_float2int32_rd__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rd(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @brief Converts the float scalar value to int32_t using the ru (CEIL) rounding mode and returns the int32_t result (non-void return, PIPE_S).
+ *
+ * @override_id asc_float2int32_ru__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_ru(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @brief Converts the float scalar value to int32_t using the rn (RINT) rounding mode and returns the int32_t result (non-void return, PIPE_S).
+ *
+ * @override_id asc_float2int32_rn__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rn(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @brief Converts the float scalar value to int32_t using the rna (ROUND) rounding mode and returns the int32_t result (non-void return, PIPE_S).
+ *
+ * @override_id asc_float2int32_rna__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rna(float value);
 
 #endif

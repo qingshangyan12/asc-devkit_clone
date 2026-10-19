@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "执行矢量复制操作，将标量值复制填充到矢量中，要求目的地址32字节对齐，接口已废弃，替代方案为asc_duplicate与asc_sync。"
+tag:
+  - roles: [data_initialization]
+  - operations: [fill]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
+    kind: replaced_by
+    condition: "非同步计算场景改用asc_duplicate实现"
+version: ">=9.0.0"
+---
 # asc_duplicate_sync（废弃）
 
 ## 产品支持情况

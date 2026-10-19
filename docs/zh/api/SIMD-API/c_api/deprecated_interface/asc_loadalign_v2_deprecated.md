@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "对齐数据搬运接口，从Unified Buffer连续对齐搬入目的操作数，通过地址寄存器传入偏移，源地址需32B对齐。该接口已废弃，替代方案为asc_loadalign_brc_datablock、asc_loadalign_brc_elem2datablock与asc_loadalign_unpack4。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md
+    kind: replaced_by
+    condition: "BRCV2搬入模式替代实现"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md
+    kind: replaced_by
+    condition: "BRCV3搬入模式替代实现"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md
+    kind: replaced_by
+    condition: "UNPACKV2搬入模式替代实现"
+version: ">=9.0.0"
+---
 # asc_loadalign (废弃)
 
 ## 产品支持情况

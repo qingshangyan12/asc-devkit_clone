@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "对输入的int32_t类型数据逐元素量化并转换为half类型，需配合asc_set_deq_scale的非向量模式设置量化参数，起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: requires
+    condition: "需配合非向量模式使用"
+version: ">=9.0.0"
+---
 
 # asc_deq_int322half
 
