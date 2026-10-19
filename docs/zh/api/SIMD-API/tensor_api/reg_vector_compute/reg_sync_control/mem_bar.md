@@ -26,9 +26,11 @@
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/experimental/arch/vector/reg_sync_control.h"`，命名空间为`asc::te::experimental`。
+头文件路径为：`"tensor_api/experimental/arch/vector/reg_sync_control.h"`，接口命名空间为`asc::te::experimental`。
 
-`mem_bar`用于同步`SIMD_VF`函数内不同流水线对Unified Buffer（UB）的访问。目的流水线中位于`mem_bar`之后的UB访问，会等待源流水线中位于`mem_bar`之前的UB访问完成。
+`mem_bar`是Reg矢量计算函数内不同流水线之间的同步接口。接口通过模板参数指定源流水线和目的流水线：目的流水线中位于`mem_bar`之后的Unified Buffer（UB）访问，需要等待源流水线中位于`mem_bar`之前的UB访问全部完成后才能执行。
+
+读写场景下，如果读指令和写指令使用相同的寄存器，硬件可以触发寄存器保序，指令会按照代码顺序执行，无需插入同步接口。如果使用不同的寄存器，并且需要保证两条流水线按代码顺序访问同一块UB地址空间，则需要调用本接口。写后写场景同理。
 
 本接口仅在AIV上生效，不用于MTE流水线同步、核间同步或整核同步。
 
@@ -45,63 +47,73 @@ __simd_callee__ inline void mem_bar()
 
 | 参数名 | 描述 |
 | --- | --- |
-| src | 源流水线，类型为`mem_type`。该流水线中位于本接口之前的UB访问需要先完成。 |
-| dst | 目的流水线，类型为`mem_type`。该流水线中位于本接口之后的UB访问等待源流水线。 |
+| src | 源流水线，类型为`mem_type`。该流水线中位于本接口之前的UB访问需要先完成，具体取值参见[表2](#mem-type-values)。 |
+| dst | 目的流水线，类型为`mem_type`。该流水线中位于本接口之后的UB访问等待源流水线，具体取值参见[表2](#mem-type-values)。 |
+
+<a id="mem-type-values"></a>
+
+**表2** `mem_type`取值说明
+
+| 取值 | 含义 |
+| --- | --- |
+| `mem_type::vec_store` | `__simd_vf__`函数内的矢量写UB流水线，对应寄存器到UB的数据搬出接口，例如`store`。 |
+| `mem_type::vec_load` | `__simd_vf__`函数内的矢量读UB流水线，对应UB到寄存器的数据搬入接口，例如`load`。 |
+| `mem_type::scalar_store` | `__simd_vf__`函数内的标量写UB流水线。 |
+| `mem_type::scalar_load` | `__simd_vf__`函数内的标量读UB流水线。 |
+| `mem_type::vec_all` | `__simd_vf__`函数内所有矢量读写UB流水线。 |
+| `mem_type::scalar_all` | `__simd_vf__`函数内所有标量读写UB流水线。 |
 
 <a id="mem-bar-supported-combinations"></a>
 
-**表2** 支持的`src`和`dst`组合
+**表3** `src`和`dst`组合取值说明
 
-| src | dst | 含义 |
-| --- | --- | --- |
-| `mem_type::vec_store` | `mem_type::vec_load` | 矢量写流水线同步到矢量读流水线。 |
-| `mem_type::vec_load` | `mem_type::vec_store` | 矢量读流水线同步到矢量写流水线。 |
-| `mem_type::vec_store` | `mem_type::vec_store` | 矢量写流水线内部同步。 |
-| `mem_type::vec_store` | `mem_type::scalar_load` | 矢量写流水线同步到标量读流水线。 |
-| `mem_type::vec_load` | `mem_type::scalar_store` | 矢量读流水线同步到标量写流水线。 |
-| `mem_type::vec_store` | `mem_type::scalar_store` | 矢量写流水线同步到标量写流水线。 |
-| `mem_type::scalar_store` | `mem_type::vec_load` | 标量写流水线同步到矢量读流水线。 |
-| `mem_type::scalar_load` | `mem_type::vec_store` | 标量读流水线同步到矢量写流水线。 |
-| `mem_type::scalar_store` | `mem_type::vec_store` | 标量写流水线同步到矢量写流水线。 |
-| `mem_type::vec_all` | `mem_type::vec_all` | 所有矢量读写流水线之间同步。 |
-| `mem_type::vec_all` | `mem_type::scalar_all` | 所有矢量读写流水线同步到所有标量读写流水线。 |
-| `mem_type::scalar_all` | `mem_type::vec_all` | 所有标量读写流水线同步到所有矢量读写流水线。 |
-
-`vec_load`和`vec_store`分别表示SIMD VF内的矢量读UB和写UB流水线；
-`scalar_load`和`scalar_store`分别表示标量读UB和写UB流水线；
-`vec_all`和`scalar_all`分别表示全部矢量读写流水线和全部标量读写流水线。
+| src | dst |
+| --- | --- |
+| `mem_type::vec_store` | `mem_type::vec_load` |
+| `mem_type::vec_load` | `mem_type::vec_store` |
+| `mem_type::vec_store` | `mem_type::vec_store` |
+| `mem_type::vec_store` | `mem_type::scalar_load` |
+| `mem_type::vec_store` | `mem_type::scalar_store` |
+| `mem_type::vec_load` | `mem_type::scalar_store` |
+| `mem_type::scalar_store` | `mem_type::vec_load` |
+| `mem_type::scalar_store` | `mem_type::vec_store` |
+| `mem_type::scalar_load` | `mem_type::vec_store` |
+| `mem_type::vec_all` | `mem_type::vec_all` |
+| `mem_type::vec_all` | `mem_type::scalar_all` |
+| `mem_type::scalar_all` | `mem_type::vec_all` |
 
 ## 返回值说明
 
 无。
 
+## 数据类型
+
+无。
+
 ## 约束说明
 
-- 仅支持[表2](#mem-bar-supported-combinations)列出的模板参数组合，其他组合会产生编译期错误。
-- 仅当源流水线和目的流水线访问的UB地址存在依赖时使用本接口；冗余同步会降低性能。
-- 当具有依赖关系的读写指令使用同一寄存器时，硬件可以保证指令顺序，无需额外调用本接口。
+- 仅支持[表3](#mem-bar-supported-combinations)列出的模板参数组合，其他组合会产生编译期错误。
+- 读写依赖场景下，如果读指令和写指令使用相同的寄存器，会触发寄存器保序，无需额外调用本接口。
+- 仅在不同流水线访问的UB地址存在依赖时使用本接口，冗余同步会降低性能。
 - 本接口应在`__simd_vf__`函数或`__simd_callee__`函数中调用。
 
 ## 调用示例
 
-下面的示例用于循环间存在写后读依赖的场景。前一次循环将结果写入UB，下一次循环从相同地址读取数据，因此读取前需等待矢量写流水线完成。
+如下示例中，`data`既是搬入数据的源Tensor，也是搬出数据的目的Tensor。后一次循环中的矢量读UB操作与前一次循环中的矢量写UB操作访问同一块UB地址空间，因此，每次读取前需要调用`mem_bar`，使矢量读流水线等待矢量写流水线完成。
 
 ```cpp
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
-
 template <typename Tensor>
-__simd_vf__ inline void Accumulate(Tensor data)
+__simd_vf__ inline void Process(Tensor& data, uint16_t repeatTimes)
 {
-    using namespace asc::te::experimental;
-    for (int32_t i = 0; i < 4; ++i) {
-        mem_bar<mem_type::vec_store, mem_type::vec_load>();
-        auto value = load(data);
-        // 使用value完成计算后，将结果写回data。
-        value.with_mask(all_mask<typename Tensor::data_type>());
-        store(data, value);
+    using T = typename Tensor::data_type;
+    const auto mask = asc::te::experimental::all_mask<T>();
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        asc::te::experimental::mem_bar<asc::te::experimental::mem_type::vec_store,
+                                       asc::te::experimental::mem_type::vec_load>();
+        auto value = asc::te::experimental::load(data, asc::te::make_coord(0));
+        value.with_mask(mask);
+        // 使用value完成寄存器计算。
+        asc::te::experimental::store(data, asc::te::make_coord(0), value);
     }
 }
 ```
