@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将源操作数中的uint8_t元素转换为half类型，因源与目的位宽比为1:2，需按src_pos标签选择读取源寄存器偶数或奇数索引位置，未参与计算的元素在输出中置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_uint82half
 
 ## 产品支持情况

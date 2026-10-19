@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将float类型数据转换为int16_t类型的同步接口并支持多种舍入模式，这些接口已废弃，替代方案为对应的非同步接口asc_float2int16与同步接口asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_float2int16_sync（废弃）
 
 ## 产品支持情况

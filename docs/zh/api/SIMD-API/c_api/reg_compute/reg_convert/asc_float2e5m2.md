@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "依据掩码将源矢量寄存器中的 float 元素转换为 fp8_e5m2_t，并按四分之一位置标签离散选取目标索引位置写入结果，其他位置置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入与饱和模式规则"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: ">=9.0.0"
+---
 # asc_float2e5m2
 
 ## 产品支持情况

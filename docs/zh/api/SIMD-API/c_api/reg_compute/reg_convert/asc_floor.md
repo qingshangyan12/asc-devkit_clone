@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "将源矢量中的half、bfloat16_t或float元素按FLOOR模式向负无穷方向舍入到整数值，结果保持原浮点类型，未参与计算元素置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入模式规则"
+version: ">=9.0.0"
+---
 # asc_floor
 
 ## 产品支持情况

@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的同步转换接口，将int4_t类型数据转换为half类型，要求dst与src起始地址32字节对齐，替代为对应的非同步接口asc_int42half与同步接口asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口替代"
+version: ">=9.0.0"
+---
 # asc_int42half_sync（废弃）
 
 ## 产品支持情况

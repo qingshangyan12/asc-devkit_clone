@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃接口，将half类型元素转化为float类型且无舍入模式，请改用对应的非同步接口asc_half2float与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "接口已废弃，配合同步接口asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md
+    kind: replaced_by
+    condition: "接口已废弃，使用对应非同步接口替代"
+version: ">=9.0.0"
+---
 # asc_half2float_sync（废弃）
 
 ## 产品支持情况

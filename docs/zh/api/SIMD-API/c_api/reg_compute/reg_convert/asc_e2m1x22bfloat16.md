@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "依据掩码将源矢量寄存器中的 fp4x2_e2m1_t 元素转换为 bfloat16_t，并按四分之一位置标签从离散索引位置读取数据写入目的寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_e2m1x22bfloat16
 
 ## 产品支持情况

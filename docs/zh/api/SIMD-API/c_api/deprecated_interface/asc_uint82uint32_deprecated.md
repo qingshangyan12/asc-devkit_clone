@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将uint8_t类型数据转换为uint32_t类型，因源与目的位宽比1:4需按索引分四部分读取输入。该接口的无显式位置参数原型已废弃，请使用asc_uint82uint32的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_uint82uint32（废弃）
 
 ## 产品支持情况

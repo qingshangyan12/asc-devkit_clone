@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将uint32_t类型转换为uint8_t类型并支持饱和与非饱和模式，因源与目的位宽比4:1需按索引分四部分写入，替代为asc_uint322uint8的显式位置参数重载。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_uint322uint8（废弃）
 
 ## 产品支持情况

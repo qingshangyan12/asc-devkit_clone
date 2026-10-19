@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将float类型数据转换为int16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，要求dst、src起始地址32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_float2int16
 
 ## 产品支持情况

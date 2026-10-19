@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将int8_t类型数据转换为int16_t类型，因源与目的位宽比1:2需按奇或偶索引读取输入，该通过接口后缀控制写入位置的原型已废弃，请使用asc_int82int16的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md
+    kind: replaced_by
+    condition: "通过接口后缀控制写入位置的原型改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_int82int16（废弃）
 
 ## 产品支持情况

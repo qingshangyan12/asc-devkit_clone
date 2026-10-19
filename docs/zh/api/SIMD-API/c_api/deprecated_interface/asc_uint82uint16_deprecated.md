@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "将uint8_t类型数据转换为uint16_t类型，根据mask控制元素是否参与计算，因源与目的位宽比1:2需按奇或偶索引读取输入，该通过接口后缀控制读取位置的原型已废弃，请使用asc_uint82uint16的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md
+    kind: replaced_by
+    condition: "通过接口后缀控制源操作数读取位置的原型改用显式位置参数重载实现"
+version: ">=9.0.0"
+---
 # asc_uint82uint16（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将hifloat8_t类型数据转换为float类型，因源与目的位宽比1:4需将VL数据分四部分并按索引0至3选取，请使用asc_hif82float的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md
+    kind: replaced_by
+    condition: "改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_hif82float（废弃）
 
 ## 产品支持情况

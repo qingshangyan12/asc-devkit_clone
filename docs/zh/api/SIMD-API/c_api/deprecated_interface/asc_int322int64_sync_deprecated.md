@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的同步转换接口，将int32_t类型数据转换为int64_t类型，请改用对应的非同步接口asc_int322int64和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_int322int64_sync（废弃）
 
 ## 产品支持情况
