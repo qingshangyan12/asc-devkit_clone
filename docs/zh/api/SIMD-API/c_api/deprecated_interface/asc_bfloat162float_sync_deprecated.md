@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "将bfloat16_t类型数据转为float，无舍入模式，接口已废弃，请使用asc_bfloat162float与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md
+    kind: replaced_by
+    condition: "bfloat16转float场景改用asc_bfloat162float实现"
+version: ">=9.0.0"
+---
 # asc_bfloat162float_sync（废弃）
 
 ## 产品支持情况

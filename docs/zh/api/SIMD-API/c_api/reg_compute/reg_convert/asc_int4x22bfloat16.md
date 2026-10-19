@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码将int4x2打包的4bit有符号整数转换为bfloat16类型，按四分之一索引从源矢量读取，结果作为两个连续元素写入目的矢量寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int4x22bfloat16
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "根据掩码将源操作数中参与计算的uint8_t元素转换为uint32_t，因位宽比为1:4，需按src_quarter_pos离散选取每隔4个元素的索引位置读取数据并写入目的寄存器。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_uint82uint32
 
 ## 产品支持情况

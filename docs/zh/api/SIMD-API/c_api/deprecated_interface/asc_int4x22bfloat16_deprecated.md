@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将int4x2_t存储单元中两个4bit有符号整数按掩码同时转换为连续存放的bfloat16_t元素，替代为asc_int4x22bfloat16的显式位置参数重载。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_int4x22bfloat16（废弃）
 
 ## 产品支持情况

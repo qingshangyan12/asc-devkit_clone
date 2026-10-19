@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "将int8_t类型数据转换为int16_t类型，因源与目的位宽比为1:2，需通过src_pos选择读取源操作数索引为偶数或奇数的位置，未参与计算元素置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int82int16
 
 ## 产品支持情况

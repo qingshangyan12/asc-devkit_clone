@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将int32_t类型数据转换为float类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，提供前n个数据计算与高维切分计算，起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int322float
 
 ## 产品支持情况

@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_bfloat162int32
 
 ## 产品支持情况

@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据mask将src中参与计算的4bit有符号整数转换为int16_t类型，同一存储单元内两个4bit整数共用掩码位，并通过src_quarter_pos离散选取每隔4个存储单元的位置读取源数据。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_int4x22int16
 
 ## 产品支持情况

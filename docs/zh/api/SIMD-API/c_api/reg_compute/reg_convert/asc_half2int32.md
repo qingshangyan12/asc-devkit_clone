@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码将源寄存器中每个参与计算的half元素转换为int32，按src_pos选择读取源索引的偶数或奇数位置，支持五种舍入模式。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_half2int32
 
 ## 产品支持情况

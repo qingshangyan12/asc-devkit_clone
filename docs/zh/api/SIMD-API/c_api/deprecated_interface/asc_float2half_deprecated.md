@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "接口asc_float2half通过后缀控制目的操作数写入位置的旧原型已废弃，原用于将float类型数据转换成half类型并支持多种舍入模式与饱和模式，替代方案为其显式位置参数重载。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md
+    kind: replaced_by
+    condition: "使用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_float2half（废弃）
 
 ## 产品支持情况

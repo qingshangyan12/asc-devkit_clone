@@ -1,3 +1,20 @@
+---
+okftype: reference.api
+description: "将源寄存器中的浮点元素按CEIL向正无穷方向舍入到整数值并保持原浮点类型，未通过掩码筛选的元素置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [elementwise, rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入模式规则"
+version: ">=9.0.0"
+---
 # asc_ceil
 
 ## 产品支持情况

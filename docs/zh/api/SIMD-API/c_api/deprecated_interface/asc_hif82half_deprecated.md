@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "已废弃的寄存器转换接口，将src中hifloat8_t类型元素转换为half类型写入dst，因位宽比1:2需将VL数据分两部分并取奇数或偶数索引，请使用asc_hif82half的显式位置参数重载替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md
+    kind: replaced_by
+    condition: "改用显式位置参数重载"
+version: ">=9.0.0"
+---
 # asc_hif82half（废弃）
 
 ## 产品支持情况
