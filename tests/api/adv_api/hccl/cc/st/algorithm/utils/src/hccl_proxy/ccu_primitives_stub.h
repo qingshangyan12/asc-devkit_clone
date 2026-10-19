@@ -225,6 +225,9 @@ public:
     explicit Func(Callable&& fn) : body_(std::forward<Callable>(fn))
     {}
 
+    template <typename Callable>
+    Func(Callable&& fn, uint32_t numIn, const char* name);
+
     void RunBody() const
     {
         if (body_)
@@ -255,6 +258,19 @@ template <>
 Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex);
 
 Result LoadArg(Variable variable, uint32_t argId);
+
+template <typename Callable>
+Func::Func(Callable&& fn, uint32_t numIn, const char* name)
+{
+    (void)name;
+    // ST captures the named function body inline; each formal binds to the matching task-arg slot.
+    Array<Variable> args(numIn);
+    for (uint32_t index = 0; index < numIn; ++index) {
+        LoadArg(args[index], index);
+    }
+    fn(args);
+}
+
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
 Result Load(uint64_t address, Variable destination);

@@ -9,6 +9,9 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "../ccu_temp_all_to_all_v_mesh_1D.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -30,20 +33,79 @@ constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_LOOP_COUNT = 8ULL;
 
-CcuResult CcuAlltoAllVMesh1DKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
-    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
-{
-    std::vector<ccu::Variable> output(rankSize);
-    std::vector<ccu::Variable> token(rankSize);
-    std::vector<ccu::LocalAddr> src(rankSize);
-    std::vector<ccu::RemoteAddr> dst(rankSize);
+struct AllToAllVContext : CcuKernelCtxBase {
+    const ChannelHandle* channels = nullptr;
+    uint32_t channelCount = 0;
+    uint32_t rankSize = 0;
+    uint32_t rankId = 0;
+    ccu::Variable inputAddr;
+    ccu::Variable outputAddr;
+    ccu::Variable tokenInfo;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    ccu::Variable extAddr;
+    GroupOpSizeVars tailGoSize;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    std::vector<ccu::LocalAddr> src;
+    std::vector<ccu::RemoteAddr> dst;
     ccu::LocalAddr localDst;
-    std::vector<ccu::Event> events((rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT);
-    CcuKernelCtxBase ctx;
-    InitCcuKernelCtxBase(ctx);
-    GroupOpSizeVars tailGoSize{goSize1, goSize2, goSize3, goSize4};
+    std::vector<ccu::Event> events;
+};
+
+static CcuResult InitResource(AllToAllVContext& ctx)
+{
+    ctx.output.resize(ctx.rankSize);
+    ctx.token.resize(ctx.rankSize);
+    ctx.src.resize(ctx.rankSize);
+    ctx.dst.resize(ctx.rankSize);
+    ctx.events.resize((ctx.rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT);
+    uint32_t channelIdx = 0;
+    for (uint32_t peerId = 0; peerId < ctx.rankSize; peerId++) {
+        if (peerId == ctx.rankId) {
+            continue;
+        }
+        ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], A2AV_OUTPUT_XN_ID);
+        ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], A2AV_TOKEN_XN_ID);
+        ++channelIdx;
+    }
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(AllToAllVContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    ctx.inputAddr = args[0];
+    ctx.outputAddr = args[1];
+    ctx.tokenInfo = args[2];
+    ctx.srcOffset = args[3];
+    ctx.dstOffset = args[4];
+    ctx.extAddr = args[9];
+    ctx.tailGoSize.addrOffset = args[5];
+    ctx.tailGoSize.loopParam = args[6];
+    ctx.tailGoSize.parallelParam = args[7];
+    ctx.tailGoSize.residual = args[8];
+    return CCU_SUCCESS;
+}
+
+static CcuResult DoAllToAllV(AllToAllVContext& ctx)
+{
+    const auto channels = ctx.channels;
+    const uint32_t channelCount = ctx.channelCount;
+    const uint32_t rankSize = ctx.rankSize;
+    const uint32_t rankId = ctx.rankId;
+    ccu::Variable& inputAddr = ctx.inputAddr;
+    ccu::Variable& outputAddr = ctx.outputAddr;
+    ccu::Variable& tokenInfo = ctx.tokenInfo;
+    ccu::Variable& srcOffset = ctx.srcOffset;
+    ccu::Variable& dstOffset = ctx.dstOffset;
+    ccu::Variable& extAddr = ctx.extAddr;
+    GroupOpSizeVars& tailGoSize = ctx.tailGoSize;
+    auto& output = ctx.output;
+    auto& token = ctx.token;
+    auto& src = ctx.src;
+    auto& dst = ctx.dst;
+    auto& localDst = ctx.localDst;
+    auto& events = ctx.events;
     GroupOpSizeVars fullBlockGoSize;
     fullBlockGoSize.addrOffset = A2AV_MAX_TRANSPORT_SIZE;
     fullBlockGoSize.loopParam = A2AV_MAX_TRANSPORT_SIZE / (A2AV_GROUP_MEMSLICE_SIZE * A2AV_GROUP_LOOP_COUNT);
@@ -58,16 +120,6 @@ CcuResult CcuAlltoAllVMesh1DKernel(
     token[rankId] = tokenInfo;
 
     uint32_t channelIdx = 0;
-    for (uint32_t peerId = 0; peerId < rankSize; peerId++) {
-        if (peerId == rankId) {
-            continue;
-        }
-        output[peerId] = ccu::GetResByChannel<ccu::Variable>(channels[channelIdx], A2AV_OUTPUT_XN_ID);
-        token[peerId] = ccu::GetResByChannel<ccu::Variable>(channels[channelIdx], A2AV_TOKEN_XN_ID);
-        channelIdx++;
-    }
-
-    channelIdx = 0;
     for (uint32_t peerId = 0; peerId < rankSize; peerId++) {
         if (peerId == rankId) {
             continue;
@@ -190,6 +242,25 @@ CcuResult CcuAlltoAllVMesh1DKernel(
     for (uint32_t i = 0; i < channelCount; i++) {
         ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT);
     }
+    return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
+    AllToAllVContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            DoAllToAllV(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_V_MESH1D_NAME);
     return CCU_SUCCESS;
 }
 

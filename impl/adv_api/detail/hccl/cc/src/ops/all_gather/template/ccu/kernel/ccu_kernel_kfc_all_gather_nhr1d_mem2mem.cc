@@ -9,6 +9,9 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
+#include "../ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
+#include "ccu_func_dl.hpp"
+#include <stdexcept>
 
 namespace mc2_ops_hccl {
 namespace {
@@ -359,39 +362,48 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
-    ccu::Variable die1Size, ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, uint32_t axisId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx, ccu::Variable turnEndAddr)
+CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMem2Mem*>(arg);
     KfcAllGatherNhr1DContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.stepInfoVector = &stepInfoVector;
-    ctx.rank2ChannelIdx = &rank2ChannelIdx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
-    LoadNhr1DArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, die0Size, die1Size, outputSliceStride, goSize0, goSize1, goSize2,
-        goSize3, axisId);
-
-    CCU_CHK_RET(PreSync(ctx));
-
-    CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
-
-    // D3：末步同步完成后本 mission 半区输出已完整（各步接收分片到达 + GroupCopy 阻塞落位 +
-    // 本 rank 写 EventWait；双 die 两 mission 数据不相交，AIV 等齐两个 turn-end 即全量完整），
-    // 在 PostSync 前写 turn-end，AIV 提前返回；PostSync 仍在 server 指令流中先于下一轮
-    // PreSync 执行，跨轮 XN 保护不变。
-    CCU_CHK_RET(ccu::Store(turnEndAddr, ctx.constVar1));
-
-    CCU_CHK_RET(PostSync(ctx));
-
+    static_assert(KFC_AG_SOLE_NHR_FUNC_TURN_END_INDEX < CCU_FUNC_TASK_ARG_MAX, "SoleNHR AG Func arguments overflow");
+    ccu::Func func(
+        [&ctx, kernelArg](ccu::Array<ccu::Variable>& args) {
+            const uint32_t goSizeBase =
+                kernelArg->axisId == 0U ? KFC_AG_SOLE_NHR_GO_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_D1_SIZE_0;
+            LoadNhr1DArgs(
+                ctx, args[KFC_AG_SOLE_NHR_INPUT], args[KFC_AG_SOLE_NHR_OUTPUT],
+                args[KFC_AG_SOLE_NHR_FUNC_TOKEN_INDEX], args[KFC_AG_SOLE_NHR_DIE0_SIZE],
+                args[KFC_AG_SOLE_NHR_DIE1_SIZE], args[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE],
+                args[goSizeBase], args[goSizeBase + 1U], args[goSizeBase + 2U], args[goSizeBase + 3U],
+                kernelArg->axisId);
+            if (PreSync(ctx) != CCU_SUCCESS) {
+                throw std::runtime_error("SoleNHR AG PreSync failed");
+            }
+            if (DoRepeatAllGatherNHR(ctx) != CCU_SUCCESS) {
+                throw std::runtime_error("SoleNHR AG execution failed");
+            }
+            // D3：末步同步完成后本 mission 半区输出已完整（各步接收分片到达 + GroupCopy 阻塞落位 +
+            // 本 rank 写 EventWait；双 die 两 mission 数据不相交，AIV 等齐两个 turn-end 即全量完整），
+            // 在 PostSync 前写 turn-end，AIV 提前返回；PostSync 仍在 server 指令流中先于下一轮
+            // PreSync 执行，跨轮 XN 保护不变。
+            if (static_cast<CcuResult>(ccu::Store(args[KFC_AG_SOLE_NHR_FUNC_TURN_END_INDEX], ctx.constVar1)) !=
+                CCU_SUCCESS) {
+                throw std::runtime_error("SoleNHR AG turn-end failed");
+            }
+            if (PostSync(ctx) != CCU_SUCCESS) {
+                throw std::runtime_error("SoleNHR AG PostSync failed");
+            }
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_GATHER_NHR1D_MEM2MEM_NAME);
     return CCU_SUCCESS;
 }
 
