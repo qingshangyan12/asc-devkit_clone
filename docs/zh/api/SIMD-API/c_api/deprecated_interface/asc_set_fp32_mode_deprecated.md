@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "已废弃的Mmad模式配置接口，用于关闭HF32模式，使L0A与L0B Buffer中的float数据在参与Mmad计算前不做舍入处理。需在矩阵乘加指令执行前调用，替代接口为asc_disable_hf32。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hf32.md
+    kind: replaced_by
+    condition: "关闭HF32模式使float数据不做舍入处理的场景改用asc_disable_hf32"
+version: ">=9.1.0,<=9.2.0"
+---
 # asc_set_fp32_mode（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "asc_mmad 的 k_direction_align 参数控制 float 数据类型下 L0A/L0B Buffer 矩阵在 K 方向的对齐方式，取 true 时 K 方向对齐到 ceil(K/16)*16，取 false 时对齐到 ceil(K/8)*8，其他数据类型无需关注此特性。"
+---
 # K方向对齐约束
 
 **特性说明：**

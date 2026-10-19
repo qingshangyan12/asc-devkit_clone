@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "设置Mmad计算开启HF32模式以提升FP32数据计算性能，但会带来精度损失，启用后数据在参与计算前舍入为HF32格式，需在矩阵乘加指令前调用。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: configures
+    condition: "执行矩阵乘加计算前"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hf32.md
+    kind: related
+    condition: "需要关闭HF32模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md
+    kind: requires
+    condition: "启用HF32模式后需配置舍入模式时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
+    kind: related
+    condition: "了解HF32格式、舍入模式及对计算精度的影响时"
+version: ">=9.1.0"
+---
 # asc_enable_hf32
 
 ## 产品支持情况

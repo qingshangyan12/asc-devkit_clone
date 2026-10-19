@@ -1,3 +1,7 @@
+---
+okftype: reference.concept
+description: "详解矩阵分形格式：不同产品形态对A、B、C矩阵格式组合要求不同，并说明ND、DN、Zz、Zn、Nz、NC1HWC0等格式的定义、物理位置与转换过程。"
+---
 # 关键分形格式详解
 
 矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。

@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "稀疏矩阵乘加接口，左矩阵A为稀疏矩阵并在计算时完成稠密化，右矩阵B需预先稠密化并配合索引矩阵载入后参与计算。"
+tag:
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+  - traits: [sparse_input]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
+    kind: related
+    condition: "了解稀疏权重及索引矩阵的排布时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
+    kind: related
+    condition: "了解从稀疏数据准备到矩阵乘加的流程时"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_sparse.md
+    kind: requires
+    condition: "稠密矩阵B载入时"
+version: ">=9.0.0"
+---
 # asc_mmad_sparse
 
 ## 产品支持情况
