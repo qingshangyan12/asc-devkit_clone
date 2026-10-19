@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "以内置固定模式或用户自定义输入的gather mask为掩码，从源操作数中选取元素写入目的操作数，不支持通过asc_set_vector_mask配置掩码，支持高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址存在重叠时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: related
+    condition: "掩码配置场景下"
+version: ">=9.0.0"
+---
 # asc_reduce
 
 ## 产品支持情况

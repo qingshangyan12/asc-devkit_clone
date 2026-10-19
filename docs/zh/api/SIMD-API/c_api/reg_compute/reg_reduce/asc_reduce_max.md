@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码对源矢量执行归约最大值操作，最大值写入dst第0个元素、最大值索引原始位模式写入第1个元素，其余置0，多个最大值保留最小索引。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_reduce_max
 
 ## 产品支持情况

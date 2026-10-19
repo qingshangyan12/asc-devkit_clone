@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "根据掩码对源矢量数据寄存器中的参与元素进行二叉树归约求和，结果写入目的寄存器0位置，其余元素置0，16位输入时提升精度计算。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器和掩码寄存器说明"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_reduce_sum
 
 ## 产品支持情况

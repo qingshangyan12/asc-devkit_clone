@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "对每个Repeat内所有元素求和，源操作数按二叉树方式两两相加，计算结果大于65504时保存为65504，该接口已废弃，请改用对应的非同步接口asc_repeat_reduce_sum和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [reduction]
+  - traits: [high_dimensional, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md
+    kind: replaced_by
+    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
+version: ">=9.0.0"
+---
 # asc_repeat_reduce_sum_sync（废弃）
 
 ## 产品支持情况
