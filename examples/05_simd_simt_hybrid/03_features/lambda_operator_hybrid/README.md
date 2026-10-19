@@ -22,7 +22,7 @@
 
 ```text
 ├── lambda_operator_hybrid
-│   ├── CMakeLists.txt             // cmake编译文件（混合编程模式，不加--enable-simt）
+│   ├── CMakeLists.txt             // cmake编译文件
 │   ├── lambda_operator_hybrid.asc // 以LeakyReLU-Affine与Clamp为载体的混合编程Lambda捕获样例实现
 │   └── README.md                  // 样例说明文档
 ```

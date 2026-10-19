@@ -1,7 +1,5 @@
 # C/C++通用语法限制
 
-本文介绍Ascend C Device侧的通用语法限制，包含不支持的语法特性，以及指针与内存地址、变量、函数、类、模板等语法使用限制。
-
 ## 不支持的特性
 
 -   不支持虚函数
@@ -11,11 +9,11 @@
 -   不支持STL
 -   不支持运行时typeid
 -   不支持文件系统IO
--   不支持标准库下的tuple及算法类运算（相关库函数调用需要标记aicore）
+-   不支持标准库下的tuple及算法类运算，相关库函数调用需要标记aicore
 
 ## 指针与内存地址
 
-指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM/UB指针不能在Host侧解引用，Host栈/全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
+指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM/UB指针不能在Host侧解引用，Host栈或全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
 
 ### 取Device函数的地址
 
@@ -31,7 +29,9 @@
     }
     ```
 
-- SIMT VF/SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识：`__simt_callee__`/`__simd_callee__`标记使函数类型带上函数属性，向**普通**函数指针转换时报错：
+- SIMT VF/SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识。
+
+    `__simt_callee__`和`__simd_callee__`标记使函数类型带上函数属性，向普通函数指针转换时报错：
 
     ```cpp
     __simt_callee__ float scale2(float v) { return v * 2.f; }
@@ -44,7 +44,7 @@
     }
     ```
 
-    函数指针类型加上callee标识后即可正常转换与调用（SIMT VF内用`__simt_callee__`，SIMD VF内用`__simd_callee__`）：
+    函数指针类型加上callee标识后即可正常转换与调用。SIMT VF内函数指针使用`__simt_callee__`标识，SIMD VF内则使用`__simd_callee__`标识：
 
     ```cpp
     __simt_callee__ float scale2(float v) { return v * 2.f; }
@@ -56,9 +56,9 @@
     }
     ```
 
-- SIMT VF/SIMD VF函数不支持经函数指针调用或启动，只支持使用`asc_vf_call()`接口进行调用。
+- SIMT VF和SIMD VF函数不支持经函数指针调用或启动，只支持使用`asc_vf_call()`接口调用。
 
-- 不允许引用Host函数的地址：核函数内引用Host函数（含直接调用与函数指针）编译报错：
+- 不允许引用Host函数的地址：核函数内引用Host函数，包括直接调用和函数指针均会编译报错：
 
     ```cpp
     float host_fn(float v) { return v + 100.f; }
@@ -87,7 +87,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### 指针运算与字节重解释
 
-不支持不同地址空间的指针不支持大小比较和`reinterpret_cast`字节重解释，只支持同一地址空间内（如GM同一数组）的指针大小比较、`reinterpret_cast`字节重解释，使用示例如下：
+不支持不同地址空间的指针不支持大小比较和`reinterpret_cast`字节重解释，只支持同一地址空间内的指针大小比较、`reinterpret_cast`字节重解释，使用示例如下：
 
 ```cpp
 __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
@@ -102,7 +102,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 跨地址空间的指针运算和`reinterpret_cast`字节重解释将触发编译报错：
 
--   不同地址空间指针比较大小（如`__gm__`与`__ubuf__`、`__gm__`与栈地址）：
+-   不同地址空间指针比较大小，如`__gm__`、`__ubuf__`与栈地址不能比较大小：
 
     ```cpp
     __simt_vf__ __launch_bounds__(128) inline void vf_func(__gm__ float* in, __ubuf__ float* out, uint32_t count)
@@ -121,7 +121,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
--   不同地址空间指针`reinterpret_cast`字节重解释（如`__gm__`指针重解释为`__ubuf__`指针或普通栈空间指针）：
+-   不同地址空间指针`reinterpret_cast`字节重解释：
 
     ```cpp
     __simt_vf__ __launch_bounds__(128) inline void vf_func(__gm__ float* in, __ubuf__ float* out, uint32_t count)
@@ -142,7 +142,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     ```
 
 > [!NOTE]说明
-> 上述限制针对**带地址空间限定**的指针（`__gm__`/`__ubuf__`与栈地址之间、`__gm__`与`__ubuf__`之间）。SIMT编程场景的指针形参无地址空间限定概念，核内GM指针与栈变量指针可直接比较和`reinterpret_cast`。
+> 上述限制针对**带地址空间限定**的指针，即`__gm__`、`__ubuf__`与栈地址之间以及`__gm__`与`__ubuf__`之间的比较和转换。SIMT编程场景的指针形参无地址空间限定概念，核内GM指针与栈变量指针可直接比较和`reinterpret_cast`。
 
 ## 变量
 
@@ -150,8 +150,8 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 核函数与`__aicore__`函数内允许声明static局部变量，但**不保证多核/多线程间的读写结果确定**，原因如下：
 
--   **存放位置**：static局部变量位于GM中的全局数据区，被同一核函数的所有执行实例（所有核、所有线程）共享，并非线程私有；
--   **多核并发竞争**：多个核并行执行同一核函数时，对同一static变量的读-改-写（如`counter += 1`）交错执行，无原子性与互斥保证，最终值取决于各核的执行时序；
+-   **存放位置**：static局部变量位于GM中的全局数据区，被同一核函数的全部执行实例即所有核和所有线程共享，并非线程私有；
+-   **多核并发竞争**：多个核并行执行同一核函数时，对同一static变量的读改写操作如`counter += 1`交错执行，无原子性与互斥保证，最终值取决于各核的执行时序；
 -   **内存一致性**：各核对static变量的修改缺乏跨核的内存可见性保证，其他核可能读到修改前的旧值。
 
 如下所示，计算结果并不确定：
@@ -191,7 +191,7 @@ __simt_vf__ __launch_bounds__(128) inline void vf_func(__ubuf__ float* out, uint
 
 ### 全局变量与namespace-scope变量
 
-Device侧不支持无地址空间标识的可写全局变量（包括namespace-scope的`static`变量与非常量初始化的普通全局变量）；若要在Device侧使用可写的全局变量，需为变量声明加上`__gm__`标识符（变量实际存储于Global Memory）：
+可写的全局变量包括namespace-scope的`static`变量与非常量初始化的普通全局变量，此类变量若无地址空间标识则Device侧不支持。若要在Device侧使用可写的全局变量，需为变量声明加上`__gm__`标识符，变量实际存储于Global Memory：
 
 -   不加`__gm__`标识：Device侧编译报错。
 
@@ -219,7 +219,7 @@ Device侧不支持无地址空间标识的可写全局变量（包括namespace-s
 
 ### const限定符变量
 
-全局、namespace或类作用域声明的const限定变量（无Device侧内存空间标注）默认属于Host变量。Ascend C Device侧可直接使用、引用与取地址常量表达式初始化的const全局变量：
+全局、namespace或类作用域声明的const限定变量默认属于Host变量，除非带有Device侧内存空间标注。Ascend C Device侧可直接使用、引用与取地址常量表达式初始化的const全局变量：
 
 ```cpp
 const int ConstVar = 10;                  // 常量表达式初始化的全局const
@@ -249,13 +249,13 @@ __global__ void probe(float* output, uint32_t count)
 ```
 
 > [!NOTE]说明
-> 从C++14起，推荐使用constexpr（或C++17的inline constexpr）变量替代const限定变量。constexpr变量不受类型限制，且语义上明确为编译期常量，Device侧使用行为与const一致。
+> 从C++14起，推荐使用constexpr变量替代const限定变量，C++17起也可使用inline constexpr变量。constexpr变量不受类型限制，且语义上明确为编译期常量，Device侧使用行为与const一致。
 
 ### volatile限定符变量
 
 volatile关键字为兼容ISO C++而支持，volatile读写不提供线程间同步保证，也不保证硬件执行的记忆体访问次数与指令数一致，编译器不合并、不省略volatile访问，但多个线程对同一volatile对象的访问无顺序与可见性保证。
 
-以for循环轮询GM标志位为例：volatile读在每轮循环中都从GM真实重新加载（不缓存到寄存器），因此循环能持续观测到GM的最新内容：
+以for循环轮询GM标志位为例：volatile读在每轮循环中都从GM真实重新加载而不缓存到寄存器，因此循环能持续观测到GM的最新内容：
 
 ```cpp
 __global__ __launch_bounds__(128) void probe(int* flag, float* output, uint32_t count)
@@ -315,7 +315,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 \_\_simt\_vf\_\_标记的SIMT VF函数需要遵循以下约束和限制：
 
--   标量参数不允许使用指针和引用：指针形参必须显式携带`__gm__`或`__ubuf__`地址空间限定符（标识指向GM/UB内存），引用形参一律不支持。标量数据按值传入，需要输出标量结果时经指针形参写出。以下错误示例在编译期报错：
+-   标量参数不允许使用指针和引用：指针形参必须显式携带`__gm__`或`__ubuf__`地址空间限定符以标识指向GM或UB内存，引用形参一律不支持。标量数据按值传入，需要输出标量结果时经指针形参写出。以下错误示例在编译期报错：
 
     ```cpp
     // 错误示例1：标量指针形参（无地址空间限定）
@@ -364,23 +364,31 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 -   VF内部禁止访问MainScalar的栈空间。
 
-    以下为使用内层栈地址指针访问MainScalar栈空间的错误示例：
+    MainScalar的栈地址如经`__ubuf__`指针携带传入VF函数后，VF内对其解引用属于无效访问：**编译可以通过，但运行期读不到MainScalar栈上的数据、写入也不会落到MainScalar栈**，属于难以定位的静默错误。以下为实测验证过的示例：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void foo(__gm__ int* a, __gm__ int* b, __gm__ int* c, __ubuf__ uint64_t* s) {
-        int idx = blockIdx.x * blockDim.x + threadIdx.x;
-        int* stack = (int*)(s[0]);
-        a[idx] = b[idx] + c[idx] + *stack; // error: *stack表示从MainScalar的栈中读取，不允许使用
+    __simt_vf__ __launch_bounds__(1024) inline void foo(__gm__ int* out, __ubuf__ uint64_t* s, uint32_t count) {
+        if (threadIdx.x >= count) {
+            return;
+        }
+        int* stack = (int*)(s[0]);          // 编译通过：从多级指针取出MainScalar栈地址
+        out[threadIdx.x] = *stack;          // 运行期读到的是无关内存内容，并非栈上的stack值
     }
-    __global__ __aicore__ void foo(__gm__ int* a, __gm__ int* b, __gm__ int* c) {
-        int stack = 0;
-        __ubuf__ uint64_t* s = ...;
-        s[0] = &stack;
-        asc_vf_call<foo>(dim3{256}, a, b, c, s);
+
+    __global__ __vector__ void kernel_func(__gm__ int* output, uint32_t count)
+    {
+        int stack = 123;                    // MainScalar栈变量
+        __ubuf__ uint64_t sbuf[1];
+        sbuf[0] = (uint64_t)&stack;         // 栈地址经UB指针传入VF
+        asc_vf_call<foo>(dim3(1024), output, sbuf, count);
+        asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     }
     ```
 
--   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定（VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取device函数的地址)）。
+    实测表现基于CANN 9.3.0与Ascend 950PR：VF内读取得到的是无关内存的内容，实测读到的是其他数据区的字节且多轮运行稳定复现；VF内写入后MainScalar侧回读自己的栈变量，值未被修改。VF函数内需要的数据应经参数显式传入，包括标量值传与`__gm__`、`__ubuf__`指针，VF自身局部变量即VF自己的栈访问正常。
+
+-   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定。VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取device函数的地址)。
 -   函数的inline行为由编译器决定，添加的always\_inline或noinline将被忽略。
 -   不允许使用结构体作为参数，以下为错误示例。
 
@@ -392,7 +400,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### 递归
 
-支持编译期递归（constexpr求值），运行期递归仅在SIMT编程场景可用，混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`/`__simd_callee__`/`__aicore__`函数的递归调用编译报错：
+编译期递归即constexpr求值递归，在各类编程场景均可用；运行期递归仅在SIMT编程场景可用，混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
 
 ```cpp
 // 混合编程SIMT VF内：ERROR
@@ -403,9 +411,9 @@ __simt_callee__ uint32_t rec_sum(uint32_t n)
 }
 ```
 
-编译期递归（constexpr求值）在各编程场景的用法如下：
+编译期递归即constexpr求值递归，在各编程场景的用法如下：
 
--   **SIMT编程**：`__aicore__ constexpr`递归函数可在核函数内以编译期结果使用（不加`__aicore__`的constexpr函数被判定为Host函数，核内调用报`call to __host__ function from __global__ function`）：
+-   **SIMT编程**：`__aicore__ constexpr`递归函数可在核函数内以编译期结果使用。不加`__aicore__`的constexpr函数被判定为Host函数，核内调用报`call to __host__ function from __global__ function`：
 
     ```cpp
     __aicore__ constexpr uint32_t rec_sum(uint32_t n)
@@ -421,7 +429,7 @@ __simt_callee__ uint32_t rec_sum(uint32_t n)
     }
     ```
 
--   **混合编程**：callee链内`__aicore__`/`__simt_callee__`constexpr函数的递归同样被`recursive aicore function call is not allowed`拦截（递归检查先于constexpr求值，不区分编译期/运行期）；混合编程场景的编译期递归应改用**模板递归**（类模板特化终止，不构成函数递归调用）：
+-   **混合编程**：callee链内`__aicore__`、`__simt_callee__` constexpr函数的递归同样被`recursive aicore function call is not allowed`拦截，该检查先于constexpr求值执行，不区分编译期与运行期。混合编程场景的编译期递归应改用**模板递归**，以类模板特化终止，不构成函数递归调用：
 
     ```cpp
     template <uint32_t N>
@@ -443,7 +451,7 @@ __simt_callee__ uint32_t rec_sum(uint32_t n)
 
 ### Host函数与Device函数的调用边界
 
-Device侧代码不可以调用或引用Host函数，编译报错`reference to __host__ function`；`__global__`函数不能调用`__global__`函数，`__aicore__`函数也不能回调`__global__`函数——核函数只能由Host侧`<<<>>>`启动（详细见[指针与内存地址](#核函数的地址)）。
+Device侧代码不可以调用或引用Host函数，编译报错`reference to __host__ function`；`__global__`函数不能调用`__global__`函数，`__aicore__`函数也不能回调`__global__`函数，核函数只能由Host侧`<<<>>>`启动，详见[指针与内存地址](#核函数的地址)。
 
 ### 可变参数
 
@@ -535,7 +543,7 @@ __global__ __vector__ void kernel_func(__gm__ TestS *data1, __gm__ TestS *data2)
 
 ### 成员函数的执行空间标记
 
-类的成员函数（含静态成员函数）在Device侧被调用时需标记`__aicore__`，未标记的成员函数会被识别为Host函数，在核函数内调用报错：
+类的成员函数含静态成员函数，在Device侧被调用时需标记`__aicore__`，未标记的成员函数会被识别为Host函数，在核函数内调用报错：
 
 ```cpp
 struct Holder {
@@ -606,7 +614,7 @@ __global__ void probe(float* output, uint32_t count)
 
 ### 动态分配相关的类能力
 
-类的成员函数不支持引入`operator new/delete`依赖，Device侧不支持动态new/delete、malloc/free（见[不支持的特性](#不支持的特性)）。
+类的成员函数不支持引入`operator new/delete`依赖，Device侧不支持动态new/delete、malloc/free，见[不支持的特性](#不支持的特性)。
 
 ## 模板
 
@@ -661,7 +669,7 @@ tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);
     tpl_kernel<<<1, 128, 0, stream>>>(dev, 128);          // 自动推导T=float：同样可用
     ```
 
--   **混合编程**：指针形参必须带`__gm__`限定（核函数参数列表限制），此时**不支持从Host指针实参自动推导**——推导得到的`__gm__ T*`与实参调整后的`T*`类型不匹配（`deduced type '__gm__ float *' does not match adjusted type 'float *'`），须显式指定模板实参：
+-   **混合编程**：指针形参必须带`__gm__`限定，此为核函数参数列表限制，此时**不支持从Host指针实参自动推导**——推导得到的`__gm__ T*`与实参调整后的`T*`类型不匹配，报`deduced type '__gm__ float *' does not match adjusted type 'float *'`，须显式指定模板实参：
 
     ```cpp
     template <typename T>
@@ -672,7 +680,7 @@ tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);
     tpl_kernel<float><<<1, 128, stream>>>(dev, N);        // 显式指定：可用（实例化后按__gm__ float*处理）
     ```
 
-    模板参数仅用于标量形参（指针形参固定为`__gm__ float*`等具体类型）时，标量实参可正常推导：
+    模板参数仅用于标量形参而指针形参固定为`__gm__ float*`等具体类型时，标量实参可正常推导：
 
     ```cpp
     template <typename T>
@@ -707,4 +715,4 @@ __global__ __vector__ void kernel_func(__gm__ float* input, __gm__ float* output
 }
 ```
 
-以同一模板按不同实参多次调用（如`asc_vf_call<vf_scale<float>>`与`asc_vf_call<vf_scale<int32_t>>`）会生成相互独立的实例，均无需额外声明。
+以同一模板按不同实参多次调用，如`asc_vf_call<vf_scale<float>>`与`asc_vf_call<vf_scale<int32_t>>`，会生成相互独立的实例，均无需额外声明。
