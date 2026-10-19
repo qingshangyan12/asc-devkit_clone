@@ -136,7 +136,7 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 <!-- npu="9030" id20 -->
 - 针对Kirin 9030处理器系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id20 -->
-- 针对Kirin 9030处理器系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
+- 针对Kirin 9020处理器系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
