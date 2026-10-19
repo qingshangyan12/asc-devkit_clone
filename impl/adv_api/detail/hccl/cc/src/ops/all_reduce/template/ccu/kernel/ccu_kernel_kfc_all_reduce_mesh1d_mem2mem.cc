@@ -801,8 +801,7 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
         tailGoSize1, tailGoSize2, tailGoSize3));
     CCU_CHK_RET(PreSync(ctx));
 
-    HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] skip DoRepeatAllReduceChunking");
-    // CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduceChunking(ctx)); }
+    CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduceChunking(ctx)); }
 
     CCU_CHK_RET(PostSync(ctx));
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D end");
