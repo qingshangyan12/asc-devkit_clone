@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "统计64位有符号整数中从最高数值位开始与符号位相同的连续比特位个数，输入为全0或全1时返回-1，仅支持int64_t类型。"
+tag:
+  - roles: [compute]
+  - operations: [bit_manipulation]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_sflbits
 
 ## 产品支持情况
