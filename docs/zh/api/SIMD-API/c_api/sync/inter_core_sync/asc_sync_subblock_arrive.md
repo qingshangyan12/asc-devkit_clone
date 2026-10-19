@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "同一AI Core内全部AIV之间的核间同步到达接口，各AIV向调度模块发送通知使对应flag_id计数器加一，需与asc_sync_subblock_wait配对使用。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
+    kind: related
+    condition: "配对使用，flag_id必须完全一致"
+version: ">=9.1.0"
+---
 # asc_sync_subblock_arrive
 
 ## 产品支持情况

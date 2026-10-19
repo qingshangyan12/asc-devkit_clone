@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "单AI Core内AIC与全部AIV间的核间同步等待接口，阻塞指定流水的后续指令直到对应flag_id计数器非0，需与asc_sync_block_arrive配对使用。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
+    kind: related
+    condition: "配对使用，flag_id必须完全一致"
+version: ">=9.0.0"
+---
 # asc_sync_block_wait
 
 ## 产品支持情况
