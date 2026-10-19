@@ -40,10 +40,12 @@ __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)
         SetMaskNorm();
         SetLoadDataPaddingValue((uint64_t)0);
         ClearSSbufImpl();
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        CrossCoreSetFlag<KFC_INTRA_MODE, PIPE_S>(KFC_SYNC_ID);
+#else
         CrossCoreSetFlag<KFC_INTRA_MODE, PIPE_S>(KFC_SYNC_ID);
         CrossCoreSetFlag<KFC_INTRA_MODE, PIPE_S>(KFC_SYNC_ID + 16);
-
+#endif
     } else {
         SetVectorMask<uint64_t, MaskMode::NORMAL>((uint64_t)-1, (uint64_t)-1);
         SetMaskNorm();
@@ -74,7 +76,11 @@ constexpr bool DAV_310_ENABLE_GM = true;
 constexpr bool DAV_310_ENABLE_GM = false;
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+constexpr bool ENABLE_HARD_POOL = true;
+#else
 constexpr bool ENABLE_HARD_POOL = false;
+#endif
 
 constexpr int8_t CUBEOBJ_MIX_MODE = 2; // 0 no, 1 all, 2 mix
 template <class... Args>
