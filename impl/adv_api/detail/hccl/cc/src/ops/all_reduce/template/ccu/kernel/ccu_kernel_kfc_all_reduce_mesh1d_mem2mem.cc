@@ -22,6 +22,14 @@ constexpr int CKE_IDX_0 = 0;
 constexpr uint16_t BIT_NUM_PER_CKE = 16;
 constexpr uint16_t GROUP_REDUCE_MAX_PIECE_CNT = 8;
 
+struct GroupReduceMem2MemVar {
+    ccu::LocalAddr loopDst[MAX_LOOP_NUM];
+    ccu::LocalAddr loopSrc[MAX_LOOP_NUM];
+    std::array<std::vector<ccu::LocalAddr>, MAX_LOOP_NUM> loopScratch;
+    ccu::Variable loopLen[MAX_LOOP_NUM];
+    ccu::Variable loopLenExp[MAX_LOOP_NUM];
+};
+
 static CcuResult InitResource(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
     uint32_t channelIdx = 0;

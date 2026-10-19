@@ -26,14 +26,6 @@ struct CcuKernelArgAllReduceKfc : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
-struct GroupReduceMem2MemVar {
-    ccu::LocalAddr loopDst[MAX_LOOP_NUM];
-    ccu::LocalAddr loopSrc[MAX_LOOP_NUM];
-    std::array<std::vector<ccu::LocalAddr>, MAX_LOOP_NUM> loopScratch;
-    ccu::Variable loopLen[MAX_LOOP_NUM];
-    ccu::Variable loopLenExp[MAX_LOOP_NUM];
-};
-
 struct KfcAllReduceMesh1DMem2MemContext : CcuKernelCtxBase {
     const ChannelHandle* channels{nullptr};
     uint32_t channelCount{0};
