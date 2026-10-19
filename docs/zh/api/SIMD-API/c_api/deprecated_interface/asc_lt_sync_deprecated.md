@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素判断src0 < src1是否成立，成立则目的操作数对应比特位为1否则为0，支持结果存入寄存器或输出到目标地址，起始地址需32字节对齐。该接口已废弃，替代为asc_lt与asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
+    kind: replaced_by
+    condition: "非同步计算采用asc_lt实现"
+version: ">=9.0.0"
+---
 # asc_lt_sync（废弃）
 
 ## 产品支持情况

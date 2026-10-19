@@ -55,8 +55,22 @@ __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value);
  */
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @brief Reads a 128-bit mask from the SPR, expands each bit into 2 bits, and returns the resulting 256-bit b16 mask register for 16-bit vector computation.
+ *
+ * @override_id asc_get_mask_spr_b16__z
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16();
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @brief Reads a 64-bit mask from the SPR, expands each bit into 4 bits, and returns the resulting 256-bit b32 mask register for 32-bit vector computation.
+ *
+ * @override_id asc_get_mask_spr_b32__z
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_get_mask_spr_b32();
 
 #define asc_create_mask_b8 pset_b8

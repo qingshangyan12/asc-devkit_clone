@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "按元素判断src0与src1是否不相等，成立时输出对应比特位为1，否则为0，结果可存入寄存器或目标地址，寄存器形式需配合asc_get_cmp_mask获取结果。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+    condition: "使用寄存器形式的接口时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: "需要初始化结果寄存器时"
+version: ">=9.0.0"
+---
 # asc_ne
 
 ## 产品支持情况

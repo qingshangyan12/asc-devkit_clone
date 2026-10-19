@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "比较src0与src1在对应索引位置的元素，比较结果为真时输出结果的对应比特位设为1，否则设为0。结果可存入寄存器或目的地址，寄存器形式需配合asc_get_cmp_mask获取比较结果。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+    condition: "使用寄存器形式的接口时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: "需要初始化结果寄存器时"
+version: ">=9.0.0"
+---
 # asc_eq
 
 ## 产品支持情况

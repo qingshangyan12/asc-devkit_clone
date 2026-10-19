@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "逐元素比较src0 >= src1是否成立，成立输出1否则输出0，每个元素的比较结果占一个bit。该接口已废弃，请使用非同步接口asc_ge和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync替代"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md
+    kind: replaced_by
+    condition: "非同步计算场景使用asc_ge替代"
+version: ">=9.0.0"
+---
 # asc_ge_sync（废弃）
 
 ## 产品支持情况

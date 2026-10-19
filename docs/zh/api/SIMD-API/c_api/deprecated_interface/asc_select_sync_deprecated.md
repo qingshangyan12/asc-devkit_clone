@@ -1,3 +1,18 @@
+---
+okftype: reference.api
+description: "已废弃的同步矢量选择接口，给定两个源操作数src0和src1，根据条件选择元素得到目的操作数dst，需配合asc_set_cmp_mask使用，请改用对应的非同步接口asc_select和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [selection]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
+    kind: replaced_by
+    condition: "非同步选择场景改用asc_select实现"
+version: ">=9.0.0"
+---
 # asc_select_sync（废弃）
 
 ## 产品支持情况

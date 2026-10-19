@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素比较矢量中各位置与标量value的大小，值小于标量时对应比特位输出1否则输出0，结果按小端序排布，起始地址需32字节对齐。该接口已废弃，替代为asc_lt_scalar与asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md
+    kind: replaced_by
+    condition: "非同步计算采用asc_lt_scalar实现"
+version: ">=9.0.0"
+---
 # asc_lt_scalar_sync（废弃）
 
 ## 产品支持情况

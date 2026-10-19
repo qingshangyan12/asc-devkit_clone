@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "从SPR中读取mask值并按数据类型格式化后返回，b16模式将每个bit扩展为2bit、b32模式扩展为4bit，拼成256bit掩码寄存器。"
+tag:
+  - roles: [query]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
+version: ">=9.0.0"
+---
 # asc_get_mask_spr
 
 ## 产品支持情况

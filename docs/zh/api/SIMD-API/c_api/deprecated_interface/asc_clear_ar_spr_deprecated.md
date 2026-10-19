@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "对AR特殊寄存器进行清零操作，需在调用asc_squeeze_with_status之前调用，以复位有效元素总字节数累计。该接口已废弃，请使用asc_squeeze_and_storeunalign_init实现此功能。"
+tag:
+  - roles: [control]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
+    kind: replaced_by
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_clear_ar_spr（废弃）
 
 ## 产品支持情况

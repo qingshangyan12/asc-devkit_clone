@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "按元素判断src0小于src1是否成立，成立时输出结果对应比特位为1，否则为0，结果可输出到目标地址或寄存器，支持高维切分计算。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+    condition: "使用寄存器形式的接口时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: "需要初始化结果寄存器时"
+version: ">=9.0.0"
+---
 # asc_lt
 
 ## 产品支持情况

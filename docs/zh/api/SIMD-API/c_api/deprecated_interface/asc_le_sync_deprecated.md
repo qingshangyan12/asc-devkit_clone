@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "按元素判断矢量src0是否小于等于src1，成立输出1否则输出0，每个元素结果占1bit，结果可输出到寄存器或目标地址。该接口已废弃，请改用对应的非同步接口asc_le和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_le_sync（废弃）
 
 ## 产品支持情况
