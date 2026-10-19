@@ -14,11 +14,11 @@ AGENTS.md
 CLAUDE.md
 oat_reports/
 presmoke_reports/
-log/
+/log/
 .DS_Store
 !/examples/**/10_math/log/
 !/scripts/presmoke/cases/**/10_math/log/
-third_party/
+/third_party/
 openssl-device-src/
 openssl-host-src/
 build_device/
@@ -37,4 +37,4 @@ docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
 
 oat_reports/
 
-log/
+/log/
