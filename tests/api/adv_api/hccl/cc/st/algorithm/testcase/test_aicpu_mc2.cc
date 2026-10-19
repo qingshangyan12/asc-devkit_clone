@@ -123,6 +123,7 @@ protected:
         g_aclrtMemcpyCallCount = 0U;
         g_hcclEngineCtxCopyCallCount = 0U;
         g_stubEndpointBwCoeff = 0U;
+        (void)Mc2ClearCcuLaunchCtxCache();
         unsetenv(EXEC_TIMEOUT_ENV);
     }
 
