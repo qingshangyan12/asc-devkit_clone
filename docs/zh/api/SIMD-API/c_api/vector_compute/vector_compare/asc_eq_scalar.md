@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按元素判断矢量src是否等于标量value，成立则输出结果的对应比特位为1，否则为0，dst按小端顺序排列为二进制结果。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 
 # asc_eq_scalar
 

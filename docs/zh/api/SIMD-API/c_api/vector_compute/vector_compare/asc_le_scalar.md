@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将源矢量src的每个元素与标量value比较，判断src <= value是否成立，成立则输出结果的对应比特位为1，dst按小端顺序排列为二进制结果。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_le_scalar
 
 ## 产品支持情况

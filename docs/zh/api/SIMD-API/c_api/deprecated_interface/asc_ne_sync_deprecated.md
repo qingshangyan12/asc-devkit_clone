@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素判断src0与src1是否不等，每个元素的比较结果占1个bit并可输出到寄存器或目标地址；该接口已废弃，请使用对应的非同步接口asc_ne和同步接口asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [aligned_transfer, elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md
+    kind: replaced_by
+    condition: "非同步比较场景改用asc_ne实现"
+version: ">=9.0.0"
+---
 # asc_ne_sync（废弃）
 
 ## 产品支持情况
