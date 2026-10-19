@@ -70,7 +70,7 @@ public:
         uint8_t left_padding_cnt, uint8_t right_padding_cnt, asc_load_l2_cache_mode cache_mode, uint64_t src_stride,
         uint32_t dst_stride, bool pre_allocation = false)
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_align(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), block_count,
@@ -149,7 +149,7 @@ public:
         mte2_nz_para |= static_cast<uint64_t>(loop2_dst_stride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2_nz_para |= static_cast<uint64_t>(nd_num);                         // MTE2_NZ_PARA[15:0]
         set_mte2_nz_para(mte2_nz_para);
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_nd2nz(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
@@ -218,7 +218,7 @@ public:
         mte2_nz_para |= static_cast<uint64_t>(loop2_dst_stride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2_nz_para |= static_cast<uint64_t>(dn_num);                         // MTE2_NZ_PARA[15:0]
         set_mte2_nz_para(mte2_nz_para);
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_dn2nz(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
