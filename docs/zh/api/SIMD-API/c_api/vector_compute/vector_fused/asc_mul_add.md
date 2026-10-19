@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "对矢量执行乘加融合计算，将源操作数src0与目的操作数dst相乘后加上src1，结果写回dst，支持前n个数据计算和高维切分计算两种形式，操作数起始地址需32字节对齐。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 
 # asc_mul_add
 

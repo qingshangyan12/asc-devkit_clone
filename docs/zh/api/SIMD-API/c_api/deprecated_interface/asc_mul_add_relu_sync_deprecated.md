@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素将src0与dst相乘后加上src1，再进行Relu计算（结果和0对比取较大值）并存入dst。该同步接口已废弃，请使用asc_mul_add_relu与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add, relu]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md
+    kind: replaced_by
+    condition: "乘加与Relu融合计算场景改用asc_mul_add_relu实现"
+version: ">=9.0.0"
+---
 # asc_mul_add_relu_sync（废弃）
 
 ## 产品支持情况

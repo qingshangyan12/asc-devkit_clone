@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将int16_t类型数据量化转换为int8_t或uint8_t并存放在每个DataBlock的高半块或低半块，使用前需调用量化参数设置接口，接口已废弃，替代方案为asc_deq_int162b8与asc_sync。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md
+    kind: replaced_by
+    condition: "非同步计算场景改用asc_deq_int162b8实现"
+version: ">=9.0.0"
+---
 # asc_deq_int162b8_sync（废弃）
 
 ## 产品支持情况

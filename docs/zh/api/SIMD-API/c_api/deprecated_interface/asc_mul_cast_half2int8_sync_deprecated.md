@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按元素求积并将结果转换为int8_t类型，转换采用RINT舍入模式（四舍六入五成双），溢出做饱和处理。该同步接口已废弃，请使用asc_mul_cast_half2int8与asc_sync替代。"
+tag:
+  - roles: [compute]
+  - operations: [conversion, multiply]
+  - traits: [aligned_transfer, rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md
+    kind: replaced_by
+    condition: "half求积并转int8_t场景改用asc_mul_cast_half2int8实现"
+version: ">=9.0.0"
+---
 # asc_mul_cast_half2int8_sync（废弃）
 
 ## 产品支持情况

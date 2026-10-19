@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "根据掩码将源矢量元素与标量value求积后累加到目的矢量dst对应元素，dst既作输入累加器又存储最终结果，掩码位为0时dst对应元素置0。"
+tag:
+  - roles: [compute]
+  - operations: [fused_multiply_add]
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
 # asc_axpy
 
 ## 产品支持情况
