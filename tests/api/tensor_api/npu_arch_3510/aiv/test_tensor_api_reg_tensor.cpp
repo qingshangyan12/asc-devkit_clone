@@ -344,11 +344,11 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_reg_mask_data_reorder_b32;
 }
 
-#define TENSOR_API_REG_GATHER_TEST(DataType, IndexType)                              \
-    TEST(tensor_api_reg_tensor_3510, gather_register_##DataType)                     \
-    {                                                                               \
-        auto mask = asc::te::experimental::all_mask<IndexType>();                    \
-        compile_reg_register_gather<DataType, IndexType>(mask.reg);                  \
+#define TENSOR_API_REG_GATHER_TEST(DataType, IndexType)             \
+    TEST(tensor_api_reg_tensor_3510, gather_register_##DataType)    \
+    {                                                               \
+        auto mask = asc::te::experimental::all_mask<IndexType>();   \
+        compile_reg_register_gather<DataType, IndexType>(mask.reg); \
     }
 
 TENSOR_API_REG_GATHER_TEST(int8_t, uint8_t)
