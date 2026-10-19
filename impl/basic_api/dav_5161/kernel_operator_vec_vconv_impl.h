@@ -1348,51 +1348,6 @@ __aicore__ inline void TruncateImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint
         }
     }
 }
-
-namespace RegAddReluCast {
-template <typename T1, typename T2, typename RegT, typename RegU>
-__simd_callee__ inline void AddReluCast(RegT& dstReg, RegU& src0Reg, RegU& src1Reg, Reg::MaskReg& mask)
-{
-    Reg::Add(src0Reg, src0Reg, src1Reg, mask);
-    Reg::Maxs(src0Reg, src0Reg, static_cast<T2>(0), mask);
-    if constexpr (IsSameType<T2, float>::value) {
-        Reg::Cast<T1, T2, CastParam::AddReluCastTrait>(dstReg, src0Reg, mask);
-        Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::LOWEST>(
-            (Reg::RegTensor<uint16_t>&)dstReg, (Reg::RegTensor<uint32_t>&)dstReg);
-    } else {
-        if constexpr (IsSameType<T2, int16_t>::value) {
-            Reg::RegTensor<half> tmpReg;
-            Reg::Cast<half, int16_t, CastParam::s162HalfTrait>(tmpReg, src0Reg, mask);
-            Reg::Cast<int8_t, half, CastParam::AddReluCastTrait>(dstReg, tmpReg, mask);
-        } else {
-            Reg::Cast<T1, T2, CastParam::AddReluCastTrait>(dstReg, src0Reg, mask);
-        }
-        Reg::Pack<uint8_t, uint16_t, Reg::HighLowPart::LOWEST>(
-            (Reg::RegTensor<uint8_t>&)dstReg, (Reg::RegTensor<uint16_t>&)dstReg);
-    }
-}
-} // namespace RegAddReluCast
-namespace RegSubReluCast {
-template <typename T1, typename T2, typename RegT, typename RegU>
-__simd_callee__ inline void SubReluCast(RegT& dstReg, RegU& src0Reg, RegU& src1Reg, Reg::MaskReg& mask)
-{
-    Reg::Sub(src0Reg, src0Reg, src1Reg, mask);
-    Reg::Maxs<T2>(src0Reg, src0Reg, static_cast<T2>(0), mask);
-    if constexpr (IsSameType<T2, float>::value) {
-        Reg::Cast<T1, T2, layoutZSatSMrgZRndR>(dstReg, src0Reg, mask);
-        Reg::Pack((Reg::RegTensor<uint16_t>&)dstReg, (Reg::RegTensor<uint32_t>&)dstReg);
-    } else {
-        if constexpr (IsSameType<T2, int16_t>::value) {
-            Reg::RegTensor<half> tmpReg;
-            Reg::Cast<half, int16_t, MrgZRndRSatS>(tmpReg, src0Reg, mask);
-            Reg::Cast<int8_t, half, layoutZSatSMrgZRndR>(dstReg, tmpReg, mask);
-        } else {
-            Reg::Cast<T1, T2, layoutZSatSMrgZRndR>(dstReg, src0Reg, mask);
-        }
-        Reg::Pack((Reg::RegTensor<uint8_t>&)dstReg, (Reg::RegTensor<uint16_t>&)dstReg);
-    }
-}
-} // namespace RegSubReluCast
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_IMPL_H__)
