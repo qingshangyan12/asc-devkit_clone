@@ -1843,7 +1843,7 @@ private:
             *((uint32_t*)&kfcMsg_.body) = 0;
             return;
         }
-#if __NPU_ARCH__ != 9201
+#if (__NPU_ARCH__ != 9201 && (__NPU_ARCH__ != 9202))
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             if (GetSubBlockIdxImpl() == 1) {
                 client->PostSameABFakeMsg<isAck>(funID, this->instIdx);
@@ -1883,7 +1883,7 @@ private:
     template <KFC_Enum funID, bool isAck>
     __aicore__ inline void PostMessage()
     {
-#if __NPU_ARCH__ != 9201
+#if (__NPU_ARCH__ != 9201 && (__NPU_ARCH__ != 9202))
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             ASSERT(DoMatmulNorm(MM_CFG) && "MM_CFG should use norm config when sameab is enabled");
             if (GetSubBlockIdxImpl() == 1) {     // Do not send v1's message to cube
@@ -1946,7 +1946,7 @@ private:
         const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         // If the cache is not configured, the output is stored in the L0C buffer.
-#if __NPU_ARCH__ != 9201
+#if (__NPU_ARCH__ != 9201 && (__NPU_ARCH__ != 9202))
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             if (GetSubBlockIdxImpl() == 1) {
                 CrossCoreSetFlag<INTRA_MODE, PIPE_V>(
