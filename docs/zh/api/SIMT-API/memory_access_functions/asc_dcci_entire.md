@@ -77,7 +77,7 @@ inline void asc_dcci_entire(void *dst)
             while (*(volatile uint32_t *)flag != 1) {
                 asc_nop(); // 15个cycle后再发送下一个load指令
             }
-            asc_dcci_entire((void*)(data)); // 刷新核内的整个Data Cache  
+            asc_dcci_entire((void*)(data)); // 刷新核内的整个Data Cache
             output[0] = data[0]; // 数据就绪，获取数据
         }
     }
