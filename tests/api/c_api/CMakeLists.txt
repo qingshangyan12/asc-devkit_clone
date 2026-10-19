@@ -21,6 +21,8 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
     ascend950pr_9599_AIV
     ascend960dt_AIC
     ascend960dt_AIV
+    ascend960pr_AIC
+    ascend960pr_AIV
 )
 
 set(ASCENDC_UT_HEADER
@@ -90,6 +92,9 @@ file(GLOB ASCENDC_UT_ascend960dt_AIV_CASE_SRC
     npu_arch_9201/vector_datamove/*.cpp
 )
 
+set(ASCENDC_UT_ascend960pr_AIC_CASE_SRC ${ASCENDC_UT_ascend960dt_AIC_CASE_SRC})
+set(ASCENDC_UT_ascend960pr_AIV_CASE_SRC ${ASCENDC_UT_ascend960dt_AIV_CASE_SRC})
+
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_c_api_${product_type}
         ${ASCENDC_DIR}/tests/main.cpp
@@ -108,6 +113,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend960dt_AIC>:__NPU_ARCH__=9201;__DAV_CUBE__;ASC_DEVKIT_VERSION_NUM=90200000>
         $<$<STREQUAL:${product_type},ascend960dt_AIV>:__NPU_ARCH__=9201;__DAV_VEC__;ASC_DEVKIT_VERSION_NUM=90200000>
+        $<$<STREQUAL:${product_type},ascend960pr_AIC>:__NPU_ARCH__=9202;__DAV_CUBE__;ASC_DEVKIT_VERSION_NUM=90200000>
+        $<$<STREQUAL:${product_type},ascend960pr_AIV>:__NPU_ARCH__=9202;__DAV_VEC__;ASC_DEVKIT_VERSION_NUM=90200000>
         __disable_kernel_type_autoinfer__=
         __callee__=
     )
@@ -132,6 +139,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend960dt_AIC>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend960dt_AIV>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend960pr_AIC>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend960pr_AIV>:tikicpulib::ascend950pr_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa
