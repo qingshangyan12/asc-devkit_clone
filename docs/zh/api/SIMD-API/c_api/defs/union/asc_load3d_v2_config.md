@@ -1,3 +1,11 @@
+---
+okftype: reference.union
+description: "用于设置Load3Dv2接口的repeat参数，包含height或width方向前后迭代起始地址间距rpt_stride、迭代次数rpt_time与控制迭代方向的rpt_mode，rpt_mode为0时沿height方向迭代、为1时沿width方向迭代。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_load3d_v2_config
 
 头文件路径为：`"c_api/defs/union.h"`。

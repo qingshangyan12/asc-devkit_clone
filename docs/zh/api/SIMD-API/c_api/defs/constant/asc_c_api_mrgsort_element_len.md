@@ -1,3 +1,17 @@
+---
+okftype: reference.constant
+description: "定义ASC_C_API_MRGSORT_ELEMENT_LEN常量，表示MrgSort4操作支持的队列数量，值为4，用作asc_mrgsort4接口src数组和asc_get_vms4_sr接口sorted_num数组的长度。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+    kind: configures
+    condition: "作为sorted_num数组长度"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: configures
+    condition: "作为src数组长度"
+version: ">=9.0.0"
+---
 # ASC_C_API_MRGSORT_ELEMENT_LEN
 
 ASC_C_API_MRGSORT_ELEMENT_LEN表示MrgSort4操作支持的队列数量，值为4。该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。

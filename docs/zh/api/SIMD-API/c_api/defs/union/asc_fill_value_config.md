@@ -1,3 +1,20 @@
+---
+okftype: reference.union
+description: "fill_value的初始化参数结构体，包含asc_fill_l0a、asc_fill_l0b和asc_fill_l1填充接口需要配置的参数：repeat为迭代次数，blk_num为每次迭代初始化的数据块个数，dst_gap为相邻迭代目的地址之间的距离，目的操作数位于L1时数据块为32B、位于L0A或L0B时为512B。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_fill_l0a.md
+    kind: configures
+    condition: "作为该填充接口的初始化参数结构体"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_fill_l0b.md
+    kind: configures
+    condition: "作为该填充接口的初始化参数结构体"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_fill_l1.md
+    kind: configures
+    condition: "作为该填充接口的初始化参数结构体"
+version: ">=9.0.0"
+---
 # asc_fill_value_config
 
 头文件路径为：`"c_api/defs/union.h"`。

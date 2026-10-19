@@ -1,3 +1,20 @@
+---
+okftype: reference.enum
+description: "定义asc_store_l2_cache_mode枚举，表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，供向量搬运接口与标量访存store策略配置和查询使用，含NORMAL系列与NOTALLOC_CLEAN共四种取值。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md
+    kind: configures
+    condition: "查询标量访存路径store策略时返回该枚举"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: configures
+    condition: "配置标量访存路径store策略时传入该枚举"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+    kind: configures
+    condition: "作为向量搬运接口的L2 Cache策略"
+version: ">=9.0.0"
+---
 # asc_store_l2_cache_mode
 
 asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于：

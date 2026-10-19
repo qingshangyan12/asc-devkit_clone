@@ -1,3 +1,26 @@
+---
+okftype: reference.enum
+description: "定义asc_load_l2_cache_mode枚举，表示数据从GM搬运到Unified Buffer时的L2 Cache管理策略，用于向量搬运接口以及标量访存load策略配置与查询。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md
+    kind: configures
+    condition: "标量访存load策略查询"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: configures
+    condition: "标量访存load策略配置"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: configures
+    condition: "作为该向量搬运接口的L2 Cache管理策略"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+    condition: "作为该向量搬运接口的L2 Cache管理策略"
+  - path: examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode/README.md
+    kind: related
+    condition: "L2 Cache模式最佳实践说明"
+version: ">=9.0.0"
+---
 # asc_load_l2_cache_mode
 
 asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于：

@@ -1,3 +1,18 @@
+---
+okftype: reference.union
+description: "用于设置asc_copy_l12l0a与asc_copy_l12l0b的3D格式搬运接口的Feature map属性参数，包含宽l1_width、高l1_height及左右上下四个方向的padding填充大小，定义后必须为l1_height和l1_width赋值。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a.md
+    kind: configures
+    condition: "作为3D格式搬运接口的Feature map属性参数"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b.md
+    kind: configures
+    condition: "作为3D格式搬运接口的Feature map属性参数"
+version: ">=9.0.0"
+---
 # asc_l13d_fmatrix_config
 
 头文件路径为：`"c_api/defs/union.h"`。

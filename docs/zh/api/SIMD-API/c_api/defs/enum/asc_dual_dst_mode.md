@@ -1,3 +1,11 @@
+---
+okftype: reference.enum
+description: "定义asc_dual_dst_mode枚举，表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中dual_dst_ctrl参数的类型。"
+tag:
+  - roles: [data_movement_configuration]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_dual_dst_mode
 
 `asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。

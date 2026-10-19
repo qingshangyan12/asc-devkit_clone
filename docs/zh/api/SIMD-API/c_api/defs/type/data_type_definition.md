@@ -1,3 +1,20 @@
+---
+okftype: reference.type
+description: "定义C API的寄存器类型，包括矢量数据寄存器、掩码寄存器、非对齐寄存器与地址寄存器的位宽类别、容量上限和使用方式，并说明掩码设置及addr_reg偏移量计算等约束。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
+    kind: related
+    condition: "从非对齐地址搬入数据前需先调用其初始化"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+    condition: "在循环内生成地址寄存器以计算偏移量"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
+    kind: related
+    condition: "创建b64掩码时需先用其创建b32掩码"
+version: ">=9.0.0"
+---
 # 寄存器类型定义
 
 ## 产品支持情况
