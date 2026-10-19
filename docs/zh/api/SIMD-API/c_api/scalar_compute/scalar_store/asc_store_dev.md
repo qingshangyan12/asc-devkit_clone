@@ -1,3 +1,21 @@
+---
+okftype: reference.api
+description: "不经过DCache向GM地址写入标量数据，避免多核场景下Cache Line粒度的随机覆盖，起始地址须按写入类型字节数对齐。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
+  - path: docs/zh/guide/programming_guide/advanced_programming/memory_model/cache_coherence.md
+    kind: related
+    condition: "了解Scalar原子操作与DCache一致性时"
+version: ">=9.0.0"
+---
 # asc_store_dev
 
 ## 产品支持情况

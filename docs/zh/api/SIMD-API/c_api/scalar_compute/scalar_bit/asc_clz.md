@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "计算64位无符号整数二进制表示下的前导零个数，即从最高位到首个1之间连续0的数量，输入为0时返回64。"
+tag:
+  - roles: [compute]
+  - operations: [bit_manipulation]
+  - traits: [count_limited]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_clz
 
 ## 产品支持情况

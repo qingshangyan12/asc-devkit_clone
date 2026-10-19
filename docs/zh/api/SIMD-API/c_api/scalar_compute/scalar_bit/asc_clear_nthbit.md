@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "对标量流水上的64位无符号整数执行位清除，将bits中第idx位清零，其余位保持不变并返回修改后的结果。"
+tag:
+  - roles: [compute]
+  - operations: [bit_manipulation]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_clear_nthbit
 
 ## 产品支持情况
