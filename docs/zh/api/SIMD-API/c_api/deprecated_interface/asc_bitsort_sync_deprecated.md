@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "位图排序，一次迭代可完成32个元素的排序，按Score降序排序后将Score与其对应Index以（Score，Index）结构存入dst。该接口已废弃，请使用对应的非同步接口asc_bitsort和asc_sync同步接口替代。"
+tag:
+  - roles: [compute]
+  - operations: [sort]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+    kind: replaced_by
+version: ">=9.1.0"
+---
 # asc_bitsort_sync（废弃）
 
 ## 产品支持情况
