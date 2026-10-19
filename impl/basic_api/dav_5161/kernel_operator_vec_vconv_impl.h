@@ -285,9 +285,9 @@ __aicore__ inline void CastAdaptor(RegTensor<T>& dstReg, RegTensor<U>& srcReg, M
             Reg::RegTensor<int4x2_t> dstVreg;                                                                     \
             for (uint16_t i = 0; i < repeatTime; ++i) {                                                           \
                 preg = Reg::UpdateMask<srcType>(sreg);                                                            \
-                Reg::DataCopy(srcVreg, src + i * oneRepSize);                                                     \
+                Reg::LoadAlign(srcVreg, src + i * oneRepSize);                                                     \
                 Reg::Cast<int4x2_t, srcType, castTrait>(dstVreg, srcVreg, preg);                                  \
-                Reg::DataCopy<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(                                           \
+                Reg::StoreAlign<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(                                           \
                     (__local_mem__ uint8_t*)dst + (i * oneRepSize) / 2, (Reg::RegTensor<uint8_t>&)dstVreg, preg); \
             }                                                                                                     \
         }                                                                                                         \
@@ -598,7 +598,7 @@ template <typename T, typename U>
 __aicore__ inline void GenLoadL0(
     Reg::RegTensor<U>& srcVreg, __ubuf__ U*& srcAddr, Reg::MaskReg& preg, const UnaryRepeatParams& repeatParams)
 {
-    Reg::DataCopy<U, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+    Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
         srcVreg, srcAddr, static_cast<uint32_t>(repeatParams.srcBlkStride),
         static_cast<uint32_t>(repeatParams.srcRepStride), preg);
     if constexpr (SupportType<U, int4b_t>() && sizeof(T) == 2) {
@@ -642,7 +642,7 @@ __aicore__ inline void GenStoreL0(
         Reg::Pack<uint16_t, uint32_t>((Reg::RegTensor<uint16_t>&)dstVreg, (Reg::RegTensor<uint32_t>&)dstVreg);
         Reg::Pack<uint8_t, uint16_t>((Reg::RegTensor<uint8_t>&)dstVreg, (Reg::RegTensor<uint16_t>&)dstVreg);
     }
-    Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+    Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
         dstAddr, dstVreg, static_cast<uint32_t>(repeatParams.dstBlkStride),
         static_cast<uint32_t>(repeatParams.dstRepStride), preg);
 }
@@ -715,7 +715,7 @@ __aicore__ inline void CastIntrinsicsImplCounterVF(
     if constexpr (!isSetMask) {
         // get SPR.MASK in VF
         Reg::MaskReg sprLoadMaskReg = Reg::MoveMask<uint16_t>();
-        Reg::DataCopy<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
         // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         countSreg = static_cast<uint32_t>(maskBuf[0]);
@@ -1342,9 +1342,9 @@ __aicore__ inline void TruncateImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint
         Reg::MaskReg mask;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             mask = Reg::UpdateMask<T>(sreg);
-            Reg::DataCopy(vSrcReg, src + i * sregLower);
+            Reg::LoadAlign(vSrcReg, src + i * sregLower);
             Reg::Truncate<T, roundMode>(vDstReg, vSrcReg, mask);
-            Reg::DataCopy(dst + i * sregLower, vDstReg, mask);
+            Reg::StoreAlign(dst + i * sregLower, vDstReg, mask);
         }
     }
 }
