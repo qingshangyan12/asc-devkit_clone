@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "已废弃的同步复合搬运接口，将数据从Unified Buffer（UB）搬运到UB并支持高维切分，要求dst与src起始地址32字节对齐，替代接口为非同步接口asc_copy与同步接口asc_sync。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
+    kind: replaced_by
+    condition: "使用对应的非同步接口"
+version: ">=9.0.0"
+---
 # asc_copy_sync（废弃）
 
 ## 产品支持情况

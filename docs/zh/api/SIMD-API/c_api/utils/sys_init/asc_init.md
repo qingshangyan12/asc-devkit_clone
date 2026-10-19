@@ -1,3 +1,14 @@
+---
+okftype: reference.api
+description: "将当前AI Core上可能由前序算子遗留的全局控制状态恢复为接口约定的初始状态，包括原子累加、Mask工作模式、CTRL寄存器及搬运循环次数等，不涉及用户数据清零。"
+tag:
+  - roles: [configuration]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a.md
+    kind: configures
+    condition: "Ascend 950PR&950DT系列产品AIC进行3D格式搬运时"
+version: ">=9.0.0"
+---
 # asc_init
 
 ## 产品支持情况
