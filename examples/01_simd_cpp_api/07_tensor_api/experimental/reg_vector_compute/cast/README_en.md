@@ -130,7 +130,7 @@ Run the following steps in the sample root directory to build and execute the op
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo
@@ -141,7 +141,7 @@ Run the following steps in the sample root directory to build and execute the op
   To use NPU simulation, add the following build option:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
 
   When switching the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before reconfiguring the project.
@@ -152,7 +152,6 @@ Run the following steps in the sample root directory to build and execute the op
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default is `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Experimental ASC API switch. This sample requires `ON`; the default is `OFF`. |
   | `SCENARIO_NUM` | Required data type conversion scenario number. The valid range is 1 to 6. |
 
 - Expected Result
