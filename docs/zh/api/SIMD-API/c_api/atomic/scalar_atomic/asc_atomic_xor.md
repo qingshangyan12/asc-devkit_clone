@@ -1,3 +1,31 @@
+---
+okftype: reference.api
+description: "对Global Memory中address指向的单个元素执行原子按位异或，读取旧值与输入标量val异或后将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作。"
+tag:
+  - roles: [compute]
+  - operations: [bitwise_xor]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "其他核或其他通路通过缓存访问同一GM地址时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: "使用asc_dcci清理或失效Cache Line后保证相关访存执行顺序和数据可见性时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "作为asc_sync_pipe的替代方案配合asc_sync_wait保证执行顺序时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址且执行顺序影响结果时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "作为asc_sync_pipe的替代方案配合asc_sync_notify保证执行顺序时"
+  - path: docs/zh/guide/programming_guide/advanced_programming/memory_model/cache_coherence.md
+    kind: related
+    condition: "了解Scalar原子操作与DCache一致性细节时"
+version: ">=9.1.0"
+---
 # asc_atomic_xor
 
 ## 产品支持情况

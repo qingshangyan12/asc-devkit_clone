@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "设置原子操作启用位与原子操作类型的值，其中op为2时表示求和操作。该接口已废弃，原子加操作请使用asc_atomic_add实现。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md
+    kind: replaced_by
+    condition: "原子加操作改用asc_atomic_add实现"
+version: ">=9.0.0,<=9.1.0"
+---
 # asc_set_store_atomic_config_v2（废弃）
 
 ## 产品支持情况

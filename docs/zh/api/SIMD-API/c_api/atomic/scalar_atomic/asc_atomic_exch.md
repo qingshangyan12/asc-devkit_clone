@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对Global Memory中单个元素执行原子交换，将val写回该地址替换旧值，并返回读取到的旧值。"
+tag:
+  - roles: [compute]
+  - operations: [copy]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "Scalar原子操作绕过DCache时需保证GM与DCache的一致性"
+version: ">=9.1.0"
+---
 # asc_atomic_exch
 
 ## 产品支持情况

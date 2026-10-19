@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "对Global Memory中指定地址的单个元素执行原子比较交换，相等时写入新值并返回计算前的旧值。"
+tag:
+  - roles: [compute]
+  - operations: [comparison]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "Scalar原子操作绕过DCache时"
+version: ">=9.1.0"
+---
 # asc_atomic_cas
 
 ## 产品支持情况

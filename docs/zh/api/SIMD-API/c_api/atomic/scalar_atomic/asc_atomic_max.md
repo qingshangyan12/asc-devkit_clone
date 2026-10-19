@@ -1,3 +1,34 @@
+---
+okftype: reference.api
+description: "对Global Memory中单个元素执行原子取大，将旧值与标量val中的较大值写回并返回旧值，并发调用不丢失更新。"
+tag:
+  - roles: [compute]
+  - operations: [maximum]
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
+    kind: related
+    condition: "确认本接口与数据搬运随路原子设置互不影响时"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: "其他核或其他通路通过缓存访问同一GM地址时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: "其他核或其他通路通过缓存访问同一GM地址时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址且执行顺序影响结果时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址且执行顺序影响结果时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址且执行顺序影响结果时"
+  - path: docs/zh/guide/programming_guide/advanced_programming/memory_model/cache_coherence.md
+    kind: related
+    condition: "了解Scalar原子操作与DCache一致性时"
+version: ">=9.1.0"
+---
 # asc_atomic_max
 
 ## 产品支持情况
