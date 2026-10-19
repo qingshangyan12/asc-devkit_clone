@@ -38,7 +38,7 @@ template <typename T, bool highPrecision>
 __simd_callee__ inline void GeluExpTrans(
     Reg::RegTensor<T>& dstVreg, Reg::RegTensor<T>& srcVreg, Reg::MaskReg& mask, Reg::RegTensor<T>& tmpReg)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     Reg::RegTensor<float> tmpCastReg0;
     Reg::RegTensor<float> tmpCastReg1;
     if constexpr (!highPrecision && IsSameType<T, half>::value) {
@@ -68,7 +68,7 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
     Reg::RegTensor<T> tmpReg3;
     Reg::RegTensor<T> tmpReg4;
     Reg::MaskReg mask;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     if constexpr (!highPrecision && IsSameType<T, half>::value) {
         mask = Reg::CreateMask<T>();
         Reg::Duplicate(tmpReg4, 0, mask);
@@ -160,7 +160,7 @@ __aicore__ inline void FastGeluHighPrecisionAlg(
     FastGeluHighPrecisionAlgVF<T>(dst, src, dataSize);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 template <typename T>
 __simd_vf__ inline void FastGeluAlgVF(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t dataSize)
 {

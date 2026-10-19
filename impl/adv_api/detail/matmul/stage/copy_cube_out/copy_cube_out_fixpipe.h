@@ -116,7 +116,8 @@ private:
                 { KERNEL_LOG(KERNEL_ERROR, "if split N when copy cube out, NZ is not supported"); });
             CopyOutNZ2NZ<enSequentialWrite, T, isIntraBlock>(
                 dst, co1Local, curRow, curCol, baseHeight, baseWidth, baseBlockHeight, baseBlockWidth);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 9202)
         } else if constexpr (C_TYPE::format == CubeFormat::COLUMN_MAJOR) {
             CopyOutNZ2DN<enSequentialWrite, T, isIntraBlock>(
                 dst, co1Local, curRow, curCol, baseHeight, baseWidth, baseBlockHeight, baseBlockWidth);
@@ -187,7 +188,7 @@ private:
 
     __aicore__ inline void AlignHeightWithTrans(FixpipeAdaptor& fixpipe, int32_t mSize)
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         if constexpr (HasScalePosition<A_TYPE>::value) {
             if constexpr (IsMxDisableUnitFlag<A_TYPE, B_TYPE, MM_CFG>) {
                 fixpipe.params_.unitFlag = 0;
@@ -205,7 +206,7 @@ private:
     __aicore__ inline int64_t GetDstOffset(int32_t curRow, int32_t curCol, int32_t baseHeight, int32_t stride)
     {
         int64_t dstOffset = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         dstOffset = static_cast<int64_t>(curRow * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM() * stride) +
                     static_cast<int64_t>(curCol * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN());
 #else
@@ -243,7 +244,7 @@ private:
     {
         if constexpr (PhyPosIsUB(C_TYPE::pos) && MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB()) {
             fixpipe.SetSubBlockId(MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx());
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
             fixpipe.SetMcgShfMode(McgShfMode::SINGLE_DST_MODE);
 #else
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare && FIXPIPE_MODE == McgShfMode::SINGLE_DST_MODE) {
@@ -261,7 +262,8 @@ private:
 #endif
     }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 9202)
     template <bool enSequentialWrite, class T, bool isIntraBlock = false>
     __aicore__ inline void CopyOutNZ2NZ(
         const T& dst, const LocalTensor<SrcT>& co1Local, int32_t curRow, int32_t curCol, int32_t baseHeight,
@@ -290,7 +292,7 @@ private:
                     PhyPosIsUB(C_TYPE::pos) &&
                     ((A_TYPE::ibShare && B_TYPE::ibShare) || FIXPIPE_MODE == McgShfMode::DUAL_DST_SPLIT_M ||
                      FIXPIPE_MODE == McgShfMode::DUAL_DST_SPLIT_N)) {
-#if __NPU_ARCH__ != 9201
+#if (__NPU_ARCH__ != 9201 && (__NPU_ARCH__ != 9202))
                     dstOffset = dstOffset >> 1;
 #endif
                 }
@@ -327,7 +329,7 @@ private:
 
     __aicore__ inline void CheckUnitFlagStatus(FixpipeAdaptor& fixpipe)
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         if constexpr (HasScalePosition<A_TYPE>::value) {
             if constexpr (IsMxDisableUnitFlag<A_TYPE, B_TYPE, MM_CFG>) {
                 fixpipe.params_.unitFlag = 0;

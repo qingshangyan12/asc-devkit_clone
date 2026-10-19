@@ -40,7 +40,7 @@ __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)
         SetMaskNorm();
         SetLoadDataPaddingValue((uint64_t)0);
         ClearSSbufImpl();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
         CrossCoreSetFlag<KFC_INTRA_MODE, PIPE_S>(KFC_SYNC_ID);
 #else
         CrossCoreSetFlag<KFC_INTRA_MODE, PIPE_S>(KFC_SYNC_ID);
@@ -76,7 +76,7 @@ constexpr bool DAV_310_ENABLE_GM = true;
 constexpr bool DAV_310_ENABLE_GM = false;
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 constexpr bool ENABLE_HARD_POOL = true;
 #else
 constexpr bool ENABLE_HARD_POOL = false;
