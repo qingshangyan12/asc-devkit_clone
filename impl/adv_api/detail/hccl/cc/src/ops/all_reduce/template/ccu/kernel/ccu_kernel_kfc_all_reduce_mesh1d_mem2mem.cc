@@ -230,7 +230,7 @@ static CcuResult ReduceLoopGroup(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Loc
     }
 }
 
-static CcuResult ReduceLoopGroupV1(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::LocalAddr srcOrg)
+CcuResult ReduceLoopGroupV1(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::LocalAddr srcOrg)
 {
     const uint32_t size = ctx.reduceScatterDst.size();
 
