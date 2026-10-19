@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer，本接口不传入偏移量，用户需自行更新目的操作数地址。该接口已废弃，请改用asc_storealign_pack_quarter实现。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md
+    kind: replaced_by
+version: ">=9.0.0"
+---
 # asc_storealign_pack_v2（废弃）
 
 ## 产品支持情况

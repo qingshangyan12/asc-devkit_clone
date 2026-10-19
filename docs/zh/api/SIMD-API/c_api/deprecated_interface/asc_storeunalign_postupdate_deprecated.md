@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "已废弃的reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址搬出到Unified Buffer，每次调用自动更新目的操作数地址，请改用asc_squeeze_and_storeunalign。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [post_update, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: replaced_by
+    condition: "不指定存储偏移量的原型已废弃"
+version: ">=9.0.0,<=9.2.0"
+---
 # asc_storeunalign_postupdate（废弃）
 
 ## 产品支持情况
