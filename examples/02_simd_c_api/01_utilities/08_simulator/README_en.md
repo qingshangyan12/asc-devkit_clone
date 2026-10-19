@@ -102,9 +102,9 @@ msopprof simulator --soc-version=<soc_version> ./build/demo
 > Please obtain the AI ​​processor model `<soc_version>` through the following methods:
 >
 > - Ascend 950PR&950DT products
->   - Run `npu-smi info -t board -i <id> -c <chip_id>` on the NPU host and combine the **Chip Name** and **NPU Name** values as Chip Name_NPU Name.
+>   - Run `npu-smi info -t board -i <id>` on the NPU host and combine the **Chip Name** and **NPU Name** values as Chip Name_NPU Name.
 >
-> Among them, `id` is the device ID, and the NPU ID found through the `npu-smi info -l` command is the device ID; `chip_id` is the chip ID, and the Chip ID found out through the `npu-smi info -m` command is the chip ID.
+> Here, `id` is the device ID, which is listed as NPU ID by `npu-smi info -l`.
 
 After the command is completed, a folder named `OPPROF_{timestamp}_XXX` will be generated in the current directory. The product structure is as follows:
 

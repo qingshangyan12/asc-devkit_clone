@@ -103,9 +103,9 @@ msopprof simulator --soc-version=<soc_version> ./build/demo
 > AI处理器的型号`<soc_version>`请通过如下方式获取：
 >
 > - Ascend 950PR&950DT系列产品
->   - 在安装昇腾AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`，获取**Chip Name**和**NPU Name**，配置值为Chip Name_NPU Name。
+>   - 在安装昇腾AI处理器的服务器执行`npu-smi info -t board -i <id>`，获取**Chip Name**和**NPU Name**，配置值为Chip Name_NPU Name。
 >
-> 其中，`id`为设备ID，通过`npu-smi info -l`命令查出的NPU ID即为设备ID；`chip_id`为芯片ID，通过`npu-smi info -m`命令查出的Chip ID即为芯片ID。
+> 其中，`id`为设备ID，通过`npu-smi info -l`命令查出的NPU ID即为设备ID。
 
 命令完成后，会在当前目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，产物结构如下：
 

@@ -134,13 +134,15 @@ z = x + y
 
 - **未初始化检测**
 
-  未初始化检测用于定位内存申请后未初始化、直接读取未初始化值导致的异常。用户可以注释掉`zGm.SetGlobalBuffer`来复现该场景。对于Device侧的`zGm`在使用前未初始化，因此触发未初始化检测。
+  未初始化检测用于定位使用未初始化指针导致的异常。将`z_gm`的初始化声明替换为未初始化声明，即可复现该场景：Device侧使用`z_gm`前未赋值。
 
   注意：调用`mssanitizer`时需要传入`--tool=initcheck`来开启未初始化检测。
 
   ```cpp
-  // 正确初始化zGm。删除该行后，可触发未初始化检测。
-  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+  // 正确初始化输出地址：
+  __gm__ float* z_gm = z + block_idx * BLOCK_LENGTH;
+  // 错误示例：将上面的声明替换为以下声明，输出地址未初始化。
+  // __gm__ float* z_gm;
   ```
 
   重新编译并执行检测：

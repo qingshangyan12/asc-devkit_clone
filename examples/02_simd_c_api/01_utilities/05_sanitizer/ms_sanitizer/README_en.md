@@ -134,13 +134,15 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
 
 - **Uninitialized Access Detection**
 
-  Uninitialized access detection is used to locate anomalies caused by reading uninitialized values after memory allocation. Users can comment out `zGm.SetGlobalBuffer` to reproduce this scenario. The device-side `zGm` is not initialized before use, thus triggering uninitialized access detection.
+  Uninitialized access detection locates errors caused by using an uninitialized pointer. Replace the initialized declaration of `z_gm` with an uninitialized declaration to reproduce this scenario: the device-side `z_gm` is used before it is assigned.
 
   Notice: Pass `--tool=initcheck` when calling `mssanitizer` to enable uninitialized access detection.
 
   ```cpp
-  // Correctly initialize zGm. Remove this line to trigger uninitialized access detection.
-  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+  // Correctly initialize the output address:
+  __gm__ float* z_gm = z + block_idx * BLOCK_LENGTH;
+  // Incorrect example: replace the declaration above with this uninitialized pointer.
+  // __gm__ float* z_gm;
   ```
 
   Rebuild and run detection:
