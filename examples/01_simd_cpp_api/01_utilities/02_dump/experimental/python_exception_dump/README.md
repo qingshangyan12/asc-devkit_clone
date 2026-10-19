@@ -60,9 +60,7 @@
 
 - 安装前置依赖
 
-  ```bash
-  pip3 install ascend_ops    # demo调用的IFA算子所在pip包
-  ```
+  demo 调用的 IFA 算子由 `ascend_ops` 包提供。该包未发布到公共 pip 索引，无法通过 `pip3 install ascend_ops` 直接安装，请按环境实际获取（如取得离线 whl 后执行 `pip3 install ./ascend_ops-<版本>-py3-none-<平台>.whl`）。
 
 - 配置环境变量
 
