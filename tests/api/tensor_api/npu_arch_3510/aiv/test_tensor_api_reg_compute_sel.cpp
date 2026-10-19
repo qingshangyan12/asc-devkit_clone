@@ -91,15 +91,9 @@ void compress_stub(
 
 class AivCoreTypeGuard {
 public:
-    AivCoreTypeGuard() : previous_core_type(g_coreType)
-    {
-        g_coreType = AscendC::AIV_TYPE;
-    }
+    AivCoreTypeGuard() : previous_core_type(g_coreType) { g_coreType = AscendC::AIV_TYPE; }
 
-    ~AivCoreTypeGuard()
-    {
-        g_coreType = previous_core_type;
-    }
+    ~AivCoreTypeGuard() { g_coreType = previous_core_type; }
 
 private:
     int32_t previous_core_type;
