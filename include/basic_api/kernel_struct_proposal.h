@@ -26,8 +26,6 @@
 #define ASCENDC_MODULE_STRUCT_PROPOSAL_H
 
 #include "../../impl/basic_api/utils/kernel_utils_constants.h"
-#include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -78,7 +76,13 @@ struct MrgSortSrcList {
     Source3 src3;
     Source4 src4;
 };
+} // namespace AscendC
 
+// CPU_DEBUG tensor checks require the proposal types to be declared first.
+#include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+
+namespace AscendC {
 template <typename Source1, typename Source2, typename Source3, typename Source4>
 __aicore__ MrgSortSrcList(Source1, Source2, Source3, Source4)
     -> MrgSortSrcList<typename VectorOperand::Traits<Source1>::Element, Source1, Source2, Source3, Source4>;
