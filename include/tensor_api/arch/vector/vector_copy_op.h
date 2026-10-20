@@ -25,6 +25,12 @@
 namespace asc {
 namespace te {
 
+namespace detail {
+template <typename T>
+inline constexpr bool is_gm_to_ub_pad_type = Std::is_one_of_v<
+    T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+} // namespace detail
+
 struct gm_to_ub_params {
     __aicore__ constexpr gm_to_ub_params() {}
 
@@ -38,6 +44,21 @@ struct gm_to_ub_params {
     uint8_t left_padding_count = 0;
     uint8_t right_padding_count = 0;
     bool enable_constant_pad = true;
+};
+
+template <typename PadType>
+struct gm_to_ub_params_with : gm_to_ub_params {
+    __aicore__ constexpr gm_to_ub_params_with(
+        uint8_t left_padding_count, uint8_t right_padding_count, bool enable_constant_pad, PadType pad_value)
+        : gm_to_ub_params(left_padding_count, right_padding_count, enable_constant_pad), pad_value(pad_value)
+    {
+        static_assert(
+            detail::is_gm_to_ub_pad_type<PadType>,
+            "GM-to-UB constant pad value only supports int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, "
+            "int32_t, uint32_t, and float");
+    }
+
+    PadType pad_value = {};
 };
 
 struct copy_gm_to_ub {
