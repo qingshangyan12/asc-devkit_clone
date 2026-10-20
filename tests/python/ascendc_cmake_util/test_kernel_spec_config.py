@@ -42,44 +42,26 @@ def test_scoped_ordinary_device_options_are_unchanged(tmp_path):
     assert (tmp_path / "custom_opc_options.ini").read_text() == "AddCustom@ascend910b@--op_debug_config=dump_cce\n"
 
 
-def test_cmake_package_rejects_invalid_kernel_spec_mode(tmp_path):
+@pytest.mark.parametrize("mode", ["Normal", "Invalid"])
+def test_cmake_package_kernel_spec_mode(tmp_path, mode):
     func_cmake = REPO_ROOT / "cmake/asc/fwk_modules/func.cmake"
-    project = tmp_path / "CMakeLists.txt"
-    project.write_text(
+    (tmp_path / "CMakeLists.txt").write_text(
         f"""cmake_minimum_required(VERSION 3.16)
 project(kernel_spec_config NONE)
-include(\"{func_cmake}\")
-npu_op_package(demo TYPE RUN CONFIG KERNEL_SPEC_MODE Invalid)
-""",
-        encoding="utf-8",
-    )
-
-    result = subprocess.run(
-        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "build")], text=True, capture_output=True, check=False
-    )
-
-    assert result.returncode != 0
-    assert "KERNEL_SPEC_MODE must be None, Normal or SK" in result.stderr
-
-
-def test_cmake_package_stores_kernel_spec_mode(tmp_path):
-    func_cmake = REPO_ROOT / "cmake/asc/fwk_modules/func.cmake"
-    project = tmp_path / "CMakeLists.txt"
-    project.write_text(
-        f"""cmake_minimum_required(VERSION 3.16)
-project(kernel_spec_config NONE)
-include(\"{func_cmake}\")
-npu_op_package(demo TYPE RUN CONFIG KERNEL_SPEC_MODE Normal)
+include("{func_cmake}")
+npu_op_package(demo TYPE RUN CONFIG KERNEL_SPEC_MODE {mode})
 get_property(mode GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_MODE)
-if(NOT mode STREQUAL \"Normal\")
-    message(FATAL_ERROR \"unexpected Kernel Spec mode: ${{mode}}\")
+if(NOT mode STREQUAL "{mode}")
+    message(FATAL_ERROR "unexpected Kernel Spec mode: ${{mode}}")
 endif()
 """,
         encoding="utf-8",
     )
-
     result = subprocess.run(
-        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "build")], text=True, capture_output=True, check=False
+        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "build")], text=True, capture_output=True
     )
-
-    assert result.returncode == 0, result.stdout + result.stderr
+    if mode == "Invalid":
+        assert result.returncode != 0
+        assert "KERNEL_SPEC_MODE must be None, Normal or SK" in result.stderr
+    else:
+        assert result.returncode == 0, result.stdout + result.stderr
