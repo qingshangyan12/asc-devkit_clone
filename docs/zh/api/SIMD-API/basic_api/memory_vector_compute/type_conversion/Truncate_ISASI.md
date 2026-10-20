@@ -23,6 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="x90" id11 -->
+- Kirin X90处理器系列产品：支持
+<!-- end id11 -->
+<!-- npu="9020" id12 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id12 -->
+<!-- npu="9030" id13 -->
+- Kirin 9030处理器系列产品：支持
+<!-- end id13 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Truncate_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -61,6 +70,9 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
 <!-- npu="950" id8 -->
 - 针对Ascend 950PR&950DT系列产品，T支持的数据类型为：half、float、bfloat16_t。
 <!-- end id8 -->
+<!-- npu="x90,9020,9030" id10 -->
+针对Kirin X90处理器系列产品、Kirin 9020处理器系列产品和Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id10 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

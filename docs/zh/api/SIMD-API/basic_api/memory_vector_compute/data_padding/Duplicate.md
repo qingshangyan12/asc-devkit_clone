@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id27 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id27 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -128,11 +131,14 @@ def Duplicate(scalarValue, dst, count):
 - 针对Atlas训练系列产品，T支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id17 -->
 <!-- npu="x90" id18 -->
-- 针对Kirin X90处理器系列产品，T支持的数据类型为：half。
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id18 -->
 <!-- npu="9030" id19 -->
-- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half。
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id19 -->
+<!-- npu="9020" id28 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id28 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>	 
 

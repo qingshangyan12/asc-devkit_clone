@@ -27,8 +27,11 @@
 - Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin 9020处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id24 -->
+- Kirin 9030处理器系列产品：支持
+<!-- end id24 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Cast_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -348,6 +351,34 @@ enum class RoundMode {
 | bfloat16_t | float | CAST_NONE |
 
 <!-- end id17 -->
+
+<!-- npu="9020" id25 -->
+**表**  Kirin 9020处理器系列产品支持的数据类型组合情况
+
+| src数据类型 | dst数据类型 | 支持的roundMode |
+| :---------- | :---------- | :-------------- |
+**表**  Kirin 9020处理器系列产品支持的数据类型组合情况
+
+| src数据类型 | dst数据类型 | 支持的roundMode |
+| :---------- | :---------- | :-------------- |
+| int8_t | half | CAST_NONE |
+| uint8_t | half | CAST_NONE |
+| int16_t | half | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| int16_t | float | CAST_NONE |
+| uint16_t | uint8_t | CAST_NONE |
+| half | int8_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| half | uint8_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| half | int16_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| half | int32_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| half | float | CAST_NONE |
+| int32_t | int16_t | CAST_NONE |
+| int32_t | half | roundMode不生效，与[SetDeqScale(half scale)](../type_conversion_aux_config/SetDeqScale.md)接口配合使用。 |
+| int32_t | float | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| float | int16_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| float | half | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| float | int32_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+| float | float | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id25 -->
 
 ## 返回值说明
 
