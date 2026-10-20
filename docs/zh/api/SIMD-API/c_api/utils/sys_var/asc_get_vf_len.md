@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/utils/sys_var.h"`。
 
-获取当前芯片的矢量寄存器位宽VL（[Vector Length](../../defs/type/data_type_definition.md)），即矢量计算单元单次Repeat可处理的元素个数。VL是Reg矢量计算循环每轮消耗的元素数量，常用于推导mask长度、循环次数、单次搬运元素数等参数。本接口在AIC与AIV上均可调用，返回值含义一致。
+此接口获取当前芯片的矢量寄存器位宽VL（[Vector Length](../../defs/type/data_type_definition.md)），单位为字节。常用于 `asc_get_vf_len() / sizeof(dtype)`的方式推导循环次数、单次搬运元素数等参数（`dtype`表示数据类型）。本接口在AIC与AIV上均可调用，返回值含义一致。
 
 ## 函数原型
 
@@ -42,7 +42,7 @@ __aicore__ inline constexpr int64_t asc_get_vf_len()
 
 ## 返回值说明
 
-位宽VL（Vector Length）的大小。
+位宽VL（Vector Length）的大小，单位为字节。
 
 ## 流水类型
 
