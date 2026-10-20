@@ -2,10 +2,10 @@
 
 ## 概述
 
-本样例是[Lambda捕获样例（SIMT编程）](../../../03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)在**SIMD与SIMT混合编程**下的对照实现：同一组算子——LeakyReLU-Affine融合算子（`y = scale * leaky_relu(x, alpha) + bias`，同遍历统计负数个数）与Clamp算子（`y = clamp(x, lo, hi)`）——在SIMD与SIMT混合编程下按各执行上下文的Lambda标记规则实现，展示Lambda捕获在SIMD与SIMT混合编程算子开发中的实际编程作用：
+本样例是[Lambda捕获样例（SIMT编程）](../../../03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)在**SIMD与SIMT混合编程**下的对照实现：同一组算子，即LeakyReLU-Affine融合算子（`y = scale * leaky_relu(x, alpha) + bias`，同遍历统计负数个数）与Clamp算子（`y = clamp(x, lo, hi)`），在SIMD与SIMT混合编程下按各执行上下文的Lambda标记规则实现，展示Lambda捕获在SIMD与SIMT混合编程算子开发中的实际编程作用：
 
 1. **SIMT VF内Lambda标记`__simt_callee__`**：值捕获LeakyReLU斜率与仿射系数完成"激活→仿射"融合；引用捕获线程私有负数计数器完成同遍历统计，每线程计数经`asc_atomic_add`原子累加为本核计数。
-2. **SIMD VF内Lambda标记`__simd_callee__`**：值捕获Clamp上下界参与边界计算，标量结果在矢量循环前算好（`asc_duplicate_scalar`生成上下界矢量寄存器），再以`asc_min`与`asc_max`矢量intrinsics完成连续向量裁剪——“Lambda标量逻辑与矢量intrinsics结合”的标准数据流。
+2. **SIMD VF内Lambda标记`__simd_callee__`**：值捕获Clamp上下界参与边界计算，标量结果在矢量循环前算好（`asc_duplicate_scalar`生成上下界矢量寄存器），再以`asc_min`与`asc_max`矢量intrinsics完成连续向量裁剪，这是“Lambda标量逻辑与矢量intrinsics结合”的标准数据流。
 3. **核函数体内Lambda标记`__aicore__`**（`__global__ __vector__`的SIMD侧scalar代码）：按核号计算本核数据分片，供SIMT VF与SIMD VF复用。
 4. **策略与框架分离**：SIMT VF内的通用`elementwise_simt`框架（`__simt_callee__`模板函数）只负责线程保护与逐元素分发，融合闭包经模板形参注入。
 
@@ -58,7 +58,7 @@ elementwise_simt(fused, output, v);          // 闭包经模板形参注入框�
 asc_atomic_add(neg_count, neg_local);        // 线程计数原子合并为本核计数
 ```
 
-**SIMD VF内的标量与矢量数据流**：callee-Lambda的标量结果参与矢量计算时，在矢量循环前计算并作为操作数进入——本样例上下界经`asc_duplicate_scalar`广播为矢量寄存器后，`asc_min`与`asc_max`在寄存器级完成裁剪。
+**SIMD VF内的标量与矢量数据流**：callee-Lambda的标量结果参与矢量计算时，在矢量循环前计算并作为操作数进入，比如本样例的上下界经`asc_duplicate_scalar`广播为矢量寄存器后，`asc_min`与`asc_max`在寄存器级完成裁剪。
 
 **流水同步**：SIMT VF与SIMD VF写UB后`asc_copy_ub2gm_align`搬出前，需`asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)`与`asc_sync_wait(...)`同步Vector计算流水和MTE3搬出流水。
 

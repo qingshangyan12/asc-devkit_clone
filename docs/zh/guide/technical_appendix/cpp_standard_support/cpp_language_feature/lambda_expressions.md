@@ -65,7 +65,7 @@ SIMD与SIMT混合编程场景下，Device侧定义的Lambda表达式**必须显�
 | `__simd_vf__`函数体内 | `__simd_callee__` | 与所在VF函数的callee标记一致。 |
 | `__simt_callee__`、`__simd_callee__`、`__aicore__`辅助函数体内 | 与宿主函数一致的`__simt_callee__`、`__simd_callee__`、`__aicore__` | SIMD与SIMT混合编程中`__aicore__`辅助函数内的lambda需标记`__aicore__`。 |
 | SIMD与SIMT混合编程核函数体内，即`__global__`函数的SIMD侧scalar代码 | `__aicore__` | 未标记会触发编译报错。 |
-| `__callee__`函数体内 | `__callee__` | —— |
+| `__callee__`函数体内 | `__callee__` | 与宿主函数的callee标记一致。 |
 
 标记位置在Lambda的参数列表之后：
 

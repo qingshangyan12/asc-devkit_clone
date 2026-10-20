@@ -4,15 +4,15 @@
 
 This sample answers one question: **what practical problems Lambda capturing actually solves in real operator development**; for the hybrid programming counterpart implementation (including the Lambda marking rules), see the [lambda_operator_hybrid](../../../../05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README_en.md) sample.
 
-Using two simple operators as the carrier — a LeakyReLU-Affine fused operator (`y = scale * leaky_relu(x, alpha) + bias`) and a Clamp operator (`y = clamp(x, lo, hi)`) — this sample demonstrates four practical uses of Lambda capturing external parameters inside a pure SIMT kernel:
+Using two simple operators as the carrier, a LeakyReLU-Affine fused operator (`y = scale * leaky_relu(x, alpha) + bias`) and a Clamp operator (`y = clamp(x, lo, hi)`), this sample demonstrates four practical uses of Lambda capturing external parameters inside a pure SIMT kernel:
 
-1. **Capture-by-value carries operator hyperparameters**: hyperparameters such as `alpha/scale/bias/lo/hi` are passed in as kernel arguments and then **captured by value** (copied into the closure) by in-kernel Lambdas. The generic framework function `elementwise_transform` does not carry any operator parameter in its signature — it only handles thread mapping. Adding a new operator requires no extra parameters and produces no long parameter chains.
-2. **Capture-by-reference accumulates statistics**: the negative-value counter `negCount` is updated in place by the statistics Lambda via **capture by reference** — "transform and tally" in a single pass, with the statistics result going straight into a thread-private variable without passing through parameters or return values.
+1. **Capture-by-value carries operator hyperparameters**: hyperparameters such as `alpha/scale/bias/lo/hi` are passed in as kernel arguments and then **captured by value** (copied into the closure) by in-kernel Lambdas. The generic framework function `elementwise_transform` does not carry any operator parameter in its signature; it only handles thread mapping. Adding a new operator requires no extra parameters and produces no long parameter chains.
+2. **Capture-by-reference accumulates statistics**: the negative-value counter `negCount` is updated in place by the statistics Lambda via **capture by reference**, so "transform and tally" is done in a single pass, with the statistics result going straight into a thread-private variable without passing through parameters or return values.
 3. **Closure composition expresses a fused operator**: the outer `fused` Lambda captures the three closures `leaky/affine/tally` by reference, composing "tally → activation → affine" into a single-pass fused operator, with no separate multiply-add expansion needed for the fusion.
-4. **Separation of policy and framework**: `elementwise_transform` is written once; injecting the LeakyReLU-Affine Lambda yields the fused operator, and injecting the Clamp Lambda yields the clipping operator — policy (Lambda) and execution framework (template function) are orthogonal.
+4. **Separation of policy and framework**: `elementwise_transform` is written once; injecting the LeakyReLU-Affine Lambda yields the fused operator, and injecting the Clamp Lambda yields the clipping operator, which keeps policy (Lambda) and execution framework (template function) orthogonal.
 
 > [!NOTE]
-> An Ascend C Lambda is a Device-side local closure: kernel arguments support only basic types, PODs, and pointers, so **a Lambda cannot be passed into a kernel from the Host side** (there is no equivalent of CUDA's `--extended-lambda`). The standard pattern is therefore: **pass hyperparameters into the kernel as plain scalars, and define Lambdas inside the kernel to capture and consume them** — this sample is organized exactly that way. In pure SIMT scenarios, in-kernel Lambdas neither need nor can carry callee attributes; in hybrid programming scenarios they must be marked with `__simt_callee__`/`__simd_callee__`/`__aicore__` according to the execution context. For details, see the [Lambda Expressions](../../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md) documentation and the hybrid programming counterpart sample.
+> An Ascend C Lambda is a Device-side local closure: kernel arguments support only basic types, PODs, and pointers, so **a Lambda cannot be passed into a kernel from the Host side** (there is no equivalent of CUDA's `--extended-lambda`). The standard pattern is therefore: **pass hyperparameters into the kernel as plain scalars, and define Lambdas inside the kernel to capture and consume them**; this sample is organized exactly that way. In pure SIMT scenarios, in-kernel Lambdas neither need nor can carry callee attributes; in hybrid programming scenarios they must be marked with `__simt_callee__`/`__simd_callee__`/`__aicore__` according to the execution context. For details, see the [Lambda Expressions](../../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md) documentation and the hybrid programming counterpart sample.
 
 ## Supported Products and CANN Software Versions
 
@@ -45,7 +45,7 @@ The Host recomputes the expected values with the same formulas and the same thre
 
 ### Key Code Explanation
 
-**Generic element-wise framework (Device-side template function)** — its signature carries no operator parameter:
+**Generic element-wise framework (Device-side template function)**: its signature carries no operator parameter. For example:
 
 ```cpp
 template <typename Op>
@@ -59,7 +59,7 @@ __aicore__ inline void elementwise_transform(Op op, const float* input, float* o
 }
 ```
 
-**Constructing closures inside the kernel** — capture hyperparameters by value, capture statistics state by reference, compose closures:
+**Constructing closures inside the kernel**: capture hyperparameters by value, capture statistics state by reference, and compose closures. For example:
 
 ```cpp
 auto leaky  = [alpha](float v) { return v > 0.0f ? v : alpha * v; };   // capture hyperparameters by value
