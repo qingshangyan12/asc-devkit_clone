@@ -66,6 +66,8 @@ HcclResult InheritKfcServerKernelArg(
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAllReduce =
         srcName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+    const bool isHalfAlltoAllV =
+        srcName == "CcuKernelHalfAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
     const CcuVersion ccuVersion = GetCcuVersion();
     if (isAllGatherNhr) {
         const auto* srcArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(srcKernel.kernelArg);
@@ -135,12 +137,13 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (
         isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce ||
-        (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)) {
+        isHalfAlltoAllV || (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
+        kfcArg->localWinAddr = srcKernel.localWinAddr;
     } else {
         HCCL_WARNING(
             "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
@@ -176,11 +179,10 @@ HcclResult CcuTempKfcServer::CalcRes(
     HCCL_INFO("[CcuTempKfcServer::CalcRes start]");
     if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
         param.opType != HcclCMDType::HCCL_CMD_ALLTOALL && param.opType != HcclCMDType::HCCL_CMD_ALLTOALLV &&
-        param.opType != HcclCMDType::HCCL_CMD_ALLREDUCE) {
+        param.opType != HcclCMDType::HCCL_CMD_ALLREDUCE && param.opType != HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
         return HCCL_E_NOT_SUPPORT;
     }
-    // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.notifyNumPerThread.clear();
     HCCL_DEBUG(
@@ -256,6 +258,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuAllToAllMesh1DMultiJettyKernel" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
         const bool isAllReduce =
             sourceName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+        const bool isHalfAlltoAllV =
+            sourceName == "CcuKernelHalfAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
         const bool roleMatches = missionNum == 1U ||
                                  (missionIndex == 0U && (isAllGather || isAllGatherKfc || isReduceScatter)) ||
                                  (missionIndex == 1U && (isAllGatherNhr || isReduceScatterNhr)) ||
@@ -263,7 +267,7 @@ HcclResult CcuTempKfcServer::CalcRes(
                                  isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die);
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
-             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr) ||
+             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr && !isHalfAlltoAllV) ||
             !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",

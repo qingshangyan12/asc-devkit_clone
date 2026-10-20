@@ -40,6 +40,8 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
+    // 仅HALF_ALLTOALLV使用，见CcuKernelInfo::localWinAddr
+    uint64_t localWinAddr = 0;
 };
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
