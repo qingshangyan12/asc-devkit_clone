@@ -260,7 +260,7 @@ def _gen_usr_workspace_codes():
     workspace_ptr = "AscendC::GetUserWorkspace(workspace)"
     if CommonUtility.is_support_workspace_offset():
         workspace_ptr = "workspace + AscendC::RESERVED_WORKSPACE"
-        if CommonUtility.is_c310():
+        if CommonUtility.is_c310() or CommonUtility.is_920r1():
             return (
                 "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
                 "    GM_ADDR usrWorkspace = workspace;\n"
