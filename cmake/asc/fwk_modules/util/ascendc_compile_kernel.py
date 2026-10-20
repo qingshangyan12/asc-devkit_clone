@@ -15,12 +15,23 @@ import glob
 import configparser
 import shutil
 import argparse
+import json
+from pathlib import Path
+import subprocess
 import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
-from ascendc_build_kernel_spec import KernelSpecBuildDirectory, task_directory
+from ascendc_build_kernel_spec import kernel_spec_current_directory, task_directory
 from opdesc_parser import _trans_soc_ver_to_short
+
+
+def record_kernel_spec_result(directory, source, status, reason=""):
+    directory.mkdir(parents=True, exist_ok=True)
+    result = directory / ".producer-result.json"
+    temporary = result.with_suffix(".tmp")
+    temporary.write_text(json.dumps({"status": status, "source": source, "reason": reason}), encoding="utf-8")
+    os.replace(temporary, result)
 
 
 class CompileKernel:
@@ -29,7 +40,7 @@ class CompileKernel:
         self.kernel_spec_mode = getattr(args, "kernel_spec_mode", "None")
         self.kernel_spec_dir = getattr(args, "kernel_spec_dir", None)
         if self.kernel_spec_mode != "None" and getattr(args, "kernel_spec_build", None):
-            self.kernel_spec_dir = str(KernelSpecBuildDirectory(args.kernel_spec_build).current_directory)
+            self.kernel_spec_dir = str(kernel_spec_current_directory(args.kernel_spec_build))
         self.op_cpp_file = os.path.realpath(args.src_file)
         self.impl_path = os.path.dirname(self.op_cpp_file)
         self.op_soc_ver = args.compute_unit
@@ -200,18 +211,40 @@ class CompileKernel:
             )
         else:
             cmd_str = "export HI_PYTHON=python3 && export ASCEND_CUSTOM_OPP_PATH={} && make -f {} PY={} OUT={} CPP={}"
-        if os.system(cmd_str.format(self.build_opp_path, mkfile, self.op_impl_py, op_bin_dir, self.op_cpp_file)) != 0:
+        command = cmd_str.format(self.build_opp_path, mkfile, self.op_impl_py, op_bin_dir, self.op_cpp_file)
+        if self.kernel_spec_mode == "None":
+            returncode = os.system(command)
+        else:
+            result = subprocess.run(
+                command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=False
+            )
+            print(result.stdout, end="", flush=True)
+            returncode = result.returncode
+            if returncode == 0:
+                expected = sum("--kernel-spec=" in Path(script).read_text() for script in self.compile_sh)
+                outcomes = [
+                    line[len(const_var.KERNEL_SPEC_RESULT_PREFIX) :]
+                    for line in result.stdout.splitlines()
+                    if line.startswith(const_var.KERNEL_SPEC_RESULT_PREFIX)
+                ]
+                if (
+                    not expected
+                    or len(outcomes) != expected
+                    or any(value not in {"completed", "filtered"} for value in outcomes)
+                ):
+                    raise RuntimeError("Kernel Spec compile variants did not report complete results")
+                self.kernel_spec_status = "completed" if "completed" in outcomes else "filtered"
+        if returncode != 0:
             raise RuntimeError(
                 "Kernel Compilation Error: OpType {} Kernel File {}!".format(self.op_type, self.op_cpp_file)
             )
 
-    def record_kernel_spec_success(self):
-        """Tell the package build that this producer completed, including its source selection."""
+    def record_kernel_spec_result(self, status, reason=""):
+        """Publish this producer's result and source selection in one record."""
         if self.kernel_spec_mode == "None":
             return
         directory = task_directory(self.kernel_spec_dir, self.op_type, self.op_soc_ver)
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / ".producer-success").write_text(self.op_cpp_file, encoding="utf-8")
+        record_kernel_spec_result(directory, self.op_cpp_file, status, reason)
 
 
 def args_parse():
@@ -241,18 +274,35 @@ def args_parse():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = args_parse()
-    kernel_builder = CompileKernel(args)
-    kernel_builder.clean()
-    if args.enable_binary == "False":
-        kernel_builder.ascendc_gen_impl()
+    kernel_builder = None
+    try:
+        kernel_builder = CompileKernel(args)
         kernel_builder.clean()
-    else:
         kernel_builder.ascendc_gen_impl()
-        kernel_builder.ascendc_gen_param()
-        kernel_builder.ascendc_put_json()
-        kernel_builder.ascendc_put_tiling()
-        kernel_builder.ascendc_build()
+        if args.enable_binary != "False":
+            kernel_builder.ascendc_gen_param()
+            kernel_builder.ascendc_put_json()
+            kernel_builder.ascendc_put_tiling()
+            kernel_builder.ascendc_build()
+            status = getattr(kernel_builder, "kernel_spec_status", "completed")
+            kernel_builder.record_kernel_spec_result(status, "all tiling keys filtered" if status == "filtered" else "")
         kernel_builder.clean()
-        kernel_builder.record_kernel_spec_success()
+    except Exception as error:
+        if kernel_builder is not None:
+            kernel_builder.record_kernel_spec_result("failed", str(error))
+        elif args.kernel_spec_mode != "None":
+            root = (
+                kernel_spec_current_directory(args.kernel_spec_build)
+                if args.kernel_spec_build
+                else args.kernel_spec_dir
+            )
+            record_kernel_spec_result(
+                task_directory(str(root), args.op_type, args.compute_unit), args.src_file, "failed", str(error)
+            )
+        raise
+
+
+if __name__ == "__main__":
+    main()
