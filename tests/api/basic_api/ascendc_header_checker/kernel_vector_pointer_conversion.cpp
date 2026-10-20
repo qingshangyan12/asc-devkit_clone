@@ -4386,12 +4386,15 @@ __aicore__ void CheckSortPointers(
 
 #include "basic_api/kernel_operator_mm_intf.h"
 #if __NPU_ARCH__ == 3510
+// The raw L1 Fill overload is only available in device compilation.
+#if !defined(ASCENDC_CPU_DEBUG)
 __aicore__ void CheckFillPointer(__cbuf__ half* dst)
 {
     InitConstValueParams<half> params{};
     Fill(dst, params);
     Fill<half, half>(dst, params);
 }
+#endif
 __aicore__ void CheckTransposeAddressPointers(
     LocalTensor<uint64_t>& dst, LocalTensor<uint64_t>& src, const TransDataTo5HDParams& params)
 {
