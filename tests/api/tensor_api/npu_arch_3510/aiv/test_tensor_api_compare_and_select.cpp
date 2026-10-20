@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 #include "tensor_api/tensor.h"
 
 class tensor_api_vector_compare_and_select_3510 : public testing::Test {};

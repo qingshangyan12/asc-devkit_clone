@@ -80,7 +80,7 @@ storer.flush(dst_stream, static_cast<int32_t>(repeat_time * elements_per_registe
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   ./demo
   ```
@@ -90,7 +90,7 @@ storer.flush(dst_stream, static_cast<int32_t>(repeat_time * elements_per_registe
   使用 NPU 仿真时，增加 `-DCMAKE_ASC_RUN_MODE=sim` 编译选项：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   ./demo
   ```
@@ -105,7 +105,6 @@ storer.flush(dst_stream, static_cast<int32_t>(repeat_time * elements_per_registe
 | --- | --- | --- |
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | NPU 运行或 NPU 仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | 对应 Ascend 950PR/Ascend 950DT |
-| `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性 ASC 接口 |
 | `SCENARIO_NUM` | `1`（默认）、`2` | 非对齐复制或 datablock 最大值归约 |
 
 - 执行结果

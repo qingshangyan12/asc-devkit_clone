@@ -81,7 +81,7 @@ dst[i] = src[index[i]], 0 <= i < 128
 
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py
   ./demo
@@ -95,7 +95,6 @@ dst[i] = src[index[i]], 0 <= i < 128
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，本样例仅支持 `dav-3510`。 |
-  | `CANN_ASC_USE_EXPERIMENTAL` | 实验性ASC接口开关，本样例必须设为 `ON`。 |
 
 - 执行结果
 

@@ -56,7 +56,7 @@ data_reorder
   在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # 编译工程（默认npu模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试真值数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
@@ -65,7 +65,7 @@ data_reorder
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -76,7 +76,6 @@ data_reorder
 | ---------------------------| -----------------------------| ---------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真　　　　　　　|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
 
