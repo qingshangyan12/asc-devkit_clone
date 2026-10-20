@@ -23,6 +23,10 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/cube_copy_op.h"
 #include "tensor_api/arch/vector/vector_copy_op.h"
+#include "tensor_api/arch/sync/block_sync.h"
+#include "tensor_api/arch/sync/mutex.h"
+#include "tensor_api/arch/atomic/dma_atomic.h"
+#include "tensor_api/arch/cube/fill.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 

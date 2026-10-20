@@ -31,10 +31,10 @@ namespace te {
 
 class copy_gm_to_ub_common {
 protected:
-    template <typename DstTensor, typename SrcTensor>
+    template <typename Params, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void emit_copy(
         const DstTensor& dst, const SrcTensor& src, uint16_t block_count, uint32_t block_len, int64_t src_stride,
-        int64_t dst_stride, const gm_to_ub_params& params)
+        int64_t dst_stride, const Params& params)
     {
         using src_type = typename SrcTensor::element_type;
         using dst_type = typename DstTensor::element_type;
@@ -44,13 +44,13 @@ protected:
         auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_ub_instr::data_copy(
             dst.data().get(), src.data().get(), block_count, block_len, params.left_padding_count,
-            params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride, dst_stride);
+            params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride, dst_stride, params);
     }
 
-    template <typename T, typename U, typename DstOffset, typename SrcOffset>
+    template <typename Params, typename T, typename U, typename DstOffset, typename SrcOffset>
     __aicore__ inline static void emit_copy(
         const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, uint16_t block_count,
-        uint32_t block_len, int64_t src_stride, int64_t dst_stride, const gm_to_ub_params& params)
+        uint32_t block_len, int64_t src_stride, int64_t dst_stride, const Params& params)
     {
         using src_type = typename U::element_type;
         using dst_type = typename T::element_type;
@@ -59,7 +59,7 @@ protected:
         copy_gm_to_ub_instr::data_copy(
             (dst.data() + dst_offset).get(), (src.data() + src_offset).get(), block_count, block_len,
             params.left_padding_count, params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride,
-            dst_stride);
+            dst_stride, params);
     }
 };
 
