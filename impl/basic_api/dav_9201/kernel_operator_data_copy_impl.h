@@ -654,7 +654,6 @@ __aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopPara
         uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21;
         loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);
 
-
         ASCENDC_ASSERT((loopParams.loop1DstStride % GetDataBlockSizeInBytes() == 0), {
             KERNEL_LOG(KERNEL_ERROR, "loop1DstStride must be 32B aligned");
         });

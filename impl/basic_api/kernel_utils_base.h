@@ -32,8 +32,8 @@
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #include "c_api/utils/sys_init.h"
 #endif
 
@@ -75,9 +75,9 @@ public:
         Internal::g_deqValue = static_cast<half>(1);
 #endif
 #else
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 5165 || \
-                              __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+     __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #else
         set_atomic_none();
 #endif
