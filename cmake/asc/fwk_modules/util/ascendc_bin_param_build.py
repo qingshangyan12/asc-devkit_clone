@@ -19,6 +19,7 @@ import re
 import copy
 import shlex
 from collections import defaultdict
+from pathlib import Path
 from typing import Set, NamedTuple
 
 import const_var
@@ -428,12 +429,14 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             if enable_tiling_keys:
                 check_result += '    if [ "${opc_status}" -eq 1 ] && echo "${res}" | '
                 check_result += 'grep -q "None of the given tiling keys are in the supported list"; then\n'
+                check_result += f'        echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}filtered"\n'
                 check_result += "        exit 0\n"
                 check_result += "    fi\n"
             check_result += '    exit "${opc_status}"\n'
             check_result += "fi\n"
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".json")
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".o")
+            check_result += f'echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}completed"\n'
             return check_result
         if enable_tiling_keys is False:
             check_result += 'echo "${res}"\n'
@@ -466,8 +469,8 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         compile_file = os.path.join(self.out_path, "-".join(name_com) + ".sh")
         compile_file = os.path.realpath(compile_file)
 
-        bin_cmd_str = "res=$(asc_opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
-                --output=$2 --impl_mode={impl} --op_mode=dynamic "
+        bin_cmd_str = 'res=$(asc_opc "$1" --main_func={fun} --input_param={param} --soc_version={soc} \
+                --output="$2" --impl_mode={impl} --op_mode=dynamic '
 
         build_cmd_var = "#!/bin/bash\n"
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} ..."\n'
@@ -478,6 +481,10 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         if plog_stdout is None:
             build_cmd_var += const_var.SET_PLOG_STDOUT
         build_cmd_var += const_var.SRC_ENV
+        if self.kernel_spec_options and not super_mode:
+            directory = getattr(self, "kernel_spec_directory", None)
+            if directory is not None:
+                build_cmd_var += "rm -rf -- " + shlex.quote(str(directory / bin_file)) + " || exit $?\n"
         if hard_soc == "Ascend610Lite":
             build_cmd_var += f"export ASCEND_CUSTOM_OPP_PATH={auto_gen_path}:$ASCEND_CUSTOM_OPP_PATH \n"
         build_cmd_var += bin_cmd_str.format(
@@ -520,8 +527,9 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         build_cmd_var += check_result
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} Done"\n'
 
-        with os.fdopen(os.open(compile_file, const_var.WFLAGS, const_var.WMODES), "w") as fd:
-            fd.write(build_cmd_var)
+        if not os.path.isfile(compile_file) or Path(compile_file).read_text() != build_cmd_var:
+            with os.fdopen(os.open(compile_file, const_var.WFLAGS, const_var.WMODES), "w") as fd:
+                fd.write(build_cmd_var)
 
 
 def get_tiling_keys(tiling_keys: str) -> Set:
@@ -738,6 +746,8 @@ def gen_bin_param_file(
         op_desc.kernel_spec_options = ""
         if kernel_spec_mode != "None":
             directory = task_directory(kernel_spec_dir, op_desc.op_type, soc)
+            directory.mkdir(parents=True, exist_ok=True)
+            op_desc.kernel_spec_directory = directory
             op_desc.kernel_spec_options = " " + shlex.join(
                 ["--kernel-spec=" + kernel_spec_mode, "--kernel-spec-dir=" + str(directory)]
             )
@@ -786,6 +796,8 @@ def parse_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("argv", nargs="+")
     parser.add_argument("--opc-config-file", nargs="?", const="", default="")
+    parser.add_argument("--kernel-spec-mode", "--kernel-spec", choices=("None", "Normal", "SK"), default="None")
+    parser.add_argument("--kernel-spec-dir")
     return parser.parse_args(argv)
 
 
@@ -793,4 +805,11 @@ if __name__ == "__main__":
     args = parse_args(sys.argv)
     if len(args.argv) <= 3:
         raise RuntimeError("arguments must greater than 3")
-    gen_bin_param_file(args.argv[1], args.argv[2], args.argv[3], opc_config_file=args.opc_config_file)
+    gen_bin_param_file(
+        args.argv[1],
+        args.argv[2],
+        args.argv[3],
+        opc_config_file=args.opc_config_file,
+        kernel_spec_mode=args.kernel_spec_mode,
+        kernel_spec_dir=args.kernel_spec_dir,
+    )
