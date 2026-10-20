@@ -209,7 +209,7 @@ if(PRODUCT_SIDE STREQUAL "device")
     target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
         # TODO(T1临接): device 侧编译与 mc2_client 相同的已切 asccomm 源文件，需同款头路径（交叉校验 Blocker-1 修复）
-        $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
+        ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm
     )
 
     target_compile_options(mc2_server PRIVATE
@@ -273,7 +273,7 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
     target_include_directories(mc2_client PRIVATE
         ${INCLUDE_LIST}
         # TODO(T1临接): 正式依赖治理走 FetchContent TAG_ID bump（Q12），此路径穿刺期联调用
-        $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
+        ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm
     )
 
     target_compile_definitions(mc2_client PRIVATE
