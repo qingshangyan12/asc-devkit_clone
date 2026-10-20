@@ -15,8 +15,7 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
+- Atlas推理系列产品：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
 - Atlas训练系列产品：不支持
