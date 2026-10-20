@@ -240,6 +240,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | float | uint32_t | float |
 
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask_res.md#id2 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -267,6 +268,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
   - 内置固定模式占用8KB UB临时空间。
   - 用户自定义模式不涉及8KB UB临时空间的占用。
 <!-- end id26 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

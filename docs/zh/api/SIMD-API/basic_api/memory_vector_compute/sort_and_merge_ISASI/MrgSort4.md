@@ -165,6 +165,7 @@ __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 -   不支持源操作数与目的操作数之间存在地址重叠。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort4_res.md#id2 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
