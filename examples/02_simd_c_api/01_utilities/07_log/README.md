@@ -15,7 +15,7 @@
 ## 目录结构介绍
 
 ```
-├── 09_log
+├── 07_log
 │   ├── CMakeLists.txt          // cmake编译文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── log.asc                 // Ascend C Kernel示例代码
@@ -126,12 +126,12 @@
   ```bash
   [INFO] Matrix shape: M=256, K=64, N=256
   [INFO] Launching kernel with assert(M < 100)...
-  Ascend Error: <your_path>/09_log/log.asc:<line> code=507015 EZ9999: Inner Error!
+  Ascend Error: <your_path>/07_log/log.asc:<line> code=507015 EZ9999: Inner Error!
   ...
   rtDeviceSynchronize execution failed, reason=aicore exception
   ...
 
-  [ASSERT] <your_path>/09_log/log.asc:<line>: : Assertion 'M < 100 && "M exceeds expected limit!"' failed.
+  [ASSERT] <your_path>/07_log/log.asc:<line>: : Assertion 'M < 100 && "M exceeds expected limit!"' failed.
   [INFO] Execution completed. Check for error messages above.
   ```
 

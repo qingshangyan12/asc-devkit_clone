@@ -13,7 +13,7 @@ This sample uses MatmulLeakyRelu fusion computing as a carrier to demonstrate th
 ## Introduction to directory structure
 
 ```
-├── 08_simulator
+├── 06_simulator
 │   ├── CMakeLists.txt          // Compile project files
 │   ├── data_utils.h            // Data reading and writing auxiliary functions
 │   ├── README.md               // Sample description

@@ -15,7 +15,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 ## Directory Structure
 
 ```
-├── 09_log
+├── 07_log
 │   ├── CMakeLists.txt          // CMake build file
 │   ├── data_utils.h            // Data read and write functions
 │   ├── log.asc                 // Ascend C Kernel example code
@@ -126,12 +126,12 @@ Run the following steps in the root directory of this example to build and execu
   ```bash
   [INFO] Matrix shape: M=256, K=64, N=256
   [INFO] Launching kernel with assert(M < 100)...
-  Ascend Error: <your_path>/09_log/log.asc:<line> code=507015 EZ9999: Inner Error!
+  Ascend Error: <your_path>/07_log/log.asc:<line> code=507015 EZ9999: Inner Error!
   ...
   rtDeviceSynchronize execution failed, reason=aicore exception
   ...
 
-  [ASSERT] <your_path>/09_log/log.asc:<line>: : Assertion 'M < 100 && "M exceeds expected limit!"' failed.
+  [ASSERT] <your_path>/07_log/log.asc:<line>: : Assertion 'M < 100 && "M exceeds expected limit!"' failed.
   [INFO] Execution completed. Check for error messages above.
   ```
 

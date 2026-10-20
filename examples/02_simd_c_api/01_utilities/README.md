@@ -13,5 +13,5 @@
 | [03_clock](./03_clock) | Kernel函数执行耗时打印 | Ascend 950PR&950DT系列产品 |
 | [04_profiling](./04_profiling) | 使用Profiling工具采集性能数据 | Ascend 950PR&950DT系列产品|
 | [05_sanitizer](./05_sanitizer) | Sanitizer调测工具的使用方法 | Ascend 950PR&950DT系列产品 |
-| [08_simulator](./08_simulator) | CAmodel仿真与问题分析 | Ascend 950PR&950DT系列产品 |
-| [09_log](./09_log) | Kernel日志功能（日志打屏/落盘/级别控制） | Ascend 950PR&950DT系列产品 |
+| [06_simulator](./06_simulator) | CAmodel仿真与问题分析 | Ascend 950PR&950DT系列产品 |
+| [07_log](./07_log) | Kernel日志功能（日志打屏/落盘/级别控制） | Ascend 950PR&950DT系列产品 |

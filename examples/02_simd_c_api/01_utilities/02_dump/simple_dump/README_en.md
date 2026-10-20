@@ -6,9 +6,9 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
 ## Supported Products and CANN Software Versions
 
-| Product | CANN Software Version |
-|---------|----------------------|
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Product | CANN Software Version | HDK Version |
+|---------|-----------------------|-------------|
+| Ascend 950PR&950DT products | >= CANN 9.1.0 | >= 25.7.RC1.6 |
 
 ## Directory Structure
 

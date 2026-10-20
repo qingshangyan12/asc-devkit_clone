@@ -14,7 +14,7 @@
 ## 目录结构介绍
 
 ```
-├── 08_simulator
+├── 06_simulator
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读写辅助函数
 │   ├── README.md               // 样例说明
