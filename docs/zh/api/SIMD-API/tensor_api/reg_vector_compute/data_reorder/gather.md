@@ -32,7 +32,7 @@
 
 设`VL_T`为一个矢量数据寄存器可容纳的`DataType`元素个数，计算关系为`dst.reg[i] = src.reg[index.reg[i] % VL_T]`。例如，`src`的前四个元素为`{10, 20, 30, 40}`，`index`的前四个元素为`{3, 1, 0, 2}`，则结果的前四个元素为`{40, 20, 10, 30}`。
 
-本接口仅在AIV上生效，底层调用寄存器源收集接口[asc_gather](../../../c_api/reg_compute/reg_gather/asc_gather.md)。
+本接口仅在AIV上生效。
 
 ## 函数原型
 
@@ -72,7 +72,7 @@ __simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& s
 ## 约束说明
 
 - 仅支持数据类型表中的组合。底层C API支持的float/uint32_t组合不在本接口当前实现的支持范围内。
-- 收集计算不使用`src.mask`或`index.mask`屏蔽元素。须保证被索引的源元素及参与计算的索引值已初始化；返回对象的`mask`仅继承`index.mask`，不根据`src.mask`重新计算。
+- 收集计算不使用`src.mask`或`index.mask`屏蔽元素。须保证被索引的源元素及参与计算的索引值已初始化；返回对象的`mask`继承`index.mask`。
 - 索引超出源寄存器可容纳的元素范围时，按`index.reg[i] % VL_T`取模后访问。
 - 在后续操作使用返回对象的`mask`前，须保证`index.mask`已初始化。
 

@@ -72,9 +72,7 @@ __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src);
 
 ## 约束说明
 
-- 本接口执行低位提取，不执行饱和转换；被舍弃的高位不影响压缩结果。
-- `part`仅支持`high_low_part::low`和`high_low_part::high`。源类型不支持int16_t、int32_t，即使底层C API支持这些类型。
-- 压缩计算不使用`src.mask`屏蔽元素，须保证参与压缩的源数据已初始化。不要依赖结果寄存器另一半部分的值。
+- 压缩计算不使用`src.mask`屏蔽元素，须保证参与压缩的源数据已初始化。
 - 返回值直接继承`src.mask`，不会因元素位宽变化或结果存放位置而调整掩码。在后续操作使用掩码前，须根据结果元素位宽及有效位置重新绑定合适的掩码，参见[with_mask](../reg_tensor/reg_tensor.md#with_mask)。
 
 ## 调用示例

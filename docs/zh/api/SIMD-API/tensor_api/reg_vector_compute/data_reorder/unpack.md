@@ -34,7 +34,7 @@
 - 有符号整型执行符号扩展，保持元素的符号。
 - bool类型将所选半部分中的每个比特扩展为两个比特，低位为原比特，高位补0。
 
-本接口仅在AIV上生效。`part`为`high_low_part::low`时调用`asc_unpack_lower`，为`high_low_part::high`时调用`asc_unpack_upper`，底层语义请参见[asc_unpack](../../../c_api/reg_compute/reg_permute_sel/asc_unpack.md)。
+本接口仅在AIV上生效。
 
 ## 函数原型
 
