@@ -35,9 +35,15 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9020" id12 -->
 - Kirin 9020处理器系列产品：支持
+<!-- end id12 -->
+<!-- npu="9030" id13 -->
 - Kirin 9030处理器系列产品：支持
+<!-- end id13 -->
+<!-- npu="x90" id14 -->
 - Kirin X90处理器系列产品：支持
+<!-- end id14 -->
 
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Prelu_res.md#id1 -->
 
@@ -81,7 +87,15 @@ __simd_callee__ inline void Prelu(U &dstReg, U &srcReg0, U &srcReg1, MaskReg &ma
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：half、float。
 
+<!-- npu="9020" id15 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id15 -->
+<!-- npu="9030" id16 -->
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id17 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

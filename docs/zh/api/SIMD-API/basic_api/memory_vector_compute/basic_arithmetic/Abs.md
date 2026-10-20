@@ -29,7 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id22 -->
 - Kirin 9020处理器系列产品：支持
+<!-- end id22 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Abs_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -123,7 +125,9 @@ $dst_i = |src_i|$
 <!-- npu="9030" id19 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id19 -->
+<!-- npu="9020" id23 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：int8_t、int16_t、int32_t、half、float。
+<!-- end id23 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
