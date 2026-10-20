@@ -158,6 +158,11 @@ file(GLOB ASCENDC_TEST_mc62cm12aa_AIC_CASE_SRC_FILES
     ascendc_case_mc62cm12aa/ascendc_case_mc62cm12aa_aic/*.cpp
 )
 
+# kirindev0001 test cases
+file(GLOB ASCENDC_TEST_kirindev0001_CASE_SRC_FILES
+    ascendc_case_kirindev0001/*.cpp
+)
+
 foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_basic_api_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
@@ -179,6 +184,7 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},kirindev0001>:../common/k3_pvwrap.cpp>
         ${ASCENDC_TEST_${product_type}_CASE_SRC_FILES}
         $<$<STREQUAL:${product_type},ascend910B1_AIV_MSTX>:${ASCENDC_TEST_ascend910B1_AIV_MSTX_CASE_SRC_FILES}>
     )
@@ -201,6 +207,7 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:__NPU_ARCH__=5102>
+        $<$<STREQUAL:${product_type},kirindev0001>:__NPU_ARCH__=5161>
         __disable_kernel_type_autoinfer__=
         __callee__=
     )
@@ -234,6 +241,7 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:tikicpulib::mc62cm12aa>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:tikicpulib::mc62cm12aa>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:tikicpulib::mc62cm12aa>
+        $<$<STREQUAL:${product_type},kirindev0001>:tikicpulib::kirindev0001>
         -Wl,--no-as-needed
         error_manager
         mmpa
