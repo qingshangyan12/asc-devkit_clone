@@ -85,4 +85,31 @@ constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter
 constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
     ASC_DISPERSE_FOURTH_QUARTER;
 
+enum class asc_cast_round_mode : uint8_t {
+    RN = 0,
+    RNA,
+    RD,
+    RU,
+    RZ,
+    RO,
+    RH
+};
+
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> ASC_CAST_RN;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> ASC_CAST_RNA;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> ASC_CAST_RD;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> ASC_CAST_RU;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> ASC_CAST_RZ;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> ASC_CAST_RO;
+constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RH> ASC_CAST_RH;
+
+enum class asc_cast_saturation_mode : uint8_t {
+    NO_SAT = 0,
+    SAT
+};
+
+constexpr std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> ASC_CAST_NO_SAT;
+constexpr std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> ASC_CAST_SAT;
+
+
 #endif
