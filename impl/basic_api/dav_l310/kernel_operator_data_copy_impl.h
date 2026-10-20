@@ -139,17 +139,21 @@ __aicore__ inline void CopyCbufToGmAlignV2(
 template <typename T>
 __aicore__ inline void DataCopyGM2UBImpl(__ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
-    CopyGmToUbufAlignV2(
-        dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride, intriParams.dstStride,
-        false);
+    uint32_t burstLength = intriParams.blockLen * BYTE_32_ALIGN;
+    uint32_t srcStride300 = intriParams.srcStride * BYTE_32_ALIGN;
+    copy_gm_to_ubuf_align(
+        (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, burstLength, 0, 0, srcStride300,
+        intriParams.dstStride);
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1Impl(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
-    CopyGmToCbufAlignV2(
-        dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, false, intriParams.srcStride,
-        intriParams.dstStride, false);
+    uint32_t burstLength = intriParams.blockLen * BYTE_32_ALIGN;
+    uint32_t actSrcStride = intriParams.srcStride * BYTE_32_ALIGN;
+    copy_gm_to_cbuf_align(
+        (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, burstLength, 0, 0, actSrcStride,
+        intriParams.dstStride);
 }
 
 template <typename T>
