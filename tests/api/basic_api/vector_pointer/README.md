@@ -1,6 +1,25 @@
 # VECTOR Basic API pointer extension tests
 
-Scope: **85 API names / 256 workbook signatures / 20 headers**. `scope.json` contains the workbook signatures and rows; `signature_matrix.csv` records the selected call forms, dtypes, shapes and architecture applicability. Its source/log references describe the archived validation run; the logs and generated project copies are delivered separately, not tracked in this code branch.
+This contribution implements the September 2026 community task **AscendC Basic_API优化实现(VECTOR矢量接口扩展)** for team ddplys. The task has completed community acceptance; this branch requests integration into asc-devkit.
+
+Scope: **85 API names / 256 workbook signatures / 20 headers**. `scope.json` contains the workbook signatures and rows. Per-signature configurations, historical results and original logs are provided in the acceptance attachment linked below.
+
+## Interface behavior
+
+Each data operand can independently use a raw pointer or `LocalTensor`; existing Tensor calls remain supported. Vector operands use `__ubuf__` pointers, while Fill uses Cube L1 `__cbuf__` pointers. Callers must satisfy the original address-space, alignment, capacity, workspace and synchronization requirements. The adapters reuse the existing numerical implementation and do not extend backend dtype support.
+
+Declarations are in `include/basic_api/`; implementations and the shared `impl/basic_api/utils/kernel_vector_operand.h` adapter are in `impl/basic_api/`.
+
+```cpp
+// Allocate TPipe/TBuf buffers and synchronize as required by the original API.
+__ubuf__ float* dstPtr = (__ubuf__ float*)dst.GetPhyAddr();
+__ubuf__ float* src0Ptr = (__ubuf__ float*)src0.GetPhyAddr();
+AscendC::Add(dstPtr, src0, src1, count);
+AscendC::Add(dst, src0Ptr, src1, count);
+AscendC::Add(dstPtr, src0Ptr, src1, count);
+```
+
+Design review: [Issue #1680](https://gitcode.com/cann/asc-devkit/issues/1680) and [merged design-document PR #1611](https://gitcode.com/cann/cann-ops-competitions/pull/1611).
 
 ## Requirements
 
@@ -39,7 +58,7 @@ These scripts include the compilation commands and produce build/run logs in the
 | Signature extensions | Explicit element types, shift counts, comparison masks and Select level-0 forms |
 | Precision instrumentation | Per-case parameters, mixed-tolerance match ratio, maximum error and exact-type checks; see precision_metrics.h |
 
-The matrix covers representative valid configurations: 236 active device entries, 2 CPU_DEBUG entries and 18 inactive legacy-architecture entries. It does not claim exhaustive dtype/configuration coverage. Use legal domains for logarithm/division and legal block sizes for sorting, transpose and interleave. Performance tests: no additional task metric; no performance benchmark claim.
+The archived validation covers representative valid configurations: 236 active device entries, 2 CPU_DEBUG entries and 18 inactive legacy-architecture entries. It does not claim exhaustive dtype/configuration coverage. Use legal domains for logarithm/division and legal block sizes for sorting, transpose and interleave. Performance tests: no additional task metric; no performance benchmark claim.
 
 ## Official sample comparison
 
@@ -52,6 +71,10 @@ python3 tests/api/basic_api/vector_pointer/finalize_official_samples.py --output
 
 The runners compare baseline Tensor, modified Tensor and pointer variants with original CMake/data/verification scripts. Common CANN 9.1 harness adjustments use explicit Basic API includes, initialize TPipe when required and omit optional device printf. Input/output hashes establish identical data. The reduce sample's explicit verification messages are checked because its exit code alone is insufficient. See each scenario's result and logs; additional out-of-scope scenarios are not counted as in-scope passes.
 
-## Workbook maintenance
+## Acceptance evidence
 
-`extract_manifest.py` reads the original workbook and requires openpyxl. The production headers and tests do not depend on the development code generators. Original logs, reports and generator tools remain in the separate local delivery archive.
+The [complete acceptance report and logs](https://raw.gitcode.com/cann/asc-devkit/attachment/uploads/7e5d6aae-c899-4ee3-ae53-b0d6fc1d44cc/VECTOR_Basic_API_acceptance_reports.zip) contain the seven required report/log files, per-signature evidence and supplementary reproduction scripts. SHA256: `d00ec30d4403edfa6dd2e8ba3731bd1099d528142d2b3ab519176780a096826a`.
+
+The archived acceptance commit is [`a3313b6ead63f3e8ad4ad2b9e6187c452a2ca375`](https://gitcode.com/ddplys/asc-devkit/commit/a3313b6ead63f3e8ad4ad2b9e6187c452a2ca375) on `community/vector-pointer-sep2026`. Validation used Ascend950PR / dav-3510, Ubuntu 22.04, CANN 9.2.0-beta.2 and bisheng 15.0.5: 8 runtime suites with 783 PASS records, 7 supplementary signature suites with 188 PASS records, 728 precision records and 945 generalization precision records. All 47 in-scope official scenarios passed baseline Tensor, modified Tensor and pointer verification with identical inputs and bitwise-identical outputs. The out-of-scope `region_proposal_sort` baseline failure was recorded separately and excluded from the pass count.
+
+The integration branch is `community/vector-pointer-sep2026-merge`. Its scope-preservation and host-adapter results are distinct from these archived device results; NPU tests have not been rerun after integrating the newer upstream baseline.
