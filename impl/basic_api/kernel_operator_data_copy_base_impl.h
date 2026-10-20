@@ -22,6 +22,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_BASE_IMPL_H
 #include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_operator_ptr_utils.h"
 #include "kernel_process_lock.h"
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 
@@ -172,7 +173,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZ(
     using PrimType = PrimT<T>;
     const uint8_t cacheMode = ExtractCacheMode(src);
     DataCopyGM2L1ND2NZImpl<PrimType, enableSmallC0>(
-        (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+        (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 }
 #endif
 
@@ -186,7 +187,8 @@ __aicore__ inline void DataCopyGM2UBND2NZ(
     using PrimType = PrimT<T>;
     const uint8_t cacheMode = ExtractCacheMode(srcGlobal);
     DataCopyGM2UBND2NZImpl(
-        (__ubuf__ PrimType*)dstLocal.GetPhyAddr(), (__gm__ PrimType*)srcGlobal.GetPhyAddr(), intriParams, cacheMode);
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dstLocal), (__gm__ PrimType*)GetUnderlyingPtr(srcGlobal), intriParams,
+        cacheMode);
 }
 #endif
 } // namespace AscendC

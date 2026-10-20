@@ -30,6 +30,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
+#include "kernel_operator_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
@@ -569,6 +570,10 @@ __aicore__ inline void NdDmaDci();
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
+
+/* Pointer overloads for the DMA sheet (same *Impl as Tensor) live in
+ * impl/basic_api/kernel_operator_data_copy_ptr_impl.h and are included from the
+ * impl header. Callers may pass __gm__ / __ubuf__ / __cbuf__ / __cc__ pointers. */
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

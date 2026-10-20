@@ -26,6 +26,11 @@
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 
+// 与 CANN 原装 kernel_utils_macros.h 保持一致：分支预测提示宏
+// （CANN 自家 kernel_tpipe_base.h、adv_api/hccl 等头文件依赖，覆盖安装时不可缺失）
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 #include "utils/base/sys_macros.h"
 #include "../kernel_macros.h"
 #include "../kernel_log.h"
