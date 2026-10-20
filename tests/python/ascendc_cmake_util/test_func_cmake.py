@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -18,6 +19,109 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 FWK_MODULES_DIR = REPO_ROOT / "cmake/asc/fwk_modules"
+
+
+def test_package_add_rejects_multiple_kernel_libraries_per_call(tmp_path):
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(multiple_kernel_libraries NONE)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_TYPE RUN)
+set_property(GLOBAL PROPERTY ASCENDC_KERNEL_TARGET kernel_a kernel_b)
+set_property(GLOBAL PROPERTY ASCENDC_TILING_TARGET tiling)
+npu_op_package_add(demo LIBRARY kernel_a tiling kernel_b)
+'''
+    )
+    result = subprocess.run(
+        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "build")], text=True, capture_output=True
+    )
+    assert result.returncode != 0
+    error = " ".join(result.stderr.split())
+    assert "npu_op_package_add accepts only one KERNEL library per call" in error
+    assert "Received 'kernel_a' and 'kernel_b'" in error
+
+
+def test_package_add_rejects_kernel_libraries_across_calls(tmp_path):
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(multiple_kernel_library_calls NONE)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR}")
+set(ASCEND_PYTHON_EXECUTABLE python3)
+set(ASCEND_COMPUTE_UNIT "")
+set(ASCEND_SKIP_FAILED_COMPUTE_UNIT OFF)
+set(ASCENDC_AUTO_GEN_PATH "${{CMAKE_BINARY_DIR}}/autogen")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_TYPE RUN)
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_CODE_GEN_DIRS "${{CMAKE_BINARY_DIR}}/autogen")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_VENDOR_NAME demo)
+set_property(GLOBAL PROPERTY ASCENDC_KERNEL_TARGET kernel_a kernel_b)
+set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_kernel_a_BINARY_DIR "${{CMAKE_BINARY_DIR}}/kernel_a")
+set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_kernel_b_BINARY_DIR "${{CMAKE_BINARY_DIR}}/kernel_b")
+npu_op_package_add(demo LIBRARY kernel_a)
+npu_op_package_add(demo LIBRARY kernel_b)
+'''
+    )
+    result = subprocess.run(
+        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "build")], text=True, capture_output=True
+    )
+    assert result.returncode != 0
+    error = " ".join(result.stderr.split())
+    assert "accepts only one KERNEL library per package" in error
+    assert "already contains 'kernel_a'" in error
+    assert "cannot add 'kernel_b'" in error
+
+
+@pytest.mark.skipif(shutil.which("ninja") is None, reason="Ninja is required")
+@pytest.mark.parametrize("source_suffix", ["", "/"])
+@pytest.mark.parametrize("build_path", ["build", "nested/build"])
+def test_kernel_copy_excludes_nested_build_directory(tmp_path, source_suffix, build_path):
+    source = tmp_path / "add.cpp"
+    source.write_text("int add() { return 0; }\n")
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(kernel_copy NONE)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR}")
+set(ASCEND_PYTHON_EXECUTABLE python3)
+file(MAKE_DIRECTORY "${{CMAKE_BINARY_DIR}}/autogen")
+set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "${{CMAKE_BINARY_DIR}}/autogen")
+npu_op_kernel_library(kernel SRC_BASE "${{CMAKE_CURRENT_SOURCE_DIR}}{source_suffix}" TILING_LIBRARY tiling)
+'''
+    )
+    build = tmp_path / build_path
+
+    def run(*arguments):
+        result = subprocess.run(["cmake", *arguments], text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+        return result
+
+    run("-G", "Ninja", "-S", str(tmp_path), "-B", str(build))
+    target = ("--build", str(build), "--target", "kernel_copy_kernel_srcs")
+    result = run(*target)
+    assert "GLOB mismatch" not in result.stdout + result.stderr
+    assert "Re-running CMake" not in result.stdout
+    stamp = build / "autogen/kernel_copy_kernel_srcs.timestamp"
+    copied = build / "kernel/binary/dynamic/add.cpp"
+    assert copied.read_text() == source.read_text()
+    copied_at = stamp.stat().st_mtime_ns
+    assert "Re-running CMake" not in run(*target).stdout
+    assert stamp.stat().st_mtime_ns == copied_at
+    (build / "autogen/generated.cpp").write_text("int generated() { return 0; }\n")
+    result = run(*target)
+    assert "GLOB mismatch" not in result.stdout + result.stderr
+    assert "Re-running CMake" not in result.stdout
+    assert stamp.stat().st_mtime_ns == copied_at
+    source.write_text("int add() { return 1; }\n")
+    run(*target)
+    assert copied.read_text() == source.read_text()
+    extra = tmp_path / "extra.cpp"
+    extra.write_text("int extra() { return 2; }\n")
+    run(*target)
+    extra_copy = build / "kernel/binary/dynamic/extra.cpp"
+    assert extra_copy.read_text() == extra.read_text()
+    extra.unlink()
+    run(*target)
+    assert not extra_copy.exists()
 
 
 def _valid_binary_json(op_type="AddCustomTemplate"):
@@ -135,18 +239,24 @@ npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}/.")
 
 
 @pytest.mark.parametrize("cross_compile,skip_failed", [(False, False), (False, True), (True, False), (True, True)])
-def test_kernel_spec_parameters_reach_compile_command_directly(tmp_path, cross_compile, skip_failed):
+@pytest.mark.parametrize("use_ccache", [False, True])
+def test_kernel_spec_parameters_reach_compile_command_directly(tmp_path, cross_compile, skip_failed, use_ccache):
     scripts = tmp_path / "scripts"
     (scripts / "util").mkdir(parents=True)
+    launcher = scripts / "ccache"
+    launcher.write_text('#!/bin/sh\nexec "$@"\n')
+    launcher.chmod(0o755)
     (scripts / "util/ascendc_compile_kernel.py").write_text(
-        "import json,sys\nfrom pathlib import Path\n"
-        "Path(__file__).with_name('arguments.json').write_text(json.dumps(sys.argv[1:]))\n"
+        "import json,os,sys\nfrom pathlib import Path\n"
+        "Path(__file__).with_name('arguments.json').write_text(json.dumps(\n"
+        "    {'args': sys.argv[1:], 'ccache': os.environ.get('ASCENDC_CCACHE_EXECUTABLE')}))\n"
     )
     root = tmp_path / "resource root"
     (tmp_path / "stub.cpp").write_text("int stub() { return 0; }\n")
     (tmp_path / "CMakeLists.txt").write_text(
         f'''cmake_minimum_required(VERSION 3.16)
 project(direct_spec_options CXX)
+set(CMAKE_CXX_COMPILER_LAUNCHER "{launcher if use_ccache else ""}")
 include("{FWK_MODULES_DIR / "func.cmake"}")
 set(ASCENDC_CMAKE_SCRIPTS_PATH "{scripts}")
 set(ASCEND_PYTHON_EXECUTABLE python3)
@@ -171,6 +281,9 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     ]:
         result = subprocess.run(command, text=True, capture_output=True)
         assert result.returncode == 0, result.stdout + result.stderr
-    arguments = json.loads((scripts / "util/arguments.json").read_text())
+    recorded = json.loads((scripts / "util/arguments.json").read_text())
+    if use_ccache:
+        assert recorded["ccache"] == str(launcher)
+    arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-build={root}" in arguments

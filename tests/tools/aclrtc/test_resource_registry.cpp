@@ -52,6 +52,7 @@ static_assert(
     "ResourceSourceType must have a stable width");
 
 const AcCompileResourceBundleHeader* gBundleHeader = nullptr;
+std::vector<const AcCompileResourceBundleHeader*> gBundleHeaders;
 uint32_t gDlopenCalls = 0U;
 uint32_t gDlsymCalls = 0U;
 uint32_t gDlcloseCalls = 0U;
@@ -59,7 +60,10 @@ bool gDlsymReportsError = false;
 uint32_t gDlerrorCalls = 0U;
 std::string gDlopenFailurePath;
 
-const AcCompileResourceBundleHeader* TestBundleGetter() { return gBundleHeader; }
+const AcCompileResourceBundleHeader* TestBundleGetter()
+{
+    return gBundleHeaders.empty() ? gBundleHeader : gBundleHeaders.at(gDlopenCalls - 1U);
+}
 
 void* DlopenSuccess(const char*, int)
 {
@@ -254,6 +258,7 @@ protected:
     void ResetLoaderState()
     {
         gBundleHeader = nullptr;
+        gBundleHeaders.clear();
         gDlopenCalls = 0U;
         gDlsymCalls = 0U;
         gDlcloseCalls = 0U;
@@ -770,7 +775,7 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
 
     const std::string valid = R"({"resource_id":"resource","source_file":"source.cpp","value":3})";
     EXPECT_EQ(loadText(valid), ResourceStatus::Success);
-    EXPECT_EQ(loadText(valid), ResourceStatus::Conflict);
+    EXPECT_EQ(loadText(valid), ResourceStatus::Success);
 
     AcCompileResourceManifest invalidString{{nullptr, 1U}, nullptr, 0U};
     EXPECT_EQ(ResourceRegistry::LoadManifest(invalidString, spec, 1U, stage), ResourceStatus::InvalidResource);
@@ -963,8 +968,12 @@ TEST_F(ResourceRegistryTest, LoadLibrariesDiscardsPartialManifestsFromFailedSo)
 TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlierSo)
 {
     const std::string json = R"({"resource_id":"conflict"})";
-    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
-    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    const std::string uniqueJson = R"({"resource_id":"unique"})";
+    const std::string name = "payload.bin";
+    const std::vector<uint8_t> payload = {1U};
+    AcCompileResourceFile file{StringView(name), StringView(name), payload.data(), payload.size()};
+    AcCompileResourceManifest manifests[] = {{StringView(json), &file, 1U}, {StringView(uniqueJson), &file, 1U}};
+    AcCompileResourceBundle bundle = MakeBundle(manifests, 1U);
     gBundleHeader = &bundle.header;
     MockSuccessfulLoader();
     const fs::path first = Path("conflict-first.so");
@@ -973,13 +982,68 @@ TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlier
     WriteFile(second);
 
     StageState stage;
+    ASSERT_EQ(
+        ResourceRegistry::LoadLibraries({{first.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::Success);
+    bundle.manifestCount = 2U;
     EXPECT_EQ(
-        ResourceRegistry::LoadLibraries(
-            {{first.string(), ResourceSourceType::External}, {second.string(), ResourceSourceType::External}}, stage),
+        ResourceRegistry::LoadLibraries({{second.string(), ResourceSourceType::External}}, stage),
         ResourceStatus::Success);
     EXPECT_EQ(gDlopenCalls, 2U);
-    ASSERT_EQ(stage.external.resources.size(), 1U);
+    ASSERT_EQ(stage.external.resources.size(), 2U);
     EXPECT_EQ(stage.external.resources.at("conflict")->sourceSoPath, fs::canonical(first).string());
+    EXPECT_EQ(stage.external.resources.at("unique")->sourceSoPath, fs::canonical(second).string());
+    EXPECT_EQ(stage.external.bytes, 2U);
+    EXPECT_EQ(stage.external.files, 2U);
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesKeepsFirstDuplicateIdDespiteContentDifferences)
+{
+    const std::string originalJson = R"({"resource_id":"shared","options":[]})";
+    const std::string changedJson = R"({"resource_id":"shared","options":["-O0"]})";
+    const std::string uniqueJson = R"({"resource_id":"unique"})";
+    const std::string name = "payload.bin";
+    const std::vector<uint8_t> original = {1U};
+    const std::vector<uint8_t> changed = {2U};
+    AcCompileResourceFile file{StringView(name), StringView(name), original.data(), original.size()};
+    AcCompileResourceManifest manifests[] = {
+        {StringView(originalJson), &file, 1U}, {StringView(uniqueJson), &file, 1U}};
+    AcCompileResourceBundle bundle = MakeBundle(manifests, 1U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path first = Path("first.so");
+    const fs::path second = Path("second.so");
+    WriteFile(first);
+    WriteFile(second);
+
+    for (bool changeManifest : {false, true}) {
+        SCOPED_TRACE(changeManifest ? "manifest differs" : "payload differs");
+        manifests[0].json = StringView(originalJson);
+        file.data = original.data();
+        bundle.manifestCount = 1U;
+        StageState stage;
+        ASSERT_EQ(
+            ResourceRegistry::LoadLibraries({{first.string(), ResourceSourceType::External}}, stage),
+            ResourceStatus::Success);
+        if (changeManifest) {
+            manifests[0].json = StringView(changedJson);
+        } else {
+            file.data = changed.data();
+        }
+        bundle.manifestCount = 2U;
+        EXPECT_EQ(
+            ResourceRegistry::LoadLibraries({{second.string(), ResourceSourceType::External}}, stage),
+            ResourceStatus::Success);
+        EXPECT_FALSE(stage.external.conflict);
+        EXPECT_EQ(stage.external.resources.size(), 2U);
+        EXPECT_EQ(stage.external.bytes, 2U);
+        EXPECT_EQ(stage.external.files, 2U);
+        EXPECT_EQ(registry_->Commit(stage), ResourceStatus::Success);
+        ASSERT_NE(registry_->FindResource("shared"), nullptr);
+        EXPECT_EQ(registry_->FindResource("shared")->data.json, nlohmann::json::parse(originalJson));
+        EXPECT_EQ(registry_->FindResource("shared")->files[0].bytes, original);
+        EXPECT_NE(registry_->FindResource("unique"), nullptr);
+    }
 }
 
 TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesThatExceedCumulativeLimits)
@@ -1057,20 +1121,22 @@ TEST_F(ResourceRegistryTest, CommitMergesCategoriesAndFindResourceUsesExpectedPr
     EXPECT_EQ(registry_->FindResource("ignored"), nullptr);
 }
 
-TEST_F(ResourceRegistryTest, CommitRejectsConflictsAndLimitsWithoutPartialMerge)
+TEST_F(ResourceRegistryTest, CommitKeepsFirstResourceAndRejectsInvalidTransactions)
 {
     StageState initial;
     initial.external.discovered = true;
     initial.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Commit(initial), ResourceStatus::Success);
+    const auto* first = registry_->FindResource("existing");
 
     StageState conflict;
     conflict.external.discovered = true;
     conflict.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
-    conflict.external.resources.emplace("must-not-merge", MakeEntry(ResourceSourceType::External));
-    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Conflict);
-    EXPECT_TRUE(conflict.external.conflict);
-    EXPECT_EQ(registry_->FindResource("must-not-merge"), nullptr);
+    conflict.external.resources.emplace("unique", MakeEntry(ResourceSourceType::External));
+    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Success);
+    EXPECT_FALSE(conflict.external.conflict);
+    EXPECT_EQ(registry_->FindResource("existing"), first);
+    EXPECT_NE(registry_->FindResource("unique"), nullptr);
 
     StageState preconflicted;
     preconflicted.custom.discovered = true;
@@ -1092,6 +1158,87 @@ TEST_F(ResourceRegistryTest, CommitRejectsConflictsAndLimitsWithoutPartialMerge)
     files.external.resources.emplace("too-many", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Commit(files), ResourceStatus::InvalidResource);
     EXPECT_EQ(registry_->FindResource("too-many"), nullptr);
+}
+
+TEST_F(ResourceRegistryTest, CommitKeepsFirstDuplicateIdDespiteContentDifferences)
+{
+    for (const auto type : {ResourceSourceType::External, ResourceSourceType::Custom, ResourceSourceType::BuiltIn}) {
+        for (unsigned difference = 0U; difference < 5U; ++difference) {
+            SCOPED_TRACE(static_cast<unsigned>(type));
+            SCOPED_TRACE(difference);
+            registry_.reset(new ResourceRegistry());
+            auto first = MakeEntry(type);
+            first->data.json = {{"resource_id", "shared"}, {"options", {"-O2"}}};
+            first->files.push_back({"payload.bin", "payload.bin", {1U}});
+            StageState initial;
+            auto& initialCategory = ResourceRegistry::SelectStagedResources(initial, type);
+            initialCategory.discovered = true;
+            initialCategory.bytes = 1U;
+            initialCategory.files = 1U;
+            initialCategory.resources.emplace("shared", std::move(first));
+            ASSERT_EQ(registry_->Commit(initial), ResourceStatus::Success);
+            const auto* committed = registry_->FindResource("shared");
+
+            auto incoming = MakeEntry(type);
+            incoming->data.json = committed->data.json;
+            incoming->files = committed->files;
+            if (difference == 0U) {
+                incoming->data.json["options"] = {"-O0"};
+            } else if (difference == 1U) {
+                incoming->files[0].fileName = "other.bin";
+            } else if (difference == 2U) {
+                incoming->files[0].relativePath = "nested/payload.bin";
+            } else if (difference == 3U) {
+                incoming->files[0].bytes[0] = 2U;
+            } else {
+                incoming->files.push_back({"extra.bin", "extra.bin", {2U}});
+            }
+            StageState stage;
+            auto& category = ResourceRegistry::SelectStagedResources(stage, type);
+            category.discovered = true;
+            category.bytes = incoming->files.size();
+            category.files = incoming->files.size();
+            category.resources.emplace("shared", std::move(incoming));
+            category.resources.emplace("unique", MakeEntry(type));
+            EXPECT_EQ(registry_->Commit(stage), ResourceStatus::Success);
+            EXPECT_FALSE(category.conflict);
+            EXPECT_EQ(registry_->FindResource("shared"), committed);
+            EXPECT_NE(registry_->FindResource("unique"), nullptr);
+            EXPECT_EQ(registry_->resourceBytes_, 1U);
+            EXPECT_EQ(registry_->resourceFileCount_, 1U);
+        }
+    }
+}
+
+TEST_F(ResourceRegistryTest, CommitDeduplicatesEquivalentContentsAcrossInstallLocations)
+{
+    StageState initial;
+    initial.external.discovered = true;
+    auto first = MakeEntry(ResourceSourceType::External, "/old/vendor");
+    first->data.json = nlohmann::json::parse(R"({"resource_id":"shared","options":["-O2"]})");
+    first->files.push_back({"payload.bin", "payload.bin", {1U}});
+    initial.external.bytes = 1U;
+    initial.external.files = 1U;
+    initial.external.resources.emplace("shared", std::move(first));
+    ASSERT_EQ(registry_->Commit(initial), ResourceStatus::Success);
+    const auto* committed = registry_->FindResource("shared");
+
+    StageState stage;
+    stage.external.discovered = true;
+    auto incoming = MakeEntry(ResourceSourceType::External, "/new/vendor");
+    incoming->sourceSoPath = "different.so";
+    incoming->data.resourceDir = "/tmp/materialized";
+    incoming->data.json = nlohmann::json::parse(R"({ "options": ["-O2"], "resource_id": "shared" })");
+    incoming->files = committed->files;
+    stage.external.bytes = 1U;
+    stage.external.files = 1U;
+    stage.external.resources.emplace("shared", std::move(incoming));
+    stage.external.resources.emplace("unique", MakeEntry(ResourceSourceType::External));
+    EXPECT_EQ(registry_->Commit(stage), ResourceStatus::Success);
+    EXPECT_EQ(registry_->FindResource("shared"), committed);
+    EXPECT_NE(registry_->FindResource("unique"), nullptr);
+    EXPECT_EQ(registry_->resourceBytes_, 1U);
+    EXPECT_EQ(registry_->resourceFileCount_, 1U);
 }
 
 TEST_F(ResourceRegistryTest, WriteMaterializedFilesWritesNestedAndEmptyPayloadsAndReportsIoErrors)
@@ -1347,6 +1494,57 @@ TEST_F(ResourceRegistryTest, LoadAutomaticCachesFirstStatus)
     EXPECT_TRUE(registry_->automaticLoadAttempted_);
     EXPECT_EQ(registry_->automaticLoadStatus_, ResourceStatus::NotFound);
     EXPECT_TRUE(fs::exists(layout.soPath));
+}
+
+TEST_F(ResourceRegistryTest, LoadAutomaticKeepsDuplicateIdAndLoadsOtherResources)
+{
+    for (bool customConflict : {true, false}) {
+        SCOPED_TRACE(customConflict ? "custom conflict" : "built-in conflict");
+        registry_.reset(new ResourceRegistry());
+        ResetLoaderState();
+        const fs::path base = Path(customConflict ? "custom-conflict" : "builtin-conflict");
+        const fs::path custom = base / "custom";
+        const fs::path builtIn = base / "opp/built-in";
+        const fs::path conflictingRoot = customConflict ? custom : builtIn;
+        const fs::path validRoot = customConflict ? builtIn : custom;
+        WriteFile(conflictingRoot / "op_spec/a/liba_compile_database.so");
+        WriteFile(conflictingRoot / "op_spec/b/libb_compile_database.so");
+        WriteFile(validRoot / "op_spec/libvalid_compile_database.so");
+        SetEnvironment("ASCEND_CUSTOM_OPP_PATH", custom.string());
+        SetEnvironment("ASCEND_OPP_PATH", (base / "opp").string());
+
+        const std::string originalJson = R"({"resource_id":"shared","options":[]})";
+        const std::string changedJson = R"({"resource_id":"shared","options":["-O0"]})";
+        const std::string validJson = R"({"resource_id":"valid"})";
+        const std::string name = "payload.bin";
+        const std::vector<uint8_t> payload = {1U};
+        AcCompileResourceFile file{StringView(name), StringView(name), payload.data(), payload.size()};
+        AcCompileResourceManifest original{StringView(originalJson), &file, 1U};
+        AcCompileResourceManifest changed{StringView(changedJson), &file, 1U};
+        AcCompileResourceManifest valid{StringView(validJson), &file, 1U};
+        AcCompileResourceBundle first = MakeBundle(&original, 1U);
+        AcCompileResourceBundle second = MakeBundle(&changed, 1U);
+        AcCompileResourceBundle other = MakeBundle(&valid, 1U);
+        MockSuccessfulLoader();
+        gBundleHeaders =
+            customConflict ?
+                std::vector<const AcCompileResourceBundleHeader*>{&first.header, &second.header, &other.header} :
+                std::vector<const AcCompileResourceBundleHeader*>{&other.header, &first.header, &second.header};
+
+        EXPECT_EQ(registry_->Load(nullptr), ResourceStatus::Success);
+        EXPECT_EQ(gDlopenCalls, 3U);
+        EXPECT_NE(registry_->FindResource("shared"), nullptr);
+        ResourceData output;
+        EXPECT_EQ(registry_->Lookup("valid", output), ResourceStatus::Success);
+        if (!output.resourceDir.empty()) {
+            EXPECT_EQ(ReadFile(fs::path(output.resourceDir) / name), std::string(1U, '\1'));
+        }
+        EXPECT_EQ(registry_->resourceBytes_, 2U);
+        EXPECT_EQ(registry_->resourceFileCount_, 2U);
+        EXPECT_EQ(registry_->Load(nullptr), ResourceStatus::Success);
+        EXPECT_EQ(gDlopenCalls, 3U);
+        GlobalMockObject::verify();
+    }
 }
 
 TEST_F(ResourceRegistryTest, InstanceReturnsStableSingleton)
