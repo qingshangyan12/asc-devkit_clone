@@ -14,7 +14,7 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 |------|------|
 | **Reuse** | 直接克隆 3510 同名用例（API/指令一致），证明复用可行 |
 | **Adapt** | 需按 M510 差异改写（cube 耦合路径、expdiff 策略） |
-| **Drop** | 3510 专属、M510 首期不提供（如 fp4 MX） |
+| **Drop** | 3510 专属、或 M510 不支持的数据类型路径：fp4/fp8/s4 专用指令（UNPK4_B8/vsel/vcvt_s42*）、expdiff（vexpdif）、fp4 MX（asc_mmad_mx*）；首期不提供 |
 
 ## 3. 完整测试矩阵（对齐 npu_arch_3510）
 
@@ -33,6 +33,10 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 | `vector_compute/` | `test_return_vconv.cpp` 中的 `ExpSubHalfToFloatUsesVexpdif` / `ExpSubUsesVexpdif` | Adapt/Drop | M510 无 `vexpdif` 专用指令，按 RFC §4.5 决策；当前用例已拆出到 `test_exp_sub_m510_policy.cpp` 占位 |
 | `vector_datamove/` | 见 3510 `vector_datamove/` 全量 | Reuse | |
 | `reg_compute/` | 见 3510 `reg_compute/` 对应 | Reuse | reg 类实现共享 |
+| `reg_compute/reg_convert/` | `reg_convert` 中 UNPK4_B8(fp4)/vsel(fp8)/vcvt_s42*(s4) 相关用例 | Drop | M510 不支持 fp4/fp8/s4 专用指令（RFC §4.5/§4.7），共享通用头已守卫排除 |
+| `reg_compute/loadalign/`、`storealign/` | fp4 解包/打包（UNPK4_B8）相关用例 | Drop | 同上（RFC §4.5/§4.7） |
+| `reg_compute/reg_fused/` | `test_return_vconv.cpp` 中 expdiff 两个用例 | Drop | M510 无 vexpdif（RFC §4.5） |
+| `reg_compute/reg_permute_sel/`、`reg_gather/` | fp4/fp8 相关选择/交织/gather 用例 | Drop | 同上（RFC §4.5/§4.7） |
 
 ## 4. 本目录已落地用例（可直接克隆验证复用）
 
@@ -42,6 +46,7 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 - `cube_compute/test_mmad.cpp` —— Reuse（3510 克隆，验证 cube 共享子集）
 - `vector_compute/test_return_vconv.cpp` —— Reuse（克隆 3510，已移除 expdiff 两个用例）
 - `vector_compute/test_exp_sub_m510_policy.cpp` —— Adapt 占位（按 §4.5 决策回填）
+- `reg_compute/reg_convert/`、`loadalign/`、`storealign/`、`reg_permute_sel/`、`reg_gather/`、`reg_fused/` 克隆 3510 用例时，须剔除 fp4/fp8/s4/expdiff 相关函数（对应 3510 用例中这些函数为 Drop，见上方矩阵）。这些函数在 5102 通用头中已被守卫排除，克隆后不应引用。
 
 ## 5. 如何接入与运行
 

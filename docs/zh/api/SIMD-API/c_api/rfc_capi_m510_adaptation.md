@@ -22,7 +22,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 
 - **3510**：cube/vector 分离；独立 scalar 单元（c310，见 `impl/basic_api/dav_3510/kernel_tpipe_impl_c310*.h`）；拥有专属 `expdiff`（Vexpdif）fp16 指令。
 - **M510**：cube/vector **耦合**（`PRE_COMPILE_KERNEL_MIX_COUPLING`，核心宏 `__DAV_M200__` / `__DAV_M200_VEC__`）；scalar 单元走通用路径（`dav_m510/` 下无 tpipe/scalar 专属文件）。
-- **vector 侧差距很小**：基础_api 中 M510 的 vector impl 多数可直接复用 3510；唯一明确的 vector 差异是 M510 缺乏 `expdiff`/`VexpdifFloat` 这条 fp16 专用指令（`impl/simt_api/cpp/dav_3510/kernel_simt_common_impl.h` 与 capi 3510 测试 `tests/api/c_api/npu_arch_3510/vector_compute/test_return_vconv.cpp` 实证）。
+- **vector 侧差距比预期大**：基础_api 中 M510 的 vector impl 多数可直接复用 3510；但 ccec（`dav-510r2`）实测 M510 不仅缺 `expdiff`/`VexpdifFloat`，还缺一整类数据类型专用指令路径——fp4（`UNPK4_B8` 解包/打包：`vld`/`vlds`/`vst`/`vsts`/`vsta` 等）、fp8（`vsel`/`vintlv`/`vdintlv`/`vselr`/`vstar`）、s4（`vcvt_s42bf16`/`vcvt_s42f16`）以及 expdiff（`vexpdif`）。这些指令的 capi 实现不在 `npu_arch_3510/` 内，而是直接定义在共享通用头（`reg_convert_intf_impl.h`、`loadalign_intf_impl.h`、`storealign_intf_impl.h` 等）里，因此 3510 能编译、M510 用同一份通用头编译会直接报指令不支持。已与用户确认：M510 对这些数据类型确实不支持（非缺编译开关），故采用「从共享通用头中排除 5102」的守卫策略（见 §4.7），代价是 M510 的 capi 在这几类数据类型上的 API 面比 3510 小。
 - **cube 侧差距很大**：`impl/basic_api/dav_m510/kernel_operator_mm_impl.h` 已对 M510 将多条 cube 路径桩化/报错（`LoadData2DL12L0ACal` 直接 `ASSERT(false)`；GM→L0A、L1→L0A transpose、InitL0A 等路径返回"not supported on current device"）。
 
 **问题**：能否基于 3510 的 capi 代码，搞出一套适配 M510 的 capi？如果可行，产出 RFC，并为该芯片 capi 准备一套测试用例。
@@ -38,7 +38,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 1. **分发机制完全一致**：capi 的架构选择是 100% 编译期行为，靠 `__NPU_ARCH__` 宏 + 通用头内的 `#if / #elif / #include` 链，与已落地的 3510 / 9201 机制完全相同。新增 M510 分支是机械操作，无需改 CMake 编译逻辑（`impl/c_api/CMakeLists.txt` 仅 `install(DIRECTORY)`，新增文件自动纳入）。
 2. **`memory_base_impl/` 完全架构无关**：25 个文件，已确认零 `__NPU_ARCH__` 引用 → **零改动**。
 3. **大量 reg/vector/scalar 类实现可直接复用 3510**：`npu_arch_3510/` 下 20 个文件中的 vector / reg / scalar / sys_var / sync / spr / ub_scatter / loadalign / storealign 等，与 M510 行为一致，复制后基本原样保留即可。
-4. **唯一明确的 vector 差异（expdiff）范围可控**：仅 `asc_exp_sub*` 系列依赖 Vexpdif 专用指令，可集中决策（见 §4.5）。
+4. **数据类型专用指令缺口（expdiff / fp4 / fp8 / s4）范围可控且已策略化**：依赖 `vexpdif`（expdiff）、`UNPK4_B8`（fp4）、`vsel`/`vintlv`（fp8）、`vcvt_s42*`（s4）等专用指令的函数，绝大多数定义在**共享通用头**而非 `npu_arch_3510/` 内；对这些函数统一加「`#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)`」守卫即可在编译期从 5102 排除，且对 3510/9201 零影响（守卫条件对其恒真）。见 §4.7。
 5. **cube 差异已有 basic_api 基准**：M510 不支持的 cube 路径在 `dav_m510/kernel_operator_mm_impl.h` 中已有明确 ASSERT/报错实现，可作为 capi `npu_arch_5102/cube_*` 的裁剪依据。
 
 **主要风险**（详见 §6，均可在 Phase 0/1 化解）：通用层"总是编译"的 additive-only 机制无法用 arch 文件"覆盖"已存在的通用函数体；测试实际运行依赖外部 `tikicpulib::ascendm510` CPU 模型库（当前不存在）。
@@ -88,11 +88,11 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 
 | 分类 | 文件 | M510 处理 |
 |------|------|-----------|
-| **直接复用**（行为一致） | `vector_compute_composite_intf_impl.h`、`vector_datamove_intf_impl.h`、`reg_convert_intf_impl.h`、`reg_fused_intf_impl.h`、`reg_logic_intf_impl.h`、`reg_permute_sel_intf_impl.h`、`reg_addr_reg_intf_impl.h`、`scalar_atomic_intf_impl.h`、`spr_intf_impl.h`、`sync_intf_impl.h`、`sys_var_intf_impl.h`、`ub_scatter_intf_impl.h`、`loadalign_intf_impl.h`、`storealign_intf_impl.h`、`storeunalign_intf_impl.h` | 复制到 `npu_arch_5102/`，验证指令集一致后原样保留 |
+| **直接复用（薄包含）**（行为一致） | `vector_compute_composite_intf_impl.h`、`vector_datamove_intf_impl.h`、`reg_convert_intf_impl.h`、`reg_fused_intf_impl.h`、`reg_logic_intf_impl.h`、`reg_permute_sel_intf_impl.h`、`reg_addr_reg_intf_impl.h`、`scalar_atomic_intf_impl.h`、`spr_intf_impl.h`、`sync_intf_impl.h`、`sys_var_intf_impl.h`、`ub_scatter_intf_impl.h`、`loadalign_intf_impl.h`、`storealign_intf_impl.h`、`storeunalign_intf_impl.h` | `npu_arch_5102/` 下对应文件**仅一行 `#include` 直接包含 `npu_arch_3510/` 同名文件**（薄包含），不复制函数体。指令集一致的，3510 实现在 5102 下原样可用。 |
 | **需裁剪/改造**（cube 耦合差异） | `cube_compute_intf_impl.h`、`cube_compute_composite_intf_impl.h`、`cube_datamove_intf_impl.h`、`cube_datamove_composite_intf_impl.h`、`datamove_atomic_intf_impl.h` | 保留 M510 支持的共享算子（`asc_mmad`/`mad`、`fixpipe`、`l0c2gm` 等）；**删除或桩化** M510 不支持路径（GM→L0A、L1→L0A transpose、InitL0A、v1 LoadData），以 `impl/basic_api/dav_m510/kernel_operator_mm_impl.h` 的 ASSERT/报错为基准 |
 | **3510 专属、首期不纳入** | `cube_compute_intf_impl.h` 中的 `asc_mmad_mx*` 系列（fp4 MX） | M510 是否支持待确认（见 §6），首期不在复用范围 |
 
-> 可选优化（二期）：将 vector_* / reg_* 的共享实现抽到 `npu_arch_common/` 或保留在通用层，避免 3510 与 5102 双份维护。首期以"复制复用"换取落地速度。
+> 可选优化（二期）：将 vector_* / reg_* 的共享实现抽到 `npu_arch_common/` 或保留在通用层，避免 3510 与 5102 双份维护。首期以「薄包含 + 通用头守卫」换取落地速度（薄包含零重复，守卫只在 10 个通用头里出现）。
 
 ### 4.3 通用头审计（Phase 0 必做）
 
@@ -107,19 +107,59 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 #endif
 ```
 
-### 4.5 expdiff / VexpdifFloat 决策（vector 侧唯一差异）
+### 4.5 数据类型专用指令缺口决策（expdiff / fp4 / fp8 / s4）
 
-M510 无 `expdiff`（Vexpdif）fp16 专用指令。三个候选策略：
+M510 缺一组数据类型专用指令（expdiff / fp4 / fp8 / s4）。
 
-1. **不暴露**：M510 不提供 `asc_exp_sub*` 系列（最省事，但功能缺失）。
-2. **软件/通用 Exp 组合模拟**：用通用 `Exp` 组合实现语义等价（需与架构团队确认精度/语义是否可接受）。
-3. **编译期报错 + 清晰提示**：保留 API 名，M510 下用 `static_assert`/删除声明，让调用方编译期即知不支持。
+关键事实（ccec dav-510r2 实测 + 用户确认）：
+- 这些指令的 capi 实现直接定义在共享通用头（reg_convert_intf_impl.h、loadalign_intf_impl.h、storealign_intf_impl.h、storeunalign_intf_impl.h、loadunalign_intf_impl.h、loadunalign_composite_intf_impl.h、storeunalign_composite_intf_impl.h、reg_fused_intf_impl.h、reg_permute_sel_intf_impl.h、reg_gather_intf_impl.h），不在 npu_arch_3510/ 里。单靠复制 3510 文件到 5102 无法解决——5102 编译时仍会拉到这些通用函数并撞到不支持的指令。
+- 用户确认 M510 对这些数据类型确实不支持（非缺编译开关），故正确做法是编译期排除，而非模拟。
 
-**建议**：首期采用策略 1 或 3（明确"不支持"优于静默错误），并在文档中标注；后续若确有需求再评估策略 2。该决策直接影响 `vector_compute/test_return_vconv.cpp` 中 2 个 expdiff 用例在 M510 的归属（见测试用例 README）。
+候选策略：
+
+1. **不暴露（编译期排除）**：用守卫把相关函数从 5102 编出里拿掉。零运行时风险，但 M510 在这些数据类型上的 API 面比 3510 小。
+2. **软件/通用指令组合模拟**：用通用指令拼出语义等价（精度/语义需架构团队确认）。首期不做。
+3. **编译期报错 + 清晰提示**：保留 API 名，M510 下 static_assert/删声明，让调用方编译期即知不支持。
+
+**决策（已落地）**：采用策略 1，统一用「`#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)`」守卫包裹这些函数（见 §4.7）。理由：明确不支持优于静默错误；守卫对 3510/9201 恒真，零行为变化。这直接影响测试用例归属——`test_return_vconv.cpp` 中 expdiff 用例、`reg_convert` 中 fp4/fp8/s4 相关用例在 M510 下为 Drop（见 §8 与测试 README）。
 
 ### 4.6 命名约定
 
 basic_api 用 `dav_m510`（字符串名），capi 用 `npu_arch_<id>`（数字名，如 `npu_arch_3510`/`npu_arch_9201`）。**建议 capi 侧沿用 `npu_arch_5102`**（与现有数字约定一致），对外文档统一称"M510（npu_arch_5102）"。
+
+### 4.7 排除仅 5102 守卫策略（已在共享通用头落地）
+
+决策 §4.5 的落地方式不是改 `npu_arch_3510/`，而是**在 10 个共享通用头里，对依赖专用指令的函数加编译期守卫**。原因：这些函数直接定义在通用头（对所有 arch 都编译），无法靠 arch 文件覆盖已存在的函数体（additive-only 约束，见 §3）。
+
+守卫写法（每个被排除函数整体包一层）：
+
+```
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
+__simd_callee__ inline void asc_xxx(...) { ... }  // 使用 vexpdif / UNPK4_B8 / vsel / vcvt_s42* 等
+#endif  // not M510 (3510-only instruction path, see RFC 4.5)
+```
+
+语义：`#if` 条件对 3510 / 9201 恒为真（宏未定义或值不等于 5102）→ 函数照常编出；仅当 `__NPU_ARCH__ == 5102` 时条件为假 → 函数从 5102 编出中消失。因此**对 3510/9201 零行为变化**，已用 ccec 双向验证（见 §7 状态）。
+
+10 个共享通用头与排除函数数（ccec dav-510r2 实测收敛，5102 全量 0 错误）：
+
+| 共享通用头 | 排除函数数 | 主要涉及指令 |
+|------|------|------|
+| reg_convert_intf_impl.h | 475 | UNPK4_B8(fp4)、vsel/vintlv(fp8)、vcvt_s42*(s4) |
+| loadalign_intf_impl.h | 332 | UNPK4_B8(fp4) 等加载解包 |
+| storealign_intf_impl.h | 71 | UNPK4_B8(fp4) 等存储打包 |
+| reg_permute_sel_intf_impl.h | 36 | fp4/fp8 相关选择/交织 |
+| storeunalign_intf_impl.h | 42 | fp4 相关非对齐存储 |
+| loadunalign_intf_impl.h | 35 | fp4 相关非对齐加载 |
+| loadunalign_composite_intf_impl.h | 14 | 复合非对齐加载 |
+| storeunalign_composite_intf_impl.h | 14 | 复合非对齐存储 |
+| reg_gather_intf_impl.h | 10 | fp4/fp8 相关 gather |
+| reg_fused_intf_impl.h | 6 | expdiff(vexpdif) 等融合 |
+| **合计** | **1035** | |
+
+> 排除后，M510 的 capi 在 fp4 / fp8 / s4 / expdiff 这几类数据类型上的 **API 面比 3510 小**（对应函数不编出）。这是「明确不支持」策略的代价，已在测试矩阵（§8）与测试 README 中标注为 Drop。
+
+注意：`npu_arch_5102/` 的 20 个 shim 文件仍是薄包含 3510 同名文件（见 §4.2）；通用头守卫负责剔除 3510-only 指令路径，二者配合即得到可编译的 5102 capi。
 
 ---
 
@@ -136,17 +176,28 @@ basic_api 用 `dav_m510`（字符串名），capi 用 `npu_arch_<id>`（数字�
 
 ## 6. 风险与待确认项（Open Questions）
 
-- [ ] 编译器是否对 M510 预定义 `__NPU_ARCH__ == 5102`（以及 5101/5161/5163/5165 兄弟族）？需编译器团队确认宏值。
-- [ ] `tikicpulib::ascendm510` CPU 模型库就绪时间（**阻塞测试实际运行**）。
-- [ ] cube 耦合下，3510 中哪些 `asc_*` 在 M510 必须删除/桩化（以 `dav_m510` 为基准核对全量清单，产出最终裁剪表）。
-- [ ] expdiff 策略（§4.5）最终拍板。
-- [ ] 3510 专属 fp4 MX（`asc_mmad_mx*`）M510 支持范围。
-- [ ] 命名：`npu_arch_5102` vs `npu_arch_m510`（建议前者）。
-- [ ] adv_api（`impl/adv_api/detail/.../*_3510_impl.h`）是否需同步 M510 适配（**本 RFC 范围外**，作为后续）。
+- [x] __NPU_ARCH__ == 5102 已确认：用户确认 5102 即宏值、编译器认识（--cce-aicore-arch=dav-510r2 配合 -D__NPU_ARCH__=5102）；编译工程 mc62cm12a.py 已注入该宏。注意 ccec 不会自动预定义该宏，须显式 -D 传入（与构建工程一致）。5101/5161/5163/5165 兄弟族沿用同一 npu_arch_5102 分支。
+- [ ] tikicpulib::ascendm510 CPU 模型库就绪时间（阻塞测试实际运行）。但已验证：不依赖 tikicpulib，ccec（CANN 9.3.0）即可编译验证 M510 capi 实现，故 impl 工作不受该库阻塞。
+- [~] cube 耦合裁剪：Phase 2 待做。npu_arch_5102/cube_* 当前为薄包含 3510 文件，尚未按 dav_m510/kernel_operator_mm_impl.h 的 ASSERT/报错裁剪不支持路径（GM to L0A、L1 to L0A transpose、InitL0A、v1 LoadData）。
+- [x] expdiff / fp4 / fp8 / s4 策略已拍板并落地：采用编译期排除（§4.5 / §4.7），已在 10 个共享通用头加守卫，5102 全量 0 错误、9201 零回归。
+- [x] fp4 MX（asc_mmad_mx*）确认不支持：用户确认 M510 对 fp4 等数据类型确实不支持（非缺开关），故首期 Drop（与 §4.5 一致）。
+- [x] 命名已定：npu_arch_5102（与现有数字约定一致），对外称 M510（npu_arch_5102）。
+- [ ] adv_api（impl/adv_api/detail/.../*_3510_impl.h）是否需同步 M510 适配（本 RFC 范围外，作为后续）。
 
 ---
 
 ## 7. 实施计划（分阶段）
+
+**实施状态（截至本 RFC 修订）**：
+
+- Phase 0（审计）：完成。确认分发机制、公共门控、通用头需补 5102 分支；确认 M510 数据类型专用指令缺口（expdiff/fp4/fp8/s4，见 §1/§4.5）。
+- Phase 1（骨架）+ §4.7（排除守卫）：完成并验证。新增 `npu_arch_5102/`（20 个薄包含 shim）；公共门控与通用头分发链已加 5102 分支；10 个共享通用头加「排除仅 5102」守卫（共 1035 个函数，见 §4.7）。
+- 验证：ccec（CANN 9.3.0，`--cce-aicore-arch=dav-510r2 -D__NPU_ARCH__=5102 -std=c++17`）对 `c_api/asc_simd.h` 全量编译 **0 错误**；同法以 `dav-920r2 -D__NPU_ARCH__=9201` 编译 **零回归**（共享通用头对 9201 保留全部函数）；3510 因本环境无 dav-351 模型无法本地编译，但守卫语义保证其行为不变。
+- Phase 2（cube 裁剪）：待做。
+- Phase 3（expdiff）：已并入 §4.7 守卫落地，无需单独动作。
+- Phase 4（测试 + CMake）：阻塞于 tikicpulib::ascendm510；impl 编译验证已用 ccec 完成。
+- Phase 5（文档）：进行中（本 RFC 修订 + 测试 README）。
+
 
 - **Phase 0 审计**：① 列出 23 个通用头中需补 `5102` 分支的文件；② 完成 §4.2 复用/裁剪清单；③ 与编译器团队确认 `__NPU_ARCH__` 值。
 - **Phase 1 骨架**：新增 `reg_base_impl/npu_arch_5102/`；复制 3510 的 vector/reg/scalar 文件（直接复用）；扩展公共门控与通用头分支。
@@ -216,3 +267,7 @@ $<$<STREQUAL:${product_type},ascendm510_AIV>:tikicpulib::ascendm510>
 | vector_datamove | `test_*` | Reuse |
 | misc | `test_asc_init.cpp` 等 | Reuse |
 | reg_compute | `reg_*` 系列 | Reuse（reg 类实现共享） |
+| reg_convert（fp4/fp8/s4） | reg_convert 中 UNPK4_B8/vsel/vcvt_s42* 相关用例 | Drop（§4.5/§4.7，M510 不支持） |
+| loadalign/storealign（fp4） | fp4 解包/打包相关用例 | Drop（§4.5/§4.7） |
+| reg_fused（expdiff） | test_return_vconv 中 expdiff 两个用例 | Drop（§4.5） |
+| reg_permute_sel / reg_gather（fp4/fp8） | 相关选择/交织/gather 用例 | Drop（§4.5/§4.7） |

@@ -107,6 +107,7 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_exp_sub_half2float(
     vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -115,7 +116,9 @@ __simd_callee__ inline void asc_exp_sub_half2float(
         vexpdif(dst, src0, src1, mask, PART_EVEN);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_exp_sub_half2float(
     vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
@@ -124,7 +127,9 @@ __simd_callee__ inline void asc_exp_sub_half2float(
         vexpdif(dst, src0, src1, mask, PART_ODD);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_float asc_exp_sub_half2float(
     vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -133,7 +138,9 @@ __simd_callee__ inline vector_float asc_exp_sub_half2float(
     asc_exp_sub_half2float(dst, src0, src1, mask, src_pos);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_float asc_exp_sub_half2float(
     vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
@@ -142,20 +149,25 @@ __simd_callee__ inline vector_float asc_exp_sub_half2float(
     asc_exp_sub_half2float(dst, src0, src1, mask, src_pos);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vexpdif(dst, src0, src1, mask, PART_EVEN);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_float asc_exp_sub(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
     asc_exp_sub(dst, src0, src1, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask)
 {
