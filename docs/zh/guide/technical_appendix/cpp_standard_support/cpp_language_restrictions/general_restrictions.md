@@ -142,7 +142,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     ```
 
 > [!NOTE]说明
-> 上述限制针对**带地址空间限定**的指针，即`__gm__`、`__ubuf__`与栈地址之间以及`__gm__`与`__ubuf__`之间的比较和转换。SIMT编程场景的指针形参无地址空间限定概念，核内GM指针与栈变量指针可直接比较和`reinterpret_cast`。
+> 上述限制针对**带地址空间限定**的指针，即`__gm__`、`__ubuf__`、栈地址之间的比较和转换。SIMT编程场景的指针形参无地址空间限定概念，核内GM指针与栈变量指针可直接比较和`reinterpret_cast`。
 
 ## 变量
 
@@ -205,7 +205,7 @@ __simt_vf__ __launch_bounds__(128) inline void vf_func(__ubuf__ float* out, uint
     }
     ```
 
--   加`__gm__`标识：核函数与VF函数内均可读写，运行结果正确。
+-   加`__gm__`标识后Device侧正常使用。
 
     ```cpp
     __gm__ int32_t g_counter = 10;    // __gm__标记：Device侧可用
@@ -543,7 +543,7 @@ __global__ __vector__ void kernel_func(__gm__ TestS *data1, __gm__ TestS *data2)
 
 ### 成员函数的执行空间标记
 
-类的成员函数含静态成员函数，在Device侧被调用时需标记`__aicore__`，未标记的成员函数会被识别为Host函数，在核函数内调用报错：
+类的成员函数含静态成员函数，在Device侧被调用时需加上`__aicore__`等函数标记，未标记的成员函数会被识别为Host函数，在核函数内调用报错：
 
 ```cpp
 struct Holder {
@@ -660,38 +660,16 @@ __global__ __launch_bounds__(128) void tpl_kernel(T* output, uint32_t count)
 tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);
 ```
 
-**模板实参的指定与推导**：
-
--   **SIMT编程**：显式指定与自动推导均可用——核函数指针形参无地址空间限定，编译器可从实参推导`T`：
+也支持自动推导：
 
     ```cpp
     tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);   // 显式指定：可用
     tpl_kernel<<<1, 128, 0, stream>>>(dev, 128);          // 自动推导T=float：同样可用
     ```
 
--   **混合编程**：指针形参必须带`__gm__`限定，此为核函数参数列表限制，此时**不支持从Host指针实参自动推导**——推导得到的`__gm__ T*`与实参调整后的`T*`类型不匹配，报`deduced type '__gm__ float *' does not match adjusted type 'float *'`，须显式指定模板实参：
+### VF模板函数
 
-    ```cpp
-    template <typename T>
-    __global__ __vector__ void tpl_kernel(__gm__ T* output, uint32_t count) { ... }
-
-    tpl_kernel<<<1, 128, stream>>>(dev, N);               // 推导失败：deduced '__gm__ float *'
-                                                           //        does not match adjusted 'float *'
-    tpl_kernel<float><<<1, 128, stream>>>(dev, N);        // 显式指定：可用（实例化后按__gm__ float*处理）
-    ```
-
-    模板参数仅用于标量形参而指针形参固定为`__gm__ float*`等具体类型时，标量实参可正常推导：
-
-    ```cpp
-    template <typename T>
-    __global__ __vector__ void tpl_kernel(__gm__ float* output, uint32_t count, T base) { ... }
-
-    tpl_kernel<<<1, 128, stream>>>(dev, N, 5);            // T从标量实参推导为int：可用
-    ```
-
-### 显式实例化
-
-混合编程VF模板函数无需显式实例化声明，模板经`asc_vf_call()`调用时显式指定实参即可完成实例化，示例代码如下：
+VF模板函数无需显式实例化声明，模板经`asc_vf_call()`调用时显式指定实参即可完成实例化，示例代码如下：
 
 ```cpp
 template <typename T>
@@ -716,3 +694,14 @@ __global__ __vector__ void kernel_func(__gm__ float* input, __gm__ float* output
 ```
 
 以同一模板按不同实参多次调用，如`asc_vf_call<vf_scale<float>>`与`asc_vf_call<vf_scale<int32_t>>`，会生成相互独立的实例，均无需额外声明。
+
+`asc_vf_call()`**不支持省略模板实参由编译器自动推导**。`asc_vf_call()`的模板形参为非类型模板参数即函数指针常量`template <auto funcPtr, ...>`，显式实参必须是一个完整的函数实体，无法只写VF模板名`asc_vf_call<vf_scale>`让编译器从调用实参推导`T`：
+
+```cpp
+asc_vf_call<vf_scale>(dim3(THREAD_COUNT), ub_out, input, count, 2.f);
+// error: no matching function for call to asc_vf_call
+// note: candidate template ignored: invalid explicitly-specified argument
+//       for template parameter funcPtr
+```
+
+须显式指定完整实例，如`asc_vf_call<vf_scale<float>>`。

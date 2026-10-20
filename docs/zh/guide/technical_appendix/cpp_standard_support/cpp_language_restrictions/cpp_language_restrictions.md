@@ -1,3 +1,3 @@
 # Device侧C/C++语法限制
 
--   [C/C++通用语法限制](./general_restrictions.md)：C++ 通用语法限制，含不支持的特性总览，以及指针与内存地址、变量、函数、类、模板等语法使用限制。
+-   [C/C++通用语法限制](./general_restrictions.md)
