@@ -87,7 +87,6 @@ Run the following steps in the sample root directory to build and execute the op
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default value is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default value is `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Enables experimental ASC interfaces. This sample requires `ON`. The default value is `OFF`. |
   | `SCENARIO_NUM` | Type conversion scenario number. This option is required and accepts values from 1 through 5. |
 
 - Expected result

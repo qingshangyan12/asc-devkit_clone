@@ -176,8 +176,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZ(
 }
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
     (__NPU_ARCH__ == 9202)
 template <typename T>
 __aicore__ inline void DataCopyGM2UBND2NZ(

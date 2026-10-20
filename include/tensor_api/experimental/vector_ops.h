@@ -20,10 +20,6 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_OPS_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_OPS_H
 
-#ifndef CANN_ASC_USE_EXPERIMENTAL
-#error "this is experimental feature, please set CANN_ASC_USE_EXPERIMENTAL = ON to use it."
-#endif
-
 #include "tensor_api/tensor.h"
 #include "tensor_api/experimental/utils/reg_enum.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
