@@ -56,13 +56,13 @@ __simd_callee__ inline decltype(auto) unpack(reg_tensor<T> src);
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src | 输入 | 源操作数，类型为[reg_tensor<T>](../reg_tensor/reg_tensor.md)。 |
+| src | 输入 | 源操作数，类型为[reg_tensor&lt;T&gt;](../reg_tensor/reg_tensor.md)。 |
 
 ## 数据类型
 
 | T | 返回值类型 |
 | --- | --- |
-| bool | reg_tensor<bool> |
+| bool | reg_tensor&lt;bool&gt; |
 | int8_t | reg_tensor<int16_t> |
 | uint8_t | reg_tensor<uint16_t> |
 | int16_t | reg_tensor<int32_t> |

@@ -53,7 +53,7 @@ __simd_callee__ inline reg_tensor<T> expand(reg_tensor<bool> mask);
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| mask | 输入 | 源掩码，类型为[reg_tensor<bool>](../reg_tensor/reg_tensor.md)。`mask.reg`参与前缀计数，并作为返回对象的掩码。 |
+| mask | 输入 | 源掩码，类型为[reg_tensor&lt;bool&gt;](../reg_tensor/reg_tensor.md)。`mask.reg`参与前缀计数，并作为返回对象的掩码。 |
 
 ## 数据类型
 

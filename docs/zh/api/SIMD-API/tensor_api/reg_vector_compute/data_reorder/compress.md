@@ -51,7 +51,7 @@ __simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src | 输入 | 源操作数，类型为[reg_tensor<T>](../reg_tensor/reg_tensor.md)。 |
+| src | 输入 | 源操作数，类型为[reg_tensor&lt;T&gt;](../reg_tensor/reg_tensor.md)。 |
 | mask | 输入 | 筛选条件，类型为`reg_tensor<bool>`。使用`mask.reg`中与T元素位宽对应的比特位，1表示选中对应源元素，0表示不选中。 |
 
 ## 数据类型
