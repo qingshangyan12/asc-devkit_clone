@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id9 -->
-- Kirin 9020处理器系列产品：支持。
+- Kirin 9020处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="9030" id10 -->
-- Kirin 9030处理器系列产品：支持。
+- Kirin 9030处理器系列产品：支持
 <!-- end id10 -->
 <!-- npu="x90" id11 -->
-- Kirin X90处理器系列产品：支持。
+- Kirin X90处理器系列产品：支持
 <!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/PairReduceElem_res.md#id1 -->
 

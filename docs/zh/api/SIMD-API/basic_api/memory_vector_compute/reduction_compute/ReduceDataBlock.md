@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id30 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id30 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock_res.md#id1 -->
 
 ## 功能说明
@@ -112,6 +115,9 @@
 <!-- npu="9030" id17 -->
 - Kirin 9030处理器系列产品，支持half、float。
 <!-- end id17 -->
+<!-- npu="9020" id31 -->
+- Kirin 9020处理器系列产品，支持half、float。
+<!-- end id31 -->
 
 目的操作数与源操作数的数据类型需要保持一致。
 

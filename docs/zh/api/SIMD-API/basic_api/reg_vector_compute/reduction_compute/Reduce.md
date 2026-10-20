@@ -36,13 +36,13 @@
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
 <!-- npu="9020" id12 -->
-- Kirin 9020处理器系列产品：支持。
+- Kirin 9020处理器系列产品：支持
 <!-- end id12 -->
 <!-- npu="9030" id16 -->
-- Kirin 9030处理器系列产品：支持。
+- Kirin 9030处理器系列产品：支持
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90处理器系列产品：支持。
+- Kirin X90处理器系列产品：支持
 <!-- end id17 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/Reduce_res.md#id1 -->
 
