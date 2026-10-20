@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id23 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id23 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/FusedMulAdd_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -115,6 +118,9 @@ Kirin X90处理器系列产品，支持的数据类型为：half、float。
 Kirin 9030处理器系列产品，支持的数据类型为：half、float。
 <!-- end id16 -->
 
+<!-- npu="9020" id24 -->
+Kirin 9020处理器系列产品，支持的数据类型为：half、float。
+<!-- end id24 -->
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无

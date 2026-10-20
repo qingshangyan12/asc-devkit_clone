@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id24 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id24 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/Axpy_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -191,7 +194,17 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 
 <!-- end id17 -->
+<!-- npu="9020" id25 -->
 
+**表** Kirin 9020处理器系列产品支持的数据类型组合情况
+
+| src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
+| ----------- | -------------- | ----------- | --- |
+| half        | half           | half        | 64 |
+| float       | float          | float       | 32  |
+| half        | half           | float       | 32  |
+
+<!-- end id25 -->
 ## 返回值说明<a name="section17124037164714"></a>
 
 无

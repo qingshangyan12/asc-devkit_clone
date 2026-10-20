@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id44 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id44 -->
 <!-- npu="9050" id10 -->
 - Kirin 9050处理器系列产品：支持
 <!-- end id10 -->
@@ -232,6 +235,10 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
   <!-- npu="9030" id24 -->
   Kirin 9030处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
   <!-- end id24 -->
+
+  <!-- npu="9020" id45 -->
+  Kirin 9020处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
+  <!-- end id45 -->
 
   <!-- npu="9050" id36 -->
   Kirin 9050处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。

@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id34 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id34 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -88,6 +91,10 @@ Kirin X90处理器系列产品，支持模式0、1、2。
 <!-- npu="9030" id24 -->
 Kirin 9030处理器系列产品，支持模式0、1、2。
 <!-- end id24 -->
+
+<!-- npu="9020" id36 -->
+Kirin 9020处理器系列产品，支持模式0、1、2。
+<!-- end id36 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -211,6 +218,9 @@ Kirin 9030处理器系列产品，支持模式0、1、2。
   - Kirin 9030处理器系列产品，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
     <!-- end id32 -->
 
+  <!-- npu="9020" id35 -->
+  - Kirin 9020处理器系列产品，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
+  <!-- end id35 -->
 - U支持的数据类型为：uint8_t、uint16_t、uint32_t、uint64_t。
 
 ## 返回值说明<a name="section198548421851"></a>

@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id24 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id24 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -174,6 +177,11 @@
     - U支持的数据类型为：uint8_t。
 <!-- end id23 -->
 
+<!-- npu="9020" id25 -->
+- 针对Kirin 9020处理器系列产品
+    - T支持的数据类型为：half（所有CMPMODE都支持）、float（所有CMPMODE都支持）、int32_t（只支持CMPMODE::EQ）。
+    - U支持的数据类型为：uint8_t。
+<!-- end id25 -->
 ## 返回值说明<a name="section128671456102513"></a>
 
 无
