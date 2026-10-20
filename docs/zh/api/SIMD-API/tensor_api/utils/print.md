@@ -41,27 +41,27 @@ Tensor API提供三个调试打印接口：
 ### print
 
 ```cpp
-__aicore__ inline void print(__gm__ const char* fmt);
+__aicore__ inline void print(__gm__ const char* fmt)
 
 template <typename Arg0, typename... Args>
-__aicore__ inline void print(__gm__ const char* fmt, Arg0&& arg0, Args&&... args);
+__aicore__ inline void print(__gm__ const char* fmt, Arg0&& arg0, Args&&... args)
 
 template <typename Value, typename Std::enable_if_t<!detail::is_print_string_v<Value>, int> = 0>
-__aicore__ inline void print(const Value& value);
+__aicore__ inline void print(const Value& value)
 ```
 
 ### print_layout
 
 ```cpp
 template <typename Layout>
-__aicore__ inline void print_layout(const Layout& layout);
+__aicore__ inline void print_layout(const Layout& layout)
 ```
 
 ### print_tensor
 
 ```cpp
 template <typename Tensor>
-__aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true);
+__aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true)
 ```
 
 ## 参数说明
@@ -169,10 +169,9 @@ using namespace asc::te;
 
 __aicore__ inline void print_scalar_and_tuple_example()
 {
-    print(-7);
-    print(make_coord(2, make_coord(3, 4)));
-    print((__gm__ const char*)"value=%d, text=%s\n", 7, (__gm__ const char*)"ok");
-}
+    print(-7)
+    print(make_coord(2, make_coord(3, 4)))
+    print((__gm__ const char*)"value=%d, text=%s\n", 7, (__gm__ const char*)"ok")
 ```
 
 NPU模式下的输出示例：
@@ -193,9 +192,8 @@ using namespace asc::te;
 
 __aicore__ inline void print_layout_description_example()
 {
-    auto layout = make_layout(make_shape(2, 3), make_stride(3, 1));
-    print(layout);
-}
+    auto layout = make_layout(make_shape(2, 3), make_stride(3, 1))
+    print(layout)
 ```
 
 输出示例：
@@ -214,9 +212,8 @@ using namespace asc::te;
 
 __aicore__ inline void print_layout_table_example()
 {
-    auto layout = make_layout(make_shape(2, 3), make_stride(3, 1));
-    print_layout(layout);
-}
+    auto layout = make_layout(make_shape(2, 3), make_stride(3, 1))
+    print_layout(layout)
 ```
 
 输出示例：
@@ -242,10 +239,9 @@ using namespace asc::te;
 __aicore__ inline void print_gm_tensor_example(__gm__ int32_t* data)
 {
     auto tensor = make_tensor(
-        make_mem_ptr<location::gm>(data), make_layout(make_shape(2, 2), make_stride(2, 1)));
+        make_mem_ptr<location::gm>(data), make_layout(make_shape(2, 2), make_stride(2, 1)))
 
-    print_tensor(tensor);
-}
+    print_tensor(tensor)
 ```
 
 输出示例（地址因运行环境而异）：
@@ -268,18 +264,17 @@ using namespace asc::te;
 
 __aicore__ inline void print_nested_tensor_example(__gm__ int32_t* data)
 {
-    auto shape_2d_nested = make_shape(make_shape(2, 2), make_shape(2, 2));
-    auto stride_2d_nested = make_stride(make_stride(4, 8), make_stride(1, 2));
+    auto shape_2d_nested = make_shape(make_shape(2, 2), make_shape(2, 2))
+    auto stride_2d_nested = make_stride(make_stride(4, 8), make_stride(1, 2))
     auto tensor_2d_nested = make_tensor(
-        make_mem_ptr<location::gm>(data), make_layout(shape_2d_nested, stride_2d_nested));
-    print_tensor(tensor_2d_nested);
+        make_mem_ptr<location::gm>(data), make_layout(shape_2d_nested, stride_2d_nested))
+    print_tensor(tensor_2d_nested)
 
-    auto shape_3d_nested = make_shape(2, make_shape(make_shape(2, 2), make_shape(2, 2)));
-    auto stride_3d_nested = make_stride(16, make_stride(make_stride(1, 2), make_stride(4, 8)));
+    auto shape_3d_nested = make_shape(2, make_shape(make_shape(2, 2), make_shape(2, 2)))
+    auto stride_3d_nested = make_stride(16, make_stride(make_stride(1, 2), make_stride(4, 8)))
     auto tensor_3d_nested = make_tensor(
-        make_mem_ptr<location::gm>(data), make_layout(shape_3d_nested, stride_3d_nested));
-    print_tensor(tensor_3d_nested);
-}
+        make_mem_ptr<location::gm>(data), make_layout(shape_3d_nested, stride_3d_nested))
+    print_tensor(tensor_3d_nested)
 ```
 
 调用方应在调用`print_nested_tensor_example`前准备至少覆盖示例Layout访问范围的GM数据。对应的Tensor描述和元素排布如下（地址因运行环境而异）：
