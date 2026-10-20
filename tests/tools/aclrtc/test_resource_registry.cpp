@@ -963,8 +963,12 @@ TEST_F(ResourceRegistryTest, LoadLibrariesDiscardsPartialManifestsFromFailedSo)
 TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlierSo)
 {
     const std::string json = R"({"resource_id":"conflict"})";
-    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
-    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    const std::string uniqueJson = R"({"resource_id":"unique"})";
+    const std::string name = "payload.bin";
+    const std::vector<uint8_t> payload = {1U};
+    AcCompileResourceFile file{StringView(name), StringView(name), payload.data(), payload.size()};
+    AcCompileResourceManifest manifests[] = {{StringView(json), &file, 1U}, {StringView(uniqueJson), &file, 1U}};
+    AcCompileResourceBundle bundle = MakeBundle(manifests, 1U);
     gBundleHeader = &bundle.header;
     MockSuccessfulLoader();
     const fs::path first = Path("conflict-first.so");
@@ -973,13 +977,19 @@ TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlier
     WriteFile(second);
 
     StageState stage;
+    ASSERT_EQ(
+        ResourceRegistry::LoadLibraries({{first.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::Success);
+    bundle.manifestCount = 2U;
     EXPECT_EQ(
-        ResourceRegistry::LoadLibraries(
-            {{first.string(), ResourceSourceType::External}, {second.string(), ResourceSourceType::External}}, stage),
+        ResourceRegistry::LoadLibraries({{second.string(), ResourceSourceType::External}}, stage),
         ResourceStatus::Success);
     EXPECT_EQ(gDlopenCalls, 2U);
-    ASSERT_EQ(stage.external.resources.size(), 1U);
+    ASSERT_EQ(stage.external.resources.size(), 2U);
     EXPECT_EQ(stage.external.resources.at("conflict")->sourceSoPath, fs::canonical(first).string());
+    EXPECT_EQ(stage.external.resources.at("unique")->sourceSoPath, fs::canonical(second).string());
+    EXPECT_EQ(stage.external.bytes, 2U);
+    EXPECT_EQ(stage.external.files, 2U);
 }
 
 TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesThatExceedCumulativeLimits)
@@ -1057,20 +1067,22 @@ TEST_F(ResourceRegistryTest, CommitMergesCategoriesAndFindResourceUsesExpectedPr
     EXPECT_EQ(registry_->FindResource("ignored"), nullptr);
 }
 
-TEST_F(ResourceRegistryTest, CommitRejectsConflictsAndLimitsWithoutPartialMerge)
+TEST_F(ResourceRegistryTest, CommitKeepsFirstResourceAndRejectsInvalidTransactions)
 {
     StageState initial;
     initial.external.discovered = true;
     initial.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Commit(initial), ResourceStatus::Success);
+    const auto* first = registry_->FindResource("existing");
 
     StageState conflict;
     conflict.external.discovered = true;
     conflict.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
-    conflict.external.resources.emplace("must-not-merge", MakeEntry(ResourceSourceType::External));
-    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Conflict);
-    EXPECT_TRUE(conflict.external.conflict);
-    EXPECT_EQ(registry_->FindResource("must-not-merge"), nullptr);
+    conflict.external.resources.emplace("unique", MakeEntry(ResourceSourceType::External));
+    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Success);
+    EXPECT_FALSE(conflict.external.conflict);
+    EXPECT_EQ(registry_->FindResource("existing"), first);
+    EXPECT_NE(registry_->FindResource("unique"), nullptr);
 
     StageState preconflicted;
     preconflicted.custom.discovered = true;

@@ -21,6 +21,7 @@ import copy
 import json
 import shutil
 import struct
+import shlex
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Tuple
@@ -197,30 +198,31 @@ def _trans_compile_cmds_to_assemble(cmds_s: list):
 
 def write_mk(tiling_key_list, cmds_list, dst, compile_log_path):
     file = f"{dst}.mk"
+    target_prefix = os.path.basename(dst)
     try:
         with open(file, mode="wt") as f:
             os.chmod(file, stat.S_IRUSR + stat.S_IWUSR)
             i = 0
             f.write("ALL: ")
             for tiling_key in tiling_key_list:
-                f.write(f"{dst}_{tiling_key} ")
+                f.write(f"{target_prefix}_{tiling_key} ")
             f.write("\n\n")
             for cmds in cmds_list:
-                f.write(f"{dst}_{tiling_key_list[i]}:\n")
+                f.write(f"{target_prefix}_{tiling_key_list[i]}:\n")
                 if global_var_storage.get_variable("ascendc_compile_debug_config"):
                     cmds_i = copy.deepcopy(cmds)
                     _trans_compile_cmds_to_precompile(cmds_i)
-                    cmds_i_str = " ".join(cmds_i)
+                    cmds_i_str = shlex.join(cmds_i).replace("$", "$$")
                     CommonUtility.dump_compile_log(cmds_i, CompileStage.DEBUG_PRECOMPILE, compile_log_path)
                     f.write(f"\t{cmds_i_str}\n")
-                cmds_str = " ".join(cmds)
+                cmds_str = shlex.join(cmds).replace("$", "$$")
                 CommonUtility.dump_compile_log(cmds, CompileStage.COMPILE, compile_log_path)
                 if CommonUtility.is_v200():
                     f.write(f"\t{cmds_str} 2>/dev/null || ")
                     cmds_list_long = ["-mllvm", "-cce-aicore-jump-expand=true"]
                     cmds_long = copy.deepcopy(cmds)
                     cmds_long.extend(cmds_list_long)
-                    cmds_str_long = " ".join(cmds_long)
+                    cmds_str_long = shlex.join(cmds_long).replace("$", "$$")
                     f.write(f" {cmds_str_long}\n")
                     CommonUtility.dump_compile_log(cmds_long, CompileStage.COMPILE, compile_log_path)
                 else:

@@ -428,12 +428,14 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             if enable_tiling_keys:
                 check_result += '    if [ "${opc_status}" -eq 1 ] && echo "${res}" | '
                 check_result += 'grep -q "None of the given tiling keys are in the supported list"; then\n'
+                check_result += f'        echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}filtered"\n'
                 check_result += "        exit 0\n"
                 check_result += "    fi\n"
             check_result += '    exit "${opc_status}"\n'
             check_result += "fi\n"
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".json")
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".o")
+            check_result += f'echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}completed"\n'
             return check_result
         if enable_tiling_keys is False:
             check_result += 'echo "${res}"\n'

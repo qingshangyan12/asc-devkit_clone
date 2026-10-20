@@ -12,7 +12,9 @@
 
 import json
 import shlex
+import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 from collections import defaultdict
@@ -24,6 +26,105 @@ UTIL_DIR = REPO_ROOT / "cmake/asc/fwk_modules/util"
 sys.path.insert(0, str(UTIL_DIR))
 
 import ascendc_bin_param_build
+import ascendc_compile_kernel
+
+
+def test_compile_scripts_import_shared_kernel_spec_helpers():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import ascendc_bin_param_build, ascendc_compile_kernel, sys; "
+            "assert 'ascendc_build_kernel_spec' in sys.modules",
+        ],
+        cwd=UTIL_DIR,
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+    "returncode,message,status",
+    [
+        (0, "compiled", "completed"),
+        (1, "None of the given tiling keys are in the supported list", "filtered"),
+        (1, "compile failed", None),
+        (2, "compile failed", None),
+    ],
+)
+def test_kernel_spec_shell_reports_variant_result(tmp_path, returncode, message, status):
+    for suffix in (".o", ".json"):
+        (tmp_path / ("add" + suffix)).touch()
+    checks = ascendc_bin_param_build.BinParamBuilder("Add")._generate_check_result(True, "add", True)
+    script = f"res={shlex.quote(message)}\n(exit {returncode})\n" + checks
+    result = subprocess.run(["bash", "-c", script, "_", "unused", str(tmp_path)], text=True, capture_output=True)
+    assert result.returncode == (0 if status else returncode)
+    outcomes = [line for line in result.stdout.splitlines() if line.startswith("ASCENDC_KERNEL_SPEC_RESULT=")]
+    assert outcomes == (["ASCENDC_KERNEL_SPEC_RESULT=" + status] if status else [])
+
+
+@pytest.mark.parametrize("status", ["completed", "filtered", "mixed", None])
+def test_kernel_spec_producer_reads_make_results(tmp_path, monkeypatch, status):
+    monkeypatch.chdir(tmp_path)
+    args = SimpleNamespace(
+        op_type="Add",
+        compute_unit="ascend910b",
+        src_file=str(tmp_path / "add.cpp"),
+        kernel_spec_mode="Normal",
+        kernel_spec_dir=str(tmp_path / "resources"),
+        kernel_spec_build=None,
+        compile_options="",
+        debug_config="",
+        config_ini=str(tmp_path / "ops.ini"),
+        tiling_lib=str(tmp_path / "tiling.so"),
+        output_path=str(tmp_path / "output"),
+        target_name="kernel",
+        auto_gen_path=str(tmp_path),
+        dynamic_dir=None,
+        json_file=None,
+    )
+    builder = ascendc_compile_kernel.CompileKernel(args)
+    monkeypatch.setattr(
+        ascendc_compile_kernel.ascendc_op_info, "OpInfo", lambda *_: SimpleNamespace(get_op_file=lambda: "add")
+    )
+    for index, value in enumerate(["completed", "filtered"] if status == "mixed" else [status]):
+        script = tmp_path / f"variant{index}.sh"
+        script.write_text(
+            "# --kernel-spec=Normal\n" + (f"echo ASCENDC_KERNEL_SPEC_RESULT={value}\n" if value else "true\n")
+        )
+        builder.compile_sh.append(str(script))
+    if status is None:
+        with pytest.raises(RuntimeError, match="did not report complete results"):
+            builder.ascendc_build()
+    else:
+        builder.ascendc_build()
+        builder.record_kernel_spec_result(builder.kernel_spec_status)
+        result = json.loads((tmp_path / "resources/ascend910b/Add/.producer-result.json").read_text())
+        assert result["status"] == ("completed" if status == "mixed" else status)
+        assert result["source"] == args.src_file
+
+
+def test_kernel_spec_initialization_failure_is_recorded(tmp_path, monkeypatch):
+    args = SimpleNamespace(
+        kernel_spec_mode="Normal",
+        kernel_spec_build=None,
+        kernel_spec_dir=str(tmp_path),
+        op_type="Add",
+        compute_unit="ascend910b",
+        src_file="add.cpp",
+    )
+    monkeypatch.setattr(ascendc_compile_kernel, "args_parse", lambda: args)
+
+    def fail(_args):
+        raise ValueError("invalid source selection")
+
+    monkeypatch.setattr(ascendc_compile_kernel, "CompileKernel", fail)
+    with pytest.raises(ValueError, match="invalid source selection"):
+        ascendc_compile_kernel.main()
+    result = json.loads((tmp_path / "ascend910b/Add/.producer-result.json").read_text())
+    assert result["status"] == "failed"
+    assert result["reason"] == "invalid source selection"
 
 
 def test_parse_keeps_simplified_key_mode_as_text_until_final_resolution():

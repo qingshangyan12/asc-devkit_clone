@@ -12,6 +12,9 @@
 import os
 import sys
 import unittest
+import tempfile
+import subprocess
+from pathlib import Path
 from unittest import mock
 from itertools import product
 
@@ -69,6 +72,23 @@ def SetCurrentSocInfo(soc: str):
 
 
 class TestAscendCCompileBase(unittest.TestCase):
+    def test_write_mk_paths_with_spaces(self):
+        with tempfile.TemporaryDirectory(prefix="compile paths ") as directory:
+            destination = Path(directory) / "kernel"
+            output = Path(directory) / "result file.txt"
+            command = [
+                sys.executable,
+                "-c",
+                "from pathlib import Path; import sys; Path(sys.argv[1]).write_text('ok')",
+                str(output),
+            ]
+            with mock.patch.object(global_var_storage, "get_variable", return_value=False), mock.patch.object(
+                CommonUtility, "dump_compile_log"
+            ), mock.patch.object(CommonUtility, "is_v200", return_value=False):
+                write_mk([1001], [command], str(destination), None)
+            subprocess.run(["make", "-f", str(destination) + ".mk"], check=True, capture_output=True)
+            self.assertEqual(output.read_text(), "ok")
+
     def setUp(self):
         pass
 

@@ -239,7 +239,7 @@ function(simple_kernel_compile)
   # add Environment Variable Configurations of ccache
   set(_ASCENDC_ENV_VAR)
   if(${CMAKE_CXX_COMPILER_LAUNCHER} MATCHES "ccache$")
-    list(APPEND _ASCENDC_ENV_VAR export ASCENDC_CCACHE_EXECUTABLE=${CMAKE_CXX_COMPILER_LAUNCHER} &&)
+    list(APPEND _ASCENDC_ENV_VAR "ASCENDC_CCACHE_EXECUTABLE=${CMAKE_CXX_COMPILER_LAUNCHER}")
   endif()
 
   get_property(auto_gen_path GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_CODE_GEN_DIRS)
@@ -296,7 +296,7 @@ function(simple_kernel_compile)
       )
     else()
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
-                      COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
+                      COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
                       --compute-unit=${BINCMP_COMPUTE_UNIT}
@@ -359,7 +359,7 @@ function(simple_kernel_compile)
       )
     else()
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
-                      COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
+                      COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
                       --compute-unit=${BINCMP_COMPUTE_UNIT}
@@ -445,6 +445,7 @@ function(ascend_copy_kernel_source_file)
   get_filename_component(copy_binary_dir "${COPY_KERNEL_DST_DIR}/../../.." ABSOLUTE)
   set(copy_inputs)
   foreach(source IN LISTS kernel_sources)
+    get_filename_component(source "${source}" ABSOLUTE)
     string(FIND "${source}" "${copy_binary_dir}/" in_build_dir)
     if(NOT in_build_dir EQUAL 0)
       list(APPEND copy_inputs "${source}")
@@ -569,8 +570,12 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   if(kernel_spec_mode STREQUAL "None")
     set(spec_tasks_json "[]")
   endif()
+  set(spec_allow_failed false)
+  if(ASCEND_SKIP_FAILED_COMPUTE_UNIT)
+    set(spec_allow_failed true)
+  endif()
   string(CONCAT kernel_context
-    "{\"tasks\":${spec_tasks_json},\"opc_config\":${opc_config_json},"
+    "{\"tasks\":${spec_tasks_json},\"allow_failed\":${spec_allow_failed},\"opc_config\":${opc_config_json},"
     "\"source_root\":${KERNEL_SRC_BASE_json},\"copied_source_root\":${KERNEL_DYNAMIC_PATH_json},"
     "\"source_destination\":${kernel_spec_source_destination_json}}")
   file(APPEND "${spec_build_config}" "${kernel_context}\n")
@@ -1291,6 +1296,12 @@ function(npu_op_package_add target_package_name)
       set(_ascendc_tiling_target ${_ascendc_sub_target})
       message(INFO " target name: ${_ascendc_tiling_target}")
     elseif("${_ascendc_enable_target}" STREQUAL "KERNEL")
+      if(NOT "${_ascendc_kernel_target}" STREQUAL "")
+        message(FATAL_ERROR
+          "npu_op_package_add accepts only one KERNEL library per call. "
+          "Received '${_ascendc_kernel_target}' and '${_ascendc_sub_target}'."
+        )
+      endif()
       set(_ascendc_kernel_target ${_ascendc_sub_target})
       message(INFO " target name: ${_ascendc_kernel_target}")
     elseif("${_ascendc_enable_target}" STREQUAL "TF_PLUGIN")
@@ -1880,6 +1891,10 @@ endif()
       if (${kernel_enable_binary_package})
         set(INSTALL_DIR packages/vendors/${current_target_vendor_name}/op_impl/ai_core/tbe/)
         foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
+          get_property(spec_chip_producers GLOBAL PROPERTY ${_ascendc_kernel_target}_ASCENDC_KERNEL_TARGETS_${compute_unit})
+          if(kernel_spec_mode AND NOT kernel_spec_mode STREQUAL "None" AND NOT spec_chip_producers)
+            continue()
+          endif()
           adapt_install_path(
             INPUT_PATH ${INSTALL_DIR}/kernel/${compute_unit}/
             INPUT_TARGET ${target_package_name}
