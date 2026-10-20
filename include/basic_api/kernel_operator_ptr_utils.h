@@ -81,11 +81,16 @@ __aicore__ inline __cc__ T* GetUnderlyingPtr(__cc__ T* val)
     return val;
 }
 
+// dav-c100 / dav-m200 不允许 CCE 内存属性 __fbuf__，且没有 Fixpipe Buffer。
+// 这些架构上的指针透传由上方 T* 重载覆盖。
+#if !defined(__DAV_C100__) && !defined(__DAV_M200__) && \
+    (!defined(__NPU_ARCH__) || (__NPU_ARCH__ != 1001 && __NPU_ARCH__ != 2002))
 template <typename T>
 __aicore__ inline __fbuf__ T* GetUnderlyingPtr(__fbuf__ T* val)
 {
     return val;
 }
+#endif
 #endif
 } // namespace AscendC
 
