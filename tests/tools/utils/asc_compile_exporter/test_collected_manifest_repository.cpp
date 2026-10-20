@@ -94,7 +94,7 @@ TEST_F(ModuleTest, RepositoryDeduplicatesEquivalentResourceIds)
     EXPECT_EQ(units[0].files.size(), 2U);
 }
 
-TEST_F(ModuleTest, RepositoryRejectsConflictingResourceIds)
+TEST_F(ModuleTest, RepositoryKeepsFirstDuplicateIdDespiteContentDifferences)
 {
     for (const std::string difference : {"manifest", "bytes", "path", "empty-directory", "empty-file"}) {
         SCOPED_TRACE(difference);
@@ -123,8 +123,15 @@ TEST_F(ModuleTest, RepositoryRejectsConflictingResourceIds)
         } else {
             WriteTestFile(FileUtils::JoinPath(second, "resources/empty.h"), "");
         }
+        const std::string third = FileUtils::JoinPath(collection, "c");
+        WriteTestFile(FileUtils::JoinPath(third, "resources/unique.cpp"), "unique");
+        CreateManifest(third, "Unique");
         std::vector<ManifestUnit> units;
-        EXPECT_FALSE(CollectedManifestRepository(collection).Load(units));
+        ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
+        ASSERT_EQ(units.size(), 2U);
+        ASSERT_EQ(units[0].files.size(), 1U);
+        EXPECT_EQ(units[0].files[0].filePath, "resources/kernel.cpp");
+        EXPECT_EQ(std::string(units[0].files[0].data.begin(), units[0].files[0].data.end()), "source");
     }
 }
 

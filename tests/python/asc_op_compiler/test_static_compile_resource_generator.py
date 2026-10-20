@@ -930,27 +930,7 @@ class TestManifestPublication(unittest.TestCase):
         compilation.sk_compile_info = None
         compilation.resource_id = "a" * 64
         compilation.record_sk_commands = False
-        compilation._manifest_path = None
         return compilation
-
-    def test_success_without_publication_fails_for_each_export_mode(self):
-        for mode in ("Normal", "SK"):
-            with self.subTest(mode=mode):
-                with self.assertRaisesRegex(RuntimeError, "kernel=AddTest.*mode=" + mode + ".*not generated"):
-                    with self.compilation(mode):
-                        pass
-
-    def test_missing_or_empty_publication_fails_even_with_another_valid_manifest(self):
-        (self.root / "other_manifest.json").write_text("{}")
-        published = self.root / "requested_manifest.json"
-        for empty in (False, True):
-            if empty:
-                published.touch()
-            with mock.patch.object(generator, "ManifestPackageWriter") as writer:
-                writer.return_value.write.return_value = str(published)
-                with self.assertRaisesRegex(RuntimeError, "manifest (was not generated|is empty)"):
-                    with self.compilation() as compilation:
-                        compilation.publish_manifest(None, 4)
 
     def test_publication_io_error_reports_task_context(self):
         with mock.patch.object(generator, "ManifestPackageWriter") as writer:
@@ -959,13 +939,14 @@ class TestManifestPublication(unittest.TestCase):
                 with self.compilation() as compilation:
                     compilation.publish_manifest(None, 4)
 
-    def test_valid_publication_and_non_export_tasks_succeed(self):
-        published = self.root / "requested_manifest.json"
-        published.write_text("{}")
-        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
-            writer.return_value.write.return_value = str(published)
+    def test_publication_uses_writer_without_rechecking_files(self):
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer, mock.patch.object(
+            Path, "is_file", side_effect=AssertionError("publication is handled by the writer")
+        ):
+            writer.return_value.write.return_value = None
             with self.compilation() as compilation:
                 compilation.publish_manifest(None, 4)
+            writer.return_value.write.assert_called_once()
         with self.compilation("None"):
             pass
         compilation = self.compilation()
@@ -980,15 +961,19 @@ class TestManifestPublication(unittest.TestCase):
                 raise original
         self.assertIs(raised.exception, original)
 
-    def test_missing_publication_still_cleans_up_and_restores_sk_state(self):
+    def test_generation_failure_still_cleans_up_and_restores_sk_state(self):
         compilation = self.compilation("SK")
         compilation.record_sk_commands = True
         compilation._global_state = {"ascendc_enable_super_kernel": False}
         compilation.cleanup = mock.Mock()
-        with mock.patch.object(generator.storage_module.global_var_storage, "set_variable") as restore:
-            with self.assertRaisesRegex(RuntimeError, "not generated"):
+        with mock.patch.object(
+            generator.storage_module.global_var_storage, "set_variable"
+        ) as restore, mock.patch.object(
+            generator, "ManifestPackageWriter", side_effect=generator.ManifestGenerationError("generation failed")
+        ):
+            with self.assertRaisesRegex(RuntimeError, "generation failed"):
                 with compilation:
-                    pass
+                    compilation.publish_manifest(None, 4)
             compilation.cleanup.assert_called_once()
             restore.assert_called_once_with("ascendc_enable_super_kernel", False)
 
