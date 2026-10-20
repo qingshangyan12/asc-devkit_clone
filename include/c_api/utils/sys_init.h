@@ -19,7 +19,8 @@
 
 #ifndef INCLUDE_C_API_UTILS_SYS_INIT_H
 #define INCLUDE_C_API_UTILS_SYS_INIT_H
-#include "c_api/defs/defs.h"
+#include "utils/base/sys_macros.h"
+#include "c_api/defs/macro.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/sys_init_intf_impl.h"

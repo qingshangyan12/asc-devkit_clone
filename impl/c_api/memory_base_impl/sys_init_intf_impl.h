@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_MEMORY_BASE_IMPL_SYS_INIT_INTF_IMPL_H
 #define IMPL_C_API_MEMORY_BASE_IMPL_SYS_INIT_INTF_IMPL_H
 
-#include "impl/c_api/memory_base_impl/utils_impl.h"
-
 __aicore__ inline void asc_init_impl()
 {
     set_atomic_none();
