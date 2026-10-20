@@ -86,6 +86,12 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             CHK_PRT_RET(
                 closRanks.empty(), HCCL_ERROR("[%s] MESH_1D_CLOS closRanks is empty.", __func__), HCCL_E_PARA);
             subCommRanks1 = {closRanks};
+            // V1 的 infos[1] 是第三层级（V1 的 infos[0] 打包了 mesh+clos 两级）
+            if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
+                subCommRanks2 = algHierarchyInfo_.infos[1];
+            } else {
+                subCommRanks2.emplace_back(std::vector<u32>{myRank_});
+            }
         } else {
             // V2 格式（TopoMatchTwoLevel）：分组已由 TopoMatch 完成，直接按层级取用
             subCommRanks0 = algHierarchyInfo_.infos[0];
@@ -94,17 +100,15 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             } else {
                 subCommRanks1.emplace_back(std::vector<u32>{myRank_});
             }
+            // V2 两级算法的 L2 恒为退化单卡（TopoMatchTwoLevel 只产出 2 级，无第三级）
+            subCommRanks2.emplace_back(std::vector<u32>{myRank_});
         }
         omniNeedSetStepNum_ = (subCommRanks1[0].size() == RANK_LEVEL_4) ? OmniNeedSetStepNum::OMNIPIPE_UBX_16P :
                                                                           OmniNeedSetStepNum::OMNIPIPE_DEFAULT;
         omniUbxLastStepRead_ = true;
-        if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
-            subCommRanks2 = algHierarchyInfo_.infos[1];
-            omniUbxLastStepRead_ = (subCommRanks2[0].size() > 1) ? false : omniUbxLastStepRead_;
-            omniNeedSetStepNum_ =
-                (subCommRanks2[0].size() > 1) ? OmniNeedSetStepNum::OMNIPIPE_UBX_32P : omniNeedSetStepNum_;
-        } else {
-            subCommRanks2.emplace_back(std::vector<u32>{myRank_});
+        if (subCommRanks2[0].size() > 1) {
+            omniUbxLastStepRead_ = false;
+            omniNeedSetStepNum_ = OmniNeedSetStepNum::OMNIPIPE_UBX_32P;
         }
     } else if (topoType_ == TopoType::THREE_LEVEL) {
         HCCL_INFO("[BuildSubCommAndTempMap] treeLevel");
