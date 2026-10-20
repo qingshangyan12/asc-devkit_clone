@@ -28,12 +28,7 @@
 #include "impl/c_api/reg_base_impl/sys_init_intf_impl.h"
 #endif
 
-__aicore__ inline void asc_init()
-{
-#if !defined(__BISHENG_ENABLE_ASC_INIT)
-    asc_init_impl();
-#endif
-}
+__aicore__ inline void asc_init();
 
 #endif
 

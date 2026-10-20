@@ -18,8 +18,9 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_INIT_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_INIT_INTF_IMPL_H
 
-__aicore__ inline void asc_init_impl()
+__aicore__ inline void asc_init()
 {
+#if !defined(__BISHENG_ENABLE_ASC_INIT)
     set_atomic_none();
     set_mask_norm();
     uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
@@ -36,6 +37,7 @@ __aicore__ inline void asc_init_impl()
         set_loop_size_outtoub(loopSizePara);
     }
     set_st_atomic_cfg(0b00100100);
+#endif
 }
 
 #endif
