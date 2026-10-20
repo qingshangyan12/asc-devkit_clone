@@ -364,7 +364,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 -   VF内部禁止访问MainScalar的栈空间。
 
-    MainScalar的栈地址如经`__ubuf__`指针携带传入VF函数后，VF内对其解引用属于无效访问：**编译可以通过，但运行期读不到MainScalar栈上的数据、写入也不会落到MainScalar栈**，属于难以定位的静默错误。以下为实测验证过的示例：
+    MainScalar的栈地址如经`__ubuf__`指针携带传入VF函数后，VF内对其解引用属于无效访问：运行期读写是未定义行为，属于难以定位的静默错误。以下为错误示例：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void foo(__gm__ int* out, __ubuf__ uint64_t* s, uint32_t count) {
@@ -386,8 +386,6 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
-    实测表现基于CANN 9.3.0与Ascend 950PR：VF内读取得到的是无关内存的内容，实测读到的是其他数据区的字节且多轮运行稳定复现；VF内写入后MainScalar侧回读自己的栈变量，值未被修改。VF函数内需要的数据应经参数显式传入，包括标量值传与`__gm__`、`__ubuf__`指针，VF自身局部变量即VF自己的栈访问正常。
-
 -   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定。VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取device函数的地址)。
 -   函数的inline行为由编译器决定，添加的always\_inline或noinline将被忽略。
 -   不允许使用结构体作为参数，以下为错误示例。
@@ -400,7 +398,24 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### 递归
 
-编译期递归即constexpr求值递归，在各类编程场景均可用；运行期递归仅在SIMT编程场景可用，混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
+编译期递归即constexpr求值递归，constexpr函数需要加上函数标记。
+
+以SIMT编程场景为例，`__aicore__ constexpr`递归函数可在核函数内以编译期结果使用：
+
+    ```cpp
+    __aicore__ constexpr uint32_t rec_sum(uint32_t n)
+    {
+        return n == 0u ? 0u : n + rec_sum(n - 1u);   // 编译期递归求值
+    }
+
+    __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
+    {
+        constexpr uint32_t s10 = rec_sum(10u);        // 先落constexpr变量：编译期折叠为55
+        output[threadIdx.x] = static_cast<float>(s10);
+    }
+    ```
+
+运行期递归仅在SIMT编程场景可用，混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
 
 ```cpp
 // 混合编程SIMT VF内：ERROR
@@ -410,44 +425,6 @@ __simt_callee__ uint32_t rec_sum(uint32_t n)
     // error: recursive aicore function call is not allowed
 }
 ```
-
-编译期递归即constexpr求值递归，在各编程场景的用法如下：
-
--   **SIMT编程**：`__aicore__ constexpr`递归函数可在核函数内以编译期结果使用。不加`__aicore__`的constexpr函数被判定为Host函数，核内调用报`call to __host__ function from __global__ function`：
-
-    ```cpp
-    __aicore__ constexpr uint32_t rec_sum(uint32_t n)
-    {
-        return n == 0u ? 0u : n + rec_sum(n - 1u);   // 编译期递归求值
-    }
-    static_assert(rec_sum(10u) == 55u, "");           // static_assert直接触发编译期求值
-
-    __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
-    {
-        constexpr uint32_t s10 = rec_sum(10u);        // 先落constexpr变量：编译期折叠为55
-        output[threadIdx.x] = static_cast<float>(s10);
-    }
-    ```
-
--   **混合编程**：callee链内`__aicore__`、`__simt_callee__` constexpr函数的递归同样被`recursive aicore function call is not allowed`拦截，该检查先于constexpr求值执行，不区分编译期与运行期。混合编程场景的编译期递归应改用**模板递归**，以类模板特化终止，不构成函数递归调用：
-
-    ```cpp
-    template <uint32_t N>
-    struct RecSum {
-        static constexpr uint32_t value = N + RecSum<N - 1u>::value;   // 编译期递归展开
-    };
-    template <>
-    struct RecSum<0u> {
-        static constexpr uint32_t value = 0u;                          // 终止特化
-    };
-    static_assert(RecSum<10u>::value == 55u, "");
-
-    __simt_vf__ __launch_bounds__(128) inline void vf_func(__ubuf__ float* out, uint32_t count)
-    {
-        constexpr uint32_t s10 = RecSum<10u>::value;   // 模板实例化时编译期求值
-        out[threadIdx.x] = static_cast<float>(s10);    // 输出55
-    }
-    ```
 
 ### Host函数与Device函数的调用边界
 
@@ -499,7 +476,7 @@ __simt_vf__ void simt_kernel(__gm__ TestS *data1, __ubuf__ TestS *data2)
 }
 ```
 
-在异构编译场景中，Host和Device可共用结构体定义代码，但Host侧无法识别`__callee__`、`__gm__`等Device侧关键字，因此无法根据这些关键字实现函数重载。当需要定义多个地址空间重载函数时，需通过宏`__NPU_ARCH__`将相关Device代码隔离，以避免函数定义冲突。`__NPU_ARCH__`是由编译预定义的宏，可用于区分Device侧代码，具体可参考[《毕昇编译器》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)中的“基本编程指导 > AI Core编程指导 > 预定义宏和内建变量”章节。
+在异构编译场景中，Host和Device可共用结构体定义代码，但Host侧无法识别`__callee__`、`__gm__`等Device侧关键字，因此无法根据这些关键字实现函数重载。当需要定义多个地址空间重载函数时，需通过宏`__NPU_ARCH__`将相关Device代码隔离，以避免函数定义冲突。`__NPU_ARCH__`是由编译预定义的宏，可用于区分Device侧代码，具体可参考[《毕昇编译器》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)中的“编程语言参考 > AI Core编程指导 > 预定义宏和内建变量”章节。
 
 此外，SIMD与SIMT混合编程场景下不支持直接向Global Memory或UB地址空间写入结构体。
 
