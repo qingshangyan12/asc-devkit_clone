@@ -13,5 +13,8 @@
 // ST 环境 stub HCOMM 完整实现了 V2 接口（见 ccu_primitives_stub.h），因此探测接口恒返回 true，
 // 使 GetCcuVersion() 在 960 上进入 CCU_V2 分支，V2 路径用例可达。
 #include "ccu_primitives_impl_dl.h"
+#include "ccu_launch_dl.h"
 
 extern "C" bool HcommIsSupportCcuV2(void) { return true; }
+
+extern "C" bool HcommIsSupportHcommCcuFunctionGet(void) { return true; }
