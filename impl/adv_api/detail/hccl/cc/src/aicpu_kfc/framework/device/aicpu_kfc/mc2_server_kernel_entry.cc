@@ -31,12 +31,14 @@ static uint32_t Mc2ServerKernelBody(void* args[])
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
     if (descValue == MC2_AICPU_SIMPLE_CTX_PROTOCOL) {
         HCCL_INFO("[Mc2ServerKernel]Simple ctx protocol, ctxNum is 1.");
-        return CommKfcDispatcher::Run(&(args[1]), 1U);
+        uint32_t probeRet = CommKfcDispatcher::Run(&(args[1]), 1U);
+        return probeRet;
     }
     auto* desc = reinterpret_cast<CommKfcParamDesc*>(&descValue);
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
     HCCL_INFO("[Mc2ServerKernel]Finish Mc2ServerKernel.");
-    return CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
+    uint32_t probeRet = CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
+    return probeRet;
 }
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
