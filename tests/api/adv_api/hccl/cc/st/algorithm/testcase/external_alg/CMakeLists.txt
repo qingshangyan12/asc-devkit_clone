@@ -289,6 +289,8 @@ target_include_directories(${HCCL_EXTERNAL_ALG_TARGET} PRIVATE
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/kernel
+    # TODO(T1临接): external_alg 编译与 mc2_client 相同的已切 asccomm 源文件，需同款头路径
+    $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 
 target_compile_options(${HCCL_EXTERNAL_ALG_TARGET} PRIVATE

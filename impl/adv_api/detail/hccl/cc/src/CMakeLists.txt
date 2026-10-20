@@ -10,6 +10,18 @@
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
 
+# asccomm 头路径（T1临接）：host 进程经 impl/adv_api 的 asc-comm.cmake 取得 ASC_COMM_SOURCE_PATH；
+# device 是独立 cmake 进程，在 cmake/device 入口按 devkit 根相对探测 asc-comm 后展开
+# ASCCOMM_PRIMITIVES_HDR（见 cmake/device/CMakeLists.txt）；本地 standalone 构建亦可经
+# EXT_ARGS 显式传入。两者皆空时回落 ASCCOMM_PRIMITIVES_INCLUDE_DIR 环境变量（开发侧本地构建用）。
+if(ASCCOMM_PRIMITIVES_HDR)
+    # device 入口已展开，直接用
+elseif(ASC_COMM_SOURCE_PATH)
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm")
+else()
+    set(ASCCOMM_PRIMITIVES_HDR "$ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}")
+endif()
+
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${ASCENDC_DIR}
@@ -211,6 +223,8 @@ if(PRODUCT_SIDE STREQUAL "device")
 
     target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
+        # TODO(T1临接): device 侧与 mc2_client 编译相同的已切 asccomm 源文件，头路径经 ASCCOMM_PRIMITIVES_HDR（见文件头）
+        ${ASCCOMM_PRIMITIVES_HDR}
     )
 
     target_compile_options(mc2_server PRIVATE
@@ -273,6 +287,8 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 
     target_include_directories(mc2_client PRIVATE
         ${INCLUDE_LIST}
+        # TODO(T1临接): 正式依赖治理走 FetchContent TAG_ID bump（Q12），此路径穿刺期联调用
+        ${ASCCOMM_PRIMITIVES_HDR}
     )
 
     target_compile_definitions(mc2_client PRIVATE
@@ -323,9 +339,29 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
         target_link_options(mc2_client_hcomm_stub PRIVATE
             -Wl,-soname,libhcomm.so)
 
+        # asccomm 提供者登记（与 device mc2_server 同机制）：mc2_client 数据面已切到
+        # asccomm_*，这些是对 libasccomm_aicpu.so 的 loose-U。host 侧此前靠
+        # LD_PRELOAD libasccomm_aicpu.so 兜底；登记进 NEEDED 后由运行期解析提供者
+        # （与 server 一致），消灭 preload 依赖。asc-comm.cmake 只 build asccomm_ccu，
+        # 无 asccomm_aicpu target 可链，故用空壳桩登记 soname（真身由环境/runtime 供给）。
+        if(NOT TARGET mc2_client_asccomm_stub)
+            set(MC2_CLIENT_ASCCOMM_STUB_SRC
+                ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_asccomm_stub.cc)
+            file(WRITE ${MC2_CLIENT_ASCCOMM_STUB_SRC}
+                "extern \"C\" void __mc2_client_asccomm_stub(void) {}\n")
+            add_library(mc2_client_asccomm_stub SHARED
+                ${MC2_CLIENT_ASCCOMM_STUB_SRC})
+            set_target_properties(mc2_client_asccomm_stub PROPERTIES
+                OUTPUT_NAME asccomm_aicpu
+                LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_link_stub)
+            target_link_options(mc2_client_asccomm_stub PRIVATE
+                -Wl,-soname,libasccomm_aicpu.so)
+        endif()
+
         target_link_libraries(mc2_client PRIVATE
             -Wl,--no-as-needed
             mc2_client_hcomm_stub
+            mc2_client_asccomm_stub
             mc2_compat
             acl_rt
             c_sec
