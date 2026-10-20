@@ -29,6 +29,8 @@ enum MEM_TYPE {
     SV_ALL,
 };
 
+inline void asc_mem_bar(MEM_TYPE) {}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
 using vector_uint8_t = uint8_t;
 using vector_uint16_t = uint8_t;
