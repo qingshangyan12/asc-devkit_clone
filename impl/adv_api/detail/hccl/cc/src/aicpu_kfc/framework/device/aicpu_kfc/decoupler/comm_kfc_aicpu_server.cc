@@ -9,6 +9,7 @@
  */
 #include "comm_kfc_aicpu_server.h"
 #include <algorithm>
+#include <cstddef>
 #include <limits>
 #include <numeric>
 #include "adapter_rts_common.h"
@@ -67,6 +68,40 @@ HcclResult IsDevice950(bool& isDevice950)
     return HCCL_SUCCESS;
 }
 
+// AICPU 数据面公开句柄的兼容解包：5739 起公开 ThreadHandle 为设备资源实体（POD HcommThreadEntity）
+// 地址，控制面在设备侧 init 时将原始 C++ 对象地址写入实体偏移 80（compatThreadHandle）；老控制面
+// 的句柄本身就是 C++ 对象地址（实体首部魔数不命中）。按实体头魔数识别后取兼容句柄再解引用，两种
+// ABI 均可消费。布局与 hcomm 仓 aicpu_thread_ctx.h::UnwrapThreadHandle 逐字对齐（abiHeader@0:
+// version@0/magicWord@4，compatThreadHandle@80）。
+struct ThreadEntityAbiHeader {
+    u32 version;
+    u32 magicWord;
+    u32 size;
+    u32 reserved;
+};
+static constexpr u32 THREAD_ENTITY_ABI_MAGIC_WORD = 0x0fcf0f6fU;
+static constexpr u64 THREAD_ENTITY_COMPAT_HANDLE_OFFSET = 80U;
+static_assert(offsetof(ThreadEntityAbiHeader, magicWord) == 4U, "thread entity ABI magic offset mismatch");
+
+ThreadHandle UnwrapDeviceThreadHandle(ThreadHandle handle)
+{
+    const auto* entity = reinterpret_cast<const ThreadEntityAbiHeader*>(handle);
+    HCCL_ERROR(
+        "[PROBE] gnts mainThread[%#llx] magic[%#x].", static_cast<unsigned long long>(handle), entity->magicWord);
+    if (entity->magicWord != THREAD_ENTITY_ABI_MAGIC_WORD) {
+        return handle; // 老控制面句柄：即 C++ 对象地址，原样通过
+    }
+    const auto* compatHandle = reinterpret_cast<const ThreadHandle*>(
+        reinterpret_cast<const char*>(handle) + THREAD_ENTITY_COMPAT_HANDLE_OFFSET);
+    if (*compatHandle == 0U) {
+        HCCL_ERROR(
+            "[PROBE] gnts entity compat handle is null, mainThread[%#llx].", static_cast<unsigned long long>(handle));
+        return 0U;
+    }
+    HCCL_ERROR("[PROBE] gnts unwrapped[%#llx].", static_cast<unsigned long long>(*compatHandle));
+    return *compatHandle;
+}
+
 HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& thread, Hccl::StreamLite*& streamLite)
 {
     CHK_PRT_RET(
@@ -74,7 +109,14 @@ HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& t
         HCCL_ERROR(
             "Invalid main thread for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(), execCtx.opParamKey),
         HCCL_E_PARA);
-    thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
+    const ThreadHandle unwrapped = UnwrapDeviceThreadHandle(execCtx.mainThread);
+    CHK_PRT_RET(
+        unwrapped == 0U,
+        HCCL_ERROR(
+            "Invalid thread entity handle for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(),
+            execCtx.opParamKey),
+        HCCL_E_PARA);
+    thread = reinterpret_cast<hccl::Thread*>(unwrapped);
     CHK_PTR_NULL(thread);
     streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
     CHK_PTR_NULL(streamLite);
@@ -236,6 +278,26 @@ u32 ReadAicpuOrderDfxValue(u64 addr)
     return *reinterpret_cast<volatile const u32*>(addr);
 }
 
+void LogProbeSq(const char* stage, Hccl::StreamLite* streamLite)
+{
+    if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
+        HCCL_ERROR("[PROBE] %s sq unavailable, streamLite[%p].", stage, streamLite);
+        return;
+    }
+    u32 head = INVALID_UINT;
+    u32 tail = INVALID_UINT;
+    EXECEPTION_CATCH(head = streamLite->GetRtsq()->QuerySqHead(), head = INVALID_UINT);
+    EXECEPTION_CATCH(tail = streamLite->GetRtsq()->QuerySqTail(), tail = INVALID_UINT);
+    HCCL_ERROR("[PROBE] %s sq head[%u] tail[%u].", stage, head, tail);
+}
+
+void LogProbeDualValue(const char* stage, u64 recordAddr, u64 valueAddr)
+{
+    HCCL_ERROR(
+        "[PROBE] %s recordVal[%u] valueVal[%u].", stage, ReadAicpuOrderDfxValue(recordAddr),
+        ReadAicpuOrderDfxValue(valueAddr));
+}
+
 u32 GetAicpuOrderDfxCommitCnt(const HcclMsgArea* msgArea, u32 pos)
 {
     if (msgArea == nullptr || pos >= HCCL_MSG_CNT) {
@@ -309,6 +371,9 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
         HCCL_E_PARA);
     if (msgArea_ == nullptr) {
         msgArea_ = reinterpret_cast<HcclMsgArea*>(ctx->workspace);
+        HCCL_ERROR(
+            "[PROBE] p1a msgArea_ origin, ctxWorkspace[%#llx] msgArea[%p].",
+            static_cast<unsigned long long>(ctx->workspace), msgArea_);
         turnNumsAddr_ = reinterpret_cast<u64>(msgArea_ + 1);
         rankNum_ = static_cast<u32>(ctx->rankSize);
         std::iota(reinterpret_cast<u32*>(turnNumsAddr_), reinterpret_cast<u32*>(turnNumsAddr_) + UINT8_MAX + 1U, 0U);
@@ -423,6 +488,7 @@ const ServerExecCtx* CommKfcAicpuServer::MatchExecCtx(u64 opParamKey) const
 HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
     const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast)
 {
+    HCCL_ERROR("[PROBE] ccwait enter, turnNum[%u], isLast[%u].", turnNum, static_cast<u32>(isLast));
     const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][CcoreWaitBegin] group %u, commName[%s], opParamKey %#llx, resourceType %u, "
@@ -437,6 +503,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         hccl::Thread* thread = nullptr;
         Hccl::StreamLite* streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
+        HCCL_ERROR("[PROBE] ccwait got thread[%p] streamLite[%p].", thread, streamLite);
         HCCL_INFO(
             "[AICPU_ORDER_DFX][Ccore] WaitNext group[%u], commName[%s], opParamKey[%#llx], "
             "thread[%p], streamLite[%p], rtsq[%p], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], "
@@ -450,11 +517,15 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
             "waitAddr %#llx, valueAddr %#llx.",
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
             static_cast<unsigned long long>(valueAddr));
+        LogProbeSq("p1b wait before", streamLite);
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast), return HCCL_E_INTERNAL);
+        HCCL_ERROR("[PROBE] ccore wait sqe done, turnNum[%u].", turnNum);
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcoreWaitSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
+        HCCL_ERROR("[PROBE] ccore wait launch done, turnNum[%u].", turnNum);
+        LogProbeSq("p1b wait after", streamLite);
         HCCL_INFO(
             "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCoreWait group[%u], thread[%p], streamLite[%p], "
             "rtsq[%p], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -509,6 +580,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
 HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
     const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr)
 {
+    HCCL_ERROR("[PROBE] ccpost enter, turnNum[%u].", turnNum);
     const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][CcorePostBegin] group %u, commName[%s], opParamKey %#llx, resourceType %u, "
@@ -522,6 +594,18 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         hccl::Thread* thread = nullptr;
         Hccl::StreamLite* streamLite = nullptr;
         CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
+        HCCL_ERROR("[PROBE] ccpost got thread[%p] streamLite[%p].", thread, streamLite);
+        const u64 ftBase = reinterpret_cast<u64>(&msgArea_->commMsg.singleMsg.finishedTurnCnt[0].cnt);
+        const u32 recPos = static_cast<u32>((recordAddr - ftBase) / sizeof(TurnCnt));
+        const u32 valueVal = ReadAicpuOrderDfxValue(valueAddr);
+        HCCL_ERROR(
+            "[PROBE] p1a post addr, recordAddr[%#llx], msgArea[%p], ftBase[%#llx], recOff[%llu], pos[%u], "
+            "recomputed[%#llx], valueAddr[%#llx], valueVal[%u], turnNum[%u], iotaMatch[%u].",
+            static_cast<unsigned long long>(recordAddr), msgArea_, static_cast<unsigned long long>(ftBase),
+            static_cast<unsigned long long>(recordAddr - reinterpret_cast<u64>(msgArea_)), recPos,
+            static_cast<unsigned long long>(
+                reinterpret_cast<u64>(&msgArea_->commMsg.singleMsg.finishedTurnCnt[recPos].cnt)),
+            static_cast<unsigned long long>(valueAddr), valueVal, turnNum, static_cast<u32>(valueVal == turnNum));
         HCCL_INFO(
             "[AICPU_ORDER_DFX][Ccore] PostNext group[%u], commName[%s], opParamKey[%#llx], "
             "thread[%p], streamLite[%p], rtsq[%p], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], "
@@ -535,11 +619,25 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
             "recordAddr %#llx, valueAddr %#llx.",
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
             static_cast<unsigned long long>(valueAddr));
+        LogProbeSq("p1b post before", streamLite);
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
+        HCCL_ERROR("[PROBE] ccore post record done, turnNum[%u].", turnNum);
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcorePostSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
+        HCCL_ERROR("[PROBE] ccore post launch done, turnNum[%u].", turnNum);
+        LogProbeSq("p1b post after", streamLite);
+        const u64 ts0 = GetCurCpuTimestamp();
+        HCCL_ERROR(
+            "[PROBE] p1c post t0, recordVal[%u], valueVal[%u], restart[%u].", ReadAicpuOrderDfxValue(recordAddr),
+            ReadAicpuOrderDfxValue(valueAddr), static_cast<u32>(msgArea_->controlMsg.restart));
+        while (GetCurCpuTimestamp() - ts0 < 1000000UL) {}
+        LogProbeDualValue("p1c post t1", recordAddr, valueAddr);
+        while (GetCurCpuTimestamp() - ts0 < 2000000UL) {}
+        LogProbeDualValue("p1c post t2", recordAddr, valueAddr);
+        while (GetCurCpuTimestamp() - ts0 < 5000000UL) {}
+        LogProbeDualValue("p1c post t5", recordAddr, valueAddr);
         HCCL_INFO(
             "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCorePost group[%u], thread[%p], streamLite[%p], "
             "rtsq[%p], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -621,6 +719,9 @@ HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
 
 HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos)
 {
+    HCCL_ERROR(
+        "[PROBE] orchestrate(server) opType[%u] seq[%u] pos[%u].", static_cast<u32>(msg.commType.prepareType),
+        static_cast<u32>(msg.addMsg.v1Msg.seqNum), msgPos);
     KeepAlive();
     CHK_PTR_NULL(msgArea_);
     const HcclCMDType opType = static_cast<HcclCMDType>(msg.commType.prepareType);
@@ -787,9 +888,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
     }
+    HCCL_ERROR("[PROBE] orch loop end, repeatCnt[%u].", static_cast<u32>(repeatCnt));
 
     if (dfxRegistered) {
+        HCCL_ERROR("[PROBE] orch before reportDfx.");
         HcclResult ret = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
+        HCCL_ERROR("[PROBE] orch after reportDfx, ret[%u].", static_cast<u32>(ret));
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR(
                 "Group %u: failed to report DFX tasks for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
@@ -802,7 +906,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
 
     HcclResult releaseRet = HCCL_SUCCESS;
     if (commAcquired) {
+        HCCL_ERROR("[PROBE] orch before releaseComm.");
         releaseRet = static_cast<HcclResult>(HcommReleaseComm(acquiredCommName.c_str()));
+        HCCL_ERROR("[PROBE] orch after releaseComm, ret[%u].", static_cast<u32>(releaseRet));
         if (releaseRet != HCCL_SUCCESS) {
             HCCL_ERROR(
                 "Group %u: failed to release comm context for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
@@ -816,6 +922,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     CHK_RET(releaseRet);
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+    HCCL_ERROR("[PROBE] orchestrate(server) exit, handle[%d], msgPos[%u].", handle, msgPos);
     return HCCL_SUCCESS;
 }
 
@@ -989,7 +1096,7 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
             continue;
         }
 
-        auto* thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
+        auto* thread = reinterpret_cast<hccl::Thread*>(UnwrapDeviceThreadHandle(execCtx.mainThread));
         if (thread == nullptr) {
             MC2_TIMEOUT_LOG(
                 isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
