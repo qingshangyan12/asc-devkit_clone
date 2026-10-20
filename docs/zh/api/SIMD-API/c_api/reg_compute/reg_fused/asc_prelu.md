@@ -122,20 +122,38 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(float);
+constexpr uint8_t MUTEX_ID = 0;
 
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(float);
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(float);
+
+// one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素，
+// 对应i * one_repeat_size * sizeof(float)字节。
 __simd_vf__ inline void prelu_vf(__ubuf__ float* output,
                                  __ubuf__ float* input,
-                                 __ubuf__ float* alpha_input)
+                                 __ubuf__ float* alpha_input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0;
     vector_float alpha;
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
-    asc_loadalign(src0, input);
-    asc_loadalign(alpha, alpha_input);
-    vector_float dst = asc_prelu(src0, alpha, mask);
-    asc_storealign(output, dst, mask);
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src0, input + offset);
+        asc_loadalign(alpha, alpha_input + offset);
+        vector_float dst = asc_prelu(src0, alpha, mask);
+        asc_storealign(output + offset, dst, mask);
+    }
 }
 
 __global__ __vector__ void asc_prelu_kernel(__gm__ float* output,
@@ -143,27 +161,33 @@ __global__ __vector__ void asc_prelu_kernel(__gm__ float* output,
                                             __gm__ float* alpha)
 {
     asc_init();
-    __ubuf__ float output_local[ELEMENT_COUNT];
-    __ubuf__ float input_local[ELEMENT_COUNT];
-    __ubuf__ float alpha_local[ELEMENT_COUNT];
+    __ubuf__ float output_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float input_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float alpha_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
     asc_copy_gm2ub_align(alpha_local, alpha, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    prelu_vf(output_local, input_local, alpha_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<prelu_vf>(output_local, input_local, alpha_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> input(ELEMENT_COUNT);
-    std::vector<float> alpha(ELEMENT_COUNT, 0.1f);
-    std::vector<float> output(ELEMENT_COUNT, 0.0f);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<float> input(TOTAL_LENGTH);
+    std::vector<float> alpha(TOTAL_LENGTH, 0.1f);
+    std::vector<float> output(TOTAL_LENGTH, 0.0f);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         input[i] = static_cast<float>(static_cast<int32_t>(i) - 64);
     }
 
@@ -182,7 +206,7 @@ int main()
     aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
     bool passed = true;
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         const float expected = input[i] > 0.0f ? input[i] : input[i] * alpha[i];
         if (std::fabs(output[i] - expected) > 1e-6f) {
             passed = false;

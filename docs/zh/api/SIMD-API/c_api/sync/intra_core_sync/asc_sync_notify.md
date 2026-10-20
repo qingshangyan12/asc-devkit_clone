@@ -142,7 +142,7 @@ __global__ __vector__ void asc_sync_notify_kernel(__gm__ float* output, __gm__ f
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, z, BYTES);
-    asc_sync_mte3(0);
+    asc_sync_pipe(PIPE_ALL);
 }
 
 } // namespace

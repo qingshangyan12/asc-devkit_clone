@@ -188,32 +188,45 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t INPUT_BYTES = 256;
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+
+constexpr uint32_t ELEMENT_COUNT = 67;
 constexpr uint32_t PACKED_BYTES = 64;
 constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_TIMES * PACKED_BYTES;
+constexpr uint32_t INPUT_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint32_t);
 constexpr uint32_t STEP_BYTES = 128;
 constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
+// one_repeat_size的单位为uint32_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void pack_quarter_vf(__ubuf__ uint8_t* output,
-                                        __ubuf__ uint32_t* input)
+                                        __ubuf__ uint32_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
     vector_int32_t src_i32;
     vector_uint32_t src_u32;
     vector_float src_f32;
-    asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_loadalign(src_u32, input);
-    asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input));
-    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input) + i * PACKED_BYTES);
+        asc_loadalign(src_u32, input + i * PACKED_BYTES);
+        asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input) + i * PACKED_BYTES);
+        vector_bool tail_mask = asc_update_mask_b32(remaining_length);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ int32_t*>(
-            output + repeat * STEP_BYTES), src_i32, mask);
+            output + i * STEP_BYTES), src_i32, tail_mask);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ uint32_t*>(
-            output + SECTION_BYTES + repeat * STEP_BYTES), src_u32, mask);
+            output + SECTION_BYTES + i * STEP_BYTES), src_u32, tail_mask);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ float*>(
-            output + 2 * SECTION_BYTES + repeat * STEP_BYTES), src_f32, mask);
+            output + 2 * SECTION_BYTES + i * STEP_BYTES), src_f32, tail_mask);
     }
 }
 
@@ -223,31 +236,40 @@ __global__ __vector__ void asc_storealign_pack_quarter_kernel(
     asc_init();
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
     __ubuf__ uint32_t input_local[ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    pack_quarter_vf(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint32_t);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<pack_quarter_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint32_t> input(ELEMENT_COUNT);
+    std::vector<uint32_t> input(PADDED_ELEMENT_COUNT, 0);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        input[i] = 0x5a000000u | i;
-        const uint8_t value = static_cast<uint8_t>(input[i]);
-        for (uint32_t section = 0; section < 3; ++section) {
-            for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = 0x5a000000u | i;
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        const uint32_t valid_count = remaining_length > PACKED_BYTES ? PACKED_BYTES : remaining_length;
+        for (uint32_t i = 0; i < valid_count; ++i) {
+            const uint8_t value = static_cast<uint8_t>(input[repeat * PACKED_BYTES + i]);
+            for (uint32_t section = 0; section < 3; ++section) {
                 expected[section * SECTION_BYTES + repeat * STEP_BYTES + i] = value;
             }
         }
+        remaining_length -= valid_count;
     }
 
     aclInit(nullptr);

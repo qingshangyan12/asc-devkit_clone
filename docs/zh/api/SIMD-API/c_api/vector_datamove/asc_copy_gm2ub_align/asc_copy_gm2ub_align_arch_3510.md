@@ -212,11 +212,12 @@ __global__ __vector__ void asc_copy_gm2ub_align_arch3510_kernel(__gm__ uint8_t* 
 {
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
-    // Copy INPUT_BYTES from GM to UB, then wait only for PIPE_MTE2.
+    // 将INPUT_BYTES字节从GM搬入UB。
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
     asc_sync_pipe(PIPE_ALL);
 }
 

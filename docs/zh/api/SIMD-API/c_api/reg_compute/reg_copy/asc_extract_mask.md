@@ -92,6 +92,14 @@ bisheng example.asc -o main --npu-arch=dav-3510&& ./main
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -102,41 +110,61 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 128;
-__simd_vf__ inline void extract_mask(__ubuf__ uint32_t* output, __ubuf__ uint16_t* input)
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t ELEMENT_COUNT = 323;
+constexpr uint32_t REPEAT_COUNT = (ELEMENT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t STORAGE_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t MASK_WORDS_PER_REGISTER = 8;
+constexpr uint32_t OUTPUT_WORD_COUNT = REPEAT_COUNT * MASK_WORDS_PER_REGISTER;
+constexpr uint32_t DATA_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
+// one_repeat_size的单位为uint16_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
+__simd_vf__ inline void extract_mask(__ubuf__ uint32_t* output, __ubuf__ uint16_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src_reg;
-    asc_loadalign(src_reg, input);
-    vector_bool mask = asc_extract_mask(src_reg, 0);
-    asc_storealign(output, mask);
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * ELEMENTS_PER_REGISTER;
+        vector_bool valid_mask = asc_update_mask_b16(remaining_length);
+        asc_loadalign(src_reg, input + offset);
+        vector_bool mask = asc_extract_mask(src_reg, 0);
+        mask = asc_and(mask, valid_mask, asc_create_mask_b16(PAT_ALL));
+        asc_storealign(output + i * MASK_WORDS_PER_REGISTER, mask);
+    }
 }
 __global__ __vector__ void asc_extract_mask_kernel(__gm__ uint32_t* output, __gm__ uint16_t* input)
 {
     asc_init();
-    __ubuf__ uint32_t output_local[ELEMENT_COUNT];
-    __ubuf__ uint16_t input_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(input_local, input, ELEMENT_COUNT * sizeof(uint16_t));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    extract_mask(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, ELEMENT_COUNT * sizeof(uint32_t));
+    __ubuf__ uint32_t output_local[OUTPUT_WORD_COUNT];
+    __ubuf__ uint16_t input_local[STORAGE_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, STORAGE_COUNT * sizeof(uint16_t));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<extract_mask>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_WORD_COUNT * sizeof(uint32_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<uint16_t> input(ELEMENT_COUNT);
-    std::vector<uint32_t> output(ELEMENT_COUNT, 0);
+    std::vector<uint16_t> input(STORAGE_COUNT, 0);
+    std::vector<uint32_t> output(OUTPUT_WORD_COUNT, 0);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = static_cast<uint16_t>(i);
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint16_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), (ELEMENT_COUNT) * sizeof(uint16_t),
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), (STORAGE_COUNT) * sizeof(uint16_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint32_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (OUTPUT_WORD_COUNT) * sizeof(uint32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(uint16_t), input.data(), input.size() * sizeof(uint16_t),
         ACL_MEMCPY_HOST_TO_DEVICE);

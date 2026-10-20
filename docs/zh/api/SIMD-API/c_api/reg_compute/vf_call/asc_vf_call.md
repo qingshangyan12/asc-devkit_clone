@@ -67,39 +67,100 @@ __aicore__ inline void asc_vf_call(Args &&...args)
 使用Reg矢量计算C API在Vector Function中对UB数据执行加法计算。
 
 ```cpp
-constexpr uint32_t ELEMENT_COUNT = 64;
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
 
-__simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
 {
-    vector_float dst_reg;
-    vector_float src0_reg;
-    vector_float src1_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-
-    asc_loadalign(src0_reg, src0);
-    asc_loadalign(src1_reg, src1);
-    asc_add(dst_reg, src0_reg, src1_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    return (numerator + denominator - 1) / denominator;
 }
+
+constexpr uint32_t ELEMENT_COUNT = 67;
+constexpr uint32_t PADDED_ELEMENT_COUNT = 128;
+
+constexpr uint32_t DATA_BYTES = ELEMENT_COUNT * sizeof(float);
+constexpr uint32_t PADDED_DATA_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+// one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素。
+__simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_float dst_reg;
+        vector_float src0_reg;
+        vector_float src1_reg;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+
+        asc_loadalign(src0_reg, src0 + offset);
+        asc_loadalign(src1_reg, src1 + offset);
+        asc_add(dst_reg, src0_reg, src1_reg, mask);
+        asc_storealign(dst + offset, dst_reg, mask);
+    }
+}
+
+constexpr uint8_t MUTEX_ID = 0;
 
 __global__ __vector__ void asc_add_kernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
 {
     asc_init();
-    __ubuf__ float dst_local[ELEMENT_COUNT];
-    __ubuf__ float src0_local[ELEMENT_COUNT];
-    __ubuf__ float src1_local[ELEMENT_COUNT];
+    __ubuf__ float dst_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src1_local[PADDED_ELEMENT_COUNT];
 
-    asc_copy_gm2ub_align(src0_local, src0, ELEMENT_COUNT * sizeof(float));
-    asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src0_local, src0, PADDED_DATA_BYTES);
+    asc_copy_gm2ub_align(src1_local, src1, PADDED_DATA_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    asc_vf_call<add_vf>(dst_local, src0_local, src1_local);
 
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<add_vf>(dst_local, src0_local, src1_local, one_repeat_size, repeat_time);
+
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, PADDED_DATA_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
+}
+
+int main()
+{
+    std::vector<float> src0(PADDED_ELEMENT_COUNT), src1(PADDED_ELEMENT_COUNT);
+    std::vector<float> output(PADDED_ELEMENT_COUNT, 0.0F), golden(PADDED_ELEMENT_COUNT, 0.0F);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        src0[i] = static_cast<float>(i);
+        src1[i] = 100.0F + static_cast<float>(i);
+        golden[i] = src0[i] + src1[i];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float* src0_device = nullptr;
+    float* src1_device = nullptr;
+    float* dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), PADDED_DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), PADDED_DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src0_device, PADDED_DATA_BYTES, src0.data(), PADDED_DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src1_device, PADDED_DATA_BYTES, src1.data(), PADDED_DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_add_kernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), PADDED_DATA_BYTES, dst_device, PADDED_DATA_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = std::equal(output.begin(), output.begin() + ELEMENT_COUNT, golden.begin());
+    std::cout << (passed ? "[Success] asc_vf_call example." : "[Failed] asc_vf_call example.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src1_device);
+    aclrtFree(src0_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

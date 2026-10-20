@@ -101,19 +101,42 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t DATABLOCK_BYTES = 32;
-constexpr uint32_t DATABLOCK_COUNT = 8;
-constexpr uint16_t BLOCK_STRIDE = 2;
-constexpr uint16_t REPEAT_STRIDE = 1;
-constexpr uint32_t INPUT_BYTES = 16 * DATABLOCK_BYTES;
-constexpr uint32_t OUTPUT_BYTES = DATABLOCK_COUNT * DATABLOCK_BYTES;
-
-__simd_vf__ inline void asc_loadalign_datablock_strided_vf(
-    __ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_uint8_t dst = asc_loadalign_datablock_strided(input, BLOCK_STRIDE, REPEAT_STRIDE, mask);
-    asc_storealign(output, dst, mask);
+    return (numerator + denominator - 1) / denominator;
+}
+
+
+constexpr uint32_t DATABLOCK_BYTES = 32;
+constexpr uint32_t DATABLOCKS_PER_REGISTER = 8;
+constexpr uint32_t DATABLOCK_COUNT = 11;
+constexpr uint16_t BLOCK_STRIDE = 2;
+constexpr uint16_t REPEAT_STRIDE = 0;
+constexpr uint32_t START_BLOCK = 1;
+constexpr uint32_t REPEAT_COUNT =
+    (DATABLOCK_COUNT + DATABLOCKS_PER_REGISTER - 1) / DATABLOCKS_PER_REGISTER;
+constexpr uint32_t INPUT_BYTES_PER_REPEAT = 16 * DATABLOCK_BYTES;
+constexpr uint32_t OUTPUT_BYTES_PER_REPEAT = DATABLOCKS_PER_REGISTER * DATABLOCK_BYTES;
+constexpr uint32_t INPUT_BYTES = INPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
+
+constexpr uint32_t TOTAL_LENGTH = DATABLOCK_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATABLOCK_BYTES;
+constexpr uint8_t MUTEX_ID = 0;
+
+// one_repeat_size的单位为数据块；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
+__simd_vf__ inline void asc_loadalign_datablock_strided_vf(
+    __ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    uint32_t remaining_length = DATABLOCK_COUNT * DATABLOCK_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool mask = asc_update_mask_b8(remaining_length);
+        const uint32_t input_offset = i * INPUT_BYTES_PER_REPEAT;
+        const uint32_t output_offset = i * OUTPUT_BYTES_PER_REPEAT;
+        // 起始块偏移通过指针指定，repeat_stride不是本次读取的起始偏移。
+        vector_uint8_t dst = asc_loadalign_datablock_strided(input + input_offset + START_BLOCK * DATABLOCK_BYTES, BLOCK_STRIDE, REPEAT_STRIDE, mask);
+        asc_storealign(output + output_offset, dst, mask);
+    }
 }
 
 __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
@@ -122,13 +145,21 @@ __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
     asc_init();
     __ubuf__ uint8_t input_local[INPUT_BYTES];
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
+    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_datablock_strided_vf>(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_gm2ub_align(output_local, output, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / DATABLOCK_BYTES;
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<asc_loadalign_datablock_strided_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
@@ -136,14 +167,20 @@ __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
 int main()
 {
     std::vector<uint8_t> input(INPUT_BYTES);
-    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0);
     std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
     for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint32_t block = 0; block < DATABLOCK_COUNT; ++block) {
-        const uint32_t src_offset = (REPEAT_STRIDE + block * BLOCK_STRIDE) * DATABLOCK_BYTES;
-        const uint32_t dst_offset = block * DATABLOCK_BYTES;
-        for (uint32_t i = 0; i < DATABLOCK_BYTES; ++i) {
-            golden[dst_offset + i] = input[src_offset + i];
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t input_base = repeat * INPUT_BYTES_PER_REPEAT;
+        const uint32_t output_base = repeat * OUTPUT_BYTES_PER_REPEAT;
+        const uint32_t valid_blocks = repeat + 1 == REPEAT_COUNT ?
+            DATABLOCK_COUNT - repeat * DATABLOCKS_PER_REGISTER : DATABLOCKS_PER_REGISTER;
+        for (uint32_t block = 0; block < valid_blocks; ++block) {
+            const uint32_t src_offset = input_base + (START_BLOCK + block * BLOCK_STRIDE) * DATABLOCK_BYTES;
+            const uint32_t dst_offset = output_base + block * DATABLOCK_BYTES;
+            for (uint32_t i = 0; i < DATABLOCK_BYTES; ++i) {
+                golden[dst_offset + i] = input[src_offset + i];
+            }
         }
     }
 
@@ -154,6 +191,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_loadalign_datablock_strided_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);

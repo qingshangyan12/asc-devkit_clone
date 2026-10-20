@@ -102,6 +102,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -114,51 +121,67 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(float);
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 
-__simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, __ubuf__ float* src2)
+// one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素，
+// 对应i * one_repeat_size * sizeof(float)字节。
+__simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, __ubuf__ float* src2, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0_reg;
     vector_float src1_reg;
     vector_float src2_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_loadalign(src0_reg, src0);
-    asc_loadalign(src1_reg, src1);
-    asc_loadalign(src2_reg, src2);
-    vector_float result = asc_fma(src0_reg, src1_reg, src2_reg, mask);
-    asc_storealign(dst, result, mask);
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src0_reg, src0 + offset);
+        asc_loadalign(src1_reg, src1 + offset);
+        asc_loadalign(src2_reg, src2 + offset);
+        vector_float result = asc_fma(src0_reg, src1_reg, src2_reg, mask);
+        asc_storealign(dst + offset, result, mask);
+    }
 }
 
 __global__ __vector__ void asc_fma_kernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1, __gm__ float* src2)
 {
     asc_init();
-    __ubuf__ float dst_local[ELEMENT_COUNT];
-    __ubuf__ float src0_local[ELEMENT_COUNT];
-    __ubuf__ float src1_local[ELEMENT_COUNT];
-    __ubuf__ float src2_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(dst_local, dst, ELEMENT_COUNT * sizeof(float));
-    asc_copy_gm2ub_align(src0_local, src0, ELEMENT_COUNT * sizeof(float));
-    asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
-    asc_copy_gm2ub_align(src2_local, src2, ELEMENT_COUNT * sizeof(float));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    compute(dst_local, src0_local, src1_local, src2_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
+    __ubuf__ float dst_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src1_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src2_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(dst_local, dst, TOTAL_LENGTH * sizeof(float));
+    asc_copy_gm2ub_align(src0_local, src0, TOTAL_LENGTH * sizeof(float));
+    asc_copy_gm2ub_align(src1_local, src1, TOTAL_LENGTH * sizeof(float));
+    asc_copy_gm2ub_align(src2_local, src2, TOTAL_LENGTH * sizeof(float));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<compute>(dst_local, src0_local, src1_local, src2_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, TOTAL_LENGTH * sizeof(float));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> src0(ELEMENT_COUNT);
-    std::vector<float> src1(ELEMENT_COUNT);
-    std::vector<float> src2(ELEMENT_COUNT);
-    std::vector<float> output(ELEMENT_COUNT);
-    std::vector<float> golden(ELEMENT_COUNT);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<float> src0(TOTAL_LENGTH);
+    std::vector<float> src1(TOTAL_LENGTH);
+    std::vector<float> src2(TOTAL_LENGTH);
+    std::vector<float> output(TOTAL_LENGTH);
+    std::vector<float> golden(TOTAL_LENGTH);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         src0[i] = static_cast<float>(i % 8) * 0.25f;
         src1[i] = static_cast<float>((i + 1) % 8) * 0.25f;
         src2[i] = static_cast<float>(i) * 0.125f;
@@ -167,16 +190,16 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     float* src0_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     float* src1_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     float* src2_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src2_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&src2_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src0_device, src0.size() * sizeof(float), src0.data(), src0.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);

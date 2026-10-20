@@ -117,6 +117,14 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+
 template <typename T>
 void PrintData(const char* label, const std::vector<T>& values)
 {
@@ -140,23 +148,38 @@ bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expect
     return true;
 }
 
-constexpr uint32_t SRC_COUNT = 128;
-constexpr uint32_t DST_COUNT = 256;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t SRC_COUNT = 133;
+constexpr uint32_t REPEAT_COUNT = (SRC_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_SRC_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t DST_ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t DST_COUNT = REPEAT_COUNT * DST_ELEMENTS_PER_REGISTER;
 
-__simd_vf__ inline void Pack(__ubuf__ uint8_t* low, __ubuf__ uint8_t* high, __ubuf__ uint16_t* src)
+constexpr uint32_t DATA_BYTES = SRC_COUNT * sizeof(uint16_t);
+constexpr uint32_t TOTAL_LENGTH = SRC_COUNT;
+// one_repeat_size的单位为uint16_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
+__simd_vf__ inline void Pack(__ubuf__ uint8_t* low, __ubuf__ uint8_t* high, __ubuf__ uint16_t* src, uint16_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_uint8_t low_reg;
-    vector_uint8_t high_reg;
-    vector_uint16_t src_reg;
-    uint32_t count = DST_COUNT;
-    vector_bool dst_mask = asc_update_mask_b8(count);
-    asc_loadalign(src_reg, src);
-    asc_duplicate_scalar(low_reg, static_cast<uint8_t>(0), dst_mask);
-    asc_duplicate_scalar(high_reg, static_cast<uint8_t>(0), dst_mask);
-    
-    asc_pack_to_high(high_reg, src_reg);
-    
-    asc_storealign(high, high_reg, dst_mask);
+    vector_bool dst_mask = asc_create_mask_b8(PAT_ALL);
+    uint32_t remaining_length = SRC_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool src_mask = asc_update_mask_b16(remaining_length);
+        const uint32_t dst_offset = (offset / ELEMENTS_PER_REGISTER) * DST_ELEMENTS_PER_REGISTER;
+        vector_uint8_t low_reg;
+        vector_uint8_t high_reg;
+        vector_uint16_t src_reg;
+        vector_uint16_t valid_src;
+        asc_loadalign(src_reg, src + offset);
+        asc_duplicate_scalar(valid_src, static_cast<uint16_t>(0), asc_create_mask_b16(PAT_ALL));
+        asc_copy(valid_src, src_reg, src_mask);
+        asc_duplicate_scalar(low_reg, static_cast<uint8_t>(0), dst_mask);
+        asc_duplicate_scalar(high_reg, static_cast<uint8_t>(0), dst_mask);
+
+        asc_pack_to_high(high_reg, valid_src);
+
+        asc_storealign(high + dst_offset, high_reg, dst_mask);
+    }
 }
 
 __global__ __vector__ void AscPackToHighKernel(__gm__ uint8_t* low, __gm__ uint8_t* high, __gm__ uint16_t* src)
@@ -164,35 +187,42 @@ __global__ __vector__ void AscPackToHighKernel(__gm__ uint8_t* low, __gm__ uint8
     asc_init();
     __ubuf__ uint8_t low_local[DST_COUNT];
     __ubuf__ uint8_t high_local[DST_COUNT];
-    __ubuf__ uint16_t src_local[SRC_COUNT];
-    asc_copy_gm2ub_align(src_local, src, SRC_COUNT * sizeof(uint16_t));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    Pack(low_local, high_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    __ubuf__ uint16_t src_local[PADDED_SRC_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, PADDED_SRC_COUNT * sizeof(uint16_t));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<Pack>(low_local, high_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(low, low_local, DST_COUNT);
     asc_copy_ub2gm_align(high, high_local, DST_COUNT);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint16_t> src(SRC_COUNT);
+    std::vector<uint16_t> src(PADDED_SRC_COUNT, 0);
     std::vector<uint8_t> low(DST_COUNT, 0);
     std::vector<uint8_t> high(DST_COUNT, 0);
     std::vector<uint8_t> golden_low(DST_COUNT, 0);
     std::vector<uint8_t> golden_high(DST_COUNT, 0);
     for (uint32_t i = 0; i < SRC_COUNT; ++i) {
         src[i] = static_cast<uint16_t>(0x1200U + i);
-        
-        golden_high[SRC_COUNT + i] = static_cast<uint8_t>(src[i]);
+        const uint32_t dst_offset = (i / ELEMENTS_PER_REGISTER) * DST_ELEMENTS_PER_REGISTER +
+            ELEMENTS_PER_REGISTER + i % ELEMENTS_PER_REGISTER;
+        golden_high[dst_offset] = static_cast<uint8_t>(src[i]);
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint16_t* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (SRC_COUNT) * sizeof(uint16_t),
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_SRC_COUNT * sizeof(uint16_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint8_t* low_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&low_device), (DST_COUNT) * sizeof(uint8_t),
@@ -213,7 +243,7 @@ int main()
     PrintData("Low Golden", golden_low);
     PrintData("High output", high);
     PrintData("High Golden", golden_high);
-    const bool passed = CompareRangeData(high, golden_high, SRC_COUNT, SRC_COUNT);
+    const bool passed = CompareRangeData(high, golden_high, 0, DST_COUNT);
     std::cout << (passed ? "[Success] asc_pack_to_high passed." : "[Failed] asc_pack_to_high failed.") << std::endl;
     aclrtFree(high_device);
     aclrtFree(low_device);

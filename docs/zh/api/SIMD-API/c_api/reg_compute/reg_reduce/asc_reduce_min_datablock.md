@@ -103,11 +103,18 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 ```cpp
 #include <cstdint>
+#include <algorithm>
+#include <limits>
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 namespace {
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -120,42 +127,73 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
-__simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(uint32_t);
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint8_t MUTEX_ID = 0;
+
+// one_repeat_size的单位为uint32_t元素；第i轮指针偏移i * one_repeat_size个元素，
+// 对应i * one_repeat_size * sizeof(uint32_t)字节。
+__simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_uint32_t dst_reg, src_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_loadalign(src_reg, src);
-    asc_reduce_min_datablock(dst_reg, src_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_uint32_t dst_reg, src_reg;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src_reg, src + offset);
+        asc_reduce_min_datablock(dst_reg, src_reg, mask);
+        // 每轮只写出8个归约值；输入掩码不能作为输出掩码。
+        uint32_t result_count = 8;
+        vector_bool dst_mask = asc_update_mask_b32(result_count);
+        asc_storealign(dst + i * (ELEMENTS_PER_REGISTER / 8), dst_reg, dst_mask);
+    }
 }
 __global__ __vector__ void asc_reduce_min_datablock_kernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
 {
     asc_init();
-    __ubuf__ uint32_t dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(uint32_t));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    reduce(dst_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
+    __ubuf__ uint32_t dst_local[PADDED_ELEMENT_COUNT], src_local[PADDED_ELEMENT_COUNT];
+    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, PADDED_ELEMENT_COUNT * sizeof(uint32_t));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint32_t);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<reduce>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, PADDED_ELEMENT_COUNT * sizeof(uint32_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<uint32_t> src(ELEMENT_COUNT), output(ELEMENT_COUNT, 0), golden(ELEMENT_COUNT, 0);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) src[i] = i + 1;
-    for (uint32_t block = 0; block < 8; ++block) golden[block] = src[block * 8];
+    std::vector<uint32_t> src(PADDED_ELEMENT_COUNT), output(PADDED_ELEMENT_COUNT, 0), golden(PADDED_ELEMENT_COUNT, std::numeric_limits<uint32_t>::max());
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) src[i] = i + 1;
+    for (uint32_t offset = 0; offset < TOTAL_LENGTH; offset += ELEMENTS_PER_REGISTER) {
+        const uint32_t end = (offset + ELEMENTS_PER_REGISTER < TOTAL_LENGTH) ?
+            offset + ELEMENTS_PER_REGISTER : TOTAL_LENGTH;
+        for (uint32_t block = 0; block < 8 && offset + block * 8 < end; ++block) {
+            const uint32_t block_end = (offset + block * 8 + 8 < end) ? offset + block * 8 + 8 : end;
+            uint32_t value = src[offset + block * 8];
+            for (uint32_t i = offset + block * 8 + 1; i < block_end; ++i) value = value < src[i] ? value : src[i];
+            golden[(offset / ELEMENTS_PER_REGISTER) * (ELEMENTS_PER_REGISTER / 8) + block] = value;
+        }
+    }
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint32_t* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_ELEMENT_COUNT * sizeof(uint32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint32_t* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_ELEMENT_COUNT * sizeof(uint32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src_device, src.size() * sizeof(uint32_t), src.data(), src.size() * sizeof(uint32_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
@@ -163,7 +201,7 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    const bool passed = compare_data(output, golden);
+    const bool passed = std::equal(output.begin(), output.begin() + (REPEAT_COUNT * ELEMENTS_PER_REGISTER / 8), golden.begin());
     std::cout << (passed ? "[Success] asc_reduce_min_datablock passed." : "[Failed] asc_reduce_min_datablock failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

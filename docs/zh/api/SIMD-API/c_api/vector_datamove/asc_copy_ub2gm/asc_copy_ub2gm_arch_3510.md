@@ -158,10 +158,12 @@ __global__ __vector__ void asc_copy_ub2gm_arch_3510_kernel(__gm__ uint8_t* outpu
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
-    // Copy INPUT_BYTES from UB to GM, then wait only for PIPE_MTE3.
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    // 将INPUT_BYTES字节从UB搬出到GM。
     asc_copy_ub2gm(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync_pipe(PIPE_ALL);
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

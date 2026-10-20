@@ -151,7 +151,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -159,16 +159,29 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+
 constexpr uint32_t MASK_BYTES = 32;
 constexpr uint32_t PACKED_BYTES = 16;
+constexpr uint32_t LOGICAL_PACKED_BYTES = 19;
 constexpr uint32_t REPEAT_TIMES = 2;
+// 每次写出16字节，保留16字节哨兵区；所有起始地址均为16字节对齐。
 constexpr uint32_t STEP_BYTES = 32;
 constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
+constexpr uint32_t TOTAL_LENGTH = LOGICAL_PACKED_BYTES;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
+// one_repeat_size的单位为打包字节；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
-                                           __ubuf__ uint32_t* mask_input)
+                                           __ubuf__ uint32_t* mask_input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool src;
     asc_loadalign(src, mask_input);
@@ -176,10 +189,13 @@ __simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
     __ubuf__ uint8_t* dst8 = output;
     __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(output + SECTION_BYTES);
     __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(output + 2 * SECTION_BYTES);
-    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+    uint32_t remaining = LOGICAL_PACKED_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t valid_count = remaining > PACKED_BYTES ? PACKED_BYTES : remaining;
         asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
         asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
         asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
+        remaining -= valid_count;
     }
 }
 
@@ -189,14 +205,20 @@ __global__ __vector__ void asc_storealign_pack_postupdate_kernel(
     asc_init();
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
     __ubuf__ uint32_t mask_local[MASK_BYTES / sizeof(uint32_t)];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub(mask_local, mask_input, MASK_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    pack_postupdate_vf(output_local, mask_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / MASK_BYTES * PACKED_BYTES;
+    uint16_t repeat_time = REPEAT_TIMES;
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<pack_postupdate_vf>(output_local, mask_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace

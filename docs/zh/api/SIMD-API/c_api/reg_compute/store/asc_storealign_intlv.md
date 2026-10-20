@@ -177,6 +177,14 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+
 constexpr uint32_t INPUT_COUNT = 128;
 constexpr uint32_t STORE_COUNT = INPUT_COUNT * 2;
 constexpr uint32_t REPEAT_TIMES = 2;
@@ -190,21 +198,27 @@ constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = INPUT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
+constexpr uint32_t TOTAL_LENGTH = STORE_COUNT + 5;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
+// one_repeat_size的单位为交织输出元素；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void store_intlv_vf(__ubuf__ uint16_t* output,
                                        __ubuf__ uint16_t* input0,
-                                       __ubuf__ uint16_t* input1)
+                                       __ubuf__ uint16_t* input1, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src0;
     vector_uint16_t src1;
     asc_loadalign(src0, input0);
     asc_loadalign(src1, input1);
     addr_reg offset;
-    for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
+    uint32_t remaining = STORE_COUNT + 5;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t valid_count = remaining > STORE_COUNT ? STORE_COUNT : remaining;
         asc_storealign_intlv(output + i * DIRECT_STRIDE, src0, src1);
         asc_storealign_intlv(output + IMMEDIATE_BASE + i * DIRECT_STRIDE,
                              src0, src1, static_cast<int32_t>(IMMEDIATE_OFFSET));
         offset = asc_update_addr_reg_b16(ADDR_STRIDE);
         asc_storealign_intlv(output + ADDR_BASE, src0, src1, offset);
+        remaining -= valid_count;
     }
 }
 
@@ -216,15 +230,21 @@ __global__ __vector__ void store_intlv_kernel(__gm__ uint16_t* output,
     __ubuf__ uint16_t output_local[OUTPUT_COUNT];
     __ubuf__ uint16_t input0_local[INPUT_COUNT];
     __ubuf__ uint16_t input1_local[INPUT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub(input0_local, input0, INPUT_BYTES);
     asc_copy_gm2ub(input1_local, input1, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    store_intlv_vf(output_local, input0_local, input1_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = 2 * asc_get_vf_len() / sizeof(uint16_t);
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<store_intlv_vf>(output_local, input0_local, input1_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace

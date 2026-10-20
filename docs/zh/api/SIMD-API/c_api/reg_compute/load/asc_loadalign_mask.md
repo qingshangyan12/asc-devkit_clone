@@ -82,49 +82,77 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t MASK_BYTES = 32;
+constexpr uint8_t MUTEX_ID = 0;
 
-__simd_vf__ inline void asc_loadalign_mask_vf(
-    __ubuf__ uint32_t* output, __ubuf__ uint32_t* mask_input)
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
 {
-    vector_bool mask = asc_loadalign_mask(mask_input);
-    asc_storealign(output, mask);
+    return (numerator + denominator - 1) / denominator;
+}
+
+
+constexpr uint32_t MASK_WORD_COUNT = 11;
+constexpr uint32_t WORDS_PER_MASK = 8;
+constexpr uint32_t REPEAT_COUNT = (MASK_WORD_COUNT + WORDS_PER_MASK - 1) / WORDS_PER_MASK;
+constexpr uint32_t STORAGE_WORD_COUNT = REPEAT_COUNT * WORDS_PER_MASK;
+constexpr uint32_t TOTAL_MASK_BYTES = STORAGE_WORD_COUNT * sizeof(uint32_t);
+
+constexpr uint32_t TOTAL_LENGTH = MASK_WORD_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
+// one_repeat_size的单位为掩码存储字；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
+__simd_vf__ inline void asc_loadalign_mask_vf(
+    __ubuf__ uint32_t* output, __ubuf__ uint32_t* mask_input, uint16_t one_repeat_size, uint16_t repeat_time)
+{
+    uint32_t remaining = MASK_WORD_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t valid_count = remaining > WORDS_PER_MASK ? WORDS_PER_MASK : remaining;
+        const uint32_t offset = i * WORDS_PER_MASK;
+        vector_bool mask = asc_loadalign_mask(mask_input + offset);
+        asc_storealign(output + offset, mask);
+        remaining -= valid_count;
+    }
 }
 
 __global__ __vector__ void asc_loadalign_mask_kernel(
     __gm__ uint32_t* output, __gm__ uint32_t* mask_input)
 {
     asc_init();
-    __ubuf__ uint32_t output_local[MASK_BYTES / sizeof(uint32_t)];
-    __ubuf__ uint32_t mask_local[MASK_BYTES / sizeof(uint32_t)];
-    asc_copy_gm2ub_align(mask_local, mask_input, MASK_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_mask_vf>(output_local, mask_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, MASK_BYTES);
+    __ubuf__ uint32_t output_local[STORAGE_WORD_COUNT];
+    __ubuf__ uint32_t mask_local[STORAGE_WORD_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(mask_local, mask_input, TOTAL_MASK_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint32_t) / 8;
+    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<asc_loadalign_mask_vf>(output_local, mask_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, output_local, TOTAL_MASK_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint32_t> output(MASK_BYTES / sizeof(uint32_t), 0);
-    std::vector<uint32_t> mask_input(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
+    std::vector<uint32_t> output(STORAGE_WORD_COUNT, 0);
+    std::vector<uint32_t> mask_input(STORAGE_WORD_COUNT, 0x55555555u);
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint32_t* output_device = nullptr;
     uint32_t* mask_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&mask_device), MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(mask_device, MASK_BYTES, mask_input.data(), MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&mask_device), TOTAL_MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(mask_device, TOTAL_MASK_BYTES, mask_input.data(), TOTAL_MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_loadalign_mask_kernel<<<1, 0>>>(output_device, mask_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), MASK_BYTES, output_device, MASK_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output.data(), TOTAL_MASK_BYTES, output_device, TOTAL_MASK_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == mask_input;
+    bool passed = true;
+    for (uint32_t i = 0; i < MASK_WORD_COUNT; ++i) passed = passed && output[i] == mask_input[i];
     std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadalign_mask example." << std::endl;
     aclrtFree(output_device);
     aclrtFree(mask_device);
