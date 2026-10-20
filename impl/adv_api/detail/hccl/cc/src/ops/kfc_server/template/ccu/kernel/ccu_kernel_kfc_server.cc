@@ -22,6 +22,7 @@
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
+#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_half_alltoallv_mesh1d.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -137,13 +138,62 @@ static CcuResult CompArgs(KfcServerContext& ctx)
     return CCU_SUCCESS;
 }
 
-void MissionPreSync(const ccu::Variable& func, const KfcServerContext& ctx)
+CcuResult MissionPreSync(const ccu::Variable& func, KfcServerContext& ctx)
 {
     (void)func;
-    (void)ctx;
+
+    // 单 mission 时短路，零影响现有路径
+    // Variable 支持 == 和 != 与 uint64_t 比较
+    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
+    CCU_IF(ctx.missionNum == 1)
+    {
+        // 单 mission 模式：无需同步，直接返回
+    }
+    CCU_ELSE
+    {
+        // 双 mission 栅障同步：用 tag-based local notify 实现 mission 间互斥等待
+        // 替代 hcomm 的 ExportMaskSignal + LocalCtxPost/LocalWait 机制
+        // missionIndex==0 发出 bit 0，等待 bit 1
+        // missionIndex==1 发出 bit 1，等待 bit 0
+        CCU_IF(ctx.missionIndex == 0)
+        {
+            // mission 0: post bit 0, wait bit 1
+            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi0", 1 << 0));
+            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi1", 1 << 1));
+        }
+        CCU_ELSE
+        {
+            // mission 1: post bit 1, wait bit 0
+            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi1", 1 << 1));
+            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi0", 1 << 0));
+        }
+    }
+    return CCU_SUCCESS;
 }
 
-void MissionPostSync(const KfcServerContext& ctx) { (void)ctx; }
+CcuResult MissionPostSync(KfcServerContext& ctx)
+{
+    // 单 mission 时短路
+    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
+    CCU_IF(ctx.missionNum == 1)
+    {
+        // 单 mission 模式：无需同步，直接返回
+    }
+    CCU_ELSE
+    {
+        // 双 mission 模式：仅 mission 0 负责执行远程 Post 同步
+        // （对应 hcomm 的 PostSync：RemotePost 到各 transport + GroupWait）
+        // mission 1 无需执行此步骤
+        CCU_IF(ctx.missionIndex == 0)
+        {
+            // mission 0 的远程 Post 逻辑由具体算子 kernel 的 PostSync 实现
+            // （HalfAlltoAllV 已在其 PostSync 中实现 NotifyRecord + NotifyWait 循环）
+            // 此处仅作为框架层的 hook，确保调用时机正确
+        }
+        // mission 1 走 ELSE 分支：什么都不做
+    }
+    return CCU_SUCCESS;
+}
 
 CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, const KfcServerContext& ctx)
 {
@@ -403,6 +453,19 @@ static void DispatchKfcSubKernel(
                 param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], ctx.arg->channels,
                 ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
         }
+    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
+        // 单 mission xn 布局（与 CcuPrepareForAllToAllVWrite 严格对应）：
+        // [0]=opId(签名+哨兵) [1]=sendBuf [2]=sendSizes [3]=sendOffsets
+        // [4..7]=goSize [8]=remoteWinOffset
+        // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位
+        //
+        // 阶段 3-1：将 missionNum 和 missionIndex 传递给 HalfAlltoAllV kernel
+        // 使其能够根据 mission 选择对应的 A/B 切片
+        CcuKfcHalfAlltoAllVMesh1DKernel(
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+            ctx.token, ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
+            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex);
     }
 }
 
@@ -447,9 +510,9 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
-            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
             DispatchKfcSubKernel(param, ctx, recordAddr);
-            MissionPostSync(ctx);
+            CCU_CHK_RET(MissionPostSync(ctx));
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
             if (!KernelEmitsEarlyTurnEnd(ctx)) {
@@ -474,27 +537,43 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     ccu::Variable signature; // 算子签名
-
     ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
     repeatCond = 0;
 
     ccu::Variable paramAddr;
     paramAddr = ctx.xnAddr;
 
+    // 阶段 3-2：添加wraparound所需的游标和常量（与master对齐）
+    ccu::Variable paramSize;
+    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ccu::Variable queueIdx;
+    ccu::Variable one;
+    queueIdx = 0;
+    one = 1;
+
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
 
     CCU_WHILE(repeatCond == 0)
     {
-        MissionPreSync(signature, ctx);                              // 在context中依次加入8轮指令
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-
+        // 阶段 3-2：先加载参数，检查哨兵，仅在非哨兵轮次才进入 barrier
+        // 保持 slave 与 master 的 barrier 对称，避免在 sentinel 轮次卡死在 MissionPreSync
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
+            CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
             // turnEndAddr 仅 SoleNHR AG 消费；slave 不会以该角色 dispatch（死代码路径，保持编译）。
             DispatchKfcSubKernel(param, ctx, ctx.recordAddr);
+            CCU_CHK_RET(MissionPostSync(ctx));
         }
-        MissionPostSync(ctx);
+        // 阶段 3-2：推进参数地址游标，wraparound at CCU_TASK_NUM_MAX
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
+        }
     }
     return CCU_SUCCESS;
 }
