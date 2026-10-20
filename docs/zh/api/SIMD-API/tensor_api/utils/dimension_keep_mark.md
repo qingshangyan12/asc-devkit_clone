@@ -34,7 +34,7 @@ Tensor API提供`keep_mark`类型和常量`_`，当前仅用于在`squeeze`接�
 
 ```cpp
 struct keep_mark {
-    __aicore__ inline constexpr keep_mark() = default;
+    __aicore__ inline constexpr keep_mark() = default
 };
 
 inline constexpr keep_mark _{};
@@ -57,6 +57,6 @@ inline constexpr keep_mark _{};
 using namespace asc::te;
 
 // 删除大小为1的第二个维度，保留第一个和第三个维度。
-auto source_layout = make_layout(make_shape(4, _1{}, 8));
-auto squeezed_layout = squeeze(source_layout, make_coord(_, _1{}, _));
+auto source_layout = make_layout(make_shape(4, _1{}, 8))
+auto squeezed_layout = squeeze(source_layout, make_coord(_, _1{}, _))
 ```

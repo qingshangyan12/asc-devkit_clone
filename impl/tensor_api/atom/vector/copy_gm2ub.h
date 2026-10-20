@@ -30,23 +30,39 @@ namespace asc {
 namespace te {
 
 template <typename Traits>
-struct copy_traits<copy_gm_to_ub, Traits> : public copy_traits<copy_gm_to_ub, Traits, copy_gm_to_ub_with, Traits> {};
+struct copy_traits<copy_gm_to_ub, Traits> : public copy_traits<copy_gm_to_ub, Traits, copy_gm_to_ub_with, Traits> {
+    template <typename Params>
+    __aicore__ inline constexpr auto with(const Params& params) const
+    {
+        return copy_traits<copy_gm_to_ub_with, Traits, Params>{params};
+    }
+};
 
 template <>
 struct copy_traits<copy_gm_to_ub> : public copy_traits<copy_gm_to_ub, gm_to_ub_trait_default> {};
 
-template <typename TraitStruct>
-struct copy_traits<copy_gm_to_ub_with, TraitStruct> {
+template <typename TraitStruct, typename Params>
+struct copy_traits<copy_gm_to_ub_with, TraitStruct, Params> {
     using trait_type = get_trait_member_type_t<TraitStruct>;
     static constexpr const trait_type default_trait = TraitStruct::value;
+
+    template <typename NewParams>
+    __aicore__ inline constexpr auto with(const NewParams& params) const
+    {
+        return copy_traits<copy_gm_to_ub_with, TraitStruct, NewParams>{params};
+    }
 
     template <const trait_type& trait = default_trait, typename... Args>
     __aicore__ inline void copy_unpack(const Args&... args) const
     {
-        copy_gm_to_ub_with::template copy<trait_type, trait, Args...>(args..., params);
+        copy_gm_to_ub_with::template copy<decltype(params), trait_type, trait, Args...>(args..., params);
     }
 
-    gm_to_ub_params params{};
+    Params params{};
+};
+
+template <typename TraitStruct>
+struct copy_traits<copy_gm_to_ub_with, TraitStruct> : copy_traits<copy_gm_to_ub_with, TraitStruct, gm_to_ub_params> {
 };
 
 } // namespace te
