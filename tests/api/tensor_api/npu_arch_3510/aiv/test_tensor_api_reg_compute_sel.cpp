@@ -82,10 +82,15 @@ __simd_vf__ inline void compile_reg_mask_pack_unpack(vector_bool mask)
 }
 
 template <typename T>
+vector_bool expected_compress_mask{};
+
+template <typename T>
 void compress_stub(
     typename asc::te::experimental::reg_tensor<T>::reg_type& dst,
     typename asc::te::experimental::reg_tensor<T>::reg_type src, vector_bool mask, Literal mode)
 {
+    EXPECT_EQ(mask, expected_compress_mask<T>);
+    EXPECT_EQ(mode, MODE_NO_STORED);
     dst = src;
 }
 
@@ -107,13 +112,14 @@ __simd_vf__ inline void compile_reg_compress(vector_bool mask)
     asc::te::experimental::reg_tensor<T> src{};
     std::memset(&src.reg, 0x12, sizeof(src.reg));
     src.mask = mask;
+    expected_compress_mask<T> = mask;
     MOCKER(static_cast<void (*)(reg_type&, reg_type, vector_bool, Literal)>(vsqz))
         .expects(once())
-        .with(any(), any(), eq(mask), any())
         .will(invoke(compress_stub<T>));
     auto compressed = asc::te::experimental::compress(src);
     static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(std::memcmp(&compressed.reg, &src.reg, sizeof(src.reg)), 0);
+    EXPECT_EQ(compressed.mask, src.mask);
     GlobalMockObject::verify();
 }
 
@@ -149,6 +155,7 @@ TEST(tensor_api_reg_compute_sel_3510, pack_unpack_mask)
     {                                                            \
         auto mask = asc::te::experimental::all_mask<DataType>(); \
         compile_reg_compress<DataType>(mask.reg);                \
+        compile_reg_compress<DataType>(static_cast<vector_bool>(0x5A5A)); \
     }
 
 TENSOR_API_COMPRESS_TEST(int8_t)
