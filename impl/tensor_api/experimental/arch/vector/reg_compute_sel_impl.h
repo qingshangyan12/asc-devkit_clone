@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/tensor_api/experimental/arch/vector/reg_compute_sel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/experimental/arch/vector/reg_compute_sel.h instead."
+    "impl/tensor_api/experimental/arch/vector/reg_compute_sel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_compute_sel.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_SEL_IMPL_H
 #endif
@@ -40,7 +40,17 @@ struct pack_dst_type<uint16_t> {
 };
 
 template <>
+struct pack_dst_type<int16_t> {
+    using type = uint8_t;
+};
+
+template <>
 struct pack_dst_type<uint32_t> {
+    using type = uint16_t;
+};
+
+template <>
+struct pack_dst_type<int32_t> {
     using type = uint16_t;
 };
 
@@ -143,7 +153,7 @@ __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src)
         "pack only supports high_low_part::low and high_low_part::high");
     static_assert(
         detail::is_pack_support_type_v<T>, "pack with reg_tensor<T> only supports "
-                                           "bool, uint16_t and uint32_t.");
+                                           "bool, uint16_t, int16_t, uint32_t and int32_t.");
 
     using dst_type = detail::pack_dst_t<T>;
     reg_tensor<dst_type> dst;
@@ -178,7 +188,7 @@ __simd_callee__ inline decltype(auto) unpack(reg_tensor<T> src)
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool> mask)
+__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src)
 {
     static_assert(
         detail::is_compress_support_type_v<T>,
@@ -187,7 +197,8 @@ __simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool
         "bfloat16_t, uint32_t, int32_t and float.");
 
     reg_tensor<T> dst;
-    asc_squeeze(dst.reg, src.reg, mask.reg);
+    asc_squeeze(dst.reg, src.reg, src.mask);
+    dst.mask = src.mask;
     return dst;
 }
 

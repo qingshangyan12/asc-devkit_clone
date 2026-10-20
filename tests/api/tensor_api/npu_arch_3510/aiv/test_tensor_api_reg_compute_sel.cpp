@@ -17,7 +17,7 @@
 
 namespace {
 
-template <typename SrcType, typename PackedType>
+template <typename SrcType, typename PackedType, typename UnpackedType = SrcType>
 __simd_vf__ inline void compile_reg_data_pack_unpack(vector_bool mask)
 {
     asc::te::experimental::reg_tensor<SrcType> src{};
@@ -35,9 +35,9 @@ __simd_vf__ inline void compile_reg_data_pack_unpack(vector_bool mask)
     auto unpacked_default = asc::te::experimental::unpack(packed_default);
     auto unpacked_low = asc::te::experimental::unpack<asc::te::experimental::high_low_part::low>(packed_low);
     auto unpacked_high = asc::te::experimental::unpack<asc::te::experimental::high_low_part::high>(packed_high);
-    static_assert(AscendC::Std::is_same_v<decltype(unpacked_default), asc::te::experimental::reg_tensor<SrcType>>);
-    static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<SrcType>>);
-    static_assert(AscendC::Std::is_same_v<decltype(unpacked_high), asc::te::experimental::reg_tensor<SrcType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_default), asc::te::experimental::reg_tensor<UnpackedType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<UnpackedType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_high), asc::te::experimental::reg_tensor<UnpackedType>>);
     EXPECT_EQ(unpacked_default.mask, mask);
     EXPECT_EQ(unpacked_low.mask, mask);
     EXPECT_EQ(unpacked_high.mask, mask);
@@ -107,13 +107,11 @@ __simd_vf__ inline void compile_reg_compress(vector_bool mask)
     asc::te::experimental::reg_tensor<T> src{};
     std::memset(&src.reg, 0x12, sizeof(src.reg));
     src.mask = mask;
-    asc::te::experimental::reg_tensor<bool> select_mask{};
-    select_mask.reg = mask;
     MOCKER(static_cast<void (*)(reg_type&, reg_type, vector_bool, Literal)>(vsqz))
         .expects(once())
-        .with(any(), any(), any(), any())
+        .with(any(), any(), eq(mask), any())
         .will(invoke(compress_stub<T>));
-    auto compressed = asc::te::experimental::compress(src, select_mask);
+    auto compressed = asc::te::experimental::compress(src);
     static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(std::memcmp(&compressed.reg, &src.reg, sizeof(src.reg)), 0);
     GlobalMockObject::verify();
@@ -134,6 +132,8 @@ TEST(tensor_api_reg_compute_sel_3510, pack_unpack_data)
     auto mask = asc::te::experimental::all_mask<uint16_t>();
     compile_reg_data_pack_unpack<uint16_t, uint8_t>(mask.reg);
     compile_reg_data_pack_unpack<uint32_t, uint16_t>(mask.reg);
+    compile_reg_data_pack_unpack<int16_t, uint8_t, uint16_t>(mask.reg);
+    compile_reg_data_pack_unpack<int32_t, uint16_t, uint32_t>(mask.reg);
     compile_reg_data_unpack<int8_t, int16_t>(mask.reg);
     compile_reg_data_unpack<int16_t, int32_t>(mask.reg);
 }

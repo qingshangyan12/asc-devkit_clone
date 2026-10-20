@@ -52,17 +52,16 @@ __simd_callee__ inline decltype(auto) unpack(reg_tensor<T> src);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
- * @brief Compresses the lanes selected by mask into contiguous low lanes.
+ * @brief Compresses the lanes selected by the source tensor mask into contiguous low lanes.
  *
- * @override_id te_experimental_compress__reg_tensor_T_reg_tensor_bool__template_T
+ * @override_id te_experimental_compress__reg_tensor_T__template_T
  * @archs 3510
  * @tparam T Element type of the source register tensor.
  * @return A register tensor containing selected elements packed into low lanes.
- * @param [in] src Source register tensor.
- * @param [in] mask Lane-selection mask.
+ * @param [in] src Source register tensor whose mask selects the lanes to compress.
  */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool> mask);
+__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
