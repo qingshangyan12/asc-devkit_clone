@@ -29,10 +29,15 @@ namespace te {
 namespace experimental {
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_index_compute
  * @brief Creates an arithmetic lane-index register from a scalar start value.
+ *
+ * @override_id te_experimental_iota__const_T_R__template_order_T
+ * @archs 3510
  * @tparam order Sequence order. increase generates ascending lane values; decrease generates descending lane values.
- * @param start Scalar start value.
+ * @tparam T Type of the scalar start value and generated lane values.
  * @return A register tensor containing the generated lane-index sequence.
+ * @param [in] start Scalar start value.
  */
 template <iota_order order = iota_order::increase, typename T>
 __simd_callee__ inline reg_tensor<Std::remove_cvref_t<T>> iota(const T& start);

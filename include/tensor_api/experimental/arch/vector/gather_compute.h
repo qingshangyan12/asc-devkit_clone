@@ -26,10 +26,16 @@ namespace asc {
 namespace te {
 namespace experimental {
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.gather_compute
  * @brief Gathers elements from a source register tensor according to per-lane indexes.
- * @param src Source register tensor.
- * @param index Register tensor containing per-lane source indexes.
+ *
+ * @override_id te_experimental_gather__const_reg_tensor_DataType_R_const_reg_tensor_IndexType_R__template_DataType_IndexType
+ * @archs 3510
+ * @tparam DataType Element type of the source and result register tensors.
+ * @tparam IndexType Element type of the index register tensor.
  * @return A register tensor containing the gathered data. The result mask is inherited from index.
+ * @param [in] src Source register tensor.
+ * @param [in] index Register tensor containing per-lane source indexes.
  */
 template <typename DataType, typename IndexType>
 __simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index);
