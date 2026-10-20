@@ -100,6 +100,12 @@ $dst_i = scalar \div src_i$
 <!-- npu="9020" id13 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id13 -->
+<!-- npu="9030" id14 -->
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id14 -->
+<!-- npu="x90" id15 -->
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id15 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
