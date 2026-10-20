@@ -106,6 +106,25 @@ function(configure_mc2_server_minimal_target)
             -Wl,-soname,libccl_kernel_plf.so)
     endif()
 
+    # asccomm 提供者登记（与 ccl_kernel 桩同机制）：server 数据面已切到 asccomm_*，
+    # 这些是对 libasccomm_aicpu.so 的 loose-U（不在任何已链库中定义）。AICPU 按每个 so
+    # 的 NEEDED 逐 so dlopen（OpenSo/CreateSingleSoMgr），不会预加载部署目录里的全部库，
+    # 故必须把 libasccomm_aicpu.so 登记进 NEEDED 才能拉起运行期提供者（真身由设备侧
+    # asccomm_aicpu.tar.gz 部署单元供给）。此处仅建空壳桩登记 soname，不打包其产物。
+    if(NOT TARGET mc2_server_asccomm_stub)
+        set(MC2_SERVER_ASCCOMM_STUB_SRC
+            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_asccomm_stub.cc)
+        file(WRITE ${MC2_SERVER_ASCCOMM_STUB_SRC}
+            "extern \"C\" void __mc2_asccomm_stub(void) {}\n")
+        add_library(mc2_server_asccomm_stub SHARED
+            ${MC2_SERVER_ASCCOMM_STUB_SRC})
+        set_target_properties(mc2_server_asccomm_stub PROPERTIES
+            OUTPUT_NAME asccomm_aicpu
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
+        target_link_options(mc2_server_asccomm_stub PRIVATE
+            -Wl,-soname,libasccomm_aicpu.so)
+    endif()
+
     target_compile_definitions(mc2_server PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_DEFINITIONS>
     )
@@ -126,6 +145,7 @@ function(configure_mc2_server_minimal_target)
         ${HCCL_C_SEC_LINK}
         ${HCCL_UNIFIED_DLOG_LINK}
         mc2_server_ccl_kernel_plf_stub
+        mc2_server_asccomm_stub
         ${HCCL_MMPA_LINK}
         -Wl,--as-needed
         -lrt

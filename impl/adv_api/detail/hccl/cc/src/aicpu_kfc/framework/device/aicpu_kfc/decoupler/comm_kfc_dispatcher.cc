@@ -186,11 +186,13 @@ HcclResult GroupServerProcess(std::vector<AscCommServerInfo>& serverList, u32 gr
 
 u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
 {
+    HCCL_ERROR("[PROBE] kfc Run enter, ctxNum[%u].", ctxNum);
     std::vector<AscCommServerInfo> serverList{};
     CHK_RET(CreateServerList(args, ctxNum, serverList));
 
     u32 finishCnt = 0U;
     u32 expectSeqNum = 0U;
+    HCCL_ERROR("[PROBE] kfc waiting.");
     while (finishCnt != serverList.size()) {
         for (u32 i = 0U; i < serverList.size(); ++i) {
             HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
@@ -198,5 +200,6 @@ u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
         }
     }
 
+    HCCL_ERROR("[PROBE] kfc Run exit, ret[0].");
     return HCCL_SUCCESS;
 }

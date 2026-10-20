@@ -19,9 +19,11 @@ using namespace HcclApi;
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
+    HCCL_ERROR("[PROBE] enter Mc2ServerKernel.");
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
+        HCCL_ERROR("[PROBE] exit Mc2ServerKernel, ret[%u].", static_cast<uint32_t>(HCCL_E_PARA));
         return HCCL_E_PARA;
     }
 
@@ -29,10 +31,14 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
     if (descValue == MC2_AICPU_SIMPLE_CTX_PROTOCOL) {
         HCCL_INFO("[Mc2ServerKernel]Simple ctx protocol, ctxNum is 1.");
-        return CommKfcDispatcher::Run(&(args[1]), 1U);
+        uint32_t probeRet = CommKfcDispatcher::Run(&(args[1]), 1U);
+        HCCL_ERROR("[PROBE] exit Mc2ServerKernel (simple ctx), ret[%u].", probeRet);
+        return probeRet;
     }
     auto* desc = reinterpret_cast<CommKfcParamDesc*>(&descValue);
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
     HCCL_INFO("[Mc2ServerKernel]Finish Mc2ServerKernel.");
-    return CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
+    uint32_t probeRet = CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
+    HCCL_ERROR("[PROBE] exit Mc2ServerKernel, ret[%u].", probeRet);
+    return probeRet;
 }
