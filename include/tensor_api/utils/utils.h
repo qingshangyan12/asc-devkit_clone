@@ -31,6 +31,18 @@ namespace Std = AscendC::Std;
 
 enum class unit_flag_mode : uint8_t { disable = 0, enable_keep = 2, enable_update = 3 };
 
+/** @brief Initialize device state; semantics follow asc_init. */
+__aicore__ inline void init_soc_state();
+
+/** @brief Return the current sub-block ID. */
+__aicore__ inline int64_t get_sub_block_id();
+
+/** @brief Return the sub-block count. */
+__aicore__ inline int64_t get_sub_block_num();
+
+/** @brief Return the physical buffer address for offset. */
+__aicore__ inline uint64_t get_phy_buf_addr(uint64_t offset);
+
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
 using _2 = Std::Int<2>;
@@ -75,5 +87,7 @@ struct ssbuf {};
 
 } // namespace te
 } // namespace asc
+
+#include "impl/tensor_api/utils/sys_var_impl.h"
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
