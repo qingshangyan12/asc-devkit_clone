@@ -98,8 +98,9 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
 endif()
 
 if (BUILD_OPEN_PROJECT)
-    add_subdirectory(detail/hccl/cc)
+    # asc-comm 头树先就位（ASC_COMM_SOURCE_PATH），hccl/cc 的 mc2 构建在 include 路径中消费 asccomm 头
     include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
+    add_subdirectory(detail/hccl/cc)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
