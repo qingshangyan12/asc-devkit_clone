@@ -256,7 +256,7 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
 
 template <typename T, typename U>
 constexpr bool ShiftScalarSupported() {
-    return SupportType<U, int16_t>() || 
+    return SupportType<U, int16_t>() ||
            (SupportType<T, uint8_t, int8_t>() && SupportType<U, uint8_t>()) ||
            (SupportType<T, uint16_t, int16_t>() && SupportType<U, uint16_t>()) ||
            (SupportType<T, uint32_t, int32_t>() && SupportType<U, uint32_t>());
@@ -265,10 +265,10 @@ constexpr bool ShiftScalarSupported() {
 template <typename T>
 using ShiftScalarT = Std::conditional_t<SupportType<T, uint8_t, int8_t>(), uint8_t,
                      Std::conditional_t<SupportType<T, uint16_t, int16_t>(), uint16_t,
-                     Std::conditional_t<SupportType<T, uint32_t, int32_t>(), uint32_t>>>;
+                     Std::conditional_t<SupportType<T, uint32_t, int32_t>(), uint32_t, uint16_t>>>;
 
 template <typename T, typename U>
-__simd__callee__ inline ShiftScalar<T> GetShiftScalarValue(U scalarValue) {
+__simd_callee__ inline ShiftScalarT<T> GetShiftScalarValue(U scalarValue) {
     if constexpr (SupportType<T, uint8_t, int8_t>() && !std::is_same_v<U, uint8_t>) {
         scalarValue = scalarValue > 255 ? 255 : scalarValue;
     }
