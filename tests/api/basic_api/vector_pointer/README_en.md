@@ -56,7 +56,7 @@ These scripts include the compilation commands and produce build/run logs in the
 | Header fixtures | Compile the target interfaces and verify the compiler uses the modified headers |
 | Negative operands | One valid control; reject const output, wrong address space and inconsistent element types |
 | Runtime suites | Arithmetic, conversion, comparison, indexing, layout, sorting, transpose and special interfaces; Tensor/pointer permutations |
-| CPU_DEBUG address | GetAbsAddr member/free forms in UB/L1 at multiple offsets |
+| CPU_DEBUG address and headers | GetAbsAddr member/free forms in UB/L1 at multiple offsets; compile the public compare/select header for six architecture definitions to check legacy compatibility |
 | Signature extensions | Explicit element types, shift counts, comparison masks and Select level-0 forms |
 | Precision instrumentation | Per-case parameters, mixed-tolerance match ratio, maximum error and exact-type checks; see precision_metrics.h |
 

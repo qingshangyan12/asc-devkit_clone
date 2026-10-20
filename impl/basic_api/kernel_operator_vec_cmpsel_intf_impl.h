@@ -59,6 +59,9 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // Shared pointer dispatch for scalar-source and vector-source Select forms.
 template <const BinaryConfig& config, typename D, typename M, typename A, typename B, typename... Args>
 __aicore__ inline void VectorSelectDispatch(D dst, M sel, A a, B b, SELMODE mode, Args... args)
@@ -86,6 +89,7 @@ __aicore__ inline void VectorSelectDispatch(D dst, M sel, A a, B b, SELMODE mode
         static_assert(VectorOperand::AllOperands<A, B>(), "Select requires at least one vector source");
     }
 }
+#endif
 
 /* **************************************************************************************************
  * Compare                                           *

@@ -56,7 +56,7 @@ python3 tests/api/basic_api/vector_pointer/run_precision_regressions.py --output
 | 头文件编译 | 编译目标接口，确认采用本次修改的头文件 |
 | 非法操作数 | 一个合法对照，以及只读输出、错误地址空间、元素类型不一致等拒绝用例 |
 | 设备回归 | 算术、转换、比较、索引、布局、排序、转置和特殊接口；Tensor/指针排列组合 |
-| CPU_DEBUG 地址 | GetAbsAddr 成员和自由函数的 UB/L1 多偏移验证 |
+| CPU_DEBUG 地址与头文件 | GetAbsAddr 成员和自由函数的 UB/L1 多偏移验证；六种架构定义下编译公共比较/选择头文件，检查旧架构兼容性 |
 | 补充签名 | 显式元素类型、移位计数、比较掩码和 Select level-0 形式 |
 | 精度记录 | 逐用例参数、混合容差匹配率、最大误差及整数精确比较；判据见 precision_metrics.h |
 

@@ -31,3 +31,21 @@ printf '\n' >> "${logs}/command.txt"
 export LD_LIBRARY_PATH="${cpu}/lib64/Ascend950PR_9599:${cpu}/lib64:${model}:${LD_LIBRARY_PATH:-}"
 "${logs}/get_abs_addr_cpu" > "${logs}/cpu_run.log" 2>&1
 cat "${logs}/cpu_run.log"
+
+# Parse the public comparison/selection header with the CPU_DEBUG architecture
+# definitions used by LLT. Legacy products do not declare TypeUtils.
+printf '#include "basic_api/kernel_operator_vec_cmpsel_intf.h"\n' > "${logs}/cmpsel_include.cpp"
+for target in 1001:C100 2002:M200 2201:C220 3002:M300 3102:M310 3510:C310; do
+    arch=${target%%:*}
+    product=${target#*:}
+    header_flags=(-std=c++17 -fsyntax-only "-D__NPU_ARCH__=${arch}" "-D__DAV_${product}__"
+                  -DASCENDC_CPU_DEBUG=1 -D__callee__= -D_GLIBCXX_USE_CXX11_ABI=0)
+    for dir in . include include/basic_api include/utils impl impl/basic_api; do
+        header_flags+=(-iquote "${root}/${dir}")
+    done
+    command=(g++ "${header_flags[@]}" -I"${cpu}/include" "${logs}/cmpsel_include.cpp")
+    printf '%q ' "${command[@]}" > "${logs}/header_${arch}_command.txt"
+    printf '\n' >> "${logs}/header_${arch}_command.txt"
+    "${command[@]}" > "${logs}/header_${arch}.log" 2>&1
+    printf 'PASS public cmpsel header CPU_DEBUG arch=%s\n' "${arch}"
+done
