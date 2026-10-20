@@ -29,7 +29,8 @@ namespace experimental {
  * @ingroup simd_api.tensor_api.reg_vector_compute.gather_compute
  * @brief Gathers elements from a source register tensor according to per-lane indexes.
  *
- * @override_id te_experimental_gather__const_reg_tensor_DataType_R_const_reg_tensor_IndexType_R__template_DataType_IndexType
+ * @override_id
+ * te_experimental_gather__const_reg_tensor_DataType_R_const_reg_tensor_IndexType_R__template_DataType_IndexType
  * @archs 3510
  * @tparam DataType Element type of the source and result register tensors.
  * @tparam IndexType Element type of the index register tensor.
