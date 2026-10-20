@@ -479,6 +479,13 @@ class TestCompileOp(unittest.TestCase):
                     mock_generate_manifest = stack.enter_context(
                         mock.patch.object(static_compile_resource_generator, "ManifestPackageWriter")
                     )
+                    manifest_path = Path(stack.enter_context(TemporaryDirectory())) / "test_manifest.json"
+
+                    def write_manifest():
+                        manifest_path.write_text(json.dumps({"resource_id": "resource-id"}), encoding="utf-8")
+                        return str(manifest_path)
+
+                    mock_generate_manifest.return_value.write.side_effect = write_manifest
                     compile_op_common_part("test.cpp", "test", op_info, CompileOptionTuple([], []), infered_info, {})
         finally:
             global_var_storage.set_variable("ascendc_enable_super_kernel", False)
@@ -672,13 +679,17 @@ class TestCompileOp(unittest.TestCase):
     def test_kernel_spec_reports_producer_errors_as_ascendc_errors(self):
         compile_info = CompileInfo()
         compile_info.dst_file = "/tmp/kernel.o"
-        kernel_spec = object.__new__(compile_op_module.KernelSpecCompilation)
-        kernel_spec.enabled = True
-        kernel_spec.compile_info = compile_info
-        kernel_spec.kernel_spec_dir = "/tmp/kernel_spec"
+        compile_info.kernel_name = "TestKernel"
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = False
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("kernel_spec_mode", "Normal")
+            ctx.add_addition("kernel_spec_dir", "/tmp/kernel_spec")
+            with mock.patch.object(CommonUtility, "is_v220", return_value=True):
+                kernel_spec = compile_op_module.KernelSpecCompilation.create(
+                    compile_info, CompileOptionTuple([], []), tiling_info
+                )
         kernel_spec.resource_id = "resource-id"
-        kernel_spec.basic_compile_info = compile_info
-        kernel_spec.sk_compile_info = None
 
         cases = (
             (
@@ -689,7 +700,8 @@ class TestCompileOp(unittest.TestCase):
                     side_effect=static_compile_resource_generator.ManifestGenerationError("manifest failed"),
                 ),
                 lambda: kernel_spec.publish_manifest(TilingInfo(), 0),
-                "generate Manifest failed, reason is: manifest failed",
+                "Kernel Spec manifest generation failed: kernel=TestKernel, "
+                "mode=Normal, output_dir=/tmp/kernel_spec; manifest failed",
             ),
         )
         for stage, producer_patch, action, expected_message in cases:
@@ -740,6 +752,9 @@ class TestCompileOp(unittest.TestCase):
                                 self.assertEqual(current_values, (False, False, True))
                                 if failure_stage == "body":
                                     raise RuntimeError(message)
+                                manifest_path = Path(stack.enter_context(TemporaryDirectory())) / "test_manifest.json"
+                                manifest_path.write_text("{}", encoding="utf-8")
+                                kernel_spec._manifest_path = str(manifest_path)
                                 kernel_spec.sk_compile_info.gen_kernel_func_file = "/tmp/sk.cpp"
 
                 restored_values = tuple(global_var_storage.get_variable(name) for name in variable_names)
