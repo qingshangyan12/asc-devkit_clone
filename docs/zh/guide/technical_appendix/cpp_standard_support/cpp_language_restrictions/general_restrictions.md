@@ -5,7 +5,7 @@
 -   不支持虚函数
 -   不支持虚继承
 -   不支持运行时递归
--   不支持动态malloc/free、new/delete
+-   不支持动态内存分配，即malloc、free、new、delete均不可用
 -   不支持STL
 -   不支持运行时typeid
 -   不支持文件系统IO
@@ -13,7 +13,7 @@
 
 ## 指针与内存地址
 
-指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM/UB指针不能在Host侧解引用，Host栈或全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
+指针解引用，如`*pointer`、`pointer->member`、`pointer[0]`等操作，不允许跨空间执行：Device侧的GM、UB指针不能在Host侧解引用，Host栈或全局地址不能在Device侧解引用，原因是Host侧与Device侧地址空间相互不可见，此类跨空间访问在编程模型层面禁止。
 
 ### 取Device函数的地址
 
@@ -29,7 +29,7 @@
     }
     ```
 
-- SIMT VF/SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识。
+- SIMT VF与SIMD VF内的callee函数可以函数指针形式间接调用，但函数指针类型须携带与函数一致的callee标识。
 
     `__simt_callee__`和`__simd_callee__`标记使函数类型带上函数属性，向普通函数指针转换时报错：
 
@@ -148,7 +148,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### static局部变量
 
-核函数与`__aicore__`函数内允许声明static局部变量，但**不保证多核/多线程间的读写结果确定**，原因如下：
+核函数与`__aicore__`函数内允许声明static局部变量，但**不保证多核、多线程间的读写结果确定**，原因如下：
 
 -   **存放位置**：static局部变量位于GM中的全局数据区，被同一核函数的全部执行实例即所有核和所有线程共享，并非线程私有；
 -   **多核并发竞争**：多个核并行执行同一核函数时，对同一static变量的读改写操作如`counter += 1`交错执行，无原子性与互斥保证，最终值取决于各核的执行时序；
@@ -272,7 +272,7 @@ __global__ __launch_bounds__(128) void probe(int* flag, float* output, uint32_t 
 }
 ```
 
-若去掉volatile，编译器可将循环内的多次读取合并为一次加载甚至完全消除，将无法实及时获取到其他执行单元对该地址的修改。但volatile只保证访问不被优化，不保证读到其他核/线程写入的最新值。原因是各核对GM的修改缺乏跨核可见性与顺序保证，轮询也有可能读到旧值。
+若去掉volatile，编译器可将循环内的多次读取合并为一次加载甚至完全消除，将无法实及时获取到其他执行单元对该地址的修改。但volatile只保证访问不被优化，不保证读到其他核、其他线程写入的最新值。原因是各核对GM的修改缺乏跨核可见性与顺序保证，轮询也有可能读到旧值。
 
 ### constexpr全局只读表
 
@@ -295,7 +295,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 **数组下标越界不被编译器拦截，属未定义行为**。运行期下标越界、编译期常量下标越界、经指针算术越界（`*(tp + idx)`）在编译期均无告警无报错，需用户自行做好越界保护。
 
 > [!NOTE]说明
-> 混合编程SIMT VF内**直接**以运行期下标索引constexpr全局表会触发编译报错；VF内需要索引全局表时，先将表元素拷贝到VF函数局部数组再索引。
+> SIMD与SIMT混合编程的SIMT VF内**直接**以运行期下标索引constexpr全局表会触发编译报错；VF内需要索引全局表时，先将表元素拷贝到VF函数局部数组再索引。
 
 ### thread_local存储
 
@@ -331,7 +331,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
-    **正确写法**：标量按值传递；指针按`__gm__`/`__ubuf__`限定传入；需要输出标量结果时经指针形参写出：
+    **正确写法**：标量按值传递；指针按`__gm__`或`__ubuf__`限定传入；需要输出标量结果时经指针形参写出：
 
     ```cpp
     // 标量按值传入 + 指针带地址空间限定
@@ -415,10 +415,10 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
-运行期递归仅在SIMT编程场景可用，混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
+运行期递归仅在SIMT编程场景可用，SIMD与SIMT混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
 
 ```cpp
-// 混合编程SIMT VF内：ERROR
+// SIMD与SIMT混合编程的SIMT VF内：ERROR
 __simt_callee__ uint32_t rec_sum(uint32_t n)
 {
     return n == 0u ? 0u : n + rec_sum(n - 1u);
@@ -476,7 +476,7 @@ __simt_vf__ void simt_kernel(__gm__ TestS *data1, __ubuf__ TestS *data2)
 }
 ```
 
-在异构编译场景中，Host和Device可共用结构体定义代码，但Host侧无法识别`__callee__`、`__gm__`等Device侧关键字，因此无法根据这些关键字实现函数重载。当需要定义多个地址空间重载函数时，需通过宏`__NPU_ARCH__`将相关Device代码隔离，以避免函数定义冲突。`__NPU_ARCH__`是由编译预定义的宏，可用于区分Device侧代码，具体可参考[《毕昇编译器》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)中的“编程语言参考 > AI Core编程指导 > 预定义宏和内建变量”章节。
+在异构编译场景中，Host和Device可共用结构体定义代码，但Host侧无法识别`__callee__`、`__gm__`等Device侧关键字，因此无法根据这些关键字实现函数重载。当需要定义多个地址空间重载函数时，需通过宏`__NPU_ARCH__`将相关Device代码隔离，以避免函数定义冲突。`__NPU_ARCH__`是由编译预定义的宏，可用于区分Device侧代码，具体可参考[《毕昇编译器》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/compiler/BishengCompiler/atlas_bisheng_10_0001.html)中的“编程语言参考 > AI Core编程指导 > 预定义宏和内建变量”章节。
 
 此外，SIMD与SIMT混合编程场景下不支持直接向Global Memory或UB地址空间写入结构体。
 
@@ -591,7 +591,7 @@ __global__ void probe(float* output, uint32_t count)
 
 ### 动态分配相关的类能力
 
-类的成员函数不支持引入`operator new/delete`依赖，Device侧不支持动态new/delete、malloc/free，见[不支持的特性](#不支持的特性)。
+类的成员函数不支持引入`operator new`、`operator delete`依赖，Device侧不支持动态new、delete、malloc、free，见[不支持的特性](#不支持的特性)。
 
 ## 模板
 
@@ -639,10 +639,10 @@ tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);
 
 也支持自动推导：
 
-    ```cpp
-    tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);   // 显式指定：可用
-    tpl_kernel<<<1, 128, 0, stream>>>(dev, 128);          // 自动推导T=float：同样可用
-    ```
+```cpp
+tpl_kernel<float><<<1, 128, 0, stream>>>(dev, 128);   // 显式指定：可用
+tpl_kernel<<<1, 128, 0, stream>>>(dev, 128);          // 自动推导T=float：同样可用
+```
 
 ### VF模板函数
 

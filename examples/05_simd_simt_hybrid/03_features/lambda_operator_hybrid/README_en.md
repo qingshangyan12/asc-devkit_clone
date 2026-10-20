@@ -16,7 +16,7 @@ This sample is the **SIMD and SIMT hybrid programming** counterpart of the [Lamb
 
 | Product | CANN Software Version |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.3.0 |
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -60,7 +60,7 @@ asc_atomic_add(neg_count, neg_local);        // thread counts atomically merged 
 
 **Scalar/vector data flow inside the SIMD VF**: when the scalar result of a callee-Lambda participates in vector computation, compute it before the vector loop and feed it in as an operand — in this sample, after the bounds are broadcast into vector registers via `asc_duplicate_scalar`, the clipping is completed at register level by `asc_min`/`asc_max`.
 
-**Pipeline synchronization**: before `asc_copy_ub2gm_align` moves data out of the UB written by the SIMT/SIMD VFs, the Vector compute pipeline and the MTE3 copy-out pipeline must be synchronized with `asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)`/`asc_sync_wait(...)`.
+**Pipeline synchronization**: before `asc_copy_ub2gm_align` moves data out of the UB written by the SIMT and SIMD VFs, the Vector compute pipeline and the MTE3 copy-out pipeline must be synchronized with `asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)` and `asc_sync_wait(...)`.
 
 ## Compilation and Execution
 
@@ -98,7 +98,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | Option | Value | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR&950DT products) |
 
   ```text
   [lambda_operator_hybrid] leaky-affine(SIMT VF) + clamp(SIMD VF) via capturing lambdas: PASS (y[5]=0.400000, yClamp[5]=-2.000000, negTotal=3723)

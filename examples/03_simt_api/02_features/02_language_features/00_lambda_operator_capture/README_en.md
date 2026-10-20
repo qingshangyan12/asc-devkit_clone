@@ -18,7 +18,7 @@ Using two simple operators as the carrier — a LeakyReLU-Affine fused operator 
 
 | Product | CANN Software Version |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -111,7 +111,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | Option | Value | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR&950DT products) |
 
   The following output indicates that both operator outputs and the negative-value statistics all pass verification.
 

@@ -14,7 +14,7 @@ SIMD和SIMT编程场景均可通过`-std=c++<version>`或`--std=c++<version>`编
 -   C++17（ISO/IEC 14882:2017）：`-std=c++17`，默认值
 -   C++20（ISO/IEC 14882:2020）：`-std=c++20`
 
-Host侧与clang15一致，支持C++11至C++20及后续各档标准。低于C++11的标准，如C++98/03，Device侧不支持。
+Host侧与clang15一致，支持C++11至C++20及后续各档标准。低于C++11的标准，如C++98、C++03，Device侧不支持。
 
 **表1**  语言标准的指定方式
 
@@ -35,4 +35,4 @@ Host侧与clang15一致，支持C++11至C++20及后续各档标准。低于C++11
     -   [C++17语言特性](./cpp_language_feature/cpp17_language_feature.md)：C++17语言特性在Device侧的支持列表。
     -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：不同编程场景下Lambda表达式的使用方式与注意事项。
 -   **[Device侧C/C++语法限制](./cpp_language_restrictions/cpp_language_restrictions.md)**：Device侧通用的语法与能力限制。
-    -   [C/C++通用语法限制](./cpp_language_restrictions/general_restrictions.md)：指针与内存地址、变量、函数、类、模板等语法使用限制，含核函数参数列表限制、SIMT VF函数限制、混合编程结构体使用限制。
+    -   [C/C++通用语法限制](./cpp_language_restrictions/general_restrictions.md)：指针与内存地址、变量、函数、类、模板等语法使用限制，含核函数参数列表限制、SIMT VF函数限制、SIMD与SIMT混合编程结构体使用限制。

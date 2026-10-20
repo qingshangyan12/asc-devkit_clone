@@ -4,7 +4,7 @@
 
 Ascend C的Lambda是**Device侧局部闭包**：核函数参数仅支持基础类型、POD结构体与指针，见[核函数参数列表限制](../cpp_language_restrictions/general_restrictions.md#section_kernel_func_param_restriction)，不支持Host侧lambda传入核函数的使用方法，因此也没有跨执行空间的Lambda限制与闭包类型traits。
 
-SIMT编程场景与SIMD和SIMT混合编程场景下Lambda的使用约束略有不同，下文分别展开说明。
+SIMT编程场景、SIMD与SIMT混合编程场景下Lambda的使用约束略有不同，下文分别展开说明。
 
 ## SIMT编程场景
 
@@ -57,14 +57,14 @@ Lambda捕获在实际算子开发中的用法请参考[Lambda捕获样例](../..
 
 SIMD与SIMT混合编程场景下，Device侧定义的Lambda表达式**必须显式标记函数属性**，否则编译报错。标记的选择规则如下：
 
-**表1**  混合编程Lambda标记选择规则
+**表1**  SIMD与SIMT混合编程Lambda标记选择规则
 
 | Lambda定义位置 | 应使用的标记 | 说明 |
 | --- | --- | --- |
 | `__simt_vf__`函数体内 | `__simt_callee__` | 与所在VF函数的callee标记一致。 |
-| `__simd_vf__`函数体内 | `__simd_callee__` | 同上。 |
-| `__simt_callee__`、`__simd_callee__`、`__aicore__`辅助函数体内 | 与宿主函数一致的`__simt_callee__`、`__simd_callee__`、`__aicore__` | 混合编程中`__aicore__`辅助函数内的lambda需标记`__aicore__`。 |
-| 混合编程核函数体内，即`__global__`函数的SIMD侧scalar代码 | `__aicore__` | 未标记会触发编译报错。 |
+| `__simd_vf__`函数体内 | `__simd_callee__` | 与所在VF函数的callee标记一致。 |
+| `__simt_callee__`、`__simd_callee__`、`__aicore__`辅助函数体内 | 与宿主函数一致的`__simt_callee__`、`__simd_callee__`、`__aicore__` | SIMD与SIMT混合编程中`__aicore__`辅助函数内的lambda需标记`__aicore__`。 |
+| SIMD与SIMT混合编程核函数体内，即`__global__`函数的SIMD侧scalar代码 | `__aicore__` | 未标记会触发编译报错。 |
 | `__callee__`函数体内 | `__callee__` | —— |
 
 标记位置在Lambda的参数列表之后：
@@ -94,21 +94,21 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 }
 ```
 
-混合编程下Lambda捕获的完整样例请参考[混合编程Lambda捕获样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
+SIMD与SIMT混合编程下Lambda捕获的完整样例请参考[混合编程Lambda捕获样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
 
 
 ### VF函数内支持的Lambda能力
 
-混合编程场景下，VF函数内Lambda各能力项的支持情况如下表所示：
+SIMD与SIMT混合编程场景下，VF函数内Lambda各能力项的支持情况如下表所示：
 
-**表2**  混合编程VF函数内Lambda能力列表
+**表2**  SIMD与SIMT混合编程VF函数内Lambda能力列表
 
 | 能力 | 是否支持 | 说明 |
 | --- | --- | --- |
 | 值捕获标量 | 是 | 写法：`[scale, bias](float v) __simt_callee__ { ... }`。 |
 | 引用捕获 | 是 | 写法：`[&counter](float v) __simt_callee__ { ... }`，可修改VF函数内的局部变量。 |
-| 捕获`__ubuf__`/`__gm__`指针 | 是 | Lambda体内可直接访问UB/GM内存，指针来源须为VF函数形参或VF函数内的合法局部指针。 |
-| 捕获this / `[*this]` | 是 | `__simt_callee__`成员函数内`[this]`与C++17 `[*this]`按值捕获均可用。 |
+| 捕获`__ubuf__`与`__gm__`指针 | 是 | Lambda体内可直接访问UB、GM内存，指针来源须为VF函数形参或VF函数内的合法局部指针。 |
+| 捕获`this`与`[*this]` | 是 | `__simt_callee__`成员函数内`[this]`与C++17 `[*this]`按值捕获均可用。 |
 | mutable | 是 | 写法：`[m]() __simt_callee__ mutable { ... }`。函数属性标记须置于`mutable`**之前**，置于其后报语法错误`expected body of lambda expression`。 |
 | 泛型Lambda（C++14） | 是 | 写法：`[](auto x) __simt_callee__ { ... }`。 |
 | init-capture（C++14） | 是 | 写法：`[sum = base * 2.f](float x) __simt_callee__ { ... }`。 |
@@ -126,7 +126,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 
 以下将对lambda的使用约束逐项展开说明：
 
--   **约束1：constexpr lambda需加函数标识**：VF函数内的constexpr lambda必须携带与所在空间一致的callee函数标识，否则**编译通过但运行结果错误**:
+-   **约束1：constexpr lambda需加函数标识**：VF函数内的constexpr lambda必须携带与所在空间一致的callee函数标识，否则**编译通过但运行结果错误**：
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -185,7 +185,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     ```
 
 
--   **约束3：无参数列表形式须写显式括号**：省略参数列表的lambda是C++2b特性，而默认是按C++17编译，可编译但会触发扩展告警：
+-   **约束3：无参数列表形式须写显式括号**：省略参数列表的写法，如`[v] __simt_callee__ { ... }`，是C++2b特性；当前默认按C++17编译，该写法可编译但会触发扩展告警，应写显式参数列表`()`：
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)

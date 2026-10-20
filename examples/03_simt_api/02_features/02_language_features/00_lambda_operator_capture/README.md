@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例回答一个问题：**Lambda捕获在实际算子开发里到底解决了什么问题**；对应的混合编程对照实现（含Lambda标记规则）见[lambda_operator_hybrid](../../../../05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)样例。
+本样例回答一个问题：**Lambda捕获在实际算子开发里到底解决了什么问题**；对应的SIMD与SIMT混合编程对照实现（含Lambda标记规则）见[lambda_operator_hybrid](../../../../05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)样例。
 
 以两个简单算子为载体——LeakyReLU-Affine融合算子（`y = scale * leaky_relu(x, alpha) + bias`）与Clamp算子（`y = clamp(x, lo, hi)`）——展示SIMT编程核函数内Lambda捕获外部参数的四种实际编程作用：
 
@@ -12,13 +12,13 @@
 4. **策略与框架分离**：`elementwise_transform`只写一份线程映射代码，注入LeakyReLU-Affine的Lambda得到融合算子，注入Clamp的Lambda得到裁剪算子——策略（Lambda）与执行框架（模板函数）正交。
 
 > [!NOTE]
-> Ascend C的Lambda是Device侧局部闭包：核函数参数仅支持基础类型、POD与指针，**Host侧无法把Lambda传入核函数**（不存在CUDA `--extended-lambda`等价机制）。因此标准模式是：**超参作为普通标量传入核函数，核函数内定义Lambda捕获消费**——本样例即按此模式组织。SIMT编程场景核函数内Lambda无需（也不能）标记callee属性；混合编程场景需按执行上下文标记`__simt_callee__`/`__simd_callee__`/`__aicore__`，详见[Lambda表达式](../../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md)文档与混合编程对照样例。
+> Ascend C的Lambda是Device侧局部闭包：核函数参数仅支持基础类型、POD与指针，**Host侧无法把Lambda传入核函数**（不存在CUDA `--extended-lambda`等价机制）。因此标准模式是：**超参作为普通标量传入核函数，核函数内定义Lambda捕获消费**——本样例即按此模式组织。SIMT编程场景核函数内Lambda无需（也不能）标记callee属性；SIMD与SIMT混合编程场景需按执行上下文标记`__simt_callee__`、`__simd_callee__`、`__aicore__`，详见[Lambda表达式](../../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md)文档及SIMD与SIMT混合编程对照样例。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.3.0 |
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -108,7 +108,7 @@ elementwise_transform(fused, input, yLeakyAffine, totalLength);
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR&950DT系列产品） |
 
   执行结果如下，说明两个算子输出与负数统计全部校验通过。
 
