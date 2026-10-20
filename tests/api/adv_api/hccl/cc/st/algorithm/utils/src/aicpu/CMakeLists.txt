@@ -64,6 +64,8 @@ set(INCLUDE_LIST
 
 list(APPEND INCLUDE_LIST
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    # TODO(T1临接): ST 静态库编译 alg_template_base.cc 等已切 asccomm 的源文件，需同款头路径（与 cc/src/CMakeLists.txt 的 mc2_client 挂载保持一致）
+    $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 
 add_library(${HCCL_CHECKER_SELECTOR_TARGET} STATIC

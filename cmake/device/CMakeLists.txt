@@ -40,6 +40,33 @@ include(${ASCENDC_DIR}/version.cmake)
 set(DEVICE_MODE TRUE)
 set(KERNEL_MODE TRUE)
 
+# asc-comm 头路径：mc2_server 编入了已切 asccomm 的源文件（alg_template_base.cc /
+# aicpu/kernel_launch.cc / wrapper/alg_data_trans_wrapper.cc），需要 asccomm_primitives.h。
+# device 是独立 cmake 进程，既不继承 host 进程的 ASC_COMM_SOURCE_PATH，在 superbuild 下
+# host 侧 add_cann_device_project 又会提前返回（EXT_ARGS 传不进来）——故在此按 devkit 根
+# 相对探测 asc-comm 源码目录（候选集与 host 侧 cmake/third_party/asc-comm.cmake 保持一致）；
+# 若 host 已显式传入 ASC_COMM_SOURCE_DIR（本地 standalone 构建）则优先采用。
+# 不 include asc-comm.cmake —— 避免 device 进程重复注册 install 规则/FetchContent，仅取头路径。
+if(NOT EXISTS "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm/asccomm_primitives.h")
+    get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." REALPATH)
+    foreach(_asc_comm_candidate
+        "${_ASC_COMM_DEVKIT_ROOT}/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../asc/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../asc/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../../asc/asc-comm")
+        if(EXISTS "${_asc_comm_candidate}/include/aicpu/hcomm/asccomm_primitives.h")
+            set(ASC_COMM_SOURCE_DIR "${_asc_comm_candidate}")
+            break()
+        endif()
+    endforeach()
+endif()
+if(ASC_COMM_SOURCE_DIR AND EXISTS "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+endif()
+
 add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
 add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
 add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)

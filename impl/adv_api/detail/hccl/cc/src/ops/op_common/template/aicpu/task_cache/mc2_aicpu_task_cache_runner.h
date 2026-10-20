@@ -11,6 +11,7 @@
 #define MC2_AICPU_TASK_CACHE_RUNNER_H
 
 #include "hcomm_primitives.h"
+#include "asccomm_primitives.h"
 #include "log.h"
 #include "mc2_aicpu_task_cache.h"
 
@@ -48,7 +49,7 @@ HcclResult RunWithMc2TaskCache(
     HCCL_DEBUG(
         "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
         param.algTag);
-    HcclResult startRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
+    HcclResult startRet = static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag));
     CHK_PRT_RET(
         startRet != HCCL_SUCCESS,
         HCCL_ERROR(
@@ -64,7 +65,7 @@ HcclResult RunWithMc2TaskCache(
             HCCL_WARNING("[MC2_TASK_CACHE][Policy] failed and fallback to executor, ret[%d].", policyRet);
         }
         HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -74,7 +75,7 @@ HcclResult RunWithMc2TaskCache(
     const Mc2TaskCacheReserveResult reserveResult = manager.TryReserve(plan.comm, plan.tag);
     if (reserveResult == Mc2TaskCacheReserveResult::FULL) {
         HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -88,7 +89,7 @@ HcclResult RunWithMc2TaskCache(
             "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(), lookupRet);
         ClearMc2TaskCacheBestEffort(plan, "lookup", manager);
         HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -97,7 +98,7 @@ HcclResult RunWithMc2TaskCache(
 
     if (isHit) {
         const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
-        const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        const HcclResult endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         HCCL_INFO(
             "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet, endRet);
         if (executeRet != HCCL_SUCCESS) {
@@ -118,7 +119,7 @@ HcclResult RunWithMc2TaskCache(
             cacheStartRet);
         ClearMc2TaskCacheBestEffort(plan, "start", manager);
         HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -127,11 +128,11 @@ HcclResult RunWithMc2TaskCache(
 
     HcclResult execRet = func();
 
-    HcclResult flushRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    HcclResult flushRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
     batchActive = false;
     HcclResult restartRet = HCCL_SUCCESS;
     if (flushRet == HCCL_SUCCESS) {
-        restartRet = static_cast<HcclResult>(HcommBatchModeStart(param.algTag));
+        restartRet = static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag));
         batchActive = (restartRet == HCCL_SUCCESS);
     }
 
@@ -147,7 +148,7 @@ HcclResult RunWithMc2TaskCache(
 
     HcclResult endRet = HCCL_SUCCESS;
     if (batchActive) {
-        endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        endRet = static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag));
         if (endRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "final batch end", manager);
         }
