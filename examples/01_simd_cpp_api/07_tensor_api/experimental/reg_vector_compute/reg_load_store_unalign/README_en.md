@@ -78,21 +78,21 @@ Run these commands from the sample directory. NPU mode and scenario 1 are the de
 
 ```bash
 mkdir -p build && cd build
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j;
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
 ./demo
 ```
 
 For scenario 2, reconfigure and rebuild from the build directory:
 
 ```bash
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON -DSCENARIO_NUM=2 ..;make -j;
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=2 ..;make -j;
 ./demo
 ```
 
 For NPU simulation, add `-DCMAKE_ASC_RUN_MODE=sim`:
 
 ```bash
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON -DSCENARIO_NUM=1 ..;make -j;
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..;make -j;
 ./demo
 ```
 
@@ -106,7 +106,6 @@ After updating CANN package headers, run `make clean` followed by `make -j`, or 
 | --- | --- | --- |
 | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | NPU execution or simulation |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | Ascend 950PR/Ascend 950DT |
-| `CANN_ASC_USE_EXPERIMENTAL` | `ON` (required), `OFF` (default) | Enable experimental ASC APIs |
 | `SCENARIO_NUM` | `1` (default), `2` | Unaligned copy or datablock maximum reduction |
 
 Successful verification prints the corresponding line:

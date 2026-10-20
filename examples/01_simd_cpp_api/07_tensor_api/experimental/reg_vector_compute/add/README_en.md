@@ -67,7 +67,7 @@ Perform the following steps in the sample root directory to build and run the sa
 
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   ./demo
   ```
