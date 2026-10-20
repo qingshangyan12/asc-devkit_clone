@@ -28,7 +28,7 @@
   founds[i] = (keys[i] ∈ table)
   ```
 
-  - keys为查询集，形状为[1, 1048576]，数据类型为int64，为1M条从未装入表的互不重复key
+  - keys为查询集，形状为[1, 1048576]，数据类型为int64，为1M条混合查询key：80%（838861条）从已装表key中抽取、必命中，20%（209715条）为从未装入表的key、必未命中，两部分shuffle打散（查询集允许重复key）
   - founds为命中标志，形状为[1, 1048576]，数据类型为uint8；
 - 样例规格：
 
@@ -402,8 +402,10 @@ Case 3 的关键在于：在保持访存指令数量不变的前提下，减少�
   Running case 3: coop G=4 x swar: 16-slot window, asc_ballot...
   Threads/Thread Block: 512
   Table: capacity=1048576 slots, load factor=0.9, inserted=943718
-  Queries: 1048576 all-miss keys, expected probes ~50 (Knuth: (1+1/(1-a)^2)/2, a=0.9)
+  Queries: 1048576 mixed keys, hit ratio=0.8 (838861 hits + 209715 misses)
+  Expected probes: hit ~5.5, miss ~50, mixed ~14.4 (Knuth, a=0.9)
   Soc: Ascend950PR_9589  device: 0
+  Hits: actual=838861, expected=838861
   [Success] Case accuracy verification passed.
   ```
 
