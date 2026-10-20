@@ -29,17 +29,18 @@ namespace te {
 
 class copy_gm_to_ub_zn : private copy_gm_to_ub_common {
 public:
-    template <const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const gm_to_ub_params& params)
+    template <typename Params, const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const Params& params)
     {
-        data_copy_impl<trait, DstTensor, SrcTensor>(dst, src, params);
+        data_copy_impl<Params, trait, DstTensor, SrcTensor>(dst, src, params);
     }
 
     template <
-        const gm_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+        typename Params, const gm_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
     __aicore__ inline static void run(
         const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const ShapeType& copy_shape,
-        const gm_to_ub_params& params)
+        const Params& params)
     {
         check_template<trait, T, U>();
         using src_type = typename U::element_type;
@@ -50,7 +51,7 @@ public:
         auto block_len = get_shape_columns(src_shape) * c0_size<>;
         auto src_stride = get_row_stride(src.layout()) * sizeof(src_type);
         auto dst_stride = get_row_stride(dst.layout()) * sizeof(dst_type);
-        emit_copy(
+        emit_copy<Params>(
             dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, src_stride, dst_stride,
             params);
     }
@@ -63,9 +64,8 @@ private:
         check_data_type::check_gm_to_ub_data_type<DstTensor, SrcTensor>();
     }
 
-    template <const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
-    __aicore__ inline static void data_copy_impl(
-        const DstTensor& dst, const SrcTensor& src, const gm_to_ub_params& params)
+    template <typename Params, const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const Params& params)
     {
         using src_type = typename SrcTensor::element_type;
         using dst_type = typename DstTensor::element_type;
@@ -82,7 +82,7 @@ private:
         int64_t src_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout) * sizeof(src_type);
         int64_t dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout) * sizeof(dst_type);
 
-        emit_copy(dst, src, block_count, block_len, src_stride, dst_stride, params);
+        emit_copy<Params>(dst, src, block_count, block_len, src_stride, dst_stride, params);
     }
 };
 
