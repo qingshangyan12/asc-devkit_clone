@@ -76,40 +76,50 @@ __simd_callee__ inline void asc_gather(vector_half& dst, vector_half src, vector
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index)
 {
     if ASC_IS_AIV {
         vselr(dst, src, index);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_gather(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_uint8_t index)
 {
     if ASC_IS_AIV {
         vselr(dst, src, index);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_uint8_t index)
 {
     if ASC_IS_AIV {
         vselr(reinterpret_cast<vector_uint8_t&>(dst), *reinterpret_cast<vector_uint8_t*>(&src), index);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_uint8_t index)
 {
     if ASC_IS_AIV {
         vselr(dst, src, index);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_uint8_t index)
 {
     if ASC_IS_AIV {
         vselr(dst, src, index);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_gather(vector_int8_t src, vector_uint8_t index)
 {
@@ -167,40 +177,50 @@ __simd_callee__ inline vector_half asc_gather(vector_half src, vector_uint16_t i
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_bfloat16_t asc_gather(vector_bfloat16_t src, vector_uint16_t index)
 {
     vector_bfloat16_t dst;
     asc_gather(dst, src, index);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather(vector_fp8_e4m3fn_t src, vector_uint8_t index)
 {
     vector_fp8_e4m3fn_t dst;
     asc_gather(dst, src, index);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_gather(vector_hifloat8_t src, vector_uint8_t index)
 {
     vector_hifloat8_t dst;
     asc_gather(dst, src, index);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather(vector_fp8_e5m2_t src, vector_uint8_t index)
 {
     vector_fp8_e5m2_t dst;
     asc_gather(dst, src, index);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(vector_fp8_e8m0_t src, vector_uint8_t index)
 {
     vector_fp8_e8m0_t dst;
     asc_gather(dst, src, index);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 #endif
 

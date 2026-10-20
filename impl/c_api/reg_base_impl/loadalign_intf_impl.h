@@ -38,20 +38,25 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -59,34 +64,43 @@ __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -172,20 +186,25 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -193,34 +212,43 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -285,20 +313,25 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -306,34 +339,43 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -384,20 +426,25 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -405,34 +452,43 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubu
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -483,20 +539,25 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -504,34 +565,43 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ 
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -582,34 +652,43 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -617,34 +696,43 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
@@ -660,20 +748,25 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __u
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -681,34 +774,43 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -822,20 +924,25 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -843,34 +950,43 @@ __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -956,20 +1072,25 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -977,34 +1098,43 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1069,20 +1199,25 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1090,34 +1225,43 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1168,6 +1312,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -1175,7 +1320,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vlds(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
@@ -1183,7 +1330,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vlds(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1191,21 +1340,27 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubu
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
@@ -1213,13 +1368,16 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vlds(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1270,20 +1428,25 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1291,34 +1454,43 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ 
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1369,34 +1541,43 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1404,34 +1585,43 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -1447,6 +1637,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __u
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -1454,7 +1645,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
@@ -1462,7 +1655,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1470,7 +1665,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
@@ -1478,7 +1675,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
@@ -1486,7 +1685,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
@@ -1494,7 +1695,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
@@ -1502,6 +1705,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1669,6 +1873,7 @@ __simd_callee__ inline void asc_loadalign(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -1677,7 +1882,9 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -1687,7 +1894,9 @@ __simd_callee__ inline void asc_loadalign(
             (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -1695,7 +1904,9 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -1703,7 +1914,9 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -1712,7 +1925,9 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_int4x2_t& dst, __ubuf__ int4b_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -1723,7 +1938,9 @@ __simd_callee__ inline void asc_loadalign(
             mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -1732,6 +1949,7 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign(
     vector_half& dst, __ubuf__ half* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -1749,20 +1967,25 @@ __simd_callee__ inline void asc_loadalign(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1770,6 +1993,7 @@ __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -1785,33 +2009,41 @@ __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* s
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -1883,20 +2115,25 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1904,6 +2141,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -1919,33 +2157,41 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -1996,6 +2242,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2003,7 +2250,9 @@ __simd_callee__ inline void asc_loadalign_upsample(
         vld(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
@@ -2011,7 +2260,9 @@ __simd_callee__ inline void asc_loadalign_upsample(
         vld(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2019,6 +2270,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf_
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2034,6 +2286,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ 
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2041,27 +2294,34 @@ __simd_callee__ inline void asc_loadalign_upsample(
         vld(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, US_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2098,6 +2358,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ ui
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2105,7 +2366,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
@@ -2113,7 +2376,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2121,6 +2386,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubu
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2136,6 +2402,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf_
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2143,27 +2410,34 @@ __simd_callee__ inline void asc_loadalign_downsample(
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2200,20 +2474,25 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ 
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2221,6 +2500,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ 
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2236,33 +2516,41 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ in
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2313,20 +2601,25 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2334,49 +2627,63 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2384,7 +2691,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
@@ -2392,7 +2701,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2400,6 +2711,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2415,6 +2727,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ub
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2422,7 +2735,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
@@ -2430,7 +2745,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
@@ -2438,7 +2755,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
@@ -2446,6 +2765,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2565,6 +2885,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_u
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src)
 {
@@ -2572,7 +2893,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src)
 {
@@ -2580,7 +2903,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -2590,7 +2915,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
             DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src)
 {
@@ -2598,7 +2925,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src)
 {
@@ -2606,7 +2935,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src)
 {
@@ -2614,7 +2945,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src)
 {
@@ -2624,6 +2957,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             reinterpret_cast<__ubuf__ uint8_t*>(src), 0, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src)
 {
@@ -2675,6 +3009,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2682,7 +3017,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
@@ -2690,7 +3027,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src, addr_reg offset)
 {
@@ -2700,6 +3039,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src, addr_reg offset)
@@ -2717,6 +3057,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2724,7 +3065,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
@@ -2733,7 +3076,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
@@ -2741,7 +3086,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
@@ -2749,6 +3096,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src, addr_reg offset)
@@ -2822,6 +3170,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -2829,7 +3178,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
@@ -2837,7 +3188,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src, int32_t offset)
 {
@@ -2848,7 +3201,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
@@ -2856,7 +3211,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
@@ -2864,7 +3221,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
@@ -2872,7 +3231,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src, int32_t offset)
 {
@@ -2882,6 +3243,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DINTLV_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src, int32_t offset)
@@ -2953,6 +3315,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -2960,7 +3323,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -2968,7 +3333,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -2976,21 +3343,27 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubu
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -2998,7 +3371,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -3006,6 +3381,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_hifloat8_t& dst, __u
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, NORM, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3091,6 +3467,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_uint8_t& dst, __
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3098,7 +3475,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -3106,7 +3485,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -3114,7 +3495,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -3122,7 +3505,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int4x2_t& dst, _
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -3130,7 +3515,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -3138,7 +3525,9 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -3147,6 +3536,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3213,6 +3603,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3220,7 +3611,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -3228,7 +3621,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -3237,7 +3632,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -3245,7 +3642,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -3253,7 +3652,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -3261,7 +3662,9 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -3270,6 +3673,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, US_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -3325,6 +3729,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3332,7 +3737,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -3340,7 +3747,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -3349,7 +3758,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -3357,7 +3768,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -3365,7 +3778,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -3373,7 +3788,9 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -3382,6 +3799,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -3436,6 +3854,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_uint8_t& dst,
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3443,7 +3862,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -3451,7 +3872,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -3460,7 +3883,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -3468,7 +3893,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -3476,7 +3903,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -3484,7 +3913,9 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -3493,6 +3924,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3562,6 +3994,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3569,7 +4002,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -3577,7 +4012,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -3588,7 +4025,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
             DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -3596,7 +4035,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -3604,7 +4045,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -3612,7 +4055,9 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -3623,6 +4068,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
             DINTLV_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t*& src, int32_t offset)
@@ -3746,6 +4192,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -3754,7 +4201,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -3764,7 +4213,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
             (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -3772,7 +4223,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -3780,7 +4233,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -3789,7 +4244,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask)
@@ -3798,7 +4255,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -3809,6 +4268,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(
             POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_half& dst, __ubuf__ half*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -3840,20 +4300,25 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -3861,34 +4326,43 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -3953,20 +4427,25 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -3974,34 +4453,43 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -4052,6 +4540,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_float& dst, __ubuf__ f
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -4059,7 +4548,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem(
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
@@ -4067,7 +4558,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem(
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -4075,6 +4568,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf_
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -4090,6 +4584,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int8_t& dst, __ubuf__ 
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -4097,27 +4592,34 @@ __simd_callee__ inline void asc_loadalign_brc_elem(
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -4183,6 +4685,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4190,7 +4693,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -4198,7 +4703,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -4207,7 +4714,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -4215,7 +4724,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -4223,7 +4734,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -4231,7 +4744,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -4240,6 +4755,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -4295,13 +4811,16 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(vector_float& dst,
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 {
@@ -4309,7 +4828,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4317,7 +4838,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -4325,7 +4848,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -4334,7 +4859,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -4342,7 +4869,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -4350,7 +4879,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -4358,7 +4889,9 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -4367,6 +4900,7 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
@@ -4384,6 +4918,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4391,7 +4926,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
@@ -4399,7 +4936,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
@@ -4408,7 +4947,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
@@ -4416,7 +4957,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
@@ -4424,7 +4967,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
@@ -4432,7 +4977,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
@@ -4441,6 +4988,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BLK, POST_UPDATE);
     }
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -4554,12 +5102,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     }
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign(__ubuf__ int8_t* src)
 {
@@ -4575,47 +5125,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign(__ubuf__ uint8_t* src)
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign(__ubuf__ int16_t* src)
 {
@@ -4666,12 +5228,14 @@ __simd_callee__ inline vector_float asc_loadalign(__ubuf__ float* src)
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_brc_datablock(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_brc_datablock(__ubuf__ int8_t* src)
 {
@@ -4687,47 +5251,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_brc_datablock(__ubuf__ uint8
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_brc_datablock(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_brc_datablock(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_brc_datablock(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_brc_datablock(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_brc_datablock(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_brc_datablock(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_brc_datablock(__ubuf__ int16_t* src)
 {
@@ -4778,12 +5354,14 @@ __simd_callee__ inline vector_float asc_loadalign_brc_datablock(__ubuf__ float* 
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_brc_elem(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_brc_elem(__ubuf__ int8_t* src)
 {
@@ -4799,47 +5377,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_brc_elem(__ubuf__ uint8_t* s
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_brc_elem(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_brc_elem(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_brc_elem(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_brc_elem(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_brc_elem(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_brc_elem(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_brc_elem(__ubuf__ int16_t* src)
 {
@@ -4939,12 +5529,14 @@ __simd_callee__ inline vector_float asc_loadalign_brc_elem2datablock(__ubuf__ fl
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_downsample(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_downsample(__ubuf__ int8_t* src)
 {
@@ -4960,47 +5552,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_downsample(__ubuf__ uint8_t*
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_downsample(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_downsample(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_downsample(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_downsample(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_downsample(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_downsample(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_downsample(__ubuf__ int16_t* src)
 {
@@ -5030,12 +5634,14 @@ __simd_callee__ inline vector_bfloat16_t asc_loadalign_downsample(__ubuf__ bfloa
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_unpack(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_unpack(__ubuf__ int8_t* src)
 {
@@ -5051,47 +5657,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_unpack(__ubuf__ uint8_t* src
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_unpack(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_unpack(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_unpack(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_unpack(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_unpack(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_unpack(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_unpack(__ubuf__ int16_t* src)
 {
@@ -5142,75 +5760,95 @@ __simd_callee__ inline vector_float asc_loadalign_unpack(__ubuf__ float* src)
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_unpack4(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int8_t asc_loadalign_unpack4(__ubuf__ int8_t* src)
 {
     vector_int8_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_uint8_t asc_loadalign_unpack4(__ubuf__ uint8_t* src)
 {
     vector_uint8_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_unpack4(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_unpack4(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_unpack4(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_unpack4(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_unpack4(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_unpack4(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_upsample(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_upsample(__ubuf__ int8_t* src)
 {
@@ -5226,47 +5864,59 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_upsample(__ubuf__ uint8_t* s
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_upsample(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_upsample(__ubuf__ fp4x2_e1m2_t* src)
 {
     vector_fp4x2_e1m2_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_upsample(__ubuf__ hifloat8_t* src)
 {
     vector_hifloat8_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_upsample(__ubuf__ fp8_e8m0_t* src)
 {
     vector_fp8_e8m0_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_upsample(__ubuf__ fp8_e5m2_t* src)
 {
     vector_fp8_e5m2_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_upsample(__ubuf__ fp8_e4m3fn_t* src)
 {
     vector_fp8_e4m3fn_t dst;
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_upsample(__ubuf__ int16_t* src)
 {
@@ -5296,6 +5946,7 @@ __simd_callee__ inline vector_bfloat16_t asc_loadalign_upsample(__ubuf__ bfloat1
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_datablock_strided(
     __ubuf__ int4b_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5303,6 +5954,7 @@ __simd_callee__ inline vector_int4x2_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int8_t asc_loadalign_datablock_strided(
     __ubuf__ int8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -5320,6 +5972,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_datablock_strided(
     return dst;
 }
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_datablock_strided(
     __ubuf__ fp4x2_e2m1_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5327,7 +5980,9 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_datablock_strided(
     __ubuf__ fp4x2_e1m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5335,7 +5990,9 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_loadalign_datablock_strided(
     __ubuf__ hifloat8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5343,7 +6000,9 @@ __simd_callee__ inline vector_hifloat8_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e8m0_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5351,7 +6010,9 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e5m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5359,7 +6020,9 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e4m3fn_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5367,6 +6030,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_int16_t asc_loadalign_datablock_strided(
     __ubuf__ int16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
