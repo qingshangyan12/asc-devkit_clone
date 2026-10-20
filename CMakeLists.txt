@@ -56,7 +56,7 @@ endif()
 
 if(PACKAGE_OPEN_PROJECT)
   cmake_minimum_required(VERSION 3.16)
-  project(asc-devkit VERSION 1.0.0)
+  project(asc-devkit VERSION 9.3.0)
   include(CMakePrintHelpers)
   include(cmake/package.cmake)
   include(cmake/version_info.cmake)
