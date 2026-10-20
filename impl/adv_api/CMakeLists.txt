@@ -27,7 +27,14 @@ endif()
 add_subdirectory(tiling)
 
 if (BUILD_OPEN_PROJECT)
-  add_cann_device_project(asc-devkit)
+  # asc-comm 头树先就位（ASC_COMM_SOURCE_PATH）：device ExternalProject 经 EXT_ARGS
+  # 消费该路径（独立 cmake 进程不继承本进程变量）；host 侧消费见下方 include(asc-comm.cmake)
+  include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
+  if(ASC_COMM_SOURCE_DIR)
+    add_cann_device_project(asc-devkit EXT_ARGS "-DASC_COMM_SOURCE_DIR=${ASC_COMM_SOURCE_DIR}")
+  else()
+    add_cann_device_project(asc-devkit)
+  endif()
 endif()
 
 
@@ -98,8 +105,9 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
 endif()
 
 if (BUILD_OPEN_PROJECT)
+    # asc-comm.cmake 已在上方 add_cann_device_project 前include（ASC_COMM_SOURCE_PATH 就绪）；
+    # hccl/cc 的 mc2 构建在 include 路径中消费 asccomm 头
     add_subdirectory(detail/hccl/cc)
-    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)

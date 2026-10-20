@@ -10,6 +10,18 @@
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
 
+# asccomm 头路径（T1临接）：host 进程经 impl/adv_api 的 asc-comm.cmake 取得 ASC_COMM_SOURCE_PATH；
+# device 是 ExternalProject 独立进程，host 侧经 EXT_ARGS(-DASC_COMM_SOURCE_DIR) 传入后在
+# cmake/device 入口展开为 ASCCOMM_PRIMITIVES_HDR（见 cmake/device/CMakeLists.txt）；两者皆空时
+# 回落 ASCCOMM_PRIMITIVES_INCLUDE_DIR 环境变量（开发侧本地构建用）。
+if(ASCCOMM_PRIMITIVES_HDR)
+    # device 入口已展开，直接用
+elseif(ASC_COMM_SOURCE_PATH)
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm")
+else()
+    set(ASCCOMM_PRIMITIVES_HDR "$ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}")
+endif()
+
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${ASCENDC_DIR}
@@ -208,6 +220,8 @@ if(PRODUCT_SIDE STREQUAL "device")
 
     target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
+        # TODO(T1临接): device 侧与 mc2_client 编译相同的已切 asccomm 源文件，头路径经 ASCCOMM_PRIMITIVES_HDR（见文件头）
+        ${ASCCOMM_PRIMITIVES_HDR}
     )
 
     target_compile_options(mc2_server PRIVATE
@@ -270,6 +284,8 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 
     target_include_directories(mc2_client PRIVATE
         ${INCLUDE_LIST}
+        # TODO(T1临接): 正式依赖治理走 FetchContent TAG_ID bump（Q12），此路径穿刺期联调用
+        ${ASCCOMM_PRIMITIVES_HDR}
     )
 
     target_compile_definitions(mc2_client PRIVATE
