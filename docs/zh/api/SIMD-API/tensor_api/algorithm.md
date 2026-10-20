@@ -212,7 +212,7 @@ struct mmad_atom<mmad_traits<MmadOperation, Args...>> : mmad_traits<MmadOperatio
 
 | 功能 | Operation | Traits | Trait | Params |
 | :--- | :--- | :--- | :--- | :--- |
-| [Global Memory到Unified Buffer的数据搬运](reg_vector_compute/vector_compute_load/copy_gm_to_ub.md) | `copy_gm_to_ub` | `copy_traits<copy_gm_to_ub, ...>` | `gm_to_ub_trait` | `gm_to_ub_params` |
+| [Global Memory到Unified Buffer的数据搬运](reg_vector_compute/vector_compute_load/copy_gm_to_ub.md) | `copy_gm_to_ub` | `copy_traits<copy_gm_to_ub, ...>` | `gm_to_ub_trait` | `gm_to_ub_params`，支持配置左右Padding和常量填充值 |
 | [Unified Buffer到Global Memory的数据搬运](reg_vector_compute/vector_compute_store/copy_ub_to_gm.md) | `copy_ub_to_gm` | `copy_traits<copy_ub_to_gm, ...>` | `ub_to_gm_trait` | 无 |
 | [Global Memory到L1 Buffer的数据搬运](matrix_compute/cube_compute_load/copy_gm_to_l1.md) | `copy_gm_to_l1` | `copy_traits<copy_gm_to_l1, ...>` | `gm_to_l1_trait` | 无 |
 | [Unified Buffer到L1 Buffer的数据搬运](reg_vector_compute/vector_compute_load/copy_ub_to_l1.md) | `copy_ub_to_l1` | `copy_traits<copy_ub_to_l1, ...>` | `ub_to_l1_trait` | 无 |

@@ -72,15 +72,15 @@ constexpr bool is_valid_quant_v;
 
 using namespace asc::te;
 
-auto tensor_layout = make_layout(make_shape(_8{}, _16{}), make_stride(_16{}, _1{}));
-static_assert(is_layout_v<decltype(tensor_layout)>);
+auto tensor_layout = make_layout(make_shape(_8{}, _16{}), make_stride(_16{}, _1{}))
+static_assert(is_layout_v<decltype(tensor_layout)>)
 
-auto tensor = make_tensor(make_mem_ptr<location::gm, float>(0), tensor_layout);
-static_assert(is_attr_tensor_v<decltype(tensor)>);
+auto tensor = make_tensor(make_mem_ptr<location::gm, float>(0), tensor_layout)
+static_assert(is_attr_tensor_v<decltype(tensor)>)
 
-auto coord = make_coord(0, 0);
-auto shape = make_shape(8, 16);
-static_assert(is_valid_coord_v<decltype(coord)>);
-static_assert(is_valid_shape_v<decltype(shape)>);
-static_assert(is_valid_quant_v<uint64_t>);
+auto coord = make_coord(0, 0)
+auto shape = make_shape(8, 16)
+static_assert(is_valid_coord_v<decltype(coord)>)
+static_assert(is_valid_shape_v<decltype(shape)>)
+static_assert(is_valid_quant_v<uint64_t>)
 ```

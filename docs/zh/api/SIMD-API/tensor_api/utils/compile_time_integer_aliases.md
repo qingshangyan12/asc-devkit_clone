@@ -74,5 +74,5 @@ using _4096 = Std::Int<4096>;
 using namespace asc::te;
 
 // 使用编译期整数构造shape和stride。
-auto tensor_layout = make_layout(make_shape(_8{}, _16{}), make_stride(_16{}, _1{}));
+auto tensor_layout = make_layout(make_shape(_8{}, _16{}), make_stride(_16{}, _1{}))
 ```
