@@ -30,9 +30,11 @@
 
 将源寄存器各元素的低半位宽数据按原顺序压缩，写入返回寄存器的低半部分或高半部分。`part`选择的是结果的存放位置，不是源元素中待提取的高位或低位。
 
-- T为uint16_t时，提取各元素的低8位，结果元素类型为uint8_t。
-- T为uint32_t时，提取各元素的低16位，结果元素类型为uint16_t。
+- T为int16_t或uint16_t时，提取各元素的低8位，结果元素类型为uint8_t。
+- T为int32_t或uint32_t时，提取各元素的低16位，结果元素类型为uint16_t。
 - T为bool时，从掩码寄存器每两个比特中提取低位比特，即索引为0、2、4等偶数位置的比特，结果仍为掩码寄存器。
+
+有符号整型输入同样按位提取低半位宽，返回无符号整型寄存器，不保留源元素的符号。
 
 本接口仅在AIV上生效。`part`为`high_low_part::low`时调用[asc_pack_to_low](../../../c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md)，为`high_low_part::high`时调用[asc_pack_to_high](../../../c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md)。
 
@@ -63,7 +65,9 @@ __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src);
 | T | 返回值类型 |
 | --- | --- |
 | bool | reg_tensor&lt;bool&gt; |
+| int16_t | reg_tensor<uint8_t> |
 | uint16_t | reg_tensor<uint8_t> |
+| int32_t | reg_tensor<uint16_t> |
 | uint32_t | reg_tensor<uint16_t> |
 
 ## 返回值说明

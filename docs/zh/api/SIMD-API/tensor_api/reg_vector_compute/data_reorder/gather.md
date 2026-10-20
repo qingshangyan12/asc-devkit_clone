@@ -63,7 +63,7 @@ __simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& s
 | --- | --- |
 | int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t | uint8_t |
 | int16_t、uint16_t、half、bfloat16_t | uint16_t |
-| int32_t、uint32_t | uint32_t |
+| int32_t、uint32_t、float | uint32_t |
 
 ## 返回值说明
 
@@ -71,7 +71,6 @@ __simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& s
 
 ## 约束说明
 
-- 仅支持数据类型表中的组合。底层C API支持的float/uint32_t组合不在本接口当前实现的支持范围内。
 - 收集计算不使用`src.mask`或`index.mask`屏蔽元素。须保证被索引的源元素及参与计算的索引值已初始化；返回对象的`mask`继承`index.mask`。
 - 索引超出源寄存器可容纳的元素范围时，按`index.reg[i] % VL_T`取模后访问。
 - 在后续操作使用返回对象的`mask`前，须保证`index.mask`已初始化。
