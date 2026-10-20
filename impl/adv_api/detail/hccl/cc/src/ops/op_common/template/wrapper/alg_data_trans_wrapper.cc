@@ -13,7 +13,7 @@
 
 #include <atomic>
 
-// 消费侧 ABI 守护：asccomm 头自身无断言，dl.h 旧断言随 T2 退役后由此处接管（notes/24 存疑2裁决）
+// 消费侧 ABI 守护：asccomm 头自身无断言，desc 尺寸契约由此处接管
 static_assert(sizeof(AsccommBatchTransferDesc) == 64, "Asccomm batch transfer descriptor ABI size mismatch");
 
 namespace mc2_ops_hccl {

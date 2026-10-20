@@ -217,7 +217,7 @@ if(PRODUCT_SIDE STREQUAL "device")
 
     target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
-        # TODO(T1临接): device 侧编译与 mc2_client 相同的已切 asccomm 源文件，需同款头路径（交叉校验 Blocker-1 修复）
+        # TODO(T1临接): device 侧与 mc2_client 编译相同的已切 asccomm 源文件，头路径经 ASCCOMM_PRIMITIVES_HDR（见文件头）
         ${ASCCOMM_PRIMITIVES_HDR}
     )
 
