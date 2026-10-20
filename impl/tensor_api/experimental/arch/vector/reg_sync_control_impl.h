@@ -35,20 +35,19 @@ struct is_mem_bar_supported {
 template <mem_type src, mem_type dst>
 __simd_callee__ inline void mem_bar()
 {
-    static_assert(
-        detail::is_mem_bar_supported<src, dst>::value, "Unsupported mem_bar source/destination combination");
+    static_assert(detail::is_mem_bar_supported<src, dst>::value, "Unsupported mem_bar source/destination combination");
 }
 
-#define REGISTER_MEM_BAR(SRC, DST, VALUE)                      \
-    template <>                                                \
-    struct detail::is_mem_bar_supported<SRC, DST> {            \
-        static constexpr bool value = true;                    \
-    };                                                         \
-    template <>                                                \
-    __simd_callee__ inline void mem_bar<SRC, DST>()            \
-    {                                                          \
-        static constexpr auto value = VALUE;                   \
-        asc_mem_bar(value);                                    \
+#define REGISTER_MEM_BAR(SRC, DST, VALUE)           \
+    template <>                                     \
+    struct detail::is_mem_bar_supported<SRC, DST> { \
+        static constexpr bool value = true;         \
+    };                                              \
+    template <>                                     \
+    __simd_callee__ inline void mem_bar<SRC, DST>() \
+    {                                               \
+        static constexpr auto value = VALUE;        \
+        asc_mem_bar(value);                         \
     }
 
 REGISTER_MEM_BAR(mem_type::vec_store, mem_type::vec_load, VST_VLD);
