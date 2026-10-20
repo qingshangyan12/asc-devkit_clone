@@ -35,6 +35,15 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="x90" id12 -->
+- KirinX90：不支持
+<!-- end id12 -->
+<!-- npu="9020" id13 -->
+- Kirin9020：不支持
+<!-- end id13 -->
+<!-- npu="9030" id14 -->
+- Kirin9030：不支持
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_MaskReg_res.md#id1 -->
 
 ## 功能说明

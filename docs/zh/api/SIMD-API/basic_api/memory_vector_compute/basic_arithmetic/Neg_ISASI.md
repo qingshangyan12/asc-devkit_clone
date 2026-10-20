@@ -23,6 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9020" id9 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="9030" id10 -->
+- Kirin 9030处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="x90" id11 -->
+- Kirin X90处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Neg_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -61,6 +70,15 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为int8_t、int16_t、half、int32_t、float、int64_t。
 <!-- end id8 -->
+<!-- npu="9020" id12 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int8_t、int16_t、int32_t、half、float。
+<!-- end id12 -->
+<!-- npu="9030" id13 -->
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：int8_t、int16_t、int32_t、half、float。
+<!-- end id13 -->
+<!-- npu="x90" id14 -->
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：int8_t、int16_t、int32_t、half、float。
+<!-- end id14 -->
 
 ## 返回值说明<a name="section14483414194"></a>
 

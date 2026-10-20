@@ -31,6 +31,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id22 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id22 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id1 -->
 
 ### 传入config的原型
@@ -62,6 +65,9 @@
 <!-- npu="9030" id18 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
+<!-- npu="9020" id23 -->
+- Kirin 9020处理器系列产品：不支持
+<!-- end id23 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id2 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -148,6 +154,16 @@ $dst_i = \ln(src_i)$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+
+<!-- npu="9020" id28 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id28 -->
+<!-- npu="9030" id31 -->
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id31 -->
+<!-- npu="x90" id32 -->
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id32 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

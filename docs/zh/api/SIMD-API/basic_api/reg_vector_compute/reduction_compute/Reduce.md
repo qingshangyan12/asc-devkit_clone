@@ -35,6 +35,15 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9020" id12 -->
+- Kirin 9020处理器系列产品：支持。
+<!-- end id12 -->
+<!-- npu="9030" id16 -->
+- Kirin 9030处理器系列产品：支持。
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
+- Kirin X90处理器系列产品：支持。
+<!-- end id17 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/Reduce_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -122,6 +131,15 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
 - 当归约求最小值或者归约求最大值时，源操作数的数据类型和目的操作数相同。
 - mask为空场景及异常值处理参考[mask为空场景及异常值处理](#mask为空场景及异常值处理)。
 - 指令内累加顺序采用二叉树累加方式，规则参考[ReduceType::SUM累加顺序](#ReduceType::SUM累加顺序)。
+<!-- npu="9020" id13 -->
+- 针对Kirin 9020处理器系列产品，支持数据类型为：half、float。
+<!-- end id13 -->
+<!-- npu="9030" id14 -->
+- 针对Kirin 9030处理器系列产品，支持数据类型为：half、float。
+<!-- end id14 -->
+<!-- npu="x90" id15 -->
+- 针对Kirin X90处理器系列产品，支持数据类型为：half、float。
+<!-- end id15 -->
 
 ## 关键特性<a name="zh-cn_topic_0000002537812548_section18972943153217"></a>
 

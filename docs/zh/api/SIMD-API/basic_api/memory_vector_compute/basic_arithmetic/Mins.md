@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id10 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id10 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Mins_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -132,6 +135,9 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 <!-- npu="9030" id19 -->
 - 针对Kirin 9030处理器系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id19 -->
+<!-- npu="9020" id11 -->
+- 针对Kirin 9020处理器系列产品，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。数据类型int8_t、uint8_t、uint16_t、uint32_t仅支持tensor前n个数据计算接口。
+<!-- end id11 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 

@@ -23,6 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9020" id25 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id25 -->
+<!-- npu="9030" id26 -->
+- Kirin 9030处理器系列产品：支持
+<!-- end id26 -->
+<!-- npu="x90" id27 -->
+- Kirin X90处理器系列产品：支持
+<!-- end id27 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -138,6 +147,15 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 <!-- npu="310b" id18 -->
 - 针对Atlas 200I/500 A2推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id18 -->
+<!-- npu="9020" id28 -->
+- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id28 -->
+<!-- npu="9030" id29 -->
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id29 -->
+<!-- npu="x90" id30 -->
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id30 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
