@@ -40,6 +40,13 @@ include(${ASCENDC_DIR}/version.cmake)
 set(DEVICE_MODE TRUE)
 set(KERNEL_MODE TRUE)
 
+# asc-comm 头路径（host 侧 add_cann_device_project 经 EXT_ARGS 传入；独立 cmake 进程
+# 不继承 host 进程的 ASC_COMM_SOURCE_PATH 变量）。不 include asc-comm.cmake —— 避免
+# device 进程重复注册 install 规则/FetchContent，仅取头路径。
+if(ASC_COMM_SOURCE_DIR AND EXISTS "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+endif()
+
 add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
 add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
 add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)
