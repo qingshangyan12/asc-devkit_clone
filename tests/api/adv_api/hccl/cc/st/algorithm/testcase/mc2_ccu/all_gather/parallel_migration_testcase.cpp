@@ -169,20 +169,22 @@ protected:
             arg.algSubType = mc2_ops_hccl::KFC_PARALLEL_ALL_GATHER_SUB_TYPE;
             auto parallel = std::make_shared<mc2_ops_hccl::KfcParallelAllGatherArg>();
             arg.algArg = parallel;
-            arg.opParam.opType = HCCL_CMD_ALLGATHER;
+            arg.opType = HCCL_CMD_ALLGATHER;
             arg.role =
                 mesh ? mc2_ops_hccl::KfcServerRole::ALL_GATHER_MESH : mc2_ops_hccl::KfcServerRole::ALL_GATHER_NHR;
+            arg.missionIndex = mission;
+            mc2_ops_hccl::InitKfcSubKernelArgLayout(arg);
             parallel->rankSizeLevel0 = meshSize;
             parallel->rankIdxLevel0 = m;
             parallel->rankSizeLevel1 = nhrSize;
             parallel->rankIdxLevel1 = n;
-            arg.rankSize = mesh ? meshSize : nhrSize;
-            arg.rankId = mesh ? m : n;
+            const uint32_t subRankSize = mesh ? meshSize : nhrSize;
+            const uint32_t subRankId = mesh ? m : n;
             parallel->jettyNum = 1;
             parallel->stepInfoVector = NhrSteps(n, nhrSize);
             std::vector<ChannelHandle> channels;
-            for (uint32_t peer = 0; peer < arg.rankSize; ++peer) {
-                if (peer == arg.rankId) {
+            for (uint32_t peer = 0; peer < subRankSize; ++peer) {
+                if (peer == subRankId) {
                     continue;
                 }
                 parallel->rank2ChannelIdx[peer] = channels.size();
@@ -210,7 +212,8 @@ protected:
             ASSERT_EQ(registry.RegisterEnd(rank + 1), Result::SUCCESS);
             launches[rank] = {
                 handle,
-                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission, 0x1000U + rank},
+                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission, 0x1000U + rank,
+                 0x1000U},
                 &memory};
         }
         RuntimeWorld runtime;
