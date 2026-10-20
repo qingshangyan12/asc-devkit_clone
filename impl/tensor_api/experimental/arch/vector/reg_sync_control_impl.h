@@ -26,68 +26,8 @@ namespace experimental {
 namespace detail {
 
 template <mem_type src, mem_type dst>
-struct mem_bar_mapping {
-    static_assert(src != src, "Unsupported mem_bar source/destination combination");
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_store, mem_type::vec_load> {
-    static constexpr MEM_TYPE value = VST_VLD;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_load, mem_type::vec_store> {
-    static constexpr MEM_TYPE value = VLD_VST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_store, mem_type::vec_store> {
-    static constexpr MEM_TYPE value = VST_VST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_store, mem_type::scalar_load> {
-    static constexpr MEM_TYPE value = VST_LD;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_load, mem_type::scalar_store> {
-    static constexpr MEM_TYPE value = VLD_ST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_store, mem_type::scalar_store> {
-    static constexpr MEM_TYPE value = VST_ST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::scalar_store, mem_type::vec_load> {
-    static constexpr MEM_TYPE value = ST_VLD;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::scalar_load, mem_type::vec_store> {
-    static constexpr MEM_TYPE value = LD_VST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::scalar_store, mem_type::vec_store> {
-    static constexpr MEM_TYPE value = ST_VST;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_all, mem_type::vec_all> {
-    static constexpr MEM_TYPE value = VV_ALL;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::vec_all, mem_type::scalar_all> {
-    static constexpr MEM_TYPE value = VS_ALL;
-};
-
-template <>
-struct mem_bar_mapping<mem_type::scalar_all, mem_type::vec_all> {
-    static constexpr MEM_TYPE value = SV_ALL;
+struct is_mem_bar_supported {
+    static constexpr bool value = false;
 };
 
 } // namespace detail
@@ -95,8 +35,36 @@ struct mem_bar_mapping<mem_type::scalar_all, mem_type::vec_all> {
 template <mem_type src, mem_type dst>
 __simd_callee__ inline void mem_bar()
 {
-    asc_mem_bar(detail::mem_bar_mapping<src, dst>::value);
+    static_assert(
+        detail::is_mem_bar_supported<src, dst>::value, "Unsupported mem_bar source/destination combination");
 }
+
+#define REGISTER_MEM_BAR(SRC, DST, VALUE)                      \
+    template <>                                                \
+    struct detail::is_mem_bar_supported<SRC, DST> {            \
+        static constexpr bool value = true;                    \
+    };                                                         \
+    template <>                                                \
+    __simd_callee__ inline void mem_bar<SRC, DST>()            \
+    {                                                          \
+        static constexpr auto value = VALUE;                   \
+        asc_mem_bar(value);                                    \
+    }
+
+REGISTER_MEM_BAR(mem_type::vec_store, mem_type::vec_load, VST_VLD);
+REGISTER_MEM_BAR(mem_type::vec_load, mem_type::vec_store, VLD_VST);
+REGISTER_MEM_BAR(mem_type::vec_store, mem_type::vec_store, VST_VST);
+REGISTER_MEM_BAR(mem_type::vec_store, mem_type::scalar_load, VST_LD);
+REGISTER_MEM_BAR(mem_type::vec_load, mem_type::scalar_store, VLD_ST);
+REGISTER_MEM_BAR(mem_type::vec_store, mem_type::scalar_store, VST_ST);
+REGISTER_MEM_BAR(mem_type::scalar_store, mem_type::vec_load, ST_VLD);
+REGISTER_MEM_BAR(mem_type::scalar_load, mem_type::vec_store, LD_VST);
+REGISTER_MEM_BAR(mem_type::scalar_store, mem_type::vec_store, ST_VST);
+REGISTER_MEM_BAR(mem_type::vec_all, mem_type::vec_all, VV_ALL);
+REGISTER_MEM_BAR(mem_type::vec_all, mem_type::scalar_all, VS_ALL);
+REGISTER_MEM_BAR(mem_type::scalar_all, mem_type::vec_all, SV_ALL);
+
+#undef REGISTER_MEM_BAR
 
 } // namespace experimental
 } // namespace te

@@ -17,23 +17,25 @@ namespace {
 
 using asc::te::experimental::mem_type;
 
-#define CHECK_MEM_BAR_MAPPING(Src, Dst, Expected) \
-    static_assert(asc::te::experimental::detail::mem_bar_mapping<mem_type::Src, mem_type::Dst>::value == Expected)
+#define CHECK_MEM_BAR_SUPPORTED(Src, Dst) \
+    static_assert(asc::te::experimental::detail::is_mem_bar_supported<mem_type::Src, mem_type::Dst>::value)
 
-CHECK_MEM_BAR_MAPPING(vec_store, vec_load, VST_VLD);
-CHECK_MEM_BAR_MAPPING(vec_load, vec_store, VLD_VST);
-CHECK_MEM_BAR_MAPPING(vec_store, vec_store, VST_VST);
-CHECK_MEM_BAR_MAPPING(vec_store, scalar_load, VST_LD);
-CHECK_MEM_BAR_MAPPING(vec_load, scalar_store, VLD_ST);
-CHECK_MEM_BAR_MAPPING(vec_store, scalar_store, VST_ST);
-CHECK_MEM_BAR_MAPPING(scalar_store, vec_load, ST_VLD);
-CHECK_MEM_BAR_MAPPING(scalar_load, vec_store, LD_VST);
-CHECK_MEM_BAR_MAPPING(scalar_store, vec_store, ST_VST);
-CHECK_MEM_BAR_MAPPING(vec_all, vec_all, VV_ALL);
-CHECK_MEM_BAR_MAPPING(vec_all, scalar_all, VS_ALL);
-CHECK_MEM_BAR_MAPPING(scalar_all, vec_all, SV_ALL);
+CHECK_MEM_BAR_SUPPORTED(vec_store, vec_load);
+CHECK_MEM_BAR_SUPPORTED(vec_load, vec_store);
+CHECK_MEM_BAR_SUPPORTED(vec_store, vec_store);
+CHECK_MEM_BAR_SUPPORTED(vec_store, scalar_load);
+CHECK_MEM_BAR_SUPPORTED(vec_load, scalar_store);
+CHECK_MEM_BAR_SUPPORTED(vec_store, scalar_store);
+CHECK_MEM_BAR_SUPPORTED(scalar_store, vec_load);
+CHECK_MEM_BAR_SUPPORTED(scalar_load, vec_store);
+CHECK_MEM_BAR_SUPPORTED(scalar_store, vec_store);
+CHECK_MEM_BAR_SUPPORTED(vec_all, vec_all);
+CHECK_MEM_BAR_SUPPORTED(vec_all, scalar_all);
+CHECK_MEM_BAR_SUPPORTED(scalar_all, vec_all);
 
-#undef CHECK_MEM_BAR_MAPPING
+#undef CHECK_MEM_BAR_SUPPORTED
+
+static_assert(!asc::te::experimental::detail::is_mem_bar_supported<mem_type::vec_load, mem_type::vec_load>::value);
 
 TEST(TensorApiVectorRegSyncControl3510, AllSupportedCombinations)
 {
