@@ -785,6 +785,18 @@ __aicore__ inline void FillImpl(const LocalTensor<T>& dst, const InitConstValueP
     }
 }
 
+#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+template <typename T, typename U>
+__aicore__ inline void FillImpl(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    static_assert(Std::is_same<PrimT<T>, U>::value && !Std::is_const<T>::value);
+    ASCENDC_ASSERT((reinterpret_cast<uint64_t>(dst) % ONE_BLK_SIZE == 0), {
+        KERNEL_LOG(KERNEL_ERROR, "Fill L1 destination must be 32-byte aligned");
+    });
+    InitL1BufferCal((__cbuf__ PrimT<T>*)dst, initConstValueParams);
+}
+#endif
+
 /* **************************************************************************************************
  * InitConstValue                                             *
  * ************************************************************************************************* */

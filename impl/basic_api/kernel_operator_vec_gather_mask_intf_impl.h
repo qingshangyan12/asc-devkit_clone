@@ -87,6 +87,32 @@ __aicore__ inline void GatherMask(
 #endif
 }
 
+template <typename T, typename U, GatherMaskMode mode,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(), int>::type>
+__aicore__ inline void GatherMask(
+    Operand0 dst, Operand1 src0, Operand2 src1Pattern, const bool reduceMode,
+    const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand2>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using Src1PrimType = PrimT<VectorElementU>;
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+    GatherMaskCal(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ DstPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1Pattern), reduceMode, mask, gatherMaskParams, rsvdCnt);
+#else
+    GatherMaskCal<DstPrimType, Src1PrimType, mode>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ DstPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1Pattern), reduceMode, mask, gatherMaskParams, rsvdCnt);
+#endif
+}
+
 template <typename T, GatherMaskMode mode>
 __aicore__ inline void GatherMask(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t src1Pattern, const bool reduceMode,
@@ -114,6 +140,29 @@ __aicore__ inline void GatherMask(
 #else
     GatherMaskCal<PrimType, mode>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(), src1Pattern, reduceMode, mask,
+        gatherMaskParams, rsvdCnt);
+#endif
+}
+
+template <typename T, GatherMaskMode mode,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void GatherMask(
+    Operand0 dst, Operand1 src0, const uint8_t src1Pattern, const bool reduceMode,
+    const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+    GatherMaskCal(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0), src1Pattern, reduceMode, mask,
+        gatherMaskParams, rsvdCnt);
+#else
+    GatherMaskCal<PrimType, mode>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0), src1Pattern, reduceMode, mask,
         gatherMaskParams, rsvdCnt);
 #endif
 }

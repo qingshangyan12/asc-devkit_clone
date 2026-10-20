@@ -405,6 +405,13 @@ template <
     typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams);
 
+#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+// Fill on 3510 targets L1 on the Cube core; UB and L0A/L0B are not supported.
+template <typename T, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && !Std::is_const<T>::value, bool>::type = true>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+#endif
+
 // InitConstValue has been updated, please use Fill instead.
 template <
     typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>

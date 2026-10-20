@@ -664,6 +664,20 @@ __aicore__ inline __inout_pipe__(V) void Copy(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const uint8_t repeatTime,
+    const CopyRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    CopyImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
+
 // Copy::Level 0 - mask count mode
 template <typename T, bool IsSetMask>
 __aicore__ inline __inout_pipe__(V) void Copy(
@@ -682,6 +696,20 @@ __aicore__ inline __inout_pipe__(V) void Copy(
 #endif
     CopyImpl<PrimType, IsSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask, const uint8_t repeatTime,
+    const CopyRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    CopyImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 
 /*
@@ -704,6 +732,18 @@ __aicore__ inline __inout_pipe__(V) void Copy(
     }
 #endif
     CopyImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint32_t count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    CopyImpl<PrimType>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 

@@ -123,6 +123,21 @@ __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>
     TransposeImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)src.GetPhyAddr());
 }
 
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Transpose(Operand0 dst, Operand1 src)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    ASCENDC_ASSERT((SupportType<PrimT<VectorElementT>, int16_t, uint16_t, half>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Failed to check dtype in Transpose, current api support dtype combination is "
+                          "src and dst both: int16_t, uint16_t, half");
+    });
+    TransposeImpl((__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
+}
+
 /* **************************************************************************************************
  * TransDataTo5HD                                            *
  * ************************************************************************************************* */
@@ -162,6 +177,28 @@ __aicore__ inline void TransDataTo5HD(
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         dstAddrList[i] = (__ubuf__ PrimT<T>*)dstList[i].GetPhyAddr();
         srcAddrList[i] = (__ubuf__ PrimT<T>*)srcList[i].GetPhyAddr();
+    }
+
+    TransDataTo5HDImpl(dstAddrList, srcAddrList, nchwconvParams);
+}
+
+template <typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::IsWritable<Operand0>(), int>::type>
+__aicore__ inline void TransDataTo5HD(
+    const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE],
+    const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+
+    __ubuf__ PrimT<VectorElementT>* dstAddrList[NCHW_CONV_ADDR_LIST_SIZE];
+    __ubuf__ PrimT<VectorElementT>* srcAddrList[NCHW_CONV_ADDR_LIST_SIZE];
+
+    for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
+        dstAddrList[i] = (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dstList[i]);
+        srcAddrList[i] = (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(srcList[i]);
     }
 
     TransDataTo5HDImpl(dstAddrList, srcAddrList, nchwconvParams);
@@ -257,6 +294,49 @@ __aicore__ inline void Transpose(
         }
     }
 }
+
+#if __NPU_ARCH__ == 3510
+template <typename T,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint8_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+__aicore__ inline void Transpose(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
+        (transposeParams.hSize == NCHW_CONV_ADDR_LIST_SIZE) && (transposeParams.wSize == NCHW_CONV_ADDR_LIST_SIZE)) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        ASCENDC_ASSERT((SupportType<PrimT<VectorElementT>, int16_t, uint16_t, half>()), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
+                              "current api support dtype combination is src and dst both: int16_t, uint16_t, half");
+        });
+#else
+        ASCENDC_ASSERT((SupportType<PrimT<VectorElementT>, uint16_t>()), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
+                              "current api support dtype combination is src and dst both: uint16_t");
+        });
+#endif
+        TransposeImpl((__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
+    } else if (
+        transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC ||
+        transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
+        if (transposeParams.cSize == 1) {
+            struct DataCopyParams repeatParams;
+            repeatParams.blockLen = transposeParams.nSize * transposeParams.cSize * transposeParams.hSize *
+                                    transposeParams.wSize / AscendCUtils::GetC0Count(sizeof(PrimT<VectorElementT>));
+            TransposeUB2UBImpl(
+                (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src), repeatParams);
+        } else {
+            Transpose4DImpl(GetUnderlyingPtr(dst), GetUnderlyingPtr(src), GetUnderlyingPtr(sharedTmpBuffer), transposeParams);
+        }
+    }
+}
+#endif
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
@@ -308,6 +388,46 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
     TransDataTo5HDVldVaRegImpl<T>(
         (__ubuf__ uint64_t*)dst.GetPhyAddr(), (__ubuf__ uint64_t*)src.GetPhyAddr(), nchwconvParams);
 #endif
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<uint64_t, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<uint64_t, Operand1>() && VectorOperand::IsWritable<Operand1>(), int>::type>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
+    Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams)
+{
+    constexpr uint32_t vaRegSize = VA_REG_ARRAY_LEN / HALF_FACTOR;
+    constexpr uint32_t vaOne = 1;
+    constexpr uint32_t vaTwo = 2;
+    constexpr uint32_t vaThree = 3;
+    constexpr uint64_t vaAddr = 5;
+    constexpr uint64_t vaMask = 0x1fff;
+    constexpr uint64_t vaBit1 = 16;
+    constexpr uint64_t vaBit2 = 32;
+    constexpr uint64_t vaBit3 = 48;
+
+    for (uint32_t i = 0; i < vaRegSize; i++) {
+        uint64_t dstAddrConfig =
+            (((GetUnderlyingPtr(dst)[vaRegSize * i] >> vaAddr) & vaMask) |
+             (((GetUnderlyingPtr(dst)[vaRegSize * i + vaOne] >> vaAddr) & vaMask) << vaBit1) |
+             (((GetUnderlyingPtr(dst)[vaRegSize * i + vaTwo] >> vaAddr) & vaMask) << vaBit2) |
+             (((GetUnderlyingPtr(dst)[vaRegSize * i + vaThree] >> vaAddr) & vaMask) << vaBit3));
+        GetUnderlyingPtr(dst)[i] = dstAddrConfig;
+
+        uint64_t srcAddrConfig =
+            (((GetUnderlyingPtr(src)[vaRegSize * i] >> vaAddr) & vaMask) |
+             (((GetUnderlyingPtr(src)[vaRegSize * i + vaOne] >> vaAddr) & vaMask) << vaBit1) |
+             (((GetUnderlyingPtr(src)[vaRegSize * i + vaTwo] >> vaAddr) & vaMask) << vaBit2) |
+             (((GetUnderlyingPtr(src)[vaRegSize * i + vaThree] >> vaAddr) & vaMask) << vaBit3));
+        GetUnderlyingPtr(src)[i] = srcAddrConfig;
+    }
+
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    SetFlag<HardEvent::S_V>(eventIdSToV);
+    WaitFlag<HardEvent::S_V>(eventIdSToV);
+    TransDataTo5HDVldVaRegImpl<T>(
+        (__ubuf__ uint64_t*)GetUnderlyingPtr(dst), (__ubuf__ uint64_t*)GetUnderlyingPtr(src), nchwconvParams);
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_INTERFACE_IMPL_H

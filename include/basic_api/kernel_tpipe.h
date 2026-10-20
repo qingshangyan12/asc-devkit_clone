@@ -524,6 +524,10 @@ public:
     // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
     template <typename T>
     inline uint64_t GetAbsAddr(const LocalTensor<T>& tensor);
+    // CPU pointers have no address-space qualifier. VECTOR defaults to UB;
+    // callers translating an L1 pointer must select Hardware::L1 explicitly.
+    template <typename T, Hardware space = Hardware::UB>
+    inline uint64_t GetAbsAddr(T* pointer);
     inline uint8_t* GetBaseAddr(int8_t logicPos);
 #endif
 

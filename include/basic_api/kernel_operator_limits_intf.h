@@ -292,6 +292,36 @@ public:
     {
         Duplicate(dst, DeNormMin(), count);
     }
+
+    __aicore__ static inline void DeNormMin(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, DeNormMin(), count);
+    }
+
+    __aicore__ static inline void Infinity(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, Infinity(), count);
+    }
+
+    __aicore__ static inline void Lowest(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, Lowest(), count);
+    }
+
+    __aicore__ static inline void NegativeInfinity(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, NegativeInfinity(), count);
+    }
+
+    __aicore__ static inline void QuietNaN(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, QuietNaN(), count);
+    }
+
+    __aicore__ static inline void SignalingNaN(__ubuf__ T* dst, uint32_t count)
+    {
+        Duplicate(dst, SignalingNaN(), count);
+    }
 };
 } // namespace AscendC
 

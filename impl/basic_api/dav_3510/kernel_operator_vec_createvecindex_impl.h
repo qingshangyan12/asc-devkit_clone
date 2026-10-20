@@ -175,6 +175,35 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<int64_t> dstLocal, const i
     __ubuf__ int64_t* dstLocalAddr = (__ubuf__ int64_t*)dstLocal.GetPhyAddr();
     CreateVecIndexCalcVic<T>(dstLocalAddr, firstValue, calCount);
 }
+template <typename T>
+__aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, uint64_t mask,
+    uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+{
+    CheckCreateVecIndexApi0SupportedType<T>();
+    Internal::VecCreateVecIndexLevel0Template<false>(
+        dst, firstValue, nullptr, mask, repeatTime, dstBlkStride, dstRepStride);
+}
+
+template <typename T>
+__aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, uint64_t mask[],
+    uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+{
+    CheckCreateVecIndexApi0SupportedType<T>();
+    Internal::VecCreateVecIndexLevel0Template<true>(
+        dst, firstValue, mask, 0, repeatTime, dstBlkStride, dstRepStride);
+}
+
+template <typename T>
+__aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, uint32_t count)
+{
+    CheckCreateVecIndexApi2SupportedType<T>();
+    if constexpr (SupportType<T, int64_t>()) {
+        CreateVecIndexCalcVic<T>(dst, firstValue, count);
+    } else {
+        uint32_t lanes = GetVecLen() / sizeof(T);
+        CreateVecIndexCalcVci2<T>(dst, firstValue, count, lanes, CeilDivision(count, lanes));
+    }
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H__)

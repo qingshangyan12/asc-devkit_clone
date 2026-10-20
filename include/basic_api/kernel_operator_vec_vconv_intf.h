@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_vdeq.h"
@@ -62,11 +63,29 @@ __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Cast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Cast(
+    Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 // Cast::Level 0 - mask count mode
 template <typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Cast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask,
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Cast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Cast(
+    Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 /* **************************************************************************************************
@@ -94,6 +113,13 @@ template <typename T, typename U>
 __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__aicore__ inline void Cast(
+    Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint32_t count);
+
 /*
  * @ingroup CastDequant Level 0
  * @brief Dequant from int16_t to uint8_t/int8_t
@@ -112,11 +138,31 @@ __aicore__ inline void CastDequant(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "CastDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void CastDequant(
+    Operand0 dst, Operand1 src, const uint64_t mask[], uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
 template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "CastDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CastDequant(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "CastDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void CastDequant(
+    Operand0 dst, Operand1 src, const int32_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 // CastDeq has been updated, please use CastDequant instead.
@@ -126,11 +172,29 @@ __aicore__ inline void CastDeq(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "CastDeq is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void CastDeq(
+    Operand0 dst, Operand1 src, const uint64_t mask[], uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
 // CastDeq has been updated, please use CastDequant instead.
 template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
 __ASC_USE_RESERVED_UBUF__(3510, "CastDeq is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CastDeq(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "CastDeq is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void CastDeq(
+    Operand0 dst, Operand1 src, const int32_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 /*
@@ -143,9 +207,21 @@ __aicore__ inline void CastDeq(
 template <typename T, typename U, bool isVecDeq = true, bool halfBlock = true>
 __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__aicore__ inline void CastDequant(Operand0 dst, Operand1 src, const uint32_t count);
+
 // CastDeq has been updated, please use CastDequant instead.
 template <typename T, typename U, bool isVecDeq = true, bool halfBlock = true>
 __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isVecDeq = true, bool halfBlock = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+__aicore__ inline void CastDeq(Operand0 dst, Operand1 src, const uint32_t count);
 
 /* **************************************************************************************************
  * AddReluCast                                             *
@@ -173,12 +249,34 @@ __aicore__ inline void AddReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "AddReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void AddReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
 // AddReluCast::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "AddReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "AddReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void AddReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
@@ -192,6 +290,14 @@ __aicore__ inline void AddReluCast(
 template <typename T, typename U>
 __aicore__ inline void AddReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__aicore__ inline void AddReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count);
 
 /* **************************************************************************************************
  * SubReluCast                                             *
@@ -219,12 +325,34 @@ __aicore__ inline void SubReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "SubReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void SubReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
 // SubReluCast::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "SubReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void SubReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "SubReluCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void SubReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
@@ -239,6 +367,14 @@ template <typename T, typename U>
 __aicore__ inline void SubReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+__aicore__ inline void SubReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count);
+
 #pragma end_pipe
 __aicore__ inline void SetDeqScale(half scale);
 
@@ -246,6 +382,13 @@ __aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode);
 
 template <typename T>
 __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo);
+
+#if __NPU_ARCH__ == 3510
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+__aicore__ inline void SetDeqScale(Operand0 vdeq, const VdeqInfo& vdeqInfo);
+#endif
 
 /*
  * @ingroup Truncate Level 2
@@ -256,6 +399,12 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
  */
 template <typename T, RoundMode roundMode>
 __aicore__ inline void Truncate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
+
+template <typename T = VectorOperand::DefaultType, RoundMode roundMode,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void Truncate(Operand0 dst, Operand1 src, const uint32_t count);
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_vec_vconv_intf_impl.h"

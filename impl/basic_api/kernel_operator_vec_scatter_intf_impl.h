@@ -114,6 +114,26 @@ __aicore__ inline void Scatter(
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
 }
 
+#if __NPU_ARCH__ == 3510
+template <typename T,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+__aicore__ inline void Scatter(
+    Operand0 dst, Operand1 src, Operand2 dstOffset,
+    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ScatterCheck<VectorElementT>();
+    constexpr uint32_t dstLength = 0; // Unused by the 3510 backend.
+    ScatterImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+}
+#endif
+
 /*
  * @ingroup scatter Level 0
  * @brief scatter element from dst according to dstOffset
@@ -142,6 +162,26 @@ __aicore__ inline void Scatter(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
 }
+
+#if __NPU_ARCH__ == 3510
+template <typename T,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+__aicore__ inline void Scatter(
+    Operand0 dst, Operand1 src, Operand2 dstOffset,
+    const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ScatterCheck<VectorElementT>();
+    constexpr uint32_t dstLength = 0; // Unused by the 3510 backend.
+    ScatterImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+}
+#endif
 
 /*
  * @ingroup scatter Level 2
@@ -235,6 +275,22 @@ __aicore__ inline void ScatterDataCopy(
     ScatterToGlobalImpl(
         (__gm__ T*)dstGlobal.GetPhyAddr(), (__ubuf__ T*)srcLocal.GetPhyAddr(), (__ubuf__ U*)offsetLocal.GetPhyAddr(),
         scatterParams, cacheMode);
+}
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <typename T,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+__aicore__ inline void Scatter(
+    Operand0 dst, Operand1 src, Operand2 dstOffset,
+    const uint32_t dstBaseAddr, const uint32_t count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ScatterImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstBaseAddr, count);
 }
 #endif
 } // namespace AscendC

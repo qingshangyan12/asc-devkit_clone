@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_binary.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
@@ -68,6 +69,16 @@ __aicore__ inline void Adds(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Adds is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Adds(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Adds is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Adds(
@@ -80,6 +91,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "Adds is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Adds(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Adds is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Adds(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
@@ -120,6 +141,14 @@ template <
 __aicore__ inline void Adds(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void Adds(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 // One of src0/src1 should be scalar or single point LocalTensor
@@ -159,6 +188,16 @@ __aicore__ inline void Muls(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Muls is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Muls(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Muls is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Muls(
@@ -171,6 +210,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "Muls is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Muls(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Muls is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Muls(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
@@ -211,6 +260,14 @@ template <
 __aicore__ inline void Muls(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void Muls(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 // One of src0/src1 should be scalar or single point LocalTensor
@@ -250,6 +307,16 @@ __aicore__ inline void Maxs(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Maxs is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Maxs(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Maxs is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Maxs(
@@ -262,6 +329,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "Maxs is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Maxs(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Maxs is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Maxs(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
@@ -302,6 +379,14 @@ template <
 __aicore__ inline void Maxs(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void Maxs(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 // One of src0/src1 should be scalar or single point LocalTensor
@@ -341,6 +426,16 @@ __aicore__ inline void Mins(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Mins is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Mins(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Mins is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Mins(
@@ -353,6 +448,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "Mins is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Mins(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Mins is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Mins(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
@@ -393,6 +498,14 @@ template <
 __aicore__ inline void Mins(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void Mins(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 // One of src0/src1 should be scalar or single point LocalTensor
@@ -424,6 +537,15 @@ __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -432,10 +554,29 @@ __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 template <
@@ -444,6 +585,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "ShiftLeft is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 /*
@@ -458,11 +609,26 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const T& scalarValue, const int32_t& count);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void ShiftLeft(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
 
 /* **************************************************************************************************
  * ShiftRight                                             *
@@ -487,6 +653,16 @@ __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -496,11 +672,32 @@ __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams, bool roundEn = false);
+
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams, bool roundEn = false);
 
 template <
@@ -510,6 +707,17 @@ __ASC_USE_RESERVED_UBUF__(
     3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams, bool roundEn);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams, bool roundEn);
 
 /*
@@ -524,11 +732,26 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const T& scalarValue, const int32_t& count);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void ShiftRight(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
 
 /* **************************************************************************************************
  * LeakyRelu                                             *
@@ -552,6 +775,15 @@ __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -560,10 +792,29 @@ __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 template <
@@ -572,6 +823,16 @@ template <
 __ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 /*
@@ -586,11 +847,26 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const T& scalarValue, const int32_t& count);
+
 template <
     typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
+
+template <
+    typename T = VectorOperand::DefaultType, typename U, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() && Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, U>::value &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__aicore__ inline void LeakyRelu(
+    Operand0 dst, Operand1 src, const typename VectorOperand::Identity<U>::Type& scalarValue, const int32_t& count);
 
 /* **************************************************************************************************
  * Subs                                             *

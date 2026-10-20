@@ -37,6 +37,15 @@
 #endif // ASCENDC_CPU_DEBUG
 
 namespace AscendC {
+
+template <typename T>
+__aicore__ inline void VectorSortCopy(__ubuf__ T* dst, __ubuf__ T* src, uint32_t count)
+{
+    DataCopyParams params;
+    params.blockLen = static_cast<uint16_t>(count * sizeof(T) / ONE_BLK_SIZE);
+    DataCopyUB2UBImpl(dst, src, params);
+}
+
 constexpr uint32_t singleSortElementCountArch3510 = 32;
 constexpr uint32_t regionProposalDataSize = 8;
 template <typename T>
@@ -123,6 +132,32 @@ __aicore__ inline void MrgSortCal(
     Vmrgsort4Cal((__ubuf__ T*)dstLocal.GetPhyAddr(), addrArray, src1, config);
 }
 
+// Pointer overload of the existing merge algorithm.
+template <typename T>
+__aicore__ inline void MrgSortCal(
+    __ubuf__ T* dstLocal, const MrgSortSrcList<T, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*>& sortList, const uint16_t elementCountList[4],
+    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+{
+    static_assert(SupportType<T, float, half>(), "MrgSort only support half / float.");
+    MrgSort4Info mrgSortInfo(elementCountList, false, validBit, static_cast<uint16_t>(repeatTime));
+    uint64_t config = 0;
+    config |= (mrgSortInfo.repeatTimes & 0xFF);
+    config |= (uint64_t(mrgSortInfo.validBit & 0xF) << 8);
+    config |= (uint64_t(mrgSortInfo.ifExhaustedSuspension & 0x1) << 12);
+
+    uint64_t src1 = 0;
+    src1 |= (uint64_t(mrgSortInfo.elementLengths[0] & 0xFFFF));
+    src1 |= (uint64_t(mrgSortInfo.elementLengths[1] & 0xFFFF) << 16);
+    src1 |= (uint64_t(mrgSortInfo.elementLengths[2] & 0xFFFF) << 32);
+    src1 |= (uint64_t(mrgSortInfo.elementLengths[3] & 0xFFFF) << 48);
+
+    __ubuf__ T* addrArray[MRG_SORT_ELEMENT_LEN] = {
+        (__ubuf__ T*)sortList.src1, (__ubuf__ T*)sortList.src2,
+        (__ubuf__ T*)sortList.src3, (__ubuf__ T*)sortList.src4};
+
+    Vmrgsort4Cal((__ubuf__ T*)dstLocal, addrArray, src1, config);
+}
+
 __aicore__ inline void GetMrgSortResultImpl(
     uint16_t& mrgSortList1, uint16_t& mrgSortList2, uint16_t& mrgSortList3, uint16_t& mrgSortList4)
 {
@@ -153,6 +188,23 @@ __aicore__ inline void FullSortInnerLoop(
     }
     MrgSortSrcList sortList =
         MrgSortSrcList(tmpLocal[0], tmpLocal[baseOffset], tmpLocal[2 * baseOffset], tmpLocal[3 * baseOffset]);
+    const uint16_t elementCountList[MRG_SORT_ELEMENT_LEN] = {
+        singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount};
+    uint32_t sortedNum[MRG_SORT_ELEMENT_LEN];
+    MrgSortCal<T>(dstLocal, sortList, elementCountList, sortedNum, 0b1111, mergeTmpRepeatTimes);
+}
+
+// Pointer overload of the existing merge algorithm.
+template <typename T>
+__aicore__ inline void FullSortInnerLoop(
+    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset,
+    const uint16_t singleMergeTmpElementCount, const int32_t mergeTmpRepeatTimes)
+{
+    if (mergeTmpRepeatTimes <= 0) {
+        return;
+    }
+    MrgSortSrcList sortList =
+        MrgSortSrcList((tmpLocal + 0), (tmpLocal + baseOffset), (tmpLocal + 2 * baseOffset), (tmpLocal + 3 * baseOffset));
     const uint16_t elementCountList[MRG_SORT_ELEMENT_LEN] = {
         singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount};
     uint32_t sortedNum[MRG_SORT_ELEMENT_LEN];
@@ -208,6 +260,56 @@ __aicore__ inline void FullSortInnerLoopTail(
     }
 }
 
+// Pointer overload of the existing merge algorithm.
+template <typename T>
+__aicore__ inline void FullSortInnerLoopTail(
+    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset,
+    const uint16_t singleMergeTmpElementCount, const uint32_t elementCountTail, const int32_t mergeTmpRepeatTimes,
+    int32_t mergeTmpTailQueNum)
+{
+    if (mergeTmpTailQueNum <= 0) {
+        return;
+    }
+    uint32_t offset0Tail = MRG_SORT_ELEMENT_LEN * baseOffset * mergeTmpRepeatTimes;
+    uint32_t offset1Tail = 0;
+    uint32_t offset2Tail = 0;
+    uint32_t offset3Tail = 0;
+    uint16_t validBitTail;
+    uint16_t elementCountListTail[MRG_SORT_ELEMENT_LEN] = {
+        singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount};
+    if (mergeTmpTailQueNum == 2) {
+        offset1Tail = offset0Tail + baseOffset;
+        elementCountListTail[1] = elementCountTail;
+        elementCountListTail[2] = 0;
+        elementCountListTail[3] = 0;
+        validBitTail = 0b0011;
+    } else if (mergeTmpTailQueNum == 3) {
+        offset1Tail = offset0Tail + baseOffset;
+        offset2Tail = offset0Tail + 2 * baseOffset;
+        elementCountListTail[2] = elementCountTail;
+        elementCountListTail[3] = 0;
+        validBitTail = 0b0111;
+    } else {
+        offset1Tail = offset0Tail + baseOffset;
+        offset2Tail = offset0Tail + 2 * baseOffset;
+        offset3Tail = offset0Tail + 3 * baseOffset;
+        elementCountListTail[3] = elementCountTail;
+        validBitTail = 0b1111;
+    }
+    if (mergeTmpTailQueNum > 1) {
+        MrgSortSrcList sortListTail =
+            MrgSortSrcList((tmpLocal + offset0Tail), (tmpLocal + offset1Tail), (tmpLocal + offset2Tail), (tmpLocal + offset3Tail));
+        uint32_t sortedNumTail[MRG_SORT_ELEMENT_LEN];
+        MrgSortCal<T>((dstLocal + offset0Tail), sortListTail, elementCountListTail, sortedNumTail, validBitTail, 1);
+    } else {
+        if constexpr (IsSameType<T, half>::value) {
+            VectorSortCopy((dstLocal + offset0Tail), (tmpLocal + offset0Tail), elementCountTail * 4);
+        } else {
+            VectorSortCopy((dstLocal + offset0Tail), (tmpLocal + offset0Tail), elementCountTail * 2);
+        }
+    }
+}
+
 __aicore__ inline uint32_t GetFullSortInnerLoopTimes(const int32_t repeatTime)
 {
     uint32_t loopTimes = 0;
@@ -247,6 +349,49 @@ __aicore__ inline void DoFullSort(
             mergeTmpTailQueNum);
         PipeBarrier<PIPE_V>();
         DataCopy(tmpLocal, dstLocal, dstElementCount);
+        PipeBarrier<PIPE_V>();
+        singleMergeTmpElementCount *= MRG_SORT_ELEMENT_LEN;
+        mergeTmpTotalQueNum = mergeTmpTotalQueNum % MRG_SORT_ELEMENT_LEN ?
+                                  mergeTmpTotalQueNum / MRG_SORT_ELEMENT_LEN + 1 :
+                                  mergeTmpTotalQueNum / MRG_SORT_ELEMENT_LEN;
+        mergeTmpTailQueNum = mergeTmpTotalQueNum % MRG_SORT_ELEMENT_LEN;
+        if (mergeTmpTailQueNum == 0 && elementCountTail != singleMergeTmpElementCount) {
+            mergeTmpTailQueNum = MRG_SORT_ELEMENT_LEN;
+        }
+        mergeTmpQueNum = mergeTmpTotalQueNum - mergeTmpTailQueNum;
+        mergeTmpRepeatTimes = mergeTmpQueNum / MRG_SORT_ELEMENT_LEN;
+    }
+}
+
+// Pointer overload of the existing merge algorithm.
+template <typename T>
+__aicore__ inline void DoFullSort(
+    __ubuf__ T* dstLocal, __ubuf__ T* concatLocal, __ubuf__ uint32_t* indexLocal,
+    __ubuf__ T* tmpLocal, const int32_t repeatTime)
+{
+    uint32_t singleMergeElementCount = singleSortElementCountArch3510;
+    uint32_t loopTimes = GetFullSortInnerLoopTimes(repeatTime);
+    uint16_t singleMergeTmpElementCount = singleMergeElementCount;
+    uint32_t srcElementCount = repeatTime * singleMergeElementCount;
+    uint32_t dstElementCount = srcElementCount * regionProposalDataSize / sizeof(T);
+    int32_t mergeTmpTotalQueNum = repeatTime;
+    int32_t mergeTmpTailQueNum = repeatTime % MRG_SORT_ELEMENT_LEN;
+    int32_t mergeTmpQueNum = mergeTmpTotalQueNum - mergeTmpTailQueNum;
+    int32_t mergeTmpRepeatTimes = repeatTime / MRG_SORT_ELEMENT_LEN;
+    VectorSortCopy(tmpLocal, dstLocal, dstElementCount);
+    PipeBarrier<PIPE_V>();
+    for (int i = 0; i < loopTimes; i++) {
+        uint32_t baseOffset = singleMergeTmpElementCount * regionProposalDataSize / sizeof(T);
+        FullSortInnerLoop(dstLocal, tmpLocal, baseOffset, singleMergeTmpElementCount, mergeTmpRepeatTimes);
+        PipeBarrier<PIPE_V>();
+        uint16_t elementCountTail = ((srcElementCount % singleMergeTmpElementCount) != 0) ?
+                                        srcElementCount % singleMergeTmpElementCount :
+                                        singleMergeTmpElementCount;
+        FullSortInnerLoopTail(
+            dstLocal, tmpLocal, baseOffset, singleMergeTmpElementCount, elementCountTail, mergeTmpRepeatTimes,
+            mergeTmpTailQueNum);
+        PipeBarrier<PIPE_V>();
+        VectorSortCopy(tmpLocal, dstLocal, dstElementCount);
         PipeBarrier<PIPE_V>();
         singleMergeTmpElementCount *= MRG_SORT_ELEMENT_LEN;
         mergeTmpTotalQueNum = mergeTmpTotalQueNum % MRG_SORT_ELEMENT_LEN ?

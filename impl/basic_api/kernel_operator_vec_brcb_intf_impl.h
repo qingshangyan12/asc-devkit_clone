@@ -98,6 +98,19 @@ __aicore__ inline void Brcb(
 #endif
     BrcbImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(), repeatTime, repeatParams);
 }
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Brcb(
+    Operand0 dst, Operand1 src, const uint8_t repeatTime,
+    const BrcbRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    BrcbImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatTime, repeatParams);
+}
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BRCB_INTERFACE_IMPL_H

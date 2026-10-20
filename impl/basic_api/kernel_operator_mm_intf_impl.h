@@ -588,6 +588,15 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
     FillImpl(dst, initConstValueParams);
 }
 
+#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+template <typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && !Std::is_const<T>::value, bool>::type>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    FillImpl(dst, initConstValueParams);
+}
+#endif
+
 // InitConstValue has been updated, please use Fill instead.
 template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
 __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams)

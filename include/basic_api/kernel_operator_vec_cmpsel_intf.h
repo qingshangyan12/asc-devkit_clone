@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
@@ -62,9 +63,27 @@ __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
     const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
+__aicore__ inline void Compare(
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode,
+    const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
+    const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
+__aicore__ inline void Compare(
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode,
     const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
@@ -73,10 +92,28 @@ __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[],
     const BinaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Compare(
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask[],
+    const BinaryRepeatParams& repeatParams);
+
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask,
+    const BinaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Compare(
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask,
     const BinaryRepeatParams& repeatParams);
 
 /*
@@ -92,11 +129,29 @@ template <typename T, typename U>
 __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count);
 
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
+__aicore__ inline void Compare(
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, uint32_t count);
+
 template <typename T>
 __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst);
 
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+__aicore__ inline void GetCmpMask(Operand0 dst);
+
 template <typename T>
 __aicore__ inline void SetCmpMask(const LocalTensor<T>& src);
+
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>(), int>::type = 0>
+__aicore__ inline void SetCmpMask(Operand0 src);
 
 /* **************************************************************************************************
  * Compares                                           *
@@ -205,11 +260,33 @@ __aicore__ inline void Select(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
+template <typename T = VectorOperand::DefaultType, SELMODE selMode,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Select(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(
     2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(
     const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Select(
+    Operand0 dst, Operand1 selMask, Operand2 src0, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
 /*
@@ -345,6 +422,14 @@ template <
 __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+#if __NPU_ARCH__ == 3510
+template <
+    typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+    const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
+    uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+#endif
 
 template <
     typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
@@ -352,12 +437,27 @@ template <
 __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+#if __NPU_ARCH__ == 3510
+template <
+    typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+    const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
+    uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+#endif
 
 template <
     typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
     const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count);
+#if __NPU_ARCH__ == 3510
+template <
+    typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
+    const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count);
+#endif
 #endif
 
 } // namespace AscendC

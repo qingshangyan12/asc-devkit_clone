@@ -391,6 +391,45 @@ __aicore__ inline void TransBroadCastForB8Cal(
     TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
 }
 
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void TransBroadCastForB8Cal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, Transpose4dParams<T>& params)
+{
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList1[m] = (__ubuf__ T*)(dstLocal + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList1[n] = (__ubuf__ T*)(srcLocal + params.srcBlockIndex * params.blockSize);
+    }
+    params.transDataParams1.dstRepStride = params.transDataParams1.repeatTimes > 1 ? ONE_BLK_SIZE : 0;
+    params.transDataParams1.srcRepStride = params.transDataParams1.repeatTimes > 1 ? (params.imageBlockNum) : 0;
+    params.transDataParams1.dstHighHalf = false;
+    params.transDataParams1.srcHighHalf = false;
+    TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+    PipeBarrier<PIPE_V>();
+    params.transDataParams1.dstHighHalf = true;
+    params.transDataParams1.srcHighHalf = false;
+    TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+    PipeBarrier<PIPE_V>();
+
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList1[m] = (__ubuf__ T*)(dstLocal + B8_TRANS_FRACTAL + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList1[n] = (__ubuf__ T*)(srcLocal + params.srcBlockIndex * params.blockSize);
+    }
+    params.transDataParams1.dstRepStride = params.transDataParams1.repeatTimes > 1 ? ONE_BLK_SIZE : 0;
+    params.transDataParams1.srcRepStride = params.transDataParams1.repeatTimes > 1 ? (params.imageBlockNum) : 0;
+    params.transDataParams1.dstHighHalf = false;
+    params.transDataParams1.srcHighHalf = true;
+    TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+    PipeBarrier<PIPE_V>();
+    params.transDataParams1.dstHighHalf = true;
+    params.transDataParams1.srcHighHalf = true;
+    TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+}
+
 template <typename T>
 __aicore__ inline void TransBroadCastCal(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, Transpose4dParams<T>& params)
@@ -419,6 +458,35 @@ __aicore__ inline void TransBroadCastCal(
     PipeBarrier<PIPE_V>();
 }
 
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void TransBroadCastCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, Transpose4dParams<T>& params)
+{
+    if constexpr (sizeof(T) == sizeof(half)) {
+        for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+            params.dstList1[m] = (__ubuf__ T*)(dstLocal + m * params.blockSize);
+        }
+        for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+            params.srcList1[n] = (__ubuf__ T*)(srcLocal + params.srcBlockIndex * params.blockSize);
+        }
+        TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+    } else if constexpr (sizeof(T) == sizeof(uint8_t)) {
+        TransBroadCastForB8Cal(dstLocal, srcLocal, params);
+    } else {
+        for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m = m + TWO_NUM) {
+            params.dstList1[m] = (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM));
+            params.dstList1[m + 1] =
+                (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM) + params.blockSize);
+        }
+        for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+            params.srcList1[n] = (__ubuf__ T*)(srcLocal + params.srcBlockIndex * params.blockSize);
+        }
+        TransDataTo5HDImpl<T>(params.dstList1, params.srcList1, params.transDataParams1);
+    }
+    PipeBarrier<PIPE_V>();
+}
+
 template <typename T>
 __aicore__ inline void CopyFirstBlockCal(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const TransposeParamsExt& transposeParams,
@@ -426,6 +494,20 @@ __aicore__ inline void CopyFirstBlockCal(
 {
     if ((params.dstNeedBlockNum != 0) && (params.tmp3RemainRowCount != 0)) {
         DataCopy(dstLocal[params.dstBlockNum * (params.blockSize)], srcLocal, dataCopyParams);
+        params.dstNeedBlockNum -= params.tmp3RemainRowCount;
+        params.dstBlockNum += params.tmp3RemainRowCount;
+        params.tmp3RemainRowCount = 0;
+    }
+}
+
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void CopyFirstBlockCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, const TransposeParamsExt& transposeParams,
+    Transpose4dParams<T>& params, DataCopyParams& dataCopyParams)
+{
+    if ((params.dstNeedBlockNum != 0) && (params.tmp3RemainRowCount != 0)) {
+        DataCopyUB2UBImpl((dstLocal + params.dstBlockNum * (params.blockSize)), srcLocal, dataCopyParams);
         params.dstNeedBlockNum -= params.tmp3RemainRowCount;
         params.dstBlockNum += params.tmp3RemainRowCount;
         params.tmp3RemainRowCount = 0;
@@ -493,6 +575,55 @@ __aicore__ inline void TransFracForB8Cal(
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
 }
 
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void TransFracForB8Cal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, Transpose4dParams<T>& params)
+{
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList2[m] = (__ubuf__ T*)(dstLocal + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList2[n] = (__ubuf__ T*)(srcLocal + n * params.blockSize);
+    }
+    params.transDataParams2.dstHighHalf = false;
+    params.transDataParams2.srcHighHalf = false;
+    TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+    PipeBarrier<PIPE_V>();
+
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList2[m] = (__ubuf__ T*)(dstLocal + B8_TRANS_FRACTAL + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList2[n] = (__ubuf__ T*)(srcLocal + n * params.blockSize);
+    }
+    params.transDataParams2.dstHighHalf = false;
+    params.transDataParams2.srcHighHalf = true;
+    TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+    PipeBarrier<PIPE_V>();
+
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList2[m] = (__ubuf__ T*)(dstLocal + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList2[n] = (__ubuf__ T*)(srcLocal + B8_TRANS_FRACTAL + n * params.blockSize);
+    }
+    params.transDataParams2.dstHighHalf = true;
+    params.transDataParams2.srcHighHalf = false;
+    TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+    PipeBarrier<PIPE_V>();
+
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+        params.dstList2[m] = (__ubuf__ T*)(dstLocal + B8_TRANS_FRACTAL + m * params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+        params.srcList2[n] = (__ubuf__ T*)(srcLocal + B8_TRANS_FRACTAL + n * params.blockSize);
+    }
+    params.transDataParams2.dstHighHalf = true;
+    params.transDataParams2.srcHighHalf = true;
+    TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+}
+
 template <typename T>
 __aicore__ inline void TransFracCal(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, Transpose4dParams<T>& params)
@@ -515,6 +646,35 @@ __aicore__ inline void TransFracCal(
         }
         for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
             params.srcList2[n] = (__ubuf__ T*)srcLocal[n * params.blockSize].GetPhyAddr();
+        }
+        TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+    }
+    PipeBarrier<PIPE_V>();
+}
+
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void TransFracCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, Transpose4dParams<T>& params)
+{
+    if constexpr (sizeof(T) == sizeof(half)) {
+        for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m++) {
+            params.dstList2[m] = (__ubuf__ T*)(dstLocal + m * params.blockSize);
+        }
+        for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+            params.srcList2[n] = (__ubuf__ T*)(srcLocal + n * params.blockSize);
+        }
+        TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+    } else if constexpr (sizeof(T) == sizeof(uint8_t)) {
+        TransFracForB8Cal(dstLocal, srcLocal, params);
+    } else {
+        for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m = m + TWO_NUM) {
+            params.dstList2[m] = (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM));
+            params.dstList2[m + 1] =
+                (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM) + params.blockSize);
+        }
+        for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE; n++) {
+            params.srcList2[n] = (__ubuf__ T*)(srcLocal + n * params.blockSize);
         }
         TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
     }
@@ -609,6 +769,67 @@ __aicore__ inline void Transpose2HwcCal(
     }
 }
 
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void Transpose2HwcCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ T* sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams, Transpose4dParams<T>& params)
+{
+    __ubuf__ T* tempTensorA = sharedTmpBuffer;
+    __ubuf__ T* tempTensorB = (sharedTmpBuffer + transposeParams.cSize * params.preTmpLen);
+    __ubuf__ T* tempTensorC = (sharedTmpBuffer + (transposeParams.cSize + 1) * params.preTmpLen);
+
+    while (params.dstNeedBlockNum != 0) {
+        // 1、transdataTo5hd: src->tmp1
+        if (params.tmp1RemainRowCount == 0) {
+            TransBroadCastCal(tempTensorA, srcLocal, params);
+            // update the start address of src
+            params.srcBlockIndex += 1;
+            // update remaining row numbers of tmp1
+            if (params.dstNeedBlockNum == 1) {
+                // update last tail block section
+                params.tmp1RemainRowCount = params.oneChwSize % params.tmp1NeedRowCount == 0 ?
+                                                transposeParams.cSize * params.tmp1NeedRowCount :
+                                                (params.oneChwSize % params.tmp1NeedRowCount);
+            } else {
+                params.tmp1RemainRowCount = transposeParams.cSize * params.tmp1NeedRowCount;
+            }
+        }
+        PipeBarrier<PIPE_V>();
+        // 2、datacopy:tmp1->tmp2: jump to carry one block from each C dimension and splice them
+        while (params.tmp2NeedRowCount != 0) {
+            params.dataCopyParams1.blockCount = 1;
+            params.dataCopyParams1.blockLen = 1;
+
+            params.preCinnerOffset = (params.copyColCount * (params.tmp1CopyCount / transposeParams.cSize));
+            params.preCoffset = (params.transLen) * (params.copyCIndex % transposeParams.cSize);
+            DataCopyUB2UBImpl(
+                (tempTensorB + (params.tmp2Count % params.transRowCount) * (params.blockSize)),
+                (tempTensorA + params.preCoffset + params.preCinnerOffset), params.dataCopyParams1);
+            // update params
+            UpdateCopyToTmp2ParamCal(params, transposeParams);
+            // When all valid data in tmp1 is transferred, the operation stops. Reload from src
+            if (params.tmp1RemainRowCount == 0) {
+                params.tmp1CopyCount = 0;
+                break;
+            }
+            PipeBarrier<PIPE_V>();
+        }
+        // 3、transdataTo5hd:tmp2->tmp3
+        if (params.tmp2NeedRowCount == 0) {
+            TransFracCal(tempTensorC, tempTensorB, params);
+            // update params
+            UpdateTransToTmp3ParamCal(params, transposeParams.cSize, TransposeType::TRANSPOSE_NCHW2NHWC);
+        }
+        PipeBarrier<PIPE_V>();
+        // 4、dataCopy tmp3->dst
+        params.dataCopyParams1.blockCount = 1;
+        params.dataCopyParams1.blockLen = params.tmp3RemainRowCount;
+        CopyFirstBlockCal(dstLocal, tempTensorC, transposeParams, params, params.dataCopyParams1);
+        PipeBarrier<PIPE_V>();
+    }
+}
+
 template <typename T>
 __aicore__ inline void UpdateTransToTmp1ParamCal(Transpose4dParams<T>& params)
 {
@@ -642,6 +863,24 @@ __aicore__ inline void TransLastFracCal(
     TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
 }
 
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void TransLastFracCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, Transpose4dParams<T>& params)
+{
+    for (int32_t m = 0; m < NCHW_CONV_ADDR_LIST_SIZE; m = m + TWO_NUM) {
+        params.dstList2[m] = (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM));
+        params.dstList2[m + 1] =
+            (__ubuf__ T*)(dstLocal + NCHW_CONV_ADDR_LIST_SIZE * (m / TWO_NUM) + params.blockSize);
+    }
+    for (int32_t n = 0; n < NCHW_CONV_ADDR_LIST_SIZE / TWO_NUM; n++) {
+        params.srcList2[n] = (__ubuf__ T*)(srcLocal + n * params.blockSize);
+        params.srcList2[n + NCHW_CONV_ADDR_LIST_SIZE / TWO_NUM] =
+            (__ubuf__ T*)(srcLocal + n * params.blockSize);
+    }
+    TransDataTo5HDImpl<T>(params.dstList2, params.srcList2, params.transDataParams2);
+}
+
 template <typename T>
 __aicore__ inline void CopyTodstForChwCal(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint16_t cSize, Transpose4dParams<T>& params)
@@ -653,6 +892,30 @@ __aicore__ inline void CopyTodstForChwCal(
 
     if ((params.dstNeedBlockNum != 0) && (params.tmp3RemainRowCount != 0)) {
         DataCopy(dstLocal[params.dstBlockNum * (params.blockSize)], srcLocal, params.dataCopyParams2);
+        params.dstNeedBlockNum -= params.tmp3RemainRowCount;
+        params.dstBlockNum += params.tmp3RemainRowCount;
+        params.dstAllBlockNum = params.tmp3RemainRowCount * cSize;
+        params.tmp3RemainRowCount = 0;
+    }
+    if (sizeof(T) == sizeof(float) && (params.dstNeedBlockNum == 1) && (params.dstAllBlockNum != 0) &&
+        (params.srcBlockIndex % params.dstAllBlockNum == 0)) {
+        params.tmp2NeedRowCount = cSize * (params.imageSize % NCHW_CONV_ADDR_LIST_SIZE);
+    }
+    PipeBarrier<PIPE_V>();
+}
+
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void CopyTodstForChwCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, const uint16_t cSize, Transpose4dParams<T>& params)
+{
+    params.dataCopyParams2.blockCount = cSize;
+    params.dataCopyParams2.blockLen = params.tmp3RemainRowCount;
+    params.dataCopyParams2.srcStride = params.preTmpLen * sizeof(T) / ONE_BLK_SIZE - params.tmp3RemainRowCount;
+    params.dataCopyParams2.dstStride = params.imageBlockNum - params.tmp3RemainRowCount;
+
+    if ((params.dstNeedBlockNum != 0) && (params.tmp3RemainRowCount != 0)) {
+        DataCopyUB2UBImpl((dstLocal + params.dstBlockNum * (params.blockSize)), srcLocal, params.dataCopyParams2);
         params.dstNeedBlockNum -= params.tmp3RemainRowCount;
         params.dstBlockNum += params.tmp3RemainRowCount;
         params.dstAllBlockNum = params.tmp3RemainRowCount * cSize;
@@ -708,6 +971,60 @@ __aicore__ inline void Transpose2ChwCal(
             } else {
                 for (int16_t k = 0; k < transposeParams.cSize; k++) {
                     TransFracCal(tempTensorC[k * params.preTmpLen], tempTensorB[k * params.preTmpLen], params);
+                }
+            }
+            UpdateTransToTmp3ParamCal(params, transposeParams.cSize, TransposeType::TRANSPOSE_NHWC2NCHW);
+        }
+        PipeBarrier<PIPE_V>();
+        // 4、dataCopy tmp3->dst
+        CopyTodstForChwCal(dstLocal, tempTensorC, transposeParams.cSize, params);
+    }
+}
+
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void Transpose2ChwCal(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ T* sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams, Transpose4dParams<T>& params)
+{
+    __ubuf__ T* tempTensorA = sharedTmpBuffer;                   // size: params.preTmpLen;
+    __ubuf__ T* tempTensorB = (sharedTmpBuffer + params.preTmpLen); // size: transposeParams.cSize * params.preTmpLen;
+    // size: transposeParams.cSize * params.preTmpLen;
+    __ubuf__ T* tempTensorC = (sharedTmpBuffer + (transposeParams.cSize + 1) * params.preTmpLen);
+    while (params.dstNeedBlockNum != 0) {
+        if (params.tmp1RemainRowCount == 0) {
+            TransBroadCastCal(tempTensorA, srcLocal, params);
+            // update params
+            UpdateTransToTmp1ParamCal(params);
+        }
+        PipeBarrier<PIPE_V>();
+        // 2、datacopy:tmp1->tmp2:transfer one block in each C dimension from src to dst.
+        while (params.tmp1RemainRowCount != 0) {
+            params.dataCopyParams1.blockCount = 1;
+            params.dataCopyParams1.blockLen = 1;
+            params.preCinnerOffset = (params.copyColCount * (params.tmp2Count / transposeParams.cSize));
+            params.preCoffset = params.transLen * (params.copyCIndex % transposeParams.cSize);
+            DataCopyUB2UBImpl(
+                (tempTensorB + params.preCoffset + params.preCinnerOffset),
+                (tempTensorA + (params.tmp2Count % params.blockSize) * params.transRowCount), params.dataCopyParams1);
+            // update params
+            UpdateCopyToTmp2ParamCal(params, transposeParams);
+            // When all valid data in tmp1 is transferred, the operation stops. Reload from src
+            if (params.tmp1RemainRowCount == 0) {
+                params.tmp1CopyCount = 0;
+                break;
+            }
+            PipeBarrier<PIPE_V>();
+        }
+        // 3、transdataTo5hd:tmp2->tmp3
+        if (params.tmp2NeedRowCount == 0) {
+            if ((params.imageSize % NCHW_CONV_ADDR_LIST_SIZE != 0) && (params.dstNeedBlockNum == 1)) {
+                for (int16_t k = 0; k < transposeParams.cSize; k++) {
+                    TransLastFracCal((tempTensorC + k * params.preTmpLen), (tempTensorB + k * params.preTmpLen), params);
+                }
+            } else {
+                for (int16_t k = 0; k < transposeParams.cSize; k++) {
+                    TransFracCal((tempTensorC + k * params.preTmpLen), (tempTensorB + k * params.preTmpLen), params);
                 }
             }
             UpdateTransToTmp3ParamCal(params, transposeParams.cSize, TransposeType::TRANSPOSE_NHWC2NCHW);
@@ -804,6 +1121,63 @@ __aicore__ inline void Transpose4DImpl(
             }
             Transpose2ChwCal<Transpose4DType>(
                 dstTmpLocal[i * params.oneChwSize], srcTmpLocal[i * params.oneChwSize], stackBuffer, transposeParams,
+                params);
+        }
+    }
+}
+
+// Address-only pointer overload; caller provides the documented workspace.
+template <typename T>
+__aicore__ inline void Transpose4DImpl(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint8_t* sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams)
+{
+    static_assert((SupportBytes<PrimT<T>, 1, 2, 4>()), "Transpose only supports type fp4/b8/b16/b32 on current device");
+    using Transpose4DType = typename ExtractTransposeTypeBySize<sizeof(PrimT<T>)>::T;
+    __ubuf__ Transpose4DType* stackBuffer = (__ubuf__ Transpose4DType*)sharedTmpBuffer;
+    __ubuf__ Transpose4DType* dstTmpLocal = (__ubuf__ Transpose4DType*)dstLocal;
+    __ubuf__ Transpose4DType* srcTmpLocal = (__ubuf__ Transpose4DType*)srcLocal;
+
+    Transpose4dParams<Transpose4DType> params;
+    GetTransposeParamCal<Transpose4DType>(transposeParams, params);
+
+    if (transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC) {
+        for (int16_t i = 0; i < transposeParams.nSize; i++) {
+            params.dstBlockNum = 0;   // blockNum for entire dst
+            params.srcBlockIndex = 0; // srcLocal has an offset, and srcBlockIndex needs to be set to 0 each time
+            params.copyCIndex = 0;
+            params.tmp1RemainRowCount = 0;
+            params.tmp1CopyCount = 0;
+            params.dstNeedBlockNum = params.oneChwSize * sizeof(PrimT<T>) / ONE_BLK_SIZE;
+            params.tmp2NeedRowCount =
+                params.dstNeedBlockNum == 1 ? (params.imageSize % params.transRowCount) : params.transRowCount;
+            Transpose2HwcCal<Transpose4DType>(
+                (dstTmpLocal + i * params.oneChwSize), (srcTmpLocal + i * params.oneChwSize), stackBuffer, transposeParams,
+                params);
+        }
+    } else if (transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
+        for (int16_t i = 0; i < transposeParams.nSize; i++) {
+            params.transDataParams1.repeatTimes = 1;
+            params.transDataParams1.dstRepStride =
+                params.transDataParams1.repeatTimes > 1 ? NCHW_CONV_ADDR_LIST_SIZE : 0;
+            params.transDataParams1.srcRepStride = params.transDataParams1.repeatTimes > 1 ? (params.imageBlockNum) : 0;
+            params.dstBlockNum = 0;    // blockNum of each c dimension
+            params.dstAllBlockNum = 0; // blockNum for entire dst
+            params.srcBlockIndex = 0;  // srcLocal has an offset, and srcBlockIndex needs to be set to 0 each time
+            params.dstNeedBlockNum =
+                params.imageBlockNum; // In the copy->dst part, repeat is used to transfer dimension C. Therefore,
+                                      // dstNeedBlockNum is calculated as h x w.
+            params.tmp2NeedRowCount =
+                params.oneChwSize * sizeof(PrimT<T>) / ONE_BLK_SIZE == 1 ?
+                    (params.imageSize % params.transRowCount) :
+                    transposeParams.cSize * params.transRowCount; // In tmp2, c transposed fractals need to be
+                                                                  // collected, and then transposing is performed.
+            // float type: when H x W = 8, tmp2NeedRowCount = c x 8.
+            if ((sizeof(PrimT<T>) == sizeof(float)) && (params.dstNeedBlockNum == 1)) {
+                params.tmp2NeedRowCount = transposeParams.cSize * params.blockSize;
+            }
+            Transpose2ChwCal<Transpose4DType>(
+                (dstTmpLocal + i * params.oneChwSize), (srcTmpLocal + i * params.oneChwSize), stackBuffer, transposeParams,
                 params);
         }
     }

@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_gather.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -53,6 +54,17 @@ __aicore__ inline void Gatherb(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& offset, const uint8_t repeatTime,
     const GatherRepeatParams& repeatParams);
 
+#if __NPU_ARCH__ == 3510
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+__aicore__ inline void Gatherb(
+    Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime,
+    const GatherRepeatParams& repeatParams);
+#endif
+
 /*
  * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
@@ -69,6 +81,17 @@ __aicore__ inline void Gather(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset,
     const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
 
+#if __NPU_ARCH__ == 3510
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset,
+    const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
+#endif
+
 /*
  * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
@@ -84,6 +107,17 @@ template <typename T>
 __aicore__ inline void Gather(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset,
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
+
+#if __NPU_ARCH__ == 3510
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset,
+    const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
+#endif
 
 /*
  * @ingroup gather Level 2
@@ -112,6 +146,17 @@ template <typename T, typename U>
 __aicore__ inline void GatherDataCopy(
     LocalTensor<T> dst, GlobalTensor<T> src, LocalTensor<U> offset, GatherParams& gatherParam,
     GatherPadParams<T>& gatherPadParam);
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <typename T = VectorOperand::DefaultType,
+    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset,
+    const uint32_t srcBaseOffset, const uint32_t count);
 #endif
 } // namespace AscendC
 #pragma end_pipe

@@ -93,6 +93,20 @@ __aicore__ inline void Relu(
     ReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Relu(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReluImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Relu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -114,6 +128,20 @@ __aicore__ inline void Relu(
 #endif
     ReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Relu(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReluImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 
 /*
@@ -140,6 +168,17 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Relu", count);
 #endif
     ReluImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Relu(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReluImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 
 /* **************************************** Exp ****************************************** */
@@ -175,6 +214,20 @@ __aicore__ inline void Exp(
     ExpImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask, const ExpConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask, const ExpConfig& config>
 __aicore__ inline void Exp(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -192,6 +245,20 @@ __aicore__ inline void Exp(
 #endif
     ExpImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const ExpConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #else
 template <typename T, bool isSetMask>
@@ -216,6 +283,20 @@ __aicore__ inline void Exp(
     ExpImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Exp(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -237,6 +318,20 @@ __aicore__ inline void Exp(
 #endif
     ExpImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #endif
 
@@ -263,6 +358,17 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 #endif
     ExpImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
+
+template <typename T, const ExpConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl<PrimType, config>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
 #else
 template <typename T>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
@@ -281,6 +387,17 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Exp", count);
 #endif
     ExpImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Exp(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ExpImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -317,6 +434,20 @@ __aicore__ inline void Ln(
     LnImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask, const LnConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask, const LnConfig& config>
 __aicore__ inline void Ln(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -334,6 +465,20 @@ __aicore__ inline void Ln(
 #endif
     LnImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const LnConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #else
 template <typename T, bool isSetMask>
@@ -358,6 +503,20 @@ __aicore__ inline void Ln(
     LnImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Ln(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -379,6 +538,20 @@ __aicore__ inline void Ln(
 #endif
     LnImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #endif
 
@@ -405,6 +578,17 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 #endif
     LnImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
+
+template <typename T, const LnConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl<PrimType, config>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
 #else
 template <typename T>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
@@ -423,6 +607,17 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Ln", count);
 #endif
     LnImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Ln(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    LnImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -461,6 +656,20 @@ __aicore__ inline void Abs(
     AbsImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Abs(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    AbsImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Abs(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -482,6 +691,20 @@ __aicore__ inline void Abs(
 #endif
     AbsImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Abs(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    AbsImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 
 /*
@@ -510,6 +733,17 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     AbsImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Abs(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    AbsImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
     (__NPU_ARCH__ == 9202)
 /*
@@ -531,6 +765,17 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Abs", count);
 #endif
     AbsImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src.GetPhyAddr(), count);
+}
+
+template <typename T, typename U,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() && (!Std::is_same<U, VectorOperand::DefaultType>::value || !Std::is_same<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>::value), int>::type>
+__aicore__ inline void Abs(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    AbsImpl((__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -568,6 +813,20 @@ __aicore__ inline void Reciprocal(
     ReciprocalImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask, const ReciprocalConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask, const ReciprocalConfig& config>
 __aicore__ inline void Reciprocal(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -585,6 +844,20 @@ __aicore__ inline void Reciprocal(
 #endif
     ReciprocalImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const ReciprocalConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #else
 template <typename T, bool isSetMask>
@@ -610,6 +883,20 @@ __aicore__ inline void Reciprocal(
     ReciprocalImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Reciprocal(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -631,6 +918,20 @@ __aicore__ inline void Reciprocal(
 #endif
     ReciprocalImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #endif
 
@@ -657,6 +958,17 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 #endif
     ReciprocalImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
+
+template <typename T, const ReciprocalConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl<PrimType, config>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
 #else
 template <typename T>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
@@ -675,6 +987,17 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Reciprocal", count);
 #endif
     ReciprocalImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Reciprocal(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ReciprocalImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -711,6 +1034,20 @@ __aicore__ inline void Rsqrt(
     RsqrtImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask, const RsqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask, const RsqrtConfig& config>
 __aicore__ inline void Rsqrt(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -728,6 +1065,20 @@ __aicore__ inline void Rsqrt(
 #endif
     RsqrtImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const RsqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #else
 template <typename T, bool isSetMask>
@@ -752,6 +1103,20 @@ __aicore__ inline void Rsqrt(
     RsqrtImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Rsqrt(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -773,6 +1138,20 @@ __aicore__ inline void Rsqrt(
 #endif
     RsqrtImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #endif
 
@@ -799,6 +1178,17 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 #endif
     RsqrtImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
+
+template <typename T, const RsqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl<PrimType, config>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
 #else
 template <typename T>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
@@ -817,6 +1207,17 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Rsqrt", count);
 #endif
     RsqrtImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Rsqrt(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    RsqrtImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -853,6 +1254,20 @@ __aicore__ inline void Sqrt(
     SqrtImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask, const SqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask, const SqrtConfig& config>
 __aicore__ inline void Sqrt(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -870,6 +1285,20 @@ __aicore__ inline void Sqrt(
 #endif
     SqrtImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask, const SqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl<PrimType, isSetMask, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #else
 template <typename T, bool isSetMask>
@@ -894,6 +1323,20 @@ __aicore__ inline void Sqrt(
     SqrtImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Sqrt(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -915,6 +1358,20 @@ __aicore__ inline void Sqrt(
 #endif
     SqrtImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 #endif
 
@@ -941,6 +1398,17 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 #endif
     SqrtImpl<PrimType, config>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
+
+template <typename T, const SqrtConfig& config,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl<PrimType, config>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
 #else
 template <typename T>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
@@ -959,6 +1427,17 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     MstxTensor::GetMstxVecUnaryInfo<T, T, true>(dst, src, "Sqrt", count);
 #endif
     SqrtImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Sqrt(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SqrtImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -997,6 +1476,20 @@ __aicore__ inline void Not(
     NotImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Not(
+    Operand0 dst, Operand1 src, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    NotImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
+}
 template <typename T, bool isSetMask>
 __aicore__ inline void Not(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
@@ -1018,6 +1511,20 @@ __aicore__ inline void Not(
 #endif
     NotImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <typename T, bool isSetMask,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Not(
+    Operand0 dst, Operand1 src, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    NotImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime, repeatParams);
 }
 
 /*
@@ -1046,6 +1553,17 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     NotImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Not(Operand0 dst, Operand1 src, const int32_t& count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    NotImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+}
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 /* **************************************** Neg ****************************************** */
@@ -1066,6 +1584,17 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     }
 #endif
     NegImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <typename T,
+    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+__aicore__ inline void Neg(Operand0 dst, Operand1 src, const uint32_t count)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    NegImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 } // namespace AscendC

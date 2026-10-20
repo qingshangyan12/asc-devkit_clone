@@ -213,6 +213,44 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
     Vmrgsort4Cal((__ubuf__ PrimType*)dst.GetPhyAddr(), addrArray, src1, config);
 }
 
+#if __NPU_ARCH__ == 3510
+template <typename T,
+    typename Operand0, typename Source0, typename Source1, typename Source2, typename Source3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() && VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() && VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+__aicore__ inline void MrgSort(Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& src, const MrgSort4Info& params)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
+                          "src and dst both: half / float");
+    });
+    for (int8_t i = 0; i < MRG_SORT_ELEMENT_LEN; ++i) {
+        ASCENDC_CHECK_VALUE_RANGE(params.elementLengths[i], 0, 4095, "elementLengths", "MrgSort");
+    }
+    ASCENDC_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15), {
+        KERNEL_LOG(KERNEL_ERROR, "Failed to check validBit value in MrgSort, its valid value is 3 / 7 / 15");
+    });
+    uint64_t config = 0;
+    config |= (params.repeatTimes & 0xFF);                          // Xt[7:0]: repeat time
+    config |= (uint64_t(params.validBit & 0xF) << 8);               // Xt[11:8]: 4-bit mask signal
+    config |= (uint64_t(params.ifExhaustedSuspension & 0x1) << 12); // Xt[12]: 1-enable input list exhausted suspension
+
+    uint64_t src1 = 0;
+    src1 |= (uint64_t(params.elementLengths[0] & 0xFFFF));
+    src1 |= (uint64_t(params.elementLengths[1] & 0xFFFF) << 16);
+    src1 |= (uint64_t(params.elementLengths[2] & 0xFFFF) << 32);
+    src1 |= (uint64_t(params.elementLengths[3] & 0xFFFF) << 48);
+
+    __ubuf__ PrimType* addrArray[MRG_SORT_ELEMENT_LEN] = {
+        (__ubuf__ PrimType*)GetUnderlyingPtr(src.src1), (__ubuf__ PrimType*)GetUnderlyingPtr(src.src2),
+        (__ubuf__ PrimType*)GetUnderlyingPtr(src.src3), (__ubuf__ PrimType*)GetUnderlyingPtr(src.src4)};
+
+    Vmrgsort4Cal((__ubuf__ PrimType*)GetUnderlyingPtr(dst), addrArray, src1, config);
+}
+#endif
+
 /* **************************************** Sort32 ****************************************** */
 /*
  * @ingroup Sort32
@@ -474,6 +512,55 @@ __aicore__ inline void MrgSort(
     }
 }
 
+#if __NPU_ARCH__ == 3510
+template <typename T, bool isExhaustedSuspension,
+    typename Operand0, typename Source0, typename Source1, typename Source2, typename Source3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() && VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() && VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+__aicore__ inline void MrgSort(
+    Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& sortList, const uint16_t elementCountList[4],
+    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
+    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
+                          "src and dst both: half / float");
+    });
+    MrgSort4Info mrgSortInfo(elementCountList, isExhaustedSuspension, validBit, (uint16_t)repeatTime);
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+    MrgSort(dst, sortList, mrgSortInfo);
+#elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
+    MrgSort4(dst, sortList, mrgSortInfo);
+#endif
+    if (isExhaustedSuspension) {
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)
+        constexpr uint32_t validBitMask = 0xFFFF;
+        constexpr uint32_t shiftBase = 16; // register is 16 bit per num
+#elif __NPU_ARCH__ == 2002
+        constexpr uint32_t validBitMask = 0x1FFF;
+        constexpr uint32_t shiftBase = 13; // register is 13 bit per num
+#else
+        constexpr uint32_t validBitMask = 0;
+        constexpr uint32_t shiftBase = 0; // not support
+#endif
+        auto res = get_vms4_sr();
+        sortedNum[0] = res & validBitMask;
+        sortedNum[1] = (res >> shiftBase) & validBitMask;
+        sortedNum[2] = (res >> (2 * shiftBase)) & validBitMask;
+        sortedNum[3] = (res >> (3 * shiftBase)) & validBitMask;
+    }
+}
+#endif
+
 /* **************************************** Sort ****************************************** */
 /*
  * @ingroup Sort
@@ -543,6 +630,28 @@ __aicore__ inline void Sort(
         DoFullSort(dst, concat, index, tmp, repeatTime);
     }
 }
+
+#if __NPU_ARCH__ == 3510
+template <typename T, bool isFullSort,
+    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+        VectorOperand::Matches<uint32_t, Operand2>() &&
+        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>() && VectorOperand::IsWritable<Operand3>(), int>::type>
+__aicore__ inline void Sort(
+    Operand0 dst, Operand1 concat, Operand2 index, Operand3 tmp,
+    const int32_t repeatTime)
+{
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    ProposalIntriParams params; params.repeat = repeatTime;
+    VbitsortCal((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(concat), (__ubuf__ uint32_t*)GetUnderlyingPtr(index), params);
+    if constexpr (isFullSort) {
+        PipeBarrier<PIPE_V>();
+        DoFullSort(GetUnderlyingPtr(dst), GetUnderlyingPtr(concat), GetUnderlyingPtr(index), GetUnderlyingPtr(tmp), repeatTime);
+    }
+}
+#endif
 
 constexpr uint32_t halfSortedDataSize = 4;
 constexpr uint32_t floatSortedDataSize = 2;
