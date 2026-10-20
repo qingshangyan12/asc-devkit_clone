@@ -20,11 +20,14 @@
 
 #include "impl/c_api/memory_base_impl/utils_impl.h"
 
-__aicore__ inline void asc_init()
+__aicore__ inline void asc_init_impl()
 {
-    if ASC_IS_AIV {
-        set_atomic_none();
-        asc_set_mask_count_end();
+    set_atomic_none();
+    set_mask_norm();
+    if ASC_IS_AIC {
+        set_l1_3d_size(static_cast<uint64_t>(0));
+        set_padding(static_cast<uint64_t>(0));
+    } else {
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
     }
 }
