@@ -3,7 +3,7 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id3 -->
-- Ascend 950PR&950DT系列产品：不支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
 - Atlas A3系列产品：支持
