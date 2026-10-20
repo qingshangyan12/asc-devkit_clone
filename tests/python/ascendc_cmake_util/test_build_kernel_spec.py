@@ -109,12 +109,67 @@ def test_build_config_is_json_lines_only(tmp_path):
         bundle.load_build_contexts(config)
 
 
-def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_request):
+@pytest.mark.parametrize("keep", [False, True])
+def test_old_rounds_are_removed_only_after_publication(tmp_path, keep):
+    opc = tmp_path / "options.ini"
+    opc.write_text("ALL@ALL@--op_debug_config=dump_cce,oom\n" if keep else "")
+    context = {"tasks": [["Add", "ascend910b"]], "opc_config": str(opc)}
+    rounds = bundle.KernelSpecBuildDirectory(tmp_path / "rounds")
+    rounds.prepare([context])
+    first = rounds.current_directory
+    opc.write_text("")
+    rounds.prepare([context])
+    assert first.is_dir()
+    rounds.write_install_entry()
+    assert first.exists() is keep
+    assert rounds.current_directory.is_dir()
+
+
+@pytest.mark.parametrize("status", [None, "completed", "filtered", "failed", "invalid"])
+def test_bundle_requires_explicit_producer_result(bundle_request, tmp_path, status):
+    source = Path(bundle_request.source_file[0])
+    context = {
+        "tasks": [["Add", "ascend910b"]],
+        "opc_config": str(tmp_path / "options.ini"),
+        "source_root": str(source.parent),
+        "copied_source_root": str(source.parent),
+        "source_destination": "op_impl/dynamic",
+        "allow_failed": False,
+    }
+    Path(context["opc_config"]).write_text("")
+    config = tmp_path / "config.jsonl"
+    config.write_text(json.dumps(context) + "\n")
+    rounds = bundle.KernelSpecBuildDirectory(tmp_path / "rounds")
+    rounds.prepare([context])
+    task = rounds.current_directory / "ascend910b/Add"
+    if status is not None:
+        (task / ".producer-result.json").write_text(
+            json.dumps({"status": status, "source": str(source), "reason": "test result"})
+        )
+    if status == "filtered":
+        bundle.bundle_resources(config, rounds.work_dir, "unused", "unused", "unused")
+        assert "file(REMOVE" in rounds.install_script.read_text()
+    else:
+        with pytest.raises(bundle.BundleError):
+            bundle.bundle_resources(config, rounds.work_dir, "unused", "unused", "unused")
+        assert not rounds.install_script.exists()
+
+
+def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_request, monkeypatch):
     root = Path(bundle_request.input_dir[0])
     original = (root / "910b/add_manifest.json").read_bytes()
     _unit(root / "950", "a" * 64)
     _unit(root / "other", "b" * 64)
+    hashed_sources = []
+    hash_file = bundle._hash_file
+
+    def record_hash(path):
+        hashed_sources.append(path)
+        return hash_file(path)
+
+    monkeypatch.setattr(bundle, "_hash_file", record_hash)
     bundle_request.build()
+    assert hashed_sources == [Path(bundle_request.source_file[0])]
     data = _published(bundle_request)
     assert [m["resource_id"] for m in data] == ["a" * 64, "a" * 64, "b" * 64]
     assert data[0]["source_file"] == "op_impl/dynamic/add.cpp"
@@ -159,14 +214,29 @@ def test_exporter_failure_preserves_output_and_cleans_bundle_dir(bundle_request)
     assert not list(Path(bundle_request.work_dir).glob(".bundle-*"))
 
 
-@pytest.mark.parametrize("case", ["empty", "missing", "resource_escape", "source_escape", "symlink"])
+@pytest.mark.parametrize("empty_only", [False, True])
+def test_empty_resource_directories_are_skipped(bundle_request, tmp_path, caplog, empty_only):
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    bundle_request.input_dir = [str(empty)] if empty_only else bundle_request.input_dir + [str(empty)]
+    output = Path(bundle_request.output)
+    if empty_only:
+        output.parent.mkdir(parents=True)
+        output.write_bytes(b"stale")
+        bundle_request.exporter = "missing-exporter"
+    assert bundle_request.build() is (not empty_only)
+    assert "no manifests" in caplog.text
+    if empty_only:
+        assert not output.exists()
+    else:
+        assert len(_published(bundle_request)) == 1
+
+
+@pytest.mark.parametrize("case", ["missing", "resource_escape", "source_escape", "symlink"])
 def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
     manifest = json.loads(path.read_text())
-    if case == "empty":
-        bundle_request.input_dir.append(str(tmp_path / "empty"))
-        (tmp_path / "empty").mkdir()
-    elif case == "missing":
+    if case == "missing":
         bundle_request.input_dir.append(str(tmp_path / "missing"))
     elif case == "resource_escape":
         manifest["resource_path"] = "../resources"
@@ -380,3 +450,37 @@ def test_producer_binding_selects_actual_source_among_same_names(bundle_request,
     bundle_request.source_bindings = {str(Path(bundle_request.input_dir[0])): bundle_request.source_file[0]}
     bundle_request.build()
     assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
+
+
+def test_bundle_round_relocates_shared_include_outside_kernel_root(bundle_request, tmp_path):
+    work = tmp_path / "rounds"
+    source = Path(bundle_request.source_file[0])
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    config = tmp_path / "build.jsonl"
+    opc = tmp_path / "options.ini"
+    opc.write_text("")
+    context = {
+        "tasks": [["Add", "ascend910b"]],
+        "opc_config": str(opc),
+        "source_root": str(source.parent),
+        "copied_source_root": str(source.parent),
+        "source_destination": "op_impl/dynamic",
+    }
+    config.write_text(
+        json.dumps(context) + "\n" + json.dumps({"tasks": [], "source_maps": [[str(shared), "op_impl/common"]]}) + "\n"
+    )
+    directory = bundle.KernelSpecBuildDirectory(work)
+    directory.prepare([context])
+    task = bundle.task_directory(str(directory.current_directory), "Add", "ascend910b")
+    manifest_path = _unit(task, "a" * 64)
+    manifest = json.loads(manifest_path.read_text())
+    manifest["options"]["common_compile"] = ["-I" + str(shared)]
+    manifest_path.write_text(json.dumps(manifest))
+    (task / ".producer-result.json").write_text(
+        json.dumps({"status": "completed", "source": str(source), "reason": ""})
+    )
+    bundle.bundle_resources(str(config), str(work), bundle_request.exporter, "c++", "make")
+    output = directory.current_directory / "op_spec/libcust_compile_resource.so"
+    published = json.loads(output.read_bytes()[4:])
+    assert published[0]["options"]["common_compile"] == ["-I${source_file_path}/op_impl/common"]

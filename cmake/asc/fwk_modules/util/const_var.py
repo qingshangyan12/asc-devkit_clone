@@ -78,6 +78,7 @@ ATTR_DEF_VAL = {
     "list_float": [],
     "list_list_int": [[]],
 }
+KERNEL_SPEC_RESULT_PREFIX = "ASCENDC_KERNEL_SPEC_RESULT="
 
 
 def conv_soc_ver(ver: str):
