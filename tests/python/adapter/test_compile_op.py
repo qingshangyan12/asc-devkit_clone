@@ -4922,6 +4922,21 @@ Contents of section
 
         with (
             mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(CommonUtility, "is_920r1", return_value=True),
+            mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+                "    GM_ADDR usrWorkspace = workspace;\n"
+                "#else\n"
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+                "#endif\n",
+            )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(CommonUtility, "is_920r1", return_value=False),
             mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
         ):
             self.assertEqual(

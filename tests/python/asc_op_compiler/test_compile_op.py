@@ -5755,6 +5755,21 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         tiling_info.static_shape_flag = False
         self.assertNotEqual(gen_usr_origin_kernel_function_call(func_name, op_info, tiling_info), "")
 
+    def test_gen_usr_workspace_codes_920r1(self):
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(CommonUtility, "is_920r1", return_value=True),
+            mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
+        ):
+            self.assertEqual(
+                compile_op_module._gen_usr_workspace_codes(),
+                "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+                "    GM_ADDR usrWorkspace = workspace;\n"
+                "#else\n"
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+                "#endif\n",
+            )
+
     def test_gen_set_workspace_codes(self):
         SetCurrentSocInfo("Ascend910B1")
         cce_file = os.path.join(TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
