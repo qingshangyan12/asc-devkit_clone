@@ -32,9 +32,9 @@ constexpr gm_to_ub_params default_gm_to_ub_params{};
 
 struct copy_gm_to_ub_base {
 public:
-    template <const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+    template <typename Params, const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(
-        const DstTensor& dst, const SrcTensor& src, const gm_to_ub_params& params = default_gm_to_ub_params)
+        const DstTensor& dst, const SrcTensor& src, const Params& params = default_gm_to_ub_params)
     {
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
@@ -49,14 +49,15 @@ public:
         using src_layout_ptn = get_layout_pattern<typename SrcTensor::layout_type>;
         using copy_gm_to_ub_impl =
             typename copy_gm_to_ub_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
-        copy_gm_to_ub_impl::template run<trait, DstTensor, SrcTensor>(dst, src, params);
+        copy_gm_to_ub_impl::template run<Params, trait, DstTensor, SrcTensor>(dst, src, params);
     }
 
     template <
-        const gm_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+        typename Params, const gm_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
     __aicore__ inline static void data_copy_impl(
         const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const ShapeType& copy_shape,
-        const gm_to_ub_params& params = default_gm_to_ub_params)
+        const Params& params = default_gm_to_ub_params)
     {
         using dst_pos = get_mem_location<T>;
         using src_pos = get_mem_location<U>;
@@ -68,22 +69,22 @@ public:
             typename copy_gm_to_ub_routing<current_arch_version, dst_layout_ptn, src_layout_ptn>::type;
         auto resolved_dst = resolve_copy_coord(dst.layout(), copy_shape, dst_coord);
         auto resolved_src = resolve_copy_coord(src.layout(), copy_shape, src_coord);
-        copy_gm_to_ub_impl::template run<trait, T, U>(dst, src, resolved_dst, resolved_src, copy_shape, params);
+        copy_gm_to_ub_impl::template run<Params, trait, T, U>(dst, src, resolved_dst, resolved_src, copy_shape, params);
     }
 };
 
 template <typename Trait, const Trait& trait, typename... Args>
 __aicore__ inline void copy_gm_to_ub::copy(const Args&... args)
 {
-    copy_gm_to_ub_base::data_copy_impl<trait>(args...);
+    copy_gm_to_ub_base::data_copy_impl<gm_to_ub_params, trait>(args...);
 }
 
 struct copy_gm_to_ub_with : public copy_gm_to_ub_base {
 public:
-    template <typename Trait, const Trait& traits, typename... Args>
-    __aicore__ inline static void copy(const Args&... args)
+    template <typename Params, typename Trait, const Trait& traits, typename... Args>
+    __aicore__ inline static void copy(const Args&... args, const Params& params)
     {
-        data_copy_impl<traits>(args...);
+        data_copy_impl<Params, traits>(args..., params);
     }
 };
 

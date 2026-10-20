@@ -26,16 +26,27 @@
 
 namespace asc {
 namespace te {
+namespace detail {
+
+template <typename Params, typename = void>
+struct has_pad_value : Std::false_type {};
+
+template <typename Params>
+struct has_pad_value<Params, void_t<decltype(Std::declval<Params>().pad_value)>> : Std::true_type {};
+
+} // namespace detail
 
 class copy_gm_to_ub_instr {
 public:
-    template <typename DataType>
+    template <typename DataType, typename Params>
     __aicore__ inline static void data_copy(
         __ubuf__ DataType* dst, __gm__ DataType* src, const uint16_t block_count, const uint32_t block_len,
         const uint8_t left_padding_count, const uint8_t right_padding_count, const bool enable_constant_pad,
-        const asc_load_l2_cache_mode cache_mode, const int64_t src_stride, const int64_t dst_stride)
+        const asc_load_l2_cache_mode cache_mode, const int64_t src_stride, const int64_t dst_stride,
+        const Params& params)
     {
         using PaddingElementType = Std::conditional_t<(sizeof(DataType) > sizeof(uint32_t)), uint32_t, DataType>;
+        const bool use_constant_pad = enable_constant_pad || left_padding_count != 0 || right_padding_count != 0;
         TENSOR_API_DEBUG_CHECK(
             debug_check_block_limit, block_count, debug_block_count_max, "block_count", "copy_gm_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(
@@ -47,21 +58,39 @@ public:
             block_len, block_count, "copy_gm_to_ub instruction");
 
         if constexpr (sizeof(DataType) == 1) {
+            if constexpr (detail::has_pad_value<Params>::value) {
+                if (use_constant_pad) {
+                    asc_set_copy_pad_val(params.pad_value);
+                }
+            }
             asc_copy_gm2ub_align(
                 reinterpret_cast<__ubuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), block_count,
                 block_len, left_padding_count, right_padding_count, enable_constant_pad, cache_mode, src_stride,
                 dst_stride);
         } else if constexpr (sizeof(DataType) == 2) {
+            if constexpr (detail::has_pad_value<Params>::value) {
+                if (use_constant_pad) {
+                    asc_set_copy_pad_val(params.pad_value);
+                }
+            }
             asc_copy_gm2ub_align(
                 reinterpret_cast<__ubuf__ uint16_t*>(dst), reinterpret_cast<__gm__ uint16_t*>(src), block_count,
                 block_len, left_padding_count, right_padding_count, enable_constant_pad, cache_mode, src_stride,
                 dst_stride);
         } else if constexpr (sizeof(DataType) == 4) {
+            if constexpr (detail::has_pad_value<Params>::value) {
+                if (use_constant_pad) {
+                    asc_set_copy_pad_val(params.pad_value);
+                }
+            }
             asc_copy_gm2ub_align(
                 reinterpret_cast<__ubuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), block_count,
                 block_len, left_padding_count, right_padding_count, enable_constant_pad, cache_mode, src_stride,
                 dst_stride);
         } else if constexpr (sizeof(DataType) == 8) {
+            static_assert(
+                !detail::has_pad_value<Params>::value,
+                "GM-to-UB constant pad value is not supported for 8-byte data types");
             asc_copy_gm2ub_align(
                 reinterpret_cast<__ubuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), block_count,
                 block_len, left_padding_count, right_padding_count, enable_constant_pad, cache_mode, src_stride,
