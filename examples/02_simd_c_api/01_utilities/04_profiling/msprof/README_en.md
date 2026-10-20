@@ -8,7 +8,7 @@ This example uses Add computation as the carrier to demonstrate how to collect o
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 

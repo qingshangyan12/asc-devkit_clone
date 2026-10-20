@@ -8,7 +8,7 @@ This example introduces the usage of the ascendc_assert assertion API. If the as
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 

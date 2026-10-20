@@ -11,7 +11,7 @@ Matrix transfers, computation, and Fixpipe use the C API; `asc_dump` and `printf
 
 | Product | CANN Software Version | HDK Version |
 |---------|-----------------------|-------------|
-| Ascend 950PR&950DT products | >= CANN 9.1.0 | >= 25.7.RC1.6 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 | >= 25.7.RC1.6 |
 
 ## Directory Structure
 

@@ -8,7 +8,7 @@ This example demonstrates the usage of the `clock()` API for timestamp marking i
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 950PR&950DT products | >= CANN 9.0.0-beta.2 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 

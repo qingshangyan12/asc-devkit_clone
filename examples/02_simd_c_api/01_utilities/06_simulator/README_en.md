@@ -8,7 +8,7 @@ This sample uses MatmulLeakyRelu fusion computing as a carrier to demonstrate th
 
 | Products | CANN Software Version |
 |------|-------------|
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Introduction to directory structure
 

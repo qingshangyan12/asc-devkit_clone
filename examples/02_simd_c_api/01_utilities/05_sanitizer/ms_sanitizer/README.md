@@ -12,7 +12,7 @@ msSanitizer是基于昇腾AI处理器的异常检测工具，用于检测Ascend 
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
