@@ -37,36 +37,16 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     const uint8_t rightPaddingCount, const uint32_t srcStride, const uint32_t dstStride, const bool isDataCopyPad,
     const bool isPad = false, const uint8_t sid = 0)
 {
-    // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
+    // dav-l310 backend has no raw copy_*_align_v2 (instr of 3113+); route v1 primitive (3003-gen, 1300 proven).
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
     uint32_t burstLength = blockLen * unitOfBytes;
-    uint32_t padLength = leftPaddingCount * sizeof(T) + rightPaddingCount * sizeof(T);
-    uint64_t srcStride310 = srcStride * unitOfBytes + burstLength; // GM  DataCopy:32Bytes, DataCopyPad:1Byte
-    uint32_t dstStride310 =
-        dstStride * BYTE_32_ALIGN + burstLength + padLength; // UB  DataCopy:32Bytes, DataCopyPad:32Bytes
-    // gm stride should be 32B aligned
-    dstStride310 = DivCeil(dstStride310, BYTE_32_ALIGN) * BYTE_32_ALIGN;
-
-    if constexpr (sizeof(T) == B64_BYTE_SIZE) {
-        copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCount * 2,
-            rightPaddingCount * 2, isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-        copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, blockCount, burstLength, leftPaddingCount,
-            rightPaddingCount, isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-        copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, sid, blockCount, burstLength, leftPaddingCount,
-            rightPaddingCount, isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-        copy_gm_to_ubuf_align_v2(
-            (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, sid, blockCount, burstLength, leftPaddingCount,
-            rightPaddingCount, isPad, srcStride310, dstStride310);
-    } else {
-        ASCENDC_ASSERT(
-            false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data type of copy from gm to ubuf on current device"); });
-    }
+    uint8_t leftPaddingCountT = static_cast<uint8_t>(leftPaddingCount * sizeof(T));
+    uint8_t rightPaddingCountT = static_cast<uint8_t>(rightPaddingCount * sizeof(T));
+    uint64_t srcStrideV1 = (isDataCopyPad) ? srcStride : (srcStride * BYTE_32_ALIGN);
+    uint32_t dstStrideV1 = dstStride;
+    copy_gm_to_ubuf_align(
+        (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, sid, blockCount, burstLength, leftPaddingCountT,
+        rightPaddingCountT, static_cast<uint32_t>(srcStrideV1), dstStrideV1);
 }
 
 // only support VecCore   PIPE_MTE3
@@ -76,14 +56,13 @@ __aicore__ inline void CopyUbufToGmAlignV2(
     __gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint32_t srcStride,
     const uint32_t dstStride, const bool isDataCopyPad)
 {
-    // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
+    // dav-l310 backend has no raw copy_ubuf_to_gm_alignv2; route v1 primitive (1300 proven pairing).
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
     uint32_t burstLength = blockLen * unitOfBytes;
-    uint32_t srcStride310 = srcStride * BYTE_32_ALIGN + burstLength; // UB   DataCopy:32Bytes, DataCopyPad:32Bytes
-    uint64_t dstStride310 = dstStride * unitOfBytes + burstLength;   // GM   DataCopy:32Bytes, DataCopyPad:1Byte
-    // srcstride should be 32B aligned
-    srcStride310 = DivCeil(srcStride310, BYTE_32_ALIGN) * BYTE_32_ALIGN;
-    copy_ubuf_to_gm_align_v2(dst, src, 0, blockCount, burstLength, dstStride310, srcStride310);
+    uint64_t srcStrideV1 = srcStride;
+    uint64_t dstStrideV1 = dstStride * unitOfBytes;
+    copy_ubuf_to_gm_align(
+        (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, srcStrideV1, dstStrideV1);
 }
 
 // only support CubeCore   PIPE_MTE2
@@ -94,28 +73,27 @@ __aicore__ inline void CopyGmToCbufAlignV2(
     const uint8_t rightPadding, const bool isPad, const uint32_t srcStride, const uint32_t dstStride,
     const bool isDataCopyPad, const uint8_t sid = 0)
 {
-    uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
-    uint32_t burstLength = blockLen * unitOfBytes;
-    uint32_t padLength = leftPadding * sizeof(T) + rightPadding * sizeof(T);
-    uint64_t actSrcStride = srcStride * unitOfBytes + burstLength;
-    uint32_t actDstStride = AlignUp(dstStride * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
+    // dav-l310 backend has no raw copy_gmto_cubf_align_v2;route v1 primitive per 3003-gen dispatch (l300 proven).
+    uint32_t burstLength = (isDataCopyPad) ? blockLen : (blockLen * BYTE_32_ALIGN);
+    uint64_t actSrcStride = (isDataCopyPad) ? srcStride : (srcStride * BYTE_32_ALIGN);
+    uint32_t actDstStride = dstStride;
 
     if constexpr (sizeof(T) == B64_BYTE_SIZE) {
-        copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, (uint8_t)sid, blockCount, burstLength, leftPadding * 2,
-            rightPadding * 2, isPad, actSrcStride, actDstStride);
+        copy_gm_to_cbuf_align(
+            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, static_cast<uint16_t>(blockCount), burstLength,
+            static_cast<uint8_t>(leftPadding * 2), static_cast<uint8_t>(rightPadding * 2), actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-        copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, (uint8_t)sid, blockCount, burstLength, leftPadding,
-            rightPadding, isPad, actSrcStride, actDstStride);
+        copy_gm_to_cbuf_align(
+            (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, sid, static_cast<uint16_t>(blockCount), burstLength,
+            leftPadding, rightPadding, isPad, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-        copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint16_t*)dst, (__gm__ uint16_t*)src, (uint8_t)sid, blockCount, burstLength, leftPadding,
-            rightPadding, isPad, actSrcStride, actDstStride);
+        copy_gm_to_cbuf_align(
+            (__cbuf__ uint16_t*)dst, (__gm__ uint16_t*)src, sid, static_cast<uint16_t>(blockCount), burstLength,
+            leftPadding, rightPadding, isPad, actSrcStride, actDstStride);
     } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-        copy_gm_to_cbuf_align_v2(
-            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, (uint8_t)sid, blockCount, burstLength, leftPadding,
-            rightPadding, isPad, actSrcStride, actDstStride);
+        copy_gm_to_cbuf_align(
+            (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, sid, static_cast<uint16_t>(blockCount), burstLength,
+            leftPadding, rightPadding, isPad, actSrcStride, actDstStride);
     } else {
         ASCENDC_ASSERT(
             false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data type of copy from gm to cbuf on current device"); });
@@ -129,11 +107,12 @@ __aicore__ inline void CopyCbufToGmAlignV2(
     __gm__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint32_t srcStride,
     const uint32_t dstStride, const uint8_t sid = 0)
 {
+    // dav-l310 backend has no raw copy_cbuf_gm_align_v2; route v1 primitive (l300 proveb pariing).
     uint32_t burstLength = blockLen * BYTE_32_ALIGN;
-    uint64_t actSrcStride = srcStride * BYTE_32_ALIGN + burstLength;
-    uint32_t actDstStride = dstStride * BYTE_32_ALIGN + burstLength;
+    uint64_t actSrcStride = srcStride;
+    uint32_t actDstStride = dstStride * BYTE_32_ALIGN;
     copy_cbuf_to_gm_align_v2(
-        (__gm__ T*)dst, (__cbuf__ T*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
+        (__gm__ uint8_t*)dst, (__cbuf__ uint8_t*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
 }
 
 template <typename T>
@@ -816,10 +795,9 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
     }
 
-    uint64_t srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
-    uint32_t dstStride = intriParams.blockLen + intriParams.dstStride;
-
-    copy_cbuf_to_gm_align_v2(dst, src, 0, intriParams.blockCount, intriParams.blockLen, dstStride, srcStride);
+    copy_cbuf_to_gm_align(
+        (__gm__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        intriParams.dstStride, intriParams.srcStride);
 }
 
 template <typename T>
@@ -830,10 +808,9 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
     }
 
-    uint64_t srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
-    uint32_t dstStride = intriParams.blockLen + intriParams.dstStride;
-
-    copy_cbuf_to_gm_align_v2(dst, src, 0, intriParams.blockCount, intriParams.blockLen, dstStride, srcStride);
+    copy_cbuf_to_gm_align(
+        (__gm__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        intriParams.dstStride, intriParams.srcStride);
 }
 
 template <typename T>

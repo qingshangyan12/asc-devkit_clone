@@ -117,7 +117,7 @@ constexpr uint32_t INT2_BIT_NUM = 2;
 constexpr uint32_t INT1_BIT_NUM = 1;
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 3103 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 // int3b_t param
 constexpr uint32_t INT3_BIT_NUM = 3;
@@ -194,6 +194,7 @@ const uint32_t TMP_UB_OFFSET = 118 * 1024;
 const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
+const uint32_t VECTOR_REG_WIDTH = 256
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 #elif (__NPU_ARCH__ == 3102)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 184 * 1024;
@@ -312,7 +313,7 @@ const int32_t VREDUCE_PER_REP_OUTPUT = 2;
 const uint16_t ONE_PARAM_SIZE = 8;
 #if defined(__NPU_ARCH__) &&                                                                         \
     (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
+     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3103)
 const int32_t BLOCK_COUT = 16;
 const uint16_t TWO_BLK_SIZE = 64;
 #endif
@@ -715,7 +716,7 @@ struct IntegerSubType {
 
 using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
 
-#if (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3103)
 using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
 using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
 using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
@@ -723,7 +724,7 @@ using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
 
 #if defined(__NPU_ARCH__) &&                                                                         \
     (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
+     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3103)
 using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
