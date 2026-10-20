@@ -6,7 +6,7 @@ Ascend C的Lambda是**Device侧局部闭包**：核函数参数仅支持基础�
 
 SIMT编程场景与SIMD和SIMT混合编程场景下Lambda的使用约束略有不同，下文分别展开说明。
 
-## SIMT编程场景<a name="section_lambda_pure_simt"></a>
+## SIMT编程场景
 
 SIMT编程场景下，核函数与`__aicore__`函数内定义的Lambda表达式无需额外标记，直接使用即可：
 
@@ -53,9 +53,9 @@ __global__ __launch_bounds__(THREAD_COUNT) void probe(float* output)
 
 Lambda捕获在实际算子开发中的用法请参考[Lambda捕获样例](../../../../../../examples/03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)。
 
-## SIMD与SIMT混合编程场景<a name="section_lambda_hybrid"></a>
+## SIMD与SIMT混合编程场景
 
-SIMD与SIMT混合编程场景下，Device侧各执行上下文中定义的Lambda表达式**必须显式标记函数属性**，否则编译报错。标记的选择规则如下：
+SIMD与SIMT混合编程场景下，Device侧定义的Lambda表达式**必须显式标记函数属性**，否则编译报错。标记的选择规则如下：
 
 **表1**  混合编程Lambda标记选择规则
 
@@ -97,7 +97,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 混合编程下Lambda捕获的完整样例请参考[混合编程Lambda捕获样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
 
 
-### VF函数内支持的Lambda能力<a name="section_lambda_hybrid_list"></a>
+### VF函数内支持的Lambda能力
 
 混合编程场景下，VF函数内Lambda各能力项的支持情况如下表所示：
 
@@ -126,7 +126,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 
 以下将对lambda的使用约束逐项展开说明：
 
--   **约束1：constexpr lambda需加函数标识**：VF函数内的constexpr lambda必须携带与所在空间一致的callee函数标识，否则**编译通过但运行结果错误**；结果先落`constexpr`局部变量后使用同样可用。
+-   **约束1：constexpr lambda需加函数标识**：VF函数内的constexpr lambda必须携带与所在空间一致的callee函数标识，否则**编译通过但运行结果错误**:
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -154,7 +154,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     }
     ```
 
--   **约束2：lambda的类型不可跨执行空间使用**：标记callee的Lambda只能在对应VF函数及其callee链内定义和使用。`__simt_callee__`函数返回的闭包只能在SIMT VF及其callee链内消费，跨到核函数体（MainScalar）等其他执行空间调用编译报错：
+-   **约束2：lambda的类型不可跨执行空间使用**：标记callee的Lambda只能在对应VF函数及其callee链内定义和使用。`__simt_callee__`函数返回的闭包只能在SIMT VF及其callee链内消费，跨到MainScalar等其他执行空间调用编译报错：
 
     ```cpp
     __simt_callee__ auto makeAdder(float bias)
@@ -185,7 +185,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     ```
 
 
--   **约束3：无参数列表形式写显式括号**：省略参数列表的lambda如`[v] __simt_callee__ { ... }`是C++2b特性，可编译但触发扩展告警，C++17标准下应写显式`()`。
+-   **约束3：无参数列表形式写显式括号**：省略参数列表的lambda，如`[v] __simt_callee__ { ... }`，是C++2b特性，而默认是按C++17编译，可编译但会触发扩展告警：
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)

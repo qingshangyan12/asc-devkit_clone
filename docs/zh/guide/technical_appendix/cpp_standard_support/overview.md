@@ -5,7 +5,7 @@
 -   Host侧与clang15一致，支持完整的C/C++标准。
 -   Device侧支持C++11、C++14、C++17与C++20四档语言标准，默认按C++17编译。
 
-## 语言标准的选择<a name="section_selecting_cpp_standard"></a>
+## 语言标准的选择
 
 SIMD和SIMT编程场景均可通过`-std=c++<version>`或`--std=c++<version>`编译选项为编译单元指定C++语言标准。该选项启用所选标准的全部语言特性，并同时作用于Host侧与Device侧的编译过程。Device侧可选择的语言标准及对应编译选项如下：
 
@@ -27,7 +27,7 @@ Host侧与clang15一致，支持C++11至C++20及后续各档标准。低于C++11
 > - 指定低于C++17的标准时，部分高版本语言特性会以clang扩展告警的形式继续可用，而非全部变为编译错误；需要严格限制语言版本时，可配合`-Werror`编译选项将此类告警升级为错误。
 > - 部分API接口内部实现依赖C++17标准，若指定低于C++17的标准，可能导致部分API无法使用。
 
-## 语言特性与限制导航<a name="section_reading_navigation"></a>
+## 语言特性与限制导航
 
 -   **[Device侧C++语言支持](./cpp_language_feature/cpp_language_feature.md)**：C++语言特性在Device侧的支持情况。
     -   [C++11语言特性](./cpp_language_feature/cpp11_language_feature.md)：C++11核心语言特性在Device侧的支持列表。
