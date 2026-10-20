@@ -25,6 +25,9 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9020" id39 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id39 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB_res.md#id1 -->
 
 ### 含mode模板参数的函数原型
@@ -50,6 +53,9 @@
 <!-- npu="910" id14 -->
 - Atlas训练系列产品：不支持
 <!-- end id14 -->
+<!-- npu="9020" id40 -->
+- Kirin 9020处理器系列产品：不支持
+<!-- end id40 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB_res.md#id2 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -259,6 +265,11 @@
 - Atlas 200I/500 A2推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 <!-- end id23 -->
+<!-- npu="9020" id41 -->
+
+- Kirin 9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+
+<!-- end id41 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

@@ -24,10 +24,10 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：不支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：不支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="9050" id10 -->
 - Kirin 9050处理器系列产品：支持
@@ -41,6 +41,9 @@
 <!-- npu="kirin3" id13 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id13 -->
+<!-- npu="9020" id20 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id20 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_highdim_split_res.md#id1 -->
 
 ## 功能说明<a name="section474617392321"></a>
@@ -176,6 +179,13 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 - KirinDev0003处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 
 <!-- end id18 -->
+
+<!-- npu="9020" id21 -->
+
+- Kirin 9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+
+<!-- end id21 -->
+
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_highdim_split_res.md#id2 -->
 
 ## 返回值说明<a name="section44801012174220"></a>

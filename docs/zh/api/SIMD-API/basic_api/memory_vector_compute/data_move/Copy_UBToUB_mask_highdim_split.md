@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id21 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id21 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/Copy_UBToUB_mask_highdim_split_res.md#id1 -->
 
 ## 功能说明<a name="zh-cn_topic_0000002567699435_section106841136114319"></a>
@@ -130,6 +133,12 @@
 - Kirin 9030处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 
 <!-- end id15 -->
+
+<!-- npu="9020" id22 -->
+
+- Kirin 9020处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+
+<!-- end id22 -->
 
 ## 返回值说明
 
