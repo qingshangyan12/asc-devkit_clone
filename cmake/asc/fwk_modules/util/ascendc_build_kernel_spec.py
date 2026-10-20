@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 import fcntl
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path, PurePosixPath
 import shutil
@@ -39,18 +40,22 @@ def task_directory(root, current_op_type, soc):
     return Path(root) / soc.lower() / current_op_type
 
 
-def load_build_contexts(config_path):
-    """Load one JSON object per line; array configuration is intentionally unsupported."""
-    lines = [line for line in Path(config_path).read_text(encoding="utf-8").splitlines() if line.strip()]
-    if lines and lines[0].lstrip().startswith("["):
-        raise BundleError("JSON array configuration is no longer supported; use JSON Lines")
-    try:
-        contexts = [json.loads(line) for line in lines]
-    except json.JSONDecodeError as error:
-        raise BundleError(f"invalid JSON Lines context: {error}") from error
-    if any(not isinstance(context, dict) for context in contexts):
-        raise BundleError("each JSON Lines context must be an object")
-    return contexts
+def kernel_spec_current_directory(work_dir):
+    work = Path(os.path.abspath(work_dir))
+    directory = Path(json.loads((work / "current_build.json").read_text(encoding="utf-8"))["directory"])
+    if directory.parent != work or not directory.name.startswith("build-") or not directory.is_dir():
+        raise ValueError("Invalid current build directory: " + str(directory))
+    if any(parent.is_symlink() for parent in (directory, *directory.parents)):
+        raise ValueError("symlink is not permitted: " + str(directory))
+    return directory
+
+
+def load_build_context(config_path):
+    """Load the package's single kernel build configuration."""
+    context = json.loads(Path(config_path).read_text(encoding="utf-8"))
+    if not isinstance(context, dict):
+        raise BundleError("build configuration must be a JSON object")
+    return context
 
 
 def _checked_path(value):
@@ -69,7 +74,7 @@ def _relative(value):
     return path
 
 
-def _files(root):
+def _files(root, include_directories=False):
     root = _checked_path(root)
     if not root.is_dir():
         raise BundleError(f"directory is missing: {root}")
@@ -83,7 +88,9 @@ def _files(root):
         dirs.sort()
         for name in sorted(dirs + files):
             path = _checked_path(Path(directory) / name)
-            if name in files:
+            if name in dirs and include_directories:
+                yield path
+            elif name in files:
                 if not path.is_file():
                     raise BundleError(f"non-regular file: {path}")
                 yield path
@@ -112,7 +119,9 @@ def _keep_temp(config):
         raise BundleError(f"OPC config is missing: {path}")
     for line in path.read_text(encoding="utf-8").splitlines():
         for option in line.split("@")[2:]:
-            if option.startswith("--op_debug_config=") and "dump_cce" in option.split("=", 1)[1].split(";"):
+            if option.startswith("--op_debug_config=") and "dump_cce" in option.split("=", 1)[1].replace(
+                ",", ";"
+            ).split(";"):
                 return True
     return False
 
@@ -144,30 +153,35 @@ class KernelSpecBuildDirectory:
 
     @property
     def current_directory(self):
-        work = self.work_dir
-        directory = _checked_path(json.loads((work / "current_build.json").read_text(encoding="utf-8"))["directory"])
-        if directory.parent != work or not directory.name.startswith("build-") or not directory.is_dir():
-            raise BundleError("Invalid current build directory: " + str(directory))
-        return directory
+        return kernel_spec_current_directory(self.work_dir)
 
-    def prepare(self, contexts):
+    def prepare(self, context):
         work = self.work_dir
         work.mkdir(parents=True, exist_ok=True)
         self.install_script.unlink(missing_ok=True)
         (work / "current_build.json").unlink(missing_ok=True)
         directory = Path(tempfile.mkdtemp(prefix="build-", dir=work))
-        for context in contexts:
-            for op_type, soc in context["tasks"]:
-                task_directory(str(directory), op_type, soc).mkdir(parents=True, exist_ok=True)
+        for op_type, soc in context["tasks"]:
+            task_directory(str(directory), op_type, soc).mkdir(parents=True, exist_ok=True)
+        config = context.get("opc_config")
+        (directory / "bundle_options.ini").write_text(
+            Path(config).read_text(encoding="utf-8") if config else "", encoding="utf-8"
+        )
         (work / "current_build.json").write_text(json.dumps({"directory": str(directory)}), encoding="utf-8")
 
     def write_install_entry(self, output=None):
-        if output is None:
-            command = 'file(REMOVE "$ENV{DESTDIR}${spec_destination}/libcust_compile_resource.so")\n'
-        else:
-            output_string = str(output).replace("\\", "\\\\").replace('"', '\\"').replace("$", "\\$")
-            command = 'file(INSTALL DESTINATION "${spec_destination}" TYPE FILE FILES "' + output_string + '")\n'
-        _atomic_write(self.install_script, lambda stream: stream.write(command.encode("utf-8")))
+        KernelSpecBundleBuilder.write_install_entry(self.install_script, output)
+        current = self.current_directory
+        for previous in self.work_dir.glob("build-*"):
+            if previous == current or previous.is_symlink() or not previous.is_dir():
+                continue
+            config = previous / "bundle_options.ini"
+            if config.is_file() and _keep_temp(config):
+                continue
+            try:
+                shutil.rmtree(previous)
+            except OSError as error:
+                logging.warning("Kernel Spec: could not clean old build directory %s: %s", previous, error)
 
 
 class KernelSpecSourceMapper:
@@ -203,8 +217,9 @@ class KernelSpecSourceMapper:
             return self.map_path(path) == relative.as_posix()
 
         if bound_source is not None:
-            candidates = {_checked_path(bound_source)}
-            if not matches(next(iter(candidates))):
+            bound = _checked_path(bound_source)
+            candidates = {path for path in bound.rglob(relative.name) if matches(path)} if bound.is_dir() else {bound}
+            if not bound.is_dir() and not matches(bound):
                 raise BundleError(f"source_file does not match producer source: {value}: {bound_source}")
         else:
             candidates = set()
@@ -303,15 +318,18 @@ class KernelSpecBundleBuilder:
     opc_config: str = None
     jobs: int = 8
     source_bindings: dict = field(default_factory=dict)
+    cache_dir: str = None
 
     def _collect(self, mapper):
         units = []
         sources_by_id = {}
+        source_hashes = {}
         bindings = self.source_bindings
         for directory in sorted(set(self.input_dir)):
             manifests = [p for p in _files(directory) if p.name.endswith("_manifest.json")]
             if not manifests:
-                raise BundleError(f"no manifests in input directory: {directory}")
+                logging.warning("Kernel Spec: no manifests in input directory, skipping: %s", directory)
+                continue
             for path in manifests:
                 manifest = json.loads(path.read_text(encoding="utf-8"))
                 resource_id = manifest.get("resource_id")
@@ -324,7 +342,9 @@ class KernelSpecBundleBuilder:
                 resource_root = _checked_path(path.parent / _relative(manifest.get("resource_path")))
                 relocated = mapper.relocate(manifest, package_source)
                 encoded = json.dumps(relocated, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
-                unit = ResourceUnit(path, encoded, resource_root, package_source, _hash_file(source))
+                if source not in source_hashes:
+                    source_hashes[source] = _hash_file(source)
+                unit = ResourceUnit(path, encoded, resource_root, package_source, source_hashes[source])
                 previous = sources_by_id.get(resource_id)
                 if previous is not None and previous.source_delivery_signature() != unit.source_delivery_signature():
                     raise BundleError(f"conflicting resource_id {resource_id}: {previous.manifest_path} and {path}")
@@ -334,8 +354,21 @@ class KernelSpecBundleBuilder:
                 units.append((resource_id, unit))
         return sorted(units, key=lambda item: (item[0], str(item[1].manifest_path)))
 
-    def build(self):
-        """Collect delivery inputs and publish a newly exported RUN SO."""
+    @staticmethod
+    def write_install_entry(install_script, output=None):
+        if output is None:
+            command = 'file(REMOVE "$ENV{DESTDIR}${spec_destination}/libcust_compile_resource.so")\n'
+        else:
+            output_string = str(output).replace("\\", "\\\\").replace('"', '\\"').replace("$", "\\$")
+            command = 'file(INSTALL DESTINATION "${spec_destination}" TYPE FILE FILES "' + output_string + '")\n'
+        install_script.parent.mkdir(parents=True, exist_ok=True)
+        _atomic_write(install_script, lambda stream: stream.write(command.encode("utf-8")))
+
+    def build(self, install_script=None):
+        """Export resources and publish the optional installation entry only on success."""
+        install = _checked_path(install_script) if install_script else None
+        if install:
+            install.unlink(missing_ok=True)
         output = _checked_path(self.output)
         if output.suffix != ".so":
             raise BundleError("RUN resource output must have the .so suffix")
@@ -347,17 +380,54 @@ class KernelSpecBundleBuilder:
         output.parent.mkdir(parents=True, exist_ok=True)
         work.mkdir(parents=True, exist_ok=True)
         # Output ownership, rather than work-dir ownership, serializes separate callers.
-        with open(_checked_path(output.parent / ("." + output.name + ".lock")), "a+") as lock:
+        lock_root = _checked_path(self.cache_dir) if self.cache_dir else output.parent
+        lock_root.mkdir(parents=True, exist_ok=True)
+        with open(_checked_path(lock_root / ("." + output.name + ".lock")), "a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
-            return self._export(output, work)
+            exported = self._export(output, work)
+            if install:
+                self.write_install_entry(install, output if exported else None)
+            return exported
 
     def _export(self, output, work):
         mapper = KernelSpecSourceMapper(self.source_map, self.source_file)
         units = self._collect(mapper)
+        if not units:
+            output.unlink(missing_ok=True)
+            if self.cache_dir:
+                cached = _checked_path(Path(self.cache_dir) / output.name)
+                cached.unlink(missing_ok=True)
+                cached.with_suffix(cached.suffix + ".cache.json").unlink(missing_ok=True)
+            return False
         tools = {name: _tool(getattr(self, name)) for name in ("exporter", "cxx", "make")}
         keep = _keep_temp(self.opc_config)
         if self.jobs < 1:
             raise BundleError("jobs must be positive")
+        fingerprint = hashlib.sha256()
+        for name, tool in sorted(tools.items()):
+            fingerprint.update((name + str(tool) + _hash_file(tool)).encode())
+        for resource_id, unit in units:
+            fingerprint.update(json.dumps([resource_id, unit.installed_source, unit.source_hash]).encode())
+            fingerprint.update(unit.manifest_json)
+            for path in _files(unit.resource_root, include_directories=True):
+                relative = str(path.relative_to(unit.resource_root))
+                if path.is_dir():
+                    fingerprint.update(json.dumps(["directory", relative]).encode())
+                else:
+                    fingerprint.update(json.dumps(["file", relative, _hash_file(path)]).encode())
+        cached_output = _checked_path(Path(self.cache_dir) / output.name) if self.cache_dir else output
+        cache = _checked_path(cached_output.with_suffix(cached_output.suffix + ".cache.json"))
+        signature = fingerprint.hexdigest()
+        if not keep and cache.is_file() and cached_output.is_file():
+            try:
+                saved = json.loads(cache.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                saved = None
+            if saved == {"input": signature, "output": _hash_file(cached_output)}:
+                if cached_output != output:
+                    with open(cached_output, "rb") as source:
+                        _atomic_write(output, lambda stream: shutil.copyfileobj(source, stream))
+                return True
         bundle_dir = Path(tempfile.mkdtemp(prefix=".bundle-", dir=work))
         try:
             collected = bundle_dir / "collected"
@@ -394,6 +464,12 @@ class KernelSpecBundleBuilder:
                 raise BundleError(f"exporter failed ({result.returncode}): {detail}")
             with open(_checked_path(staged), "rb") as source:
                 _atomic_write(output, lambda stream: shutil.copyfileobj(source, stream))
+            if cached_output != output:
+                with open(output, "rb") as source:
+                    _atomic_write(cached_output, lambda stream: shutil.copyfileobj(source, stream))
+            contents = json.dumps({"input": signature, "output": _hash_file(output)}).encode()
+            _atomic_write(cache, lambda stream: stream.write(contents))
+            return True
         finally:
             if keep:
                 print(f"Kernel Spec diagnostics retained: {bundle_dir}")
@@ -402,53 +478,46 @@ class KernelSpecBundleBuilder:
 
 
 def bundle_resources(build_config, work_dir, exporter, cxx, make):
-    contexts = load_build_contexts(build_config)
+    context = load_build_context(build_config)
     build_directory = KernelSpecBuildDirectory(work_dir)
     build_directory.install_script.unlink(missing_ok=True)
     directory = build_directory.current_directory
     output = directory / "op_spec/libcust_compile_resource.so"
     inputs = []
-    maps = []
-    sources = set()
     source_bindings = {}
-    configs = []
-    for context in contexts:
-        tasks = context["tasks"]
-        if not tasks:
+    source_root = Path(context["source_root"]).resolve()
+    copied_root = Path(context["copied_source_root"])
+    for op_type, soc in context["tasks"]:
+        task_root = task_directory(str(directory), op_type, soc)
+        receipt = task_root / ".producer-result.json"
+        if not receipt.is_file():
+            raise BundleError(f"Kernel Spec producer result is missing: {op_type}/{soc}")
+        result = json.loads(receipt.read_text(encoding="utf-8"))
+        status = result.get("status")
+        if status == "filtered" or (status == "failed" and context.get("allow_failed") is True):
+            logging.warning("Kernel Spec producer %s, skipping %s/%s: %s", status, op_type, soc, result["reason"])
             continue
-        configs.append(context["opc_config"])
-        maps.append((context["source_root"], context["source_destination"]))
-        source_root = Path(context["source_root"]).resolve()
-        copied_root = Path(context["copied_source_root"])
-        for op_type, soc in tasks:
-            task_root = task_directory(str(directory), op_type, soc)
-            receipt = task_root / ".producer-success"
-            if not receipt.is_file():
-                raise ValueError("Kernel Spec producer did not complete: " + op_type + "/" + soc)
-            source = Path(receipt.read_text(encoding="utf-8"))
-            relative = source.relative_to(source_root)
-            # The source map describes the existing source installation, not a guessed new layout.
-            if not (copied_root / relative).is_file():
-                raise ValueError("Kernel Spec source is missing from the install input: " + str(source))
-            sources.add(str(source))
-            input_root = str(_checked_path(task_root))
-            if input_root in source_bindings and source_bindings[input_root] != str(source):
-                raise BundleError(f"conflicting producer source for {input_root}")
-            source_bindings[input_root] = str(source)
-            inputs.append(input_root)
-    if not configs:
+        if status != "completed":
+            raise BundleError(f"Kernel Spec producer {op_type}/{soc}: {status}: {result.get('reason', '')}")
+        if not any(task_root.rglob("*_manifest.json")):
+            raise BundleError(f"Kernel Spec producer completed without manifests: {op_type}/{soc}")
+        source = Path(result["source"])
+        relative = source.relative_to(source_root)
+        # The source map describes the existing source installation, not a guessed new layout.
+        if not (copied_root / relative).is_file():
+            raise ValueError("Kernel Spec source is missing from the install input: " + str(source))
+        input_root = str(_checked_path(task_root))
+        source_bindings[input_root] = str(source)
+        inputs.append(input_root)
+    if not inputs:
         build_directory.write_install_entry()
         return
 
-    # Retain temporary resources if any contributing kernel enables the existing debug setting.
+    # prepare captured each round's existing debug setting before producers started.
     combined_config = directory / "bundle_options.ini"
-    combined_config.write_text(
-        "\n".join(Path(config).read_text(encoding="utf-8") for config in sorted(set(configs))), encoding="utf-8"
-    )
-    KernelSpecBundleBuilder(
+    exported = KernelSpecBundleBuilder(
         input_dir=inputs,
-        source_file=sorted(sources),
-        source_map=maps,
+        source_map=[(context["source_root"], context["source_destination"])],
         output=str(output),
         work_dir=str(directory / "work"),
         exporter=exporter,
@@ -456,27 +525,55 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
         make=make,
         opc_config=str(combined_config),
         source_bindings=source_bindings,
+        cache_dir=str(build_directory.work_dir / "cache"),
     ).build()
-    build_directory.write_install_entry(output)
+    build_directory.write_install_entry(output if exported else None)
+
+
+def collect_resources(request):
+    """Aggregate existing manifest directories after the caller's compilation targets complete."""
+    KernelSpecBundleBuilder(
+        input_dir=request.input_dir + [directory for directory, _ in request.input_source],
+        source_file=request.source_file,
+        source_map=request.source_map,
+        source_bindings={str(_checked_path(directory)): source for directory, source in request.input_source},
+        output=request.output,
+        work_dir=request.work_dir,
+        exporter=request.exporter,
+        cxx=request.cxx,
+        make=request.make,
+        opc_config=request.opc_config,
+    ).build(request.install_script)
 
 
 def main():
     """Handle the internal CMake prepare and bundle entry points."""
-    if len(sys.argv) <= 1 or sys.argv[1] not in {"prepare", "bundle"}:
-        raise SystemExit("usage: ascendc_build_kernel_spec.py {prepare|bundle} ...")
+    if len(sys.argv) <= 1 or sys.argv[1] not in {"prepare", "bundle", "collect"}:
+        raise SystemExit("usage: ascendc_build_kernel_spec.py {prepare|bundle|collect} ...")
     action = sys.argv[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("build-config", "work-dir"):
-        parser.add_argument("--" + name, required=True)
-    if action == "bundle":
+    if action in {"prepare", "bundle"}:
+        parser.add_argument("--build-config", required=True)
+    parser.add_argument("--work-dir", required=True)
+    if action in {"bundle", "collect"}:
         for name in ("exporter", "cxx", "make"):
             parser.add_argument("--" + name, required=True)
+    if action == "collect":
+        parser.add_argument("--input-dir", action="append", default=[])
+        parser.add_argument("--source-file", action="append", default=[])
+        parser.add_argument("--source-map", nargs=2, action="append", default=[])
+        parser.add_argument("--input-source", nargs=2, action="append", default=[], metavar=("MANIFEST_DIR", "SOURCE"))
+        parser.add_argument("--output", required=True)
+        parser.add_argument("--install-script")
+        parser.add_argument("--opc-config")
     request = parser.parse_args(sys.argv[2:])
     try:
         if action == "prepare":
-            KernelSpecBuildDirectory(request.work_dir).prepare(load_build_contexts(request.build_config))
-        else:
+            KernelSpecBuildDirectory(request.work_dir).prepare(load_build_context(request.build_config))
+        elif action == "bundle":
             bundle_resources(request.build_config, request.work_dir, request.exporter, request.cxx, request.make)
+        else:
+            collect_resources(request)
     except (BundleError, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
         parser.exit(1, f"Kernel Spec build failed: {error}\n")
 

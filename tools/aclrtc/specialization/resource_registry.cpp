@@ -570,18 +570,61 @@ bool CheckRegistryLimits(const StagedResources& staged, ResourceSourceType sourc
     return true;
 }
 
+bool HaveSameResourceContents(const ResourceEntry& left, const ResourceEntry& right)
+{
+    if (left.data.json != right.data.json || left.files.size() != right.files.size()) {
+        return false;
+    }
+    // CopyManifestFiles sorts by relative path; installation and materialization locations are not resource content.
+    for (size_t index = 0U; index < left.files.size(); ++index) {
+        const auto& first = left.files[index];
+        const auto& second = right.files[index];
+        if (first.fileName != second.fileName || first.relativePath != second.relativePath ||
+            first.bytes != second.bytes) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DiscardDuplicateResources(StagedResources& incoming, const ResourceStore& existingResources)
+{
+    // Validate every duplicate before changing resources or their accounting.
+    for (const auto& item : incoming.resources) {
+        const auto existing = existingResources.find(item.first);
+        if (existing != existingResources.end() && !HaveSameResourceContents(*item.second, *existing->second)) {
+            ASCENDLOGE(
+                "Conflicting compile resource contents: resource_id=%s source_type=%s incoming_so=%s existing_so=%s",
+                item.first.c_str(), SourceTypeName(item.second->sourceType), item.second->sourceSoPath.c_str(),
+                existing->second->sourceSoPath.c_str());
+            return false;
+        }
+    }
+    for (auto item = incoming.resources.begin(); item != incoming.resources.end();) {
+        const auto existing = existingResources.find(item->first);
+        if (existing != existingResources.end()) {
+            ASCENDLOGW(
+                "Keeping earlier compile resource and skipping duplicate: resource_id=%s "
+                "source_type=%s incoming_so=%s existing_so=%s",
+                item->first.c_str(), SourceTypeName(item->second->sourceType), item->second->sourceSoPath.c_str(),
+                existing->second->sourceSoPath.c_str());
+            incoming.files -= item->second->files.size();
+            for (const auto& file : item->second->files) {
+                incoming.bytes -= file.bytes.size();
+            }
+            item = incoming.resources.erase(item);
+        } else {
+            ++item;
+        }
+    }
+    return true;
+}
+
 ResourceStatus MergeStagedLibrary(const LibrarySpec& spec, StagedResources& incoming, StagedResources& staged)
 {
-    for (const auto& item : incoming.resources) {
-        const auto existing = staged.resources.find(item.first);
-        if (existing != staged.resources.end()) {
-            ASCENDLOGW(
-                "Skipping compile resource SO because its resource conflicts with an earlier SO: resource_id=%s "
-                "source_type=%s incoming_so=%s existing_so=%s",
-                item.first.c_str(), SourceTypeName(spec.sourceType), spec.path.c_str(),
-                existing->second->sourceSoPath.c_str());
-            return ResourceStatus::Conflict;
-        }
+    if (!DiscardDuplicateResources(incoming, staged.resources)) {
+        staged.conflict = true;
+        return ResourceStatus::Conflict;
     }
     uint64_t bytes = staged.bytes;
     uint64_t files = staged.files;
@@ -1188,6 +1231,9 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
         }
         ++loaded;
     }
+    if (stage.external.conflict || stage.custom.conflict || stage.builtIn.conflict) {
+        return ResourceStatus::Conflict;
+    }
     if (loaded == 0U && !libraries.empty()) {
         ASCENDLOGW(
             "No compile resource SO was loaded successfully: total=%zu skipped=%zu first_failure=%s(%d)",
@@ -1279,23 +1325,6 @@ ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noe
     return builtIn == builtInResources_.end() ? nullptr : builtIn->second.get();
 }
 
-bool ResourceRegistry::HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const
-{
-    for (const auto& item : incoming) {
-        const auto existing = committed.find(item.first);
-        if (existing != committed.end()) {
-            ASCENDLOGW(
-                "Compile resource conflicts with an already registered resource and will not be added: "
-                "resource_id=%s incoming_source_type=%s incoming_so=%s "
-                "existing_source_type=%s existing_so=%s",
-                item.first.c_str(), SourceTypeName(item.second->sourceType), item.second->sourceSoPath.c_str(),
-                SourceTypeName(existing->second->sourceType), existing->second->sourceSoPath.c_str());
-            return true;
-        }
-    }
-    return false;
-}
-
 ResourceStatus ResourceRegistry::Commit(StageState& stage)
 {
     std::lock_guard<std::mutex> lock(registryMutex_);
@@ -1303,12 +1332,11 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
         "Committing compile resources: external=%zu custom=%zu built_in=%zu", stage.external.resources.size(),
         stage.custom.resources.size(), stage.builtIn.resources.size());
     ResourceStatus status = ResourceStatus::Success;
-    auto checkCategory = [this, &status](
-                             StagedResources& staged, ResourceStore& committed, ResourceSourceType sourceType) {
+    auto checkCategory = [&status](StagedResources& staged, ResourceStore& committed, ResourceSourceType sourceType) {
         if (!staged.discovered && !staged.conflict) {
             return;
         }
-        if (!staged.conflict && HasCommitConflict(staged.resources, committed)) {
+        if (!staged.conflict && !DiscardDuplicateResources(staged, committed)) {
             staged.conflict = true;
         }
         if (staged.conflict) {
@@ -1376,8 +1404,11 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
             libraries.size());
         StageState stage;
         status = LoadLibraries(libraries, stage);
-        if (status == ResourceStatus::Success) {
-            status = Commit(stage);
+        if (status == ResourceStatus::Success || status == ResourceStatus::Conflict) {
+            const ResourceStatus commitStatus = Commit(stage);
+            if (status == ResourceStatus::Success || commitStatus != ResourceStatus::Success) {
+                status = commitStatus;
+            }
         }
     }
     if (automatic) {
