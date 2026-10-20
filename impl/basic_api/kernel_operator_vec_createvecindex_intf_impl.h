@@ -75,12 +75,15 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
-    Operand0 dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride,
-    uint8_t dstRepStride)
+    Operand0 dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
@@ -116,12 +119,15 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
-    Operand0 dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
-    uint8_t dstRepStride)
+    Operand0 dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
@@ -150,11 +156,14 @@ __aicore__ inline __in_pipe__(S)
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
-__aicore__ inline __in_pipe__(S)
-    __out_pipe__(V) void CreateVecIndex(Operand0 dst, const T& firstValue, uint32_t count)
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(Operand0 dst, const T& firstValue, uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, count);

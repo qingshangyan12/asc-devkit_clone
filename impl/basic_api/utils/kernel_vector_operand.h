@@ -5,56 +5,69 @@
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef ASCENDC_KERNEL_VECTOR_OPERAND_H
 #define ASCENDC_KERNEL_VECTOR_OPERAND_H
 
 namespace AscendC {
 namespace VectorOperand {
 struct DefaultType {};
-template <typename T> struct Identity { using Type = T; };
+template <typename T>
+struct Identity {
+    using Type = T;
+};
 
-template <typename T> struct Traits {
+template <typename T>
+struct Traits {
     using Element = void;
     static constexpr bool isPointer = false;
     static constexpr bool isOperand = false;
 };
 
-template <typename T> struct Traits<LocalTensor<T>> {
+template <typename T>
+struct Traits<LocalTensor<T>> {
     using Element = T;
     static constexpr bool isPointer = false;
     static constexpr bool isOperand = true;
 };
 
-template <typename T> struct Traits<__ubuf__ T*> {
+template <typename T>
+struct Traits<__ubuf__ T*> {
     using Element = T;
     static constexpr bool isPointer = true;
     static constexpr bool isOperand = true;
 };
 
-template <typename T, unsigned long long N> struct Traits<__ubuf__ T[N]> {
+template <typename T, unsigned long long N>
+struct Traits<__ubuf__ T[N]> {
     using Element = T;
     static constexpr bool isPointer = true;
     static constexpr bool isOperand = true;
 };
 
-template <typename Explicit, typename Operand> struct Resolve {
+template <typename Explicit, typename Operand>
+struct Resolve {
     using Type = Explicit;
 };
 
-template <typename Operand> struct Resolve<DefaultType, Operand> {
+template <typename Operand>
+struct Resolve<DefaultType, Operand> {
     using Type = typename Traits<Operand>::Element;
 };
 
 template <typename Explicit, typename Operand>
 using ElementT = typename Resolve<Explicit, Operand>::Type;
 
-template <typename... Operands> __aicore__ constexpr bool HasPointer()
+template <typename... Operands>
+__aicore__ constexpr bool HasPointer()
 {
     return (Traits<Operands>::isPointer || ...);
 }
 
-template <typename... Operands> __aicore__ constexpr bool AllOperands()
+template <typename... Operands>
+__aicore__ constexpr bool AllOperands()
 {
     return (Traits<Operands>::isOperand && ...);
 }
@@ -62,7 +75,8 @@ template <typename... Operands> __aicore__ constexpr bool AllOperands()
 template <typename Operand>
 using Primitive = PrimT<typename Traits<Operand>::Element>;
 
-template <typename A, typename B> __aicore__ constexpr bool SameElement()
+template <typename A, typename B>
+__aicore__ constexpr bool SameElement()
 {
     return Std::is_same<Primitive<A>, Primitive<B>>::value;
 }
@@ -77,7 +91,8 @@ __aicore__ inline bool FitsCount(Operand operand, Count count)
     }
 }
 
-template <typename Expected, typename Operand> __aicore__ constexpr bool Matches()
+template <typename Expected, typename Operand>
+__aicore__ constexpr bool Matches()
 {
     if constexpr (!Traits<Operand>::isOperand) {
         return false;
@@ -86,7 +101,8 @@ template <typename Expected, typename Operand> __aicore__ constexpr bool Matches
     }
 }
 
-template <typename Operand> __aicore__ constexpr bool IsWritable()
+template <typename Operand>
+__aicore__ constexpr bool IsWritable()
 {
     return Traits<Operand>::isOperand && !Std::is_const<typename Traits<Operand>::Element>::value;
 }

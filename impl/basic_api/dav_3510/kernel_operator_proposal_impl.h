@@ -135,8 +135,8 @@ __aicore__ inline void MrgSortCal(
 // Pointer overload of the existing merge algorithm.
 template <typename T>
 __aicore__ inline void MrgSortCal(
-    __ubuf__ T* dstLocal, const MrgSortSrcList<T, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*>& sortList, const uint16_t elementCountList[4],
-    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+    __ubuf__ T* dstLocal, const MrgSortSrcList<T, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*, __ubuf__ T*>& sortList,
+    const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 {
     static_assert(SupportType<T, float, half>(), "MrgSort only support half / float.");
     MrgSort4Info mrgSortInfo(elementCountList, false, validBit, static_cast<uint16_t>(repeatTime));
@@ -152,8 +152,7 @@ __aicore__ inline void MrgSortCal(
     src1 |= (uint64_t(mrgSortInfo.elementLengths[3] & 0xFFFF) << 48);
 
     __ubuf__ T* addrArray[MRG_SORT_ELEMENT_LEN] = {
-        (__ubuf__ T*)sortList.src1, (__ubuf__ T*)sortList.src2,
-        (__ubuf__ T*)sortList.src3, (__ubuf__ T*)sortList.src4};
+        (__ubuf__ T*)sortList.src1, (__ubuf__ T*)sortList.src2, (__ubuf__ T*)sortList.src3, (__ubuf__ T*)sortList.src4};
 
     Vmrgsort4Cal((__ubuf__ T*)dstLocal, addrArray, src1, config);
 }
@@ -197,14 +196,14 @@ __aicore__ inline void FullSortInnerLoop(
 // Pointer overload of the existing merge algorithm.
 template <typename T>
 __aicore__ inline void FullSortInnerLoop(
-    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset,
-    const uint16_t singleMergeTmpElementCount, const int32_t mergeTmpRepeatTimes)
+    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset, const uint16_t singleMergeTmpElementCount,
+    const int32_t mergeTmpRepeatTimes)
 {
     if (mergeTmpRepeatTimes <= 0) {
         return;
     }
-    MrgSortSrcList sortList =
-        MrgSortSrcList((tmpLocal + 0), (tmpLocal + baseOffset), (tmpLocal + 2 * baseOffset), (tmpLocal + 3 * baseOffset));
+    MrgSortSrcList sortList = MrgSortSrcList(
+        (tmpLocal + 0), (tmpLocal + baseOffset), (tmpLocal + 2 * baseOffset), (tmpLocal + 3 * baseOffset));
     const uint16_t elementCountList[MRG_SORT_ELEMENT_LEN] = {
         singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount, singleMergeTmpElementCount};
     uint32_t sortedNum[MRG_SORT_ELEMENT_LEN];
@@ -263,9 +262,8 @@ __aicore__ inline void FullSortInnerLoopTail(
 // Pointer overload of the existing merge algorithm.
 template <typename T>
 __aicore__ inline void FullSortInnerLoopTail(
-    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset,
-    const uint16_t singleMergeTmpElementCount, const uint32_t elementCountTail, const int32_t mergeTmpRepeatTimes,
-    int32_t mergeTmpTailQueNum)
+    __ubuf__ T* dstLocal, __ubuf__ T* tmpLocal, const uint32_t baseOffset, const uint16_t singleMergeTmpElementCount,
+    const uint32_t elementCountTail, const int32_t mergeTmpRepeatTimes, int32_t mergeTmpTailQueNum)
 {
     if (mergeTmpTailQueNum <= 0) {
         return;
@@ -297,8 +295,8 @@ __aicore__ inline void FullSortInnerLoopTail(
         validBitTail = 0b1111;
     }
     if (mergeTmpTailQueNum > 1) {
-        MrgSortSrcList sortListTail =
-            MrgSortSrcList((tmpLocal + offset0Tail), (tmpLocal + offset1Tail), (tmpLocal + offset2Tail), (tmpLocal + offset3Tail));
+        MrgSortSrcList sortListTail = MrgSortSrcList(
+            (tmpLocal + offset0Tail), (tmpLocal + offset1Tail), (tmpLocal + offset2Tail), (tmpLocal + offset3Tail));
         uint32_t sortedNumTail[MRG_SORT_ELEMENT_LEN];
         MrgSortCal<T>((dstLocal + offset0Tail), sortListTail, elementCountListTail, sortedNumTail, validBitTail, 1);
     } else {
@@ -366,8 +364,8 @@ __aicore__ inline void DoFullSort(
 // Pointer overload of the existing merge algorithm.
 template <typename T>
 __aicore__ inline void DoFullSort(
-    __ubuf__ T* dstLocal, __ubuf__ T* concatLocal, __ubuf__ uint32_t* indexLocal,
-    __ubuf__ T* tmpLocal, const int32_t repeatTime)
+    __ubuf__ T* dstLocal, __ubuf__ T* concatLocal, __ubuf__ uint32_t* indexLocal, __ubuf__ T* tmpLocal,
+    const int32_t repeatTime)
 {
     uint32_t singleMergeElementCount = singleSortElementCountArch3510;
     uint32_t loopTimes = GetFullSortInnerLoopTimes(repeatTime);

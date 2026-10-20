@@ -55,13 +55,17 @@ __aicore__ inline void Duplicate(
     const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
 
-template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Duplicate(
-    Operand0 dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
-    const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
+    Operand0 dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride);
 
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -69,13 +73,17 @@ __aicore__ inline void Duplicate(
     const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
     const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
 
-template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Duplicate(
-    Operand0 dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
-    const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
+    Operand0 dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride);
 
 /*
  * @ingroup Duplicate Level 2
@@ -87,9 +95,13 @@ __aicore__ inline void Duplicate(
 template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
 __aicore__ inline void Duplicate(Operand0 dst, const T& scalarValue, const int32_t& count);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
@@ -104,10 +116,14 @@ __aicore__ inline void Duplicate(Operand0 dst, const T& scalarValue, const int32
 template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
 __aicore__ inline void Duplicate(Operand0 dst, Operand1 src, const int32_t& count);
 #endif
 
@@ -128,15 +144,18 @@ __aicore__ inline void Interleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
     const int32_t count);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(), int>::type = 0>
-__aicore__ inline void Interleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1,
-    const int32_t count);
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2, typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(),
+        int>::type = 0>
+__aicore__ inline void Interleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count);
 
 /* **************************************************************************************************
  * DeInterleave                                            *
@@ -155,15 +174,18 @@ __aicore__ inline void DeInterleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
     const int32_t count);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(), int>::type = 0>
-__aicore__ inline void DeInterleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1,
-    const int32_t count);
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2, typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(),
+        int>::type = 0>
+__aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count);
 
 /*
  * @ingroup DeInterleave Level 2
@@ -177,13 +199,17 @@ template <typename T>
 __aicore__ inline void DeInterleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const int32_t srcCount);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type = 0>
-__aicore__ inline void DeInterleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src, const int32_t srcCount);
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type = 0>
+__aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src, const int32_t srcCount);
 } // namespace AscendC
 #pragma end_pipe
 #if defined(__NPU_ARCH__)

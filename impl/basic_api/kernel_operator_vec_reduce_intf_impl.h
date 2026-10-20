@@ -280,21 +280,31 @@ __aicore__ inline void ReduceDataBlockCommon(
     }
 }
 
-template <ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask, typename MaskType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
 __aicore__ inline void ReduceDataBlockCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType, typename Operand0,
+    typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceDataBlockCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -309,16 +319,16 @@ __aicore__ inline void ReduceDataBlockCommon(
         "ReduceDataBlock only supports identical src type and dst type for current NPU_ARCH.");
     if constexpr (reduceType == ReduceType::SUM) {
         BlockReduceSumImpl<SrcPrimType, isSetMask>(
-            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime, mask,
-            dstRepStride, srcBlkStride, srcRepStride);
+            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime,
+            mask, dstRepStride, srcBlkStride, srcRepStride);
     } else if constexpr (reduceType == ReduceType::MAX) {
         BlockReduceMaxImpl<SrcPrimType, isSetMask>(
-            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime, mask,
-            dstRepStride, srcBlkStride, srcRepStride);
+            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime,
+            mask, dstRepStride, srcBlkStride, srcRepStride);
     } else {
         BlockReduceMinImpl<SrcPrimType, isSetMask>(
-            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime, mask,
-            dstRepStride, srcBlkStride, srcRepStride);
+            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), repeatTime,
+            mask, dstRepStride, srcBlkStride, srcRepStride);
     }
 }
 
@@ -341,21 +351,31 @@ __aicore__ inline void ReducePairElemCommon(
         dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask, typename MaskType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
 __aicore__ inline void ReducePairElemCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType, typename Operand0,
+    typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReducePairElemCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -414,23 +434,31 @@ __aicore__ inline void ReduceRepeatCommon(
     }
 }
 
-template <ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask, typename MaskType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
 __aicore__ inline void ReduceRepeatCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
-    ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename MaskType, typename Operand0,
+    typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceRepeatCommon(
-    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
-    ReduceOrder order)
+    Operand0 dst, Operand1 src, const MaskType mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -444,26 +472,27 @@ __aicore__ inline void ReduceRepeatCommon(
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     static_assert(
         (reduceType == ReduceType::SUM || Std::is_same_v<SrcPrimType, DstPrimType>),
-        "ReduceRepeat for MAX/MIN only supports identical dst type (VectorElementT) and src type (VectorElementU) for current NPU_ARCH.");
+        "ReduceRepeat for MAX/MIN only supports identical dst type (VectorElementT) and src type (VectorElementU) for "
+        "current NPU_ARCH.");
 #else
     static_assert(
-        Std::is_same_v<SrcPrimType, DstPrimType>,
-        "ReduceRepeat only supports identical dst type (VectorElementT) and src type (VectorElementU) for current NPU_ARCH.");
+        Std::is_same_v<SrcPrimType, DstPrimType>, "ReduceRepeat only supports identical dst type (VectorElementT) and "
+                                                  "src type (VectorElementU) for current NPU_ARCH.");
 #endif
     if constexpr (reduceType == ReduceType::SUM) {
         // DstPrimType is auto derived when __NPU_ARCH__ is 3510 / 5102 / 3003 / 3113
         WholeReduceSumImpl<SrcPrimType, isSetMask>(
-            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
-            dstRepStride, srcBlkStride, srcRepStride);
+            (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask,
+            repeatTime, dstRepStride, srcBlkStride, srcRepStride);
     } else {
         if constexpr (reduceType == ReduceType::MAX) {
             WholeReduceMaxImpl<SrcPrimType, isSetMask>(
-                (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
-                dstRepStride, srcBlkStride, srcRepStride, order);
+                (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask,
+                repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
         } else {
             WholeReduceMinImpl<SrcPrimType, isSetMask>(
-                (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
-                dstRepStride, srcBlkStride, srcRepStride, order);
+                (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask,
+                repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
         }
     }
 }
@@ -1064,13 +1093,17 @@ __aicore__ inline void ReduceDataBlock(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceDataBlock(
-    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1096,13 +1129,17 @@ __aicore__ inline void ReduceDataBlock(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceDataBlock(
-    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1127,13 +1164,17 @@ __aicore__ inline void ReducePairElem(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReducePairElem(
-    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1158,13 +1199,17 @@ __aicore__ inline void ReducePairElem(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReducePairElem(
-    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1190,14 +1235,17 @@ __aicore__ inline void ReduceRepeat(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceRepeat(
-    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
-    ReduceOrder order)
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1223,14 +1271,17 @@ __aicore__ inline void ReduceRepeat(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
-template <ReduceType reduceType, typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    ReduceType reduceType, typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void ReduceRepeat(
-    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime,
-    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
-    ReduceOrder order)
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1287,14 +1338,19 @@ __aicore__ inline void ReduceMax(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMax(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask,
-    const int32_t repeatTime, const int32_t srcRepStride, bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1367,14 +1423,19 @@ __aicore__ inline void ReduceMin(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMin(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask,
-    const int32_t repeatTime, const int32_t srcRepStride, bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1446,14 +1507,19 @@ __aicore__ inline void ReduceSum(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceSum(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask,
-    const int32_t repeatTime, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1517,14 +1583,19 @@ __aicore__ inline void ReduceMax(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMax(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[],
-    const int32_t repeatTime, const int32_t srcRepStride, bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1587,14 +1658,19 @@ __aicore__ inline void ReduceMin(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMin(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[],
-    const int32_t repeatTime, const int32_t srcRepStride, bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1657,14 +1733,19 @@ __aicore__ inline void ReduceSum(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceSum(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[],
-    const int32_t repeatTime, const int32_t srcRepStride)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1758,14 +1839,18 @@ __aicore__ inline void ReduceMin(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMin(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count,
-    bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1875,14 +1960,18 @@ __aicore__ inline void ReduceMax(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void ReduceMax(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count,
-    bool calIndex)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2035,17 +2124,23 @@ __aicore__ inline void ReduceSum(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
-__aicore__ inline void ReduceSum(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count)
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type>
+__aicore__ inline void ReduceSum(Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
-    ReduceSumImpl<PrimType>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), count);
+    ReduceSumImpl<PrimType>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), count);
 }
 #endif
 #endif

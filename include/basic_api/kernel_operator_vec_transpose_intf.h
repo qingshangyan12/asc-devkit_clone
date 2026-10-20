@@ -50,10 +50,14 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
 __aicore__ inline void Transpose(Operand0 dst, Operand1 src);
 
 /* **************************************************************************************************
@@ -75,14 +79,17 @@ __aicore__ inline __check_sync_alias__ void TransDataTo5HD(
     const LocalTensor<T> (&dstList)[NCHW_CONV_ADDR_LIST_SIZE],
     const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams);
 
-template <typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
-    typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
 __aicore__ inline __check_sync_alias__ void TransDataTo5HD(
-    const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE],
-    const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams);
+    const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE],
+    const TransDataTo5HDParams& nchwconvParams);
 
 template <typename T>
 __aicore__ inline __check_sync_alias__ void TransDataTo5HD(
@@ -95,26 +102,32 @@ __aicore__ inline void Transpose(
     const TransposeParamsExt& transposeParams);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint8_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint8_t, Operand2>() && VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Transpose(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer,
-    const TransposeParamsExt& transposeParams);
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const TransposeParamsExt& transposeParams);
 #endif
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __check_sync_alias__ __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
     const LocalTensor<uint64_t>& dst, const LocalTensor<uint64_t>& src, const TransDataTo5HDParams& nchwconvParams);
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<uint64_t, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<uint64_t, Operand1>() && VectorOperand::IsWritable<Operand1>(), int>::type = 0>
-__aicore__ inline __check_sync_alias__ __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
-    Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams);
+template <
+    typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() && VectorOperand::Matches<uint64_t, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() && VectorOperand::Matches<uint64_t, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>(),
+        int>::type = 0>
+__aicore__ inline __check_sync_alias__ __in_pipe__(S)
+    __out_pipe__(V) void TransDataTo5HD(Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

@@ -52,14 +52,18 @@ __aicore__ inline void Scatter(
     const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Scatter(
-    Operand0 dst, Operand1 src, Operand2 dstOffset,
-    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride);
+    Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask,
+    const uint8_t repeatTime, const uint8_t srcRepStride);
 #endif
 
 /*
@@ -78,14 +82,18 @@ __aicore__ inline void Scatter(
     const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Scatter(
-    Operand0 dst, Operand1 src, Operand2 dstOffset,
-    const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride);
+    Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask[],
+    const uint8_t repeatTime, const uint8_t srcRepStride);
 #endif
 
 /*
@@ -116,14 +124,17 @@ __aicore__ inline void ScatterDataCopy(
 #endif
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>() && VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Scatter(
-    Operand0 dst, Operand1 src, Operand2 dstOffset,
-    const uint32_t dstBaseAddr, const uint32_t count);
+    Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint32_t count);
 #endif
 } // namespace AscendC
 #pragma end_pipe

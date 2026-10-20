@@ -123,10 +123,14 @@ __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>
     TransposeImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)src.GetPhyAddr());
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type>
 __aicore__ inline void Transpose(Operand0 dst, Operand1 src)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
@@ -135,7 +139,8 @@ __aicore__ inline void Transpose(Operand0 dst, Operand1 src)
             KERNEL_ERROR, "Failed to check dtype in Transpose, current api support dtype combination is "
                           "src and dst both: int16_t, uint16_t, half");
     });
-    TransposeImpl((__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
+    TransposeImpl(
+        (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
 }
 
 /* **************************************************************************************************
@@ -182,14 +187,17 @@ __aicore__ inline void TransDataTo5HD(
     TransDataTo5HDImpl(dstAddrList, srcAddrList, nchwconvParams);
 }
 
-template <typename T, typename Operand0, typename Operand1,
-    typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline void TransDataTo5HD(
-    const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE],
-    const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
+    const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE],
+    const TransDataTo5HDParams& nchwconvParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
 
@@ -296,14 +304,17 @@ __aicore__ inline void Transpose(
 }
 
 #if __NPU_ARCH__ == 3510
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint8_t, Operand2>() && VectorOperand::IsWritable<Operand2>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint8_t, Operand2>() && VectorOperand::IsWritable<Operand2>(),
+        int>::type>
 __aicore__ inline void Transpose(
-    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer,
-    const TransposeParamsExt& transposeParams)
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const TransposeParamsExt& transposeParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
@@ -321,7 +332,9 @@ __aicore__ inline void Transpose(
                               "current api support dtype combination is src and dst both: uint16_t");
         });
 #endif
-        TransposeImpl((__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
+        TransposeImpl(
+            (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst),
+            (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
     } else if (
         transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC ||
         transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
@@ -330,9 +343,11 @@ __aicore__ inline void Transpose(
             repeatParams.blockLen = transposeParams.nSize * transposeParams.cSize * transposeParams.hSize *
                                     transposeParams.wSize / AscendCUtils::GetC0Count(sizeof(PrimT<VectorElementT>));
             TransposeUB2UBImpl(
-                (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src), repeatParams);
+                (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst),
+                (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src), repeatParams);
         } else {
-            Transpose4DImpl(GetUnderlyingPtr(dst), GetUnderlyingPtr(src), GetUnderlyingPtr(sharedTmpBuffer), transposeParams);
+            Transpose4DImpl(
+                GetUnderlyingPtr(dst), GetUnderlyingPtr(src), GetUnderlyingPtr(sharedTmpBuffer), transposeParams);
         }
     }
 }
@@ -390,12 +405,15 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
 #endif
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<uint64_t, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<uint64_t, Operand1>() && VectorOperand::IsWritable<Operand1>(), int>::type>
-__aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
-    Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams)
+template <
+    typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() && VectorOperand::Matches<uint64_t, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() && VectorOperand::Matches<uint64_t, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>(),
+        int>::type>
+__aicore__ inline __in_pipe__(S)
+    __out_pipe__(V) void TransDataTo5HD(Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams)
 {
     constexpr uint32_t vaRegSize = VA_REG_ARRAY_LEN / HALF_FACTOR;
     constexpr uint32_t vaOne = 1;

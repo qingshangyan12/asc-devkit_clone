@@ -63,28 +63,38 @@ __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
     const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Compare(
-    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode,
-    const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
     const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Compare(
-    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode,
-    const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -92,14 +102,16 @@ __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[],
     const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compare(
-    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask[],
-    const BinaryRepeatParams& repeatParams);
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask[], const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -107,14 +119,16 @@ __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask,
     const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compare(
-    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask,
-    const BinaryRepeatParams& repeatParams);
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams);
 
 /*
  * @ingroup Compare Level 2
@@ -129,28 +143,39 @@ template <typename T, typename U>
 __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(), int>::type = 0>
-__aicore__ inline void Compare(
-    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, uint32_t count);
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, typename Operand0,
+    typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type = 0>
+__aicore__ inline void Compare(Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, uint32_t count);
 
 template <typename T>
 __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
 __aicore__ inline void GetCmpMask(Operand0 dst);
 
 template <typename T>
 __aicore__ inline void SetCmpMask(const LocalTensor<T>& src);
 
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>(),
+        int>::type = 0>
 __aicore__ inline void SetCmpMask(Operand0 src);
 
 /* **************************************************************************************************
@@ -260,16 +285,19 @@ __aicore__ inline void Select(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, SELMODE selMode,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, SELMODE selMode, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(
     2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src0, Operand2 src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(
@@ -278,16 +306,20 @@ __aicore__ inline void Select(
     const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, typename Operand0,
+    typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(
     2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(
-    Operand0 dst, Operand1 selMask, Operand2 src0, uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 selMask, Operand2 src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
  * @ingroup Select Level 2

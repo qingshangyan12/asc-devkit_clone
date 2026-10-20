@@ -58,14 +58,14 @@ struct MrgSort4Info {
     uint8_t repeatTimes = 1;
 };
 
-template <typename T, typename Source1 = LocalTensor<T>, typename Source2 = LocalTensor<T>,
-    typename Source3 = LocalTensor<T>, typename Source4 = LocalTensor<T>>
+template <
+    typename T, typename Source1 = LocalTensor<T>, typename Source2 = LocalTensor<T>, typename Source3 = LocalTensor<T>,
+    typename Source4 = LocalTensor<T>>
 struct MrgSortSrcList {
     __aicore__ MrgSortSrcList() {}
 
     __aicore__ MrgSortSrcList(
-        const Source1& src1In, const Source2& src2In, const Source3& src3In,
-        const Source4& src4In)
+        const Source1& src1In, const Source2& src2In, const Source3& src3In, const Source4& src4In)
     {
         src1 = src1In;
         src2 = src2In;

@@ -56,10 +56,15 @@ __aicore__ inline void Axpy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Axpy(
     Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
@@ -71,14 +76,19 @@ __aicore__ inline void Axpy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Axpy(
-    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
 
 /*
  * @ingroup Axpy Level 2
@@ -92,12 +102,16 @@ template <typename T, typename U>
 __aicore__ inline void Axpy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, const int32_t& count);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type = 0>
-__aicore__ inline void Axpy(
-    Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count);
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, typename Operand0,
+    typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__aicore__ inline void Axpy(Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count);
 } // namespace AscendC
 #pragma end_pipe
 

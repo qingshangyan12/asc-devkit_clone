@@ -42,14 +42,19 @@ __aicore__ inline void GatherMask(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1Pattern, const bool reduceMode,
     const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
 
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, GatherMaskMode mode = defaultGatherMaskMode,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    GatherMaskMode mode = defaultGatherMaskMode, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void GatherMask(
-    Operand0 dst, Operand1 src0, Operand2 src1Pattern, const bool reduceMode,
-    const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
+    Operand0 dst, Operand1 src0, Operand2 src1Pattern, const bool reduceMode, const uint32_t mask,
+    const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
 
 template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
 __ASC_USE_RESERVED_UBUF__(
@@ -58,15 +63,20 @@ __aicore__ inline void GatherMask(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t src1Pattern, const bool reduceMode,
     const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
 
-template <typename T = VectorOperand::DefaultType, GatherMaskMode mode = defaultGatherMaskMode,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, GatherMaskMode mode = defaultGatherMaskMode, typename Operand0,
+    typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(
     3510, "GatherMask is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void GatherMask(
-    Operand0 dst, Operand1 src0, const uint8_t src1Pattern, const bool reduceMode,
-    const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
+    Operand0 dst, Operand1 src0, const uint8_t src1Pattern, const bool reduceMode, const uint32_t mask,
+    const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt);
 #pragma end_pipe
 } // namespace AscendC
 #if defined(__NPU_ARCH__)

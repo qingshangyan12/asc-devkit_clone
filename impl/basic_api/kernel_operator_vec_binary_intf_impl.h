@@ -95,14 +95,18 @@ __aicore__ inline void Add(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Add(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -135,14 +139,18 @@ __aicore__ inline void Add(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Add(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -181,13 +189,16 @@ __aicore__ inline void Add(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Add(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Add(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -238,14 +249,18 @@ __aicore__ inline void Sub(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Sub(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -278,14 +293,18 @@ __aicore__ inline void Sub(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Sub(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -324,13 +343,16 @@ __aicore__ inline void Sub(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Sub(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Sub(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -381,14 +403,18 @@ __aicore__ inline void Mul(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Mul(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -421,14 +447,18 @@ __aicore__ inline void Mul(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Mul(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -467,13 +497,16 @@ __aicore__ inline void Mul(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Mul(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Mul(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -522,14 +555,18 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask, const DivConfig& config,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -558,14 +595,18 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask, const DivConfig& config,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -598,14 +639,18 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -638,14 +683,18 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -683,13 +732,16 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, const DivConfig& config,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -720,13 +772,16 @@ __aicore__ inline void Div(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -782,14 +837,18 @@ __aicore__ inline void MulAddDst(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
 __aicore__ inline void MulAddDst(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, const uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -829,14 +888,18 @@ __aicore__ inline void MulAddDst(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
 __aicore__ inline void MulAddDst(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -880,13 +943,16 @@ __aicore__ inline void MulAddDst(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
-__aicore__ inline void MulAddDst(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void MulAddDst(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -939,14 +1005,18 @@ __aicore__ inline void Max(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Max(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -979,14 +1049,18 @@ __aicore__ inline void Max(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Max(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1025,13 +1099,16 @@ __aicore__ inline void Max(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Max(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Max(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1082,14 +1159,18 @@ __aicore__ inline void Min(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Min(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1122,14 +1203,18 @@ __aicore__ inline void Min(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Min(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1168,13 +1253,16 @@ __aicore__ inline void Min(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Min(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Min(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1225,14 +1313,18 @@ __aicore__ inline void And(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void And(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1265,14 +1357,18 @@ __aicore__ inline void And(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void And(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1311,13 +1407,16 @@ __aicore__ inline void And(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void And(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void And(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1368,14 +1467,18 @@ __aicore__ inline void Or(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Or(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1408,14 +1511,18 @@ __aicore__ inline void Or(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void Or(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1454,13 +1561,16 @@ __aicore__ inline void Or(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Or(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Or(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1500,13 +1610,16 @@ __aicore__ inline void ShiftLeft(
         (__ubuf__ Src1PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(), int>::type>
-__aicore__ inline void ShiftLeft(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(),
+        int>::type>
+__aicore__ inline void ShiftLeft(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand2>;
@@ -1521,9 +1634,13 @@ __aicore__ inline void ShiftLeft(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "ShiftLeft");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     ShiftLeftImpl<Src0PrimType, Src1PrimType>(
         (__ubuf__ Src0PrimType*)GetUnderlyingPtr(dst), (__ubuf__ Src0PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1), count);
@@ -1557,13 +1674,16 @@ __aicore__ inline void ShiftRight(
         (__ubuf__ Src1PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(), int>::type>
-__aicore__ inline void ShiftRight(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand2>, Operand2>(),
+        int>::type>
+__aicore__ inline void ShiftRight(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand2>;
@@ -1578,9 +1698,13 @@ __aicore__ inline void ShiftRight(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "ShiftRight");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     ShiftRightImpl<Src0PrimType, Src1PrimType>(
         (__ubuf__ Src0PrimType*)GetUnderlyingPtr(dst), (__ubuf__ Src0PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1), count);
@@ -1634,14 +1758,18 @@ __aicore__ inline void AddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void AddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1684,14 +1812,18 @@ __aicore__ inline void AddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void AddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1732,13 +1864,16 @@ __aicore__ inline void AddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void AddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void AddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -1819,18 +1954,20 @@ __aicore__ inline void AddDeqRelu(
         mask, repeatTime, repeatParams);
 }
 
-template <bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<half, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<int32_t, Operand1>() &&
-        VectorOperand::Matches<int32_t, Operand2>(), int>::type>
+template <
+    bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() && VectorOperand::Matches<half, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() && VectorOperand::Matches<int32_t, Operand1>() &&
+            VectorOperand::Matches<int32_t, Operand2>(),
+        int>::type>
 __aicore__ inline void AddDeqRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     AddDeqReluImpl<isSetMask>(
-        (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0), (__ubuf__ int32_t*)GetUnderlyingPtr(src1),
-        mask, repeatTime, repeatParams);
+        (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0),
+        (__ubuf__ int32_t*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -1853,14 +1990,19 @@ __aicore__ inline void AddDeqRelu(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>() && !Std::is_same<T, VectorOperand::DefaultType>::value, int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>() &&
+            !Std::is_same<T, VectorOperand::DefaultType>::value,
+        int>::type>
 __aicore__ inline void AddDeqRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1889,18 +2031,20 @@ __aicore__ inline void AddDeqRelu(
         mask, repeatTime, repeatParams);
 }
 
-template <bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<half, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<int32_t, Operand1>() &&
-        VectorOperand::Matches<int32_t, Operand2>(), int>::type>
+template <
+    bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() && VectorOperand::Matches<half, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() && VectorOperand::Matches<int32_t, Operand1>() &&
+            VectorOperand::Matches<int32_t, Operand2>(),
+        int>::type>
 __aicore__ inline void AddDeqRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     AddDeqReluImpl<isSetMask>(
-        (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0), (__ubuf__ int32_t*)GetUnderlyingPtr(src1),
-        mask, repeatTime, repeatParams);
+        (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0),
+        (__ubuf__ int32_t*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -1923,14 +2067,19 @@ __aicore__ inline void AddDeqRelu(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>() && !Std::is_same<T, VectorOperand::DefaultType>::value, int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>() &&
+            !Std::is_same<T, VectorOperand::DefaultType>::value,
+        int>::type>
 __aicore__ inline void AddDeqRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -1999,13 +2148,16 @@ __aicore__ inline void AddDeqRelu(
         (__ubuf__ PrimSrcType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
-__aicore__ inline void AddDeqRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void AddDeqRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -2063,14 +2215,18 @@ __aicore__ inline void FusedMulAdd(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void FusedMulAdd(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2109,14 +2265,18 @@ __aicore__ inline void FusedMulAdd(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void FusedMulAdd(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2161,13 +2321,16 @@ __aicore__ inline void FusedMulAdd(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void FusedMulAdd(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void FusedMulAdd(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2225,14 +2388,18 @@ __aicore__ inline void MulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void MulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2272,14 +2439,18 @@ __aicore__ inline void MulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void MulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2320,14 +2491,18 @@ __aicore__ inline void FusedMulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void FusedMulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2368,14 +2543,18 @@ __aicore__ inline void FusedMulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void FusedMulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2421,13 +2600,16 @@ __aicore__ inline void MulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void MulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void MulAddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2468,13 +2650,16 @@ __aicore__ inline void FusedMulAddRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void FusedMulAddRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void FusedMulAddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2535,14 +2720,18 @@ __aicore__ inline void SubRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void SubRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2585,14 +2774,18 @@ __aicore__ inline void SubRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
 __aicore__ inline void SubRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2633,13 +2826,16 @@ __aicore__ inline void SubRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void SubRelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void SubRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2683,13 +2879,16 @@ __aicore__ inline void Prelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void Prelu(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Prelu(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2702,9 +2901,13 @@ __aicore__ inline void Prelu(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementT>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "Prelu");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     PreluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
@@ -2744,15 +2947,18 @@ __aicore__ inline void Mull(
         (__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(), int>::type>
-__aicore__ inline void Mull(
-    Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1,
-    const uint32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2, typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(),
+        int>::type>
+__aicore__ inline void Mull(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2769,7 +2975,9 @@ __aicore__ inline void Mull(
         CheckTensorPos<VectorElementT>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "Mull");
     }
     ASCENDC_ASSERT(
-        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst0, count) && VectorOperand::FitsCount(dst1, count)), {
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst0, count) && VectorOperand::FitsCount(dst1, count)),
+        {
             KERNEL_LOG(
                 KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst0 / dst1 / src0 / src1",
                 count);
@@ -2806,13 +3014,16 @@ __aicore__ inline void AbsSub(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void AbsSub(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void AbsSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2825,9 +3036,13 @@ __aicore__ inline void AbsSub(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementT>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "AbsSub");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     FusedAbsSubImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
@@ -2850,13 +3065,16 @@ __aicore__ inline void FusedAbsSub(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void FusedAbsSub(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void FusedAbsSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -2869,9 +3087,13 @@ __aicore__ inline void FusedAbsSub(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementT>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "FusedAbsSub");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     FusedAbsSubImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
@@ -2922,13 +3144,16 @@ __aicore__ inline void ExpSub(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
-__aicore__ inline void ExpSub(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void ExpSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -2943,9 +3168,13 @@ __aicore__ inline void ExpSub(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "ExpSub");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     static_assert(
         SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<float, half>, Tuple<float, float>>(),
@@ -2980,13 +3209,16 @@ __aicore__ inline void FusedExpSub(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type>
-__aicore__ inline void FusedExpSub(
-    Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void FusedExpSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
@@ -3001,9 +3233,13 @@ __aicore__ inline void FusedExpSub(
     if constexpr (!VectorOperand::Traits<Operand2>::isPointer) {
         CheckTensorPos<VectorElementU>(src1, Hardware::UB, "src1", "VECIN/VECCALC/VECOUT", "FusedExpSub");
     }
-    ASCENDC_ASSERT((VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) && VectorOperand::FitsCount(dst, count)), {
-        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-    });
+    ASCENDC_ASSERT(
+        (VectorOperand::FitsCount(src0, count) && VectorOperand::FitsCount(src1, count) &&
+         VectorOperand::FitsCount(dst, count)),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+        });
     FusedExpSubImpl<DstPrimType, SrcPrimType>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), count);

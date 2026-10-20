@@ -176,8 +176,8 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<int64_t> dstLocal, const i
     CreateVecIndexCalcVic<T>(dstLocalAddr, firstValue, calCount);
 }
 template <typename T>
-__aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, uint64_t mask,
-    uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+__aicore__ inline void CreateVecIndexCalc(
+    __ubuf__ T* dst, const T firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
     CheckCreateVecIndexApi0SupportedType<T>();
     Internal::VecCreateVecIndexLevel0Template<false>(
@@ -185,12 +185,12 @@ __aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, u
 }
 
 template <typename T>
-__aicore__ inline void CreateVecIndexCalc(__ubuf__ T* dst, const T firstValue, uint64_t mask[],
-    uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+__aicore__ inline void CreateVecIndexCalc(
+    __ubuf__ T* dst, const T firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
+    uint8_t dstRepStride)
 {
     CheckCreateVecIndexApi0SupportedType<T>();
-    Internal::VecCreateVecIndexLevel0Template<true>(
-        dst, firstValue, mask, 0, repeatTime, dstBlkStride, dstRepStride);
+    Internal::VecCreateVecIndexLevel0Template<true>(dst, firstValue, mask, 0, repeatTime, dstBlkStride, dstRepStride);
 }
 
 template <typename T>

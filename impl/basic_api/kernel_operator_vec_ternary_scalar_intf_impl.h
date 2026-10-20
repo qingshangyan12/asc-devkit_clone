@@ -90,10 +90,14 @@ __aicore__ inline void Axpy(
         (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void Axpy(
     Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
@@ -101,7 +105,8 @@ __aicore__ inline void Axpy(
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
-        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue, mask, repeatTime, repeatParams);
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -128,18 +133,23 @@ __aicore__ inline void Axpy(
         (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
 }
 
-template <typename T, typename U, bool isSetMask,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
 __aicore__ inline void Axpy(
-    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[],
-    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
-        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue, mask, repeatTime, repeatParams);
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        mask, repeatTime, repeatParams);
 }
 
 /*
@@ -169,16 +179,21 @@ __aicore__ inline void Axpy(
     AxpyImpl<T, U>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, count);
 }
 
-template <typename T, typename U,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(), int>::type>
-__aicore__ inline void Axpy(
-    Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count)
+template <
+    typename T, typename U, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Axpy(Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
-    AxpyImpl<VectorElementT, VectorElementU>((__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue, count);
+    AxpyImpl<VectorElementT, VectorElementU>(
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        count);
 }
 } // namespace AscendC
 #pragma end_pipe

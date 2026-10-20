@@ -55,14 +55,17 @@ __aicore__ inline void Gatherb(
     const GatherRepeatParams& repeatParams);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Gatherb(
-    Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime,
-    const GatherRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime, const GatherRepeatParams& repeatParams);
 #endif
 
 /*
@@ -82,14 +85,18 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Gather(
-    Operand0 dst, Operand1 src, Operand2 srcOffset,
-    const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask,
+    const uint8_t repeatTime, const uint16_t dstRepStride);
 #endif
 
 /*
@@ -109,14 +116,18 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Gather(
-    Operand0 dst, Operand1 src, Operand2 srcOffset,
-    const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask[],
+    const uint8_t repeatTime, const uint16_t dstRepStride);
 #endif
 
 /*
@@ -149,14 +160,17 @@ __aicore__ inline void GatherDataCopy(
 #endif
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-        VectorOperand::Matches<uint32_t, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type = 0>
 __aicore__ inline void Gather(
-    Operand0 dst, Operand1 src, Operand2 srcOffset,
-    const uint32_t srcBaseOffset, const uint32_t count);
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint32_t count);
 #endif
 } // namespace AscendC
 #pragma end_pipe

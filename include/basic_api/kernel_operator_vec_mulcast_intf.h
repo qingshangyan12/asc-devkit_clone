@@ -44,15 +44,20 @@ __aicore__ inline void MulCast(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulCast(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
 #endif
 
 template <typename T, typename U, bool isSetMask = true>
@@ -62,15 +67,20 @@ __aicore__ inline void MulCast(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
+    typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type = 0>
 __ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulCast(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
 #endif
 
 template <typename T, typename U>
@@ -78,13 +88,17 @@ __aicore__ inline void MulCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint32_t count);
 
 #if __NPU_ARCH__ == 3510
-template <typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(), int>::type = 0>
-__aicore__ inline void MulCast(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint32_t count);
+template <
+    typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, typename Operand0,
+    typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type = 0>
+__aicore__ inline void MulCast(Operand0 dst, Operand1 src0, Operand2 src1, uint32_t count);
 #endif
 } // namespace AscendC
 #pragma end_pipe

@@ -94,17 +94,22 @@ __aicore__ inline void Duplicate(
         (__ubuf__ T*)dst.GetPhyAddr(), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline void Duplicate(
-    Operand0 dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
-    const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+    Operand0 dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CheckDuplicateSupportedType<VectorElementT>();
     DuplicateImpl<VectorElementT, isSetMask>(
-        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride,
+        dstRepeatStride);
 }
 
 template <typename T, bool isSetMask>
@@ -131,17 +136,22 @@ __aicore__ inline void Duplicate(
         (__ubuf__ T*)dst.GetPhyAddr(), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
 }
 
-template <typename T, bool isSetMask,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, bool isSetMask, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline void Duplicate(
-    Operand0 dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
-    const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+    Operand0 dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CheckDuplicateSupportedType<VectorElementT>();
     DuplicateImpl<VectorElementT, isSetMask>(
-        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride,
+        dstRepeatStride);
 }
 
 /*
@@ -170,9 +180,13 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
     DuplicateImpl<T>((__ubuf__ T*)dst.GetPhyAddr(), scalarValue, count);
 }
 
-template <typename T,
-    typename Operand0, typename Std::enable_if<VectorOperand::HasPointer<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>(), int>::type>
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
 __aicore__ inline void Duplicate(Operand0 dst, const T& scalarValue, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
@@ -205,16 +219,21 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>
     DuplicateImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(), int>::type>
+template <
+    typename T, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type>
 __aicore__ inline void Duplicate(Operand0 dst, Operand1 src, const int32_t& count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     CheckDuplicateSupportedType<PrimType>();
-    DuplicateImpl<PrimType>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+    DuplicateImpl<PrimType>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 
 /* **************************************************************************************************
@@ -240,15 +259,18 @@ __aicore__ inline void Interleave(
         (__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(), int>::type>
-__aicore__ inline void Interleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1,
-    const int32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2, typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(),
+        int>::type>
+__aicore__ inline void Interleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -280,15 +302,18 @@ __aicore__ inline void DeInterleave(
         (__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Operand3, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(), int>::type>
-__aicore__ inline void DeInterleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1,
-    const int32_t count)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2, typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>(),
+        int>::type>
+__aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
@@ -315,13 +340,17 @@ __aicore__ inline void DeInterleave(
         (__ubuf__ PrimType*)src.GetPhyAddr(), srcCount);
 }
 
-template <typename T,
-    typename Operand0, typename Operand1, typename Operand2, typename Std::enable_if<VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() && VectorOperand::IsWritable<Operand0>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() && VectorOperand::IsWritable<Operand1>() &&
-        VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(), int>::type>
-__aicore__ inline void DeInterleave(
-    Operand0 dst0, Operand1 dst1, Operand2 src, const int32_t srcCount)
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::IsWritable<Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src, const int32_t srcCount)
 {
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
