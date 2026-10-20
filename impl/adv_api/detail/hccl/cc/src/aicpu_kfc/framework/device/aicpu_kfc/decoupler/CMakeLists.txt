@@ -102,6 +102,9 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu_new
+    # comm_kfc_open_kernel_executor.cc 经 mc2_aicpu_task_cache_runner.h 消费 asccomm 头
+    # （task_cache 提交生命周期 asccomm_batch_mode_start/end）；头路径与 mc2_server 同源
+    ${ASCCOMM_PRIMITIVES_HDR}
 )
 
 target_link_libraries(ccl_kernel_decoupler_open_exec PRIVATE
