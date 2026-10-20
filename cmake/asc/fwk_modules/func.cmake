@@ -239,7 +239,7 @@ function(simple_kernel_compile)
   # add Environment Variable Configurations of ccache
   set(_ASCENDC_ENV_VAR)
   if(${CMAKE_CXX_COMPILER_LAUNCHER} MATCHES "ccache$")
-    list(APPEND _ASCENDC_ENV_VAR export ASCENDC_CCACHE_EXECUTABLE=${CMAKE_CXX_COMPILER_LAUNCHER} &&)
+    list(APPEND _ASCENDC_ENV_VAR "ASCENDC_CCACHE_EXECUTABLE=${CMAKE_CXX_COMPILER_LAUNCHER}")
   endif()
 
   get_property(auto_gen_path GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_CODE_GEN_DIRS)
@@ -296,7 +296,7 @@ function(simple_kernel_compile)
       )
     else()
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
-                      COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
+                      COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
                       --compute-unit=${BINCMP_COMPUTE_UNIT}
@@ -359,7 +359,7 @@ function(simple_kernel_compile)
       )
     else()
       add_custom_target(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT}
-                      COMMAND ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
+                      COMMAND ${CMAKE_COMMAND} -E env ${_ASCENDC_ENV_VAR} ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_compile_kernel.py
                       --op-type=${BINCMP_OP_TYPE}
                       --src-file=${BINCMP_SRC}
                       --compute-unit=${BINCMP_COMPUTE_UNIT}
@@ -1880,6 +1880,10 @@ endif()
       if (${kernel_enable_binary_package})
         set(INSTALL_DIR packages/vendors/${current_target_vendor_name}/op_impl/ai_core/tbe/)
         foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
+          get_property(spec_chip_producers GLOBAL PROPERTY ${_ascendc_kernel_target}_ASCENDC_KERNEL_TARGETS_${compute_unit})
+          if(kernel_spec_mode AND NOT kernel_spec_mode STREQUAL "None" AND NOT spec_chip_producers)
+            continue()
+          endif()
           adapt_install_path(
             INPUT_PATH ${INSTALL_DIR}/kernel/${compute_unit}/
             INPUT_TARGET ${target_package_name}

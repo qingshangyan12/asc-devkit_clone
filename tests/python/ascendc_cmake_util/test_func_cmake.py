@@ -135,18 +135,24 @@ npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}/.")
 
 
 @pytest.mark.parametrize("cross_compile,skip_failed", [(False, False), (False, True), (True, False), (True, True)])
-def test_kernel_spec_parameters_reach_compile_command_directly(tmp_path, cross_compile, skip_failed):
+@pytest.mark.parametrize("use_ccache", [False, True])
+def test_kernel_spec_parameters_reach_compile_command_directly(tmp_path, cross_compile, skip_failed, use_ccache):
     scripts = tmp_path / "scripts"
     (scripts / "util").mkdir(parents=True)
+    launcher = scripts / "ccache"
+    launcher.write_text('#!/bin/sh\nexec "$@"\n')
+    launcher.chmod(0o755)
     (scripts / "util/ascendc_compile_kernel.py").write_text(
-        "import json,sys\nfrom pathlib import Path\n"
-        "Path(__file__).with_name('arguments.json').write_text(json.dumps(sys.argv[1:]))\n"
+        "import json,os,sys\nfrom pathlib import Path\n"
+        "Path(__file__).with_name('arguments.json').write_text(json.dumps(\n"
+        "    {'args': sys.argv[1:], 'ccache': os.environ.get('ASCENDC_CCACHE_EXECUTABLE')}))\n"
     )
     root = tmp_path / "resource root"
     (tmp_path / "stub.cpp").write_text("int stub() { return 0; }\n")
     (tmp_path / "CMakeLists.txt").write_text(
         f'''cmake_minimum_required(VERSION 3.16)
 project(direct_spec_options CXX)
+set(CMAKE_CXX_COMPILER_LAUNCHER "{launcher if use_ccache else ""}")
 include("{FWK_MODULES_DIR / "func.cmake"}")
 set(ASCENDC_CMAKE_SCRIPTS_PATH "{scripts}")
 set(ASCEND_PYTHON_EXECUTABLE python3)
@@ -171,6 +177,9 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     ]:
         result = subprocess.run(command, text=True, capture_output=True)
         assert result.returncode == 0, result.stdout + result.stderr
-    arguments = json.loads((scripts / "util/arguments.json").read_text())
+    recorded = json.loads((scripts / "util/arguments.json").read_text())
+    if use_ccache:
+        assert recorded["ccache"] == str(launcher)
+    arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-build={root}" in arguments

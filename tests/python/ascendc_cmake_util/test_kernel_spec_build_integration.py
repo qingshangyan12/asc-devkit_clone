@@ -215,7 +215,7 @@ def test_package_builds_use_fresh_directories_and_install_resources(project):
     assert (build / "kernel_a/binary/dynamic/add.cpp").read_text() == "changed source"
 
 
-def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
+def test_skipped_producers_remove_old_result_and_reconfigure_requires_build(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
@@ -224,16 +224,17 @@ def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
     work = build / "demo/kernel_spec_bundle"
     previous_build = json.loads((work / "current_build.json").read_text())["directory"]
     (source / "fail").touch()
-    result = _build(build, success=False)
+    result = _build(build)
     assert "producer did not complete" in result.stderr
-    failed_build = json.loads((work / "current_build.json").read_text())["directory"]
-    assert failed_build != previous_build
-    assert not (Path(failed_build) / "op_spec/libcust_compile_resource.so").exists()
-    assert not (work / "install.cmake").exists()
-    _install(build, prefix, success=False)
-    assert installed.read_bytes() == previous
+    skipped_build = json.loads((work / "current_build.json").read_text())["directory"]
+    assert skipped_build != previous_build
+    assert not (Path(skipped_build) / "op_spec/libcust_compile_resource.so").exists()
+    _install(build, prefix)
+    assert not installed.exists()
     (source / "fail").unlink()
     _build(build)
+    _install(build, prefix)
+    assert installed.read_bytes() == previous
     _configure(source, build, "-DSPEC_MODE=Normal")
     _install(build, prefix, success=False)
     assert installed.read_bytes() == previous

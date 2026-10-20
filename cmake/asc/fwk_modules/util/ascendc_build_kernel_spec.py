@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 import fcntl
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path, PurePosixPath
 import shutil
@@ -311,7 +312,8 @@ class KernelSpecBundleBuilder:
         for directory in sorted(set(self.input_dir)):
             manifests = [p for p in _files(directory) if p.name.endswith("_manifest.json")]
             if not manifests:
-                raise BundleError(f"no manifests in input directory: {directory}")
+                logging.warning("Kernel Spec: no manifests in input directory, skipping: %s", directory)
+                continue
             for path in manifests:
                 manifest = json.loads(path.read_text(encoding="utf-8"))
                 resource_id = manifest.get("resource_id")
@@ -335,7 +337,7 @@ class KernelSpecBundleBuilder:
         return sorted(units, key=lambda item: (item[0], str(item[1].manifest_path)))
 
     def build(self):
-        """Collect delivery inputs and publish a newly exported RUN SO."""
+        """Return whether a RUN resource SO was exported from the delivery inputs."""
         output = _checked_path(self.output)
         if output.suffix != ".so":
             raise BundleError("RUN resource output must have the .so suffix")
@@ -354,6 +356,9 @@ class KernelSpecBundleBuilder:
     def _export(self, output, work):
         mapper = KernelSpecSourceMapper(self.source_map, self.source_file)
         units = self._collect(mapper)
+        if not units:
+            output.unlink(missing_ok=True)
+            return False
         tools = {name: _tool(getattr(self, name)) for name in ("exporter", "cxx", "make")}
         keep = _keep_temp(self.opc_config)
         if self.jobs < 1:
@@ -394,6 +399,7 @@ class KernelSpecBundleBuilder:
                 raise BundleError(f"exporter failed ({result.returncode}): {detail}")
             with open(_checked_path(staged), "rb") as source:
                 _atomic_write(output, lambda stream: shutil.copyfileobj(source, stream))
+            return True
         finally:
             if keep:
                 print(f"Kernel Spec diagnostics retained: {bundle_dir}")
@@ -413,6 +419,7 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
     source_bindings = {}
     configs = []
     for context in contexts:
+        maps.extend(context.get("source_maps", ()))
         tasks = context["tasks"]
         if not tasks:
             continue
@@ -424,7 +431,8 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
             task_root = task_directory(str(directory), op_type, soc)
             receipt = task_root / ".producer-success"
             if not receipt.is_file():
-                raise ValueError("Kernel Spec producer did not complete: " + op_type + "/" + soc)
+                logging.warning("Kernel Spec producer did not complete, skipping: %s/%s", op_type, soc)
+                continue
             source = Path(receipt.read_text(encoding="utf-8"))
             relative = source.relative_to(source_root)
             # The source map describes the existing source installation, not a guessed new layout.
@@ -436,7 +444,7 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
                 raise BundleError(f"conflicting producer source for {input_root}")
             source_bindings[input_root] = str(source)
             inputs.append(input_root)
-    if not configs:
+    if not inputs:
         build_directory.write_install_entry()
         return
 
@@ -445,7 +453,7 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
     combined_config.write_text(
         "\n".join(Path(config).read_text(encoding="utf-8") for config in sorted(set(configs))), encoding="utf-8"
     )
-    KernelSpecBundleBuilder(
+    exported = KernelSpecBundleBuilder(
         input_dir=inputs,
         source_file=sorted(sources),
         source_map=maps,
@@ -457,7 +465,7 @@ def bundle_resources(build_config, work_dir, exporter, cxx, make):
         opc_config=str(combined_config),
         source_bindings=source_bindings,
     ).build()
-    build_directory.write_install_entry(output)
+    build_directory.write_install_entry(output if exported else None)
 
 
 def main():
