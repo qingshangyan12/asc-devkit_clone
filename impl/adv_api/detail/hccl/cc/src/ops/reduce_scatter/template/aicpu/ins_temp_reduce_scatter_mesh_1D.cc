@@ -9,6 +9,7 @@
  */
 
 #include "aicpu/ins_temp_reduce_scatter_mesh_1D.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterMesh1D::InsTempReduceScatterMesh1D(
@@ -90,8 +91,8 @@ HcclResult InsTempReduceScatterMesh1D::KernelRun(
     }
     if (dataType_ == HCCL_DATA_TYPE_INT64 || dataType_ == HCCL_DATA_TYPE_UINT64 || dataType_ == HCCL_DATA_TYPE_FP64 ||
         reduceOp_ == HcclReduceOp::HCCL_REDUCE_PROD) {
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag)));
         for (const auto& thread : templateResource.threads) {
             CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
         }
@@ -145,8 +146,8 @@ HcclResult InsTempReduceScatterMesh1D::PostCopy(
         }
         if (dataType_ == HCCL_DATA_TYPE_INT64 || dataType_ == HCCL_DATA_TYPE_UINT64 ||
             dataType_ == HCCL_DATA_TYPE_FP64 || reduceOp_ == HcclReduceOp::HCCL_REDUCE_PROD) {
-            CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
-            CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+            CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag)));
+            CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag)));
             for (const auto& thread : threads) {
                 CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
             }

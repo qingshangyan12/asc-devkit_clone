@@ -10,6 +10,7 @@
 
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
 #include "alg_data_trans_wrapper.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 InsTempAllReduceMesh1DOneShot::InsTempAllReduceMesh1DOneShot(
@@ -169,8 +170,8 @@ HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(
         DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
 
     if (needAicpuReduce_) {
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag)));
         for (const auto& thread : threads) {
             CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
         }

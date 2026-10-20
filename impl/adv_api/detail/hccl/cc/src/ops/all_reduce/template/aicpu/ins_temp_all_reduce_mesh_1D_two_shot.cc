@@ -9,6 +9,7 @@
  */
 
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 
@@ -186,8 +187,8 @@ HcclResult InsTempAllReduceMesh1DTwoShot::RunReduceScatter(
     // 增加thread synchronize以支持64类数据类型
     if (needAicpuReduce_) {
         // 启动任务并等待所有threads任务执行完成
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag)));
         for (const auto& thread : threads) {
             CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
         }
