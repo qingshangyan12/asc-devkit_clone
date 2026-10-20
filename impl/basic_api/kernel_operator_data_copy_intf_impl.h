@@ -512,8 +512,7 @@ __aicore__ inline void DataCopy(
                 "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
 #if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
     (__NPU_ARCH__ == 5162)
-            DataCopyL12FBImpl(
-                (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DataCopyL12FBImpl((uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #else
             DataCopyL12FBImpl(
                 (__fbuf__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
