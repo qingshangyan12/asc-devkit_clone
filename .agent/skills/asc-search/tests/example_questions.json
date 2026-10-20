@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "id": "EX01",
+      "prompt": "CANN 9.2.0、3510 架构，用 C API 实现同步场景的 Add 算子（RegBase）：GM 数据搬入 UB、读入矢量寄存器、按掩码逐元素相加后写回并搬回 GM，需要查哪些搬运、掩码、计算与同步接口？"
+    },
+    {
+      "id": "EX02",
+      "prompt": "CANN 9.2.0、3510 架构，用 C API 实现 C = A×B + Bias 的 Mmad 样例涉及哪些接口？int8_t、bfloat16、float 三种数据类型场景的流水线为何拆分到 mmad_s1/s2/s3.h？"
+    },
+    {
+      "id": "EX03",
+      "prompt": "CANN 9.2.0、3510 架构，A/B 为 FP4/FP8、Scale 为 fp8_e8m0_t 数据类型的 MX 量化矩阵乘如何用 C API 实现？需要哪些 Mmad 与搬运接口？"
+    },
+    {
+      "id": "EX04",
+      "prompt": "CANN 9.2.0、3510 架构，data_copy_gm2l1 样例支持哪些输入格式（Nz/ND/DN）与向量量化参数搬入？从 GM 搬运到 Fixpipe 结果写回的完整链路用了哪些接口？"
+    },
+    {
+      "id": "EX05",
+      "prompt": "CANN 9.2.0、3510 架构，如何将 L0C 中的矩阵乘结果搬运到 UB，并在搬运过程中完成标量/Vector 量化、ReLU 激活与 NZ2ND 格式转换？"
+    },
+    {
+      "id": "EX06",
+      "prompt": "CANN 9.2.0、3510 架构，Reg 矢量计算中 UB 与矢量寄存器之间的对齐 load/store 有哪些寻址与数据分布场景？各场景应组合哪些接口？"
+    },
+    {
+      "id": "EX07",
+      "prompt": "CANN 9.2.0、3510 架构，asc_mmad 的 M/N/K 分块参数与 unit_flag 如何配置？样例如何准备 L0A/L0B 数据并在 L0C 取得结果？"
+    },
+    {
+      "id": "EX08",
+      "prompt": "CANN 9.2.0、3510 架构，asc_copy_l0c2gm 的随路量化、随路 ReLU 与 NZ2ND 格式转换如何配置？与 asc_set_l0c_copy_config 等接口是什么依赖关系？"
+    },
+    {
+      "id": "EX09",
+      "prompt": "CANN 9.2.0、3510 架构，asc_select 的掩码从哪里来（比较结果或 asc_set_cmp_mask）？如何按掩码在两个源操作数之间选择元素？"
+    },
+    {
+      "id": "EX10",
+      "prompt": "CANN 9.2.0、3510 架构，直方图统计如何使用 asc_frequency_histogram 的 bin0/bin1 形式？统计结果如何搬运回 GM 并校验？"
+    }
+  ]
+}
