@@ -16,6 +16,7 @@
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "hcomm_primitives.h"
+#include "asccomm_primitives.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
@@ -349,7 +350,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_DEBUG(
             "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
             CUSTOM_TIMEOUT);
-        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+        CHK_RET(static_cast<HcclResult>(asccomm_thread_notify_wait_on_thread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
 
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
         if (executor.get() == nullptr) {
@@ -373,7 +374,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
             exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
         CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+            asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
         // 上报主流和最后一个task 在notify之后
         if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
@@ -421,8 +422,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_DEBUG(
                 "[%s]Notify wait on thread[%llu], notifyNumOnMainThread[%u], timeout[%u]", __func__, thread,
                 notifyNumOnMainThread, CUSTOM_TIMEOUT);
-            CHK_RET(
-                static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, notifyNumOnMainThread, CUSTOM_TIMEOUT)));
+            CHK_RET(static_cast<HcclResult>(
+                asccomm_thread_notify_wait_on_thread(thread, notifyNumOnMainThread, CUSTOM_TIMEOUT)));
         } else {
             if (HcommAclrtNotifyWaitOnThread(thread, resCtx->notifyIds[0], CUSTOM_TIMEOUT) != HCCL_SUCCESS) {
                 HCCL_ERROR("failed to wait notify[%d] from host main stream", resCtx->notifyIds[0]);
@@ -460,7 +461,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
                 exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
             CHK_RET(static_cast<HcclResult>(
-                HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+                asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
             // 上报主流和最后一个task 在notify之后
             if (HcommProfilingReportMainStreamAndLastTask(thread) != HCCL_SUCCESS) {
