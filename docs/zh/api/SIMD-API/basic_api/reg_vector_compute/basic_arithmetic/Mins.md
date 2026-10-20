@@ -26,9 +26,15 @@
 <!-- npu="9050" id8 -->
 - Kirin 9050处理器系列产品：支持
 <!-- end id8 -->
+<!-- npu="9020" id13 -->
 - Kirin 9020处理器系列产品：支持
+<!-- end id13 -->
+<!-- npu="9030" id14 -->
 - Kirin 9030处理器系列产品：支持
+<!-- end id14 -->
+<!-- npu="x90" id15 -->
 - Kirin X90处理器系列产品：支持
+<!-- end id15 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
 <!-- end id9 -->
@@ -80,7 +86,15 @@ __simd_callee__ inline void Mins(S& dstReg, S& srcReg, U scalarValue, MaskReg& m
 ## 数据类型
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
-- 针对Kirin 9020处理器系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- npu="9020" id12 -->
+- 针对Kirin 9020处理器系列产品，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id12 -->
+<!-- npu="9030" id16 -->
+- 针对Kirin 9030处理器系列产品，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
+- 针对Kirin X90处理器系列产品，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id17 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

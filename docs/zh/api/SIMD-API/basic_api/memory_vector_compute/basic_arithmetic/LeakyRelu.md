@@ -29,7 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id10 -->
 - Kirin 9020处理器系列产品：支持
+<!-- end id10 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/LeakyRelu_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>

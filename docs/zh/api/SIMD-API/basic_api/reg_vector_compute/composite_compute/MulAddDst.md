@@ -42,7 +42,7 @@
 - Kirin 9030处理器系列产品：支持
 <!-- end id14 -->
 <!-- npu="x90" id15 -->
-- Kirin x90处理器系列产品：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/MulAddDst_res.md#id1 -->
 
@@ -110,6 +110,12 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 <!-- npu="9020" id13 -->
 - 针对Kirin 9020处理器系列产品，支持的数据类型为：half、float。
 <!-- end id13 -->
+<!-- npu="9030" id16 -->
+- 针对Kirin 9030处理器系列产品，支持的数据类型为：half、float。
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
+- 针对Kirin X90处理器系列产品，支持的数据类型为：half、float。
+<!-- end id17 -->
 
 ## 关键特性说明
 

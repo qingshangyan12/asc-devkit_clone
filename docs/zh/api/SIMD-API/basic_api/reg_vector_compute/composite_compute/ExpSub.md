@@ -42,7 +42,7 @@
 - Kirin 9030处理器系列产品：支持
 <!-- end id13 -->
 <!-- npu="x90" id14 -->
-- Kirin x90处理器系列产品：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/ExpSub_res.md#id1 -->
 
