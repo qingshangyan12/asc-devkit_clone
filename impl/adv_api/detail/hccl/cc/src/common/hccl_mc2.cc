@@ -44,6 +44,8 @@ const char* GetMc2OpTypeName(HcclCMDType opType)
             return "AllToAll";
         case HcclCMDType::HCCL_CMD_ALLTOALLV:
             return "AllToAllV";
+        case HcclCMDType::HCCL_CMD_HALF_ALLTOALLV:
+            return "AllToAllvWrite";
         default:
             return "Unknown";
     }

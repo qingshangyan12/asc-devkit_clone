@@ -38,3 +38,7 @@ docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
 oat_reports/
 
 log/
+
+build_claude/
+build_ut_ccu/
+build_stage31/

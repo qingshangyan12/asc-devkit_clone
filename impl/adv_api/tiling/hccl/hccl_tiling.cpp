@@ -49,7 +49,8 @@ static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuSchedReduceScatterSoleNHRMultiLink",
     "CcuSchedAllToAllSoleMeshConcurrent",
     "CcuSchedReduceScatterConcurMeshNHRMultiLink",
-    "CcuSchedReduceScatterSoleNHR"};
+    "CcuSchedReduceScatterSoleNHR",
+    "CcuHalfAll2AllVMesh1D"};
 
 // 外部名先过语法校验：语法错不设101（version影响CCU链后续流程），词法错误明细由mc2侧报出。
 // commEngine 非 CCU 系直接 false——version=101 仅 CCU 链消费。
