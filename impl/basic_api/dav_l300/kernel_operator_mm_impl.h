@@ -459,7 +459,12 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    mad(c, a, b, config);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, config);
+    } else {
+        mad(c, a, b, config);
+    }
 }
 
 template <typename U, typename S>
@@ -484,13 +489,23 @@ __aicore__ inline void MmadCal(
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    mad(c, a, b, bias, config);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, config);
+    } else {
+        mad(c, a, b, bias, config);
+    }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    mad(c, a, b, mmadParams.GetConfig0());
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, mmadParams.GetConfig0());
+    }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -498,7 +513,12 @@ __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
     mmadParams.SetCmatrixInitVal(false);
-    mad(c, a, b, bias, mmadParams.GetConfig0());
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, bias, mmadParams.GetConfig0());
+    }
 }
 
 /* **************************************************************************************************
