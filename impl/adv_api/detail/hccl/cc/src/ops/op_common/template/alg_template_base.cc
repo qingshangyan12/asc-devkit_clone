@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "alg_template_base.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 AlgTemplateBase::AlgTemplateBase()
@@ -78,12 +79,13 @@ HcclResult AlgTemplateBase::RunAsync(const u32 rank, const u32 rankSize, std::ve
 
 HcclResult AlgTemplateBase::ExecuteBarrier(ChannelInfo& channel, ThreadHandle thread) const
 {
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, channel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, channel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, channel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, channel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+        asccomm_channel_notify_wait_on_thread(thread, channel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, channel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, channel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, channel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
 
     return HCCL_SUCCESS;
 }
@@ -96,15 +98,16 @@ HcclResult AlgTemplateBase::ExecuteBarrier(ChannelInfo& preChannel, ChannelInfo&
 HcclResult AlgTemplateBase::ExecuteBarrier(ChannelInfo& preChannel, ChannelInfo& aftChannel, ThreadHandle thread) const
 {
     // 同步与preChannel保证数据收发已结束
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, preChannel.handle, NOTIFY_IDX_ACK)));
+    CHK_RET(
+        static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, preChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, aftChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_wait_on_thread(thread, aftChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
 
     // 同步与aftChannel保证数据收发已结束
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, aftChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     CHK_RET(static_cast<HcclResult>(
-        HcommChannelNotifyWaitOnThread(thread, preChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
+        asccomm_channel_notify_record_on_thread(thread, aftChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, preChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
 
     return HCCL_SUCCESS;
 }
@@ -117,16 +120,16 @@ HcclResult AlgTemplateBase::ExecuteBarrier(ChannelInfo& preChannel, ChannelInfo&
 HcclResult AlgTemplateBase::ExecuteBarrier(
     ChannelInfo& preChannel, ChannelInfo& aftChannel, u32 notifyIdx, ThreadHandle thread) const
 {
-    CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, aftChannel.handle, notifyIdx)));
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyWaitOnThread(thread, preChannel.handle, notifyIdx, CUSTOM_TIMEOUT)));
+    CHK_RET(static_cast<HcclResult>(asccomm_channel_notify_record_on_thread(thread, aftChannel.handle, notifyIdx)));
+    CHK_RET(static_cast<HcclResult>(
+        asccomm_channel_notify_wait_on_thread(thread, preChannel.handle, notifyIdx, CUSTOM_TIMEOUT)));
 
     return HCCL_SUCCESS;
 }
 
 HcclResult AlgTemplateBase::ExecEmptyTask(HcclMem& inputMem, HcclMem& outputMem, ThreadHandle thread)
 {
-    CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(thread, outputMem.addr, inputMem.addr, 0)));
+    CHK_RET(static_cast<HcclResult>(asccomm_local_copy_on_thread(thread, outputMem.addr, inputMem.addr, 0)));
     return HCCL_SUCCESS;
 }
 
