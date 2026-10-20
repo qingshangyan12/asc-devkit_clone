@@ -159,14 +159,29 @@ def test_exporter_failure_preserves_output_and_cleans_bundle_dir(bundle_request)
     assert not list(Path(bundle_request.work_dir).glob(".bundle-*"))
 
 
-@pytest.mark.parametrize("case", ["empty", "missing", "resource_escape", "source_escape", "symlink"])
+@pytest.mark.parametrize("empty_only", [False, True])
+def test_empty_resource_directories_are_skipped(bundle_request, tmp_path, caplog, empty_only):
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    bundle_request.input_dir = [str(empty)] if empty_only else bundle_request.input_dir + [str(empty)]
+    output = Path(bundle_request.output)
+    if empty_only:
+        output.parent.mkdir(parents=True)
+        output.write_bytes(b"stale")
+        bundle_request.exporter = "missing-exporter"
+    assert bundle_request.build() is (not empty_only)
+    assert "no manifests" in caplog.text
+    if empty_only:
+        assert not output.exists()
+    else:
+        assert len(_published(bundle_request)) == 1
+
+
+@pytest.mark.parametrize("case", ["missing", "resource_escape", "source_escape", "symlink"])
 def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
     manifest = json.loads(path.read_text())
-    if case == "empty":
-        bundle_request.input_dir.append(str(tmp_path / "empty"))
-        (tmp_path / "empty").mkdir()
-    elif case == "missing":
+    if case == "missing":
         bundle_request.input_dir.append(str(tmp_path / "missing"))
     elif case == "resource_escape":
         manifest["resource_path"] = "../resources"

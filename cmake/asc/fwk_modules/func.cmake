@@ -1880,6 +1880,10 @@ endif()
       if (${kernel_enable_binary_package})
         set(INSTALL_DIR packages/vendors/${current_target_vendor_name}/op_impl/ai_core/tbe/)
         foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
+          get_property(spec_chip_producers GLOBAL PROPERTY ${_ascendc_kernel_target}_ASCENDC_KERNEL_TARGETS_${compute_unit})
+          if(kernel_spec_mode AND NOT kernel_spec_mode STREQUAL "None" AND NOT spec_chip_producers)
+            continue()
+          endif()
           adapt_install_path(
             INPUT_PATH ${INSTALL_DIR}/kernel/${compute_unit}/
             INPUT_TARGET ${target_package_name}
