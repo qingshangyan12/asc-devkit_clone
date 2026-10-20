@@ -33,6 +33,11 @@
 namespace AscendC {
 namespace Reg {
 namespace Internal {
+constexpr CastTrait expHalf2FloatCastTrait = {
+    RegLayout::ZERO, SatMode::UNKNOWN, MaskMergeMode::ZEROING, RoundMode::CAST_NONE};
+constexpr CastTrait expFloat2HalfCastTrait = {
+    RegLayout::ZERO, SatMode::SAT, MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
+
 __aicore__ inline constexpr SqrtSpecificMode GetSqrtSpecificMode(MaskMergeMode mrgMode)
 {
     return {.mrgMode = mrgMode, .precisionMode = false, .algo = SqrtAlgo::INTRINSIC};
@@ -261,29 +266,28 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
         SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
         "current Exp api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.precision == ExpPrecision::HIGH && SupportType<ActualT, half>) {
-        constexpr CastTrait half2floatTrait = {
-            RegLayout::ZERO, SatMode::UNKNOWN, MaskMergeMode::ZEROING, RoundMode::CAST_NONE};
-        constexpr CastTrait float2halfTrait = {
-            RegLayout::ZERO, SatMode::SAT, MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
+    if constexpr (sprMode.precision == ExpPrecision::HIGH && SupportType<ActualT, half>()) {
         static constexpr ExpSpecificMode normalMode = {sprMode.mrgMode, sprMode.algo, ExpPrecision::NORMAL};
         RegTensor<float> f32Src;
         RegTensor<float> f32Dst;
         RegTensor<half> f16Tmp;
+        MaskReg f32Mask;
 
+        UnPack<HighLowPart::LOWEST>(f32Mask, mask);
         UnPack<uint32_t, uint16_t, HighLowPart::LOWEST>(
             (RegTensor<uint32_t>&)f16Tmp, (RegTensor<uint16_t>&)srcReg);
-        Cast<float, half, half2floatTrait>(f32Src, f16Tmp, mask);
-        ExpImpl<DefaultType, &normalMode, RegTensor<float>>(f32Dst, f32Src, mask);
-        Cast<half, float, float2halfTrait>(f16Tmp, f32Dst, mask);
+        Cast<float, half, Internal::expHalf2FloatCastTrait>(f32Src, f16Tmp, f32Mask);
+        ExpImpl<DefaultType, &normalMode, RegTensor<float>>(f32Dst, f32Src, f32Mask);
+        Cast<half, float, Internal::expFloat2HalfCastTrait>(f16Tmp, f32Dst, f32Mask);
         Pack<uint16_t, uint32_t, HighLowPart::LOWEST>(
             (RegTensor<uint16_t>&)dstReg, (RegTensor<uint32_t>&)f16Tmp);
 
+        UnPack<HighLowPart::HIGHEST>(f32Mask, mask);
         UnPack<uint32_t, uint16_t, HighLowPart::HIGHEST>(
             (RegTensor<uint32_t>&)f16Tmp, (RegTensor<uint16_t>&)srcReg);
-        Cast<float, half, half2floatTrait>(f32Src, f16Tmp, mask);
-        ExpImpl<DefaultType, &normalMode, RegTensor<float>>(f32Dst, f32Src, mask);
-        Cast<half, float, float2halfTrait>(f16Tmp, f32Dst, mask);
+        Cast<float, half, Internal::expHalf2FloatCastTrait>(f32Src, f16Tmp, f32Mask);
+        ExpImpl<DefaultType, &normalMode, RegTensor<float>>(f32Dst, f32Src, f32Mask);
+        Cast<half, float, Internal::expFloat2HalfCastTrait>(f16Tmp, f32Dst, f32Mask);
         Pack<uint16_t, uint32_t, HighLowPart::HIGHEST>(
             (RegTensor<uint16_t>&)dstReg, (RegTensor<uint32_t>&)f16Tmp);
     } else if constexpr (sprMode.algo == ExpAlgo::PRECISION_1ULP_FTZ_FALSE) {
