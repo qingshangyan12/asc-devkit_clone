@@ -37,8 +37,10 @@ SelectorStatus AlltoAllAutoSelector::SelectMultiLevelAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->userRankSize <= 64U) {
-        selectAlgName = "CcuSchedAllToAllSoleMesh2Die";
-        HCCL_WARNING("[AlltoAllAutoSelector][%s] algo[%s] not registered, fallback.", __func__, selectAlgName.c_str());
+        // 对齐 hccl：多级 MESH_1D≤64 对应 MultiLink；未注册 → NOT_MATCH（报错由框架统一处理）
+        selectAlgName = "CcuSchedAllToAllSoleMeshMultiLink";
+        HCCL_WARNING(
+            "[AlltoAllAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
         return SelectorStatus::NOT_MATCH;
     }
     if (topoInfo->level0Topo == Level0Shape::CLOS) {
@@ -56,7 +58,7 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
         if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
             selectAlgName = "CcuSchedAllToAllSoleMesh";
             HCCL_WARNING(
-                "[AlltoAllAutoSelector][%s] algo[%s] not registered, fallback.", __func__, selectAlgName.c_str());
+                "[AlltoAllAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
             return SelectorStatus::NOT_MATCH;
         }
         HCCL_WARNING("[AlltoAllAutoSelector] pcie mixed topo is not supported yet for ccu schedule mode.");
@@ -89,7 +91,7 @@ SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(
         if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_REGULAR) {
             selectAlgName = "CcuSchedAllToAllSoleMesh2Die";
             HCCL_WARNING(
-                "[AlltoAllAutoSelector][%s] algo[%s] not registered, fallback.", __func__, selectAlgName.c_str());
+                "[AlltoAllAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
             return SelectorStatus::NOT_MATCH;
         }
         if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
@@ -100,7 +102,7 @@ SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(
         if (IsDevType960() && dataSize > SMALL_COUNT_16M && IsTwoLevelNetLayer(topoInfo)) {
             selectAlgName = "CcuSchedAllToAllSoleMeshConcur";
             HCCL_WARNING(
-                "[AlltoAllAutoSelector][%s] algo[%s] not registered, fallback.", __func__, selectAlgName.c_str());
+                "[AlltoAllAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
             return SelectorStatus::NOT_MATCH;
         } else {
             selectAlgName = "CcuSchedAllToAllSoleMesh";
@@ -136,6 +138,12 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
         if (topoInfo->level0PcieMix) {
             selectAlgName = "AicpuAllToAllSoleMesh";
             HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
+            return SelectorStatus::MATCH;
+        }
+        // 对齐 hccl：多级 MESH_1D_CLOS 走 SoleMesh，不进入单级 Concurrent/UBX 判断
+        if (topoInfo->topoLevelNums > 1U) {
+            selectAlgName = "AicpuAllToAllSoleMesh";
+            HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
             return SelectorStatus::MATCH;
         }
     }

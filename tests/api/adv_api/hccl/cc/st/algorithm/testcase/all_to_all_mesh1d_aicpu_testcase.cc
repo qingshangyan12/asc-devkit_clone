@@ -260,4 +260,28 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_mesh1d_clos_nullptr_sendcounts_selec
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "CcuSchedAllToAllMesh1DMultiJetty"); // dataSize=0 → 非并发
 }
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_selects_sole_mesh)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U;                      // 多级
+    u64 sendCounts[4] = {600U, 600U, 600U, 600U}; // 单级时 600>512 会选 Concurrent
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMesh"); // 多级对齐 hccl：不做 Concurrent 判断
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_multilevel_mesh1d_falls_back_to_aicpu_sole_mesh)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U, 2U); // 多级 MESH_1D ≤64
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
+    std::string algName;
+    // CCU MultiLink 未注册 → NOT_MATCH → AICPU 兜底 MESH_1D → SoleMesh（路径守护用例）
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMesh");
+}
 } // namespace checker
