@@ -11,6 +11,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "channel.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -62,6 +63,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherNHR1DMultiJettyMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel);
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
