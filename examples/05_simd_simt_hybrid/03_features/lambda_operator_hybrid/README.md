@@ -37,9 +37,9 @@ Host生成取值覆盖`[-5, 5]`的输入`x[i] = (i*7) % 11 - 5`，覆盖正数�
 |---|---|---|---|
 | SIMT VF `simt_leaky_affine_vf` | 每核1024线程，每线程1元素 | `leaky`与`affine`值捕获超参；`tally`引用捕获线程私有计数；`fused`引用捕获三个内层闭包单遍融合；`asc_atomic_add`合并本核计数 | `y1[i] = scale*leaky_relu(x[i],alpha)+bias`，`y1[5]=0.4` |
 | SIMD VF `simd_clamp_vf` | 矢量intrinsics连续计算 | 上下界经`asc_duplicate_scalar`进矢量寄存器，`asc_min`与`asc_max`完成裁剪 | `y2[i] = clamp(x[i], -2, 3)`，`y2[5]=-2.0` |
-| 核函数体scalar代码 | `__aicore__` lambda | `per_block`按核号计算本核分片 | 每核计数`negCount[b]`，合计`negTotal=3723` |
+| 核函数体scalar代码 | `__aicore__` lambda | `per_block`按核号计算本核分片，并将本核GM输入分片搬入UB供两个VF共用 | 每核计数`negCount[b]`，合计`negTotal=3723` |
 
-数据流：GM输入 → SIMT VF完成融合与统计并写入UB → SIMD VF完成Clamp计算，UB到UB → `asc_copy_ub2gm_align`搬回GM两份输出。
+数据流：GM输入分片经`asc_copy_gm2ub_align`搬入UB → SIMT VF以该UB输入完成融合与统计 → SIMD VF以同一UB输入完成Clamp计算 → `asc_copy_ub2gm_align`将两份UB结果搬回GM。两个算子均作用于原始输入`x[i]`，`neg_count`按核偏移写入，各核独立计数。
 
 ### 关键代码说明
 
