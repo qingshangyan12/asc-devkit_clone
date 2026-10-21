@@ -12,6 +12,9 @@
 #include "ccu_all_to_all_mesh1d_adapter.h"
 #include "ccu_checker.h"
 #include "ccu_primitives_stub.h"
+#include "sim_world.h"
+#include "acl/acl_rt.h"
+#include "alg_param.h"
 
 #include <vector>
 
@@ -43,8 +46,26 @@ TopoMeta MakeMesh1dClosTopo(const std::vector<uint32_t>& phyIds)
 
 } // namespace
 
+TEST(CcuStAllToAllContract, DirectKernelHasNoSubKernel)
+{
+    mc2_ops_hccl::CcuKernelInfo kernelInfo;
+    EXPECT_EQ(kernelInfo.subKernelArg, nullptr);
+    EXPECT_EQ(kernelInfo.subKernelFunc, nullptr);
+    EXPECT_EQ(kernelInfo.subKernelFuncName[0], '\0');
+}
+
 TEST(CcuStAllToAllContract, MeshTaskArgsMatchCompiledKernel)
 {
+    struct ScopeGuard {
+        ~ScopeGuard()
+        {
+            RegisterManager::Global().Reset();
+            HcclSim::SimWorld::Global()->Deinit();
+        }
+    } guard;
+    RegisterManager::Global().Reset();
+    HcclSim::SimWorld::Global()->Init(TopoMeta{{{{0, 1}}}}, DevType::DEV_TYPE_950);
+    ASSERT_EQ(aclrtSetDevice(0), ACL_SUCCESS);
     Program program;
     CompilerContext compiler(program);
     AllToAllKernelConfig kernelConfig;

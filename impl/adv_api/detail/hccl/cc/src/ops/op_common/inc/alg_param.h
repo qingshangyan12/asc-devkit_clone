@@ -350,10 +350,10 @@ struct CcuKernelInfo {
     // KernelArg实例指针
     void* kernelArg;
     // subKernelArg实例指针
-    void* subKernelArg;
+    void* subKernelArg = nullptr;
     // KFC server 跨 kernel 调用所需的 Func 定义 kernel 信息
-    char subKernelFuncName[64];
-    void* subKernelFunc;
+    char subKernelFuncName[64] = {};
+    void* subKernelFunc = nullptr;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
 
