@@ -645,7 +645,7 @@ __simd_vf__ inline void CompareScalarLevel0CounterMode(
     constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
     if constexpr (!isSetMask) {
         maskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
     }
@@ -1321,7 +1321,7 @@ __aicore__ inline void SelectWithoutMaskMode0ImplVF(
     }
     if constexpr (isCounterMode) {
         maskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);
@@ -1361,7 +1361,7 @@ __aicore__ inline void SelectWithoutMaskMode2ImplVF(
     uint32_t sreg;
     if constexpr (isCounterMode) {
         maskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);
@@ -1449,7 +1449,7 @@ __simd_callee__ inline void SelectWithoutMaskMode1ImplVF(
     constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
     if constexpr (isCounterMode) {
         maskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);

@@ -366,9 +366,9 @@ __simd_vf__ inline void DeInterleaveImplNormal(
             __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + i * sregLower;
             __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + i * sregLower;
             // unalign process, copy element is sregeLower
-            Reg::LoadUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
+            Reg::StoreUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
             Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::LoadUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
+            Reg::StoreUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
             Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
         }
         Reg::LoadAlign(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
@@ -378,9 +378,9 @@ __simd_vf__ inline void DeInterleaveImplNormal(
         uint32_t tailNum = halfCount - (repeatTime - 1) * sregLower;
         __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + (repeatTime - 1) * sregLower;
         __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + (repeatTime - 1) * sregLower;
-        Reg::LoadUnAlign(dst0LocalTmp, dst0Reg, ureg, tailNum);
+        Reg::StoreUnAlign(dst0LocalTmp, dst0Reg, ureg, tailNum);
         Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
-        Reg::LoadUnAlign(dst1LocalTmp, dst1Reg, ureg, tailNum);
+        Reg::StoreUnAlign(dst1LocalTmp, dst1Reg, ureg, tailNum);
         Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
     }
 }
@@ -439,13 +439,13 @@ __simd_vf__ inline void DeInterleaveImplB64(
                 (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
                 (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
             // unalign process, copy element is sregeLower / 2
-            Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
+            Reg::StoreUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
             Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
+            Reg::StoreUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
             Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
+            Reg::StoreUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
             Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
-            Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
+            Reg::StoreUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
             Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
         }
         // tail block process, because dst copy element is diffrent with main block
@@ -473,11 +473,11 @@ __simd_vf__ inline void DeInterleaveImplB64(
             (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
             (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
         // unalign vst dst0 and dst1 same time and split main and remain
-        Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, tailNumMain);
-        Reg::LoadUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, tailNumRemain);
+        Reg::StoreUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, tailNumMain);
+        Reg::StoreUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, tailNumRemain);
         Reg::StoreUnAlignPost(dst0LocalTmp, ureg, 0);
-        Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, tailNumMain);
-        Reg::LoadUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, tailNumRemain);
+        Reg::StoreUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, tailNumMain);
+        Reg::StoreUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, tailNumRemain);
         Reg::StoreUnAlignPost(dst1LocalTmp, ureg, 0);
     }
 }

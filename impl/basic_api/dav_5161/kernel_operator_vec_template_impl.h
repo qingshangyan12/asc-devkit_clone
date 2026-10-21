@@ -53,7 +53,7 @@ __simd_callee__ inline uint32_t VecMicroGetCount(
     if constexpr (!isSetMask) {
         // get SPR.MASK in VF
         Reg::MaskReg sprLoadMaskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
         // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         count = static_cast<uint32_t>(maskBuf[0]);
