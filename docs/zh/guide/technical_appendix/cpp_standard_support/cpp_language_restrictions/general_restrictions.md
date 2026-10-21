@@ -4,7 +4,6 @@
 
 -   不支持虚函数
 -   不支持虚继承
--   不支持运行时递归
 -   不支持动态内存分配，即malloc、free、new、delete均不可用
 -   不支持STL
 -   不支持运行时typeid
@@ -386,7 +385,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
--   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定。VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取device函数的地址)。
+-   \_\_simt\_vf\_\_函数本身不支持通过函数指针间接调用，经`asc_vf_call()`调用时模板实参在编译期确定。VF内部的\_\_simt\_callee\_\_辅助函数可使用携带callee标识的函数指针，见[取Device函数的地址](#取Device函数的地址)。
 -   函数的inline行为由编译器决定，添加的always\_inline或noinline将被忽略。
 -   不允许使用结构体作为参数，以下为错误示例。
 
@@ -415,7 +414,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
     }
     ```
 
-运行期递归仅在SIMT编程场景可用，SIMD与SIMT混合编程的SIMT VF、SIMD VF与MainScalar中，`__simt_callee__`、`__simd_callee__`、`__aicore__`函数的递归调用编译报错：
+运行时递归仅在SIMT编程场景可用，其他编程场景均不支持。如下所示，SIMD与SIMT混合编程中使用运行时递归触发编译报错：
 
 ```cpp
 // SIMD与SIMT混合编程的SIMT VF内：ERROR

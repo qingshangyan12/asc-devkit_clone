@@ -37,9 +37,9 @@ The Host generates the input `x[i] = (i*7) % 11 - 5` covering `[-5, 5]` (coverin
 |---|---|---|---|
 | SIMT VF `simt_leaky_affine_vf` | 1024 threads/core, 1 element per thread | `leaky/affine` capture hyperparameters by value; `tally` captures the thread-private counter by reference; `fused` captures the three inner closures by reference for single-pass fusion; `asc_atomic_add` merges into the per-core count | `y1[i] = scale*leaky_relu(x[i],alpha)+bias`, `y1[5]=0.4` |
 | SIMD VF `simd_clamp_vf` | continuous computation with vector intrinsics | bounds enter vector registers via `asc_duplicate_scalar`, clipping done by `asc_min`/`asc_max` | `y2[i] = clamp(x[i], -2, 3)`, `y2[5]=-2.0` |
-| Kernel body (scalar) | `__aicore__` Lambda | `per_block` computes this core's slice according to the core index | Per-core count `negCount[b]`, total `negTotal=3723` |
+| Kernel body (scalar) | `__aicore__` Lambda | `per_block` computes this core's slice and copies the per-block GM input slice into UB, shared by both VFs | Per-core count `negCount[b]`, total `negTotal=3723` |
 
-Data flow: GM input → SIMT VF (fusion + statistics, writing UB) → SIMD VF (Clamp, UB to UB) → `asc_copy_ub2gm_align` copying both outputs back to GM.
+Data flow: the per-block GM input slice is copied into UB via `asc_copy_gm2ub_align` → the SIMT VF computes fusion and statistics on that UB input → the SIMD VF computes Clamp on the same UB input → `asc_copy_ub2gm_align` copies both UB results back to GM. Both operators act on the original input `x[i]`; `neg_count` is written with a per-block offset so each block counts independently.
 
 ### Key Code Explanation
 
