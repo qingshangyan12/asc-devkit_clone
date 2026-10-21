@@ -42,7 +42,7 @@
 #include "kernel_operator_common_intf.h"
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 #include "kernel_operator_vec_binary_intf.h"
 #include "kernel_operator_vec_binary_scalar_intf.h"
 #include "kernel_operator_vec_duplicate_intf.h"
@@ -53,7 +53,7 @@
 #include "kernel_operator_vec_transpose_intf.h"
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 #include "kernel_operator_vec_reduce_intf.h"
 #include "kernel_operator_proposal_intf.h"
 #include "kernel_operator_determine_compute_sync_intf.h"

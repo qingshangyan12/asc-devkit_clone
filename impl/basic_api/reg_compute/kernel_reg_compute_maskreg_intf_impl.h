@@ -57,7 +57,7 @@ __simd_callee__ inline MaskReg CreateMask()
 
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 // Kirin v516 平台尚未支持
 __simd_callee__ inline void Not(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
 
