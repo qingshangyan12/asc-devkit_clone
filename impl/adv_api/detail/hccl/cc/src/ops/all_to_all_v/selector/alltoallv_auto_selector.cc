@@ -55,6 +55,9 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
+#if defined(HCCL_CANN_COMPAT_850)
+    return SelectorStatus::NOT_MATCH;
+#else
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
@@ -66,6 +69,7 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
     selectAlgName = "AicpuAllToAllVSoleMeshConcurrent";
     HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
+#endif
 }
 
 // 对齐 hccl 分支框架：已注册算法 MATCH，未注册算法设名后 NOT_MATCH（报错由框架统一处理）。
