@@ -9,6 +9,12 @@
  */
 
 #include "ccu_all_to_all.h"
+#include "ccu_all_to_all_mesh1d_adapter.h"
+#include "ccu_checker.h"
+#include "ccu_primitives_stub.h"
+#include "sim_world.h"
+#include "acl/acl_rt.h"
+#include "alg_param.h"
 
 #include <vector>
 
@@ -73,6 +79,41 @@ TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_8Rank_PureClos_Fp32_1KB)
     scenario.pureClosTopo = true;
     scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
     VerifyScenario(scenario);
+}
+
+TEST(CcuStAllToAllContract, DirectKernelHasNoSubKernel)
+{
+    mc2_ops_hccl::CcuKernelInfo kernelInfo;
+    EXPECT_EQ(kernelInfo.subKernelArg, nullptr);
+    EXPECT_EQ(kernelInfo.subKernelFunc, nullptr);
+    EXPECT_EQ(kernelInfo.subKernelFuncName[0], '\0');
+}
+
+TEST(CcuStAllToAllContract, MeshTaskArgsMatchCompiledKernel)
+{
+    struct ScopeGuard {
+        ~ScopeGuard()
+        {
+            RegisterManager::Global().Reset();
+            HcclSim::SimWorld::Global()->Deinit();
+        }
+    } guard;
+    RegisterManager::Global().Reset();
+    HcclSim::SimWorld::Global()->Init(TopoMeta{{{{0, 1}}}}, DevType::DEV_TYPE_950);
+    ASSERT_EQ(aclrtSetDevice(0), ACL_SUCCESS);
+    Program program;
+    CompilerContext compiler(program);
+    AllToAllKernelConfig kernelConfig;
+    kernelConfig.rankSize = 2;
+    kernelConfig.channels = {MakeChannel(0, 1)};
+    CompilerContext::SetCurrent(&compiler);
+    const Result capture = CaptureAllToAllMesh1DKernel(&kernelConfig);
+    CompilerContext::SetCurrent(nullptr);
+    ASSERT_EQ(capture, Result::SUCCESS);
+
+    const auto taskArgs = PrepareAllToAllTaskArgs(AllToAllLaunchConfig{});
+    const CheckResult check = CcuTaskArgChecker().Check(program, taskArgs);
+    EXPECT_TRUE(check.Ok()) << check.message;
 }
 
 // ===== 拓扑泛化（FP16, CcuSchedAllToAllSoleMesh）=====
