@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以平铺开放寻址哈希表的查找为例，介绍Ascend C SIMT编程方式下哈希表查找的访存与并行优化思路。首先，以AoS（Array of Structures）逐槽探测建立基线，暴露value内嵌槽内导致探测步长被撑大到40B的布局代价；然后，将key与value字段分区存储（SoA，Structure of Arrays），使探测路径与value区完全解耦；接着，在key区前面引入digest预过滤区；最终，使用warp协作组探测，让协作组中的线程并行探测同一个查询key。本文完整呈现该样例从内存布局、访问粒度到并行协作的调优路径。
+本样例以平铺开放寻址哈希表的查找为例，介绍Ascend C SIMT编程方式下，如何通过修改哈希表结构，对哈希表查找进行优化的思路。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -22,22 +22,16 @@
 
 ## 样例描述
 
-- 查找语义：
+- 样例功能：[基于开放寻址法的哈希表]()查找算子，通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。
 
-  ```text
-  founds[i] = (keys[i] ∈ table)
-  ```
-
-  - keys为查询集，形状为[1, 1048576]，数据类型为int64，为1M条混合查询key：80%（838861条）从已装表key中抽取、必命中，20%（209715条）为从未装入表的key、必未命中，两部分shuffle打散（查询集允许重复key）
-  - founds为命中标志，形状为[1, 1048576]，数据类型为uint8；
-- 样例规格：
+- 样例规格：<u>(这里有问题，代码输出)</u>
 
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">hashmap_lookup</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">keys</td><td align="center">[1, 1048576]</td><td align="center">int64</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">founds</td><td align="center">[1, 1048576]</td><td align="center">uint8</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">预置数据</td><td colspan="4" align="center">哈希表设备侧预置：按Case构建其一（AoS表40MB / SoA表40MB / SoA+digest表41MB），各Case共享同一逻辑槽位分配</td></tr>
+  <tr><td align="center">keys</td><td align="center">[1, 1048576]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">value_ptr</td><td align="center">[1, 1048576]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">预置数据</td><td colspan="4" align="center">AoS表40MB / SoA表40MB / SoA+digest表41MB——按Case构建其一</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">lookup_aos_kernel / lookup_soa_kernel / lookup_soa_digest_swar_kernel / lookup_coop_swar_kernel</td></tr>
   </table>
 
@@ -45,24 +39,22 @@
 
 ### Case实现说明
 
-本样例通过4个Case构成一条优化路径，各Case的核函数、并行模型、每轮探测内容和主要变化如下表所示。
+本样例通过4个Case构成一条优化路径，各Case的核函数和主要变化如下表所示。
 
-| Case | 核函数 | 并行模型 | 每轮探测 | 本步引入的变化 |
-| ---- | ------ | -------- | -------- | -------------- |
-| 0    | `lookup_aos_kernel` | thread-per-key | 逐槽读8B key（40B步长） | 以AoS逐槽探测建立基线 |
-| 1    | `lookup_soa_kernel` | thread-per-key | 逐槽读8B key（8B步长） | key/value分区（SoA布局） |
-| 2    | `lookup_soa_digest_swar_kernel` | thread-per-key | 4B word加载4个digest | digest预过滤 + vcmp_eq4批量比较 |
-| 3    | `lookup_coop_swar_kernel` | warp协作 | 16槽窗口（4 lane × 每 lane 4槽） | 线程组协作探测 |
+| Case | 核函数 | 本步引入的变化 |
+| ---- | ------ | -------------- |
+| 0    | `lookup_aos_kernel` | 以哈希表查找基本实现作为基线 |
+| 1    | `lookup_soa_kernel` | key/value分区存储 |
+| 2    | `lookup_soa_digest_swar_kernel` | digest预过滤 + vcmp_eq4批量比较 |
+| 3    | `lookup_coop_swar_kernel` | 线程组协作探测 |
 
-Case 0~Case 2为thread-per-key模型：每个线程独立处理一条查询key，1M条查询对应2048个线程块 × 512线程。Case 3为warp协作模型：warp内4个线程组成协作组，共同探测一条key的窗口，每个warp同时推进8条查询，外层以warp为单位grid-stride覆盖全部查询。
-
-各Case的物理表由host侧同一份逻辑槽位派生：同一哈希函数、同一起始槽位、同一线性探测序——Case之间只有物理布局与访问方式有所区别，对比条件严格可控。
+<u>（修改代码中的线程配置，确保是最优解）</u>
 
 ### SoA,AoS内存布局
 
 **图1　SoA与AoS内存布局示意图** 
 
-<img src="figures/内存布局示意图.drawio.png" width="70%">
+<img src="figures/内存布局示意图.drawio.png">
 
 该图对比了 AoS（Array of Structures，结构体数组） 与 SoA（Structure of Arrays，数组结构体） 两种内存布局：
 - AoS 布局：每个 KEY 后紧跟对应的 VALUE，键值对交替存储，数据局部性较好。
@@ -70,30 +62,16 @@ Case 0~Case 2为thread-per-key模型：每个线程独立处理一条查询key�
 
 图中 KEY 占用 8B，VALUE 占用 32B。AoS 更适合键值对整体访问，SoA 更适合批量读取 KEY、执行并行查找等场景。
 
-### 哈希表查找机制
-
-哈希表为**平铺开放寻址**：容量1M槽（2^20），以负载因子0.9装入943718个互不重复的随机key，空槽以key = EMPTY_KEY标记。查找从起始槽位开始线性探测：Key 匹配则命中，遇空槽则 Miss，否则继续探测，最多遍历全表一周。
-
-负载因子α=0.9时，miss查找的期望探测次数由Knuth线性探测公式给出：
-
-$$
-E_{miss} = \frac{1}{2}\left(1 + \frac{1}{(1-\alpha)^2}\right) = \frac{1}{2}\left(1 + \frac{1}{0.01}\right) \approx 50
-$$
-
 ### 性能指标说明
 
 | 指标 | 说明 |
 | ---- | ---- |
 | Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间 |
-| read_main_memory_data(MB) | 任务执行期间从主存储器读取的总数据量，为`Memory.csv`中各block的read_main_memory_datas(KB)求和 |
-
-各Case的性能数据使用msOpProf工具对可执行文件单独采集得到：Task Duration记录于输出目录`OpBasicInfo.csv`，read_main_memory_data记录于输出目录`Memory.csv`。
-
-性能数据实测环境：Ascend950PR_9589，CANN 9.2.0。
+| read_main_memory_data(KB) | 任务执行期间每个block从GM读取的总数据量                      |
 
 ### Case 0：AoS逐槽探测基线
 
-**优化目标**：建立AoS（Array of Structures）布局下逐槽探测的耗时基线，暴露value内嵌槽内导致探测步长被撑大到40B的布局代价。
+**优化目标**：使用哈希表查找的基本实现建立性能基线。
 
 **核心实现**：一个槽 = {key, value[8]}共40B，value数组内嵌槽内；查找逻辑逐槽读8B key比较、空槽早退、全表回绕。128B的cache line只能容纳3.2个槽，查找逻辑逐行探测整张表。
 
@@ -109,7 +87,7 @@ struct AoSSlot {
 const uint64_t slot_key = slots[idx].key;
 if (slot_key == target_key) { return true; }
 if (slot_key == EMPTY_KEY) { return false; }
-idx = (idx + 1) & (CAPACITY - 1);  // 全表回绕
+idx = (idx + 1) & (CAPACITY - 1);  
 ```
 
 **性能数据**：
@@ -118,15 +96,11 @@ idx = (idx + 1) & (CAPACITY - 1);  // 全表回绕
 | ---- | :---------------: | :------------------------: |
 | 0    |     1850.870      |          679.142           |
 
+read_main_memory_data(MB)为`Memory.csv`中各block的read_main_memory_datas(KB)求和。
+
 **分析**：
 
-AoS把value内嵌在槽内，128B的cache line只能容纳3.2个槽。按期望50次探测计算，一次miss查找的访存跨度为：
-
-$$
-S_{AoS} = 50 \times 40B = 2000B \approx 16 \text{ 条 cache line}
-$$
-
-在查找到目标key或者在空槽早退之前不需要value字段，但value字段却作为无效载荷占据探测路径上的每个槽位，探测逐行踩过整张表，布局本身成为主要开销。此时探测真正需要的只有8B的key——若把key独立成紧凑的key区，步长即压缩到8B，且不再搬运任何无效的value字节，访存局部性显著提升，因此下一步优化将AoS布局修改为SoA布局。
+数据的load和store是以Cacheline为单位的，AoS把value内嵌在槽内，128B的cache line只能容纳3.2个槽。在查找到目标key或者在空槽早退之前不需要value字段，但value字段却作为无效载荷占据探测路径上的每个槽位，探测逐行踩过整张表，布局本身成为主要开销。此时探测真正需要的只有8B的key——若把key独立成紧凑的key区，步长即压缩到8B，且不再搬运任何无效的value字节，访存局部性显著提升，因此下一步优化将AoS布局修改为SoA布局。
 
 ---
 
@@ -134,9 +108,7 @@ $$
 
 **优化目标**：将key与value字段分区存储（SoA，Structure of Arrays），使探测路径与value区完全解耦，消除内嵌value对探测访存跨度的干扰。
 
-**核心实现**：与Case 0算法完全一致——逐槽读8B key比较、空槽早退、全表回绕；唯一差异是内存布局。SoA的key区（8MB）与value区（32MB）各自成区，字段为数组直存、无指针。
-
-**图2　SoA_Cacheline搬运示意图** 
+**核心实现**：与Case 0算法完全一致——逐槽读8B key比较、空槽早退、全表回绕；唯一差异是内存布局。SoA的key区（8MB）与value区（32MB）各自成区，字段为数组直存、无指针。**图2　SoA_Cacheline搬运示意图** 
 
 ![Cacheline_SoA.drawio](figures/Cacheline_SoA.drawio.png)
 
@@ -166,31 +138,23 @@ idx = (idx + 1) & (CAPACITY - 1);  // 全表回绕
 
 **分析**：
 
-同一算法、同一测试集仅改变物理布局，Task Duration从1850.870μs降至1158.006μs。两种布局下一次查找的访存跨度为：
+**图2　SoA_Cacheline搬运示意图** 
 
-$$
-S_{AoS} = 50 \times 40B = 2000B \approx 16 \text{ 条 cache line}
-$$
+![Cacheline_SoA.drawio](figures/Cacheline_SoA.drawio.png)
 
-$$
-S_{SoA} = 50 \times 8B = 400B \approx 4 \text{ 条 cache line}
-$$
+图2对比了 AoS 与 SoA 布局在 Cacheline 利用上的差异：AoS 中 KEY 和 VALUE 交替存储，查询 KEY 时会将相邻的 VALUE 一同加载；SoA 中所有 KEY 连续存储，单条 128B Cacheline 可容纳更多 KEY（如 16 个 8B KEY），从而减少查找过程中不必要的 VALUE 数据加载，降低 Cacheline 搬运开销，提高缓存利用率。
 
-Case 1相对Case 0提升x1.60；value区（32MB）整体搬离探测路径。但查看结构体发现探测仍需逐槽读取8B的key，"判断这个槽位是否匹配"这件事的读取宽度还是8B。由于查找定位起始槽本来就要计算目标key的哈希值，哈希值又是key的确定性函数，因此我们可以为每个槽预存其key哈希值的高8位作为1B的digest
+同一算法，Task Duration从1850.870μs降至1158.006μs。Case 1相对Case 0提升x1.60；若能将探测查找的读取宽度继续缩减，降低每次探测所需字节数，则性能还会有所提升，因此我们引入Case2。
 
 ---
 
 ### Case 2：digest预过滤与word批量比较
 
-**优化目标**：若能把匹配判断的读取宽度压到1B、只在匹配时才读key确认，探测跨度的字节数还能继续降低，所以我们在key区前面增加1B/槽的digest预过滤区（哈希高8位），digest不等则key必不等，先用1B比对排除绝大多数槽位，digest命中才读8B key精确确认；同时以4B word为单位批量加载digest，四路字节并行比较，保证主循环访存的流水连续性。
+**优化目标**：通过引入digest字段，只在digest匹配时才读key确认，同时探测时并行加载digest，做到减少探测所需字节数，提高访存效率。
 
-**核心实现**：digest取key哈希值的高8位；空槽的digest为hash(EMPTY_KEY)的高8位。每轮按4B对齐加载一个word（4个连续digest），两次vcmp_eq4分别与目标digest、空槽digest比较；候选槽位集合通过 `__ffs` 逐个提取，读取命中槽位的 8B key 进行精确确认。
+**核心实现**：digest取key哈希值的高8位；每轮按4B对齐加载4个连续digest并完成初步筛选；根据筛选结果对key进行精确对比。线程处理同上。
 
-**图3　digest_Cacheline示意图**
-
-![Cacheline_digest.drawio](figures/Cacheline_digest.drawio.png)
-
-图3 通过在 SoA 布局中增加 1B 的 digest 字段，将 KEY 的哈希摘要连续存储，使单条 Cacheline 能容纳更多 digest（128B 可存储 128 个 digest），从而减少查找时的 Cacheline 搬运，并通过 digest 预筛选减少 8B KEY 的读取次数。
+（加图）
 
 **关键代码**：
 
@@ -250,10 +214,10 @@ __aicore__ inline bool FindSoaDigestVcmp(const SoaTable* table,
 ```
 
 **处理逻辑**：
-digest预过滤处理流程分为三步：
-1. **Digest 预筛选**：每个槽位存储 1B 的 key 哈希摘要，每轮连续读取 4B，通过 VcmpEq4 并行比较 4 个槽位的 digest。
-2. **候选确认**：使用 __ffs 逐个提取匹配槽位，读取 8B key 精确确认，排除 digest 假阳性。
-3. **空槽早退**：并行匹配空槽 digest 后，读取对应 key 确认槽位确实为空，即可提前判定查找失败。
+digest预过滤处理流程分为两步：
+
+1. **Digest 预筛选**：每个槽位存储 1B 的 key 哈希摘要，每轮连续读取 4B，通过 `VcmpEq4` 并行比较 4 个槽位的 digest。
+2. **候选确认**：使用 `__ffs` 逐个提取比较结果，对于命中的digest进一步读取 8B key 精确确认。
 
 **性能数据**：
 
@@ -264,21 +228,16 @@ digest预过滤处理流程分为三步：
 
 **分析**：
 
-引入 digest 后，先通过一次 4B 加载并行筛选 4 个槽位，再读取候选槽位的完整 key，将一次查找中约 50 次 8B key 读取减少到约 13 次 4B 加载。
-$$
-S_{digest} = 13 \times 4B \approx 52B < 1 \text{ 条 cache line}
-$$
-
-整个digest区仅1MB，一次探测的跨度稳落单条cache line内，Case 2相对Case 1性能提升x1.40。但目前仍存在访存效率问题：每个 lane 各自查询一个 key，读取的 4B digest 分散在不同的 Cacheline 中，难以合并访存请求。整个 warp 必须等待最慢的请求完成，同时需要处理大量独立的访存事务。因此，我们引入 Case 3 的协作探测，让多个 lane 组队查询同一个 key，通过连续访存减少请求数量，提高访存效率。
+通过在 SoA 布局中增加 1B 的 digest 字段，将 KEY 的哈希摘要连续存储，使单条 Cacheline 能容纳更多 digest，从而减少查找时的 Cacheline 搬运。Case 2相对Case 1性能提升x1.40。但目前仍存在访存效率问题：每个 lane 各自查询一个 key，读取的 4B digest 分散在不同的 Cacheline 中，难以合并访存请求。整个 warp 必须等待最慢的请求完成，同时需要处理大量独立的访存事务。因此，我们引入 Case 3 的协作探测，让多个 lane 组队查询同一个 key，通过连续访存减少请求数量，提高访存效率。
 
 
 ---
 
 ### Case 3：协作探测
 
-**优化目标**：将每个 key 的串行探测轮数从约 13 轮压缩到约 4 轮。方法是结合线程协作与 digest 预筛选：4 个线程组成一个协作组，共同探测同一个 key，每个线程负责窗口内连续的 4 个槽位，通过一次 4B word 加载和两次 vcmp_eq4 完成比较，整个协作组每轮可覆盖 16 个槽位。
+**优化目标**：通过线程组协作探测结合case2的结构体设计，做到访存合并，从而提高整体性能。
 
-**核心实现**：每个 warp 的 32 个线程划分为 8 个协作组，每组 4 个线程，共同查询一个 key，因此一个 warp 可以同时处理 8 条查询事务。每轮每组协作检查连续的 16 个槽位，通过 digest 并行筛选候选槽位，再读取完整 key 进行精确确认。每轮探测推进采用 warp 统一调度：已完成查询的线程不再产生有效结果，但仍参与同步投票；当整个 warp 的查询全部完成后，再开始处理下一批查询。最后，每个 warp 通过分批处理方式遍历全部 1M 条查询。
+**核心实现**：每个 warp 的 32 个线程划分为 8 个协作组，每组 4 个线程，共同查询一个 key。
 
 **图4　协作组并行访问key示意图**
 
@@ -288,7 +247,7 @@ $$
 
 **关键代码**：
 
-以下代码在 digest 预筛选的基础上引入协作组机制：每 4 个线程协作查询同一个 key，通过组内投票汇总匹配结果，并由命中线程完成后续处理；同时保留空槽检测与回绕保护，确保查找结果正确。
+以下代码在 digest 预筛选的基础上引入协作组机制：每 4 个线程协作查询同一个 key，通过组内投票汇总匹配结果，并由命中线程完成后续处理。
 
 ```cpp
 // 每 lane 一次 4B word load + 两次并行比较（每 warp-轮 32 次 word load = 128 槽）
@@ -318,9 +277,7 @@ if (((match_ballot >> group_shift) & kGroupMask) != 0) {
 
 **分析**：
 
-Case 3 的关键在于：在保持访存指令数量不变的前提下，减少实际访存事务，并缩短每个 key 的串行探测过程。 每个 warp 每轮同样执行 32 次 4B word 加载，覆盖 128 个槽位，但查询分配方式不同：Case 2 将这 128 个槽位分配给 32 条查询，每个 key 每轮探测 4 个槽位，约需 13 轮；Case 3 则分配给 8 条查询，每个 key 每轮探测 16 个槽位，约需 4 轮。
-
-两种探测方式不同，使得两者的访存合并效率不同。Case 2 中，各线程查询不同的 key，访问地址彼此分散，32 次加载可能产生多达 32 个独立访存事务；Case 3 中，每组 4 个线程访问连续地址，4 次 4B 加载覆盖同一段 16B 数据，可合并为一次访存事务。因此，Case 3 不仅扩大了每个 key 每轮的探测范围，还减少了访存事务数量，最终成为本样例中耗时最低的实现。
+Case 3 的关键在于：在保持访存指令数量不变的前提下，减少实际访存事务。两种探测方式不同，使得两者的访存合并效率不同。Case 2 中，各线程查询不同的 key，访问地址彼此分散，32 次加载可能产生多达 32 个独立访存事务；Case 3 中，每组 4 个线程访问连续地址，4 次 4B 加载覆盖同一段 16B 数据，可合并为一次访存事务。因此，Case 3减少了访存事务数量，最终成为本样例中耗时最低的实现。
 
 
 ## 性能对比总结
@@ -332,8 +289,9 @@ Case 3 的关键在于：在保持访存指令数量不变的前提下，减少�
 | 2    | `lookup_soa_digest_swar_kernel` | 829.345 | 295.490 | 2.23x |
 | 3    | `lookup_coop_swar_kernel` | 596.943 | 284.774 | 3.10x |
 
-
 ## 调优建议
+
+
 
 **图5　不同负载因子下各优化方案的查找性能对比图**
 
