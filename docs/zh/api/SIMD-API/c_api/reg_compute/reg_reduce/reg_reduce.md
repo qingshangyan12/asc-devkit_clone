@@ -1,5 +1,6 @@
 # 归约计算
 
+- **[Reg归约计算概述](reg_reduce_overview.md)**
 - **[asc_pair_reduce_sum](asc_pair_reduce_sum.md)**
 - **[asc_reduce_max](asc_reduce_max.md)**
 - **[asc_reduce_max_datablock](asc_reduce_max_datablock.md)**

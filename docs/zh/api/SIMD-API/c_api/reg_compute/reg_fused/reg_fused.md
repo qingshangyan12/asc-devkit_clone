@@ -1,5 +1,6 @@
 # 复合计算
 
+- **[Reg复合计算概述](reg_fused_overview.md)**
 - **[asc_abs_sub](asc_abs_sub.md)**
 - **[asc_axpy](asc_axpy.md)**
 - **[asc_fma](asc_fma.md)**
