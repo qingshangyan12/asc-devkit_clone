@@ -12,27 +12,32 @@ from pathlib import Path
 import numpy as np
 
 
-def verify_result(directory):
-    directory = Path(directory)
-    z = np.fromfile(directory / "output_z.bin", dtype=np.float32)
-    golden = np.fromfile(directory / "golden_z.bin", dtype=np.float32)
-    masks = np.fromfile(directory / "output_masks.bin", dtype=np.uint8)
-    golden_masks = np.fromfile(directory / "golden_masks.bin", dtype=np.uint8)
-    if z.size != 256 or golden.size != 256 or masks.size != 64 or golden_masks.size != 64:
-        raise ValueError("Unexpected output or reference file size")
+def read_result(file_path):
+    data = Path(file_path).read_bytes()
+    data_bytes = 256 * np.dtype(np.float32).itemsize
+    if len(data) != data_bytes + 64:
+        raise ValueError(f"Unexpected file size: {file_path}, expected {data_bytes + 64} bytes")
+    z = np.frombuffer(data, dtype=np.float32, count=256)
+    masks = np.frombuffer(data, dtype=np.uint8, count=64, offset=data_bytes)
+    return z, masks
+
+
+def verify_result(output_path, golden_path):
+    z, masks = read_result(output_path)
+    golden, golden_masks = read_result(golden_path)
     np.testing.assert_array_equal(np.isposinf(z), np.isposinf(golden))
     np.testing.assert_array_equal(np.isneginf(z), np.isneginf(golden))
     finite = np.isfinite(golden)
     np.testing.assert_array_equal(z[finite], golden[finite])
     np.testing.assert_array_equal(masks, golden_masks)
-    counts = np.unpackbits(masks.reshape(2, 32), axis=1, bitorder="little").sum(axis=1)
-    print(f"+Inf: {counts[0]}, -Inf: {counts[1]}")
     print("test pass!")
 
 
 if __name__ == "__main__":
     try:
-        verify_result(sys.argv[1] if len(sys.argv) > 1 else "output")
+        if len(sys.argv) != 3:
+            raise ValueError("Usage: verify_result.py output_file golden_file")
+        verify_result(sys.argv[1], sys.argv[2])
     except (OSError, ValueError, AssertionError) as error:
         print(f"test failed: {error}", file=sys.stderr)
         sys.exit(1)

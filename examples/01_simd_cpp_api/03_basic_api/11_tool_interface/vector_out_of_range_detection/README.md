@@ -50,14 +50,18 @@ vector_out_of_range_detection
   **Kernel实现**
 
   1. 调用[InitSocState](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md)初始化全局状态寄存器。
-  2. 使用[LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md)静态分配UB内存，构造输入、计算结果、比较值和比较结果的LocalTensor。四个float缓冲区各占1024字节，比较结果缓冲区占64字节，共4160字节，各缓冲区起始地址满足32字节对齐要求。
+  2. 使用[LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md)静态分配UB内存，构造输入、计算结果、比较值和比较结果的LocalTensor。四个float矢量各占1024字节，比较结果矢量占64字节，共4160字节，各内存块起始地址满足32字节对齐要求。
   3. 调用DataCopy将x、y从GM（Global Memory）搬运到UB（Unified Buffer），通过[SetFlag/WaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md)的MTE2_V事件保证搬运完成后执行矢量计算。
   4. 调用Add计算`z = x + y`，通过NumericLimits获取正负无穷大，调用Compare和Compares逐元素检测正无穷大和负无穷大。
   5. 通过V_MTE3事件保证矢量计算完成后，将z和masks从UB搬运到GM；核函数结束前调用[PipeBarrier](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)，等待流水线任务完成。
 
+  **结果文件与验证**
+
+  `output/output.bin`和`output/golden.bin`采用相同布局：前1024字节为256个float类型的加法结果z，后64字节为两组uint8_t类型的比较结果masks（正无穷大在前，负无穷大在后）。验证脚本接收输出文件和真值文件两个路径参数，检查文件大小、正负无穷大位置、有限值结果和全部比较比特位。
+
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行样例。
+在本样例根目录下执行如下步骤，编译并执行样例。数据生成和验证脚本依赖Python 3及NumPy。
 
 - 配置环境变量
 

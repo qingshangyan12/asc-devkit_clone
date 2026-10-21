@@ -31,8 +31,9 @@ def gen_data():
     masks = np.stack([np.isposinf(z), np.isneginf(z)])
     x.tofile("input/input_x.bin")
     y.tofile("input/input_y.bin")
-    z.tofile("output/golden_z.bin")
-    np.packbits(masks, axis=1, bitorder="little").tofile("output/golden_masks.bin")
+    with open("output/golden.bin", "wb") as golden_file:
+        z.tofile(golden_file)
+        np.packbits(masks, axis=1, bitorder="little").tofile(golden_file)
 
 
 if __name__ == "__main__":

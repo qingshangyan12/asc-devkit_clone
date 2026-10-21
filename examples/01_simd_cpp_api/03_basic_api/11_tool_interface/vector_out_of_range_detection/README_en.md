@@ -8,7 +8,7 @@ This sample uses static Tensor programming with [NumericLimits](../../../../../d
 
 | Product | CANN version |
 | --- | --- |
-| Ascend 950PR&950DT products | >= CANN 9.3.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -67,6 +67,8 @@ Read the inputs, allocate device memory, and copy inputs to the device. Invoke o
 
 The generator uses a fixed random seed and NumPy reference results. The verifier checks signed infinity positions, finite results, and every comparison byte. Verification failures return a nonzero exit code.
 
+The output file `output/output.bin` and reference file `output/golden.bin` share the same layout: the first 1024 bytes contain 256 float addition results, followed by 64 bytes of uint8_t comparison masks (positive infinity first, negative infinity second). The verifier accepts the output and reference file paths and checks file sizes, signed infinity positions, finite results, and every comparison bit.
+
 ## Build and Run
 
 Run the following steps from the sample directory. Python 3 and NumPy are required for data generation and verification.
@@ -79,38 +81,38 @@ Run the following steps from the sample directory. Python 3 and NumPy are requir
   source ${install_path}/cann/set_env.sh
   ```
 
-  `${install_path}` is the CANN installation directory. For a separate weekly installation, use its installation path.
+  `${install_path}` is the CANN installation directory, which defaults to `/usr/local/Ascend` if no directory is specified.
 
 - Run the sample
 
   ```bash
-  MODE=npu
-  cmake -S . -B build_${MODE} -DCMAKE_ASC_RUN_MODE=${MODE} -DCMAKE_ASC_ARCHITECTURES=dav-3510
-  cmake --build build_${MODE} -j
-  (
-      cd build_${MODE} || exit 1
-      python3 ../scripts/gen_data.py &&
-      ./demo &&
-      python3 ../scripts/verify_result.py output
-  )
+  mkdir -p build && cd build
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+  python3 ../scripts/gen_data.py
+  ./demo
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
 
-  Set `MODE=cpu` for CPU debugging or `MODE=sim` for NPU simulation and repeat the commands. Separate build directories avoid sharing CMake caches.
+  For CPU debugging or NPU simulation, add `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim`, respectively:
+
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+  ```
+
+  Clear the CMake cache before switching modes: run `rm CMakeCache.txt` in the build directory, then configure again.
 
 - Build options
 
   | Option | Values | Description |
   | --- | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | NPU execution, CPU debugging, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | Ascend 950PR&950DT系列产品 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | Ascend 950PR&950DT系列产品 |
 
 - Execution results
 
-  The following output indicates that computation results and comparison masks passed verification:
+  The following output indicates that verification passed:
 
   ```text
-  +Inf: 3, -Inf: 3
   test pass!
   ```
-
-  During NPU simulation, Inf test inputs may produce a `vec_err_idata_inf_nan_t0` model diagnostic. In validation, simulation completed normally and all element checks passed. Check both the program exit code and verification result.
