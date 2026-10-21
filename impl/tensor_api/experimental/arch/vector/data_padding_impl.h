@@ -30,7 +30,7 @@ inline constexpr bool is_fill_support_type = Std::is_one_of_v<
     float>;
 }
 
-template <size_t N, typename T>
+template <size_t N, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask)
 {
     static_assert(
@@ -40,12 +40,16 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, value, mask.reg);
+    if constexpr (Mode == merge_mode::zeroing) {
+        asc_duplicate_scalar(dst.reg, value, mask.reg);
+    } else {
+        asc_duplicate_scalar_merge(dst.reg, value, mask.reg);
+    }
     dst.mask = mask.reg;
     return dst;
 }
 
-template <size_t N, typename T>
+template <size_t N, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(
@@ -55,7 +59,12 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate(dst.reg, src.reg, mask.reg);
+    
+    if constexpr (Mode == merge_mode::zeroing) {
+        asc_duplicate(dst.reg, src.reg, mask.reg);
+    } else {
+        asc_duplicate_merge(dst.reg, src.reg, mask.reg);
+    }
     dst.mask = mask.reg;
     return dst;
 }

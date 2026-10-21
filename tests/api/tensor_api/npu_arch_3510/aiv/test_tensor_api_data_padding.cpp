@@ -49,6 +49,17 @@ __aicore__ inline void TestFillDefaultMask()
     EXPECT_EQ(reg_tensor_dst.mask, mask.reg);
 }
 
+template <typename T>
+__aicore__ inline void TestFillMerging()
+{
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    auto scalar_dst = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(T{}, mask);
+    asc::te::experimental::reg_tensor<T> src{};
+    auto reg_dst = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(src, mask);
+    EXPECT_EQ(scalar_dst.mask, mask.reg);
+    EXPECT_EQ(reg_dst.mask, mask.reg);
+}
+
 #define DATA_PADDING_TEST(Function, DataType)                     \
     TEST_F(TensorApiVectorDataPadding3510, Function##_##DataType) \
     {                                                             \
@@ -60,6 +71,9 @@ __aicore__ inline void TestFillDefaultMask()
     DATA_PADDING_TEST(FillScalar, DataType)    \
     DATA_PADDING_TEST(FillRegTensor, DataType) \
     DATA_PADDING_TEST(FillDefaultMask, DataType)
+
+#define DATA_PADDING_MERGING_TEST(DataType) \
+    DATA_PADDING_TEST(FillMerging, DataType)
 
 DATA_PADDING_TYPE_TESTS(uint8_t)
 DATA_PADDING_TYPE_TESTS(int8_t)
@@ -73,3 +87,6 @@ DATA_PADDING_TYPE_TESTS(bfloat16_t)
 DATA_PADDING_TYPE_TESTS(uint32_t)
 DATA_PADDING_TYPE_TESTS(int32_t)
 DATA_PADDING_TYPE_TESTS(float)
+
+DATA_PADDING_MERGING_TEST(uint16_t)
+DATA_PADDING_MERGING_TEST(float)

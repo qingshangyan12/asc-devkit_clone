@@ -125,6 +125,11 @@ enum class mem_type {
     vec_all,
     scalar_all,
 };
+
+enum class merge_mode {
+    zeroing,
+    merging,
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc

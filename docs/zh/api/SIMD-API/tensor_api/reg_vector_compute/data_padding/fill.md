@@ -38,14 +38,20 @@
 - 将value广播到目的寄存器
 
     ```cpp
-    template <size_t N = 1, typename T>
+    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
     __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
     ```
+
+`Mode`默认为`merge_mode::zeroing`，掩码未选中的元素清零。需要保留目的寄存器原值时，可显式指定`merge_mode::merging`：
+
+```cpp
+auto result = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(value, mask);
+```
 
 - 将寄存器src的最低位元素广播到目的寄存器
 
     ```cpp
-    template <size_t N = 1, typename T>
+    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
     __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
     ```
 
