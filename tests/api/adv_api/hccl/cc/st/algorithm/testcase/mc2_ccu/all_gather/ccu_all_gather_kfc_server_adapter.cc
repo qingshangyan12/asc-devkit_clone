@@ -44,7 +44,7 @@ void* ConvertAllGatherKfcServerArg(const void* productArg, uint32_t argNum)
         return nullptr;
     }
     const auto* source = static_cast<const mc2_ops_hccl::CcuKernelArgKfcServer*>(productArg);
-    if (source->opParam.opType != HcclCMDType::HCCL_CMD_ALLGATHER) {
+    if (source->opType != HcclCMDType::HCCL_CMD_ALLGATHER) {
         return nullptr;
     }
     auto* config = new AllGatherKfcServerConfig();
@@ -59,13 +59,21 @@ Result CaptureAllGatherKfcServerKernel(void* kernelArg)
     }
     auto& config = *static_cast<AllGatherKfcServerConfig*>(kernelArg);
     const auto& arg = config.kernelArg;
-    if (arg.opParam.opType != HcclCMDType::HCCL_CMD_ALLGATHER || arg.rankSize < 2U || arg.rankId >= arg.rankSize ||
-        arg.channelCount != arg.rankSize - 1U) {
+    if (arg.opType != HcclCMDType::HCCL_CMD_ALLGATHER || arg.channelCount == 0U) {
         return Result::PARAM_ERROR;
     }
 
+    uint32_t rankId = 0;
+    uint32_t peerRank = 0;
+    if (!RegisterManager::GetChannelRanks(arg.channels[0], rankId, peerRank)) {
+        return Result::PARAM_ERROR;
+    }
+    const uint32_t rankSize = arg.channelCount + 1U;
+    if (rankId >= rankSize) {
+        return Result::PARAM_ERROR;
+    }
     std::vector<ChannelHandle> channels(arg.channels, arg.channels + arg.channelCount);
-    CompilerContext::Current().ConfigureProgram(arg.rankId, static_cast<uint32_t>(arg.rankSize), channels);
+    CompilerContext::Current().ConfigureProgram(rankId, rankSize, channels);
     const CcuResult result = mc2_ops_hccl::CcuKfcServerKernel(static_cast<CcuKernelArg>(&config.kernelArg));
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
@@ -126,7 +134,7 @@ std::vector<uint64_t> PrepareKfcServerTaskArgs(const RankMemory& memory, uint32_
 {
     const uint64_t parameterAddress = memory.ParameterAddress();
     const uint64_t ckeAddress = parameterAddress + static_cast<uint64_t>(KFC_CKE_WORD_OFFSET) * sizeof(uint64_t);
-    return {parameterAddress, ckeAddress, 1U, 1U, 0U, 0x1000U + rank};
+    return {parameterAddress, ckeAddress, 1U, 1U, 0U, 0x1000U + rank, 0x1000U};
 }
 
 } // namespace

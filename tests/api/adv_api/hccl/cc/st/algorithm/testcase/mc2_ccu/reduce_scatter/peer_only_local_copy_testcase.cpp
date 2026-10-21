@@ -99,6 +99,7 @@ protected:
             arg.opParam.DataDes.dataType = type;
             arg.opParam.reduceType = op;
             std::strcpy(arg.opParam.algName, "CcuSchedReduceScatterSoleMeshPeerOnly");
+            mc2_ops_hccl::InitKfcSubKernelArgLayout(arg);
             arg.rankSize = 2;
             arg.rankId = rank;
             arg.channelCount = 1;

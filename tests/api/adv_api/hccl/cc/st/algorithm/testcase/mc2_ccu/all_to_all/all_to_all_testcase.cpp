@@ -9,6 +9,9 @@
  */
 
 #include "ccu_all_to_all.h"
+#include "ccu_all_to_all_mesh1d_adapter.h"
+#include "ccu_checker.h"
+#include "ccu_primitives_stub.h"
 
 #include <vector>
 
@@ -39,6 +42,23 @@ TopoMeta MakeMesh1dClosTopo(const std::vector<uint32_t>& phyIds)
 }
 
 } // namespace
+
+TEST(CcuStAllToAllContract, MeshTaskArgsMatchCompiledKernel)
+{
+    Program program;
+    CompilerContext compiler(program);
+    AllToAllKernelConfig kernelConfig;
+    kernelConfig.rankSize = 2;
+    kernelConfig.channels = {MakeChannel(0, 1)};
+    CompilerContext::SetCurrent(&compiler);
+    const Result capture = CaptureAllToAllMesh1DKernel(&kernelConfig);
+    CompilerContext::SetCurrent(nullptr);
+    ASSERT_EQ(capture, Result::SUCCESS);
+
+    const auto taskArgs = PrepareAllToAllTaskArgs(AllToAllLaunchConfig{});
+    const CheckResult check = CcuTaskArgChecker().Check(program, taskArgs);
+    EXPECT_TRUE(check.Ok()) << check.message;
+}
 
 // ===== 拓扑泛化（FP16, CcuSchedAllToAllSoleMesh）=====
 TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_2Rank_SingleDie_Fp16_100B)

@@ -14,5 +14,22 @@
 // See ccu_variable_dl.hpp.  The stub already provides the Func abstraction
 // required by the algorithm sources captured by this ST target.
 #include "ccu_primitives_stub.h"
+#include "ccu_types.h"
+
+namespace AscendC {
+namespace ccu {
+
+inline CcuResult CallFunc(const Variable&, Array<Variable>& args)
+{
+    return args.size() > CCU_FUNC_TASK_ARG_MAX ? CCU_E_PARA : CCU_SUCCESS;
+}
+
+inline CcuResult CallFunc(const Variable&, const std::vector<Variable>& args)
+{
+    return args.size() > CCU_FUNC_TASK_ARG_MAX ? CCU_E_PARA : CCU_SUCCESS;
+}
+
+} // namespace ccu
+} // namespace AscendC
 
 #endif // CCU_FUNC_DL_HPP
