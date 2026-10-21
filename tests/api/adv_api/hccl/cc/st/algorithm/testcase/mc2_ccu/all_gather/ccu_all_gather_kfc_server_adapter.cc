@@ -13,9 +13,11 @@
 #include "alg_param.h"
 #include "ccu_all_gather.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "ccu_kernel_proxy.h"
 #include "kfc_server_protocol.h"
 
+#include <algorithm>
 #include <limits>
 #include <vector>
 
@@ -74,6 +76,15 @@ Result CaptureAllGatherKfcServerKernel(void* kernelArg)
     }
     std::vector<ChannelHandle> channels(arg.channels, arg.channels + arg.channelCount);
     CompilerContext::Current().ConfigureProgram(rankId, rankSize, channels);
+    mc2_ops_hccl::CcuKernelArgKfcAllGatherMesh1DMem2Mem subKernelArg{};
+    subKernelArg.rankId = rankId;
+    subKernelArg.rankSize = rankSize;
+    subKernelArg.channelCount = arg.channelCount;
+    std::copy(channels.begin(), channels.end(), subKernelArg.channels);
+    FunctionCaptureScope subKernel([&]() {
+        return mc2_ops_hccl::CcuKfcAllGatherMesh1DMem2MemKernel(&subKernelArg) == CCU_SUCCESS ?
+                   Result::SUCCESS : Result::CONTRACT_ERROR;
+    });
     const CcuResult result = mc2_ops_hccl::CcuKfcServerKernel(static_cast<CcuKernelArg>(&config.kernelArg));
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
