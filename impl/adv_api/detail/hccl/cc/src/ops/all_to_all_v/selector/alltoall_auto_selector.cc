@@ -63,12 +63,10 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
         return SelectorStatus::NOT_MATCH;
     }
     uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
-    u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
-    CHK_PRT_RET(
-        sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__),
-        SelectorStatus::NOT_MATCH);
+    // 选择期（tiling）无真实计数，sendCounts 为 nullptr 时按 0 处理（P5：统一走最小 datasize 路径）；
     // AllToAll（非 AllToAllV）场景下各 rank 的 sendCount 相同，取 sendCounts[0] 作为代表
-    uint64_t dataSize = sendCounts[0] * dataTypeSize;
+    const u64* sendCounts = static_cast<const u64*>(opParam.all2AllVDataDes.sendCounts);
+    const uint64_t dataSize = (sendCounts == nullptr) ? 0U : sendCounts[0] * dataTypeSize;
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
@@ -151,12 +149,11 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
         HCCL_ERROR("[AlltoAllAutoSelector] failed to compare Mesh/CLOS rank counts."), SelectorStatus::NOT_MATCH);
-    CHK_PRT_RET(
-        opParam.all2AllVDataDes.sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector] sendCounts is nullptr."),
-        SelectorStatus::NOT_MATCH);
+    // 选择期（tiling）无真实计数，sendCounts 为 nullptr 时按 0 处理（P5：统一走最小 datasize 路径）
     const auto* sendCounts = static_cast<const u64*>(opParam.all2AllVDataDes.sendCounts);
+    const u64 sendCount0 = (sendCounts == nullptr) ? 0U : sendCounts[0];
     const bool concurrentCondition = isMeshNumEqualToClosNum && topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
-                                     sendCounts[0] > CONCURRENT_COUNT_LIMIT;
+                                     sendCount0 > CONCURRENT_COUNT_LIMIT;
     selectAlgName = concurrentCondition ? "AicpuAllToAllSoleMeshConcurrent" : "AicpuAllToAllSoleMeshUBX";
     HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;

@@ -66,6 +66,28 @@ std::vector<HcclChannelDesc> MakeMultiJettyChannels(u32 rankSize, u32 channelsPe
     return channels;
 }
 
+OpParam MakeCcuParam(HcclCMDType opType)
+{
+    OpParam param{};
+    param.opType = opType;
+    param.engine = COMM_ENGINE_CCU;
+    param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
+    param.userRank = 0U;
+    return param;
+}
+
+TopoInfoWithNetLayerDetails MakeMesh1DTopo(u32 rankSize = 4U, u32 topoLevelNums = 1U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.level0MeshType = Level0MeshType::SINGLE_DIE;
+    topo.topoLevelNums = topoLevelNums;
+    return topo;
+}
+
 } // namespace
 
 class ST_ALL_TO_ALL_MESH1D_AICPU_TEST : public ::testing::Test {
@@ -215,5 +237,27 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, peer_group_rounds_cover_18_ranks)
     EXPECT_EQ(
         sortedFirstRound, std::vector<u32>({1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 10U, 11U, 12U, 13U, 14U, 15U, 16U, 17U}));
     EXPECT_EQ(secondRound, std::vector<u32>({9U}));
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = nullptr; // tiling 期常态
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX"); // 0 > 512 为假 → 最小路径
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = nullptr;
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllMesh1DMultiJetty"); // dataSize=0 → 非并发
 }
 } // namespace checker
