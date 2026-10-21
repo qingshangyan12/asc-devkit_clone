@@ -273,61 +273,14 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(
     const bool batchLoop = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1,
     const PreallocationMode preAllocationMode = PreallocationMode::PREALLOCATION_ENABLE_ALL)
 {
-    return {
-        .doNorm = false,
-        .doBasicBlock = true,
-        .doMultiDataLoad = false,
-        .basicM = basicM,
-        .basicN = basicN,
-        .basicK = basicK,
-        .intrinsicsCheck = intrinsicsLimit,
-        .isNBatch = batchLoop,
-        .enVecND2NZ = false,
-        .doSpecialBasicBlock = false,
-        .doMTE2Preload = 0,
-        .singleCoreM = 0,
-        .singleCoreN = 0,
-        .singleCoreK = 0,
-        .stepM = 0,
-        .stepN = 0,
-        .baseMN = 0,
-        .singleCoreMN = 0,
-        .enUnitFlag = false,
-        .isPerTensor = false,
-        .hasAntiQuantOffset = false,
-        .doIBShareNorm = false,
-        .doSpecialMDL = false,
-        .enableInit = true,
-        .batchMode = bmmMode,
-        .enableEnd = true,
-        .enableGetTensorC = true,
-        .enableSetOrgShape = true,
-        .enableSetBias = true,
-        .enableSetTail = true,
-        .enableQuantVector = true,
-        .enableSetDefineData = true,
-        .iterateMode = IterateMode::ITERATE_MODE_DEFAULT,
-        .enableReuse = true,
-        .enableUBReuse = true,
-        .enableL1CacheUB = false,
-        .intraBlockPartSum = false,
-        .iterateOrder = IterateOrder::UNDEF,
-        .scheduleType = ScheduleType::INNER_PRODUCT,
-        .enableDoubleCache = false,
-        .isBiasBatch = true,
-        .enableStaticPadZeros = false,
-        .isPartialOutput = false,
-        .enableMixDualMaster = false,
-        .isA2B2Shared = false,
-        .isEnableChannelSplit = false,
-        .enableKdimReorderLoad = false,
-        .isCO1Shared = false,
-        .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
-        .bmmOutMode = BatchOutMode::SINGLE_BATCH,
-        .enableL1BankConflictOptimise = false,
-        .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE,
-        .preAllocationMode = preAllocationMode};
+    MatmulConfig config = GetSpecialMDLConfig(intrinsicsLimit, batchLoop, 0, false, false, false, preAllocationMode);
+    config.doBasicBlock = true;
+    config.basicM = basicM;
+    config.basicN = basicN;
+    config.basicK = basicK;
+    config.doSpecialMDL = false;
+    config.batchMode = bmmMode;
+    return config;
 }
 
 /**

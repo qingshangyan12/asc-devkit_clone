@@ -247,6 +247,24 @@ public:
 
     TagMachinePara(const struct TagMachinePara& that)
     {
+        CopyCommonFields(that);
+        nicDeploy = (that.nicDeploy);
+        CopyTrailingFields(that);
+    }
+
+    struct TagMachinePara& operator=(struct TagMachinePara& that)
+    {
+        if (&that != this) {
+            CopyCommonFields(that);
+            CopyTrailingFields(that);
+        }
+
+        return *this;
+    }
+
+private:
+    void CopyCommonFields(const struct TagMachinePara& that)
+    {
         machineType = (that.machineType);
         linkMode = (that.linkMode);
         serverId = (that.serverId);
@@ -271,7 +289,10 @@ public:
         sockets = (that.sockets);
         exchangeInfo = (that.exchangeInfo);
         supportDataReceivedAck = (that.supportDataReceivedAck);
-        nicDeploy = (that.nicDeploy);
+    }
+
+    void CopyTrailingFields(const struct TagMachinePara& that)
+    {
         localSocketPort = that.localSocketPort;
         remoteSocketPort = that.remoteSocketPort;
         isAicpuModeEn = that.isAicpuModeEn;
@@ -284,50 +305,6 @@ public:
         specifyLink = that.specifyLink;
         enableAtomicWrite = that.enableAtomicWrite;
         queueDepthAttr = that.queueDepthAttr;
-    }
-
-    struct TagMachinePara& operator=(struct TagMachinePara& that)
-    {
-        if (&that != this) {
-            machineType = (that.machineType);
-            linkMode = (that.linkMode);
-            serverId = (that.serverId);
-            localIpAddr = (that.localIpAddr);
-            remoteIpAddr = (that.remoteIpAddr);
-            localDeviceId = (that.localDeviceId);
-            remoteDeviceId = (that.remoteDeviceId);
-            localUserrank = (that.localUserrank);
-            remoteUserrank = (that.remoteUserrank);
-            localWorldRank = (that.localWorldRank);
-            remoteWorldRank = (that.remoteWorldRank);
-            collectiveId = (that.collectiveId);
-            deviceType = (that.deviceType);
-            tag = (that.tag);
-            inputMem = (that.inputMem);
-            outputMem = (that.outputMem);
-            mem = (that.mem);
-            userDeviceMem = (that.userDeviceMem);
-            userHostMem = (that.userHostMem);
-            isIndOp = (that.isIndOp);
-            linkAttribute = (that.linkAttribute);
-            sockets = (that.sockets);
-            exchangeInfo = (that.exchangeInfo);
-            supportDataReceivedAck = (that.supportDataReceivedAck);
-            localSocketPort = that.localSocketPort;
-            remoteSocketPort = that.remoteSocketPort;
-            isAicpuModeEn = that.isAicpuModeEn;
-            deviceLogicId = that.deviceLogicId;
-            srcPorts = that.srcPorts;
-            notifyNum = that.notifyNum;
-            qpMode = that.qpMode;
-            tc = that.tc;
-            sl = that.sl;
-            specifyLink = that.specifyLink;
-            enableAtomicWrite = that.enableAtomicWrite;
-            queueDepthAttr = that.queueDepthAttr;
-        }
-
-        return *this;
     }
 };
 
@@ -509,8 +486,8 @@ public:
         Buffer(const void* addr, u64 size) : addr(addr), size(size) {}
     };
 
-    Transport(){};
-    explicit Transport(TransportBase* pimpl) : pimpl_(pimpl){};
+    Transport() {};
+    explicit Transport(TransportBase* pimpl) : pimpl_(pimpl) {};
     Transport(
         TransportType type, TransportPara& para, const HcclDispatcher dispatcher,
         const std::unique_ptr<NotifyPool>& notifyPool, MachinePara& machinePara,

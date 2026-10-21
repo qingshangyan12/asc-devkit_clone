@@ -1576,96 +1576,64 @@ OmniPipeSliceInfo CalcRSOmniPipeSliceInfo(OmniPipeSliceParam& omniPipeSliceParam
     std::vector<u64> scratchSizexyz;
     // z的斜对角，斜对角是给同z轴的每一张卡转发同xy的数据。
     u64 finStepMark = 2;
-    if (xyB > zB) {
-        // z是慢轴，n-1步同轴+1步斜对角
-        for (u64 rs = 0; rs < rankSize; rs++) {
+    const bool zIsSlowAxis = xyB > zB;
+    for (u64 rs = 0; rs < rankSize; rs++) {
+        if (zIsSlowAxis) {
             outerStepNum = CalReducescatterDataSize2D(
                 zRSDataSize[rs], xyRSDataSize[rs], zB, xyB, zRankSize, xRankSize * yRankSize,
                 omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine);
-            if (yB >= xB) {
-                for (u64 i = 0; i < outerStepNum; i++) {
-                    innerStepNum = CalReducescatterDataSize2D(
-                        xRSDataSize[rs][i], yRSDataSize[rs][i], xB, yB, xRankSize, yRankSize, xyRSDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine);
-                }
-                // 这里判断下，步数为1的时候只进下面的循环，否则这里走一步
-                if (innerStepNum > finStepMark) {
-                    xInCornerStep = 1; // 步数为1的时候只走一步，否则走innerStepNum-1步
-                    yInCornerStep = innerStepNum - finStepMark; // 步数为1的时候只走一步，否则走innerStepNum-2步
-                }
-            } else {
-                for (u64 i = 0; i < outerStepNum; i++) {
-                    innerStepNum = CalReducescatterDataSize2D(
-                        yRSDataSize[rs][i], xRSDataSize[rs][i], yB, xB, yRankSize, xRankSize, xyRSDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine);
-                }
-                // 这里判断下，步数为1的时候只进下面的循环，否则这里走一步
-                if (innerStepNum > finStepMark) {
-                    yInCornerStep = 1; // 步数为1的时候只走一步，否则走innerStepNum-1步
-                    xInCornerStep = innerStepNum - finStepMark; // 步数为1的时候只走一步，否则走innerStepNum-2步
-                }
-            }
-            CalReducescatter2DOffset(
-                zRSOffset[rs], xyRSOffset[rs], outerStepNum, zRankSize, xRankSize * yRankSize, zRSDataSize[rs],
-                xyRSDataSize[rs]);
-        }
-        if (outerStepNum > finStepMark) {
-            zConnerStep = 1;
-            xyConnerStep = outerStepNum - finStepMark;
-        }
-
-        scratchSizexyz = CalScratchSize(
-            reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
-            zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum,
-            omniPipeSliceParam.levelAlgType, omniPipeSliceParam.engine, xB, yB);
-        xyzDataSizeStep = CalRSDataSizeStep(
-            reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
-            zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum, xB, yB);
-    } else {
-        for (u64 rs = 0; rs < rankSize; rs++) {
+        } else {
             outerStepNum = CalReducescatterDataSize2D(
                 xyRSDataSize[rs], zRSDataSize[rs], xyB, zB, xRankSize * yRankSize, zRankSize,
                 omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine);
-            if (yB >= xB) {
-                for (u64 i = 0; i < outerStepNum; i++) {
-                    innerStepNum = CalReducescatterDataSize2D(
-                        xRSDataSize[rs][i], yRSDataSize[rs][i], xB, yB, xRankSize, yRankSize, xyRSDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine);
-                }
-                // 这里判断下，步数为1的时候只进下面的循环，否则这里走一步
-                if (innerStepNum > finStepMark) {
-                    xInCornerStep = 1; // 步数为1的时候只走一步，否则走innerStepNum-1步
-                    yInCornerStep = innerStepNum - finStepMark; // 步数为1的时候只走一步，否则走innerStepNum-2步
-                }
-            } else {
-                for (u64 i = 0; i < outerStepNum; i++) {
-                    innerStepNum = CalReducescatterDataSize2D(
-                        yRSDataSize[rs][i], xRSDataSize[rs][i], yB, xB, yRankSize, xRankSize, xyRSDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine);
-                }
-                // 这里判断下，步数为1的时候只进下面的循环，否则这里走一步
-                if (innerStepNum > finStepMark) {
-                    yInCornerStep = 1; // 步数为1的时候只走一步，否则走innerStepNum-1步
-                    xInCornerStep = innerStepNum - finStepMark; // 步数为1的时候只走一步，否则走innerStepNum-2步
-                }
+        }
+        if (yB >= xB) {
+            for (u64 i = 0; i < outerStepNum; i++) {
+                innerStepNum = CalReducescatterDataSize2D(
+                    xRSDataSize[rs][i], yRSDataSize[rs][i], xB, yB, xRankSize, yRankSize, xyRSDataSize[rs][i],
+                    maxStepNum, omniPipeSliceParam.engine);
             }
+            if (innerStepNum > finStepMark) {
+                xInCornerStep = 1;
+                yInCornerStep = innerStepNum - finStepMark;
+            }
+        } else {
+            for (u64 i = 0; i < outerStepNum; i++) {
+                innerStepNum = CalReducescatterDataSize2D(
+                    yRSDataSize[rs][i], xRSDataSize[rs][i], yB, xB, yRankSize, xRankSize, xyRSDataSize[rs][i],
+                    maxStepNum, omniPipeSliceParam.engine);
+            }
+            if (innerStepNum > finStepMark) {
+                yInCornerStep = 1;
+                xInCornerStep = innerStepNum - finStepMark;
+            }
+        }
+        if (zIsSlowAxis) {
+            CalReducescatter2DOffset(
+                zRSOffset[rs], xyRSOffset[rs], outerStepNum, zRankSize, xRankSize * yRankSize, zRSDataSize[rs],
+                xyRSDataSize[rs]);
+        } else {
             CalReducescatter2DOffset(
                 xyRSOffset[rs], zRSOffset[rs], outerStepNum, xRankSize * yRankSize, zRankSize, xyRSDataSize[rs],
                 zRSDataSize[rs]);
         }
-        if (outerStepNum > finStepMark) {
+    }
+    if (outerStepNum > finStepMark) {
+        if (zIsSlowAxis) {
+            zConnerStep = 1;
+            xyConnerStep = outerStepNum - finStepMark;
+        } else {
             zConnerStep = outerStepNum - finStepMark;
             xyConnerStep = 1;
         }
-
-        scratchSizexyz = CalScratchSize(
-            reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
-            zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum,
-            omniPipeSliceParam.levelAlgType, omniPipeSliceParam.engine, xB, yB);
-        xyzDataSizeStep = CalRSDataSizeStep(
-            reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
-            zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum, xB, yB);
     }
+    scratchSizexyz = CalScratchSize(
+        reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
+        zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum,
+        omniPipeSliceParam.levelAlgType, omniPipeSliceParam.engine, xB, yB);
+    xyzDataSizeStep = CalRSDataSizeStep(
+        reinterpret_cast<u64*>(xRSDataSize[maxDataPieceId]), reinterpret_cast<u64*>(yRSDataSize[maxDataPieceId]),
+        zRSDataSize[maxDataPieceId], levelRankSize, zConnerStep, outerStepNum, innerStepNum, maxStepNum, xB, yB);
     if ((omniPipeSliceParam.engine == CommEngine::COMM_ENGINE_AICPU_TS ||
          omniPipeSliceParam.engine == CommEngine::COMM_ENGINE_CPU)) {
         xCclBufferBaseOff = dataSizePerLoop[maxDataPieceId] * xRankSize * yRankSize * zRankSize;
