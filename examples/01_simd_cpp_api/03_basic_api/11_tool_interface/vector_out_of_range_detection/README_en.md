@@ -8,7 +8,7 @@ This sample uses static Tensor programming with [NumericLimits](../../../../../d
 
 | Product | CANN version |
 | --- | --- |
-| Ascend 950PR&950DT系列产品 | Validated with CANN 9.3.0 weekly.20261009.01 |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 

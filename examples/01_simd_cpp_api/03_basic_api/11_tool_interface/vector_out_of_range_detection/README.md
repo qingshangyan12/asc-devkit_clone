@@ -2,13 +2,13 @@
 
 ## 概述
 
-本样例采用静态Tensor编程方式，演示调用[NumericLimits](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/intro.md)工具类，结合[Compare](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare.md)和[Compares](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md)接口，逐元素检测矢量加法结果中的NaN、正无穷大和负无穷大。
+本样例演示调用[NumericLimits](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/intro.md)工具类，结合[Compare](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare.md)和[Compares](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md)接口，逐元素检测矢量加法结果中的NaN、正无穷大和负无穷大。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR&950DT系列产品 | CANN 9.3.0 weekly.20261009.01（已验证） |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 
