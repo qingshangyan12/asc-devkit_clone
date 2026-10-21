@@ -10,6 +10,10 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from extract_host_stub import FuncParam
 
 
 class CodeMode(Enum):
