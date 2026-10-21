@@ -12,9 +12,7 @@
 #include <sstream>
 #include "alg_data_trans_wrapper.h"
 #include "template_utils.h"
-#if CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0)
 #include "hcomm_primitives_dl.h"
-#endif /* CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0) */
 
 namespace mc2_ops_hccl {
 // devkit 适配：GetSymWinRemoteMem 的本地封装（hccl 侧由 hccl_sym_win_dl.h 提供，devkit 侧
