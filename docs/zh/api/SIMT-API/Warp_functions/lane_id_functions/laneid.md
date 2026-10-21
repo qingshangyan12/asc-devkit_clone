@@ -49,7 +49,7 @@ int32_t laneid()
 
 ## 调用示例
 
-下面示例使用`laneid()`计算全部输入数据的和，并把结果赋值到输出数据的第0位置上，示例中使用[asc_reduce_add](../Warp_reduce_functions/asc_reduce_add.md)，需另外包含`simt_api/device_warp_functions.h`头文件，使用[asc_atomic_add](../../atomic_operations/asc_atomic_add.md)，需另外包含`simt_api/device_atomic_functions.h`头文件。
+下面示例使用`lanemask_eq()`获取当前Lane对应的位掩码，并据此判断当前线程位于Warp的上半区还是下半区，再通过`asc_shfl()`分别广播上下半Warp中指定Lane的数据。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含`simt_api/device_warp_functions.h`头文件，其中`srcLane`的取值范围为[0, 15]。
 
 - SIMT编程场景：
 
