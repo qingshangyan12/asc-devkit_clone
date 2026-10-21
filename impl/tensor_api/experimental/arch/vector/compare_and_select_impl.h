@@ -55,7 +55,7 @@ __simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_eq(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -66,7 +66,7 @@ __simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_eq_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
@@ -83,7 +83,7 @@ __simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator!= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_ne(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -94,7 +94,7 @@ __simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator!= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_ne_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
@@ -111,7 +111,7 @@ __simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, con
     static_assert(
         detail::is_cmp_support_type<T>, "operator< only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_lt(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -122,7 +122,7 @@ __simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, con
     static_assert(
         detail::is_cmp_support_type<T>, "operator< only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_lt_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
@@ -139,7 +139,7 @@ __simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator<= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_le(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -150,7 +150,7 @@ __simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator<= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_le_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
@@ -167,7 +167,7 @@ __simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, con
     static_assert(
         detail::is_cmp_support_type<T>, "operator> only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_gt(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -178,7 +178,7 @@ __simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, con
     static_assert(
         detail::is_cmp_support_type<T>, "operator> only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_gt_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
@@ -195,7 +195,7 @@ __simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator>= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_ge(mask.reg, src0.reg, src1.reg, src0.mask);
     return mask;
 }
@@ -206,7 +206,7 @@ __simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, co
     static_assert(
         detail::is_cmp_support_type<T>, "operator>= only supports uint8_t, int8_t, "
                                         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
-    reg_tensor<bool> mask(src0.mask);
+    reg_tensor<bool> mask;
     asc_ge_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
