@@ -81,9 +81,6 @@ This example selects different input scenarios through the build parameter `SCEN
 - Implementation: Uses `Nd2NzParams` to transfer input data from GM to L1, performs matrix multiplication computation, transfers quantization parameters from GM to L1 via `DataCopy`, then uses `Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, quantAlphaTensor, fixpipeParams)` for Vector quantization output
 - Description: The matrix multiplication result is float type, converted to int8_t type through Vector quantization. Each column of the C matrix corresponds to one quantization parameter
 
-
-On dav-3510, scenario 1 uses `SetLoopModePara(..., DataCopyMVType::OUT_TO_L1)` to copy the 32768-byte NZ matrix A into L1 with two inner and two outer iterations. Each iteration copies 8192 bytes; source and destination strides are 8192 bytes for the inner loop and 16384 bytes for the outer loop. It then calls `ResetLoopModePara(DataCopyMVType::OUT_TO_L1)` before copying matrix B in normal mode. The existing matrix multiplication golden output checks the copy and reset behavior. On dav-2201, scenario 1 retains the original normal copy.
-
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run it.

@@ -47,7 +47,6 @@
 - 输出：C [128, 256] float类型，ND格式
 - 实现：使用 `DataCopyParams` 将NZ格式的输入数据从GM搬运到L1
 - 说明：输入数据为Nz格式，直接搬运到L1，无需格式转换
-- 在dav-3510架构下，A矩阵通过`SetLoopModePara(..., DataCopyMVType::OUT_TO_L1)`配置内外层循环次数均为2，将32768字节的NZ数据分成4个8192字节的数据块搬运至L1；内层源/目的步长为8192字节，外层源/目的步长为16384字节。随后调用`ResetLoopModePara(DataCopyMVType::OUT_TO_L1)`，再以普通模式搬运B矩阵，复用矩阵乘结果校验搬运和复位效果。dav-2201架构保持原有普通搬运逻辑。
 <p align="center">
   <img src="figures/data_copy_gm2l1_NZ2NZ.png" width="800">
 </p>
