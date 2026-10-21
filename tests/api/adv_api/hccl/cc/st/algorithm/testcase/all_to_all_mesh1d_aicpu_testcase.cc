@@ -73,6 +73,8 @@ OpParam MakeCcuParam(HcclCMDType opType)
     param.engine = COMM_ENGINE_CCU;
     param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
     param.userRank = 0U;
+    param.all2AllVDataDes.sendType = HCCL_DATA_TYPE_FP32; // 零值0是INT8，会被多级CCU分支拒绝
+    param.all2AllVDataDes.recvType = HCCL_DATA_TYPE_FP32;
     return param;
 }
 
@@ -292,6 +294,66 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_s
     topo.topoLevelNums = 2U; // 现状：topoLevelNums != 1U → NOT_MATCH
     OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_single_level_mesh1d_selects_sole_mesh)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U); // 单级 MESH_1D，alltoallv kernel 多event无rank上限
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_multilevel_small_rank_selects_sole_mesh)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U); // 多级 ≤4P
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_pcie_mix_all_connected_selects_sole_mesh)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.level0PcieMix = true;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {4U}; // 全连通 1DMESH
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_algos_stay_not_match)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {3U}; // mesh != clos
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    // CCU: MultiJetty 未注册 NOT_MATCH；AICPU: mesh!=clos 也 NOT_MATCH → 整链 NOT_MATCH
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+
+    // mesh == clos 且 4P：CCU Concurrent 未注册 NOT_MATCH → AICPU Concurrent 兜底 MATCH
+    topo = MakeConcurrentTopo();
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_int8_multilevel_falls_back_to_aicpu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U);
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    param.all2AllVDataDes.sendType = HCCL_DATA_TYPE_INT8;
+    std::string algName;
+    // CCU: int8 NOT_MATCH（对齐 hccl）→ AICPU 兜底 SoleMesh（守护用例）
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
