@@ -16,21 +16,12 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 project(hashtable_lookup LANGUAGES ASC CXX)
 
-set(RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
-set(SOC_VERSION "" CACHE STRING "Simulator SOC version, e.g. Ascend950PR_9599")
 
-# 场景参数（通过命令行传入）
-# SCENARIO_NUM: 场景编号（一 case 一访问方式，各是独立算子）
-#   0 - aos：AoS 基线，40B 桶步长，thread-per-key
-#   1 - soa：SoA 纯布局，key 区 8B 步长，thread-per-key
-#   2 - soa digest + swar：1B digest 预过滤 + 4 桶 word/vcmp_eq4 批量比较
-#   3 - coop + swar：G=4 协作 × 每 lane SWAR 4 桶（16 桶/轮窗口）
 set(SCENARIO_NUM "3" CACHE STRING "Case type to run (0-3)")
 if(NOT SCENARIO_NUM MATCHES "^[0-3]$")
     message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, but got ${SCENARIO_NUM}")
 endif()
 
-# 负载因子（< 1，建表必有空桶；用于不同负载因子下的性能对比）
 set(LOAD_FACTOR "0.9" CACHE STRING "Table load factor, e.g. 0.5-0.9")
 if(NOT LOAD_FACTOR MATCHES "^0\.[0-9]+$")
     message(FATAL_ERROR "LOAD_FACTOR must be a decimal in (0,1), but got ${LOAD_FACTOR}")
@@ -46,17 +37,5 @@ target_compile_definitions(hashtable_lookup PRIVATE
 )
 
 target_compile_options(hashtable_lookup PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
-    $<BUILD_INTERFACE:$<$<NOT:$<STREQUAL:${RUN_MODE},sim>>:-O2>>
-    --cce-res-usage
-)
-
-target_link_directories(hashtable_lookup PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
-)
-
-target_link_libraries(hashtable_lookup PRIVATE
-    m
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
+    $<$<COMPILE_LANGUAGE:ASC>:--cce-res-usage>
 )
