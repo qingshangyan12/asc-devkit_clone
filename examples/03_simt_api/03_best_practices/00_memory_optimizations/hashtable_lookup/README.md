@@ -131,13 +131,15 @@ idx = (idx + 1) & (CAPACITY - 1);
 
 **分析**：
 
-**图2　SoA_Cacheline搬运示意图** 
+同一算法，Task Duration从1311.297μs降至783.029μs。Case 1相对Case 0提升x1.67；性能提升的关键在于两种布局对Cacheline的利用方式不同：
+
+**图2　Cacheline示意图** 
 
 ![Cacheline示意图.drawio](figures/Cacheline示意图.drawio.png)
 
-图2对比了 AoS 与 SoA 布局在 Cacheline 利用上的差异：AoS 中 KEY 和 VALUE 交替存储，查询 KEY 时会将相邻的 VALUE 一同加载；SoA 中所有 KEY 连续存储，单条 128B Cacheline 可容纳更多 KEY，例如16个8B的KEY，从而减少查找过程中不必要的 VALUE 数据加载，降低 Cacheline 搬运开销，提高缓存利用率。
+图2对比了 AoS 与 SoA 布局在 Cacheline 利用上的差异：AoS 中 key 和 VALUE 交替存储，查询 key 时会将相邻的 VALUE 一同加载；SoA 中所有 key 连续存储，单条 128B Cacheline 可容纳更多 key，例如16个8B的key，从而减少查找过程中不必要的 VALUE 数据加载，降低 Cacheline 搬运开销，提高缓存利用率。
 
-同一算法，Task Duration从1311.297μs降至783.029μs。Case 1相对Case 0提升x1.67；若能将探测查找的读取宽度继续缩减，降低每次探测所需字节数，则性能还会有所提升，因此我们引入Case2。
+此时若能将探测查找的读取宽度继续缩减，降低每次探测所需字节数，则性能还会有所提升，因此我们引入Case2。
 
 ---
 
@@ -145,14 +147,14 @@ idx = (idx + 1) & (CAPACITY - 1);
 
 **优化目标**：通过引入digest字段，只在digest匹配时才读key确认，同时探测时并行加载digest，做到减少探测所需字节数，提高访存效率。
 
-**核心实现**：digest取key哈希值的高8位；每轮按4B对齐加载4个连续digest并完成初步筛选；根据筛选结果对key进行精确对比。线程处理同上。
+**核心实现**：digest取key哈希值的高8位；每轮按4B对齐加载4个连续digest并进行匹配，__ffs 逐个取出 digest 匹配的桶位——digest 相同不代表 key 相同，根据匹配结果对key进行最终确认。线程处理同上。
 
 （加图）
 
 **关键代码**：
 
 ```cpp
-// digest 取 key 哈希值的高 8 位（1B/桶），建表时随桶位一次性写入
+// digest 取 key 哈希值的高 8 位
 __host__ __aicore__ inline uint8_t DigestOf(uint64_t hashed) {
   return static_cast<uint8_t>(hashed >> 32);
 }
@@ -162,7 +164,6 @@ __host__ __aicore__ inline uint32_t DigestWordOf(uint64_t hashed) {
   return static_cast<uint32_t>(DigestOf(hashed)) * 0x01010101u;
 }
 
-// SoA + digest 查找主循环：每轮一次 4B word load + 两次 vcmp_eq4
 __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
                                              uint64_t target_key,
                                              uint32_t start,
@@ -172,7 +173,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
   for (uint32_t offset = 0; offset < CAPACITY + STRIDE; offset += STRIDE) {
     const uint32_t pos = (first_pos + offset) & (CAPACITY - 1);
 
-    // 1. 比目标 digest：__ffs 逐个消费命中桶位，读 8B key 精确确认
+    // 比较目标 digest：__ffs 逐个取出 digest 匹配的桶位——digest 相同不代表 key 相同，还要读 8B key 最终确认
     const uint32_t probe =
         *reinterpret_cast<const uint32_t*>(table->digest + pos);
     uint32_t cmp = VcmpEq4(probe, target_word) & 0x01010101u;
@@ -186,7 +187,6 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
       }
     }
 
-    // 2. 比空桶 digest：起始位置之后确认空桶 → miss 早退
     cmp = VcmpEq4(probe, empty_word) & 0x01010101u;
     while (cmp != 0) {
       const uint32_t idx =
@@ -194,23 +194,17 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
                        __ffs(static_cast<int32_t>(cmp)))) - 1u) >> 3);
       cmp &= cmp - 1;
       if (offset == 0 && idx < start) {
-        continue;  // 回绕保护：第 0 轮 word 内位于 start 之前的桶，
-                   // 逻辑上是回绕后才探到的，空了不能作为 miss 证据
+        continue;  
+                   
       }
       if (table->key[idx] == EMPTY_KEY) {
-        return NOT_FOUND;  // 读 key 确认，排除 digest 假阳性
+        return NOT_FOUND; 
       }
     }
   }
   return NOT_FOUND;
 }
 ```
-
-**处理逻辑**：
-digest预过滤处理流程分为两步：
-
-1. **Digest 预筛选**：每个槽位存储 1B 的 key 哈希摘要，每轮连续读取 4B，通过 `VcmpEq4` 并行比较 4 个槽位的 digest。
-2. **候选确认**：使用 `__ffs` 逐个提取比较结果，对于命中的digest进一步读取 8B key 精确确认。
 
 **性能数据**：
 
@@ -221,7 +215,7 @@ digest预过滤处理流程分为两步：
 
 **分析**：
 
-通过在 SoA 布局中增加 1B 的 digest 字段，将 KEY 的哈希摘要连续存储，使单条 Cacheline 能容纳更多 digest，从而减少查找时的 Cacheline 搬运。Case 2相对Case 1性能提升x1.62。但目前仍存在访存效率问题：每个 lane 各自查询一个 key，读取的 4B digest 分散在不同的 Cacheline 中，难以合并访存请求。整个 warp 必须等待最慢的请求完成，同时需要处理大量独立的访存事务。因此，我们引入 Case 3 的协作探测，让多个 lane 组队查询同一个 key，通过连续访存减少请求数量，提高访存效率。
+通过在 SoA 布局中增加 1B 的 digest 字段，将 key的哈希摘要连续存储，使单条 Cacheline 能容纳更多 digest，从而减少查找时的 Cacheline 搬运。Case 2相对Case 1性能提升x1.62。但目前仍存在访存效率问题：每个 lane 各自查询一个 key，读取的 4B digest 分散在不同的 Cacheline 中，难以合并访存请求。整个 warp 必须等待最慢的请求完成，同时需要处理大量独立的访存事务。因此，我们引入 Case 3 的协作探测，让多个 lane 组队查询同一个 key，通过连续访存减少请求数量，提高访存效率。
 
 
 ---
@@ -236,24 +230,22 @@ digest预过滤处理流程分为两步：
 
 ![协作组查找.drawio](figures/协作组查找示意图.drawio.png)
 
-图四展示了协作组查询 key 的过程：多个线程通过合并访存连续读取候选 key 到寄存器，再通过组内投票生成匹配位图，最后选出命中线程，由其负责处理命中的 key（如 key3），从而减少访存开销并避免多个线程重复处理同一结果。
+图4展示了协作组查询 key 的过程：多个线程读取连续存储的候选 key 到寄存器，再通过组内投票生成匹配位图，最后选出命中线程，由其负责处理命中的 key，例如 key3，从而减少访存开销并避免多个线程重复处理同一结果。
 
 **关键代码**：
 
 以下代码在 digest 预筛选的基础上引入协作组机制：每 4 个线程协作查询同一个 key，通过组内投票汇总匹配结果，并由命中线程完成后续处理。
 
 ```cpp
-// 每 lane 一次 4B word load + 两次并行比较（每 warp-轮 32 次 word load = 128 桶）
 const uint32_t word =
     *reinterpret_cast<const uint32_t*>(table->digest + pos);
 uint32_t tmask = VcmpEq4(word, target_word) & 0x01010101u;
 uint32_t emask = VcmpEq4(word, empty_word) & 0x01010101u;
-if (round == 0) {  // 回绕保护（字节粒度）：清位于 start 之前的字节
+if (round == 0) {  
   const uint32_t shift = (start > pos)
       ? (kBucketsPerLane < start - pos ? kBucketsPerLane : start - pos) : 0u;
   emask &= ~static_cast<uint32_t>((1ull << (shift * 8)) - 1ull);
 }
-// word 内 __ffs 迭代消费位图读 key 确认，跨 lane 由投票汇总（2 票/轮）
 const uint32_t match_ballot = asc_ballot(match);
 if (((match_ballot >> group_shift) & kGroupMask) != 0) {
   found = true;
@@ -284,11 +276,11 @@ Case 3 的关键在于：在保持访存指令数量不变的前提下，减少�
 
 ## 调优建议
 
-
+前文各Case的性能数据均在负载因子0.9下测得，而负载因子不同，各优化方案的表现也会随之变化：
 
 **图5　不同负载因子下各优化方案的查找性能对比图**
 
-![image-20261016155256161](figures/image-20261016155256161.png)
+![image-20261016155256161](figures/性能对比示意图.png)
 
 图 5 展示了不同优化方案在不同负载因子下的查找性能变化。当负载因子较低时，Case 0（AoS）和 Case 1（SoA）均能保持较好的查找性能；随着负载因子增加，哈希冲突增多、探测序列变长，各方案的耗时均明显上升。相比之下，SoA 布局减少了不必要的数据加载，Digest 预筛选降低了完整 key 的读取开销，而协作探测通过扩大单轮探测范围、合并访存请求，进一步缓解了高负载下的性能退化。
 
