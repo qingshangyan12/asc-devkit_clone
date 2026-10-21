@@ -15,10 +15,16 @@
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "sim_world.h"
 #include "acl/acl_rt.h"
+#include "mockcpp/mockcpp.hpp"
 
 #include <algorithm>
 #include <functional>
 #include <numeric>
+
+namespace mc2_ops_hccl {
+CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx);
+CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx);
+}
 
 namespace HcclSim {
 namespace CcuSt {
@@ -60,12 +66,23 @@ std::vector<KfcNhrStepInfo> NhrSteps(uint32_t rank, uint32_t size)
 
 class ParallelAllGatherMigrationTest : public ::testing::Test {
 protected:
-    void SetUp() override { RegisterManager::Global().Reset(); }
-    void TearDown() override { RegisterManager::Global().Reset(); }
+    void SetUp() override
+    {
+        RegisterManager::Global().Reset();
+        MOCKER(mc2_ops_hccl::SlaveKfcServerGenCircularQueue)
+            .stubs()
+            .will(invoke(mc2_ops_hccl::KfcServerGenCircularQueue));
+    }
+    void TearDown() override
+    {
+        GlobalMockObject::verify();
+        GlobalMockObject::reset();
+        RegisterManager::Global().Reset();
+    }
 
     // 直接编译产品 KFC server + dispatch + 两阶段子核，不替换算法计算。
     // 当前 RuntimeWorld 每 rank 只有一个执行上下文，故分别验证 Mesh/NHR
-    // 单 mission server，预填另一 mission 的 phase-0 结果和完成标志。此测试不声称
+    // mission，预填另一 mission 的 phase-0 结果和完成标志。此测试不声称
     // 覆盖双 mission 的真实并发、GM 可见性或硬件资源容量。
     void VerifyMission(uint32_t meshSize, uint32_t nhrSize, uint64_t count, uint64_t elementSize, bool mesh)
     {
@@ -240,8 +257,8 @@ protected:
             ASSERT_EQ(registry.RegisterEnd(rank + 1), Result::SUCCESS);
             launches[rank] = {
                 handle,
-                {memory.ParameterAddress(), memory.ParameterAddress() + (CKE_WORD + mission * 2 * CKE_REGION) * 8, 1, 1,
-                 0, 0x1000U + rank, 0x1000U},
+                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission,
+                 0x1000U + rank, 0x1000U},
                 &memory};
         }
         RuntimeWorld runtime;
@@ -255,6 +272,7 @@ protected:
                 << " actual=" << static_cast<uint32_t>(*mismatch.first)
                 << " expected=" << static_cast<uint32_t>(*mismatch.second);
             for (uint32_t entry = 0; entry < 2; ++entry) {
+                EXPECT_EQ(memories[rank].parameter[CKE_WORD + mission * 2 * CKE_REGION + entry], 0U);
                 EXPECT_EQ(memories[rank].parameter[CKE_WORD + (mission * 2 + 1) * CKE_REGION + entry], 1U);
             }
         }
