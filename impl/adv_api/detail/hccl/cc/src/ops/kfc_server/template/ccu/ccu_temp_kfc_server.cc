@@ -264,7 +264,8 @@ HcclResult CcuTempKfcServer::CalcRes(
                                  (missionIndex == 0U && (isAllGather || isAllGatherKfc || isReduceScatter)) ||
                                  (missionIndex == 1U && (isAllGatherNhr || isReduceScatterNhr)) ||
                                  (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty) ||
-                                 isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die);
+                                 isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die) ||
+                                 (missionNum == KFC_MAX_MISSION_NUM && isHalfAlltoAllV);
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
              !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr && !isHalfAlltoAllV) ||

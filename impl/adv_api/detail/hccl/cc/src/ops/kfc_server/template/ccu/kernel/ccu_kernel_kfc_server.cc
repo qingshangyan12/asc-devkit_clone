@@ -454,13 +454,12 @@ static void DispatchKfcSubKernel(
                 ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
         }
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
-        // 单 mission xn 布局（与 CcuPrepareForAllToAllVWrite 严格对应）：
+        // xn 布局（与 CcuPrepareForAllToAllVWrite 严格对应）：
         // [0]=opId(签名+哨兵) [1]=sendBuf [2]=sendSizes [3]=sendOffsets
         // [4..7]=goSize [8]=remoteWinOffset
-        // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位
-        //
-        // 阶段 3-1：将 missionNum 和 missionIndex 传递给 HalfAlltoAllV kernel
-        // 使其能够根据 mission 选择对应的 A/B 切片
+        // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位。
+        // 双 mission：两个 server 各自 dispatch 本 kernel，missionNum/missionIndex
+        // 来自各自的 kfcServerArgs，kernel 内按 missionIndex 选 A/B 切片。
         CcuKfcHalfAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
