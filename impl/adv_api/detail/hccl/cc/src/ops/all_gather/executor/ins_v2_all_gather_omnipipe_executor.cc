@@ -294,7 +294,14 @@ HcclResult InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     controlThread_ = threads_.at(0);
     levelThreads_.resize(OMNIPIPE_LEVEL_NUM);
 
-    CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
+    // 按本 rank 与对端 rank 所属的子通信域重新归层（对齐 hccl :401-405）
+    // 兼容 CalcRes 按层序列化和对称内存合并到 channels[0] 两种资源布局
+    const std::vector<const std::vector<std::vector<u32>>*> subCommsByLevel
+        = {&subCommRanks0, &subCommRanks1, &subCommRanks2};
+    const std::vector<uint64_t> rankSizesByLevel
+        = {rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1], rankSizeLevel_[OMNIPIPE_LEVEL2]};
+    CHK_RET(ClassifyOmniPipeChannelsByLevel(
+        myRank_, resCtx.channels, subCommsByLevel, rankSizesByLevel, remoteRankToChannelInfo_));
     if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
         if (rankSizeLevel_[OMNIPIPE_LEVEL1] > 1) {
             tempMap[OMNIPIPE_LEVEL1]->SetchannelsPerRank(remoteRankToChannelInfo_[1]);
