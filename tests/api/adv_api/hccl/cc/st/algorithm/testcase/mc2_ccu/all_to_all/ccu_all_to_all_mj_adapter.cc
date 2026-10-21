@@ -82,7 +82,7 @@ Result CaptureAllToAllMjKernel(void* kernelArg)
 
 std::vector<uint64_t> PrepareAllToAllMjTaskArgs(const AllToAllMjLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
         config.inputAddress,
         config.outputAddress,
         config.token,
@@ -96,6 +96,8 @@ std::vector<uint64_t> PrepareAllToAllMjTaskArgs(const AllToAllMjLaunchConfig& co
         config.goSize[3],
         config.sliceSizePerJetty,
         config.lastSliceSizePerJetty};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildMjScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

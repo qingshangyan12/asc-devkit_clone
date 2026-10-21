@@ -76,9 +76,12 @@ Result CaptureAllToAllMesh1DKernel(void* kernelArg)
 
 std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig& config)
 {
-    return {config.inputAddress, config.outputAddress, config.token,     config.sliceSize,
-            config.srcStride,    config.srcOffset,     config.dstOffset, config.goSize[0],
-            config.goSize[1],    config.goSize[2],     config.goSize[3]};
+    std::vector<uint64_t> args = {
+        config.inputAddress, config.outputAddress, config.token,     config.sliceSize,
+        config.srcStride,    config.srcOffset,     config.dstOffset, config.goSize[0],
+        config.goSize[1],    config.goSize[2],     config.goSize[3]};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

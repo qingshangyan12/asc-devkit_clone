@@ -121,7 +121,7 @@ std::array<uint64_t, 4> CalculateReduceScatterMeshGoSize(uint64_t size)
 // [5..12] 为其他算法预留，[13..23] 为 Mesh 专用参数。
 std::vector<uint64_t> PrepareReduceScatterMeshTaskArgs(const ReduceScatterMeshLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
         config.inputAddress,
         config.outputAddress,
         config.token,
@@ -146,6 +146,8 @@ std::vector<uint64_t> PrepareReduceScatterMeshTaskArgs(const ReduceScatterMeshLa
         config.tailGoSize[1],
         config.tailGoSize[2],
         config.tailGoSize[3]};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildReduceScatterMeshScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

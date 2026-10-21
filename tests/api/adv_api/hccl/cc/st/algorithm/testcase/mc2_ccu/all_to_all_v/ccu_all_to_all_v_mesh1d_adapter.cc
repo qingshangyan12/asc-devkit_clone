@@ -102,16 +102,19 @@ std::array<uint64_t, 4> CalculateAllToAllVGoSize(uint64_t size)
 
 std::vector<uint64_t> PrepareAllToAllVTaskArgs(const AllToAllVLaunchConfig& config)
 {
-    return {config.inputAddress,
-            config.outputAddress,
-            config.token,
-            config.sourceBaseOffset,
-            config.destinationBaseOffset,
-            config.goSize[0],
-            config.goSize[1],
-            config.goSize[2],
-            config.goSize[3],
-            config.parameterAddress};
+    std::vector<uint64_t> args = {
+        config.inputAddress,
+        config.outputAddress,
+        config.token,
+        config.sourceBaseOffset,
+        config.destinationBaseOffset,
+        config.goSize[0],
+        config.goSize[1],
+        config.goSize[2],
+        config.goSize[3],
+        config.parameterAddress};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildAllToAllVMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

@@ -108,7 +108,7 @@ Result CaptureCcuKfcReduceScatterNhr2DieKernel(void* kernelArg)
 // [21..24]=die1 goSizeNormal [25..28]=die1 goSizeLast
 std::vector<uint64_t> PrepareReduceScatterNhr2DieTaskArgs(const ReduceScatterNhr2DieLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
         config.inputAddress,
         config.outputAddress,
         config.token,
@@ -138,6 +138,8 @@ std::vector<uint64_t> PrepareReduceScatterNhr2DieTaskArgs(const ReduceScatterNhr
         config.die1GoSizeLast[1],
         config.die1GoSizeLast[2],
         config.die1GoSizeLast[3]};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 namespace {

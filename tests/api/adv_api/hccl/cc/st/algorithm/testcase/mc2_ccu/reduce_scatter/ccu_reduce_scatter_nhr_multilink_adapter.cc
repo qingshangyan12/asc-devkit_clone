@@ -102,7 +102,7 @@ Result CaptureCcuKfcReduceScatterNhrMultiLinkKernel(void* kernelArg)
 // [5]=sliceOneJettySize [6]=sliceLastJettySize [7]=repeatNumInv [8]=inputRepeatStride [9]=outputRepeatStride
 std::vector<uint64_t> PrepareReduceScatterNhrMultiLinkTaskArgs(const ReduceScatterNhrMultiLinkLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
         config.inputAddress,
         config.outputAddress,
         config.token,
@@ -113,6 +113,8 @@ std::vector<uint64_t> PrepareReduceScatterNhrMultiLinkTaskArgs(const ReduceScatt
         std::numeric_limits<uint64_t>::max() - 1U, // repeatNumInv（sole executor repeatNum=1）
         config.inputRepeatStride,
         config.outputRepeatStride};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 namespace {
