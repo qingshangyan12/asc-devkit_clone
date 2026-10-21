@@ -22,6 +22,8 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/cube_compute_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/cube_compute_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/cube_compute_intf_impl.h"
 #endif
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"

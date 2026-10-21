@@ -1,14 +1,16 @@
 /*
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * M510 (npu_arch_5102) capi shim: reuses the 3510 implementation.
- * See docs/zh/api/SIMD-API/c_api/rfc_capi_m510_adaptation.md (RFC 4.2).
+ * M510 (npu_arch_5102) capi shim.
+ * See docs/zh/api/SIMD-API/c_api/rfc_capi_m510_adaptation.md (RFC 4.2 / 4.5).
+ *
+ * NOTE: the 3510 counterpart defines only fp4/fp8 MX matmul (asc_mmad_mx*),
+ * which M510 does NOT support (user-confirmed; see RFC 4.5). Those functions
+ * are therefore intentionally NOT provided for npu_arch_5102 (Drop).
  */
 
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_5102_CUBE_COMPUTE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_5102_CUBE_COMPUTE_INTF_IMPL_H
 
-// NOTE: coupled-arch category; Phase-2 refinement required to drop/stub
-// M510-unsupported paths (per impl/basic_api/dav_m510). Reuses 3510 for now.
-#include "impl/c_api/reg_base_impl/npu_arch_3510/cube_compute_intf_impl.h"
+/* M510 provides no fp4/fp8 MX matmul; see RFC 4.5. */
 
 #endif
