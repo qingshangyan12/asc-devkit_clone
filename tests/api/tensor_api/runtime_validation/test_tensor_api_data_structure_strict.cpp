@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api_runtime_validation_include.h"
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 namespace {
 

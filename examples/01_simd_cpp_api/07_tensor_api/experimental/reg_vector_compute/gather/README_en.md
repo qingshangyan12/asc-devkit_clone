@@ -81,7 +81,7 @@ Perform the following steps from the sample root directory to build and run the 
 
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py
   ./demo
@@ -95,7 +95,6 @@ Perform the following steps from the sample root directory to build and run the 
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Options are `npu` and `sim`; the default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. This sample supports only `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Experimental ASC API switch. This sample requires `ON`. |
 
 - Execution result
 

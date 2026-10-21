@@ -147,28 +147,18 @@ y[i] = convert<To>(x[i])
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo
   ```
 
-  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。可选编号为1至6、8。
+  所有场景使用相同的编译和执行流程，仅需修改 `SCENARIO_NUM`。可选编号为1至6、8；运行场景8时设为 `SCENARIO_NUM=8`。生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。
 
   使用NPU仿真时，可分别增加以下编译选项：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} -DCANN_ASC_USE_EXPERIMENTAL=ON ..
-  ```
-
-  场景8的完整仿真命令（在样例根目录执行）：
-
-  ```bash
-  cmake -S . -B build_int4_sim -DSCENARIO_NUM=8 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON -DCMAKE_ASC_RUN_MODE=sim
-  cmake --build build_int4_sim -j2
-  cd build_int4_sim
-  python3 ../scripts/gen_data.py --scenario_num=8
-  ./demo
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
 
   构建使用 CANN 包内的 Tensor API 和 C API 头文件；验证本仓库代码时，应先同步到包内对应目录。
@@ -181,7 +171,6 @@ y[i] = convert<To>(x[i])
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
-  | `CANN_ASC_USE_EXPERIMENTAL` | 实验性ASC接口开关，本样例必须设为 `ON`，默认值为 `OFF`。 |
   | `SCENARIO_NUM` | 类型转换场景编号，必选，可选编号为1至6、8。 |
 
 - 执行结果

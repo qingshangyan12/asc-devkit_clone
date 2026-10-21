@@ -150,28 +150,18 @@ Run the following steps in the sample root directory to build and execute the op
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo
   ```
 
-  The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. Valid scenario numbers are 1–6 and 8.
+  All scenarios use the same build and execution steps; only `SCENARIO_NUM` changes. Valid numbers are 1–6 and 8; set `SCENARIO_NUM=8` to run scenario 8. The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation.
 
   To use NPU simulation, add the following build option:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} -DCANN_ASC_USE_EXPERIMENTAL=ON ..
-  ```
-
-  Complete simulator commands for scenario 8, starting in the sample directory:
-
-  ```bash
-  cmake -S . -B build_int4_sim -DSCENARIO_NUM=8 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON -DCMAKE_ASC_RUN_MODE=sim
-  cmake --build build_int4_sim -j2
-  cd build_int4_sim
-  python3 ../scripts/gen_data.py --scenario_num=8
-  ./demo
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
 
   The build uses the Tensor API and C API headers installed in CANN. Synchronize the repository code to the corresponding package directories before validating local changes.
@@ -184,7 +174,6 @@ Run the following steps in the sample root directory to build and execute the op
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default is `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Experimental ASC API switch. This sample requires `ON`; the default is `OFF`. |
   | `SCENARIO_NUM` | Required data type conversion scenario number. Valid numbers are 1–6 and 8. |
 
 - Expected Result
