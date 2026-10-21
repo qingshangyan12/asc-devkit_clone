@@ -10,17 +10,16 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/c_api/reg_base_impl/npu_arch_3510/sys_init_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+    "impl/c_api/reg_base_impl/npu_arch_9201/sys_init_impl_arch_9201.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_INIT_INTF_IMPL_H
-#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_INIT_INTF_IMPL_H
+#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_SYS_INIT_IMPL_ARCH_9201_H
+#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_SYS_INIT_IMPL_ARCH_9201_H
 
-__aicore__ inline void asc_init()
+__aicore__ inline void asc_init_impl()
 {
-#if !defined(__BISHENG_ENABLE_ASC_INIT)
     set_atomic_none();
     set_mask_norm();
     uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
@@ -36,8 +35,6 @@ __aicore__ inline void asc_init()
         set_loop_size_ubtoout(loopSizePara);
         set_loop_size_outtoub(loopSizePara);
     }
-    set_st_atomic_cfg(0b00100100);
-#endif
 }
 
 #endif

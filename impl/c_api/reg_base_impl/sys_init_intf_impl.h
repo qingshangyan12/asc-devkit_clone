@@ -19,12 +19,19 @@
 #define IMPL_C_API_REG_BASE_IMPL_SYS_INIT_INTF_IMPL_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/sys_init_intf_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_3510/sys_init_impl_arch_3510.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-#include "impl/c_api/reg_base_impl/npu_arch_9201/sys_init_intf_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_9201/sys_init_impl_arch_9201.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9202)
-#include "impl/c_api/reg_base_impl/npu_arch_9202/sys_init_intf_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_9202/sys_init_impl_arch_9202.h"
 #endif
+
+__aicore__ inline void asc_init()
+{
+#if !defined(__BISHENG_ENABLE_ASC_INIT)
+    asc_init_impl();
+#endif
+}
 
 #endif
 
