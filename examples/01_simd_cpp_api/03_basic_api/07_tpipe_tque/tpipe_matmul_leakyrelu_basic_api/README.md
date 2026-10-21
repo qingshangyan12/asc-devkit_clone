@@ -168,7 +168,7 @@
           // 以下成员位于KernelMatmul类的private区域。
           AscendC::TPipe* pipe;
           // A1预取两个分块，队列深度为2；其余队列深度为1。
-          // 队列深度与物理缓冲数不同，双缓冲通过InitBuffer的BUFFER_NUM参数开启。
+          // 队列深度与分配的内存块数量不同，双缓冲通过InitBuffer的BUFFER_NUM参数开启。
           AscendC::TQue<AscendC::TPosition::A1, BUFFER_NUM> a1Queue;
           AscendC::TQue<AscendC::TPosition::B1, 1> b1Queue;
           AscendC::TQue<AscendC::TPosition::A2, 1> a2Queue;
@@ -221,7 +221,7 @@
 
           **内存搬运与计算流程**：
 
-          - **LocalTensor创建**：在Init中用TPipe::InitBuffer初始化队列，运行时用AllocTensor申请LocalTensor；写入后EnQue，消费前DeQue，读取提交后FreeTensor。A1/A2/CO1使用两个物理缓冲，B1/B2各一个。
+          - **LocalTensor创建**：在Init中用TPipe::InitBuffer初始化队列，运行时用AllocTensor申请LocalTensor；写入后EnQue，消费前DeQue，读取提交后FreeTensor。A1、A2、CO1队列各分配两个内存块，B1、B2队列各分配一个内存块。
           - **GM → L1**：使用[DataCopy](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)将B搬入L1一次，并预取两个A分块，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
           - **L1 → L0A/L0B**：使用[LoadData](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)将A分块搬运到L0A，将B一次性转置加载到L0B（Nz→Zn）并持有到全部M分块计算结束
           - **L0A/L0B → L0C**：使用[Mmad](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)（矩阵乘累加指令）执行每个M分块的完整K维度的矩阵乘计算；每次均初始化累加器，不进行跨分块的K累加
@@ -329,6 +329,9 @@
               a1Queue.EnQue(a1Local);
           }
 
+          // 将B矩阵从B1队列的L1内存块搬入B2队列的L0B内存块，完成Nz到Zn的格式转换。
+          // 搬运后将B2 Tensor入队并释放B1 Tensor；Process在M方向分块循环前调用本函数一次，
+          // 随后将B2 Tensor出队，供各M分块的Mmad复用，循环结束后再释放。
           __aicore__ inline void LoadB()
           {
               AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
@@ -427,12 +430,10 @@
         uint32_t baseM, uint32_t baseK, uint32_t baseN>
     __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
     {
-        AscendC::InitSocState();
         AscendC::TPipe pipe;
         KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN> op;
         op.Init(xMatrix, yMatrix, zMatrix, &pipe);
         op.Process();
-        AscendC::PipeBarrier<PIPE_ALL>();
     }
     ```
 
@@ -445,13 +446,13 @@
   | 接口 | 本样例含义 |
   |------|------------|
   | `TQue<TPosition, depth>` | position指定逻辑位置，depth是最大待出队Tensor数；A1深度为2，其余为1 |
-  | `pipe->InitBuffer(queue, num, len)` | num是物理缓冲数，len是单缓冲字节数；双缓冲num=2 |
+  | `pipe->InitBuffer(queue, num, len)` | num是分配的内存块数量，len是每个内存块的大小，单位为字节；双缓冲num=2 |
   | `AllocTensor<T>()` | 获取可写的片上Tensor，类型必须与容量和计算匹配 |
   | `EnQue(tensor)` | 发布生产任务及数据依赖 |
   | `DeQue<T>()` | 按队列顺序取得Tensor，建立消费前的依赖 |
   | `FreeTensor(tensor)` | 归还缓冲使用权，后续AllocTensor复用时保护未完成的读取 |
 
-  例如`pipe->InitBuffer(a2Queue, 2, baseM * baseK * sizeof(half))`分配两个32 KiB的L0A缓冲。a2Queue的模板深度为1，并不意味着只有一个物理缓冲。相关说明见[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)。
+  例如`pipe->InitBuffer(a2Queue, 2, baseM * baseK * sizeof(half))`在L0A中分配两个32 KiB的内存块。a2Queue的模板深度为1，并不意味着只分配一个内存块。相关说明见[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)。
 
   **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
 
@@ -574,7 +575,7 @@
   - `LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, len)`依次传入输出、输入、负半轴斜率及元素数；len=8192，不是字节数。
   - `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + flagOffset)`在FIX完成后通知两个配对AIV；`CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + flagOffset)`在AIV读取完成后确认。
   - READY_FLAG=8、FREE_FLAG=10是本样例定义的flagId起始值；`flagOffset=mIndex%BUFFER_NUM`，READY使用8/9，FREE使用10/11。AIC的一次模式2等待要求两个配对AIV均完成同步。
-  - Ascend 950PR&950DT系列产品的`pipe`模板参数生效，省略时仅阻塞默认的`PIPE_S`。本样例在AIV侧使用`CrossCoreWaitFlag<0x2, PIPE_MTE2>`等待READY，保证GM→UB搬运在Fixpipe完成后执行；AIC侧使用`CrossCoreWaitFlag<0x2, PIPE_FIX>`等待FREE，保证复用flagId前两个AIV均完成读取，并约束后续Fixpipe与READY发送的顺序。末尾的FREE等待同样使用`PIPE_FIX`，由核函数末尾的`PipeBarrier<PIPE_ALL>()`保证完成。
+  - Ascend 950PR&950DT系列产品的`pipe`模板参数生效，省略时仅阻塞默认的`PIPE_S`。本样例在AIV侧使用`CrossCoreWaitFlag<0x2, PIPE_MTE2>`等待READY，保证GM→UB搬运在Fixpipe完成后执行；AIC侧使用`CrossCoreWaitFlag<0x2, PIPE_FIX>`等待FREE，保证复用flagId前两个AIV均完成读取，并约束后续Fixpipe与READY发送的顺序。末尾的FREE等待同样使用`PIPE_FIX`，由Kernel退出时TPipe析构调用`Destroy()`中的全流水同步保证完成。
   - Atlas A2系列产品和Atlas A3系列产品的`pipe`参数不影响硬件指令功能，等待会阻塞全部流水，按仓内接口建议保留`CrossCoreWaitFlag<0x2>`。两个架构分支均与Set端的模式2匹配。
 
 ## 编译运行
@@ -662,11 +663,11 @@
 | L0C | CO1：2×64 KiB | 128 KiB/AIC |
 | UB | VECIN：2×16 KiB，VECOUT：2×16 KiB | 64 KiB/AIV |
 
-同一分块内部仍按依赖执行；不同分块可利用不同物理缓冲使MTE1加载与Mmad、Mmad与Fixpipe、Vector搬运与计算重叠。TQue的FreeTensor并非立即销毁底层片上内存，后续复用仍受队列依赖保护。双缓冲提供重叠机会，不保证性能翻倍。
+同一分块内部仍按依赖执行；不同数据分块可使用不同缓冲区使MTE1加载与Mmad、Mmad与Fixpipe、Vector搬运与计算重叠。TQue的FreeTensor并非立即销毁底层片上内存，后续复用仍受队列依赖保护。双缓冲提供重叠机会，不保证性能翻倍。
 
 默认每核两个分块，AIC发送flagId为8/9的READY同步事件，在末尾等待flagId为10/11的FREE同步事件。如果baseM=64，每核四个分块，分块2复用flagId=8前等待分块0的FREE（flagId=10），分块3复用flagId=9前等待分块1的FREE（flagId=11），然后在末尾等待最后两个分块的FREE。
 
-FREE表示对应分块的GM读取已完成，不代表激活和最终写回完成。每个分块的GM区域独立，后续Cube分块不会覆盖前一个Vector输出；最终写回由队列和核函数末尾PipeBarrier保证完成，无额外GM workspace。
+FREE表示对应分块的GM读取已完成，不代表激活和最终写回完成。每个分块的GM区域独立，后续Cube分块不会覆盖前一个Vector输出；最终写回由队列同步和Kernel退出时TPipe析构中的全流水同步保证完成，无额外GM workspace。
 
 ## 功能调试
 

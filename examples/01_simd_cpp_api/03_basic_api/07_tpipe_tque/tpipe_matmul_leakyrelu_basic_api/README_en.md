@@ -137,7 +137,7 @@ tpipe_matmul_leakyrelu_basic_api/
 
   A single TPipe instance is created at the Kernel entry and passed to the operator through `Init(..., &pipe)`; the class stores only its pointer. This follows [Avoid Creating and Initializing TPipe Inside an Object](../../../../../docs/zh/guide/operator_practice/simd_operator_optimization/overhead_optimization/avoid_tpipe_init_in_object.md) and the [Reduce example](../../01_memory_vector_compute/reduce/reduce.asc), allowing constant folding and propagation of Scalar variables in the operator class.
 
-  The queue members and shared constants match the source. Tile dimensions in these excerpts are supplied by the nine template parameters of KernelMatmul. Comments are omitted from the code excerpts; the complete template is in the [source](tpipe_matmul_leakyrelu_basic_api.asc).
+  The queue members and shared constants match the source. Tile dimensions in these excerpts are supplied by the nine template parameters of KernelMatmul. Most comments are omitted from the code excerpts; the complete template is in the [source](tpipe_matmul_leakyrelu_basic_api.asc).
 
 ```cpp
 constexpr uint32_t CUBE_BLOCK = 16;
@@ -279,6 +279,9 @@ __aicore__ inline void CopyInA(uint32_t mIndex)
     AscendC::DataCopy(a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
     a1Queue.EnQue(a1Local);
 }
+// Transfer B from the B1 queue's L1 memory block to the B2 queue's L0B memory block, converting Nz to Zn.
+// Enqueue the B2 tensor and release the B1 tensor. Process calls this function once before the M-tile loop,
+// then dequeues B2 for reuse by Mmad across all M tiles and releases it after the loop.
 __aicore__ inline void LoadB()
 {
     AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
@@ -303,7 +306,7 @@ __aicore__ inline void LoadB()
   **Vector computation**
 
   - **Cross-core synchronization:** Wait for READY for the current tile. After reading, publish FREE from MTE2; the Cube core waits for both paired AIVs before reusing that flagId.
-  - **LocalTensor allocation:** Separate VECIN and VECOUT queues each have two physical buffers.
+  - **LocalTensor allocation:** Separate VECIN and VECOUT queues each have two memory blocks.
   - **GM → UB:** DataCopyPad reads `baseM/2` rows of `baseN` half elements.
   - **UB computation:** LeakyRelu writes a separate output tensor and applies the FP16 negative slope.
   - **UB → GM:** DataCopyPad writes the same half-tile region; release the output tensor and continue to the next tile.
@@ -369,12 +372,10 @@ template <
     uint32_t baseM, uint32_t baseK, uint32_t baseN>
 __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
 {
-    AscendC::InitSocState();
     AscendC::TPipe pipe;
     KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN> op;
     op.Init(xMatrix, yMatrix, zMatrix, &pipe);
     op.Process();
-    AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
@@ -387,13 +388,13 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
   | API | Meaning in this example |
   |-----|-------------------------|
   | `TQue<position, depth>` | Logical position and maximum queued tensors awaiting dequeue; A1 depth is 2, others 1 |
-  | `InitBuffer(queue, num, len)` | Physical buffer count and bytes per buffer; double buffering uses num=2 |
+  | `pipe->InitBuffer(queue, num, len)` | num is the number of allocated memory blocks; len is the size of each block in bytes; double buffering uses num=2 |
   | `AllocTensor<T>()` | Obtain a writable local tensor with the appropriate element type |
   | `EnQue(tensor)` | Publish a producer operation and its dependency |
   | `DeQue<T>()` | Obtain a tensor in queue order and establish the consumer dependency |
   | `FreeTensor(tensor)` | Return ownership; future reuse remains protected against outstanding reads |
 
-  For example, `InitBuffer(a2Queue, 2, baseM*baseK*sizeof(half))` allocates two 32 KiB L0A buffers even though a2Queue has template depth 1.
+  For example, `pipe->InitBuffer(a2Queue, 2, baseM*baseK*sizeof(half))` allocates two 32 KiB memory blocks in L0A even though a2Queue has template depth 1.
 
   **[Nd2NzParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)** — GM-to-L1 ND-to-NZ conversion:
 
@@ -518,7 +519,7 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
   `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG+flagOffset)` sends READY after FIX completes. `CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG+flagOffset)` sends FREE after the AIV finishes reading. READY_FLAG=8 and FREE_FLAG=10 are the starting flagId values defined by this example. With `flagOffset=mIndex%BUFFER_NUM`, READY uses 8/9 and FREE uses 10/11. One mode-2 wait on the AIC requires both paired AIVs to complete synchronization.
 
-  On Ascend 950PR&950DT Series Products, the `pipe` template argument takes effect; omitting it blocks only the default `PIPE_S`. The AIV uses `CrossCoreWaitFlag<0x2, PIPE_MTE2>` for READY so GM-to-UB reads follow Fixpipe completion. The AIC uses `CrossCoreWaitFlag<0x2, PIPE_FIX>` for FREE to wait for both AIV reads before reusing the flagId, ordering subsequent Fixpipe operations and READY events. The final FREE waits also use `PIPE_FIX`; the Kernel's final `PipeBarrier<PIPE_ALL>()` ensures completion.
+  On Ascend 950PR&950DT Series Products, the `pipe` template argument takes effect; omitting it blocks only the default `PIPE_S`. The AIV uses `CrossCoreWaitFlag<0x2, PIPE_MTE2>` for READY so GM-to-UB reads follow Fixpipe completion. The AIC uses `CrossCoreWaitFlag<0x2, PIPE_FIX>` for FREE to wait for both AIV reads before reusing the flagId, ordering subsequent Fixpipe operations and READY events. The final FREE waits also use `PIPE_FIX`; the all-pipeline synchronization in `Destroy()`, called by the TPipe destructor on Kernel exit, ensures completion.
 
   On Atlas A2 Series Products and Atlas A3 Series Products, `pipe` does not affect the hardware instruction: the wait blocks all pipelines. This branch retains `CrossCoreWaitFlag<0x2>` as recommended by the repository API documentation. Both architecture branches use mode 2 to match the corresponding Set calls.
 
@@ -607,11 +608,11 @@ The following tables break down the Cube and Vector operations in execution orde
 | L0C | CO1: 2×64 KiB | 128 KiB/AIC |
 | UB | VECIN: 2×16 KiB; VECOUT: 2×16 KiB | 64 KiB/AIV |
 
-Stages within one tile still obey their dependencies. Different physical buffers allow MTE1 to load while Mmad reads another tile, Mmad to write while FIX reads another result, and Vector transfers to overlap work on another half tile. FreeTensor does not immediately destroy physical local memory; subsequent reuse remains synchronized. Double buffering offers overlap, not a guaranteed 2× speedup.
+Stages within one tile still obey their dependencies. Different buffers allow MTE1 to load while Mmad reads another tile, Mmad to write while FIX reads another result, and Vector transfers to overlap work on another half tile. FreeTensor does not immediately destroy the underlying local memory; subsequent reuse remains synchronized. Double buffering offers overlap, not a guaranteed 2× speedup.
 
 With two tiles per core, the AIC sends READY with flagId 8/9 and waits for FREE with flagId 10/11 at the end. With baseM=64 and four tiles, tile 2 reuses flagId 8 only after FREE for tile 0 (flagId 10); tile 3 similarly waits for FREE for tile 1 (flagId 11) before reusing flagId 9. The final waits complete FREE synchronization for tiles 2 and 3.
 
-FREE indicates that the corresponding GM read is complete, not that activation and final output are complete. Tiles occupy distinct GM regions, so a later Cube tile does not overwrite an earlier Vector output. Queue dependencies and the final PipeBarrier complete the writes. No extra GM workspace is used.
+FREE indicates that the corresponding GM read is complete, not that activation and final output are complete. Tiles occupy distinct GM regions, so a later Cube tile does not overwrite an earlier Vector output. Queue dependencies and the all-pipeline synchronization in the TPipe destructor on Kernel exit ensure that the writes complete. No extra GM workspace is used.
 
 ## Functional Debugging
 
