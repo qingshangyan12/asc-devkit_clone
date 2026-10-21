@@ -45,18 +45,6 @@ Ascend 950PR&950DT系列产品
 
 **表3**  C API Reg矢量计算API精度标准<a id="table-c-api-precision-standard"></a>
 
-[表1](#table-precision-standard)中的Log2/Log10当前无对应的C API，因此未在表3中列出。
-
-C API需要计算Log2或Log10时，可调用`asc_ln`，再使用换底公式并通过`asc_mul_scalar`乘以倒数常量：
-
-$$
-\log_2(x) = \frac{\ln(x)}{\ln(2)} = \ln(x) \times \frac{1}{\ln(2)}
-$$
-
-$$
-\log_{10}(x) = \frac{\ln(x)}{\ln(10)} = \ln(x) \times \frac{1}{\ln(10)}
-$$
-
 | 接口类型 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- | --- |
 | 基础算术 | `asc_exp` | 1ulp, not support denormalized numbers | - |
@@ -79,6 +67,18 @@ $$
 | 归约计算 | `asc_reduce_sum_datablock` | half/float: 0ulp, 采用二叉树结构的成对累加策略 | - |
 | 归约计算 | `asc_pair_reduce_sum` | half/float: 0ulp | - |
 
+说明：[表1](#table-precision-standard)中的Log2/Log10当前无对应的C API，因此未在表3中列出。
+
+C API需要计算Log2或Log10时，可调用`asc_ln`，再使用换底公式并通过`asc_mul_scalar`乘以倒数常量：
+
+$$
+\log_2(x) = \frac{\ln(x)}{\ln(2)} = \ln(x) \times \frac{1}{\ln(2)}
+$$
+
+$$
+\log_{10}(x) = \frac{\ln(x)}{\ln(10)} = \ln(x) \times \frac{1}{\ln(10)}
+$$
+
 **表4**  C API低精度指令支持情况<a id="table-c-api-low-precision"></a>
 
 | 数据类型 | 接口 |
@@ -95,7 +95,8 @@ $$
 
 其中：
 
-- FP4、Int4、Int8和UInt8的half转换中，`<round_mode>`可取：`rd`（FLOOR，向下取整）、`rn`（RINT，按RINT规则舍入）、`rna`（ROUND，舍入到最近整数）、`ru`（CEIL，向上取整）和`rz`（TRUNC，向零截断）。
-- FP8转换固定使用`rn`，即`asc_float2e5m2_rn<sat_mode>`和`asc_float2e4m3_rn<sat_mode>`。
-- HiFloat8转换中，`<round_mode>`可取：`rh`（HIFLOAT8专用舍入模式）和`rna`（ROUND，舍入到最近整数）。
-- `<sat_mode>`可为空（非饱和）或取`_sat`（饱和）；UInt8的整数转换仅使用`<sat_mode>`。
+- `asc_bfloat162e2m1x2_<round_mode>`和`asc_bfloat162e1m2x2_<round_mode>`的源数据类型为`bfloat16_t`，`<round_mode>`可取：`rd`（FLOOR，向下取整）、`rn`（RINT，按RINT规则舍入）、`rna`（ROUND，舍入到最近整数）、`ru`（CEIL，向上取整）和`rz`（TRUNC，向零截断）。
+- `asc_half2int4x2_<round_mode><sat_mode>`、`asc_half2int8_<round_mode><sat_mode>`和`asc_half2uint8_<round_mode><sat_mode>`的源数据类型为`half`，`<round_mode>`可取：`rd`（FLOOR，向下取整）、`rn`（RINT，按RINT规则舍入）、`rna`（ROUND，舍入到最近整数）、`ru`（CEIL，向上取整）和`rz`（TRUNC，向零截断）。
+- `asc_float2e5m2_rn<sat_mode>`和`asc_float2e4m3_rn<sat_mode>`固定使用`rn`舍入。
+- `asc_float2hif8_<round_mode><sat_mode>`和`asc_half2hif8_<round_mode><sat_mode>`的`<round_mode>`可取`rh`（HIFLOAT8专用舍入模式）和`rna`（ROUND，舍入到最近整数）。
+- `<sat_mode>`可为空（非饱和）或取`_sat`（饱和）。`asc_int162uint8`、`asc_int322uint8`、`asc_uint162uint8`和`asc_uint322uint8`仅支持不带后缀和带`_sat`后缀两种形式，不支持`<round_mode>`。
