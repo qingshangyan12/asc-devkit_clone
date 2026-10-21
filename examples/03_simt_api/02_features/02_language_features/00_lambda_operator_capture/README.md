@@ -87,7 +87,7 @@ elementwise_transform(fused, input, yLeakyAffine, totalLength);
 
 - 样例执行
 
-  在本样例目录下执行如下命令:
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..

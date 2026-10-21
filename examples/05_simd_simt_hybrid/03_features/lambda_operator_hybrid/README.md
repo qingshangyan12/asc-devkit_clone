@@ -76,7 +76,7 @@ asc_atomic_add(neg_count, neg_local);        // 线程计数原子合并为本�
 
 - 样例执行
 
-  在本样例目录下执行如下命令:
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
