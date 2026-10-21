@@ -42,12 +42,6 @@
     __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
     ```
 
-`Mode`默认为`merge_mode::zeroing`，掩码未选中的元素清零。需要保留目的寄存器原值时，可显式指定`merge_mode::merging`：
-
-```cpp
-auto result = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(value, mask);
-```
-
 - 将寄存器src的最低位元素广播到目的寄存器
 
     ```cpp
@@ -62,6 +56,7 @@ auto result = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::
 | 参数名 | 描述 |
 | --- | --- |
 | N | 待填充的寄存器数量，默认值为1。 |
+| Mode | 掩码模式，默认值为`merge_mode::zeroing`。设置为`merge_mode::zeroing`时，掩码未选中的元素清零；设置为`merge_mode::merging`时，掩码未选中的元素保留目的寄存器原值。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**  函数参数说明
