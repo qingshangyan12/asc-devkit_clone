@@ -6,7 +6,7 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 
-"""Generate float32 addition inputs and per-element NaN/Inf reference masks."""
+"""Generate float32 addition inputs and per-element Inf reference masks."""
 from pathlib import Path
 import numpy as np
 
@@ -20,15 +20,15 @@ def gen_data():
     maximum = np.finfo(np.float32).max
     # Include byte, vector-repeat and final-element boundaries.
     positions = [0, 1, 7, 8, 31, 32, 63, 64, 127, 128, 191, 192, 254, 255]
-    cases = [(maximum, maximum), (-maximum, -maximum), (np.inf, -np.inf),
-             (np.nan, 1), (np.inf, 1), (-np.inf, 1), (maximum, 0),
+    cases = [(maximum, maximum), (-maximum, -maximum), (32, -16),
+             (1, -1), (np.inf, 1), (-np.inf, 1), (maximum, 0),
              (-maximum, 0), (0, 0), (-0.0, -0.0), (maximum, -maximum),
-             (1, np.nan), (np.inf, np.inf), (-np.inf, -np.inf)]
+             (-32, 16), (np.inf, np.inf), (-np.inf, -np.inf)]
     for index, (left, right) in zip(positions, cases):
         x[index], y[index] = left, right
-    with np.errstate(over="ignore", invalid="ignore"):
+    with np.errstate(over="ignore", invalid="raise"):
         z = x + y
-    masks = np.stack([np.isnan(z), np.isposinf(z), np.isneginf(z)])
+    masks = np.stack([np.isposinf(z), np.isneginf(z)])
     x.tofile("input/input_x.bin")
     y.tofile("input/input_y.bin")
     z.tofile("output/golden_z.bin")

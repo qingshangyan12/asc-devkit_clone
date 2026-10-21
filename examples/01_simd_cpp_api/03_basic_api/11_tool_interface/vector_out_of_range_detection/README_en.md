@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample uses static Tensor programming with [NumericLimits](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/intro.md), [Compare](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare.md), and [Compares](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md) to detect NaN, positive infinity, and negative infinity in vector addition results.
+This sample uses static Tensor programming with [NumericLimits](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/intro.md), [Compare](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare.md), and [Compares](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md) to detect positive infinity and negative infinity in vector addition results.
 
 ## Supported Products and CANN Version
 
@@ -28,15 +28,14 @@ vector_out_of_range_detection
 
 ### Sample Function
 
-The kernel computes `z = x + y` and produces three comparison masks:
+The kernel computes `z = x + y` and produces two comparison masks:
 
 | Mask | Condition | Implementation |
 | --- | --- | --- |
-| NaN | `z[i] != z[i]` | Compare with NE |
 | Positive infinity | `z[i] == +Inf` | NumericLimits<float>::Infinity vector interface, Compare with EQ |
 | Negative infinity | `z[i] == -Inf` | NumericLimits<float>::NegativeInfinity scalar interface, Compares with EQ |
 
-NaN is unequal to itself; equality comparison with QuietNaN cannot detect NaN. Maximum and lowest finite values are not marked.
+Maximum and lowest finite values are not marked.
 
 ### Sample Specifications
 
@@ -44,20 +43,20 @@ NaN is unequal to itself; equality comparison with QuietNaN cannot detect NaN. M
 | --- | --- | --- | --- | --- |
 | Input | x, y | [256] each | float | ND |
 | Output | z | [256] | float | ND |
-| Output | masks | [3, 32] | uint8_t | ND |
+| Output | masks | [2, 32] | uint8_t | ND |
 
-Each comparison occupies one bit (1 for true, 0 for false). The three mask rows represent NaN, positive infinity, and negative infinity, respectively. Element `i` maps to bit `i % 8` of byte `i / 8`, starting from the least significant bit.
+Each comparison occupies one bit (1 for true, 0 for false). The two mask rows represent positive infinity and negative infinity, respectively. Element `i` maps to bit `i % 8` of byte `i / 8`, starting from the least significant bit.
 
-Inputs cover ordinary finite values, zeros, maximum/lowest finite values, infinities, and NaN. Addition also produces infinities from finite overflow and NaN from opposite infinities.
+Inputs cover ordinary finite values, zeros, maximum/lowest finite values, and infinities. Addition also produces infinities from finite overflow.
 
 ### Sample Implementation
 
 **Kernel implementation**
 
 1. Call [InitSocState](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md) to initialize global status registers.
-2. Use [LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md) to allocate UB memory statically for the input, result, comparison value, and comparison masks. Four float buffers occupy 1024 bytes each, and the mask buffer occupies 96 bytes (4192 bytes in total). Buffer addresses meet the 32-byte alignment requirement.
+2. Use [LocalMemAllocator](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md) to allocate UB memory statically for the input, result, comparison value, and comparison masks. Four float buffers occupy 1024 bytes each, and the mask buffer occupies 64 bytes (4160 bytes in total). Buffer addresses meet the 32-byte alignment requirement.
 3. Copy x and y from GM to UB using DataCopy. Use [SetFlag/WaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) with MTE2_V to wait for the input transfers before vector computation.
-4. Compute `z = x + y` with Add. Obtain infinities using NumericLimits and detect NaN and signed infinities using Compare and Compares.
+4. Compute `z = x + y` with Add. Obtain infinities using NumericLimits and detect signed infinities using Compare and Compares.
 5. Use V_MTE3 to wait for vector computation before copying z and masks to GM. Call [PipeBarrier](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md) before the kernel returns to wait for pipeline tasks to complete.
 
 **Host invocation**
@@ -66,7 +65,7 @@ Read the inputs, allocate device memory, and copy inputs to the device. Invoke o
 
 **Data generation and verification**
 
-The generator uses a fixed random seed and NumPy reference results. The verifier checks NaN and signed infinity positions, finite results, and every comparison byte. Verification failures return a nonzero exit code.
+The generator uses a fixed random seed and NumPy reference results. The verifier checks signed infinity positions, finite results, and every comparison byte. Verification failures return a nonzero exit code.
 
 ## Build and Run
 
@@ -110,8 +109,8 @@ Run the following steps from the sample directory. Python 3 and NumPy are requir
   The following output indicates that computation results and comparison masks passed verification:
 
   ```text
-  NaN: 3, +Inf: 3, -Inf: 3
+  +Inf: 3, -Inf: 3
   test pass!
   ```
 
-  During NPU simulation, NaN/Inf test inputs may produce a `vec_err_idata_inf_nan_t0` model diagnostic. In validation, simulation completed normally and all element checks passed. Check both the program exit code and verification result.
+  During NPU simulation, Inf test inputs may produce a `vec_err_idata_inf_nan_t0` model diagnostic. In validation, simulation completed normally and all element checks passed. Check both the program exit code and verification result.

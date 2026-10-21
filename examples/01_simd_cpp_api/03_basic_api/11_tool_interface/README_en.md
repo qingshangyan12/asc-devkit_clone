@@ -2,4 +2,4 @@
 
 | Directory | Description |
 | --- | --- |
-| [vector_out_of_range_detection](./vector_out_of_range_detection) | Detect NaN and positive/negative infinity in vector addition results using NumericLimits, Compare, and Compares. |
+| [vector_out_of_range_detection](./vector_out_of_range_detection) | Detect positive/negative infinity in vector addition results using NumericLimits, Compare, and Compares. |
