@@ -13,18 +13,22 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+#ifndef ASCENDC_FP8_E6M2_H
 namespace float8_e6m2 {
 struct Fp8e6m2T {
     uint8_t val;
 };
 } // namespace float8_e6m2
 using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+#endif
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
 using vector_fp8_e6m2_t = vector_f8e6m2;
 
+#ifndef ASCENDC_HIF4_H
 struct hifloat4x2_t {
     uint8_t val = 0;
 };
+#endif
 using hif4x2_t = hifloat4x2_t;
 
 using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
@@ -97,48 +101,6 @@ inline void mad_mx(
 }
 
 inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp4x2_e1m2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp4x2_e1m2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp8_e4m3fn_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp8_e5m2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp8_e4m3fn_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
     uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
     bool c_matrix_source, bool c_matrix_init_val)
@@ -177,12 +139,6 @@ inline void mad_mx(
 inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
     __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ fp8_e5m2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
@@ -480,24 +436,8 @@ inline void copy_matrix_cc_to_gm(
 {}
 
 inline void copy_matrix_cc_to_gm(
-    __gm__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
     __gm__ float8_e4m3_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ float8_e4m3_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -528,24 +468,8 @@ inline void copy_matrix_cc_to_gm(
 {}
 
 inline void copy_matrix_cc_to_gm(
-    __gm__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
     __gm__ int8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ int8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -560,30 +484,6 @@ inline void copy_matrix_cc_to_gm(
 {}
 
 inline void copy_matrix_cc_to_gm(
-    __gm__ uint8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ half* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ float* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
     __gm__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
@@ -592,24 +492,8 @@ inline void copy_matrix_cc_to_gm(
 {}
 
 inline void copy_matrix_cc_to_gm(
-    __gm__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
     __gm__ half* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ half* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -672,32 +556,8 @@ inline void copy_matrix_cc_to_gm(
 {}
 
 inline void copy_matrix_cc_to_gm(
-    __gm__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ int8_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
     __gm__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_gm(
-    __gm__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -745,24 +605,8 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ half* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ half* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -777,15 +621,6 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ float8_e4m3_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd,
-    uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en,
-    bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ float8_e5m2_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
@@ -794,25 +629,8 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ float8_e5m2_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd,
-    uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en,
-    bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -827,24 +645,8 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ int8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ uint8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ uint8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -872,24 +674,8 @@ inline void copy_matrix_cc_to_ub(
 }
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ float* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -904,28 +690,11 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ half* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ float8_e4m3_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ float8_e4m3_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd,
-    uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en,
-    bool nz2dn_en)
 {}
 
 inline void copy_matrix_cc_to_ub(
@@ -937,25 +706,8 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ float8_e5m2_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
-    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd,
-    uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en,
-    bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ hifloat8_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ hifloat8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -970,14 +722,6 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ int8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
@@ -986,24 +730,8 @@ inline void copy_matrix_cc_to_ub(
 {}
 
 inline void copy_matrix_cc_to_ub(
-    __ubuf__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
     __ubuf__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub(
-    __ubuf__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
@@ -1018,24 +746,8 @@ inline void copy_matrix_cc_to_ub_s4(
 {}
 
 inline void copy_matrix_cc_to_ub_s4(
-    __ubuf__ void* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub_s4(
     __ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
-    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
-    bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
-{}
-
-inline void copy_matrix_cc_to_ub_s4(
-    __ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
-    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, bool quant_pre_rnd, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
