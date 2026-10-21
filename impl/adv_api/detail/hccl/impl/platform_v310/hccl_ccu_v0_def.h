@@ -42,7 +42,8 @@ enum class AlgorithmType : uint8_t {
     CcuSchedAllToAllSoleMeshConcurrent,
     // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（156，master 尾部隐式编号已占用 153/155）。
     CcuSchedReduceScatterConcurMeshNHRMultiLink = 156,
-    CcuSchedAllToAllMesh1DMultiJetty = 157
+    CcuSchedAllToAllMesh1DMultiJetty = 157,
+    CcuSchedAllGatherSoleNHR = 159
 };
 
 template <const auto& config>
@@ -114,6 +115,11 @@ private:
 
     __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
+    // 性能优化(A1/A2)：missionNum 由 algorithmType 单射映射，与 GetAlgorithmType 解耦——
+    // CcuPrepareForOp 分发与 missionNum 计算共享一次求值，CcuSendMsg/Wait/Finalize 经
+    // handleMissionNum_ 缓存复用（免 prepareType/opType 表/res[2] 重复 GM 读）
+    __aicore__ inline uint8_t GetKfcMissionNumByType(uint32_t algorithmType) const;
+
     __aicore__ inline uint32_t GetAlgorithmType(HcclHandle handleId) const;
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
@@ -144,6 +150,7 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForAllGatherSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;
@@ -169,6 +176,8 @@ private:
     uint8_t handleCommitCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleFinishCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleNeedCommitCnt_[HCCL_MAX_HANDLE_ID];
+    // 性能优化(A2)：per-handle mission 数缓存（CcuPrepareForOp 单次求值写入，InitInner 预置 1）
+    uint8_t handleMissionNum_[HCCL_MAX_HANDLE_ID];
 
     __gm__ CommonPrepareParamCcu* handleParamGM_;
 

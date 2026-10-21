@@ -165,7 +165,17 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
 
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
-    if (!resCtxHost->kfcServerArgs.empty()) {
+    resCtxHost->dieSplitRatio = tempCtx.dieSplitRatio;
+    if (!resCtxHost->kfcServerArgs.empty() && tempCtx.kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
+        // 保留缓存 args 的 mission 结构（2die 的动态 dieNum/missionNum 注册期已修正；AcquireAlgResources
+        // 按静态名单重生成会丢 mission1），仅原地刷新每 mission 的 xn/cke
+        const uint64_t xnAddr = resCtxHost->kfcServerArgs[0];
+        const uint64_t ckeAddr = resCtxHost->kfcServerArgs[1];
+        for (size_t offset = 0; offset + 1U < tempCtx.kfcServerArgs.size(); offset += KFC_SERVER_ARG_NUM) {
+            tempCtx.kfcServerArgs[offset] = xnAddr;
+            tempCtx.kfcServerArgs[offset + 1U] = ckeAddr;
+        }
+    } else if (!resCtxHost->kfcServerArgs.empty()) {
         tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
         tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
     }
@@ -181,6 +191,9 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
          offset += KFC_SERVER_ARG_NUM) {
         tempCtx.kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
     }
+    // 同步回 host 侧：res[2] 的 mission 计数与重序列化同源（reuse 下保持注册期修正的动态 mission 数）
+    resCtxHost->kfcServerArgs = tempCtx.kfcServerArgs;
+    resCtxHost->kfcServerArgSize = tempCtx.kfcServerArgSize;
 
     std::vector<char> updatedSeq = tempCtx.Serialize();
     CHK_PRT_RET(
@@ -900,6 +913,32 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
             resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
+        // SoleNHR 动态 mission（RS 2Die / AG SoleNHR D4）：mission 数由 dieNum（模板 CalcRes 通道探测）
+        // 决定，AcquireAlgResources 构造 kfcServerArgs 时按静态 GetKfcServerMissionNum（=1）生成——
+        // 双 die 时此处按源 kernel 数修正 missionNum 与 dieNum（ccuKernelNum 尾值即模板 push 的
+        // kernelNum=dieNum）
+        const bool isSoleNhrDynMission =
+            param.algName != nullptr && std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0;
+        if (isSoleNhrDynMission && !resRequest.ccuKernelNum.empty() &&
+            resCtxHost->kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
+            const uint32_t dieNum = std::min<uint32_t>(resRequest.ccuKernelNum.back(), KFC_MAX_MISSION_NUM);
+            const uint32_t staticMissionNum = GetKfcServerMissionNum(param.algName);
+            if (dieNum != staticMissionNum) {
+                HCCL_INFO(
+                    "[asc][AlgoResource][HcclGetAlgRes] SoleNHR 2Die regen kfcServerArgs, dieNum[%u] -> "
+                    "missionNum[%u] (static[%u])",
+                    dieNum, dieNum, staticMissionNum);
+                const uint64_t xnAddr = resCtxHost->kfcServerArgs[0];
+                const uint64_t ckeAddr = resCtxHost->kfcServerArgs[1];
+                const uint64_t token = resCtxHost->kfcServerArgs[KFC_SERVER_TOKEN_ARG_INDEX];
+                resCtxHost->kfcServerArgs.clear();
+                resCtxHost->kfcServerArgs.reserve(dieNum * KFC_SERVER_ARG_NUM);
+                for (uint32_t missionIndex = 0; missionIndex < dieNum; ++missionIndex) {
+                    resCtxHost->kfcServerArgs.insert(
+                        resCtxHost->kfcServerArgs.end(), {xnAddr, ckeAddr, dieNum, dieNum, missionIndex, token});
+                }
+            }
+        }
     }
 
     // host侧资源
@@ -1486,6 +1525,7 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     resCtxHost->parallelPortInfo = resRequest.parallelPortInfo;
+    resCtxHost->dieSplitRatio = resRequest.dieSplitRatio;
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
         CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));

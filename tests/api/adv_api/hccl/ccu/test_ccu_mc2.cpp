@@ -550,7 +550,8 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(
         algorithmMap.at("CcuSchedReduceScatterConcurMeshNHRMultiLink"),
         AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink);
-    EXPECT_EQ(algorithmMap.size(), 15U);
+    EXPECT_EQ(algorithmMap.at("CcuSchedAllGatherSoleNHR"), AlgorithmType::CcuSchedAllGatherSoleNHR);
+    EXPECT_EQ(algorithmMap.size(), 16U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
@@ -574,6 +575,7 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink), 154U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent), 155U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink), 156U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR), 159U);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)

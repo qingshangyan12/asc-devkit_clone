@@ -155,6 +155,34 @@ enum KfcReduceScatterSoleNhrParamIndex : uint32_t {
     KFC_RS_SOLE_NHR_PARAM_NUM = 10,
 };
 
+// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局（N2 常量内联 + D4 双 die，13 槽）：
+//  [0]=INPUT 兼作轮次有效哨兵——server 仅检查 param[0] != INVALID_U64（真实地址必不等于），
+//  原 opId 槽纯哨兵用途（kernel 不接收 opId），故由 INPUT 占位。
+//  常量参数不占槽、由 kernel LoadNhr1DArgs 内联（sole executor 恒定）：
+//  die0LastSize=die0Size、repeatNum=1、三 stride=0。
+//  isInputOutputEqual 不占槽：in-place 时 AIV 将两 die 的 goSize 均按 0 字节计算
+//  （CalcGoSize(0) → m=n=p=0 全零），GroupCopy 内部两个 CCU_IF 块均不触发，kernel 无需该参数。
+//  D4 双 die：die1Size/GO_D1 为 die1 半区参数（dispatch 按 kernelArg.axisId 选 goSize 组）；
+//  单 die 时 die1Size=0、GO_D1 全零（无 mission1 消费，安全）。
+// AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、KFC dispatch 逐槽转发、
+// kernel 形参三处索引必须一致。
+enum KfcAllGatherSoleNhrParamIndex : uint32_t {
+    KFC_AG_SOLE_NHR_INPUT = 0,
+    KFC_AG_SOLE_NHR_OUTPUT = 1,
+    KFC_AG_SOLE_NHR_DIE0_SIZE = 2,
+    KFC_AG_SOLE_NHR_DIE1_SIZE = 3,
+    KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE = 4,
+    KFC_AG_SOLE_NHR_GO_D0_SIZE_0 = 5,
+    KFC_AG_SOLE_NHR_GO_D0_SIZE_1 = 6,
+    KFC_AG_SOLE_NHR_GO_D0_SIZE_2 = 7,
+    KFC_AG_SOLE_NHR_GO_D0_SIZE_3 = 8,
+    KFC_AG_SOLE_NHR_GO_D1_SIZE_0 = 9,
+    KFC_AG_SOLE_NHR_GO_D1_SIZE_1 = 10,
+    KFC_AG_SOLE_NHR_GO_D1_SIZE_2 = 11,
+    KFC_AG_SOLE_NHR_GO_D1_SIZE_3 = 12,
+    KFC_AG_SOLE_NHR_PARAM_NUM = 13,
+};
+
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
 enum KfcConcurrentReduceScatterParamIndex : uint32_t {
     KFC_CONCURRENT_RS_OP_ID = 0,
