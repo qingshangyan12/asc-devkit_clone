@@ -48,13 +48,13 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `Offset` | 输入 | 模板参数，决定从`src`中提取的数据块。`T`为`uint16_t`时取值范围为[0, 15]；`T`为`uint32_t`时取值范围为[0, 31]。 |
-| `T` | 输入 | 模板参数，源寄存器的数据类型，支持`uint16_t`和`uint32_t`。 |
-| `src` | 输入 | 源矢量数据寄存器，类型为`reg_tensor<T>`。接口读取其`reg`成员，不读取`mask`成员。 |
+| Offset | 输入 | 模板参数，决定从`src`中提取的数据块。`T`为`uint16_t`时取值范围为[0, 15]；`T`为`uint32_t`时取值范围为[0, 31]。 |
+| T | 输入 | 模板参数，源寄存器的数据类型，支持`uint16_t`和`uint32_t`。 |
+| src | 输入 | 源矢量数据寄存器，类型为`reg_tensor<T>`。接口读取其`reg`成员，不读取`mask`成员。 |
 
 ## 数据类型
 
-`T`支持`uint16_t`和`uint32_t`。
+支持的数据类型为：uint16_t、uint32_t。
 
 ## 返回值说明
 

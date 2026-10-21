@@ -48,13 +48,13 @@ __simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 输入 | 模板参数，源、目的寄存器的数据类型。 |
-| `dst` | 输出 | 目的寄存器，类型为`reg_tensor<T>`，数据类型须与`src`完全一致。`T`为非`bool`类型且`src.mask`部分有效时，`dst.reg`需提前初始化，否则未被筛选的位置将出现未知值。接口会将`src.mask`写入`dst.mask`。 |
-| `src` | 输入 | 源寄存器，类型为`reg_tensor<T>`，数据类型须与`dst`完全一致。其`mask`成员用于指示参与复制的元素。对应位置有效时复制`src.reg`中的元素；`T`为非`bool`类型时，对应位置无效的元素保留`dst.reg`中的原值；`T`为`bool`类型时，对应位置无效的bit在`dst.reg`中置0。 |
+| T | 输入 | 模板参数，源、目的寄存器的数据类型。 |
+| dst | 输出 | 目的寄存器，类型为`reg_tensor<T>`，数据类型须与`src`完全一致。`T`为非`bool`类型且`src.mask`部分有效时，`dst.reg`需提前初始化，否则未被筛选的位置将出现未知值。接口会将`src.mask`写入`dst.mask`。 |
+| src | 输入 | 源寄存器，类型为`reg_tensor<T>`，数据类型须与`dst`完全一致。其`mask`成员用于指示参与复制的元素。对应位置有效时复制`src.reg`中的元素；`T`为非`bool`类型时，对应位置无效的元素保留`dst.reg`中的原值；`T`为`bool`类型时，对应位置无效的bit在`dst.reg`中置0。 |
 
 ## 数据类型
 
-`T`支持`bool`、`uint8_t`、`int8_t`、`uint16_t`、`int16_t`、`half`、`bfloat16_t`、`uint32_t`、`int32_t`和`float`。
+支持的数据类型为：bool、uint8_t、int8_t、uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float。
 
 ## 返回值说明
 

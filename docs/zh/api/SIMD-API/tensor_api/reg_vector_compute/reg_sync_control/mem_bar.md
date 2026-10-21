@@ -52,16 +52,16 @@ __simd_callee__ inline void mem_bar()
 
 <a id="mem-type-values"></a>
 
-**表2** `mem_type`取值说明
+**表2** mem_type取值说明
 
-| 取值 | 含义 |
+| mem_type取值 | 含义 |
 | --- | --- |
-| `mem_type::vec_store` | `__simd_vf__`函数内的矢量写UB流水线，对应寄存器到UB的数据搬出接口，例如`store`。 |
-| `mem_type::vec_load` | `__simd_vf__`函数内的矢量读UB流水线，对应UB到寄存器的数据搬入接口，例如`load`。 |
-| `mem_type::scalar_store` | `__simd_vf__`函数内的标量写UB流水线。 |
-| `mem_type::scalar_load` | `__simd_vf__`函数内的标量读UB流水线。 |
-| `mem_type::vec_all` | `__simd_vf__`函数内所有矢量读写UB流水线。 |
-| `mem_type::scalar_all` | `__simd_vf__`函数内所有标量读写UB流水线。 |
+| vec_store | `__simd_vf__`函数内的矢量写UB流水线，对应寄存器到UB的数据搬出接口，例如`store`。 |
+| vec_load | `__simd_vf__`函数内的矢量读UB流水线，对应UB到寄存器的数据搬入接口，例如`load`。 |
+| scalar_store | `__simd_vf__`函数内的标量写UB流水线。 |
+| scalar_load | `__simd_vf__`函数内的标量读UB流水线。 |
+| vec_all | `__simd_vf__`函数内所有矢量读写UB流水线。 |
+| scalar_all | `__simd_vf__`函数内所有标量读写UB流水线。 |
 
 <a id="mem-bar-supported-combinations"></a>
 
