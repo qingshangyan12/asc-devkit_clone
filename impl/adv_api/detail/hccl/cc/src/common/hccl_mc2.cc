@@ -1071,6 +1071,9 @@ HcclResult Mc2PrepareAicpuHostArgs(Mc2AicpuHostArgs& hostArgs, void* opResCtx)
         HcclApi::CommKfcParamDesc desc{};
         desc.version = HcclApi::MC2_PERF_DESC_VERSION;
         desc.itemNum = 1;
+        // Version 15 only: isDyn bit 0 requests controlled hot hit/miss pairs.
+        const char* cachePolicy = std::getenv("MC2_PERF_CACHE_POLICY");
+        desc.isDyn = cachePolicy != nullptr && std::strcmp(cachePolicy, "paired") == 0 ? 1 : 0;
         static_assert(sizeof(desc) == sizeof(hostArgs.ctxArgs[0]), "descriptor must fit args[0]");
         std::memcpy(&hostArgs.ctxArgs[0], &desc, sizeof(desc));
     }

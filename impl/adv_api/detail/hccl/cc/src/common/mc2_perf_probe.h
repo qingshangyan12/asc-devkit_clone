@@ -12,6 +12,8 @@
 
 #include <cstdint>
 #include <ctime>
+#include <string>
+#include <utility>
 #include "log.h"
 
 // Runtime opt-in buffered probe. Disabled launches do not read clocks or record/output samples.
@@ -26,16 +28,23 @@ struct Record {
     int cache;
     int status;
 };
+using ClearCallback = int (*)(void*, void*, const std::string&);
 struct State {
+    bool paired = false;
+    ClearCallback clear = nullptr;
+    void* manager = nullptr;
+    void* comm = nullptr;
+    std::string clearTag;
     Record records[2048];
     uint32_t count = 0;
     uint32_t dropped = 0;
     uint64_t entry = 0;
-    uint64_t receive = 0;
+    uint64_t poll = 0;
+    uint64_t parsed = 0;
     uint64_t launch = 0;
     uint32_t seq = 0;
     int cache = -1; // -1 unknown/disabled; 0 confirmed miss; 1 confirmed hit; 2 mixed
-    bool firstCondition = true;
+
 };
 inline bool& Enabled() { static thread_local bool enabled = false; return enabled; }
 inline State& Get() { static thread_local State state; return state; }
@@ -54,14 +63,23 @@ inline void Add(const char* metric, uint64_t begin, uint64_t end, int status = 0
 inline void Start()
 {
     auto& s = Get();
-    s.count = 0; s.dropped = 0; s.cache = -1; s.firstCondition = true;
-    s.seq = 0; s.receive = 0; ++s.launch; s.entry = Now();
+    s.clear = nullptr; s.clearTag.clear();
+    s.count = 0; s.dropped = 0; s.cache = -1;
+    s.seq = 0; s.poll = 0; s.parsed = 0; ++s.launch; s.entry = Now();
 }
-inline void Ready() { if (!Enabled()) return; Add("server_ready", Get().entry, Now()); }
-inline void Receive(uint32_t seq)
-{
+inline void PollBegin() {
     if (!Enabled()) return;
-    auto& s = Get(); s.receive = Now(); s.seq = seq; s.cache = -1;
+    auto& s = Get(); s.poll = Now();
+    Add("server_entry_to_poll", s.entry, s.poll);
+}
+inline void Receive(uint32_t seq) {
+    if (!Enabled()) return;
+    auto& s = Get(); s.seq = seq; s.cache = -1;
+}
+inline void Parsed() {
+    if (!Enabled()) return;
+    auto& s = Get(); s.parsed = Now();
+    Add("server_poll_to_parsed", s.poll, s.parsed);
 }
 inline void Cache(bool hit)
 {
@@ -70,17 +88,32 @@ inline void Cache(bool hit)
     const int value = hit ? 1 : 0;
     s.cache = s.cache == -1 || s.cache == value ? value : 2;
 }
-inline void Condition(int status)
-{
+inline void Submitted(int status) {
     if (!Enabled()) return;
     auto& s = Get(); const auto end = Now();
-    if (s.firstCondition) {
-        Add("server_entry_to_condition", s.entry, end, status);
-        s.firstCondition = false;
-    }
-    Add("server_receive_to_condition", s.receive, end, status);
+    Add("server_parsed_to_submit", s.parsed, end, status);
+    s.poll = end; // subsequent messages start from the previous submission boundary
 }
-inline void Submitted(int status) { if (!Enabled()) return; Add("server_receive_to_submit", Get().receive, Now(), status); }
+inline bool Paired() { return Enabled() && Get().paired; }
+inline void DeferClear(void* manager, void* comm, std::string&& tag, ClearCallback callback)
+{
+    if (!Paired()) return;
+    auto& s = Get();
+    s.manager = manager; s.comm = comm; s.clearTag = std::move(tag); s.clear = callback;
+}
+// Call only after normal dispatcher completion: Client has waited for communication
+// before Finalize. Cache destruction is outside all three measured intervals.
+inline int Finish()
+{
+    if (!Paired()) return 0;
+    auto& s = Get();
+    const bool cleared = s.clear != nullptr;
+    const int status = cleared ? s.clear(s.manager, s.comm, s.clearTag) : 0;
+    HCCL_RUN_INFO("[MC2_PERF_CACHE_CONTROL] launch=%llu policy=paired cleared=%d status=%d",
+        static_cast<unsigned long long>(s.launch), static_cast<int>(cleared), status);
+    s.clear = nullptr; s.clearTag.clear();
+    return status;
+}
 inline void Dump()
 {
     auto& s = Get();
@@ -94,9 +127,9 @@ inline void Dump()
         static_cast<unsigned long long>(s.launch), s.count, s.dropped);
 }
 struct KernelScope {
-    explicit KernelScope(bool enabled) {
+    explicit KernelScope(bool enabled, bool paired = false) {
         Enabled() = enabled;
-        if (enabled) Start();
+        if (enabled) { Start(); Get().paired = paired; }
     }
     ~KernelScope() {
         if (Enabled()) Dump();

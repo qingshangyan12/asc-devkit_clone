@@ -37,6 +37,18 @@ inline void ClearMc2TaskCacheBestEffort(
     manager.Unregister(plan.comm, plan.tag);
 }
 
+// Acceptance-only cleanup, invoked after dispatcher completion, never during replay.
+inline int ClearMc2PerfCache(void* managerPtr, void* comm, const std::string& tag)
+{
+    Mc2AicpuTaskCachePlan plan;
+    plan.comm = comm; plan.tag = tag;
+    const HcclResult ret = Mc2AicpuTaskCacheClear(plan);
+    if (ret == HCCL_SUCCESS) {
+        static_cast<Mc2AicpuTaskCacheManager*>(managerPtr)->Unregister(comm, tag);
+    }
+    return static_cast<int>(ret);
+}
+
 template <typename Func>
 HcclResult RunWithMc2TaskCache(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Func func,
@@ -109,6 +121,9 @@ HcclResult RunWithMc2TaskCache(
         if (endRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "hit batch end", manager);
             return endRet;
+        }
+        if (Mc2PerfProbe::Paired()) {
+            Mc2PerfProbe::DeferClear(&manager, plan.comm, std::move(plan.tag), ClearMc2PerfCache);
         }
         return HCCL_SUCCESS;
     }

@@ -679,6 +679,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             "BeforeFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
             execCtx);
         HcclResult ret = FormatOpParamFromMsg(msg, extMsg, *execCtx, i, runParam);
+        if (ret == HCCL_SUCCESS) Mc2PerfProbe::Parsed();
         UpdateProgress("AfterFormat", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -729,7 +730,6 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             "[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
-        Mc2PerfProbe::Condition(static_cast<int>(ret));
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,

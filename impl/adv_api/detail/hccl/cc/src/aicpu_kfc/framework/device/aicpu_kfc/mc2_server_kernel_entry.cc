@@ -28,7 +28,8 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     std::memcpy(&perfDesc, &protocol, sizeof(perfDesc));
     Mc2PerfProbe::KernelScope perfScope(
         args != nullptr && protocol != MC2_AICPU_SIMPLE_CTX_PROTOCOL &&
-        perfDesc.version == MC2_PERF_DESC_VERSION);
+        perfDesc.version == MC2_PERF_DESC_VERSION,
+        perfDesc.itemNum == 1 && perfDesc.isDyn == 1);
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
