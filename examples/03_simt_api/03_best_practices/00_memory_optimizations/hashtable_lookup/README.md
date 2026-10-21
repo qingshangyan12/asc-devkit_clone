@@ -50,15 +50,28 @@
 
 ### SoA与AoS内存布局
 
+AoS（Array of Structures，结构体数组） 与 SoA（Structure of Arrays，数组结构体） 为两种不同内存布局：
+- AoS 布局：每个结构体中包含一个对象的完整信息，多个结构体排列成数组存储在内存中。
+- SoA 布局：将对象的同种信息排列成数组，多个对象的同种信息存储在相邻内存中。
+
 **图1　SoA与AoS内存布局示意图** 
 
 <img src="figures/内存布局示意图.drawio.png">
 
-该图对比了 AoS（Array of Structures，结构体数组） 与 SoA（Structure of Arrays，数组结构体） 两种内存布局：
-- AoS 布局：每个 KEY 后紧跟对应的 VALUE，键值对交替存储，数据局部性较好。
-- SoA 布局：所有 KEY 连续存储，所有 VALUE 集中存储，便于连续访问同类数据。
+图1以本样例的哈希表结构为例，展示了不同的内存布局。哈希表结构体代码实现如下所示：
 
-图中 KEY 占用 8B，VALUE 占用 32B。AoS 更适合键值对整体访问，SoA 更适合批量读取 KEY、执行并行查找等场景。
+```c++
+struct AoSBucket {
+  uint64_t key;
+  float value[DIM];
+};
+AoSBucket buckets[CAPACITY];
+struct SoaTableNoDigest {
+  uint64_t key[CAPACITY];
+  float value[CAPACITY][DIM];
+};
+SoaTableNoDigest table;
+```
 
 ### 性能指标说明
 
@@ -81,10 +94,18 @@ struct AoSBucket {
   float value[DIM];
 };
 AoSBucket buckets[CAPACITY];
-const uint64_t bucket_key = buckets[idx].key;
-if (bucket_key == target_key) { return idx; }
-if (bucket_key == EMPTY_KEY) { return NOT_FOUND; }
-idx = (idx + 1) & (CAPACITY - 1);  
+__aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+  ...
+  const uint64_t bucket_key = buckets[idx].key;
+  if (bucket_key == target_key) {
+      return idx;  
+  }
+  if (bucket_key == EMPTY_KEY) {
+      return NOT_FOUND;  
+  }
+  idx = (idx + 1) & (CAPACITY - 1);  
+  ...
+}
 ```
 
 **性能数据**：
@@ -115,10 +136,18 @@ struct SoaTableNoDigest {
   float value[CAPACITY][DIM];
 };
 SoaTableNoDigest table;
-const uint64_t bucket_key = table->key[idx];
-if (bucket_key == target_key) { return idx; }
-if (bucket_key == EMPTY_KEY) { return NOT_FOUND; }
-idx = (idx + 1) & (CAPACITY - 1); 
+__aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+  ...
+  const uint64_t bucket_key = table->key[idx];
+  if (bucket_key == target_key) {
+      return idx;  
+  }
+  if (bucket_key == EMPTY_KEY) {
+      return NOT_FOUND;  
+  }
+  idx = (idx + 1) & (CAPACITY - 1);  
+  ...
+}
 ```
 
 **性能数据**：
@@ -234,19 +263,24 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
 以下代码在 digest 预筛选的基础上引入协作组机制：每 4 个线程协作查询同一个 key，通过组内投票汇总匹配结果，并由命中线程完成后续处理。
 
 ```cpp
-const uint32_t word =
-    *reinterpret_cast<const uint32_t*>(table->digest + pos);
-uint32_t tmask = VcmpEq4(word, target_word) & 0x01010101u;
-uint32_t emask = VcmpEq4(word, empty_word) & 0x01010101u;
-if (round == 0) {  
-  const uint32_t shift = (start > pos)
-      ? (kBucketsPerLane < start - pos ? kBucketsPerLane : start - pos) : 0u;
-  emask &= ~static_cast<uint32_t>((1ull << (shift * 8)) - 1ull);
-}
-const uint32_t match_ballot = asc_ballot(match);
-if (((match_ballot >> group_shift) & kGroupMask) != 0) {
-  found = true;
-  done = true;
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
+    const SoaTable* table, const uint64_t* keys, uint32_t* indices, uint32_t query_num) {
+    ...
+    const uint32_t word = *reinterpret_cast<const uint32_t*>(table->digest + pos);
+    uint32_t tmask = VcmpEq4(word, target_word) & 0x01010101u;
+    uint32_t emask = VcmpEq4(word, empty_word) & 0x01010101u;
+    if (round == 0) {  
+      const uint32_t shift = (start > pos)
+          ? (kBucketsPerLane < start - pos ? kBucketsPerLane : start - pos) : 0u;
+      emask &= ~static_cast<uint32_t>((1ull << (shift * 8)) - 1ull);
+    }
+    ...
+    const uint32_t match_ballot = asc_ballot(match);
+    if (((match_ballot >> group_shift) & kGroupMask) != 0) {
+      found = true;
+      done = true;
+    }
+    ...
 }
 ```
 
