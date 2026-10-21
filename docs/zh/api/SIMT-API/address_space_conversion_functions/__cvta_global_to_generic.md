@@ -63,10 +63,17 @@ SIMT编程场景：
 ```cpp
 #include "simt_api/device_functions.h"
 
-__global__ __launch_bounds__(1024) void kernel__cvta_global_to_generic(uint32_t* dst, uint64_t addr_val)
+__global__ __launch_bounds__(1024) void kernel__cvta_global_to_generic(uint32_t* result, uint64_t addr_val)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    uint32_t* ptr = static_cast<uint32_t*>(__cvta_global_to_generic(addr_val));
-    dst[idx] = ptr[0];
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_global_to_generic(addr_val)); // addr_val : GM内存空间的地址值
+    result[idx] = ptr[0];
 }
+```
+
+输入输出示例如下：
+
+```text
+addr_val: 0x120000017000(指向数据11), 0x120000017004(指向数据22), 0x120000017008(指向数据33), 0x12000001700c(指向数据44)
+result: 11, 22, 33, 44
 ```

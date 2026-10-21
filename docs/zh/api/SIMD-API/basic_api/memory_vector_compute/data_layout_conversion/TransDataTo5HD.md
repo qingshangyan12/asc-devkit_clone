@@ -151,6 +151,7 @@ KirinDev0002处理器系列产品，支持的数据类型为：int8_t、uint8_t�
 <!-- npu="kirin3" id21 -->
 KirinDev0003处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id21 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/TransDataTo5HD_res.md#id2 -->
 
 ## 约束说明<a name="zh-cn_topic_0000001521260417_section633mcpsimp"></a>
 
@@ -158,6 +159,7 @@ KirinDev0003处理器系列产品，支持的数据类型为：int8_t、uint8_t�
 - 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 - dst与src中的地址需要连续存放。
 - 单次和多次repeat操作实现转置功能，都只需要配置一次srcList和dstList，后续LocalTensor地址通过nchwconvParams参数自动偏移。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/TransDataTo5HD_res.md#id3 -->
 
 ## 返回值说明<a name="zh-cn_topic_0000001521260417_section640mcpsimp"></a>
 

@@ -122,6 +122,16 @@ enum class gather_mode {
     element = 0, // per-element gather
     data_block,  // datablock-width gather
 };
+
+/** @brief Memory access pipeline type used by register synchronization interfaces. */
+enum class mem_type {
+    vec_load,
+    vec_store,
+    scalar_load,
+    scalar_store,
+    vec_all,
+    scalar_all,
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc

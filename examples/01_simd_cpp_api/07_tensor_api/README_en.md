@@ -16,7 +16,7 @@ This directory contains samples that directly include `tensor_api/tensor.h` and 
 | [mmad_tensor_api](./mmad_tensor_api) | Implements dynamic-shape matrix multiplication and in-path quantization using the Tensor API | Ascend 950PR&950DT products |
 | [matmul_mxfp4_tensor_api_high_performance](./matmul_mxfp4_tensor_api_high_performance) | High-performance MxFP4 Matmul Tensor API sample based on the static Tensor programming model | Ascend 950PR&950DT products |
 | [custom_op_tensor_api](./custom_op_tensor_api) | Implements batched-input flattening and shared-weight QKV projection with a custom Tensor API Copy Operation | Ascend 950PR&950DT products |
-| [bank_conflict](./custom_op_tensor_api) | Introduces bank conflicts and mitigation methods based on the Tensor API | Ascend 950PR&950DT products |
+| [bank_conflict](./bank_conflict) | Introduces bank conflicts and mitigation methods based on the Tensor API | Ascend 950PR&950DT products |
 | [matmul_split_k](./matmul_split_k) | Implements multi-core matrix multiplication with K-axis splitting using the Tensor API | Ascend 950PR&950DT products |
 | [matmul_bias_fusion](./matmul_bias_fusion) | Implements Cube-Vector (CV) fusion computation with Bias using the Tensor API | Ascend 950PR&950DT products |
 | [abs_diff](./experimental/reg_vector_compute/abs_diff) | Computes the element-wise absolute difference of two float Tensors using the Tensor API | Ascend 950PR&950DT products |

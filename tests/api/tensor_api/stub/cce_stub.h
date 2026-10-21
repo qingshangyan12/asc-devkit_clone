@@ -45,6 +45,10 @@ inline void vci(vector_s32& dst, int32_t offset, Literal order) {}
 inline void vci(vector_f16& dst, half offset, Literal order) {}
 inline void vci(vector_f32& dst, float offset, Literal order) {}
 
+template <typename T>
+inline void asc_mem_bar(T)
+{}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
 using vector_uint8_t = uint8_t;
 using vector_uint16_t = uint8_t;
