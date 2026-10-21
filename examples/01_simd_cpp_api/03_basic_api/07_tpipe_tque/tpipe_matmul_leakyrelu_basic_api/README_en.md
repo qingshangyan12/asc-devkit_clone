@@ -10,9 +10,9 @@ In this example, the A1 (physically in L1 Buffer), A2 (L0A Buffer), CO1 (L0C Buf
 
 | Product | CANN Version |
 |---------|--------------|
-| Ascend 950PR&950DT Series Products | >= CANN 9.1.0 |
-| Atlas A3 Series Products | >= CANN 9.0.0 |
-| Atlas A2 Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT Series Products | >= CANN 9.3.0 |
+| Atlas A3 Series Products | >= CANN 9.3.0 |
+| Atlas A2 Series Products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -317,7 +317,7 @@ if ASCEND_IS_AIV {
 ```
 
 ```cpp
-__aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32_t tileLen)
+__aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32_t len)
 {
     uint32_t blockLen = baseN * sizeof(half);
     uint32_t srcStride = (N - baseN) * sizeof(half);
@@ -337,7 +337,7 @@ __aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32
     vecInQueue.EnQue(vecInLocal);
     vecInLocal = vecInQueue.DeQue<half>();
     AscendC::LocalTensor<half> vecOutLocal = vecOutQueue.AllocTensor<half>();
-    AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen);
+    AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, len);
     vecInQueue.FreeTensor(vecInLocal);
     vecOutQueue.EnQue(vecOutLocal);
     vecOutLocal = vecOutQueue.DeQue<half>();
@@ -514,7 +514,7 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
   **LeakyRelu and cross-core parameters**
 
-  `LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen)` receives the output tensor, input tensor, negative slope and number of elements. `tileLen=8192`, not bytes.
+  `LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, len)` receives the output tensor, input tensor, negative slope and number of elements. `len=8192`, not bytes.
 
   `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG+flagOffset)` sends READY after FIX completes. `CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG+flagOffset)` sends FREE after the AIV finishes reading. READY_FLAG=8 and FREE_FLAG=10 are the starting flagId values defined by this example. With `flagOffset=mIndex%BUFFER_NUM`, READY uses 8/9 and FREE uses 10/11. One mode-2 wait on the AIC requires both paired AIVs to complete synchronization.
 
@@ -630,7 +630,7 @@ printf output affects operator performance and is normally used during debugging
 [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) can print the contents of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md), together with custom uint32_t information such as a line number. For example, replace the existing LeakyRelu call in LeakyReluCompute with the following debug-only sequence, before releasing or enqueuing the output:
 
 ```cpp
-AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen);
+AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, len);
 AscendC::PipeBarrier<PIPE_ALL>(); // Debug only: wait for the producer.
 AscendC::DumpTensor(vecOutLocal, mIndex, 16);
 ```
