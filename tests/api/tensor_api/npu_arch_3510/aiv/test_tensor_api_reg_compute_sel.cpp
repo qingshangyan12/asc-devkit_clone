@@ -150,11 +150,11 @@ TEST(tensor_api_reg_compute_sel_3510, pack_unpack_mask)
     compile_reg_mask_pack_unpack(mask.reg);
 }
 
-#define TENSOR_API_COMPRESS_TEST(DataType)                       \
-    TEST(tensor_api_reg_compute_sel_3510, compress_##DataType)   \
-    {                                                            \
-        auto mask = asc::te::experimental::all_mask<DataType>(); \
-        compile_reg_compress<DataType>(mask.reg);                \
+#define TENSOR_API_COMPRESS_TEST(DataType)                                \
+    TEST(tensor_api_reg_compute_sel_3510, compress_##DataType)            \
+    {                                                                     \
+        auto mask = asc::te::experimental::all_mask<DataType>();          \
+        compile_reg_compress<DataType>(mask.reg);                         \
         compile_reg_compress<DataType>(static_cast<vector_bool>(0x5A5A)); \
     }
 
