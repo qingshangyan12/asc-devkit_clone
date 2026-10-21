@@ -65,13 +65,13 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_<round_mode><merge_mode>(vector_
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果
-__simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_<round_mode><merge_mode>(vector_bfloat16_t src,
+__simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_<round_mode>(vector_bfloat16_t src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
-- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+- `<round_mode>`表示支持的舍入模式，支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和组内未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和组内未写入结果的位置保留`dst`中原值。
 <!-- npu="960" id9 -->
 - 合并模式（`<merge_mode>`取值为`_merge`）仅在Ascend 960PR&960DT系列产品上支持。

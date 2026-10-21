@@ -65,13 +65,13 @@ __simd_callee__ inline void asc_float2hif8_<round_mode><sat_mode><merge_mode>(ve
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_<round_mode><sat_mode><merge_mode>(vector_float src,
+__simd_callee__ inline vector_hifloat8_t asc_float2hif8_<round_mode><sat_mode>(vector_float src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
-- `<round_mode>`支持`rna`（ROUND）和`rh`（HIFLOAT8专用舍入模式）。
+- `<round_mode>`表示支持的舍入模式，支持`rna`（ROUND）和`rh`（HIFLOAT8专用舍入模式）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 - `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和组内未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和组内未写入结果的位置保留`dst`中原值。
 <!-- npu="960" id9 -->

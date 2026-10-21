@@ -67,11 +67,11 @@ __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><merge_mode
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode>(vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode>(vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
