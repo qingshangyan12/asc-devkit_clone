@@ -109,7 +109,7 @@ def check_is_regbase_v2():
     from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import KIRIN_X90
     from .platform.platform_info import KIRIN_9030
-    from .platform.platform_info import KIRIN9050
+    from .platform.platform_info import KIRIN_9050
     from .platform.platform_info import KIRIN_DEV_0001
     from .platform.platform_info import KIRIN_DEV_0002
     from .platform.platform_info import KIRIN_DEV_0003
