@@ -46,35 +46,35 @@ __global__ __cube__ void func(GM_ADDR x, GM_ADDR y);
 // SK子函数也需要cube标识
 __sk__ __cube__ void func_sk(const ArgsStruct *args, sk::SkSystemArgs *sysArgs);
 
-SK_BIND(func, 4, func_sk);
+SK_BIND(func, 0, func_sk);
 
 // 原global函数为vector类型
 __global__ __vector__ void func_vec(GM_ADDR x, GM_ADDR y);
 // SK子函数也需要vector标识
 __sk__ __vector__ void func_vec_sk(const ArgsStruct *args, sk::SkSystemArgs *sysArgs);
 
-SK_BIND(func_vec, 4, func_vec_sk);
+SK_BIND(func_vec, 0, func_vec_sk);
 
 // 原global函数为mix类型
 __global__ __mix__(1, 2) void func_mix(GM_ADDR x, GM_ADDR y);
 // SK子函数需要mix标识
 __sk__ __mix__(1, 2) void func_mix_sk(const ArgsStruct *args, sk::SkSystemArgs *sysArgs);
 
-SK_BIND(func_mix, 4, func_mix_sk);
+SK_BIND(func_mix, 0, func_mix_sk);
 
 // 原global函数为mix(1, 0)类型
 __global__ __mix__(1, 0) void func_mix_10(GM_ADDR x, GM_ADDR y);
 // SK子函数需要cube标识
 __sk__ __mix__(1, 0) void func_mix_10_sk(const ArgsStruct *args, sk::SkSystemArgs *sysArgs);
 
-SK_BIND(func_mix_10, 4, func_mix_10_sk);
+SK_BIND(func_mix_10, 0, func_mix_10_sk);
 
 // 原global函数为mix(0, 1)类型
 __global__ __mix__(0, 1) void func_mix_01(GM_ADDR x, GM_ADDR y);
 // SK子函数需要vector标识
 __sk__ __mix__(0, 1) void func_mix_01_sk(const ArgsStruct *args, sk::SkSystemArgs *sysArgs);
 
-SK_BIND(func_mix_01, 4, func_mix_01_sk);
+SK_BIND(func_mix_01, 0, func_mix_01_sk);
 ```
 
 #### 规则3：定义参数结构体
@@ -161,7 +161,7 @@ SK子函数内部的逻辑实现必须与原global函数完全一致，包括数
 #### 规则7：使用SK_BIND宏绑定
 
 ```cpp
-SK_BIND(original_func, 4, sk_func<0>, sk_func<1>, sk_func<2>, sk_func<3>);
+SK_BIND(original_func, 0, sk_func<0>, sk_func<1>, sk_func<2>, sk_func<3>);
 ```
 
 **参数说明**：
@@ -169,14 +169,15 @@ SK_BIND(original_func, 4, sk_func<0>, sk_func<1>, sk_func<2>, sk_func<3>);
 | 参数 | 说明 |
 | --- | --- |
 | `original_func` | 原global函数，如果是模板函数需要手动实例化 |
-| `4` | 掩码参数（uint64_t类型），用于配置SuperKernel特性 |
+| `0` | 特性掩码cap（uint64_t类型），本例不设置任何特性位 |
 | `sk_func<0>` ~ `sk_func<3>` | 最多4个SK子函数，如果是模板函数需要手动实例化 |
 
 **掩码参数取值**：
-1/2/4/8/16分别代表不同bit位上置值的结果，比如8为第4bit置值的结果
+1/2/4/8/16分别代表不同bit位上置值的结果，比如8为第4bit置值的结果。详细说明请参见[SK_BIND](../../../../api/Utils-API/SuperKernel/SK_BIND.md)。
 
 | 值 | 含义 |
 | --- | --- |
+| 0 | 不设置任何特性位 |
 | 1 | early start wait flag |
 | 2 | early start set flag |
 | 4 | disable_dcci |
@@ -238,7 +239,7 @@ __sk__ __vector__ void add_custom_sk(const AddCustomArgs *args, sk::SkSystemArgs
 
 // 规则7：使用SK_BIND绑定
 // 通过指定模板参数实例化出4个不同的符号
-SK_BIND(add_custom, 4, add_custom_sk<0>, add_custom_sk<1>, add_custom_sk<2>, add_custom_sk<3>);
+SK_BIND(add_custom, 0, add_custom_sk<0>, add_custom_sk<1>, add_custom_sk<2>, add_custom_sk<3>);
 ```
 
 ## 适配步骤总结
@@ -263,12 +264,13 @@ SK_BIND(add_custom, 4, add_custom_sk<0>, add_custom_sk<1>, add_custom_sk<2>, add
 
 1. 使用`SK_BIND`宏将原global函数与SK子函数绑定
 2. 支持最多4个SK子函数
-3. 第二个参数是掩码（uint64_t类型），用于配置SuperKernel特性：
+3. 第二个参数是掩码（uint64_t类型），用于配置SuperKernel特性，详细说明请参见[SK_BIND](../../../../api/Utils-API/SuperKernel/SK_BIND.md)：
    - `16`表示blockdim scale up
    - `8`表示disable batchmode check
    - `4`表示disable dcci
    - `2`表示early start set flag
    - `1`表示early start wait flag
+   - `0`表示不设置任何特性位
 
 ## 注意事项
 
@@ -297,7 +299,7 @@ SK_BIND(add_custom, 4, add_custom_sk<0>, add_custom_sk<1>, add_custom_sk<2>, add
 
 ### 绑定掩码参数说明
 
-`SK_BIND`宏的第二个参数是掩码（uint64_t类型），用于配置SuperKernel特性：
+`SK_BIND`宏的第二个参数是掩码（uint64_t类型），用于配置SuperKernel特性，详细说明请参见[SK_BIND](../../../../api/Utils-API/SuperKernel/SK_BIND.md)：
 
 | 值 | 含义 |
 | --- | --- |
@@ -306,6 +308,7 @@ SK_BIND(add_custom, 4, add_custom_sk<0>, add_custom_sk<1>, add_custom_sk<2>, add
 | 4 | disable dcci |
 | 2 | early start set flag |
 | 1 | early start wait flag |
+| 0 | 不设置任何特性位 |
 
 ## 常见问题
 
@@ -326,7 +329,7 @@ A：不可以。SK子函数必须与原global函数在获取参数后的所有�
 A：可以在`SK_BIND`中只填写需要的函数数量，例如：
 
 ```cpp
-SK_BIND(add_custom, 4, add_custom_sk<0>, add_custom_sk<1>);
+SK_BIND(add_custom, 0, add_custom_sk<0>, add_custom_sk<1>);
 ```
 
 **Q5：sk::SkSystemArgs参数是必须的吗？**
