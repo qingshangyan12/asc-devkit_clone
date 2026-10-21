@@ -71,7 +71,7 @@ SIMT编程场景当前不支持使用该接口。
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个float8_e5m2x2_t类型的数据，即2个fp8_e5m2_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __e5m2x22float2(input[idx]);
