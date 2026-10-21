@@ -432,7 +432,11 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, config);
+    } else {
+        mad(c, a, b, config);
+    }
 }
 
 template <typename U, typename S>
@@ -459,13 +463,20 @@ __aicore__ inline void MmadCal(
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, bias, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, config);
+    } else {
+        mad(c, a, b, bias, config);
+    }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
+    } else {
         mad(c, a, b, mmadParams.GetConfig0());
     }
 }
@@ -474,8 +485,11 @@ template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
-        mmadParams.SetCmatrixInitVal(false);
+    mmadParams.SetCmatrixInitVal(false);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
+                  SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
+    } else {
         mad(c, a, b, bias, mmadParams.GetConfig0());
     }
 }
