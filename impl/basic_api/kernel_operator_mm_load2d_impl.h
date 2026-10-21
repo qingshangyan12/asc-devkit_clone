@@ -246,7 +246,7 @@ __aicore__ inline void LoadDataImpl(
     if (dstScope == Hardware::L0A) {
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)))
+    ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)))
         LoadData2DL12L0ACal(
             (__ca__ PrimT<U>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(),
             (__cbuf__ PrimT<V>*)srcMx.GetPhyAddr(), loadDataParams, loadMxDataParams);

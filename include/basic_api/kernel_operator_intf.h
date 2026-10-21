@@ -26,7 +26,7 @@
 #define ASCENDC_MODULE_OPERATOR_INTERFACE_H
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 // MICRO API
 #include "reg_compute/kernel_reg_compute_intf.h"
 #endif
@@ -78,7 +78,7 @@
 
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 #include "include/adv_api/kernel_api.h"
 #endif
 
