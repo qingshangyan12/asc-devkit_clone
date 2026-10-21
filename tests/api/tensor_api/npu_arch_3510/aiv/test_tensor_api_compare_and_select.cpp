@@ -17,12 +17,12 @@
 class tensor_api_vector_compare_and_select_3510 : public testing::Test {};
 
 template <typename T>
-__aicore__ inline void test_compare_reg_tensor()
+__aicore__ inline void test_compare_reg_tensor(vector_bool maskValue)
 {
     asc::te::experimental::reg_tensor<T> src0{};
     asc::te::experimental::reg_tensor<T> src1{};
-    auto all = asc::te::experimental::all_mask<T>();
-    src0.mask = all.reg;
+    src0.mask = maskValue;
+    src1.mask = maskValue ^ 1;
 
     auto eq = src0 == src1;
     auto ne = src0 != src1;
@@ -39,12 +39,11 @@ __aicore__ inline void test_compare_reg_tensor()
 }
 
 template <typename T>
-__aicore__ inline void test_compare_reg_tensor_scalar()
+__aicore__ inline void test_compare_reg_tensor_scalar(vector_bool maskValue)
 {
     asc::te::experimental::reg_tensor<T> src0{};
     T src1{};
-    auto all = asc::te::experimental::all_mask<T>();
-    src0.mask = all.reg;
+    src0.mask = maskValue;
 
     auto eq = src0 == src1;
     auto ne = src0 != src1;
@@ -62,12 +61,11 @@ __aicore__ inline void test_compare_reg_tensor_scalar()
 }
 
 template <typename T>
-__aicore__ inline void test_compare_scalar_reg_tensor()
+__aicore__ inline void test_compare_scalar_reg_tensor(vector_bool maskValue)
 {
     T src0{};
     asc::te::experimental::reg_tensor<T> src1{};
-    auto all = asc::te::experimental::all_mask<T>();
-    src1.mask = all.reg;
+    src1.mask = maskValue;
 
     auto eq = src0 == src1;
     auto ne = src0 != src1;
@@ -84,23 +82,26 @@ __aicore__ inline void test_compare_scalar_reg_tensor()
 }
 
 template <typename T>
-__aicore__ inline void test_select()
+__aicore__ inline void test_select(vector_bool maskValue)
 {
     asc::te::experimental::reg_tensor<bool> condition{};
     asc::te::experimental::reg_tensor<T> src0{};
     asc::te::experimental::reg_tensor<T> src1{};
-    src0.mask = asc::te::experimental::all_mask<T>().reg;
+    src0.mask = maskValue;
+    src1.mask = maskValue ^ 1;
 
     auto dst = asc::te::experimental::select(condition, src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-#define COMPARE_AND_SELECT_TEST(Function, DataType)                          \
+#define COMPARE_AND_SELECT_TEST(Function, DataType)                         \
     TEST_F(tensor_api_vector_compare_and_select_3510, Function##_##DataType) \
-    {                                                                        \
-        test_##Function<DataType>();                                         \
-        SUCCEED();                                                           \
+    {                                                                      \
+        for (vector_bool maskValue = 0; maskValue < 2; ++maskValue) {         \
+            SCOPED_TRACE(maskValue);                                       \
+            test_##Function<DataType>(maskValue);                          \
+        }                                                                  \
     }
 
 #define SELECT_TYPE_TEST(DataType) COMPARE_AND_SELECT_TEST(select, DataType)
