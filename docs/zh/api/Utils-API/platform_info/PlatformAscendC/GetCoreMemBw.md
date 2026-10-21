@@ -13,6 +13,8 @@ enum class CoreMemType {
     L2 = 4,
     UB = 5,   // 预留参数，暂不支持
     HBM = 6,
+    FB = 7,   // Fixpipe Buffer
+    BT = 8,   // BiasTable Buffer
     RESERVED
 };
 ```
