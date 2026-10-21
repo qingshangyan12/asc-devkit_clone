@@ -284,4 +284,15 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_multilevel_mesh1d_falls_back_to_aicp
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllSoleMesh");
 }
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_selects_sole_mesh)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U; // 现状：topoLevelNums != 1U → NOT_MATCH
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
 } // namespace checker

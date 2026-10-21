@@ -40,6 +40,12 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
             HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
             return SelectorStatus::MATCH;
         }
+        // 对齐 hccl：多级 MESH_1D_CLOS 走 SoleMesh
+        if (topoInfo->topoLevelNums > 1U) {
+            selectAlgName = "AicpuAllToAllVSoleMesh";
+            HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
+            return SelectorStatus::MATCH;
+        }
     }
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS || topoInfo->topoLevelNums != 1U || topoInfo->level0PcieMix) {
         HCCL_WARNING(
@@ -47,9 +53,6 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
-#if defined(HCCL_CANN_COMPAT_850)
-    return SelectorStatus::NOT_MATCH;
-#else
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
@@ -61,7 +64,6 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
     selectAlgName = "AicpuAllToAllVSoleMeshConcurrent";
     HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
-#endif
 }
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLTOALLV, 18, AlltoAllVAutoSelector);
