@@ -36,7 +36,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 支撑理由（均来自本仓库代码实证）：
 
 1. **分发机制完全一致**：capi 的架构选择是 100% 编译期行为，靠 `__NPU_ARCH__` 宏 + 通用头内的 `#if / #elif / #include` 链，与已落地的 3510 / 9201 机制完全相同。新增 M510 分支是机械操作，无需改 CMake 编译逻辑（`impl/c_api/CMakeLists.txt` 仅 `install(DIRECTORY)`，新增文件自动纳入）。
-2. **`memory_base_impl/` 完全架构无关**：25 个文件，已确认零 `__NPU_ARCH__` 引用 → **零改动**。
+2. **`memory_base_impl/` 基本架构无关**：25 个文件整体无 `__NPU_ARCH__` 分支；其中 `cube_datamove_intf_impl.h` 的 L1→L0 / GM→L0 加载函数按 §4.8 加「排除仅 5102」守卫（其余零改动）。
 3. **大量 reg/vector/scalar 类实现可直接复用 3510**：`npu_arch_3510/` 下 20 个文件中的 vector / reg / scalar / sys_var / sync / spr / ub_scatter / loadalign / storealign 等，与 M510 行为一致，复制后基本原样保留即可。
 4. **数据类型专用指令缺口（expdiff / fp4 / fp8 / s4）范围可控且已策略化**：依赖 `vexpdif`（expdiff）、`UNPK4_B8`（fp4）、`vsel`/`vintlv`（fp8）、`vcvt_s42*`（s4）等专用指令的函数，绝大多数定义在**共享通用头**而非 `npu_arch_3510/` 内；对这些函数统一加「`#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)`」守卫即可在编译期从 5102 排除，且对 3510/9201 零影响（守卫条件对其恒真）。见 §4.7。
 5. **cube 差异已有 basic_api 基准**：M510 不支持的 cube 路径在 `dav_m510/kernel_operator_mm_impl.h` 中已有明确 ASSERT/报错实现，可作为 capi `npu_arch_5102/cube_*` 的裁剪依据。
@@ -89,7 +89,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 | 分类 | 文件 | M510 处理 |
 |------|------|-----------|
 | **直接复用（薄包含）**（行为一致） | `vector_compute_composite_intf_impl.h`、`vector_datamove_intf_impl.h`、`reg_convert_intf_impl.h`、`reg_fused_intf_impl.h`、`reg_logic_intf_impl.h`、`reg_permute_sel_intf_impl.h`、`reg_addr_reg_intf_impl.h`、`scalar_atomic_intf_impl.h`、`spr_intf_impl.h`、`sync_intf_impl.h`、`sys_var_intf_impl.h`、`ub_scatter_intf_impl.h`、`loadalign_intf_impl.h`、`storealign_intf_impl.h`、`storeunalign_intf_impl.h` | `npu_arch_5102/` 下对应文件**仅一行 `#include` 直接包含 `npu_arch_3510/` 同名文件**（薄包含），不复制函数体。指令集一致的，3510 实现在 5102 下原样可用。 |
-| **需裁剪/改造**（cube 耦合差异） | `cube_compute_intf_impl.h`、`cube_compute_composite_intf_impl.h`、`cube_datamove_intf_impl.h`、`cube_datamove_composite_intf_impl.h`、`datamove_atomic_intf_impl.h` | 保留 M510 支持的共享算子（`asc_mmad`/`mad`、`fixpipe`、`l0c2gm` 等）；**删除或桩化** M510 不支持路径（GM→L0A、L1→L0A transpose、InitL0A、v1 LoadData），以 `impl/basic_api/dav_m510/kernel_operator_mm_impl.h` 的 ASSERT/报错为基准 |
+| **需裁剪/改造**（cube 耦合差异） | `cube_compute_intf_impl.h`、`cube_compute_composite_intf_impl.h`、`cube_datamove_intf_impl.h`、`cube_datamove_composite_intf_impl.h`、`datamove_atomic_intf_impl.h` | 共享算子（`asc_mmad`/`mad`、`asc_copy_l0c2gm`/`l0c2l1`、`asc_copy_gm2l1*`、`asc_copy_l12l0c`、`asc_copy_l12gm` 等）保留；M510 不支持的 L1→L0 / GM→L0 加载路径（`asc_copy_gm2l0a`/`l0b`、`asc_copy_l12l0a`/`l0b`/`bt`/`fb`、`asc_load_image_to_cbuf` 等）在共享头内按 §4.8 加「排除仅 5102」守卫编译期剔除（对 3510/9201 零影响）；fp4 MX（`asc_mmad_mx*`）按 §4.5 首期 Drop。 |
 | **3510 专属、首期不纳入** | `cube_compute_intf_impl.h` 中的 `asc_mmad_mx*` 系列（fp4 MX） | M510 是否支持待确认（见 §6），首期不在复用范围 |
 
 > 可选优化（二期）：将 vector_* / reg_* 的共享实现抽到 `npu_arch_common/` 或保留在通用层，避免 3510 与 5102 双份维护。首期以「薄包含 + 通用头守卫」换取落地速度（薄包含零重复，守卫只在 10 个通用头里出现）。
@@ -161,6 +161,70 @@ __simd_callee__ inline void asc_xxx(...) { ... }  // 使用 vexpdif / UNPK4_B8 /
 
 注意：`npu_arch_5102/` 的 20 个 shim 文件仍是薄包含 3510 同名文件（见 §4.2）；通用头守卫负责剔除 3510-only 指令路径，二者配合即得到可编译的 5102 capi。
 
+### 4.8 cube_datamove「排除仅 5102」守卫（Phase 2，cube 耦合裁剪落地）
+
+Phase 2 将 §4.7 的守卫机制应用到 **cube 数据搬运** 路径。依据 `impl/basic_api/dav_m510/kernel_operator_mm_impl.h`，M510 的 cube 数据搬运不支持 L1→L0A/L0B 的部分路径与 GM→L0A/L0B 直接加载（对应 3510 的 LoadData 路径在 `dav_m510` 中已被桩化为 `ASSERT(false)` / 返回 "not supported on current device"）。注意：`npu_arch_5102/` 的 shim 是薄包含 3510 同名文件，但**顶层分发头（`cube_datamove_intf_impl.h` 等）并无 5102 分支**，所以这些 L0 加载函数实际来自共享的 `memory_base_impl/cube_datamove_intf_impl.h` 与通用 `reg_base_impl/cube_datamove_intf_impl.h`，无法靠 arch 文件覆盖（additive-only 约束，见 §3）——因此同样采用「排除仅 5102」编译期守卫，从 5102 编出中剔除这些函数；对 3510/9201 恒真、零影响。
+
+**被守卫排除的函数族（共 10 族，约 147 个定义）**：
+
+| 函数族 | 含义 | 守卫定义点 |
+|------|------|-----------|
+| `asc_copy_gm2l0a` | GM→L0A | `memory_base_impl/cube_datamove_intf_impl.h`、`reg_base_impl/cube_datamove_intf_impl.h` |
+| `asc_copy_gm2l0b` | GM→L0B | 同上 |
+| `asc_copy_l12l0a` | L1→L0A | 同上 |
+| `asc_copy_l12l0a_trans` | L1→L0A transpose | 同上 |
+| `asc_copy_l12l0b` | L1→L0B | 同上 |
+| `asc_copy_l12l0b_sparse` | L1→L0B sparse | 同上 |
+| `asc_copy_l12l0b_trans` | L1→L0B transpose | 同上 |
+| `asc_copy_l12bt` | L1→BT | 同上 |
+| `asc_copy_l12fb` | L1→FB | 同上 |
+| `asc_load_image_to_cbuf` | LoadImage 到 cbuf | 同上 |
+
+**守卫落地位置与数量（ccec 双向验证：5102 全量 0 错误、9201 零回归）**：
+
+| 文件 | 守卫数 | 说明 |
+|------|--------|------|
+| `impl/c_api/memory_base_impl/cube_datamove_intf_impl.h` | 66 | 共享架构无关头；L1→L0 / GM→L0 加载函数加守卫，其余零改动 |
+| `impl/c_api/reg_base_impl/cube_datamove_intf_impl.h` | 79 | 通用分发头；同一批 10 族函数加守卫 |
+| `impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h` | 2 | 9201 专属路径；守卫恒真、保留 |
+| `impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_intf_impl.h` | 0 | 3510 专属头不含这 10 族（定义落在共享/通用头），无需改动 |
+
+**保留（不加守卫，M510 支持的共享 cube 算子）**：`asc_copy_l12l0c`（cbuf→L0C）、`asc_copy_gm2l1*`、`asc_copy_l0c2gm` / `l0c2l1` / `l0c2ub`、`asc_copy_l12gm`，以及 `asc_mmad` / `mad`（位于通用 `cube_compute_intf_impl.h`，M510 支持）。
+
+**fp4 MX（§4.5 Drop）**：`asc_mmad_mx*` 系列已在 `npu_arch_3510/cube_compute_composite_intf_impl.h`（8 个定义）与 `cube_datamove_composite_intf_impl.h`（106 个定义）加同款守卫；`npu_arch_5102/cube_compute_intf_impl.h` 已清空（M510 无 fp4/fp8 MX matmul，见 §4.5）。
+
+### 4.9 cube 分发链路补 5102 分支（Phase 2 缺陷修复，实测发现）
+
+**问题（ccec 预处理实测发现）**：仅靠 §4.8 的守卫**不足以让 M510 获得 cube 算子**。公共门控 `include/c_api/cube_compute/cube_compute.h`、`include/c_api/cube_datamove/cube_datamove.h` 把 `5102` 路由到**顶层通用头** `impl/c_api/reg_base_impl/cube_compute_intf_impl.h` / `cube_datamove_intf_impl.h`；但这两个顶层头原有的 `#if/#elif/#include` 链**只有 3510 与 9201 两条分支，缺 5102 分支**，于是 M510 只能拿到顶层头自身定义的通用函数（如 `asc_mmad`、`asc_copy_gm2l1`），而**所有架构专属 cube 算子都取不到**——包括 M510 实际**支持**的 `asc_copy_l0c2gm`（L0C→GM）、`asc_copy_l0c2l1`（L0C→L1）。
+
+ccec `-E` 实测（pp 输出按「定义体」计数，声明不算）：
+
+| 函数 | 修复前 5102 | 修复前 9201 | 修复后 5102 | 修复后 9201 |
+|------|-----------|-----------|-----------|-----------|
+| `asc_copy_l0c2gm` | **0** | 28 | **28** | 28 |
+| `asc_copy_l0c2l1` | **0** | 25 | **27** | 25 |
+| `asc_copy_gm2l1` | 48 | 64 | 48 | 64 |
+| `asc_mmad` | 36 | 50 | 36 | 50 |
+
+即：修复前 M510 下 `asc_copy_l0c2gm` / `l0c2l1` 只有声明、**无定义**（调用即编译失败），而它们属于 M510 应支持的算子。根因是 `npu_arch_5102/cube_*` shim 未被任何分发链引用（成了死代码）。
+
+**修复（已落地）**：在顶层 cube 分发链补上 5102 分支，让 M510 走薄包含 3510 的 `npu_arch_5102/` shim：
+
+```c
+// impl/c_api/reg_base_impl/cube_{compute,datamove}_intf_impl.h
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/cube_datamove_intf_impl.h"
+#endif
+```
+
+**为什么这样安全**：`npu_arch_3510/cube_datamove_intf_impl.h` 中**不含**那 10 个不支持家族（实测 0 定义，它们落在共享/通用头，已由 §4.8 守卫剔除），因此 cube 域路由 5102 → `npu_arch_5102` → 3510 不会引入 M510 不支持的指令。实测确认：修复后 5102 的 `UNPK4_B8` / `vexpdif`（expdiff）/ `vcvt_s42bf16`（s4）均仍为 **0**，9201 保留全部指令（`vexpdif`×3、`vcvt_s42bf16`×9），双向 0 错误。
+
+> ⚠️ **已知缺口（非 cube 域，后续 follow-up）**：同样缺 5102 分支的还有其余 18 个顶层分发头（`vector_datamove`、`reg_convert`、`reg_fused`、`reg_logic`、`reg_permute_sel`、`loadalign`、`storealign`、`storeunalign`、`sync`、`spr`、`sys_var`、`ub_scatter`、`datamove_atomic`、`scalar_atomic`、`reg_addr_reg`、`vector_compute_composite`、`cube_*_composite` 等）。**不能**简单照抄 cube 的做法给它们补 5102 分支：这些域的 M510 不兼容函数定义在 **`npu_arch_3510/` 下的完整实现头**（如 `npu_arch_3510/reg_convert_intf_impl.h` 为 140KB，**无任何 5102 守卫**），而 §4.7 的守卫只加在了顶层共享头。实测：若给 `reg_convert` / `reg_fused` / `reg_logic` / `reg_permute_sel` / `vector_datamove` 补 5102 分支，会把 `vexpdif`（0→3）、`vcvt_s42bf16`（0→3）等不支持的 s4/expdiff 指令路径拉进 5102 编出（已实测回归并回退）。正确做法是后续把守卫同步下沉到 `npu_arch_3510/` 各完整实现头（或让 `npu_arch_5102/` shim 改为选择性包含）后，再补这些域的分支。非 cube 域的 M510 分发留待独立 follow-up，本 RFC 范围仅限 cube（§4.8/§4.9）。
+
 ---
 
 ## 5. 构建与测试接入
@@ -178,7 +242,7 @@ __simd_callee__ inline void asc_xxx(...) { ... }  // 使用 vexpdif / UNPK4_B8 /
 
 - [x] __NPU_ARCH__ == 5102 已确认：用户确认 5102 即宏值、编译器认识（--cce-aicore-arch=dav-510r2 配合 -D__NPU_ARCH__=5102）；编译工程 mc62cm12a.py 已注入该宏。注意 ccec 不会自动预定义该宏，须显式 -D 传入（与构建工程一致）。5101/5161/5163/5165 兄弟族沿用同一 npu_arch_5102 分支。
 - [ ] tikicpulib::ascendm510 CPU 模型库就绪时间（阻塞测试实际运行）。但已验证：不依赖 tikicpulib，ccec（CANN 9.3.0）即可编译验证 M510 capi 实现，故 impl 工作不受该库阻塞。
-- [~] cube 耦合裁剪：Phase 2 待做。npu_arch_5102/cube_* 当前为薄包含 3510 文件，尚未按 dav_m510/kernel_operator_mm_impl.h 的 ASSERT/报错裁剪不支持路径（GM to L0A、L1 to L0A transpose、InitL0A、v1 LoadData）。
+- [x] cube 耦合裁剪（Phase 2）：完成并验证。①按 §4.8 在共享/通用 cube_datamove 头对 M510 不支持的 L0 加载函数族加「排除仅 5102」守卫（10 族约 147 个定义）；②按 §4.9 在顶层 cube 分发链补 5102 分支，修复 M510 取不到支持算子（l0c2gm/l0c2l1 0→28/27）的缺陷；fp4 MX（asc_mmad_mx*）按 §4.5 Drop。ccec 双向验证：5102 全量 0 错误、Drop 家族定义数 0、支持算子定义数 >0、不支持指令 0；9201 零回归。
 - [x] expdiff / fp4 / fp8 / s4 策略已拍板并落地：采用编译期排除（§4.5 / §4.7），已在 10 个共享通用头加守卫，5102 全量 0 错误、9201 零回归。
 - [x] fp4 MX（asc_mmad_mx*）确认不支持：用户确认 M510 对 fp4 等数据类型确实不支持（非缺开关），故首期 Drop（与 §4.5 一致）。
 - [x] 命名已定：npu_arch_5102（与现有数字约定一致），对外称 M510（npu_arch_5102）。
@@ -192,8 +256,8 @@ __simd_callee__ inline void asc_xxx(...) { ... }  // 使用 vexpdif / UNPK4_B8 /
 
 - Phase 0（审计）：完成。确认分发机制、公共门控、通用头需补 5102 分支；确认 M510 数据类型专用指令缺口（expdiff/fp4/fp8/s4，见 §1/§4.5）。
 - Phase 1（骨架）+ §4.7（排除守卫）：完成并验证。新增 `npu_arch_5102/`（20 个薄包含 shim）；公共门控与通用头分发链已加 5102 分支；10 个共享通用头加「排除仅 5102」守卫（共 1035 个函数，见 §4.7）。
-- 验证：ccec（CANN 9.3.0，`--cce-aicore-arch=dav-510r2 -D__NPU_ARCH__=5102 -std=c++17`）对 `c_api/asc_simd.h` 全量编译 **0 错误**；同法以 `dav-920r2 -D__NPU_ARCH__=9201` 编译 **零回归**（共享通用头对 9201 保留全部函数）；3510 因本环境无 dav-351 模型无法本地编译，但守卫语义保证其行为不变。
-- Phase 2（cube 裁剪）：待做。
+- 验证：ccec（CANN 9.3.0，`--cce-aicore-arch=dav-510r2 -D__NPU_ARCH__=5102 -std=c++17`）对 `c_api/asc_simd.h` 预处理 **0 错误**（涵盖 Phase 1 的 10 个共享通用头守卫 + Phase 2 的 cube_datamove 守卫 + §4.9 分发修复；所有被排除函数族在 5102 编出中**定义体数均为 0**，而 M510 支持的 `asc_copy_l0c2gm`/`l0c2l1`/`gm2l1`/`mmad` **定义体数 >0**；`UNPK4_B8`/`vexpdif`/`vcvt_s42bf16` 指令计数为 0）；同法以 `dav-920r2 -D__NPU_ARCH__=9201` 预处理 **零回归**（`l0c2gm`28/`l0c2l1`25/Drop 家族全部保留、`vexpdif`×3/`vcvt_s42bf16`×9 保留）；3510 因本环境无 dav-351 模型无法本地编译，但守卫语义保证其行为不变。注：本环境 `-E` 预处理可行但 `-c` 全量编译缺 ccec 运行时类型头，故以「定义体计数 + 指令计数」作为编出证据。
+- Phase 2（cube 裁剪）：完成并验证。①按 §4.8 在共享/通用 cube_datamove 头对 M510 不支持的 10 族 L0 加载函数加「排除仅 5102」守卫（约 147 个定义）；②按 §4.9 修复顶层 cube 分发链缺 5102 分支的缺陷（否则 M510 连支持的 l0c2gm/l0c2l1 都取不到）；fp4 MX（asc_mmad_mx*）按 §4.5 Drop。ccec 双向验证通过（见下）。非 cube 域的 5102 分发缺口见 §4.9 尾部说明，留作 follow-up。
 - Phase 3（expdiff）：已并入 §4.7 守卫落地，无需单独动作。
 - Phase 4（测试 + CMake）：阻塞于 tikicpulib::ascendm510；impl 编译验证已用 ccec 完成。
 - Phase 5（文档）：进行中（本 RFC 修订 + 测试 README）。
@@ -201,7 +265,7 @@ __simd_callee__ inline void asc_xxx(...) { ... }  // 使用 vexpdif / UNPK4_B8 /
 
 - **Phase 0 审计**：① 列出 23 个通用头中需补 `5102` 分支的文件；② 完成 §4.2 复用/裁剪清单；③ 与编译器团队确认 `__NPU_ARCH__` 值。
 - **Phase 1 骨架**：新增 `reg_base_impl/npu_arch_5102/`；复制 3510 的 vector/reg/scalar 文件（直接复用）；扩展公共门控与通用头分支。
-- **Phase 2 cube**：基于 `dav_m510/kernel_operator_mm_impl.h` 实现 `npu_arch_5102/cube_*`，删除/桩化不支持路径。
+- **Phase 2 cube**：基于 `dav_m510/kernel_operator_mm_impl.h` 裁剪 `npu_arch_5102/cube_*`（删除/守卫不支持路径）并补齐顶层 cube 分发链 5102 分支；**已完成并验证**（见 §4.8 / §4.9 / §7 状态）。
 - **Phase 3 expdiff**：按 §4.5 决策落地。
 - **Phase 4 测试**：落地 `npu_arch_5102/` 测试（克隆 3510 共享用例 + M510 差异用例），接入 CMake（依赖 tikicpulib）。
 - **Phase 5 文档**：capi 文档补充 M510 支持与差异说明。
@@ -261,7 +325,8 @@ $<$<STREQUAL:${product_type},ascendm510_AIV>:tikicpulib::ascendm510>
 | cache_ctrl | `test_dci.cpp`、`test_icache_preload.cpp` 等 | Reuse（需核对指令） |
 | cube_compute | `test_mmad.cpp`、`test_mmad_bias.cpp` | Reuse（共享 mmad 子集） |
 | cube_compute | `test_mmad_mx.cpp`、`test_mmad_mx_bias.cpp`、`test_mmad_mx_sync.cpp` | Drop（fp4 MX，首期不支持） |
-| cube_datamove | `test_asc_copy_gm2l0a.cpp`、`test_copy_l12l0a_mx.cpp` 等 | Adapt（GM→L0A / L1→L0A transpose / InitL0A 等路径 M510 不支持） |
+| cube_datamove | `test_asc_copy_gm2l1*.cpp`、`test_asc_copy_l0c2gm.cpp`、`test_copy_l0c2l1_instr.cpp`、`test_asc_copy_l0c2ub.cpp`、`test_copy_l12l0.cpp`、`test_asc_copy_l12ub.cpp` 等 | Reuse（支持的共享 cube 算子：gm2l1 / l0c2gm / l0c2l1 / l0c2ub / l12l0c / l12ub / l12gm） |
+| cube_datamove | `test_asc_copy_gm2l0a.cpp`、`test_asc_copy_l12l0a.cpp`、`test_copy_l12l0a_mx.cpp`、`test_asc_copy_l12l0b.cpp`、`test_copy_l12l0b_trans.cpp`、`test_asc_copy_l12bt.cpp`、`test_asc_copy_l12fb.cpp` 等 | Drop（GM→L0A/L0B、L1→L0A/L0B transpose/sparse、L1→BT/FB、LoadImage 到 cbuf，M510 不支持，见 §4.8 编译期守卫剔除） |
 | vector_compute | `test_return_vconv.cpp`（vconv 重载） | Reuse |
 | vector_compute | `test_return_vconv.cpp`（expdiff 两个用例） | Adapt/Drop（按 §4.5） |
 | vector_datamove | `test_*` | Reuse |

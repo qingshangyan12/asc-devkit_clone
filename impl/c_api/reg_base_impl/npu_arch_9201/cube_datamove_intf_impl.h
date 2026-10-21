@@ -857,6 +857,7 @@ __aicore__ inline void asc_prefetch_stop() { __prefetch_stop(); }
 
 // ==========asc_copy_l12l0a==========
 // hif4x2_t
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -867,6 +868,8 @@ __aicore__ inline void asc_copy_l12l0a(
             dst_stride, 0);
     }
 }
+#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
+
 
 // transpose
 __aicore__ inline void asc_copy_l12l0a_transpose(
@@ -882,6 +885,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose(
 
 // ==========asc_copy_l12l0b==========
 // hif4x2_t
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -892,6 +896,8 @@ __aicore__ inline void asc_copy_l12l0b(
             dst_stride, 0);
     }
 }
+#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
+
 
 // transpose
 __aicore__ inline void asc_copy_l12l0b_transpose(

@@ -21,6 +21,8 @@
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -33,8 +35,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -47,8 +53,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -61,8 +71,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -75,8 +89,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -89,8 +107,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -103,8 +125,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -117,8 +143,12 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -131,6 +161,8 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif  // not M510 (3510-only cube path, see RFC 4.5)
+
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
