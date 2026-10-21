@@ -85,6 +85,12 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
             __func__, topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
+    // ccu_schedule 模式不支持原地算子（与 alltoall/all_gather 等同框架算子的选择器契约一致；
+    // hccl 的 alltoallv 恰好缺失此检查，此处不照抄其缺口）
+    CHK_PRT_RET(
+        IsInputOutputOverlap(opParam) == true,
+        HCCL_WARNING("[Algo][AlltoAllVAutoSelector] ccu schedule does not support inplace alltoallv."),
+        SelectorStatus::NOT_MATCH);
     if (topoInfo->topoLevelNums > 1U) {
         if (topoInfo->level0Topo != Level0Shape::CLOS) {
             // hccl 侧 int8 判断借 union 重叠读 all2AllDataDes.sendType，此处直接用 all2AllVDataDes 语义等价

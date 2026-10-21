@@ -357,4 +357,21 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_int8_multilevel_falls_back
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U);
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    static u64 inplaceBuf[64] = {0};
+    param.inputPtr = inplaceBuf; // sendbuf == recvbuf：原地 AllToAllV
+    param.outputPtr = inplaceBuf;
+    param.inputSize = sizeof(inplaceBuf);
+    param.outputSize = sizeof(inplaceBuf);
+    std::string algName;
+    // ccu_schedule 不支持原地算子（与 alltoall/all_gather 等兄弟实现契约一致）：
+    // 应 NOT_MATCH → 框架置 CCU_FAIL → AICPU 兜底 SoleMesh，绝不能 MATCH 出 CCU 算法
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
 } // namespace checker
