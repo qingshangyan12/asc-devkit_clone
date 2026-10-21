@@ -332,7 +332,7 @@ struct CcuKernelArgBase {
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
     uint32_t channelCount;
     // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
-    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    // 框架只保留所有权并透传，具体算法在子 kernel 中解释。
     uint32_t algSubType = 0;
     std::shared_ptr<void> algArg;
 };
@@ -349,11 +349,17 @@ struct CcuKernelInfo {
     void* kernelFunc;
     // KernelArg实例指针
     void* kernelArg;
+    // subKernelArg实例指针
+    void* subKernelArg = nullptr;
+    // KFC server 跨 kernel 调用所需的 Func 定义 kernel 信息
+    char subKernelFuncName[64] = {};
+    void* subKernelFunc = nullptr;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
 
 private:
     std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
+    std::shared_ptr<CcuKernelArgBase> subKernelArgSmartPtr;
 
 public:
     template <typename T>
@@ -361,6 +367,19 @@ public:
     {
         kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
         kernelArg = static_cast<void*>(arg.get());
+    }
+
+    void setSubKernelArgFromKernelArg()
+    {
+        subKernelArgSmartPtr = kernelArgSmartPtr;
+        subKernelArg = kernelArg;
+    }
+
+    void setSubKernelFromKernel()
+    {
+        setSubKernelArgFromKernelArg();
+        subKernelFunc = kernelFunc;
+        (void)strcpy_s(subKernelFuncName, sizeof(subKernelFuncName), kernelFuncName);
     }
 };
 

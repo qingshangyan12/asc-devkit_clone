@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "../ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -36,6 +38,7 @@ struct KfcReduceScatterNhrContext : CcuKernelCtxBase {
     HcclReduceOp reduceOp = HcclReduceOp::HCCL_REDUCE_SUM;
     const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
     const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
+    bool loadSoleArgs = false;
 
     std::vector<ccu::Variable> input;
     ccu::Variable output;
@@ -74,6 +77,26 @@ CcuResult InitResource(KfcReduceScatterNhrContext& ctx)
         ctx.token[channelIdx] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], RS_NHR_TOKEN_XN_ID);
     }
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcReduceScatterNhrContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    const uint32_t localIdx = ctx.channelCount;
+    const uint32_t inputIdx = ctx.loadSoleArgs ? 0U : KFC_CONCURRENT_RS_NHR_INPUT;
+    const uint32_t outputIdx = ctx.loadSoleArgs ? 1U : KFC_CONCURRENT_RS_NHR_OUTPUT;
+    const uint32_t paramIdx = ctx.loadSoleArgs ? KFC_RS_SOLE_NHR_SLICE_SIZE : KFC_CONCURRENT_RS_NHR_SLICE_SIZE;
+    ctx.input[localIdx] = args[inputIdx];
+    ctx.output = args[outputIdx];
+    ctx.token[localIdx] = args[2];
+    ctx.sliceSize = args[paramIdx];
+    ctx.inputSliceStride = args[paramIdx + 1U];
+    ctx.sliceOneJettySize = args[paramIdx + 2U];
+    ctx.sliceLastJettySize = args[paramIdx + 3U];
+    ctx.repeatNumInv = args[paramIdx + 4U];
+    ctx.inputRepeatStride = args[paramIdx + 5U];
+    ctx.outputRepeatStride = args[paramIdx + 6U];
+    ctx.constVar1 = 1U;
     return CCU_SUCCESS;
 }
 
@@ -259,47 +282,35 @@ CcuResult RunNhr(KfcReduceScatterNhrContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable inputSliceStride, ccu::Variable sliceOneJettySize, ccu::Variable sliceLastJettySize,
-    ccu::Variable repeatNumInv, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId, uint32_t jettyNum,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem*>(arg);
     KfcReduceScatterNhrContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.jettyNum = jettyNum;
-    ctx.dataType = dataType;
-    ctx.outputDataType = outputType;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->portNum;
+    ctx.dataType = kernelArg->opParam.DataDes.dataType;
+    ctx.outputDataType = kernelArg->opParam.DataDes.outputType;
     if (ctx.outputDataType == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
-        ctx.outputDataType = dataType;
+        ctx.outputDataType = ctx.dataType;
     }
-    ctx.reduceOp = reduceType;
-    ctx.stepInfoVector = &stepInfoVector;
-    ctx.rank2ChannelIdx = &rank2ChannelIdx;
+    ctx.reduceOp = kernelArg->opParam.reduceType;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
+    ctx.loadSoleArgs =
+        kernelArg->opParam.algName != nullptr && std::strcmp(kernelArg->opParam.algName, KFC_RS_SOLE_NHR_ALG_NAME) == 0;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
-    const uint32_t localIdx = channelCount;
-    ctx.input[localIdx] = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token[localIdx] = tokenInfo;
-    ctx.sliceSize = sliceSize;
-    ctx.inputSliceStride = inputSliceStride;
-    ctx.sliceOneJettySize = sliceOneJettySize;
-    ctx.sliceLastJettySize = sliceLastJettySize;
-    ctx.repeatNumInv = repeatNumInv;
-    ctx.inputRepeatStride = inputRepeatStride;
-    ctx.outputRepeatStride = outputRepeatStride;
-    ctx.constVar1 = 1U;
-
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            PreSync(ctx);
+            CCU_IF(ctx.sliceSize != 0) { RunNhr(ctx); }
+            PostSync(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_REDUCE_SCATTER_NHR1D_MULTI_JETTY_MEM2MEM_NAME);
     return CCU_SUCCESS;
 }
 
