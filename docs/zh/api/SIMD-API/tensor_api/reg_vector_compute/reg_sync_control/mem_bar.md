@@ -84,11 +84,11 @@ __simd_callee__ inline void mem_bar()
 
 ## 返回值说明
 
-无。
+无
 
 ## 数据类型
 
-无。
+无
 
 ## 约束说明
 
