@@ -42,6 +42,8 @@
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
+#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
 #endif
 #else
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
@@ -62,6 +64,8 @@
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
+#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
 #endif
 #endif
 
