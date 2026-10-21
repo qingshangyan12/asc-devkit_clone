@@ -50,14 +50,14 @@ __aicore__ inline void VfGatherApi0B16(
         ShiftRights(offsetReg0, offsetReg0, (int16_t)1, indexMask);
         ShiftRights(offsetReg1, offsetReg1, (int16_t)1, indexMask);
         // extract the lower 16-bit of uint32_t offset data into uint16_t index data:
-        // for offsetReg0£¬pack every lower 16-bit into the lower half of the vreg£º
+        // for offsetReg0,pack every lower 16-bit into the lower half of the vreg:
         // 0x00FF00FE00FD... ->0xFFFEFD...000000...
         // for offsetReg1, pack every higher 16-bit into the higher half of the vreg:
         // 0x001100120013... -> 0x000000...111213...
         Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::LOWEST>((Reg::RegTensor<uint16_t>&)offsetReg0, offsetReg0);
         Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::HIGHEST>((Reg::RegTensor<uint16_t>&)offsetReg1, offsetReg1);
         // Select the effective data in offsetReg0 and offsetReg1 and joint them into a complete uint16_t type
-        // indexReg£º0xFFFEFD...111213...
+        // indexReg:0xFFFEFD...111213...
         Select(indexReg, (Reg::RegTensor<uint16_t>&)offsetReg0, (Reg::RegTensor<uint16_t>&)offsetReg1, selectMask);
         Reg::Gather(dstReg, (__ubuf__ uint16_t*)src + srcBaseIndex, indexReg, dstMask);
         Reg::StoreAlign((__ubuf__ uint16_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);
@@ -138,9 +138,9 @@ __aicore__ inline void GatherImpl(
         MaskReg preg = CreatePredicate<T>(sreg);
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             AddrReg indexOffset = CreateAddrReg<uint32_t>(repeatStride);
-            Reg::LoadAlign(vregIndex, offset, indexOffset);
-            Reg::GatherB(vDst, src0, vregIndex, preg);
-            Reg::StoreAlign(dst, vDst, dstBlkStd, i * dstRptStd, preg);
+            DataCopy(vregIndex, offset, indexOffset);
+            DataCopyGatherB(vDst, src0, vregIndex, preg);
+            DataCopy(dst, vDst, dstBlkStd, i * dstRptStd, preg);
         }
     }
 }

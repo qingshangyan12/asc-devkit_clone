@@ -235,7 +235,7 @@ __aicore__ inline void SetAippFunctions(
     SetAippFunctionsImpl<PrimT<T>, U>(
         const_cast<__gm__ PrimT<T>*>(src0.GetPhyAddr()), const_cast<__gm__ PrimT<T>*>(src1.GetPhyAddr()), format,
         config);
-#endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+#endif
 }
 } // namespace AscendC
 

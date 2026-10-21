@@ -642,7 +642,7 @@ __aicore__ inline void GenStoreL0(
         Reg::Pack<uint16_t, uint32_t>((Reg::RegTensor<uint16_t>&)dstVreg, (Reg::RegTensor<uint32_t>&)dstVreg);
         Reg::Pack<uint8_t, uint16_t>((Reg::RegTensor<uint8_t>&)dstVreg, (Reg::RegTensor<uint16_t>&)dstVreg);
     }
-    Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+    Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
         dstAddr, dstVreg, static_cast<uint32_t>(repeatParams.dstBlkStride),
         static_cast<uint32_t>(repeatParams.dstRepStride), preg);
 }
@@ -715,7 +715,7 @@ __aicore__ inline void CastIntrinsicsImplCounterVF(
     if constexpr (!isSetMask) {
         // get SPR.MASK in VF
         Reg::MaskReg sprLoadMaskReg = Reg::MoveMask<uint16_t>();
-        Reg::LoadAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
         // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
         countSreg = static_cast<uint32_t>(maskBuf[0]);
@@ -1348,6 +1348,7 @@ __aicore__ inline void TruncateImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint
         }
     }
 }
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_IMPL_H__)
