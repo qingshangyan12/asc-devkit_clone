@@ -67,12 +67,12 @@
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned long long* result)
     {
         thread_block block = this_thread_block();
         thread_group tile = tiled_partition(block, 16);
         unsigned long long rank = tile.thread_rank();
-        ...
+        result[threadIdx.x] = rank;
     }
     ```
 
@@ -82,11 +82,17 @@
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ unsigned long long* result)
     {
         thread_block block = this_thread_block();
         thread_group tile = tiled_partition(block, 16);
         unsigned long long rank = tile.thread_rank();
-        ...
+        result[threadIdx.x] = rank;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+```

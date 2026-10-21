@@ -60,13 +60,12 @@ unsigned int thread_rank() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned int* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned int rank = tile4.thread_rank();
-        ...
+        result[threadIdx.x] = rank;
     }
     ```
 
@@ -76,12 +75,17 @@ unsigned int thread_rank() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ unsigned int* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned int rank = tile4.thread_rank();
-        ...
+        result[threadIdx.x] = rank;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3
+```
