@@ -10,6 +10,8 @@
 
 #include "ccu_fixture.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 
 #include <algorithm>
 #include <cstring>
@@ -99,6 +101,7 @@ protected:
             arg.opParam.DataDes.dataType = type;
             arg.opParam.reduceType = op;
             std::strcpy(arg.opParam.algName, "CcuSchedReduceScatterSoleMeshPeerOnly");
+            mc2_ops_hccl::InitKfcSubKernelArgLayout(arg);
             arg.rankSize = 2;
             arg.rankId = rank;
             arg.channelCount = 1;
@@ -112,6 +115,18 @@ protected:
                     rank + 1, "peer-only-local-copy",
                     [&](void*) {
                         CompilerContext::Current().ConfigureProgram(rank, 2, channels);
+                        mc2_ops_hccl::CcuKernelArgKfcReduceScatterMesh1DMem2Mem subKernelArg{};
+                        subKernelArg.rankId = rank;
+                        subKernelArg.rankSize = 2;
+                        subKernelArg.opParam = arg.opParam;
+                        subKernelArg.channelCount = arg.channelCount;
+                        std::copy(channels.begin(), channels.end(), subKernelArg.channels);
+                        FunctionCaptureScope subKernel([&]() {
+                            return mc2_ops_hccl::CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(&subKernelArg) ==
+                                           CCU_SUCCESS ?
+                                       Result::SUCCESS :
+                                       Result::CONTRACT_ERROR;
+                        });
                         return mc2_ops_hccl::CcuKfcServerKernel(&arg) == CCU_SUCCESS ? Result::SUCCESS :
                                                                                        Result::CONTRACT_ERROR;
                     },
@@ -120,7 +135,7 @@ protected:
             ASSERT_EQ(registry.RegisterEnd(rank + 1), Result::SUCCESS);
             launches[rank] = {
                 handle,
-                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 1, 0, 0x1000U + rank},
+                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 1, 0, 0x1000U + rank, 0x1000U},
                 &memory};
         }
         RuntimeWorld runtime;

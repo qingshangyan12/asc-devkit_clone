@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
+#include "../ccu_temp_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -60,6 +62,24 @@ CcuResult InitResource(AllToAllMesh1DMultiJettyContext& ctx)
         ++channelIdx;
     }
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(AllToAllMesh1DMultiJettyContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    ctx.input = args[0];
+    ctx.output = args[1];
+    ctx.token = args[2];
+    ctx.sliceSize = args[3];
+    ctx.srcStride = args[4];
+    ctx.srcOffset = args[5];
+    ctx.dstOffset = args[6];
+    ctx.goSize.addrOffset = args[7];
+    ctx.goSize.loopParam = args[8];
+    ctx.goSize.parallelParam = args[9];
+    ctx.goSize.residual = args[10];
+    ctx.sliceSizePerJetty = args[11];
+    ctx.lastSliceSizePerJetty = args[12];
     return CCU_SUCCESS;
 }
 
@@ -161,39 +181,25 @@ CcuResult DoAllToAll(AllToAllMesh1DMultiJettyContext& ctx)
 }
 } // namespace
 
-CcuResult CcuAllToAllMesh1DMultiJettyKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,
-    ccu::Variable lastSliceSizePerJetty, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, uint32_t jettyNum)
+CcuResult CcuAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgAllToAllMesh1DMultiJetty*>(arg);
     AllToAllMesh1DMultiJettyContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.jettyNum = jettyNum;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->jettyNum;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
-    ctx.input = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token = tokenInfo;
-    ctx.sliceSize = sliceSize;
-    ctx.srcStride = srcStride;
-    ctx.srcOffset = srcOffset;
-    ctx.dstOffset = dstOffset;
-    ctx.sliceSizePerJetty = sliceSizePerJetty;
-    ctx.lastSliceSizePerJetty = lastSliceSizePerJetty;
-    ctx.goSize.addrOffset = goSize0;
-    ctx.goSize.loopParam = goSize1;
-    ctx.goSize.parallelParam = goSize2;
-    ctx.goSize.residual = goSize3;
-
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(DoAllToAll(ctx));
-    CCU_CHK_RET(PostSync(ctx));
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            PreSync(ctx);
+            DoAllToAll(ctx);
+            PostSync(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME);
     return CCU_SUCCESS;
 }
 

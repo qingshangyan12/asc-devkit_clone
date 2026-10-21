@@ -26,6 +26,13 @@ constexpr uint32_t CCU_PARAM_NUM_MAX = CCU_PARAM_NUM_PER_DIE * 2;
 constexpr uint32_t CCU_ONE_PARAM_SIZE = 8;
 constexpr uint32_t CCU_TASK_NUM_MAX = 64;
 
+enum class KfcSubKernelArgKind { QUEUE, TOKEN, TURN_END };
+
+struct KfcSubKernelArgSource {
+    KfcSubKernelArgKind kind;
+    uint32_t queueIndex = 0;
+};
+
 // new---20260603
 struct CcuKernelArgKfcServer : CcuKernelArgBase {
     uint64_t rankSize = 0;
@@ -40,6 +47,11 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    uint32_t missionIndex = 0;
+    // Host registration determines argument order and sources; no runtime values are stored here.
+    std::vector<KfcSubKernelArgSource> subKernelArgSources;
+    bool subKernelEmitsEarlyTurnEnd = false;
 };
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
@@ -56,6 +68,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;
@@ -93,6 +106,9 @@ public:
     uint64_t missionIndex_; // Mission索引
     uint64_t token_;        // Token信息
 };
+
+void InitKfcSubKernelArgLayout(CcuKernelArgKfcServer& arg);
+CcuResult CallKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, const ccu::Variable& turnEndAddr);
 
 CcuResult CcuKfcServerKernel(CcuKernelArg arg);
 
