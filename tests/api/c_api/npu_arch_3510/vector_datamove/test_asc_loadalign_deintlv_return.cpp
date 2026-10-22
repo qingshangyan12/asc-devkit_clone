@@ -15,7 +15,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 #define CANN_ASC_USE_EXPERIMENTAL
-#include "c_api/experimental/loadalign.h"
+#include "c_api/experimental/loadalign_exp.h"
 
 namespace {
 template <typename DataType>

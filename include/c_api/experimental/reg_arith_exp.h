@@ -9,16 +9,16 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "reg_arith.h cannot be used with compile flag --enable-simt enabled."
+#error "reg_arith_exp.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_EXP_H
 #endif
 
-#ifndef INCLUDE_C_API_EXPERIMENTAL_REG_ARITH_H
-#define INCLUDE_C_API_EXPERIMENTAL_REG_ARITH_H
+#ifndef INCLUDE_C_API_EXPERIMENTAL_REG_ARITH_EXP_H
+#define INCLUDE_C_API_EXPERIMENTAL_REG_ARITH_EXP_H
 
 #ifndef CANN_ASC_USE_EXPERIMENTAL
 #error "this is experimental feature, pls set CANN_ASC_USE_EXPERIMENTAL = ON to use it"
@@ -29,7 +29,7 @@
 #include "c_api/experimental/pair.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/experimental/reg_arith_intf_impl.h"
+#include "impl/c_api/experimental/reg_arith_intf_impl_exp.h"
 #endif
 
 __simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(
@@ -61,7 +61,7 @@ __simd_callee__ inline asc_int32_t_bool_pair asc_add_carry(
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_EXP_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_ARITH_EXP_H
 #endif

@@ -10,13 +10,13 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/c_api/experimental/reg_permute_sel_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+    "impl/c_api/experimental/reg_permute_sel_intf_impl_exp.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_INTF_IMPL_H
-#define IMPL_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_INTF_IMPL_H
+#ifndef IMPL_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_INTF_IMPL_EXP_H
+#define IMPL_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_INTF_IMPL_EXP_H
 
 #ifndef CANN_ASC_USE_EXPERIMENTAL
 #error "this is experimental feature, pls set CANN_ASC_USE_EXPERIMENTAL = ON to use it"

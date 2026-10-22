@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/experimental/reg_permute_sel.h"`。
+头文件路径为：`"c_api/experimental/reg_permute_sel_exp.h"`。
 
 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。编译时需定义`CANN_ASC_USE_EXPERIMENTAL`宏，并显式包含指定的试验头文件。
 
@@ -130,7 +130,7 @@ bisheng -DCANN_ASC_USE_EXPERIMENTAL example.asc -o main --npu-arch=dav-3510 && .
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
-#include "c_api/experimental/reg_permute_sel.h"
+#include "c_api/experimental/reg_permute_sel_exp.h"
 #include "acl/acl.h"
 
 namespace {
