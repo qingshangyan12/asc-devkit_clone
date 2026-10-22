@@ -45,6 +45,8 @@ struct arch_version {
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t v9201 = 9201;
     static constexpr uint32_t V9201 = 9201;
+    static constexpr uint32_t v9202 = 9202;
+    static constexpr uint32_t V9202 = 9202;
 };
 
 struct get_arch_version {
