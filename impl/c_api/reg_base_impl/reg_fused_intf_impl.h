@@ -24,6 +24,8 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/reg_fused_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/reg_fused_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask)
@@ -151,23 +153,19 @@ __simd_callee__ inline vector_float asc_exp_sub_half2float(
 }
 #endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vexpdif(dst, src0, src1, mask, PART_EVEN);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_float asc_exp_sub(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
     asc_exp_sub(dst, src0, src1, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask)
 {

@@ -14,7 +14,7 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 |------|------|
 | **Reuse** | 直接克隆 3510 同名用例（API/指令一致），证明复用可行 |
 | **Adapt** | 需按 M510 差异改写（cube 耦合路径、expdiff 策略） |
-| **Drop** | 3510 专属、或 M510 不支持的数据类型路径：fp4/fp8/s4 专用指令（UNPK4_B8/vsel/vcvt_s42*）、expdiff（vexpdif）、fp4 MX（asc_mmad_mx*）；首期不提供 |
+| **Drop** | 3510 专属、或 M510 首期不提供：fp4 MX（`asc_mmad_mx*`）、cube 的 L0 加载路径（GM→L0A/L0B、L1→L0A/L0B transpose/sparse、L1→BT/FB、LoadImage→cbuf）、expdiff 的 `Tuple<float,half>` 组合（`asc_exp_sub_half2float`）、VF-debug/ring-buffer 调试设施。**注意**：fp4/fp8/s4 的指令路径 M510 实际**支持**（RFC §4.10 已修正，相关用例为 Reuse） |
 
 ## 3. 完整测试矩阵（对齐 npu_arch_3510）
 
@@ -31,14 +31,18 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 | `scalar_compute/` | `test_asc_atomic_inc.cpp`、`test_asc_atomic_or.cpp`、`test_asc_load_dev.cpp`、`test_asc_popc.cpp`、`test_asc_atomic_xor.cpp`、`test_asc_clear_nthbit.cpp`、`test_asc_atomic_min.cpp`、`test_asc_atomic_add.cpp`、`test_asc_atomic_max.cpp`、`test_asc_float2int32.cpp`、`test_asc_atomic_sub.cpp`、`test_asc_float2half.cpp`、`test_asc_clz.cpp`、`test_asc_atomic_exch.cpp`、`test_asc_atomic_and.cpp`、`test_asc_atomic_dec.cpp`、`test_asc_atomic_cas.cpp` | Reuse | M510 走通用 scalar 路径（`dav_m510` 无 scalar 专属文件） |
 | `sync/` | `test_asc_lock.cpp`、`test_asc_sync_block_arrive.cpp`、`test_asc_unlock.cpp`、`test_asc_sync_intra_arrive.cpp`、`test_asc_sync_inter_arrive.cpp`、`test_asc_sync_inter_wait.cpp`、`test_asc_sync_data_barrier.cpp`、`test_asc_sync_intra_wait.cpp`、`test_asc_sync_pipe.cpp`、`test_asc_sync_subblock_arrive.cpp`、`test_asc_sync_subblock_wait.cpp`、`test_asc_sync_block_wait.cpp` | Reuse | |
 | `sys_var/` | 见 3510 `sys_var/` 全量 | Reuse | |
-| `vector_compute/` | `test_return_vconv.cpp`（vconv 重载部分） | Reuse | `vcvt` 等 vector 指令 M510 共享 |
-| `vector_compute/` | `test_return_vconv.cpp` 中的 `ExpSubHalfToFloatUsesVexpdif` / `ExpSubUsesVexpdif` | Adapt/Drop | M510 无 `vexpdif` 专用指令，按 RFC §4.5 决策；当前用例已拆出到 `test_exp_sub_m510_policy.cpp` 占位 |
-| `vector_datamove/` | 见 3510 `vector_datamove/` 全量 | Reuse | |
-| `reg_compute/` | 见 3510 `reg_compute/` 对应 | Reuse | reg 类实现共享 |
-| `reg_compute/reg_convert/` | `reg_convert` 中 UNPK4_B8(fp4)/vsel(fp8)/vcvt_s42*(s4) 相关用例 | Drop | M510 不支持 fp4/fp8/s4 专用指令（RFC §4.5/§4.7），共享通用头已守卫排除 |
-| `reg_compute/loadalign/`、`storealign/` | fp4 解包/打包（UNPK4_B8）相关用例 | Drop | 同上（RFC §4.5/§4.7） |
-| `reg_compute/reg_fused/` | `test_return_vconv.cpp` 中 expdiff 两个用例 | Drop | M510 无 vexpdif（RFC §4.5） |
-| `reg_compute/reg_permute_sel/`、`reg_gather/` | fp4/fp8 相关选择/交织/gather 用例 | Drop | 同上（RFC §4.5/§4.7） |
+| `vector_compute/` | `test_return_vconv.cpp`（vconv 重载部分，含 fp4/fp8/s4 数据类型） | Reuse | `vcvt` / `vcvt_s42*` / `vcvt_f162s4` 等 M510 均支持（RFC §4.10） |
+| `vector_compute/` | `test_return_vconv.cpp` 中 expdiff 的 `Tuple<float,half>` 用例（`ExpSubHalfToFloatUsesVexpdif`） | Drop | M510 的 `FusedExpSubImpl` 仅支持 `Tuple<half,half>` / `Tuple<float,float>`（RFC §4.10） |
+| `vector_compute/` | `test_return_vconv.cpp` 中 expdiff 的 `Tuple<float,float>` / `Tuple<half,half>` 用例（`ExpSubUsesVexpdif`） | Reuse | `vexpdif` M510 支持（RFC §4.10） |
+| `vector_datamove/` | 见 3510 `vector_datamove/` 全量 | Reuse | 顶层分发链已补 5102 分支（RFC §4.9/§4.10） |
+| `reg_compute/` | 见 3510 `reg_compute/` 对应 | Reuse | 18 个非 cube 分发头已补 5102 分支（RFC §4.10） |
+| `reg_compute/reg_convert/` | `vcvt_s42*` / `vcvt_f162s4` / `UNPK4_B8` 相关用例 | Reuse | **§4.10 修正**：M510 支持这些指令（原判 Drop 有误） |
+| `reg_compute/loadalign/`、`storealign/` | `UNPK4_B8` 解包/打包相关用例 | Reuse | **§4.10 修正**：M510 `CheckLoadDist` 支持 `DIST_UNPACK4_B8` |
+| `reg_compute/loadunalign/`、`storeunalign/` | 非对齐加载/存储相关用例 | Reuse | **§4.10 修正**：`vldus`/`vstus`/`vstar` 等 M510 均支持 |
+| `reg_compute/reg_fused/` | `asc_exp_sub_half2float` 相关用例 | Drop | `Tuple<float,half>` M510 不支持（RFC §4.10，守卫保留） |
+| `reg_compute/reg_fused/` | `asc_exp_sub(float,float)` 相关用例 | Reuse | `Tuple<float,float>` M510 支持（RFC §4.10，守卫已移除） |
+| `reg_compute/reg_permute_sel/`、`reg_gather/` | `vintlv`/`vselr` 相关选择/交织/gather 用例 | Reuse | **§4.10 修正**：M510 支持（原判 Drop 有误） |
+| debug（VF-debug / ring-buffer） | `asc_vf_debug_publish`、`get_ring_buf_*` 等 | Drop（已知缺口） | `npu_arch_5102/asc_debug_utils_impl.h` 为 105 行存根，需后续补齐（RFC §4.10） |
 
 ## 4. 本目录已落地用例（可直接克隆验证复用）
 
@@ -46,9 +50,9 @@ M510 在编译工程中识别为 `__NPU_ARCH__ == 5102`（耦合架构 `PRE_COMP
 - `sync/test_asc_sync_block_wait.cpp` —— Reuse（3510 克隆）
 - `sys_var/test_get_block_idx.cpp` —— Reuse（3510 克隆）
 - `cube_compute/test_mmad.cpp` —— Reuse（3510 克隆，验证 cube 共享子集）
-- `vector_compute/test_return_vconv.cpp` —— Reuse（克隆 3510，已移除 expdiff 两个用例）
-- `vector_compute/test_exp_sub_m510_policy.cpp` —— Adapt 占位（按 §4.5 决策回填）
-- `reg_compute/reg_convert/`、`loadalign/`、`storealign/`、`reg_permute_sel/`、`reg_gather/`、`reg_fused/` 克隆 3510 用例时，须剔除 fp4/fp8/s4/expdiff 相关函数（对应 3510 用例中这些函数为 Drop，见上方矩阵）。这些函数在 5102 通用头中已被守卫排除，克隆后不应引用。
+- `vector_compute/test_return_vconv.cpp` —— Reuse（克隆 3510，仅需剔除 expdiff 的 `Tuple<float,half>` 用例，即 `ExpSubHalfToFloatUsesVexpdif`）
+- `vector_compute/test_exp_sub_m510_policy.cpp` —— Adapt 占位（按 §4.10 回填 expdiff 类型组合差异）
+- `reg_compute/reg_convert/`、`loadalign/`、`storealign/`、`loadunalign/`、`storeunalign/`、`reg_permute_sel/`、`reg_gather/`、`reg_fused/` 克隆 3510 用例时**无需剔除 fp4/fp8/s4 函数**（RFC §4.10 已确认 M510 支持这些指令，守卫已收缩）；唯一需剔除的是 `reg_fused` 中的 `asc_exp_sub_half2float`（`Tuple<float,half>` 不支持）。
 
 ## 5. 如何接入与运行
 

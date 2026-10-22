@@ -20,6 +20,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/datamove_atomic_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/datamove_atomic_intf_impl.h"
 #endif
 
 /// Enables atomic add for data transfer from Unified Buffer/L0C Buffer/L1 Buffer to

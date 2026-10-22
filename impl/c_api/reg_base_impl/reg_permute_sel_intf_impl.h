@@ -24,6 +24,8 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_permute_sel_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/reg_permute_sel_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/reg_permute_sel_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_select(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
@@ -47,7 +49,6 @@ __simd_callee__ inline void asc_select(vector_int8_t& dst, vector_int8_t src0, v
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_select(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
 {
@@ -55,9 +56,7 @@ __simd_callee__ inline void asc_select(
         vsel(dst, src0, src1, mask);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_select(
     vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask)
 {
@@ -67,9 +66,7 @@ __simd_callee__ inline void asc_select(
             *reinterpret_cast<vector_uint8_t*>(&src1), mask);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_select(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
 {
@@ -77,7 +74,6 @@ __simd_callee__ inline void asc_select(
         vsel(dst, src0, src1, mask);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_select(
     vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
@@ -194,41 +190,33 @@ __simd_callee__ inline void asc_squeeze(vector_bfloat16_t& dst, vector_bfloat16_
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vsqz(dst, src, mask, MODE_NO_STORED);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vsqz(dst, src, mask, MODE_NO_STORED);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vsqz(dst, src, mask, MODE_NO_STORED);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vsqz(dst, src, mask, MODE_NO_STORED);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask)
 {
@@ -433,7 +421,6 @@ __simd_callee__ inline vector_int8_t asc_select(vector_int8_t src0, vector_int8_
     return dst;
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_select(
     vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
 {
@@ -441,25 +428,20 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_select(
     asc_select(dst, src0, src1, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_select(vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_select(dst, src0, src1, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_select(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
 {
     vector_fp8_e5m2_t dst;
     asc_select(dst, src0, src1, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_uint16_t asc_select(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
@@ -573,41 +555,33 @@ __simd_callee__ inline vector_bfloat16_t asc_squeeze(vector_bfloat16_t src, vect
     return dst;
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_hifloat8_t asc_squeeze(vector_hifloat8_t src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_squeeze(dst, src, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_squeeze(vector_fp8_e4m3fn_t src, vector_bool mask)
 {
     vector_fp8_e4m3fn_t dst;
     asc_squeeze(dst, src, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e5m2_t asc_squeeze(vector_fp8_e5m2_t src, vector_bool mask)
 {
     vector_fp8_e5m2_t dst;
     asc_squeeze(dst, src, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline vector_fp8_e8m0_t asc_squeeze(vector_fp8_e8m0_t src, vector_bool mask)
 {
     vector_fp8_e8m0_t dst;
     asc_squeeze(dst, src, mask);
     return dst;
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_intlv_b8(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
 {
@@ -691,7 +665,6 @@ __simd_callee__ inline void asc_intlv(vector_float& dst0, vector_float& dst1, ve
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_intlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
 {
@@ -699,9 +672,7 @@ __simd_callee__ inline void asc_intlv(
         vintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_intlv(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
 {
@@ -709,9 +680,7 @@ __simd_callee__ inline void asc_intlv(
         vintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_intlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
 {
@@ -719,9 +688,7 @@ __simd_callee__ inline void asc_intlv(
         vintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_intlv(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1)
 {
@@ -731,9 +698,7 @@ __simd_callee__ inline void asc_intlv(
             *reinterpret_cast<vector_uint8_t*>(&src0), *reinterpret_cast<vector_uint8_t*>(&src1));
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_intlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1)
 {
@@ -741,7 +706,6 @@ __simd_callee__ inline void asc_intlv(
         vintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline vector_uint8_t asc_unsqueeze_u8(vector_bool mask)
 {
@@ -903,7 +867,6 @@ __simd_callee__ inline void asc_deintlv(
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
 {
@@ -911,9 +874,7 @@ __simd_callee__ inline void asc_deintlv(
         vdintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_deintlv(
     vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1)
 {
@@ -923,9 +884,7 @@ __simd_callee__ inline void asc_deintlv(
             *reinterpret_cast<vector_uint8_t*>(&src0), *reinterpret_cast<vector_uint8_t*>(&src1));
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_deintlv(
     vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
 {
@@ -933,9 +892,7 @@ __simd_callee__ inline void asc_deintlv(
         vdintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_deintlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
 {
@@ -943,9 +900,7 @@ __simd_callee__ inline void asc_deintlv(
         vdintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_deintlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1)
 {
@@ -953,7 +908,6 @@ __simd_callee__ inline void asc_deintlv(
         vdintlv(dst0, dst1, src0, src1);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1)
 {
@@ -1156,7 +1110,6 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ fp8_e4m3fn_t* dst_addr, vector_fp8_e4m3fn_t& dst, vector_store_unalign& src0, vector_fp8_e4m3fn_t src1,
     vector_bool squeeze_mask)
@@ -1166,9 +1119,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ fp8_e5m2_t* dst_addr, vector_fp8_e5m2_t& dst, vector_store_unalign& src0, vector_fp8_e5m2_t src1,
     vector_bool squeeze_mask)
@@ -1178,9 +1129,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ fp8_e8m0_t* dst_addr, vector_fp8_e8m0_t& dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1,
     vector_bool squeeze_mask)
@@ -1190,9 +1139,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ fp4x2_e2m1_t* dst_addr, vector_fp4x2_e2m1_t& dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1,
     vector_bool squeeze_mask)
@@ -1202,9 +1149,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ fp4x2_e1m2_t* dst_addr, vector_fp4x2_e1m2_t& dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1,
     vector_bool squeeze_mask)
@@ -1214,9 +1159,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ int4b_t* dst_addr, vector_int4x2_t& dst, vector_store_unalign& src0, vector_int4x2_t src1,
     vector_bool squeeze_mask)
@@ -1227,7 +1170,6 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
         vstur(src0, *reinterpret_cast<vector_fp4x2_e1m2_t*>(&dst), dst_tmp, POST_UPDATE);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int8_t* dst, vector_store_unalign src)
 {
@@ -1243,25 +1185,20 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ uint8
     }
 }
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
         vstar(src, dst);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
         vstar(src, dst);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int4b_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
@@ -1269,34 +1206,27 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int4b
         vstar(src, dst_tmp);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
         vstar(src, dst);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
         vstar(src, dst);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
-#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
         vstar(src, dst);
     }
 }
-#endif  // not M510 (3510-only instruction path, see RFC 4.2)
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int16_t* dst, vector_store_unalign src)
 {
