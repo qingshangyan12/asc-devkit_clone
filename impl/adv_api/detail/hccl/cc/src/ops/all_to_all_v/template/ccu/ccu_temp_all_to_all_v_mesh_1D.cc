@@ -61,8 +61,8 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
         // CalcChannelRequestMesh1D 的 per peer 首条协议匹配链是 die 盲选，双 die 下必炸。
         // DIE0 对全部 peer 可达（12 口 = DIE0×8 + DIE1×4，任一 peer 的交换芯片必与我 DIE0 共享），
         // 故固定 DIE0-only 建链；AICPU 侧通道按 engine 分槽隔离，不受影响。
-        CHK_RET(CalcChannelRequestMesh1DOnDie(
-            comm, param, topoInfo, subCommRanks_, channelDescs, PURE_CLOS_CCU_DIE_ID));
+        CHK_RET(
+            CalcChannelRequestMesh1DOnDie(comm, param, topoInfo, subCommRanks_, channelDescs, PURE_CLOS_CCU_DIE_ID));
     } else if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     } else {

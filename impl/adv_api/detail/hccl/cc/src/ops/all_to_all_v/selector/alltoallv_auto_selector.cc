@@ -17,7 +17,7 @@ constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
 // 大禹纯 CLOS 单层 CCU 上限：event mask 已按 16 rank 一组拆分（ccu_kernel_all_to_all_v_mesh1d.cc），
 // 通道数组受 CcuKernelArgBase::channels[CCU_MAX_RANK_SIZE] 限制（CCU_MAX_RANK_SIZE=64）
 constexpr u32 CCU_CLOS_MAX_RANK_SIZE = 64U;
-}
+} // namespace
 
 SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,

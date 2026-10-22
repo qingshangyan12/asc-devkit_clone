@@ -21,7 +21,7 @@ constexpr int TOKEN_XN_ID = 2;
 constexpr int CKE_IDX_0 = 0;
 constexpr int CKE_IDX_1 = 1;
 constexpr int CKE_IDX_2 = 2;
-constexpr int POST_SYNC_BIT = 5; // PostSync 阶段使用的 event bit
+constexpr int POST_SYNC_BIT = 5;            // PostSync 阶段使用的 event bit
 constexpr uint32_t A2A_BITS_PER_EVENT = 16; // 单个 ccu::Event 的 mask 宽度（uint16_t）
 
 static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
@@ -131,9 +131,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
     // rankSize<=16 保持单 event（与既有路径行为一致）。
     const uint32_t eventNum = (ctx.rankSize + A2A_BITS_PER_EVENT - 1) / A2A_BITS_PER_EVENT;
     std::vector<ccu::Event> events(eventNum);
-    auto rankMaskOf = [](uint32_t rankIdx) {
-        return static_cast<uint16_t>(1U << (rankIdx % A2A_BITS_PER_EVENT));
-    };
+    auto rankMaskOf = [](uint32_t rankIdx) { return static_cast<uint16_t>(1U << (rankIdx % A2A_BITS_PER_EVENT)); };
     auto eventMaskOfGroup = [&ctx](uint32_t eventIdx) {
         const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2A_BITS_PER_EVENT;
         const uint32_t bitCount = std::min(remainingRanks, A2A_BITS_PER_EVENT);
@@ -162,8 +160,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
         }
         CCU_CHK_RET(eventWaitAll());
     } else {
-        HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
+        HCCL_INFO("[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r != ctx.rankId) {
                 const uint32_t eventIdx = r / A2A_BITS_PER_EVENT;

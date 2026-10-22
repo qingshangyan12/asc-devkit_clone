@@ -148,9 +148,10 @@ static CcuResult CcuAlltoAllVMesh1DKernelV1(
                         } else {
                             CCU_IF(tailSize != 0)
                             {
-                                CCU_CHK_RET(ccu::Write(
-                                    channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
-                                    rankMask));
+                                CCU_CHK_RET(
+                                    ccu::Write(
+                                        channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
+                                        rankMask));
                             }
                             CCU_IF(tailSize == 0) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
                         }
@@ -163,9 +164,10 @@ static CcuResult CcuAlltoAllVMesh1DKernelV1(
                             CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
                             localDst.addr += maxTransportSize;
                         } else {
-                            CCU_CHK_RET(ccu::Write(
-                                channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize, events[eventIdx],
-                                rankMask));
+                            CCU_CHK_RET(
+                                ccu::Write(
+                                    channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize,
+                                    events[eventIdx], rankMask));
                             dst[rankIdx].addr += maxTransportSize;
                         }
                         src[rankIdx].addr += maxTransportSize;
@@ -448,9 +450,8 @@ static CcuResult DoAll2AllVMultiLoop(AlltoAllVMesh1DContext& ctx)
         for (uint32_t eventIdx = 0; eventIdx < eventNum; eventIdx++) {
             const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2AV_BITS_PER_EVENT;
             const uint32_t bitCount = std::min(remainingRanks, A2AV_BITS_PER_EVENT);
-            const uint16_t eventMask = bitCount == A2AV_BITS_PER_EVENT ?
-                                           static_cast<uint16_t>(UINT16_MAX) :
-                                           static_cast<uint16_t>((1U << bitCount) - 1);
+            const uint16_t eventMask = bitCount == A2AV_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
+                                                                         static_cast<uint16_t>((1U << bitCount) - 1);
             ccu::EventWait(ctx.events[eventIdx], eventMask);
         }
     }

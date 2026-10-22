@@ -56,8 +56,8 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(
     if (topoInfo->level0Topo == Level0Shape::CLOS) {
         // 大禹纯 CLOS：CCU 单 kernel 全 channel 必须同 die（hcomm CheckChannelsDie），
         // CalcChannelRequestMesh1D 是 die 盲选，双 die 下必炸；固定 DIE0-only 建链。
-        CHK_RET(CalcChannelRequestMesh1DOnDie(
-            comm, param, topoInfo, subCommRanks_, channelDescs, PURE_CLOS_CCU_DIE_ID));
+        CHK_RET(
+            CalcChannelRequestMesh1DOnDie(comm, param, topoInfo, subCommRanks_, channelDescs, PURE_CLOS_CCU_DIE_ID));
     } else {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     }
