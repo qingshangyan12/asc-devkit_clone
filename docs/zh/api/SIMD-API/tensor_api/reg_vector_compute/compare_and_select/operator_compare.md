@@ -192,7 +192,8 @@ __simd_vf__ inline void compare_example(InputTensor input, OutputTensor output)
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0))
                    .with_mask(asc::te::experimental::all_mask<float>());
     auto condition = src >= 0.0f;
-    auto zero = asc::te::experimental::fill(0.0f, asc::te::experimental::all_mask<float>());
+    asc::te::experimental::reg_tensor<float> zero;
+    asc::te::experimental::fill(zero, 0.0f, asc::te::experimental::all_mask<float>());
     auto dst = asc::te::experimental::select(condition, src, zero);
     asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
