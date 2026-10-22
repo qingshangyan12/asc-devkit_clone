@@ -232,8 +232,10 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
     // One event set contains AG_M2M_UNROLL_NUM groups.  A queue entry may
     // carry more repeats, so consume it in batches and reuse the event set
     // only after every group in the current batch has been waited on.
-    CCU_WHILE(ctx.tmpRepeatNum != UINT64_MAX)
-    {
+
+    HCCL_INFO("[KFC][AllGather][Kernel] Skip ccu_while");
+    //CCU_WHILE(ctx.tmpRepeatNum != UINT64_MAX)
+    //{
         ctx.waitRepeatNum = ctx.tmpRepeatNum;
         ctx.localCopyRepeatNum = ctx.tmpRepeatNum;
 
@@ -268,8 +270,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
                 CCU_CHK_RET(DoAllGatherWait(ctx, unrollIdx));
             }
         }
-    }
-
+    //}
     return CCU_SUCCESS;
 }
 
