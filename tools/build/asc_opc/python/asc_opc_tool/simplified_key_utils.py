@@ -316,7 +316,7 @@ def get_normalized_dtype(dtype):
         OpDataType.DT_FLOAT8_E5M2,
         OpDataType.DT_FLOAT8_E4M3FN,
     ]
-    logger.debug("Curent dtype is [%s]", str(dtype))
+    logger.debug("Current dtype is [%s]", str(dtype))
     if dtype in [OpDataType.DT_INT64, OpDataType.DT_UINT64, OpDataType.DT_DOUBLE, OpDataType.DT_COMPLEX64]:
         normalized_dtype = OpDataType.DT_INT64
     elif dtype in [

@@ -217,7 +217,7 @@ static SocVersion GetSocVersion()
     if (std::strncmp(socName, "Ascend960", sizeof("Ascend960") - 1) == 0) {
         return SocVersion::ASCEND960PR;
     }
-    ASCENDLOGE("unsupport soc name: %s\n", socName);
+    ASCENDLOGE("unsupported soc name: %s\n", socName);
     return SocVersion::UNKNOWN;
 }
 
@@ -634,7 +634,7 @@ uint32_t LaunchAscendKernelForVectorCore(
         ASCENDC_ASSERT_RTOK_RETVAL(
             AscendCExecutorPreportProfiling(opType, aicNumBlocks, MSPROF_GE_TASK_TYPE_AI_CORE, launchMainBeginTime));
     }
-    ASCENDLOGI("Main stream launch sucess.\n");
+    ASCENDLOGI("Main stream launch success.\n");
 
     if (enableProf) {
         launchSubBeginTime = MsprofSysCycleTime();
@@ -648,7 +648,7 @@ uint32_t LaunchAscendKernelForVectorCore(
     }
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtRecordEvent(ascBaseStream.eventB, ascBaseStream.stream));
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtStreamWaitEvent(stream, ascBaseStream.eventB));
-    ASCENDLOGI("Sub stream launch sucess.\n");
+    ASCENDLOGI("Sub stream launch success.\n");
 
     return ASCENDC_SUCCESS;
 }

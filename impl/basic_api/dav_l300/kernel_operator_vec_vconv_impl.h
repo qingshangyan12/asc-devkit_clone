@@ -155,7 +155,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T>& dstReg, RegTensor<U>& srcReg, M
         roundMode != RoundMode::CAST_NONE && satMode == SatMode::UNKNOWN && partMode == PartMode::UNKNOWN) {
         return Cast<T, U, roundMode, mode>(dstReg, srcReg, mask);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport pattern of CastAdaptor"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported pattern of CastAdaptor"); });
     }
 }
 
@@ -171,7 +171,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T>& dstReg, RegTensor<U>& srcReg, M
         roundMode == RoundMode::CAST_NONE && satMode == SatMode::UNKNOWN && ppMode != PPMode::UNKNOWN) {
         return Cast<T, U, mode, ppMode>(dstReg, srcReg, mask);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport pattern of CastAdaptor"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported pattern of CastAdaptor"); });
     }
 }
 

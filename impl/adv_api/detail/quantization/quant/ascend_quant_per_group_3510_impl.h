@@ -1349,7 +1349,7 @@ __aicore__ inline void AscendQuantPerToken(
     } else if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerTokenForS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -1365,7 +1365,7 @@ __aicore__ inline void AscendQuantPerToken(
     } else if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerTokenForS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offset, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -1384,7 +1384,7 @@ __aicore__ inline void AscendQuantPerGroupForKCol(
         // fp4 doesn't count offset
         QuantPerGroupForKColFp4<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -1403,7 +1403,7 @@ __aicore__ inline void AscendQuantPerGroupForKCol(
         // fp4 doesn't count offset
         QuantPerGroupForKColFp4<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -1422,7 +1422,7 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
         // fp4 doesn't count offset
         QuantPerGroupForKRowFp4<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -1441,7 +1441,7 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
         // fp4 doesn't count offset
         QuantPerGroupForKRowFp4<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 

@@ -41,7 +41,7 @@ __simd_callee__ inline void PackImpl(S& dstReg, V& srcReg)
         (SupportType<
             Tuple<ActualT, ActualU>, Tuple<uint8_t, uint16_t>, Tuple<uint8_t, int16_t>, Tuple<uint16_t, uint32_t>,
             Tuple<uint16_t, int32_t>, Tuple<uint32_t, uint64_t>, Tuple<uint32_t, int64_t>>()),
-        "unsupport datatype");
+        "unsupported datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualU) != 8) {
         vpack(dstReg, srcReg, partValue);
@@ -74,7 +74,7 @@ __simd_callee__ inline void UnPackImpl(S& dstReg, V& srcReg)
         (SupportType<
             Tuple<ActualT, ActualU>, Tuple<uint32_t, uint16_t>, Tuple<int32_t, int16_t>, Tuple<uint16_t, uint8_t>,
             Tuple<int16_t, int8_t>, Tuple<uint64_t, uint32_t>, Tuple<int64_t, int32_t>>()),
-        "unsupport datatype");
+        "unsupported datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualT) != 8) {
         vunpack(dstReg, srcReg, partValue);
@@ -107,7 +107,7 @@ __simd_callee__ inline void PackDataBlockImpl(RegT& dstReg, RegT& srcReg)
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, half, uint32_t, int32_t, float, uint64_t, int64_t>()),
-        "unsupport datatype");
+        "unsupported datatype");
     vpackv2(dstReg, srcReg);
 }
 } // namespace Reg

@@ -66,7 +66,7 @@ __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
                 Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
                 Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>,
                 Tuple<uint64_t, uint64_t>, Tuple<int64_t, int64_t>>()),
-            "ReduceSum unsupport this datatype on current device");
+            "ReduceSum unsupported this datatype on current device");
         if constexpr (sizeof(ActualSrcRegT) != 8) {
             vcadd(dstReg, srcReg, mask, modeValue);
         } else if constexpr (sizeof(ActualSrcRegT) == 8) {
@@ -89,7 +89,7 @@ __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
             (SupportType<
                 Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int32_t>, Tuple<uint32_t, uint32_t>,
                 Tuple<half, half>, Tuple<float, float>>()),
-            "ReduceSum unsupport this datatype on current device");
+            "ReduceSum unsupported this datatype on current device");
         vcaddv2(dstReg, srcReg);
     }
 }
@@ -144,7 +144,7 @@ __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
     if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
         static_assert(
             (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-            "ReduceMax unsupport this datatype on current device");
+            "ReduceMax unsupported this datatype on current device");
         if constexpr (sizeof(ActualT) != 8) {
             vcmax(dstReg, srcReg, mask, modeValue);
         } else {
@@ -167,7 +167,7 @@ __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
     } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
         static_assert(
             (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceMax unsupport this datatype on current device");
+            "ReduceMax unsupported this datatype on current device");
         vcmaxv2(dstReg, srcReg);
     }
 }
@@ -227,7 +227,7 @@ __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
     if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
         static_assert(
             (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-            "ReduceMin unsupport this datatype on current device");
+            "ReduceMin unsupported this datatype on current device");
         if constexpr (sizeof(ActualT) != 8) {
             vcmin(dstReg, srcReg, mask, modeValue);
         } else if constexpr (sizeof(ActualT) == 8) {
@@ -250,7 +250,7 @@ __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
     } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
         static_assert(
             (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceMin unsupport this datatype on current device");
+            "ReduceMin unsupported this datatype on current device");
         vcminv2(dstReg, srcReg);
     }
 }
@@ -310,7 +310,7 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, Mask
     if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
         static_assert(
             (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceSumWithDataBlock unsupport this datatype on current device");
+            "ReduceSumWithDataBlock unsupported this datatype on current device");
         if constexpr (Std::is_same_v<ActualT, uint16_t>) {
             RegTensor<uint32_t> tmpReg;
             vcgadd(tmpReg, srcReg, mask, modeValue);
@@ -325,7 +325,7 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, Mask
     } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
         static_assert(
             (SupportType<ActualT, uint32_t, int32_t, float, half>()),
-            "ReduceSumWithDataBlock unsupport this datatype on current device");
+            "ReduceSumWithDataBlock unsupported this datatype on current device");
         vcgaddv2(dstReg, srcReg, mask);
     }
 }
@@ -363,7 +363,7 @@ __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMaxWithDataBlock unsupport this datatype on current device");
+        "ReduceMaxWithDataBlock unsupported this datatype on current device");
     static_assert(
         IsSameType<decltype(mode), MaskMergeMode>::value ||
             IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
@@ -387,7 +387,7 @@ __simd_callee__ inline void ReduceMinWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMinWithDataBlock unsupport this datatype on current device");
+        "ReduceMinWithDataBlock unsupported this datatype on current device");
     static_assert(
         IsSameType<decltype(mode), MaskMergeMode>::value ||
             IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
@@ -409,7 +409,7 @@ __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupport this datatype on current device");
+    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupported this datatype on current device");
     static_assert(
         IsSameType<decltype(mode), MaskMergeMode>::value ||
             IsSameType<decltype(mode), const ReduceSpecificMode*>::value,

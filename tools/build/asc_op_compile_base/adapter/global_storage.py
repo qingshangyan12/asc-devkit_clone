@@ -104,13 +104,13 @@ class GlobalStorageSingleton:
         if hasattr(self, name):
             setattr(self, name, value)
         else:
-            raise Exception(f"current varibale not exists, variable name: {name}")
+            raise Exception(f"current variable not exists, variable name: {name}")
 
     def get_variable(self, name):
         if hasattr(self, name):
             return getattr(self, name, None)
         else:
-            raise Exception(f"current varibale not exists, variable name: {name}")
+            raise Exception(f"current variable not exists, variable name: {name}")
 
 
 global_var_storage = GlobalStorageSingleton()

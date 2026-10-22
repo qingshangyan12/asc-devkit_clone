@@ -392,7 +392,7 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         "current Cast api only supported Mode ZEROING/MERGING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, int32_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<V, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     if constexpr (mode == MaskMergeMode::ZEROING) {
         CastOperator<T, U, mode, S, V>(dstReg, srcReg, mask);
@@ -432,7 +432,7 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         "current Cast api only supported Mode ZEROING/MERGING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, int64_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "RegTensor dstReg can only be RegTraitNumOne");
     if constexpr (mode == MaskMergeMode::ZEROING) {
         CastOperator<T, U, satMode, mode, S, V>(dstReg, srcReg, mask);
@@ -474,7 +474,7 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         "current Cast api only supported Mode ZEROING/MERGING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, float>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<V, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     if constexpr (mode == MaskMergeMode::ZEROING) {
         CastOperator<T, U, roundMode, satMode, mode, S, V>(dstReg, srcReg, mask);
@@ -514,7 +514,7 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         "current Cast api only supported Mode ZEROING/MERGING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<float, int64_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "RegTensor dstReg can only be RegTraitNumOne");
     if constexpr (mode == MaskMergeMode::ZEROING) {
         CastOperator<T, U, roundMode, mode, S, V>(dstReg, srcReg, mask);

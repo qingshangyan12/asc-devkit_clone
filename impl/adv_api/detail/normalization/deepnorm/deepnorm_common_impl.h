@@ -78,7 +78,7 @@ __aicore__ inline bool IsBasicBlockTmp8HBetter(const DeepNormTiling& tiling)
     return bs8Check && bsWorse;
 }
 
-// FP16 not reuseable, needs extra tmpTensor to store tmp FP32 outputMean and outputVariance
+// FP16 not reusable, needs extra tmpTensor to store tmp FP32 outputMean and outputVariance
 template <bool isReuseSource = false>
 __aicore__ inline void GetDeepNormTensorInfo(
     const LocalTensor<half>& inputX, const LocalTensor<half>& outputMean, const LocalTensor<half>& outputVariance,

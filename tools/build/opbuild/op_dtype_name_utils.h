@@ -74,10 +74,10 @@ inline const char* FindDataTypeName(const ge::DataType& type, const DataTypeName
     for (const auto& item : DTYPE_NAMES) {
         if (item.type == type) {
             const char* name = (mode == DataTypeNameMode::CFG) ? item.cfgName : item.cpuCfgName;
-            return (name == nullptr) ? "unknow" : name;
+            return (name == nullptr) ? "unknown" : name;
         }
     }
-    return "unknow";
+    return "unknown";
 }
 
 inline const char* FindCfgDataTypeName(const ge::DataType& type)

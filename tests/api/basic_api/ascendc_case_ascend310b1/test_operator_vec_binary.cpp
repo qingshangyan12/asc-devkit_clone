@@ -376,7 +376,7 @@ void DataCopyUB2GMImplStub(__gm__ SrcType* dst, __ubuf__ SrcType* src, const Dat
     REGISTER_VEC_BINARY_FUSED(cmdKey, cmdKeyLower1, cmdKeyLower2, dtype, str, 256); \
     REGISTER_VEC_BINARY_IMPL(cmdKey, cmdKeyLower1, dtype, str, 256);                \
 // 对于unsupport的dtype, 校验是否raise error ut用例
-#define Unsupport(cmdKey, cmdKeyLower, dtype) REGISTER_VEC_BINARY_DTYPE_UNSUPPORT(cmdKey, cmdKeyLower, dtype, 256);
+#define Unsupported(cmdKey, cmdKeyLower, dtype) REGISTER_VEC_BINARY_DTYPE_UNSUPPORT(cmdKey, cmdKeyLower, dtype, 256);
 
 #define PP_VA_NAME(prefix, ...) PP_CAT2(prefix, PP_ARG_N(__VA_ARGS__))
 #define PP_CAT2(a, b) PP_CAT2_1(a, b)
@@ -418,11 +418,11 @@ void DataCopyUB2GMImplStub(__gm__ SrcType* dst, __ubuf__ SrcType* src, const Dat
 // 假设Add不支持的数据类型是 half + float + int32_t，那么对应的宏的展开逻辑是
 // UNSUPPORT_MAP(Add, add, half, float, int32_t)        等价于UNSUPPORT_MAP_5(Add, add, half, float, int32_t)
 // 因为一共5个参数
-// => Unsupport(Add, add, half)                         取出最开始的1个参数，然后展开Unsupport宏
+// => Unsupported(Add, add, half)                         取出最开始的1个参数，然后展开Unsupported宏
 //  + SUPPORT_MAP_4(Add, add, float, int32_t)           float, int32_t作为__VA_ARGS__继续向下传，此时4个参数
-// => Unsupport(Add, add, float)                        取出此时最开始的1个参数，然后展开Support宏
+// => Unsupported(Add, add, float)                        取出此时最开始的1个参数，然后展开Support宏
 //  + SUPPORT_MAP_3(Add, add, int32_t)                  int32_t作为__VA_ARGS__继续向下传，此时3个参数，以此类推
-#define UNSUPPORT_MAP_3(cmdKey, cmdKeyLower, dtype) Unsupport(cmdKey, cmdKeyLower, dtype)
+#define UNSUPPORT_MAP_3(cmdKey, cmdKeyLower, dtype) Unsupported(cmdKey, cmdKeyLower, dtype)
 #define UNSUPPORT_MAP_4(cmdKey, cmdKeyLower, dtype, ...) \
     Unsupport(cmdKey, cmdKeyLower, dtype) UNSUPPORT_MAP_3(cmdKey, cmdKeyLower, __VA_ARGS__)
 #define UNSUPPORT_MAP_5(cmdKey, cmdKeyLower, dtype, ...) \

@@ -103,9 +103,9 @@ TEST_F(TEST_OPBUILD, CfgGeneratorParamHelperCoverage)
     EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_FLOAT), "float32");
     EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_INT2), "int2");
     EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_FLOAT4_E1M2), "float4_e1m2");
-    EXPECT_EQ(cfgGen.GetDataTypeName(static_cast<ge::DataType>(-1)), "unknow");
+    EXPECT_EQ(cfgGen.GetDataTypeName(static_cast<ge::DataType>(-1)), "unknown");
     EXPECT_EQ(cfgGen.GetParamTypeName(REQUIRED), "required");
-    EXPECT_EQ(cfgGen.GetParamTypeName(100U), "unknow");
+    EXPECT_EQ(cfgGen.GetParamTypeName(100U), "unknown");
     EXPECT_EQ(formats, "ND,NCHW");
     EXPECT_NE(dataTypes.find("float32,float16,int8,int16,int32,int64"), std::string::npos);
     EXPECT_NE(dataTypes.find("float8_e4m3fn,float8_e5m2,float8_e8m0"), std::string::npos);
@@ -180,7 +180,7 @@ TEST_F(TEST_OPBUILD, CPUCfgGeneratorParamHelperCoverage)
 
     EXPECT_EQ(cpuCfgGen.GetDataTypeName(ge::DT_FLOAT), "DT_FLOAT");
     EXPECT_EQ(cpuCfgGen.GetDataTypeName(ge::DT_FLOAT4_E1M2), "DT_FLOAT4_E1M2");
-    EXPECT_EQ(cpuCfgGen.GetDataTypeName(static_cast<ge::DataType>(-1)), "unknow");
+    EXPECT_EQ(cpuCfgGen.GetDataTypeName(static_cast<ge::DataType>(-1)), "unknown");
     EXPECT_EQ(formats, "ND,NCHW");
     EXPECT_NE(dataTypes.find("DT_FLOAT,DT_FLOAT16,DT_INT8,DT_INT16,DT_INT32,DT_INT64"), std::string::npos);
     EXPECT_NE(dataTypes.find("DT_FLOAT8_E4M3FN,DT_FLOAT8_E5M2,DT_FLOAT8_E8M0"), std::string::npos);

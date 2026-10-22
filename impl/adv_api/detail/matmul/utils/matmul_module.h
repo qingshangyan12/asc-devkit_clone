@@ -32,7 +32,7 @@ template <class... _Types>
 using void_t = void;
 
 // if user define self-implement module, but inherited from base module implemented in matmul,
-// child module shoud declare : using BASE_MODULE = AscendC::XXXModuleName<xxx, xxx>;
+// child module should declare : using BASE_MODULE = AscendC::XXXModuleName<xxx, xxx>;
 struct MatmulNullBase {};
 
 template <typename MODULE, typename = void>

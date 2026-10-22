@@ -437,7 +437,7 @@ __aicore__ inline void AscendQuantPerToken(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerTokenForS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -449,7 +449,7 @@ __aicore__ inline void AscendQuantPerToken(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerTokenForS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offset, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -461,7 +461,7 @@ __aicore__ inline void AscendQuantPerGroupForKCol(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerGroupForKColS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -473,7 +473,7 @@ __aicore__ inline void AscendQuantPerGroupForKCol(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerGroupForKColS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offset, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -485,7 +485,7 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerGroupForKRowS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 
@@ -497,7 +497,7 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
     if constexpr (SupportType<dstT, int8_t>()) {
         QuantPerGroupForKRowS8<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offset, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for AscendQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for AscendQuant!"); });
     }
 }
 

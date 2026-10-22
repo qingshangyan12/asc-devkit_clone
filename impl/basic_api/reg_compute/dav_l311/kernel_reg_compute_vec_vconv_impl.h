@@ -181,7 +181,7 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, float>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<RegU, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     RegTensor<float> tmpReg0;
     RegTensor<float> tmpReg1;

@@ -1152,7 +1152,7 @@ __aicore__ inline TPipe::~TPipe()
 __aicore__ inline void TPipe::Init()
 {
     ResetPool();
-    // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
+    // for matmul macro, set flag M_MTE1 at the beginning of operator, and also wait flag at the end.
     // matmul macro only use M_MTE1 event id 0 1 currently.
     if ASCEND_IS_AIC {
         auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();

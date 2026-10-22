@@ -311,7 +311,7 @@ __aicore__ inline void SetStringArg(
 template <typename T>
 __aicore__ inline void SetValueArg(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
-    static_assert(!SupportType<T, double>(), "printf unsupport double type");
+    static_assert(!SupportType<T, double>(), "printf unsupported double type");
 
     __gm__ uint64_t* scalarAddr = (__gm__ uint64_t*)paramAddr + paramIdx;
     *scalarAddr = 0;
