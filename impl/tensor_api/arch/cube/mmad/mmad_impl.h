@@ -33,7 +33,7 @@ __aicore__ inline void mmad_operation::mmad(const Args&... args)
     mmad_impl<traits>(args...);
 }
 
-template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor>
+template <auto& trait, typename CTensor, typename ATensor, typename BTensor>
 __aicore__ inline void mmad_operation::mmad_impl(
     const CTensor& c, const ATensor& a, const BTensor& b, const mmad_params& params)
 {
@@ -43,6 +43,9 @@ __aicore__ inline void mmad_operation::mmad_impl(
     static_assert(Std::is_same_v<c_pos, location::l0c>, "When Mmad, c tensor must be from L0C.");
     static_assert(Std::is_same_v<a_pos, location::l0a>, "When Mmad, a tensor must be from L0A.");
     static_assert(Std::is_same_v<b_pos, location::l0b>, "When Mmad, b tensor must be from L0B.");
+    if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+        static_assert(!trait.enable_c_scale, "When Mmad without bias tensor from bias, can not enable c_scale.");
+    }
     using c_layout = typename CTensor::layout_type;
     using a_layout = typename ATensor::layout_type;
     using b_layout = typename BTensor::layout_type;
@@ -59,7 +62,7 @@ __aicore__ inline void mmad_operation::mmad_impl(
     mmad_impl::template run<trait>(c, a, b, params);
 }
 
-template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
 __aicore__ inline void mmad_operation::mmad_impl(
     const CTensor& c, const ATensor& a, const BTensor& b, const BiasTensor& bias, const mmad_params& params)
 {
@@ -73,6 +76,19 @@ __aicore__ inline void mmad_operation::mmad_impl(
     static_assert(
         Std::is_same_v<bias_pos, location::l0c> || Std::is_same_v<bias_pos, location::bias>,
         "When Mmad, bias tensor must be from L0C or BIAS.");
+    if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+        using a_data_type = typename ATensor::element_type;
+        using b_data_type = typename BTensor::element_type;
+        if constexpr (!Std::is_same_v<a_data_type, hifloat4x2_t>) {
+            static_assert(!trait.enable_hif4_a_model, "When a tensor data type is not hifloat4, can not enable enable_hif4_a_model");
+        }
+        if constexpr (!Std::is_same_v<b_data_type, hifloat4x2_t>) {
+            static_assert(!trait.enable_hif4_b_model, "When b tensor data type is not hifloat4, can not enable enable_hif4_b_model");
+        }
+        if constexpr (!Std::is_same_v<bias_pos, location::bias>) {
+            static_assert(!trait.enable_c_scale, "When Mmad without bias tensor from BIAS, can not enable c_scale");
+        }
+    }
     using c_layout = typename CTensor::layout_type;
     using a_layout = typename ATensor::layout_type;
     using b_layout = typename BTensor::layout_type;

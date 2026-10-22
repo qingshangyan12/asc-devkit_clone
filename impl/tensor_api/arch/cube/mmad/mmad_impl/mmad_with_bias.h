@@ -30,7 +30,7 @@ namespace te {
 class mmad_with_bias {
 public:
     template <
-        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
         typename Params>
     __aicore__ inline static void run(
         const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)
@@ -39,22 +39,34 @@ public:
     }
 
 private:
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
     __aicore__ inline static constexpr void check_template_for_normal()
     {
         check_layout_pattern<CTensor, ATensor, BTensor, BiasTensor>();
+        if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+            if constexpr (trait.enable_c_scale) {
+                check_data_type::check_mmad_c_scale_data_type<CTensor, ATensor, BTensor>();
+                return;
+            }
+        }
         check_data_type::check_mmad_bias_data_type<CTensor, ATensor, BTensor, BiasTensor>();
     }
 
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
     __aicore__ inline static constexpr void check_template_for_mx()
     {
         check_layout_pattern<CTensor, ATensor, BTensor, BiasTensor>();
+        if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+            if constexpr (trait.enable_c_scale) {
+                check_data_type::check_mx_mmad_c_scale_data_type<CTensor, ATensor, BTensor>();
+                return;
+            }
+        }
         check_data_type::check_mx_mmad_bias_data_type<CTensor, ATensor, BTensor, BiasTensor>();
     }
 
     template <
-        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
         typename Params>
     __aicore__ inline static void mmad_impl(
         const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)
@@ -67,17 +79,33 @@ private:
 
         bool init_with_btbuf = false;
         if constexpr (Std::is_same_v<get_mem_location<BiasTensor>, location::bias>) {
-            init_with_btbuf = true;
+            if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+                init_with_btbuf = !trait.enable_c_scale;
+            } else {
+                init_with_btbuf = true;
+            }
         }
 
         if constexpr (trait.mmad_type == mmad_type::normal) {
-            mmad_bias_instr::mmad(
-                dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
-                trait.disable_gemv, init_with_btbuf, false);
+            if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+                mmad_bias_instr::mmad(
+                    dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, init_with_btbuf, false, trait.enable_c_scale);
+            } else {
+                mmad_bias_instr::mmad(
+                    dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, init_with_btbuf, false);
+            }
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
-            mmad_mx_bias_instr::mmad(
-                dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
-                trait.disable_gemv, init_with_btbuf, false);
+            if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202>) {
+                mmad_mx_bias_instr::mmad(
+                    dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, init_with_btbuf, false, trait.enable_c_scale, trait.enable_hif4_a_model, trait.enable_hif4_b_model);
+            } else {
+                mmad_mx_bias_instr::mmad(
+                    dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, init_with_btbuf, false);
+            }
         }
     }
 };
