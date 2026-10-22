@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id9 -->
+- Ascend 960PR&960DT系列产品：Ascend 960DT支持，Ascend 960PR不支持
+<!-- end id9 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -67,6 +70,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather(__ubuf__ <src_dtype>* src,
 | fp8_e8m0_t | fp8_e8m0_t | uint16_t |
 | fp8_e5m2_t | fp8_e5m2_t | uint16_t |
 | fp8_e4m3fn_t | fp8_e4m3fn_t | uint16_t |
+| fp8_e6m2_t | fp8_e6m2_t | uint16_t |
 | int16_t | int16_t | uint16_t |
 | int16_t | int16_t | uint32_t |
 | uint16_t | uint16_t | uint16_t |
@@ -80,6 +84,8 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather(__ubuf__ <src_dtype>* src,
 | float | float | uint32_t |
 
 > 说明：`int16_t/int8_t`、`uint16_t/uint8_t` 两组位宽扩展组合仅支持“通过引用参数输出结果”形式，“通过函数返回值返回结果”形式不支持。
+
+`fp8_e6m2_t`数据类型组合要求Ascend C DevKit 9.2.0及以上版本。
 
 ### 函数原型典型示例
 

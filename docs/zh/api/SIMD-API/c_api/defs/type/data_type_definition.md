@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id8 -->
+- Ascend 960PR&960DT系列产品：支持
+<!-- end id8 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -34,7 +37,7 @@
 
 | 位宽类别 | 矢量数据寄存器类型 |
 | --- | --- |
-| b8 | vector_int8_t、vector_uint8_t、vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t、vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t |
+| b8 | vector_int8_t、vector_uint8_t、vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t、vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t、vector_fp8_e6m2_t |
 | b16 | vector_int16_t、vector_uint16_t、vector_half、vector_bfloat16_t |
 | b32 | vector_int32_t、vector_uint32_t、vector_float |
 | b64 | vector_int64_t、vector_uint64_t |
@@ -42,6 +45,8 @@
 **注意：**
 
 - `vector_int4x2_t`、`vector_fp4x2_e2m1_t`和`vector_fp4x2_e1m2_t`均为打包类型，两个4 bit元素共用一个字节的存储空间，因此归入`b8`位宽类别。
+
+- `vector_fp8_e6m2_t`要求Ascend C DevKit 9.2.0及以上版本。
 
 - 矢量数据寄存器的数量上限为32。超出上限的寄存器数据会写入预留的8KB Unified Buffer（UB）空间中，可能会引发性能劣化。编译器会自动复用生命周期结束的寄存器和预留空间；若两者均可用，则优先复用寄存器。
 
