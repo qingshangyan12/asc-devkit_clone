@@ -1634,11 +1634,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hnegx2(const bfloat16x2_t a
     return ret;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __haddx2_rn(const bfloat16x2_t a, const bfloat16x2_t b)
-{
-    return __haddx2(a, b);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hadd(const bfloat16_t a, const bfloat16_t b) { return a + b; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hsub(const bfloat16_t a, const bfloat16_t b) { return a - b; }
@@ -1648,11 +1643,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hmul(const bfloat16_t a, cons
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hdiv(const bfloat16_t a, const bfloat16_t b) { return a / b; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hneg(const bfloat16_t a) { return -a; }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hadd_rn(const bfloat16_t a, const bfloat16_t b)
-{
-    return __hadd(a, b);
-}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hmax_nan(const bfloat16_t a, const bfloat16_t b)
 {

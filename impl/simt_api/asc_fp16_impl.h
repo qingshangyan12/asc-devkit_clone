@@ -1712,8 +1712,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hfmax2(const half2 a, const half2 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hnegx2(const half2 a) { return -a; }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __haddx2_rn(const half2 a, const half2 b) { return __haddx2(a, b); }
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hadd(const half a, const half b) { return a + b; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hsub(const half a, const half b) { return a - b; }
@@ -1723,8 +1721,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hmul(const half a, const half b) { 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hdiv(const half a, const half b) { return a / b; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hneg(const half a) { return -a; }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hadd_rn(const half a, const half b) { return __hadd(a, b); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hmax_nan(const half a, const half b)
 {
