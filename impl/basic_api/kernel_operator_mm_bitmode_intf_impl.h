@@ -66,7 +66,8 @@ __aicore__ inline int32_t Load2DBitModeParam::GetSrcStride() const { return conf
 __aicore__ inline uint16_t Load2DBitModeParam::GetDstStride() const { return config1BitMode.GetDstStride(); };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline Load3DBitModeParam::Load3DBitModeParam()
 {
     config0 = 0;
@@ -136,7 +137,9 @@ __aicore__ inline bool Load3DBitModeParam::GetFMatrixCtrl() const { return confi
 __aicore__ inline uint16_t Load3DBitModeParam::GetChannelSize() const { return config1BitMode.GetChannelSize(); };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
+                              (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline SetFMatrixBitModeParams::SetFMatrixBitModeParams() { config0 = 0; };
 template <typename T>
 __aicore__ inline SetFMatrixBitModeParams::SetFMatrixBitModeParams(const LoadData3DParamsV2<T>& loadData3DParams_)

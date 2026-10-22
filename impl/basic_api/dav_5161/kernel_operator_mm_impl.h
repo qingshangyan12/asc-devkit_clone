@@ -27,43 +27,7 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
 {
-    static_assert(
-        SupportType<
-            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
-            float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
-         half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 1);
-        } else {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 0);
-        }
-#else
-        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        } else {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        }
-#endif
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData A1 To A2 is not supported!"); });
 }
 
 template <typename T>
@@ -75,7 +39,6 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
             float, int32_t, uint32_t>(),
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_cb(
@@ -105,7 +68,6 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
             }
         }
 #endif
-    }
 }
 
 /* **************************************************************************************************
@@ -539,9 +501,11 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
         ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
+#endif
 
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
