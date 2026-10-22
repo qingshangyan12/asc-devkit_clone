@@ -140,7 +140,9 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_algos_stay
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
 
     // mesh == clos 且 4P：CCU Concurrent 未注册 → CCU 分支必须拒绝（断言与框架兜底行为无关）
+    // （Select 会按降级链改写 opParam.opExecuteConfig，二次调用前需重置，否则 CCU 分支不会进入）
     topo = MakeConcurrentTopo();
+    param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
@@ -178,9 +180,11 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_2die_never_matches_ccu)
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
     // 2Die 形态未经 SoleMesh 验证（单级路径同样拒绝），对齐单级契约：CCU 分支必须拒绝
+    // （Select 会按降级链改写 opParam.opExecuteConfig，二次调用前需重置，否则 CCU 分支不会进入）
     topo.level0MeshType = Level0MeshType::TWO_DIE_REGULAR;
     EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
     topo.level0MeshType = Level0MeshType::TWO_DIE_NOT_REGULAR;
+    param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
