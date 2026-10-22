@@ -255,7 +255,7 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
 }
 
 template <typename T, typename U>
-constexpr bool ShiftScalarSupported()
+constexpr __aicore__ __inline__ bool ShiftScalarSupported()
 {
     return SupportType<U, int16_t>() || (SupportType<T, uint8_t, int8_t>() && SupportType<U, uint8_t>()) ||
            (SupportType<T, uint16_t, int16_t>() && SupportType<U, uint16_t>()) ||
