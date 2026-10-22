@@ -83,9 +83,11 @@ file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
 file(GLOB ASCENDC_UT_ascend960dt_AIC_CASE_SRC
     npu_arch_9201/cube_compute/*.cpp
     npu_arch_9201/cube_datamove/*.cpp
+    npu_arch_9201/misc/*.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend960dt_AIV_CASE_SRC
+    npu_arch_9201/misc/*.cpp
     npu_arch_9201/vector_compute/*.cpp
     npu_arch_9201/vector_datamove/*.cpp
 )
