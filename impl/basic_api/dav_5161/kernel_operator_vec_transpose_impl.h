@@ -137,6 +137,27 @@ __aicore__ inline void TransDataTo5HDIntrinsicsImpl<uint8_t>(
     TransDataTo5HDB8IntrinsicsImpl<uint8_t>(dstList, srcList, transDataTo5HDParams);
 }
 
+template <typename T>
+__aicore__ inline void SetVaReg(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16])
+{
+    uint64_t vaRegArray1[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray2[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray3[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray4[VA_REG_ARRAY_LEN];
+
+    for (int32_t i = 0; i < VA_REG_ARRAY_LEN; i++) {
+        vaRegArray1[i] = (uint64_t)dstList[i];
+        vaRegArray2[i] = (uint64_t)dstList[VA_REG_ARRAY_LEN + i];
+        vaRegArray3[i] = (uint64_t)srcList[i];
+        vaRegArray4[i] = (uint64_t)srcList[VA_REG_ARRAY_LEN + i];
+    }
+
+    set_va_reg_sb(VA0, vaRegArray1);
+    set_va_reg_sb(VA1, vaRegArray2);
+    set_va_reg_sb(VA2, vaRegArray3);
+    set_va_reg_sb(VA3, vaRegArray4);
+}
+
 __aicore__ inline void SetVaReg(uint64_t dst[NCHW_CONV_ADDR_LIST_SIZE], uint64_t src[NCHW_CONV_ADDR_LIST_SIZE])
 {
     set_va_reg_sb(VA0, dst);
@@ -152,6 +173,14 @@ __aicore__ inline void TransDataTo5HDImpl(
 {
     SetVaReg(dstList, srcList);
     TransDataTo5HDIntrinsicsImpl<T>(dstList, srcList, transDataTo5HDParams);
+}
+
+template <typename T>
+__aicore__ inline void TransDataTo5HDImpl(
+    __ubuf__ T* dstList[16], __ubuf__ T* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
+{
+    SetVaReg(dstList, srcList);
+    TransDataTo5HDIntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
 }
 
 #define TRANSDATA_IMPL(TYPE, WIDTH)                                                                               \
@@ -171,6 +200,14 @@ __aicore__ inline void TransDataTo5HDImpl(
             VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,            \
             transDataTo5HDParams.srcRepStride);                                                       \
     }
+
+TRANSDATA_IMPL(float, 32);
+TRANSDATA_IMPL(int32_t, 32);
+TRANSDATA_IMPL(uint32_t, 32);
+TRANSDATA_IMPL(half, 16);
+TRANSDATA_IMPL(int16_t, 16);
+TRANSDATA_IMPL(uint16_t, 16);
+
 __aicore__ inline void VldVaReg(__ubuf__ uint64_t* dst, __ubuf__ uint64_t* src)
 {
     ldva(VA0, (uint64_t)dst, false); // false refers to low 128 bit;
