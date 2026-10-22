@@ -4,7 +4,7 @@
 
 本样例组合实验性 Tensor API 的寄存器加载、类型转换和存储能力，完成逐元素数据类型转换。所有场景输入和输出均为 `[512]` 个逻辑元素的一维 Tensor。
 
-样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的7种转换场景（编号1至6、8），并演示不同位宽转换时的 `unpack`、`unpack4` 访存模式和 `deinterleave` 数据重排。计算关系如下：
+样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的7种转换场景（编号1至7），并演示不同位宽转换时的 `unpack`、`unpack4` 访存模式和 `deinterleave` 数据重排。计算关系如下：
 
 ```text
 y[i] = convert<To>(x[i])
@@ -38,7 +38,7 @@ y[i] = convert<To>(x[i])
   | 4 | `int32_t` | `uint8_t` | `zero` | `rint` | `sat` | 饱和到 `[0, 255]` 后转换为8位无符号整数 |
   | 5 | `bfloat16_t` | `float` | `zero` | `rint` | `not_sat` | `bfloat16_t` 扩展为 `float` |
   | 6 | `float` | `bfloat16_t` | `zero` | `rint` | `not_sat` | `float` 舍入为 `bfloat16_t` |
-  | 8 | UB：`int4b_t`，寄存器：`int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | 直接加载512个 packed INT4，分别转换四个 quarter |
+  | 7 | UB：`int4b_t`，寄存器：`int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | 直接加载512个`int4b_t`，通过四种 layout 分别转换每组4字节中的对应字节，每次得到128个 half，并按 layout 顺序分段写回。|
 
 - 样例规格：
 
@@ -87,22 +87,14 @@ y[i] = convert<To>(x[i])
   | 4 | 512个 `int32_t` | 2048 B | 512个 `uint8_t` | 512 B |
   | 5 | 512个 `bfloat16_t` | 1024 B | 512个 `float` | 2048 B |
   | 6 | 512个 `float` | 2048 B | 512个 `bfloat16_t` | 1024 B |
-  | 8 | 512个 packed INT4（256个字节） | 256 B | 四个 quarter 的128个 `half`，共512个 | 1024 B |
+  | 7 | 512个 `int4b_t`（256个字节） | 256 B | 四个 quarter 的128个 `half`，共512个 | 1024 B |
 
-  场景8使用直接加载，显式验证源寄存器为 `reg_tensor<int4x2_t>`。layout 为 `q` 的
-  转换结果是输入逻辑元素 `8 * i + 2 * q` 和 `8 * i + 2 * q + 1`，即每4字节中的第q字节
-  包含的两个INT4，按 quarter 顺序写入输出。使用字节粒度的全掩码激活所有源位置。可将下方仿真命令中的
-  `SCENARIO_NUM` 和 `scenario_num` 同时设为8运行。
-
-  场景8在GM和UB上直接构造 `int4b_t` Tensor，layout 均表示512个逻辑元素。
-  普通 `copy(x_ub, x_gm)` 由公共 B4 搬运逻辑处理256字节 packed 输入，无需 `uint8_t` 视图。
+  场景7在GM和UB上直接构造 `int4b_t` Tensor，layout 均表示512个逻辑元素。
+  普通 `copy(x_ub, x_gm)` 由公共 B4 搬运逻辑处理256字节 packed 输入。
   低半字节对应偶数元素，高半字节对应奇数元素。
   普通 `load` 一次加载全部512个逻辑元素，四种 layout 分别转换128个元素，
   然后使用普通 `store` 写入输出的四个连续区段。
   输入覆盖全部256种打包字节，结果按half的16位编码逐项精确比较，无需浮点容差。
-  加载结果使用 `auto` 推导寄存器类型，并通过 `static_assert` 验证为 `reg_tensor<int4x2_t>`；
-  逻辑偏移到字节地址的换算由公共 Tensor 指针实现完成，样例不再单独换算。
-  编译使用 CANN 包内的头文件，不添加本地仓库头文件覆盖路径。
 
 - 样例实现：
 
@@ -153,7 +145,7 @@ y[i] = convert<To>(x[i])
   ./demo
   ```
 
-  所有场景使用相同的编译和执行流程，仅需修改 `SCENARIO_NUM`。可选编号为1至6、8；运行场景8时设为 `SCENARIO_NUM=8`。生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。
+  所有场景使用相同的编译和执行流程，仅需修改 `SCENARIO_NUM`。可选编号为1至7。生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。
 
   使用NPU仿真时，可分别增加以下编译选项：
 
@@ -171,7 +163,7 @@ y[i] = convert<To>(x[i])
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
-  | `SCENARIO_NUM` | 类型转换场景编号，必选，可选编号为1至6、8。 |
+  | `SCENARIO_NUM` | 类型转换场景编号，必选，可选编号为1至7。 |
 
 - 执行结果
 
