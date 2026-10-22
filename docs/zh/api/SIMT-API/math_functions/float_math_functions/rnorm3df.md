@@ -29,7 +29,7 @@
 
 获取输入数据a、b、c的平方和a^2 + b^2 + c^2的平方根的倒数。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816367.png)
+![](../../../figures/formulaimage_0000002516816367.png)
 
 ## 函数原型
 

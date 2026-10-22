@@ -29,7 +29,7 @@
 
 using namespace HcclApi;
 namespace {
-static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
+static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 960UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL};
@@ -63,7 +63,7 @@ HcclResult IsDevice950(bool& isDevice950)
 {
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
-    isDevice950 = (deviceType == DevType::DEV_TYPE_950);
+    isDevice950 = (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960);
     return HCCL_SUCCESS;
 }
 

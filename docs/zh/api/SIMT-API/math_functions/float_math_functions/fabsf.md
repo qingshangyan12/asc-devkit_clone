@@ -29,7 +29,7 @@
 
 获取输入数据的绝对值。
 
-![](../../../figures/zh-cn_formulaimage_0000002486622044.png)
+![](../../../figures/formulaimage_0000002486622044.png)
 
 ## 函数原型
 

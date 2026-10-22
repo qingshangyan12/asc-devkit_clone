@@ -20,7 +20,7 @@ __global__ void vec_add(float* x, float* y, float* z)
 
 -   使用函数类型限定符\_\_global\_\_，标识它是一个核函数（Kernel）。
 -   核函数（Kernel）必须具有void返回类型。
--   核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/syntax_restrictions/functions.md#section_kernel_function_argument_list_constraint)。
+-   核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/cpp_language_restrictions/general_restrictions.md#section_kernel_func_param_restriction)。
 
 ## 核函数（Kernel）的调用<a name="section33493239410"></a>
 

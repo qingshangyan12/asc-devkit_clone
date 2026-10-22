@@ -71,11 +71,11 @@ Tiling参数如下：
 
 -   优化前的流水图如下，默认不开启Tiling常量化，Tiling参数需要从Host侧拷贝到核函数（Kernel）侧，导致Matmul初始化时的Scalar计算较多，第一个MTE2指令开始于3.536us左右，MTE2前的指令头开销在算子整个流水中占比较大，因此需要优化Scalar计算。
 
-    ![](../../../figures/zh-cn_image_0000002411422713.png)
+    ![](../../../figures/image_0000002411422713.png)
 
 -   优化前的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为10.62us，从G列的aic\_scalar\_time数据来看，Scalar平均耗时6.32us。
 
-    ![](../../../figures/zh-cn_image_0000002411018580.png)
+    ![](../../../figures/image_0000002411018580.png)
 
 ## 设计优化方案<a name="section10569929145417"></a>
 
@@ -134,11 +134,11 @@ Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 -   优化后的流水图如下，通过开启Tiling全量常量化，无需将Tiling参数从Host侧拷贝到核函数（Kernel）侧，在编译期完成Tiling常量化，减少了Matmul初始化时的Scalar计算。从0us起到第一个MTE2指令发起，这之间的时间为Matmul初始化时间，Matmul初始化时间从优化前的3.536us减少到2.185us，性能有所提升。
 
-    ![](../../../figures/zh-cn_image_0000002377921500.png)
+    ![](../../../figures/image_0000002377921500.png)
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为7.87us，相较于优化前的10.62us提升了25.9%。从G列的aic\_scalar\_time数据来看，Scalar平均耗时3.38us，相较于优化前的6.32us提升了46.5%。
 
-    ![](../../../figures/zh-cn_image_0000002411019880.png)
+    ![](../../../figures/image_0000002411019880.png)
 
 ## 总结<a name="section252011820413"></a>
 

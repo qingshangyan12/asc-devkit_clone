@@ -86,7 +86,7 @@ public:
                 CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(
                     MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() * CROSS_CORE_SYNC_FACTOR);
                 if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                    CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(CROSS_CORE_SYNC_FACTOR);
+                    WaitCVSync<CROSS_CORE_INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(CROSS_CORE_SYNC_FACTOR);
                 }
             }
         }
@@ -100,7 +100,7 @@ public:
                 CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(
                     intraAId_ + MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() * CROSS_CORE_SYNC_FACTOR);
                 if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                    CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(intraAId_ + CROSS_CORE_SYNC_FACTOR);
+                    WaitCVSync<CROSS_CORE_INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(intraAId_ + CROSS_CORE_SYNC_FACTOR);
                 }
                 intraAIdBefore_ = intraAId_;
             }
@@ -110,7 +110,7 @@ public:
                 CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(
                     intraBId_ + MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() * CROSS_CORE_SYNC_FACTOR);
                 if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                    CrossCoreWaitFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(intraBId_ + CROSS_CORE_SYNC_FACTOR);
+                    WaitCVSync<CROSS_CORE_INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(intraBId_ + CROSS_CORE_SYNC_FACTOR);
                 }
                 intraBIdBefore_ = intraBId_;
             }
@@ -143,7 +143,7 @@ public:
                 CrossCoreSetFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(
                     intraAId_ + MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() * CROSS_CORE_SYNC_FACTOR);
                 if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                    CrossCoreSetFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(intraAId_ + CROSS_CORE_SYNC_FACTOR);
+                    SetCVSync<CROSS_CORE_INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(intraAId_ + CROSS_CORE_SYNC_FACTOR);
                 }
             }
         }
@@ -152,7 +152,7 @@ public:
                 CrossCoreSetFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(
                     intraBId_ + MATMUL_MODULE(MatmulSubBlockInfo)->GetSubBlockIdx() * CROSS_CORE_SYNC_FACTOR);
                 if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                    CrossCoreSetFlag<CROSS_CORE_INTRA_MODE, PIPE_MTE1>(intraBId_ + CROSS_CORE_SYNC_FACTOR);
+                    SetCVSync<CROSS_CORE_INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(intraBId_ + CROSS_CORE_SYNC_FACTOR);
                 }
             }
         }

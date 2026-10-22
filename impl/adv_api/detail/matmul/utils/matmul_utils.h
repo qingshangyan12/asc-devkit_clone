@@ -48,6 +48,8 @@ namespace AscendC {
 constexpr uint32_t L0C_BUF_BLOCK_LEN = 32 * 1024;
 constexpr uint32_t L0C_BUF_BLOCK_NUM = 8;
 constexpr int8_t N_BUFFER_33_FACTOR = 3;
+constexpr uint32_t CV_SYNC_AIV_ID0 = 0;
+constexpr uint32_t CV_SYNC_AIV_ID1 = 1;
 
 constexpr TQueConfig gCO1Config = {
     .nd2nz = false,
@@ -212,6 +214,60 @@ __aicore__ inline T CeilAlignT(T num1, T num2)
 {
     ASCENDC_ASSERT((num2 > 0), { KERNEL_LOG(KERNEL_ERROR, "num2 is %d , which should be larger than 0", num2); });
     return CeilT(num1, num2) * num2;
+}
+
+template <typename INPUT_TYPE, const auto& MM_CFG>
+__aicore__ constexpr bool NeedPreallocation()
+{
+    if constexpr (INPUT_TYPE::TAG == InputTypeTag::A) {
+        if ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_A) != 0) {
+            return true;
+        }
+        return false;
+    }
+    if constexpr (INPUT_TYPE::TAG == InputTypeTag::B) {
+        if ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_B) != 0) {
+            return true;
+        }
+        return false;
+    }
+    if constexpr (INPUT_TYPE::TAG == InputTypeTag::scaleA) {
+        if ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_SCALE_A) != 0) {
+            return true;
+        }
+        return false;
+    }
+    if constexpr (INPUT_TYPE::TAG == InputTypeTag::scaleB) {
+        if ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_SCALE_B) != 0) {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+template <uint8_t modeId, pipe_t pipe, uint32_t aivId = CV_SYNC_AIV_ID0>
+__aicore__ inline void WaitCVSync(uint16_t flagId)
+{
+    if constexpr (aivId == CV_SYNC_AIV_ID0) {
+        CrossCoreWaitFlag<modeId, pipe>(flagId);
+    } else {
+#if __NPU_ARCH__ != 9201 && __NPU_ARCH__ != 9202
+        CrossCoreWaitFlag<modeId, pipe>(flagId);
+#endif
+    }
+}
+
+template <uint8_t modeId, pipe_t pipe, uint32_t aivId = CV_SYNC_AIV_ID0>
+__aicore__ inline void SetCVSync(uint16_t flagId)
+{
+    if constexpr (aivId == CV_SYNC_AIV_ID0) {
+        CrossCoreSetFlag<modeId, pipe>(flagId);
+    } else {
+#if __NPU_ARCH__ != 9201 && __NPU_ARCH__ != 9202
+        CrossCoreSetFlag<modeId, pipe>(flagId);
+#endif
+    }
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201))

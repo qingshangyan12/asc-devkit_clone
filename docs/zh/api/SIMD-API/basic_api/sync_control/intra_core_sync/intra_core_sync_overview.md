@@ -71,6 +71,8 @@ AI Core内部并行的指令流水类型和解释如下所示：
 - 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。
     - 通过[PipeBarrier](PipeBarrier_ISASI.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。PipeBarrier指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE\_S单流水的同步。
 
+<a id="npu_arch_2201_intra_core_sync_combinations"></a>
+
 <!-- npu="910b,A3" id4 -->
 
 以[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#zh-cn_topic_0000002542725361_table13753342164113)和[表3](#zh-cn_topic_0000002542725361_table1555712177426)所示。其中，"不涉及"表示硬件层面不存在此种同步组合，"暂无应用场景"表示存在此种同步组合，但在实际开发场景中暂不需要使用。

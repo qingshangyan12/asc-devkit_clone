@@ -122,6 +122,18 @@ enum class DecompressionMode {
     DECOMP_3bitTo4bit = 0b1000,
 };
 
+enum PreallocationMode : uint8_t { // 支持多个矩阵同时使能preallocation 比如传入(PREALLOCATION_ENABLE_A |
+                                   // PREALLOCATION_ENABLE_B)表示A和B矩阵都使能preallocation
+    PREALLOCATION_ENABLE_NONE = 0b00000000,    // 默认都不使能preallocation
+    PREALLOCATION_ENABLE_A = 0b00000001,       // A矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_B = 0b00000010,       // B矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_SCALE_A = 0b00000100, // scaleA矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_SCALE_B = 0b00001000, // scaleB矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_QUANT = 0b00010000,   // quant矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_BIAS = 0b00100000,    // bias矩阵gm搬运使能preallocation
+    PREALLOCATION_ENABLE_ALL = 0b00111111,     // A/B矩阵以及scaleA/scaleB矩阵都使能preallocation
+};
+
 /**
  * @struct MatmulConfig
  * @brief Core configuration for the Matmul operator
@@ -191,6 +203,7 @@ struct MatmulConfig {
     bool enableL1BankConflictOptimise = false;             // Whether to enable L1BankConflictOptimise
     bool enableRelu = false;                               // Whether to enable Relu
     DecompressionMode decompMode = DecompressionMode::DECOMP_NONE;
+    PreallocationMode preAllocationMode = PreallocationMode::PREALLOCATION_ENABLE_ALL; // for mte2 preallocation
 };
 
 /**

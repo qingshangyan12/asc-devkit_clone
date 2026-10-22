@@ -29,7 +29,7 @@
 
 头文件路径为：`"c_api/vector_compute/compute/vector_convert.h"`。
 
-对float类型数据进行精度转换处理,支持多种舍入模式：
+对float类型数据进行精度转换处理，支持多种舍入模式：
 
 - RINT舍入模式：四舍六入五成双舍入
 - ROUND舍入模式：四舍五入舍入

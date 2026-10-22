@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。
 
-![](../../../figures/zh-cn_formulaimage_0000002521590968.png)
+![](../../../figures/formulaimage_0000002521590968.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ inline unsigned int umax(const unsigned int x, const unsigned int y)
         dst[idx] = umax(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 12, 23, 70
+y: 5, 0, 15, 7
+result: 5, 12, 23, 70
+```

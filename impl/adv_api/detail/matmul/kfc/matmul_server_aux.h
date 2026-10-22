@@ -85,6 +85,8 @@ class MatmulServiceAuxBase {
     using SrcBT = typename B_TYPE::T;
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
     template <class... Args>
     friend struct AscendC::GetCubeObjConfig;
     constexpr static bool enableMixDualMaster = ToMatmulConfig(MM_CFG).enableMixDualMaster;
@@ -257,7 +259,7 @@ public:
             !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
             "SetWorkspace not support when enableMixDualMaster is enabled");
     }
-    __aicore__ inline void End(){};
+    __aicore__ inline void End() {};
     __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
@@ -335,7 +337,7 @@ public:
 #endif
         }
     }
-    __aicore__ inline void WaitIterateAll(){};
+    __aicore__ inline void WaitIterateAll() {};
     template <bool sync = true, bool doPad = false>
     __aicore__ inline void GetTensorC(
         const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0,
@@ -484,25 +486,25 @@ public:
         }
     }
 #if defined(USE_SSBUF)
-    __aicore__ inline void SetTensorScaleA(const GlobalTensor<fp8_e8m0_t>& a, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const GlobalTensor<SrcScaleAT>& a, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleA not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleA(const LocalTensor<fp8_e8m0_t>& a, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const LocalTensor<SrcScaleAT>& a, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleA not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleB(const GlobalTensor<fp8_e8m0_t>& b, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const GlobalTensor<SrcScaleBT>& b, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetTensorScaleB not support when enableMixDualMaster is enabled.");
     }
-    __aicore__ inline void SetTensorScaleB(const LocalTensor<fp8_e8m0_t>& b, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const LocalTensor<SrcScaleBT>& b, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -519,18 +521,18 @@ private:
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
                 constexpr uint16_t l1SetIdV0 = static_cast<uint16_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB);
                 constexpr uint16_t l1SetIdV1 = static_cast<uint16_t>(VEC_WAIT_INTRA_Enum::UB_L1_L1_L0AB) + INTRA_NUM;
-                CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV0);
-                CrossCoreSetFlag<INTRA_MODE, PIPE_MTE1>(l1SetIdV1);
+                SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID0>(l1SetIdV0);
+                SetCVSync<INTRA_MODE, PIPE_MTE1, CV_SYNC_AIV_ID1>(l1SetIdV1);
             }
         }
     }
     __aicore__ inline void IterNotify()
     {
         if constexpr (GetPhyType(C_TYPE::pos) != Hardware::L1) {
-            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+            SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
                 GetIntraFlagId(cubeObj.cubeObj[0].instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP), 0U));
             if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-                CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(GetIntraFlagId(
+                SetCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID1>(GetIntraFlagId(
                     cubeObj.cubeObj[0].instID, static_cast<uint8_t>(VEC_WAIT_INTRA_Enum::WAIT_FIXP),
                     1U)); // 1 means sub_block 1
             }

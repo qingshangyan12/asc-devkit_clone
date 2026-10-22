@@ -60,7 +60,7 @@ __simd_callee__ inline vector_bool asc_loadalign_mask(__ubuf__ uint32_t* src)
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `src`的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 

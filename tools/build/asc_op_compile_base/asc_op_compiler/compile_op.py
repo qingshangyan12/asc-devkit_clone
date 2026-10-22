@@ -173,7 +173,11 @@ def _gen_kernel_func_declare_head(
     func_params = []
     super_kernel_params = []
     needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
-        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510()
+        CommonUtility.is_c310()
+        or CommonUtility.is_920r1()
+        or CommonUtility.is_920r2()
+        or CommonUtility.is_m510()
+        or CommonUtility.is_516r2()
     )
     workspace_idx = 0
     if needs_ffts:
@@ -554,7 +558,11 @@ def gen_kernel_fun(
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and (
-        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510()
+        CommonUtility.is_c310()
+        or CommonUtility.is_920r1()
+        or CommonUtility.is_920r2()
+        or CommonUtility.is_m510()
+        or CommonUtility.is_516r2()
     ):
         check_custom_dcci_end_false(compile_option_tuple)
 

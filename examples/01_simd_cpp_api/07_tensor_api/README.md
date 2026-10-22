@@ -16,7 +16,7 @@
 | [mmad_tensor_api](./mmad_tensor_api) | 基于Tensor API实现动态Shape矩阵乘法和随路量化计算 | Ascend 950PR&950DT系列产品 |
 | [matmul_mxfp4_tensor_api_high_performance](./matmul_mxfp4_tensor_api_high_performance) | MxFP4 Matmul Tensor API高性能样例，展示基于静态Tensor编程的高性能实现路径 | Ascend 950PR&950DT系列产品 |
 | [custom_op_tensor_api](./custom_op_tensor_api) | 基于自定义Tensor API Copy Operation实现batch输入展平和共享权重QKV投影 | Ascend 950PR&950DT系列产品 |
-| [bank_conflict](./custom_op_tensor_api) | 基于Tensor API介绍bank冲突及规避方式 | Ascend 950PR&950DT系列产品 |
+| [bank_conflict](./bank_conflict) | 基于Tensor API介绍bank冲突及规避方式 | Ascend 950PR&950DT系列产品 |
 | [matmul_split_k](./matmul_split_k) | 基于Tensor API实现多核K轴切分矩阵乘计算 | Ascend 950PR&950DT系列产品 |
 | [matmul_bias_fusion](./matmul_bias_fusion) | 基于Tensor API实现Cube和Vector的CV融合计算 | Ascend 950PR&950DT系列产品 |
 | [abs_diff](./experimental/reg_vector_compute/abs_diff) | 基于Tensor API对两组float Tensor逐元素计算差的绝对值 | Ascend 950PR&950DT系列产品 |

@@ -27,7 +27,7 @@ msopprof --output=$HOME/projects/output $HOME/projects/MyApp/out/main
 
     在Chrome浏览器中输入`chrome://tracing`地址，并将通过msopprof simulator生成指令流水图文件（trace.json）拖到空白处打开，键盘上输入快捷键（W：放大，S：缩小，A：左移，D：右移）可进行查看。
 
-    ![](../../figures/zh-cn_image_0000002445425429.png)
+    ![](../../figures/image_0000002445425429.png)
 
 -   指令流水图支持MindStudio Insight可视化呈现，MindStudio Insight工具以时序图方式为用户提供指令在昇腾AI处理器上的运行情况，用户可通过分析时序图中的指令详情、指令执行时间、指令关联代码的调用栈及指令/流水间同步连线等信息，识别微观指令的时序优化点。
 

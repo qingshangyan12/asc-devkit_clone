@@ -29,7 +29,7 @@
 
 获取uint32类型数据`x`和`y`的平均值，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002554985178.png)
+![](../../../figures/formulaimage_0000002554985178.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ unsigned int __uhadd(unsigned int x, unsigned int y)
         dst[idx] = __uhadd(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 12, 23, 70
+y: 6, 0, 15, 7
+result: 3, 6, 19, 38
+```

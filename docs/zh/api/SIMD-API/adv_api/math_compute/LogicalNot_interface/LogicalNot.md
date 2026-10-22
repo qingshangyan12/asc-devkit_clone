@@ -29,7 +29,7 @@
 
 按元素进行取反操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
-![](../../../../figures/zh-cn_formulaimage_0000002419746457.png)
+![](../../../../figures/formulaimage_0000002419746457.png)
 
 ## 函数原型
 

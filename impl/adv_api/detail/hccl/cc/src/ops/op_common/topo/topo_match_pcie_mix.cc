@@ -27,7 +27,7 @@ HcclResult TopoMatchPcieMix::MatchTopo(
 
 #ifdef MACRO_DEV_TYPE_NEW
     CHK_PRT_RET(
-        topoInfo->deviceType != DevType::DEV_TYPE_950,
+        topoInfo->deviceType != DevType::DEV_TYPE_950 && topoInfo->deviceType != DevType::DEV_TYPE_960,
         HCCL_ERROR("[TopoMatchPcieMix] Rank [%d], deviceType not supported yet.", myRank), HcclResult::HCCL_E_PARA);
 #else
     CHK_PRT_RET(

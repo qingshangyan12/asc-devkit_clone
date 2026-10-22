@@ -98,6 +98,7 @@
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，源操作数dst和目的操作数src支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/float/int32_t/uint32_t/complex32/int64_t/uint64_t/complex64。其中，int8\_t/uint8\_t/uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select_flexible_scalar_res.md#id2 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -111,6 +112,7 @@ Ascend 950PR&950DT系列产品，源操作数dst和目的操作数src支持的�
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 -   模式1场景使用灵活标量位置接口时需要填写模板参数config避免接口匹配到其他模式。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select_flexible_scalar_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

@@ -33,7 +33,7 @@
 
 实现对shape大小为\[B，S，H\]的输入数据的RmsNorm归一化，其计算公式如下：
 
-![](../../../figures/zh-cn_formulaimage_0000001692451498.png)
+![](../../../figures/formulaimage_0000001692451498.png)
 
 其中，γ为缩放系数，ε为防除零的权重系数。
 

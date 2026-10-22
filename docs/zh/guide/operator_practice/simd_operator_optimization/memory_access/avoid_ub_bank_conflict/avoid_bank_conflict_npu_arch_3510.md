@@ -13,7 +13,7 @@ Unified Buffer（UB）缓存总大小为256KB，包含8个bank group，每个ban
 UB的地址编码格式：
 
 ```
-UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
+UB_ADDR[17:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 ```
 
 **图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>  

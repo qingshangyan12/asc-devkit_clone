@@ -35,11 +35,11 @@
 
 按元素做正弦函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002192017270.png)
+![](../../../../figures/formulaimage_0000002192017270.png)
 
 Sin\(x\)的泰勒展开式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002192023094.png)
+![](../../../../figures/formulaimage_0000002192023094.png)
 
 ## 函数原型
 

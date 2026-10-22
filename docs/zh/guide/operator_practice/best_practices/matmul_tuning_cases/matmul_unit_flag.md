@@ -68,11 +68,11 @@
 
 -   优化前的流水图如下。如下图中红框所示，每一轮MMAD计算流水和FIXPIPE数据搬出流水之间都是串行执行的，完成MMAD计算后才开始FIXPIPE数据搬出，考虑实现MMAD与FIXPIPE之间流水并行来优化算子性能。
 
-    ![](../../../figures/zh-cn_image_0000002413944550.png)
+    ![](../../../figures/image_0000002413944550.png)
 
 -   优化前的Profiling数据如下，从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为37.39us。
 
-    ![](../../../figures/zh-cn_image_0000002414101622.png)
+    ![](../../../figures/image_0000002414101622.png)
 
 ## 设计优化方案<a name="section990382124919"></a>
 
@@ -114,11 +114,11 @@ Matmul API开启UnitFlag功能的完整样例请参考[开启UnitFlag功能和MD
 
 -   优化后的流水图如下，MMAD计算流水和FIXPIPE数据搬出流水之间实现了流水并行。
 
-    ![](../../../figures/zh-cn_image_0000002413945226.png)
+    ![](../../../figures/image_0000002413945226.png)
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为34.66us，较优化前的37.39us有约7.3%的性能提升。
 
-    ![](../../../figures/zh-cn_image_0000002447501485.png)
+    ![](../../../figures/image_0000002447501485.png)
 
 ## 总结<a name="section8281219125011"></a>
 

@@ -29,15 +29,15 @@
 
 按元素判断输入的浮点数是否非NAN、非±INF，输出结果为浮点数或者布尔值。对于非NAN或者非±INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之为false。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218496437.png)
+![](../../../../figures/formulaimage_0000002218496437.png)
 
 -   当输出为浮点类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224017961.png)
+    ![](../../../../figures/formulaimage_0000002224017961.png)
 
 -   当输出为bool类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224061861.png)
+    ![](../../../../figures/formulaimage_0000002224061861.png)
 
 ## 函数原型
 

@@ -33,11 +33,11 @@
 
 SwiGLU是采用Swish作为激活函数的GLU变体。具体计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002350049237.png)
+![](../../../../figures/formulaimage_0000002350049237.png)
 
 其中Swish激活函数的计算公式如下（β为常量）：
 
-![](../../../../figures/zh-cn_formulaimage_0000001704667878.png)
+![](../../../../figures/formulaimage_0000001704667878.png)
 
 ## 函数原型
 

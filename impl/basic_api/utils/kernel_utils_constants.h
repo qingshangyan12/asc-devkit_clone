@@ -53,12 +53,18 @@ const bool DEFAULT_REPEAT_STRIDE_MODE = 0;
 const bool STRIDE_SIZE_MODE = 0;
 const int32_t ONE_BYTE_BIT_SIZE = 8;
 const uint16_t MASK_ARRAY_SIZE = 4;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 const int32_t B32_BIT_SIZE = 32;
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+const uint32_t TOTAL_L0A_SIZE = 0;
+const uint32_t TOTAL_L0B_SIZE = 16 * 1024;
+#else
 const uint32_t TOTAL_L0A_SIZE = 64 * 1024;
 const uint32_t TOTAL_L0B_SIZE = 64 * 1024;
+#endif
 const uint32_t TMP_UB_SIZE = 8 * 1024;
 const uint32_t MAX_SLICE_SIZE = 6 * 256;
 const uint32_t F32_INF = 0x7f800000;
@@ -713,6 +719,8 @@ using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #if !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;
 #endif
+
+using hif4_scale = hif4_scale;
 
 using mx_fp8_e5m2_t = struct {};
 using mx_fp8_e4m3_t = struct {};

@@ -80,3 +80,10 @@ inline void asc_threadfence_block()
         dst[0] = src[0];
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: 9
+dst: 10
+```

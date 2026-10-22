@@ -66,6 +66,7 @@ HcclResult InheritKfcServerKernelArg(
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAllReduce =
         srcName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+    const CcuVersion ccuVersion = GetCcuVersion();
     if (isAllGatherNhr) {
         const auto* srcArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(srcKernel.kernelArg);
         CHK_PTR_NULL(srcArg);
@@ -103,11 +104,13 @@ HcclResult InheritKfcServerKernelArg(
         CHK_PTR_NULL(srcArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
+        kfcArg->axisId = srcArg->axisId;
+        kfcArg->axisSize = srcArg->axisSize;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
         kfcArg->nhrStepInfoVector = srcArg->stepInfoVector;
         kfcArg->nhrRank2ChannelIdx = srcArg->rank2ChannelIdx;
-    } else if (isAllToAllV) {
+    } else if (isAllToAllV && ccuVersion == CcuVersion::CCU_V1) {
         const auto* srcArg = static_cast<const CcuKernelArgAlltoAllVMesh1D*>(srcKernel.kernelArg);
         CHK_PTR_NULL(srcArg);
         kfcArg->rankSize = srcArg->rankSize;
@@ -131,7 +134,8 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (
-        isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce) {
+        isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce ||
+        (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
@@ -184,16 +188,19 @@ HcclResult CcuTempKfcServer::CalcRes(
         resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     const uint32_t missionNum = GetKfcServerMissionNum(param.algName);
-    // SoleNHR 2Die 特例：mission 数 = dieNum（模板 CalcRes 按通道探测塞入的源 kernel 数），
-    // 静态名单不可知（单 die=1 / 双 die=2），按尾部同名源 kernel 计数修正
+    // SoleNHR 动态 mission 特例（RS 2Die / AG SoleNHR D4）：mission 数 = dieNum（模板 CalcRes 按
+    // 通道探测塞入的源 kernel 数），静态名单不可知（单 die=1 / 双 die=2），按尾部同名源 kernel 计数修正
     const bool isSoleNhr2Die =
         param.algName != nullptr && std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0;
+    const bool isAgSoleNhrDynDie =
+        param.algName != nullptr && std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0;
     uint32_t soleNhr2DieMissionNum = missionNum;
-    if (isSoleNhr2Die) {
-        constexpr char SOLE_NHR_2DIE_KERNEL_NAME[] = "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem";
+    if (isSoleNhr2Die || isAgSoleNhrDynDie) {
+        const char* dynMissionKernelName =
+            isSoleNhr2Die ? "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem" : "CcuKernelKfcAllGatherNHR1DMem2Mem";
         uint32_t trailingCount = 0;
         for (auto it = resourceRequest.ccuKernelInfos.rbegin(); it != resourceRequest.ccuKernelInfos.rend(); ++it) {
-            if (std::strcmp(it->kernelFuncName, SOLE_NHR_2DIE_KERNEL_NAME) != 0) {
+            if (std::strcmp(it->kernelFuncName, dynMissionKernelName) != 0) {
                 break;
             }
             ++trailingCount;
@@ -201,12 +208,12 @@ HcclResult CcuTempKfcServer::CalcRes(
         CHK_PRT_RET(
             trailingCount == 0U,
             HCCL_ERROR(
-                "[CcuTempKfcServer::CalcRes] SoleNHR 2Die expects at least one source kernel, got [%zu]",
+                "[CcuTempKfcServer::CalcRes] SoleNHR dyn-mission expects at least one source kernel, got [%zu]",
                 resourceRequest.ccuKernelInfos.size()),
             HCCL_E_PARA);
         soleNhr2DieMissionNum = std::min(trailingCount, KFC_MAX_MISSION_NUM);
     }
-    const uint32_t effectiveMissionNum = isSoleNhr2Die ? soleNhr2DieMissionNum : missionNum;
+    const uint32_t effectiveMissionNum = (isSoleNhr2Die || isAgSoleNhrDynDie) ? soleNhr2DieMissionNum : missionNum;
     CHK_PRT_RET(
         resourceRequest.ccuKernelInfos.size() < effectiveMissionNum,
         HCCL_ERROR(

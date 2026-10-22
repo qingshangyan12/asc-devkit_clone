@@ -116,6 +116,11 @@ private:
 
     __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
+    // 性能优化(A1/A2)：missionNum 由 algorithmType 单射映射，与 GetAlgorithmType 解耦——
+    // CcuPrepareForOp 分发与 missionNum 计算共享一次求值，CcuSendMsg/Wait/Finalize 经
+    // handleMissionNum_ 缓存复用（免 prepareType/opType 表/res[2] 重复 GM 读）
+    __aicore__ inline uint8_t GetKfcMissionNumByType(uint32_t algorithmType) const;
+
     __aicore__ inline uint32_t GetAlgorithmType(HcclHandle handleId) const;
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
@@ -174,6 +179,8 @@ private:
     uint8_t handleCommitCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleFinishCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleNeedCommitCnt_[HCCL_MAX_HANDLE_ID];
+    // 性能优化(A2)：per-handle mission 数缓存（CcuPrepareForOp 单次求值写入，InitInner 预置 1）
+    uint8_t handleMissionNum_[HCCL_MAX_HANDLE_ID];
 
     __gm__ CommonPrepareParamCcu* handleParamGM_;
 

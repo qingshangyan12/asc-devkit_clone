@@ -161,7 +161,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 >- 针对Ascend 950PR&950DT系列产品，支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。
 ><!-- end id19 -->
 
-更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+更多的编译命令和用法可以参见[《毕昇编译器》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/compiler/BishengCompiler/atlas_bisheng_10_0001.html)。
 
 >[!NOTE]说明<a id="note-reference"></a>
 ><!-- npu="910b,910,310p,310b" id1 -->

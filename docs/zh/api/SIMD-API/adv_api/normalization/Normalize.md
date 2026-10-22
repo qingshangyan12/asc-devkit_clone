@@ -27,9 +27,9 @@
 
 [LayerNorm](LayerNorm.md)中，已知均值和方差，计算shape为\[A，R\]的输入数据的标准差的倒数rstd和y，其计算公式如下：
 
-![](../../../figures/zh-cn_formulaimage_0000002046262966.png)
+![](../../../figures/formulaimage_0000002046262966.png)
 
-![](../../../figures/zh-cn_formulaimage_0000002082381949.png)
+![](../../../figures/formulaimage_0000002082381949.png)
 
 其中，E和Var分别代表输入在R轴的均值，方差，γ为缩放系数，β为平移系数，ε为防除零的权重系数。
 

@@ -78,6 +78,8 @@ struct reg_tensor {
 | `fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t` | 对应的`vector_fp8_*`类型 |
 | `int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` | 对应的`vector_int4x2_t`或`vector_fp4x2_*`类型 |
 
+Tensor元素类型为`int4b_t`，寄存器对应的元素类型为`vector_int4x2_t`，`int4b_t`不作为`reg_tensor`的寄存器元素类型。
+
 ## 约束说明
 
 - 默认构造函数不初始化`reg`和`mask`，使用前必须通过搬入、计算、赋值或mask绑定接口完成初始化。

@@ -29,7 +29,7 @@
 
 获取输入数据x的倒数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002545900870.png)
+![](../../../../figures/formulaimage_0000002545900870.png)
 
 ## 函数原型
 

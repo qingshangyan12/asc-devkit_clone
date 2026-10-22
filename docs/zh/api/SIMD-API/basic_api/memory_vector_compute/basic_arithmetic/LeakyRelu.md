@@ -47,7 +47,7 @@ $f(x) = \begin{cases} x, & x \geq 0 \\ \alpha x, & x < 0 \end{cases}$
 
 和ReLU的区别是：ReLU是将所有的负值都设为零，而Leaky ReLU是给所有负值赋予一个斜率。下图表示了ReLU和Leaky ReLU的区别：
 
-![](../../../../figures/zh-cn_image_0000001475211729.png) ![](../../../../figures/zh-cn_image_0000001425411698.png)
+![](../../../../figures/image_0000001475211729.png) ![](../../../../figures/image_0000001425411698.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -122,6 +122,7 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 ## 数据类型<a name="zh-cn_topic_0000002530007180_section4219135304818"></a>
 
 T和U支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/LeakyRelu_res.md#id2 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -153,6 +154,7 @@ T和U支持的数据类型为：half、float。
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 - 针对Ascend 950PR&950DT系列产品，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/LeakyRelu_res.md#id3 -->
 
 ## 调用示例<a name="section112161084424"></a>
 
