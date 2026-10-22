@@ -8,8 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <cstring>
-
 #include "acl/acl_rt.h"
 #include "dtype_common.h"
 #include "hccl_types.h"
@@ -29,17 +27,18 @@ int32_t HcclLaunchDPUKernel(uint64_t ptr, int32_t size)
 
 HcclResult haclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind)
 {
-    static_cast<void>(kind);
     if (dst == nullptr || src == nullptr) {
         return HCCL_E_PTR;
-    }
-    if (count > destMax) {
-        return HCCL_E_PARA;
     }
     if (count == 0) {
         return HCCL_SUCCESS;
     }
-    std::memcpy(dst, src, count);
+    // 与真实 adapter_acl 实现对齐：内部经 aclrtMemcpy 完成拷贝，
+    // 复用桩侧计数与故障注入，保证 UT 对 D2H 拷贝路径可观测、可注入
+    aclError aclRet = aclrtMemcpy(dst, destMax, src, count, kind);
+    if (aclRet != ACL_SUCCESS) {
+        return HCCL_E_RUNTIME;
+    }
     return HCCL_SUCCESS;
 }
 
