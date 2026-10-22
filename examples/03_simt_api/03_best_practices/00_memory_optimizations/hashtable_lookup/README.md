@@ -27,7 +27,7 @@
 - 样例规格：
 
   <table>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">hashmap_lookup</td></tr>
+  <tr><td rowspan="1" align="center">样例类型（OpType）</td><td colspan="4" align="center">hashtable_lookup</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">keys</td><td align="center">[1, 1048576]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">indices</td><td align="center">[1, 1048576]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
@@ -54,13 +54,13 @@ AoS（Array of Structures，结构体数组）与SoA（Structure of Arrays，数
 - AoS布局：每个结构体中包含一个对象的完整信息，多个结构体排列成数组存储在内存中。
 - SoA布局：将对象的同种信息排列成数组，多个对象的同种信息存储在相邻内存中。
 
-**图1　SoA与AoS内存布局示意图**
+**图1　内存布局示意图**
 
 <img src="figures/内存布局示意图.drawio.png">
 
 图1以本样例的哈希表结构为例，展示了不同的内存布局。哈希表结构体代码实现如下所示：
 
-```c++
+```cpp
 struct AoSBucket {
   uint64_t key;
   float value[DIM];
@@ -79,7 +79,7 @@ SoaTableNoDigest table;
 | 指标 | 说明 |
 | ---- | ---- |
 | Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间 |
-| read_main_memory_data(KB) | 任务执行期间每个block从GM读取的总数据量                      |
+| read_main_memory_data(KB) | 任务执行期间每个block从GM读取的总数据量 |
 
 ### Case 0：AoS逐槽探测基线
 
@@ -95,6 +95,7 @@ struct AoSBucket {
   float value[DIM];
 };
 AoSBucket buckets[CAPACITY];
+
 __aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = buckets[idx].key;
@@ -162,9 +163,9 @@ __aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64
 
 同一算法，Task Duration从1311.297μs降至783.029μs。Case 1相对Case 0提升x1.67；性能提升的关键在于两种布局对Cache Line的利用方式不同：
 
-**图2　Cacheline示意图** 
+**图2　Cacheline示意图**
 
-![Cacheline示意图.drawio](figures/Cacheline示意图.drawio.png)
+![Cacheline示意图](figures/Cacheline示意图.drawio.png)
 
 图2对比了AoS与SoA布局在Cache Line利用上的差异：AoS中key和value交替存储，查询key时会将相邻的value一同加载；SoA中所有key连续存储，单条128B Cache Line可容纳更多key，例如16个8B的key，从而减少查找过程中不必要的value数据加载，降低Cache Line搬运开销，提高缓存利用率。
 
@@ -174,13 +175,20 @@ __aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64
 
 ### Case 2：digest预过滤
 
-**优化目标**：通过引入digest字段，只在digest匹配时才读key确认，同时探测时并行加载digest，做到减少探测所需字节数，提高访存效率。
+**优化目标**：提取key的局部信息作为预过滤字段，预过滤快速淘汰掉大多数key，减少探测所需字节数，提高访存效率。
 
-**核心实现**：digest取key哈希值的高8位，哈希值是key的确定性函数，同一个key建表和查找时算出的哈希值相同，所以digest对不上的Bucket存的一定不是目标key，直接跳过。每轮按4B对齐加载4个连续digest并进行匹配，`__ffs`逐个取出digest匹配的桶位——digest相同不代表key相同，因此根据匹配结果对key进行最终确认。线程处理同上。
+**核心实现**：取key哈希值的高8位作为预筛选字段（digest），哈希值是key的确定性函数，同一个key建表和查找时算出的哈希值相同，所以digest对不上的Bucket存的一定不是目标key，直接跳过。每轮按4B对齐加载4个连续digest并进行匹配，`__ffs`逐个取出digest匹配的桶位——由于digest相同不代表key相同，因此根据匹配结果对key进行最终确认。线程处理同上。
 
 **关键代码**：
 
 ```cpp
+struct SoaTable {
+  uint8_t digest[CAPACITY];
+  uint64_t key[CAPACITY];
+  float value[CAPACITY][DIM];
+};
+SoaTable table;
+
 // digest 取 key 哈希值的高 8 位
 __host__ __aicore__ inline uint8_t DigestOf(uint64_t hashed) {
   return static_cast<uint8_t>(hashed >> 32);
@@ -253,11 +261,11 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
 
 **核心实现**：每个warp的32个线程划分为8个协作组，每组4个线程，共同查询一个key。
 
-**图3　协作组并行访问key示意图**
+**图3　协作组查找示意图**
 
-![协作组查找.drawio](figures/协作组查找示意图.drawio.png)
+![协作组查找示意图](figures/协作组查找示意图.drawio.png)
 
-图3展示了协作组查询key的过程：多个线程读取连续存储的候选key到寄存器，再通过组内投票生成匹配位图，选出命中线程，由其负责处理命中的key，例如 key3，从而减少访存开销并避免多个线程重复处理同一结果。
+图3展示了协作组查询key的过程：多个线程读取连续存储的候选key到寄存器，再通过组内投票生成匹配位图，选出命中线程，由其负责处理命中的key，例如key3，从而减少访存开销并避免多个线程重复处理同一结果。
 
 **关键代码**：
 
@@ -296,9 +304,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 
 前文各Case的性能数据均在负载因子0.9下测得，而负载因子不同，各优化方案的表现也会随之变化：
 
-**图4　不同负载因子下各优化方案的查找性能对比图**
+**图4　性能对比示意图**
 
-![不同负载因子下各优化方案的查找性能对比图](figures/性能对比示意图.png)
+![性能对比示意图](figures/性能对比示意图.png)
 
 图4展示了不同优化方案在不同负载因子下的查找性能变化。当负载因子较低时，协作探测的查找性能始终低于其它Case；但随着负载因子增加，哈希冲突增多、探测序列变长，此时协作探测通过扩大单轮探测范围、合并访存请求，缓解了高负载下的性能退化。
 
@@ -309,10 +317,10 @@ Case 3的关键在于：在保持访存指令数量不变的前提下，减少�
 
 | Case | 核函数 | Task Duration(μs) | read_main_memory_data(MB) | 相对Case 0 |
 | ---- | ------ | :---------------: | :------------------------: | :--------: |
-| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | 1.00x |
-| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | 1.67x |
-| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | 2.71x |
-| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | 3.10x |
+| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | x1.00 |
+| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | x1.67 |
+| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | x2.71 |
+| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | x3.10 |
 
 ## 调优建议
 
@@ -356,14 +364,13 @@ Case 3的关键在于：在保持访存指令数量不变的前提下，减少�
   ```
 
   > **注意：** `SCENARIO_NUM`为CMake缓存变量，切换Case或切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
-  >
 - 编译选项说明
 
   | 选项                        | 可选值       | 说明                                                       |
   | --------------------------- | ------------ | ---------------------------------------------------------- |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR&950DT系列产品） |
-  | `SCENARIO_NUM`            | `0`-`3`  | 样例类型，默认为3。0: AoS逐槽探测基线；1: SoA纯布局改造；2: digest预过滤与word批量比较；3: 协作探测×SWAR组合 |
+  | `SCENARIO_NUM`            | `0`-`3`  | 样例类型，默认为3。0：AoS逐槽探测基线；1：SoA纯布局改造；2：digest预过滤与word批量比较；3：协作探测×SWAR组合 |
 
   - `--cce-res-usage`用于输出寄存器和栈等编译资源信息，便于分析资源使用。
 
