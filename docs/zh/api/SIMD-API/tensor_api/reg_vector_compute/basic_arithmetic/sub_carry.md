@@ -88,7 +88,7 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。src0.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。<br>src0.mask与元素对应的比特位为1时，该元素参与计算。<br>src0.mask与元素对应的比特位为0时，该元素不参与计算。 |
 | src1 | 输入 | 减数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 
 ### 带输入进位标志的减法
@@ -97,7 +97,7 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。src0.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。<br>src0.mask与元素对应的比特位为1时，该元素参与计算。<br>src0.mask与元素对应的比特位为0时，该元素不参与计算。 |
 | src1 | 输入 | 减数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 | carry_src | 输入 | 输入进位标志（对于减法，表示无借位），类型为reg_tensor&lt;bool&gt;。对应元素为1时不额外减1，为0时额外减1。carry_src.mask不参与本次计算。 |
 
