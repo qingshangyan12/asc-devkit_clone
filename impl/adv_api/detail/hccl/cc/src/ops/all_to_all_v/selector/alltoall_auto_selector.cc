@@ -140,12 +140,8 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
             HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
             return SelectorStatus::MATCH;
         }
-        // 对齐 hccl：多级 MESH_1D_CLOS 走 SoleMesh，不进入单级 Concurrent/UBX 判断
-        if (topoInfo->topoLevelNums > 1U) {
-            selectAlgName = "AicpuAllToAllSoleMesh";
-            HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
-            return SelectorStatus::MATCH;
-        }
+        // 注：多级 MESH_1D_CLOS 对齐 hccl 走 SoleMesh 被 executor 的双实例 hierarchy 契约阻塞
+        // （TopoMatch1D 为扁平结构），保持既有行为：落入下方单级 Concurrent/UBX 判断
     }
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS || topoInfo->level0PcieMix) {
         HCCL_WARNING(

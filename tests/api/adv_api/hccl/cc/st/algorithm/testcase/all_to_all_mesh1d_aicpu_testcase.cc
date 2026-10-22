@@ -228,28 +228,35 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_mesh1d_clos_nullptr_sendcounts_sel
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX"); // 0 > 512 为假 → 最小路径
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_selects_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_keeps_concurrent_ubx_judgment)
 {
     AlltoAllAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
-    topo.topoLevelNums = 2U;                      // 多级
-    u64 sendCounts[4] = {600U, 600U, 600U, 600U}; // 单级时 600>512 会选 Concurrent
+    topo.topoLevelNums = 2U; // 多级
+    u64 sendCounts[4] = {600U, 600U, 600U, 600U};
     OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
     param.all2AllVDataDes.sendCounts = sendCounts;
     std::string algName;
+    // 多级 MESH_1D_CLOS 保持既有行为：落入单级 Concurrent/UBX 判断
+    // （对齐 hccl 走 SoleMesh 被 executor 的 MESH_1D_CLOS 双实例 hierarchy 契约阻塞，TopoMatch1D 为扁平结构）
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllSoleMesh"); // 多级对齐 hccl：不做 Concurrent 判断
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent"); // 600>512 且 mesh==clos 且 4P
+
+    param.all2AllVDataDes.sendCounts = nullptr; // 多级 + nullptr → 最小路径 UBX
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_selects_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_is_not_supported)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
-    topo.topoLevelNums = 2U; // 现状：topoLevelNums != 1U → NOT_MATCH
+    topo.topoLevelNums = 2U;
     OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    // 多级 MESH_1D_CLOS 不支持：对齐 hccl 走 SoleMesh 被 executor 的
+    // MESH_1D_CLOS 双实例 hierarchy 契约阻塞（TopoMatch1D 为扁平结构），保持 NOT_MATCH
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
 }
 
 } // namespace checker
