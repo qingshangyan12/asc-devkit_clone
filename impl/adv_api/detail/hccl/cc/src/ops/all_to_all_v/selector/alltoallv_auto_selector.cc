@@ -38,6 +38,12 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
             topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
+        // 单层 MESH_1D：CCU SoleMesh（通道 per peer 直连）
+        selectAlgName = "CcuSchedAllToAllVSoleMesh";
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
     if (topoInfo->level0Topo == Level0Shape::CLOS && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
         // 大禹纯 CLOS 单层：CCU SoleMesh（DIE0-only 建链，模板内做 die 过滤）
         selectAlgName = "CcuSchedAllToAllVSoleMesh";
