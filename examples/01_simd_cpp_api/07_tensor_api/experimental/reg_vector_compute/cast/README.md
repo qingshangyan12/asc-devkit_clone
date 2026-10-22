@@ -2,9 +2,9 @@
 
 ## 概述
 
-本样例组合实验性 Tensor API 的寄存器加载、类型转换和存储能力，完成逐元素数据类型转换。样例输入和输出均为 `[256]` 的一维 Tensor。
+本样例组合实验性 Tensor API 的寄存器加载、类型转换和存储能力，完成逐元素数据类型转换。所有场景输入和输出均为 `[512]` 个逻辑元素的一维 Tensor。
 
-样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4` 访存模式和 `deinterleave` 数据重排。计算关系如下：
+样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的7种转换场景（编号1至7），并演示不同位宽转换时的 `unpack`、`unpack4` 访存模式和 `deinterleave` 数据重排。计算关系如下：
 
 ```text
 y[i] = convert<To>(x[i])
@@ -12,7 +12,7 @@ y[i] = convert<To>(x[i])
 
 ## 支持的产品
 
-- Ascend 950PR&950DT系列产品
+- Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 
@@ -38,6 +38,7 @@ y[i] = convert<To>(x[i])
   | 4 | `int32_t` | `uint8_t` | `zero` | `rint` | `sat` | 饱和到 `[0, 255]` 后转换为8位无符号整数 |
   | 5 | `bfloat16_t` | `float` | `zero` | `rint` | `not_sat` | `bfloat16_t` 扩展为 `float` |
   | 6 | `float` | `bfloat16_t` | `zero` | `rint` | `not_sat` | `float` 舍入为 `bfloat16_t` |
+  | 7 | UB：`int4b_t`，寄存器：`int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | 直接加载512个`int4b_t`，通过四种 layout 分别转换每组4字节中的对应字节，每次得到128个 half，并按 layout 顺序分段写回。|
 
 - 样例规格：
 
@@ -55,8 +56,8 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">x</td>
-      <td align="center">[256]</td>
-      <td align="center">half/float/int8_t/int32_t/bfloat16_t</td>
+      <td align="center">[512]</td>
+      <td align="center">half/float/int8_t/int32_t/bfloat16_t/int4b_t</td>
       <td align="center">一维</td>
     </tr>
     <tr>
@@ -68,8 +69,8 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">y</td>
-      <td align="center">[256]</td>
-      <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t</td>
+      <td align="center">[512]</td>
+      <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t/half</td>
       <td align="center">一维</td>
     </tr>
     <tr>
@@ -80,18 +81,26 @@ y[i] = convert<To>(x[i])
 
   | SCENARIO_NUM | `input/input_x.bin` | 输入大小 | `output/output.bin` / `output/golden.bin` | 输出大小 |
   | --- | --- | --- | --- | --- |
-  | 1 | 256个 `half` | 512 B | 256个 `int32_t` | 1024 B |
-  | 2 | 256个 `float` | 1024 B | 256个 `int16_t` | 512 B |
-  | 3 | 256个 `int8_t` | 256 B | 256个 `int32_t` | 1024 B |
-  | 4 | 256个 `int32_t` | 1024 B | 256个 `uint8_t` | 256 B |
-  | 5 | 256个 `bfloat16_t` | 512 B | 256个 `float` | 1024 B |
-  | 6 | 256个 `float` | 1024 B | 256个`bfloat16_t` | 512 B |
+  | 1 | 512个 `half` | 1024 B | 512个 `int32_t` | 2048 B |
+  | 2 | 512个 `float` | 2048 B | 512个 `int16_t` | 1024 B |
+  | 3 | 512个 `int8_t` | 512 B | 512个 `int32_t` | 2048 B |
+  | 4 | 512个 `int32_t` | 2048 B | 512个 `uint8_t` | 512 B |
+  | 5 | 512个 `bfloat16_t` | 1024 B | 512个 `float` | 2048 B |
+  | 6 | 512个 `float` | 2048 B | 512个 `bfloat16_t` | 1024 B |
+  | 7 | 512个 `int4b_t`（256个字节） | 256 B | 四个 quarter 的128个 `half`，共512个 | 1024 B |
+
+  场景7在GM和UB上直接构造 `int4b_t` Tensor，layout 均表示512个逻辑元素。
+  普通 `copy(x_ub, x_gm)` 由公共 B4 搬运逻辑处理256字节 packed 输入。
+  低半字节对应偶数元素，高半字节对应奇数元素。
+  普通 `load` 一次加载全部512个逻辑元素，四种 layout 分别转换128个元素，
+  然后使用普通 `store` 写入输出的四个连续区段。
+  输入覆盖全部256种打包字节，结果按half的16位编码逐项精确比较，无需浮点容差。
 
 - 样例实现：
 
   - Kernel关键步骤
 
-    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和一维 layout 构造GM、UB Tensor；layout 使用 `make_shape(256)` 和 `make_stride(1)`。
+    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和一维 layout 构造GM、UB Tensor；layout 使用 `make_shape(512)` 和 `make_stride(1)`。
     2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::experimental::update_mask` 设置有效元素掩码。
     4. 相同位宽使用普通 `load/store`；扩宽转换使用 `unpack` 或 `unpack4` 加载；窄化转换使用 `deinterleave` 压紧寄存器数据后调用普通 `store`。
@@ -116,7 +125,7 @@ y[i] = convert<To>(x[i])
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -136,13 +145,15 @@ y[i] = convert<To>(x[i])
   ./demo
   ```
 
-  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
+  所有场景使用相同的编译和执行流程，仅需修改 `SCENARIO_NUM`。可选编号为1至7。生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。
 
   使用NPU仿真时，可分别增加以下编译选项：
 
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
+
+  构建使用 CANN 包内的 Tensor API 和 C API 头文件；验证本仓库代码时，应先同步到包内对应目录。
 
   切换运行模式、芯片型号或场景时，建议清除 `build` 目录中的CMake缓存后重新配置。
 
@@ -152,7 +163,7 @@ y[i] = convert<To>(x[i])
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
-  | `SCENARIO_NUM` | 类型转换场景编号，必选，取值范围为1至6。 |
+  | `SCENARIO_NUM` | 类型转换场景编号，必选，可选编号为1至7。 |
 
 - 执行结果
 
