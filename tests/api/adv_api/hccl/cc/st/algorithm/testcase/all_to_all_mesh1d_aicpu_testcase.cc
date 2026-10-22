@@ -216,4 +216,40 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, peer_group_rounds_cover_18_ranks)
         sortedFirstRound, std::vector<u32>({1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 10U, 11U, 12U, 13U, 14U, 15U, 16U, 17U}));
     EXPECT_EQ(secondRound, std::vector<u32>({9U}));
 }
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = nullptr; // tiling 期常态
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX"); // 0 > 512 为假 → 最小路径
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_selects_sole_mesh)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U;                      // 多级
+    u64 sendCounts[4] = {600U, 600U, 600U, 600U}; // 单级时 600>512 会选 Concurrent
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMesh"); // 多级对齐 hccl：不做 Concurrent 判断
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_selects_sole_mesh)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U; // 现状：topoLevelNums != 1U → NOT_MATCH
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
 } // namespace checker
