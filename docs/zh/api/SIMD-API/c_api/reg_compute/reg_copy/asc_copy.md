@@ -187,13 +187,15 @@ void print_data(const char* label, const std::vector<T>& values)
 
 constexpr uint32_t ELEMENT_COUNT = 260;
 constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (ELEMENT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t DATA_BYTES = ELEMENT_COUNT * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
-// one_repeat_size的单位为uint8_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void load(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = ELEMENT_COUNT;
     for (uint16_t i = 0; i < repeat_time; ++i) {
     const uint32_t offset = i * ELEMENTS_PER_REGISTER;

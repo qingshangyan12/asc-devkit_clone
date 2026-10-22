@@ -75,14 +75,16 @@ __aicore__ inline void asc_vf_call(Args &&...args)
 #include "acl/acl.h"
 
 constexpr uint32_t ELEMENT_COUNT = 67;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = 128;
 
 constexpr uint32_t DATA_BYTES = ELEMENT_COUNT * sizeof(float);
 constexpr uint32_t PADDED_DATA_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
-// one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素。
 __simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;

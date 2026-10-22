@@ -160,18 +160,20 @@ bool compare_data(const std::vector<float>& actual, const std::vector<float>& ex
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t FLOAT_COUNT = 133;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (FLOAT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
 constexpr uint32_t PADDED_FLOAT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t HALF_COUNT = FLOAT_COUNT * 2;
 constexpr uint32_t PADDED_HALF_COUNT = REPEAT_COUNT * 128;
 
 constexpr uint32_t DATA_BYTES = FLOAT_COUNT * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = FLOAT_COUNT;
-// one_repeat_size的单位为float；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void compute(__ubuf__ float* float_dst, __ubuf__ float* half_even_dst,
     __ubuf__ float* half_odd_dst, __ubuf__ float* float_src0, __ubuf__ float* float_src1,
     __ubuf__ half* half_src0, __ubuf__ half* half_src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = FLOAT_COUNT;
     uint32_t remaining_length_2 = HALF_COUNT;
     for (uint16_t i = 0; i < repeat_time; ++i) {

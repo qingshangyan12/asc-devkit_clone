@@ -212,7 +212,7 @@ __global__ __vector__ void asc_copy_gm2ub_align_arch3510_kernel(__gm__ uint8_t* 
 {
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
-    // 将INPUT_BYTES字节从GM搬入UB。
+    // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对对齐搬运结果。
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
     // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
     asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);

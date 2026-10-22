@@ -143,23 +143,29 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+// 本示例按256字节的寄存器宽度预留UB空间，每个寄存器可容纳256 / sizeof(int32_t) = 64个元素。
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+// 选取137个有效元素，覆盖两个完整寄存器和一个仅含9个有效元素的尾块。
 constexpr uint32_t DATA_BYTES = 137 * sizeof(int32_t);
+// 将字节数换算为元素数，供循环次数和有效元素掩码计算使用。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(int32_t);
+// 向上取整得到3个寄存器块；直接整除只得到2，会漏掉尾块。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// UB容量扩展为3 * 64 = 192个元素，保证尾轮整寄存器加载时不越过已分配空间。
+// 额外空间仅用于安全加载，计算和写回的有效范围仍由掩码及TOTAL_LENGTH控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 
-// one_repeat_size的单位为int32_t元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(int32_t)字节。
 __simd_vf__ inline void max_vf(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int32_t dst_reg;
     vector_int32_t src0_reg;
     vector_int32_t src1_reg;
+    // 记录尚未处理的有效元素数，由asc_update_mask_b32逐轮扣减。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;
+        // 三轮分别处理64、64、9个元素；尾轮只计算并存储前9个有效元素。
         vector_bool mask = asc_update_mask_b32(remaining_length);
         asc_loadalign(src0_reg, src0 + offset);
         asc_loadalign(src1_reg, src1 + offset);
@@ -186,6 +192,7 @@ __global__ __vector__ void asc_max_kernel(__gm__ int32_t* dst, __gm__ int32_t* s
     asc_unlock(PIPE_V, MUTEX_ID);
 
     asc_lock(PIPE_MTE3, MUTEX_ID);
+    // 只搬出137个有效元素，不把UB中为整寄存器加载预留的填充空间写入GM。
     asc_copy_ub2gm_align(dst, dst_local, TOTAL_LENGTH * sizeof(int32_t));
     asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();

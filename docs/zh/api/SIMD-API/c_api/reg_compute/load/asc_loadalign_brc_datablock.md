@@ -183,17 +183,19 @@ constexpr uint32_t INPUT_ELEMENTS = AscendC::Std::ceil_div(OUTPUT_ELEMENTS, 256)
 constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint8_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint8_t);
 constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = AscendC::Std::ceil_div(OUTPUT_ELEMENTS, ELEMENTS_PER_REGISTER);
 constexpr uint32_t OUTPUT_STORAGE_ELEMENTS = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t INPUT_STORAGE_ELEMENTS = REPEAT_COUNT * 32;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = OUTPUT_ELEMENTS;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_brc_datablock_vf(__ubuf__ uint8_t* output,
                                                        __ubuf__ uint8_t* input,
                                                        uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    // one_repeat_size的单位为输出uint8_t元素；第i轮输出偏移i * one_repeat_size字节，输入偏移i * 32字节。
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = OUTPUT_ELEMENTS;
     vector_uint8_t dst_reg;
     for (uint16_t i = 0; i < repeat_time; ++i) {

@@ -185,13 +185,13 @@ constexpr uint32_t PADDED_DATA_ELEMENTS =
 constexpr uint32_t BUFFER_ELEMENTS = PADDED_DATA_ELEMENTS + 32;
 constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint8_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_ELEMENTS;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadunalign_postupdate_vf(__ubuf__ uint8_t* dst,
                                                       __ubuf__ uint8_t* src,
                                                       uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    // one_repeat_size的单位为uint8_t元素；每轮输入、输出指针均后更新本轮valid_count个字节。
     vector_load_unalign load_unalign_reg;
     vector_store_unalign store_unalign_reg;
     vector_uint8_t dst_reg;

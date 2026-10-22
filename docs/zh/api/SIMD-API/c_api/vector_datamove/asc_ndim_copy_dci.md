@@ -89,6 +89,7 @@ __global__ __vector__ void asc_ndim_copy_dci_kernel(__gm__ uint8_t* output, __gm
 {
     asc_init();
     __ubuf__ uint8_t local[64];
+    // 输入每行4字节，左右分别填充2字节和3字节，因此输出每行扩展为9字节。
     asc_set_ndim_loop0_stride(1, 1);
     asc_set_ndim_loop1_stride(6, 3);
     asc_set_ndim_loop2_stride(0, 0);

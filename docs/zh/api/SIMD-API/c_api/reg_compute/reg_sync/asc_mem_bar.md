@@ -126,21 +126,24 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t ELEMENT_COUNT = 323;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (ELEMENT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t OUTPUT_COUNT = ELEMENTS_PER_REGISTER;
 constexpr uint32_t INPUT_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(float);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(float);
-// one_repeat_size的单位为float；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void accumulate_vf(__ubuf__ float* data, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0;
     vector_float src1;
     vector_float dst;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = ELEMENT_COUNT > ELEMENTS_PER_REGISTER ?
         ELEMENT_COUNT - ELEMENTS_PER_REGISTER : 0;
 

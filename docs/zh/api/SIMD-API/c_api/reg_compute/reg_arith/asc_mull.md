@@ -126,14 +126,15 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t DATA_BYTES = 137 * sizeof(uint32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
 
-// one_repeat_size的单位为uint32_t元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(uint32_t)字节。
 __simd_vf__ inline void mull_vf(__ubuf__ uint32_t* output_low,
                                 __ubuf__ uint32_t* output_high,
                                 __ubuf__ uint32_t* input0,
@@ -143,6 +144,7 @@ __simd_vf__ inline void mull_vf(__ubuf__ uint32_t* output_low,
     vector_uint32_t src1;
     vector_uint32_t dst0;
     vector_uint32_t dst1;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;

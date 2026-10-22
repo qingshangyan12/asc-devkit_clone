@@ -186,17 +186,18 @@ constexpr uint32_t INPUT_ELEMENTS = 1030;
 constexpr uint32_t OUTPUT_ELEMENTS = 1030;
 constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
 constexpr uint32_t PAIR_COUNT = (OUTPUT_ELEMENTS + 1) / 2;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = AscendC::Std::ceil_div(PAIR_COUNT, ELEMENTS_PER_REGISTER);
 constexpr uint32_t STORAGE_ELEMENTS = REPEAT_COUNT * ELEMENTS_PER_REGISTER * 2;
 constexpr uint32_t INPUT_BYTES = STORAGE_ELEMENTS * sizeof(uint8_t);
 constexpr uint32_t OUTPUT_BYTES = STORAGE_ELEMENTS * sizeof(uint8_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = PAIR_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_deintlv_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input,
                                                  uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    // one_repeat_size的单位为单路输出uint8_t元素；每轮输入偏移2 * one_repeat_size字节，输出两路各偏移one_repeat_size字节。
     vector_uint8_t even_reg;
     vector_uint8_t odd_reg;
     uint32_t remaining_length_even = (OUTPUT_ELEMENTS + 1) / 2;

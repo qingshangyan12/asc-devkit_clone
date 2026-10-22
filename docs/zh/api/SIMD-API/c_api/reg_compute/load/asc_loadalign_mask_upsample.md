@@ -90,6 +90,7 @@ constexpr uint32_t MASK_OUTPUT_WORD_COUNT = 11;
 constexpr uint32_t MASK_DATA_WORDS_PER_REPEAT = 4;
 constexpr uint32_t MASK_STORAGE_WORDS_PER_REPEAT = 8;
 constexpr uint32_t MASK_OUTPUT_WORDS_PER_REPEAT = 8;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (MASK_OUTPUT_WORD_COUNT + MASK_OUTPUT_WORDS_PER_REPEAT - 1) / MASK_OUTPUT_WORDS_PER_REPEAT;
 constexpr uint32_t MASK_STORAGE_WORD_COUNT = MASK_STORAGE_WORDS_PER_REPEAT * REPEAT_COUNT;
@@ -97,9 +98,9 @@ constexpr uint32_t MASK_OUTPUT_STORAGE_WORD_COUNT = MASK_OUTPUT_WORDS_PER_REPEAT
 constexpr uint32_t TOTAL_MASK_STORAGE_BYTES = MASK_STORAGE_WORD_COUNT * sizeof(uint32_t);
 constexpr uint32_t TOTAL_MASK_OUTPUT_BYTES = MASK_OUTPUT_STORAGE_WORD_COUNT * sizeof(uint32_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = MASK_OUTPUT_WORD_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
-// one_repeat_size的单位为掩码存储字；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void asc_loadalign_mask_upsample_vf(
     __ubuf__ uint32_t* output, __ubuf__ uint32_t* mask_input, uint32_t one_repeat_size, uint16_t repeat_time)
 {

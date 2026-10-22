@@ -125,16 +125,18 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t DATA_BYTES = 133 * sizeof(uint32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint8_t MUTEX_ID = 0;
 
-// one_repeat_size的单位为uint32_t元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(uint32_t)字节。
 __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;
@@ -152,7 +154,6 @@ __global__ __vector__ void asc_reduce_min_datablock_kernel(__gm__ uint32_t* dst,
 {
     asc_init();
     __ubuf__ uint32_t dst_local[PADDED_ELEMENT_COUNT], src_local[PADDED_ELEMENT_COUNT];
-    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
     asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(src_local, src, PADDED_ELEMENT_COUNT * sizeof(uint32_t));
     asc_unlock(PIPE_MTE2, MUTEX_ID);

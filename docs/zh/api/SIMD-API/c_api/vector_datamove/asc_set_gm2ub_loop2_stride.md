@@ -103,6 +103,7 @@ __global__ __vector__ void asc_set_gm2ub_loop2_stride_kernel(__gm__ uint8_t* out
     asc_set_gm2ub_loop2_stride(128, 64);
     asc_copy_gm2ub_align(local, input, 1, 32, 0, 0, false,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+    // 搬运完成后恢复默认循环次数，避免该寄存器配置影响后续搬运。
     asc_set_gm2ub_loop_size(1, 1);
     // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
     asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);

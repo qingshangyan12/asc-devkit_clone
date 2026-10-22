@@ -113,15 +113,16 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
 constexpr uint32_t INPUT_COUNT = 300;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (INPUT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
 constexpr uint32_t PADDED_INPUT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BIN_COUNT = 256;
 constexpr uint32_t PADDED_INPUT_BYTES = PADDED_INPUT_COUNT * sizeof(uint8_t);
 constexpr uint32_t OUTPUT_BYTES = BIN_COUNT * sizeof(uint16_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = INPUT_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
-// one_repeat_size的单位为uint8_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void histogram_vf(__ubuf__ uint16_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint8_t src;
@@ -131,6 +132,7 @@ __simd_vf__ inline void histogram_vf(__ubuf__ uint16_t* output, __ubuf__ uint8_t
 
     asc_duplicate_scalar(dst0, static_cast<uint16_t>(0));
     asc_duplicate_scalar(dst1, static_cast<uint16_t>(0));
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = INPUT_COUNT;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;

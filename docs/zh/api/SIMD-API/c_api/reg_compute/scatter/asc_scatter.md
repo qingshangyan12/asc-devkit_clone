@@ -140,8 +140,8 @@ constexpr uint32_t INPUT_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
 constexpr uint32_t DATA_BYTES = INPUT_BYTES;
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
-// one_repeat_size的单位为uint16_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void scatter_vf(__ubuf__ uint16_t* output,
                                     __ubuf__ uint16_t* input,
                                     __ubuf__ uint16_t* indices, uint32_t one_repeat_size, uint16_t repeat_time)

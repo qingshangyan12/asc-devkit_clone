@@ -147,14 +147,15 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t DATA_BYTES = 137 * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr float COMPARE_VALUE = 3.0f;
 
-// one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(float)字节。
 __simd_vf__ inline void compare(__ubuf__ float* dst, __ubuf__ float* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
@@ -162,6 +163,7 @@ __simd_vf__ inline void compare(__ubuf__ float* dst, __ubuf__ float* src, uint32
     vector_float zeros;
     vector_float src_reg;
     vector_bool predicate;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;

@@ -121,18 +121,20 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
 constexpr uint32_t DATA_BYTES = 133 * sizeof(half);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(half);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(half);
 constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(half);
 
-// one_repeat_size的单位为half元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(half)字节。
 __simd_vf__ inline void reduce(__ubuf__ half* dst, __ubuf__ half* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst_reg, src_reg;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = 2;
     vector_bool result_mask = asc_update_mask_b16(remaining_length);
     uint32_t remaining_length_2 = TOTAL_LENGTH;

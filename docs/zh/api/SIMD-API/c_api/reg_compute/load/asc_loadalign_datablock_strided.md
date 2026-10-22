@@ -109,6 +109,7 @@ constexpr uint32_t DATABLOCK_COUNT = 11;
 constexpr uint16_t BLOCK_STRIDE = 2;
 constexpr uint16_t REPEAT_STRIDE = 0;
 constexpr uint32_t START_BLOCK = 1;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (DATABLOCK_COUNT + DATABLOCKS_PER_REGISTER - 1) / DATABLOCKS_PER_REGISTER;
 constexpr uint32_t INPUT_BYTES_PER_REPEAT = 16 * DATABLOCK_BYTES;
@@ -116,14 +117,15 @@ constexpr uint32_t OUTPUT_BYTES_PER_REPEAT = DATABLOCKS_PER_REGISTER * DATABLOCK
 constexpr uint32_t INPUT_BYTES = INPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATABLOCK_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATABLOCK_BYTES;
 constexpr uint8_t MUTEX_ID = 0;
 
-// one_repeat_size的单位为数据块；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void asc_loadalign_datablock_strided_vf(
     __ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = DATABLOCK_COUNT * DATABLOCK_BYTES;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         vector_bool mask = asc_update_mask_b8(remaining_length);
@@ -141,7 +143,6 @@ __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
     asc_init();
     __ubuf__ uint8_t input_local[INPUT_BYTES];
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
     asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_copy_gm2ub_align(output_local, output, OUTPUT_BYTES);

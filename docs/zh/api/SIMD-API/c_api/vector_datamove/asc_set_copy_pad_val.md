@@ -108,6 +108,7 @@ __global__ __vector__ void asc_set_copy_pad_val_kernel(__gm__ uint8_t* output, _
 {
     asc_init();
     __ubuf__ uint8_t local[OUTPUT_BYTES];
+    // 将填充值设为42，以便和输入数据区分并验证每行尾部的8字节Padding。
     asc_set_copy_pad_val(static_cast<uint8_t>(42));
     asc_copy_gm2ub_align(local, input, 2, 24, 4, 4, true,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 24, 32);

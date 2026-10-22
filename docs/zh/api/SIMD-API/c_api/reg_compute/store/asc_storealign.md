@@ -329,14 +329,16 @@ void print_data(const char* label, const std::vector<T>& values)
 
 constexpr uint32_t REGISTER_BYTES = 256;
 constexpr uint32_t BUFFER_BYTES = 260;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (BUFFER_BYTES + REGISTER_BYTES - 1) / REGISTER_BYTES;
 constexpr uint32_t STORAGE_BYTES = REPEAT_COUNT * REGISTER_BYTES;
 
 constexpr uint32_t DATA_BYTES = BUFFER_BYTES;
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = BUFFER_BYTES / sizeof(uint8_t);
-// one_repeat_size的单位为uint8_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void store_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = BUFFER_BYTES;
     for (uint16_t i = 0; i < repeat_time; ++i) {
       vector_bool mask = asc_update_mask_b8(remaining_length);

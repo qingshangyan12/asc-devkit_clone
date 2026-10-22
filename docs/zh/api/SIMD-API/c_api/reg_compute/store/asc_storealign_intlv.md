@@ -194,9 +194,9 @@ constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = INPUT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = STORE_COUNT + 5;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
-// one_repeat_size的单位为交织输出元素；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void store_intlv_vf(__ubuf__ uint16_t* output,
                                        __ubuf__ uint16_t* input0,
                                        __ubuf__ uint16_t* input1, uint32_t one_repeat_size, uint16_t repeat_time)

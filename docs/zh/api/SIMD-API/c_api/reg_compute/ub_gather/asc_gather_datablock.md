@@ -217,18 +217,20 @@ void PrintData(const char* label, const std::vector<T>& values)
 constexpr uint32_t DATA_BLOCK_SIZE = 32;
 constexpr uint32_t DATA_BLOCKS_PER_REGISTER = 8;
 constexpr uint32_t DATA_BLOCK_COUNT = 9;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (DATA_BLOCK_COUNT + DATA_BLOCKS_PER_REGISTER - 1) / DATA_BLOCKS_PER_REGISTER;
 constexpr uint32_t PADDED_DATA_BLOCK_COUNT = REPEAT_COUNT * DATA_BLOCKS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = DATA_BLOCK_SIZE * DATA_BLOCK_COUNT;
 constexpr uint32_t PADDED_BUFFER_BYTES = DATA_BLOCK_SIZE * PADDED_DATA_BLOCK_COUNT;
 constexpr uint32_t INDEX_WORDS = 64;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BLOCK_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATA_BLOCK_SIZE;
-// one_repeat_size的单位为数据块；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void gather_datablock_vf(
     __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index, uint32_t one_repeat_size, uint16_t repeat_time)
 {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = BUFFER_BYTES;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t block_offset = i * one_repeat_size;

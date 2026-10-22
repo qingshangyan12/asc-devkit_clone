@@ -212,8 +212,6 @@ constexpr uint32_t REPEAT_COUNT =
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint8_t MUTEX_ID = 0;
 
-// one_repeat_size的单位为int32_t元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(int32_t)字节。
 __simd_vf__ inline void add_vf(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int32_t dst_reg;
@@ -240,7 +238,6 @@ __global__ __vector__ void asc_add_kernel(__gm__ int32_t* dst, __gm__ int32_t* s
     __ubuf__ int32_t src0_local[PADDED_ELEMENT_COUNT];
     __ubuf__ int32_t src1_local[PADDED_ELEMENT_COUNT];
 
-    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
     asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(src0_local, src0, TOTAL_LENGTH * sizeof(int32_t));
     asc_copy_gm2ub_align(src1_local, src1, TOTAL_LENGTH * sizeof(int32_t));

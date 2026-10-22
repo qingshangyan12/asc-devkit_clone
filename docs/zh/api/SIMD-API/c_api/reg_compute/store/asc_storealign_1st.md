@@ -191,14 +191,15 @@ constexpr uint32_t ADDR_STRIDE = 7;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = REPEAT_TIMES;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
-// one_repeat_size的单位为uint16_t元素；每轮处理一个VL，最后一轮仅处理remaining_length个首元素。
 __simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
     addr_reg offset;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint16_t valid_count = remaining_length > one_repeat_size ? one_repeat_size : remaining_length;

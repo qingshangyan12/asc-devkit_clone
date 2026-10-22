@@ -139,13 +139,14 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 constexpr uint32_t SRC_ELEMENTS_PER_REGISTER = 256;
 constexpr uint32_t DST_ELEMENTS_PER_REGISTER = 128;
 constexpr uint32_t SRC_COUNT = 517;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (SRC_COUNT + SRC_ELEMENTS_PER_REGISTER - 1) / SRC_ELEMENTS_PER_REGISTER;
 constexpr uint32_t PADDED_SRC_COUNT = REPEAT_COUNT * SRC_ELEMENTS_PER_REGISTER;
 constexpr uint32_t DST_COUNT = REPEAT_COUNT * DST_ELEMENTS_PER_REGISTER;
 
 constexpr uint32_t DATA_BYTES = SRC_COUNT * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = SRC_COUNT;
-// one_repeat_size的单位为uint8_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void histogram(__ubuf__ uint16_t* low, __ubuf__ uint16_t* high, __ubuf__ uint8_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length_src = SRC_COUNT;

@@ -149,16 +149,17 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
 constexpr uint32_t DATA_BYTES = 557 * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT =
     (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t HALF_COUNT = ELEMENTS_PER_REGISTER / 2;
 constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint8_t);
 
-// one_repeat_size的单位为uint8_t元素；第i轮指针偏移i * one_repeat_size个元素，
-// 对应i * one_repeat_size * sizeof(uint8_t)字节。
 __simd_vf__ inline void intlv_vf(__ubuf__ uint8_t* output0, __ubuf__ uint8_t* output1,
                                  __ubuf__ uint8_t* input0, __ubuf__ uint8_t* input1, uint32_t one_repeat_size, uint16_t repeat_time)
 {

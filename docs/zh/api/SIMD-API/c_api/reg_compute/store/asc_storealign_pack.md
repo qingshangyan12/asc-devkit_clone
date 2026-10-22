@@ -308,7 +308,6 @@ constexpr uint8_t SENTINEL = 0xa5;
 
 constexpr uint8_t MUTEX_ID = 0;
 
-// one_repeat_size表示每轮写出的打包字节数（16），与目的地址步长STEP_BYTES（32字节）不同。
 // 此掩码寄存器重载不支持尾块掩码：末轮仍写满16字节，尾部填充在预留UB空间内校验。
 __simd_vf__ inline void pack_vf(__ubuf__ uint8_t* dst, __ubuf__ uint32_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
@@ -330,7 +329,6 @@ __global__ __vector__ void asc_storealign_pack_kernel(__gm__ uint8_t* dst, __gm_
     asc_init();
     __ubuf__ uint8_t dst_local[OUTPUT_BYTES];
     __ubuf__ uint32_t src_local[MASK_BYTES / sizeof(uint32_t)];
-    // 同一MUTEX_ID串联搬入、计算和搬出，各阶段的lock/unlock严格成对。
     asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(dst_local, dst, OUTPUT_BYTES);
     asc_copy_gm2ub(src_local, src, MASK_BYTES);

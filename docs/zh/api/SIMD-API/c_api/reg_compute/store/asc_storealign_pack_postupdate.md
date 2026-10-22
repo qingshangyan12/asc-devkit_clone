@@ -177,7 +177,6 @@ constexpr uint32_t SECTION_BYTES = (REPEAT_TIME + 1) * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
-// one_repeat_size表示每轮写出的打包字节数（16），与目的地址步长STEP_BYTES（32字节）不同。
 // 此掩码寄存器重载不支持尾块掩码：末轮仍写满16字节，尾部填充在预留UB空间内校验。
 __simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* dst,
                                            __ubuf__ uint32_t* src, uint32_t one_repeat_size, uint16_t repeat_time)

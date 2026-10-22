@@ -189,13 +189,14 @@ constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
 constexpr uint32_t BUFFER_STORAGE_ELEMENTS =
     AscendC::Std::ceil_div(BUFFER_ELEMENTS, ELEMENTS_PER_REGISTER) * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = BUFFER_ELEMENTS;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_postupdate_vf(__ubuf__ uint8_t* output,
                                                     __ubuf__ uint8_t* input,
                                                     uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    // one_repeat_size的单位为uint8_t元素；每轮输出偏移one_repeat_size字节，输入后更新相同字节数。
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = BUFFER_ELEMENTS;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         vector_bool mask = asc_update_mask_b8(remaining_length);

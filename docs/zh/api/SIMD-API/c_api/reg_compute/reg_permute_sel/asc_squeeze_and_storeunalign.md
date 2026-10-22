@@ -121,6 +121,7 @@ constexpr uint8_t MUTEX_ID = 0;
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t INPUT_COUNT = 139;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
 constexpr uint32_t REPEAT_COUNT = (INPUT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
 constexpr uint32_t PADDED_INPUT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t SELECTED_PER_REGISTER = 22;
@@ -131,8 +132,8 @@ constexpr uint32_t PADDED_OUTPUT_COUNT = ((OUTPUT_COUNT + ELEMENTS_PER_REGISTER 
 constexpr uint32_t LAST_SELECTED_COUNT = ((INPUT_COUNT % ELEMENTS_PER_REGISTER) + 2) / 3;
 
 constexpr uint32_t DATA_BYTES = INPUT_COUNT * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = INPUT_COUNT;
-// one_repeat_size的单位为float；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void pack_selected(
     __ubuf__ float* output, __ubuf__ float* register_output, __ubuf__ float* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
@@ -141,6 +142,7 @@ __simd_vf__ inline void pack_selected(
     vector_store_unalign unalign_reg;
     vector_bool pattern_mask = asc_create_mask_b32(PAT_M3);
     vector_bool full_mask = asc_create_mask_b32(PAT_ALL);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = INPUT_COUNT;
     vector_bool store_mask = asc_create_mask_b32(PAT_ALL);
 

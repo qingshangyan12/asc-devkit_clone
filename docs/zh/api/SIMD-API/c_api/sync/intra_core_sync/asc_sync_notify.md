@@ -136,6 +136,7 @@ __global__ __vector__ void asc_sync_notify_kernel(__gm__ float* output, __gm__ f
     __ubuf__ float x[ELEMENTS], y[ELEMENTS], z[ELEMENTS];
     asc_copy_gm2ub_align(x, src0, BYTES);
     asc_copy_gm2ub_align(y, src1, BYTES);
+    // 计算读取搬入结果，必须等待MTE2完成，避免PIPE_V读取未完成的数据。
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     add_vf(z, x, y);

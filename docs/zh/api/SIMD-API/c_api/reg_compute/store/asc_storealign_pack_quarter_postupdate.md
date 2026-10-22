@@ -113,6 +113,7 @@ constexpr uint8_t MUTEX_ID = 0;
 constexpr uint32_t ELEMENT_COUNT = 67;
 constexpr uint32_t PACKED_BYTES = 64;
 constexpr uint32_t REPEAT_TIMES = 2;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
 constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_TIMES * PACKED_BYTES;
 constexpr uint32_t INPUT_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint32_t);
 constexpr uint32_t STEP_BYTES = 256;
@@ -121,9 +122,9 @@ constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr int32_t OFFSET_ELEMENTS = 64;
 constexpr uint8_t SENTINEL = 0xa5;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
 constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
-// one_repeat_size的单位为uint32_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void pack_quarter_postupdate_vf(__ubuf__ uint8_t* output,
                                                    __ubuf__ uint32_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
@@ -133,6 +134,7 @@ __simd_vf__ inline void pack_quarter_postupdate_vf(__ubuf__ uint8_t* output,
     __ubuf__ int32_t* dst_i32 = reinterpret_cast<__ubuf__ int32_t*>(output);
     __ubuf__ uint32_t* dst_u32 = reinterpret_cast<__ubuf__ uint32_t*>(output + SECTION_BYTES);
     __ubuf__ float* dst_f32 = reinterpret_cast<__ubuf__ float*>(output + 2 * SECTION_BYTES);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = ELEMENT_COUNT;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input) + i * PACKED_BYTES);
@@ -175,6 +177,7 @@ int main()
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = 0x5a000000u | i;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
     uint32_t remaining_length = ELEMENT_COUNT;
     for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
         const uint32_t valid_count = remaining_length > PACKED_BYTES ? PACKED_BYTES : remaining_length;
