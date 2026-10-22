@@ -39,6 +39,8 @@
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
+通过函数返回值输出两个结果的重载为试验接口，请参见[试验接口asc_intlv](../../experimental/asc_intlv.md)。
+
 ## 函数原型
 
 ### 矢量数据寄存器交织模式
@@ -49,10 +51,6 @@ __simd_callee__ inline void asc_intlv(vector_<dtype>& dst0,
                                     vector_<dtype>& dst1,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1)
-
-// 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline asc_<dtype>_<dtype>_pair asc_intlv(vector_<dtype> src0,
-                                                       vector_<dtype> src1)
 ```
 
 #### dtype支持数据类型
@@ -67,10 +65,6 @@ __simd_callee__ inline void asc_intlv(vector_int8_t& dst0,
                                       vector_int8_t& dst1,
                                       vector_int8_t src0,
                                       vector_int8_t src1)
-
-// 通过函数返回值返回结果示例：对int8_t矢量数据寄存器执行交织。
-__simd_callee__ inline asc_int8_t_int8_t_pair asc_intlv(vector_int8_t src0,
-                                                         vector_int8_t src1)
 ```
 
 ### 掩码寄存器交织模式
@@ -89,14 +83,6 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
                                           vector_bool& dst1,
                                           vector_bool src0,
                                           vector_bool src1)
-
-// 通过函数返回值返回结果
-__simd_callee__ inline asc_bool_bool_pair asc_intlv_b8(vector_bool src0,
-                                                        vector_bool src1)
-__simd_callee__ inline asc_bool_bool_pair asc_intlv_b16(vector_bool src0,
-                                                          vector_bool src1)
-__simd_callee__ inline asc_bool_bool_pair asc_intlv_b32(vector_bool src0,
-                                                          vector_bool src1)
 ```
 
 ## 参数说明
@@ -127,10 +113,7 @@ __simd_callee__ inline asc_bool_bool_pair asc_intlv_b32(vector_bool src0,
 
 ## 返回值说明
 
-- 通过引用参数输出结果的函数原型无返回值。
-- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。
-    - 操作数为矢量数据寄存器时，返回类型为`asc_<dtype>_<dtype>_pair`。例如，输入为`vector_half`时，`asc_intlv`函数的返回值类型为`asc_half_half_pair`，两个成员的类型均为`vector_half`。`result.first`对应引用参数版本的`dst0`，保存交织后的低半部分数据；`result.second`对应引用参数版本的`dst1`，保存交织后的高半部分数据。
-    - 操作数为掩码寄存器时，b8、b16和b32模式的返回类型均为`asc_bool_bool_pair`。`result.first`和`result.second`的类型均为`vector_bool`，分别对应引用参数版本的`dst0`和`dst1`，保存对应粒度下交织后的低半部分和高半部分掩码。
+无。
 
 ## 约束说明
 

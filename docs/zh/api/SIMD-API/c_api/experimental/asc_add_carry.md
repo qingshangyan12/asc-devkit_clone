@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/compute/reg_arith.h"`。
+头文件路径为：`"c_api/experimental/reg_arith.h"`。
+
+本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。编译时需定义`CANN_ASC_USE_EXPERIMENTAL`宏，并显式包含指定的试验头文件。
 
 该接口根据`mask`，对`src0`和`src1`进行按元素加法运算，并通过函数返回值同时返回32位加法结果和进位标志。
 
@@ -99,28 +101,32 @@ __simd_callee__ inline asc_uint32_t_bool_pair asc_add_carry(vector_uint32_t src0
 | carry_src | 输入 | 输入进位标志（掩码寄存器），每个32位元素对应4bit中的最低位。该位为1时额外加1，为0时不增加输入进位。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与计算的元素。对应位置为1时参与计算，为0时不参与计算，未选中的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
-通过函数返回值输出结果的函数原型返回公共结果结构体，返回类型为`asc_<dtype>_bool_pair`，使用变量`result`接收函数返回值。`result.first`数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`。相同dtype的加法和减法进位接口共用该结构体类型。
+返回结构体的公共定义请参见[双返回值结构体](pair.md)。
+
+通过函数返回值输出结果的函数原型返回公共结果结构体，返回类型为`asc_<dtype>_bool_pair`。例如使用变量`result`接收函数返回值，`result.first`数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`。相同dtype的加法和减法进位接口共用该结构体类型。
 
 ## 约束说明
 
-- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../../spr/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
+- 使用本接口前，需要包含头文件：`#include "c_api/experimental/reg_arith.h"`。
+- 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
+- Reg矢量计算C API通用约束请参见[通用约束](../reg_compute/overview.md#通用约束)。
+- 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../spr/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
 - 进位输出按32位无符号加法产生：每个元素的进位为`(src0_i + src1_i) >> 32`取最高位1bit。
 - 和值截断为32位：返回值`result.first`写入`(src0_i + src1_i) & 0xFFFFFFFF`，超出32位的部分不保留，仅通过`result.second`的进位输出体现。
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+bisheng -DCANN_ASC_USE_EXPERIMENTAL example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
@@ -131,6 +137,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "c_api/experimental/reg_arith.h"
 #include "acl/acl.h"
 
 namespace {

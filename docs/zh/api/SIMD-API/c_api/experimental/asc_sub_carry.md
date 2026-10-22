@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/compute/reg_arith.h"`。
+头文件路径为：`"c_api/experimental/reg_arith.h"`。
+
+本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。编译时需定义`CANN_ASC_USE_EXPERIMENTAL`宏，并显式包含指定的试验头文件。
 
 该接口根据`mask`，对`src0`和`src1`进行按元素减法运算，并通过函数返回值同时返回32位减法结果和进位标志。
 
@@ -48,7 +50,7 @@ $$
 
 ## 函数原型
 
-```cpp
+```c
 // 通过函数返回值返回结果（占位符形式），不带输入进位。
 __simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
                                                               vector_<dtype> src1,
@@ -67,7 +69,7 @@ __simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
 
 ### 函数原型典型示例
 
-```cpp
+```c
 // 通过函数返回值返回结果示例：不带输入进位的uint32_t类型减法。
 __simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(vector_uint32_t src0,
                                                                vector_uint32_t src1,
@@ -99,17 +101,21 @@ __simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(vector_uint32_t src0
 | carry_src | 输入 | 参与补码加法的输入进位标志（掩码寄存器），每个32位元素对应4bit中的最低位。该位为1时计算`src0 - src1`，为0时计算`src0 - src1 - 1`，不能直接作为输入借位使用。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与计算的元素。对应位置为1时参与计算，为0时不参与计算，未选中的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
-通过函数返回值输出结果的函数原型返回公共结果结构体，返回类型为`asc_<dtype>_bool_pair`，使用变量`result`接收函数返回值。`result.first`保存计算结果的低32位，数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`，保存补码加法产生的进位标志，为1表示无借位，为0表示有借位。相同dtype的加法和减法进位接口共用该结构体类型。
+返回结构体的公共定义请参见[双返回值结构体](pair.md)。
+
+通过函数返回值输出结果的函数原型返回公共结果结构体，返回类型为`asc_<dtype>_bool_pair`。例如使用变量`result`接收函数返回值，`result.first`保存计算结果的低32位，数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`，保存补码加法产生的进位标志，为1表示无借位，为0表示有借位。相同dtype的加法和减法进位接口共用该结构体类型。
 
 ## 约束说明
 
-- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 使用本接口前，需要包含头文件：`#include "c_api/experimental/reg_arith.h"`。
+- 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
+- Reg矢量计算C API通用约束请参见[通用约束](../reg_compute/overview.md#通用约束)。
 - `src0`和`src1`必须使用相同的数据类型。
-- 运算输出包含低32位减法结果及进位标志，不受[asc_set_ctrl](../../spr/asc_set_ctrl.md)影响，硬件不会对结果进行饱和处理。
+- 运算输出包含低32位减法结果及进位标志，不受[asc_set_ctrl](../spr/asc_set_ctrl.md)影响，硬件不会对结果进行饱和处理。
 - 进位输出按补码加法产生，不表示有符号溢出。不带输入进位时，补码加法为`src0_i + ~src1_i + 1`；带输入进位时为`src0_i + ~src1_i + carry_src_i`，其中`~src1_i`为32位按位取反。以足够位宽计算上述加法后，最高位向外的进位写入`result.second`中对应的标志位。
 - 返回值`result.first`仅保存上述补码加法结果的低32位，超出32位的部分通过`result.second`的进位输出体现。
 
@@ -117,15 +123,17 @@ __simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(vector_uint32_t src0
 
 以下为不带输入进位的完整示例。VF函数通过for循环分批处理128个元素，每轮处理一个矢量寄存器长度的数据，并将该轮的进位掩码写入独立的输出区域。每个`uint32_t`掩码字保存8个元素的进位标志。偶数下标元素无借位，输出标志为1；奇数下标元素有借位，输出标志为0，因此每个golden掩码字为`0x01010101U`。
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+bisheng -DCANN_ASC_USE_EXPERIMENTAL example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
+
+本示例处理128个`uint32_t`元素，单次Repeat处理64个元素。Kernel通过`asc_get_vf_len()`计算`one_repeat_size`和`repeat_time`，使用`asc_vf_call`启动Vector Function，并在其中通过`for`循环完成两次计算及进位标志输出。
 
 ```cpp
 #include <cstdint>
@@ -133,6 +141,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "c_api/experimental/reg_arith.h"
 #include "acl/acl.h"
 
 namespace {

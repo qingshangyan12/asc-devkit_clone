@@ -8,13 +8,22 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DEFS_PAIR_H
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "pair.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
-#ifndef INCLUDE_C_API_DEFS_PAIR_H
-#define INCLUDE_C_API_DEFS_PAIR_H
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_PAIR_H
+#endif
+
+#ifndef INCLUDE_C_API_EXPERIMENTAL_PAIR_H
+#define INCLUDE_C_API_EXPERIMENTAL_PAIR_H
+
+#ifndef CANN_ASC_USE_EXPERIMENTAL
+#error "this is experimental feature, pls set CANN_ASC_USE_EXPERIMENTAL = ON to use it"
+#endif
+// WARNING: The APIs in this header are unstable and may change or be removed in future releases.
 
 #include "c_api/defs/type.h"
 
@@ -115,7 +124,7 @@ struct asc_int4x2_t_int4x2_t_pair {
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DEFS_PAIR_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_PAIR_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DEFS_PAIR_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_PAIR_H
 #endif
