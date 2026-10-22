@@ -79,10 +79,11 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* goodList[] = {&agSoleMesh};
     EXPECT_TRUE(CheckCcuAlgorithmsRegistered(goodList, 1U));
 
-    // AG pipeline[mesh,nhr] 仅 AICPU 候选 → 拒
+    // AG pipeline[mesh,nhr] 仅 AICPU 候选 → 过闸（闸门B 已不做 CCU 候选校验，
+    // 语法合法即过；AICPU-only + CCU 引擎的最终拒绝由选择链路 algorithmMap 完成）
     Mc2CcTilingInner agPipeline = MakeTiling("pipeline[mesh,nhr]", 6U);
     const void* badList[] = {&agPipeline};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
     // 语法错 → 拒
     Mc2CcTilingInner badSyntax = MakeTiling("sole[ring]", 6U);
@@ -105,12 +106,13 @@ TEST(ExtAlgGateB, ExternalNameGate)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
 }
 
-// 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与无候选/规则全灭分叉）。
+// 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与解析失败分叉）。
 TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
 {
+    // AICPU-only 外部名过闸（闸门B 已不做 CCU 候选校验，拒绝后置到选择链路）
     Mc2CcTilingInner rsMeshChunk = MakeTiling("sole[mesh.chunk]", 7U); // RS: AICPU-only 候选
     const void* badList[] = {&rsMeshChunk};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
     // 解析层 errMsg 三要素：解析失败消息含原文
     ExternalAlgSpec spec;
