@@ -115,15 +115,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
@@ -156,7 +152,7 @@ constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 
 // one_repeat_size的单位为float元素；第i轮指针偏移i * one_repeat_size个元素，
 // 对应i * one_repeat_size * sizeof(float)字节。
-__simd_vf__ inline void compare(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void compare(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
     vector_float ones;
@@ -189,8 +185,8 @@ __global__ __vector__ void asc_le_kernel(__gm__ float* dst, __gm__ float* src0, 
     asc_copy_gm2ub_align(src1_local, src1, TOTAL_LENGTH * sizeof(float));
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<compare>(dst_local, src0_local, src1_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

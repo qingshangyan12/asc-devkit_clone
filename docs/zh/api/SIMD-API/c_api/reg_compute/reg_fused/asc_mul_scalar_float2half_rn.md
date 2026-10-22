@@ -112,15 +112,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
@@ -143,7 +139,7 @@ constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr float SCALAR_VALUE = 2.0f;
 
 // one_repeat_size的单位为float元素；源指针按float偏移，目的结果按两个half元素展开。
-__simd_vf__ inline void compute(__ubuf__ half* dst, __ubuf__ float* src, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void compute(__ubuf__ half* dst, __ubuf__ float* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length = TOTAL_LENGTH;
     vector_bool mask_b16_all = asc_create_mask_b16(PAT_ALL);
@@ -167,8 +163,8 @@ __global__ __vector__ void asc_mul_scalar_float2half_rn_kernel(__gm__ half* dst,
     asc_copy_gm2ub_align(src_local, src, PADDED_ELEMENT_COUNT * sizeof(float));
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<compute>(dst_local, src_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

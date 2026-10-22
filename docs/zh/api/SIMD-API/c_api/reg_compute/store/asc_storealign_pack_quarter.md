@@ -185,15 +185,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 
 constexpr uint32_t ELEMENT_COUNT = 67;
@@ -210,7 +206,7 @@ constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
 // one_repeat_size的单位为uint32_t；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void pack_quarter_vf(__ubuf__ uint8_t* output,
-                                        __ubuf__ uint32_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
+                                        __ubuf__ uint32_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int32_t src_i32;
     vector_uint32_t src_u32;
@@ -235,14 +231,14 @@ __global__ __vector__ void asc_storealign_pack_quarter_kernel(
 {
     asc_init();
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    __ubuf__ uint32_t input_local[ELEMENT_COUNT];
+    __ubuf__ uint32_t input_local[PADDED_ELEMENT_COUNT];
     asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub(input_local, input, INPUT_BYTES);
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint32_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<pack_quarter_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

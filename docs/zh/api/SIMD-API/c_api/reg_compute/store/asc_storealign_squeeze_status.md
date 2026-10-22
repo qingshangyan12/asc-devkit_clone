@@ -79,14 +79,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 #include "acl/acl.h"
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
 constexpr uint32_t DATA_BYTES = 137 * sizeof(uint32_t);
@@ -100,7 +96,7 @@ constexpr uint32_t SQUEEZE_STATUS_BYTES = TOTAL_LENGTH * sizeof(float);
 // one_repeat_size的单位为uint32_t元素；第i轮指针偏移i * one_repeat_size个元素，
 // 对应i * one_repeat_size * sizeof(uint32_t)字节。
 __simd_vf__ inline void store_squeeze_status(
-    __ubuf__ uint32_t* status, __ubuf__ float* packed, __ubuf__ float* input, uint16_t one_repeat_size, uint16_t repeat_time)
+    __ubuf__ uint32_t* status, __ubuf__ float* packed, __ubuf__ float* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float squeezed;
     vector_store_unalign unalign_reg;
@@ -130,8 +126,8 @@ __global__ __vector__ void store_squeeze_status_kernel(__gm__ uint32_t* output, 
     asc_copy_gm2ub_align(input_local, input, sizeof(input_local));
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint32_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<store_squeeze_status>(status_local, packed_local, input_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

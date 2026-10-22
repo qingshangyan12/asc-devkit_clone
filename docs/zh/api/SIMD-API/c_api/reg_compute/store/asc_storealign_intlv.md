@@ -174,15 +174,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 
 constexpr uint32_t INPUT_COUNT = 128;
@@ -203,7 +199,7 @@ constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
 // one_repeat_size的单位为交织输出元素；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void store_intlv_vf(__ubuf__ uint16_t* output,
                                        __ubuf__ uint16_t* input0,
-                                       __ubuf__ uint16_t* input1, uint16_t one_repeat_size, uint16_t repeat_time)
+                                       __ubuf__ uint16_t* input1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src0;
     vector_uint16_t src1;
@@ -237,7 +233,7 @@ __global__ __vector__ void store_intlv_kernel(__gm__ uint16_t* output,
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
     uint16_t one_repeat_size = 2 * asc_get_vf_len() / sizeof(uint16_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<store_intlv_vf>(output_local, input0_local, input1_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

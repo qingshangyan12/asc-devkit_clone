@@ -104,14 +104,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
@@ -145,7 +141,7 @@ constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
 constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint16_t);
 
 // one_repeat_size的单位为half元素；asc_update_mask_b16自动更新剩余元素个数。
-__simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
@@ -169,8 +165,8 @@ __global__ __vector__ void asc_bfloat162half_kernel(__gm__ uint8_t* output, __gm
     asc_copy_gm2ub_align(output_local, input, PADDED_BUFFER_BYTES);
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<convert_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

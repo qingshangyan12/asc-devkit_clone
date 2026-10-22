@@ -174,15 +174,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 
 constexpr uint32_t ELEMENT_COUNT = 133;
@@ -198,7 +194,7 @@ constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 constexpr uint32_t TOTAL_LENGTH = REPEAT_TIMES;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
 // one_repeat_size的单位为uint16_t元素；每轮处理一个VL，最后一轮仅处理remaining_length个首元素。
-__simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
@@ -228,8 +224,8 @@ __global__ __vector__ void store_first_kernel(__gm__ uint16_t* output, __gm__ ui
     asc_copy_gm2ub(output_local, output, BUFFER_BYTES);
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<store_first_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

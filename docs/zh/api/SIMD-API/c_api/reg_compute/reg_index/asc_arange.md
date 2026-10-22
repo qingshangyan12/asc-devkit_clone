@@ -148,15 +148,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
@@ -178,7 +174,7 @@ constexpr int32_t START_VALUE = 10;
 
 // one_repeat_size的单位为int32_t元素；第i轮指针偏移i * one_repeat_size个元素，
 // 对应i * one_repeat_size * sizeof(int32_t)字节。
-__simd_vf__ inline void arange_vf(__ubuf__ int32_t* ascending, __ubuf__ int32_t* descending, uint16_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void arange_vf(__ubuf__ int32_t* ascending, __ubuf__ int32_t* descending, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
@@ -198,8 +194,8 @@ __global__ __vector__ void asc_arange_kernel(__gm__ int32_t* ascending, __gm__ i
     asc_init();
     __ubuf__ int32_t ascending_local[PADDED_ELEMENT_COUNT];
     __ubuf__ int32_t descending_local[PADDED_ELEMENT_COUNT];
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(int32_t);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(int32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<arange_vf>(ascending_local, descending_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

@@ -197,15 +197,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 
 template <typename T>
@@ -231,7 +227,7 @@ constexpr uint32_t TOTAL_LENGTH = DATA_BLOCK_COUNT;
 constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATA_BLOCK_SIZE;
 // one_repeat_size的单位为数据块；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void gather_datablock_vf(
-    __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index, uint16_t one_repeat_size, uint16_t repeat_time)
+    __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length = BUFFER_BYTES;
     for (uint16_t i = 0; i < repeat_time; ++i) {
@@ -263,8 +259,8 @@ __global__ __vector__ void asc_gather_datablock_kernel(
     asc_copy_gm2ub_align(index_local, index, INDEX_WORDS * sizeof(uint32_t));
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / DATA_BLOCK_SIZE;
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = asc_get_vf_len() / DATA_BLOCK_SIZE;
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<gather_datablock_vf>(output_local, data_local, index_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);

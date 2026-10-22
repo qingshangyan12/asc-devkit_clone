@@ -131,15 +131,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 -lm && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
-
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
 
 
 template <typename T>
@@ -174,7 +170,7 @@ constexpr uint32_t TOTAL_LENGTH = FLOAT_COUNT;
 // one_repeat_size的单位为float；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
 __simd_vf__ inline void compute(__ubuf__ float* float_dst, __ubuf__ float* half_even_dst,
     __ubuf__ float* half_odd_dst, __ubuf__ float* float_src0, __ubuf__ float* float_src1,
-    __ubuf__ half* half_src0, __ubuf__ half* half_src1, uint16_t one_repeat_size, uint16_t repeat_time)
+    __ubuf__ half* half_src0, __ubuf__ half* half_src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     uint32_t remaining_length = FLOAT_COUNT;
     uint32_t remaining_length_2 = HALF_COUNT;
@@ -223,8 +219,8 @@ __global__ __vector__ void asc_exp_sub_kernel(__gm__ float* float_dst, __gm__ fl
     asc_copy_gm2ub_align(half_src1_local, half_src1, HALF_COUNT * sizeof(half));
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(float);
-    uint16_t repeat_time = ceil_division(TOTAL_LENGTH, one_repeat_size);
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<compute>(float_dst_local, half_even_dst_local, half_odd_dst_local, float_src0_local,
         float_src1_local, half_src0_local, half_src1_local, one_repeat_size, repeat_time);

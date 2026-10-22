@@ -156,68 +156,66 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
 constexpr uint8_t MUTEX_ID = 0;
 
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
-
 
 constexpr uint32_t MASK_BYTES = 32;
 constexpr uint32_t PACKED_BYTES = 16;
-constexpr uint32_t LOGICAL_PACKED_BYTES = 19;
-constexpr uint32_t REPEAT_TIMES = 2;
+// 每个分区的有效打包字节数，可调整为其他长度；19用于覆盖非整块尾部。
+constexpr uint32_t TOTAL_LENGTH = 19;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
+// 掩码压缩每次固定写出16字节，向上取整分配完整写出块。
+constexpr uint32_t REPEAT_TIME = AscendC::Std::ceil_div(TOTAL_LENGTH, PACKED_BYTES);
 // 每次写出16字节，保留16字节哨兵区；所有起始地址均为16字节对齐。
 constexpr uint32_t STEP_BYTES = 32;
-constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
+// 额外预留一个步长，使最后一次Post Update后的地址仍处于本分区内。
+constexpr uint32_t SECTION_BYTES = (REPEAT_TIME + 1) * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
-constexpr uint32_t TOTAL_LENGTH = LOGICAL_PACKED_BYTES;
-constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
-// one_repeat_size的单位为打包字节；第i轮按接口语义偏移i * one_repeat_size个逻辑单位。
-__simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
-                                           __ubuf__ uint32_t* mask_input, uint16_t one_repeat_size, uint16_t repeat_time)
+// one_repeat_size表示每轮写出的打包字节数（16），与目的地址步长STEP_BYTES（32字节）不同。
+// 此掩码寄存器重载不支持尾块掩码：末轮仍写满16字节，尾部填充在预留UB空间内校验。
+__simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* dst,
+                                           __ubuf__ uint32_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool src;
-    asc_loadalign(src, mask_input);
+    vector_bool src_reg;
+    asc_loadalign(src_reg, src);
 
-    __ubuf__ uint8_t* dst8 = output;
-    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(output + SECTION_BYTES);
-    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(output + 2 * SECTION_BYTES);
-    uint32_t remaining = LOGICAL_PACKED_BYTES;
+    __ubuf__ uint8_t* dst8 = dst;
+    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(dst + SECTION_BYTES);
+    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(dst + 2 * SECTION_BYTES);
+    const int32_t step_bytes = static_cast<int32_t>(one_repeat_size + PACKED_BYTES);
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        const uint32_t valid_count = remaining > PACKED_BYTES ? PACKED_BYTES : remaining;
-        asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
-        asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
-        asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
-        remaining -= valid_count;
+        asc_storealign_pack_postupdate(dst8, src_reg, step_bytes);
+        asc_storealign_pack_postupdate(dst16, src_reg, step_bytes);
+        asc_storealign_pack_postupdate(dst32, src_reg, step_bytes);
     }
 }
 
 __global__ __vector__ void asc_storealign_pack_postupdate_kernel(
-    __gm__ uint8_t* output, __gm__ uint32_t* mask_input)
+    __gm__ uint8_t* dst, __gm__ uint32_t* src)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    __ubuf__ uint32_t mask_local[MASK_BYTES / sizeof(uint32_t)];
+    __ubuf__ uint8_t dst_local[OUTPUT_BYTES];
+    __ubuf__ uint32_t src_local[MASK_BYTES / sizeof(uint32_t)];
     asc_lock(PIPE_MTE2, MUTEX_ID);
-    asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
-    asc_copy_gm2ub(mask_local, mask_input, MASK_BYTES);
+    asc_copy_gm2ub(dst_local, dst, OUTPUT_BYTES);
+    asc_copy_gm2ub(src_local, src, MASK_BYTES);
     asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / MASK_BYTES * PACKED_BYTES;
-    uint16_t repeat_time = REPEAT_TIMES;
+    // 源掩码寄存器共32字节，隔位压缩后每轮输出16字节。
+    uint32_t one_repeat_size = PACKED_BYTES;
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
     asc_lock(PIPE_V, MUTEX_ID);
-    asc_vf_call<pack_postupdate_vf>(output_local, mask_local, one_repeat_size, repeat_time);
+    asc_vf_call<pack_postupdate_vf>(dst_local, src_local, one_repeat_size, repeat_time);
     asc_unlock(PIPE_V, MUTEX_ID);
 
     asc_lock(PIPE_MTE3, MUTEX_ID);
-    asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    asc_copy_ub2gm(dst, dst_local, OUTPUT_BYTES);
     asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
@@ -225,13 +223,14 @@ __global__ __vector__ void asc_storealign_pack_postupdate_kernel(
 
 int main()
 {
-    std::vector<uint32_t> mask_input(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
+    std::vector<uint32_t> src(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
-    std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
+    std::vector<uint8_t> golden(OUTPUT_BYTES, SENTINEL);
+    // 每次固定写满PACKED_BYTES：同时校验有效数据与末轮填充，块间和分区末尾的哨兵保持不变。
     for (uint32_t base = 0; base < OUTPUT_BYTES; base += SECTION_BYTES) {
-        for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        for (uint32_t repeat = 0; repeat < REPEAT_TIME; ++repeat) {
             for (uint32_t i = 0; i < PACKED_BYTES; ++i) {
-                expected[base + repeat * STEP_BYTES + i] = 0xff;
+                golden[base + repeat * STEP_BYTES + i] = 0xff;
             }
         }
     }
@@ -242,13 +241,13 @@ int main()
     uint8_t* output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&mask_device), MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(mask_device, MASK_BYTES, mask_input.data(), MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(mask_device, MASK_BYTES, src.data(), MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_storealign_pack_postupdate_kernel<<<1, 0>>>(output_device, mask_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == expected;
+    const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_storealign_pack_postupdate passed."
                          : "[Failed] asc_storealign_pack_postupdate output mismatch.")
               << std::endl;
