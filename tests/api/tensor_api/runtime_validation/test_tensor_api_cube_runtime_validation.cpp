@@ -43,6 +43,17 @@ void copy_tensor_with(const DstTensorType& dst, const SrcTensorType& src, const 
     copy(make_copy(CopyOperationType{}).with(param), dst, src);
 }
 
+template <
+    typename CopyOperationType, typename DstTensorType, typename SrcTensorType, typename DstCoordType,
+    typename SrcCoordType, typename CopyShapeType>
+void copy_tensor_with_shape(
+    const DstTensorType& dst, const SrcTensorType& src, const DstCoordType& dst_coord, const SrcCoordType& src_coord,
+    const CopyShapeType& copy_shape)
+{
+    using namespace asc::te;
+    copy(make_copy(CopyOperationType{}), dst, src, dst_coord, src_coord, copy_shape);
+}
+
 constexpr asc::te::mmad_trait GEMV_ENABLED_MMAD_TRAIT = {0, false, false, false, asc::te::mmad_type::normal};
 
 struct GemvEnabledMmadTrait {
@@ -337,4 +348,51 @@ TEST_F(TensorApiCubeRuntimeValidation, MmadRejectsMatrixMAboveOneInGemvMode)
     EXPECT_THROW((run_mmad(params, GemvEnabledMmadTrait{})), TrapException);
 }
 
+TEST_F(TensorApiCubeRuntimeValidation, CopyL0C2GMRejectsConvDestinationOverflow)
+{
+    using namespace asc::te;
+
+    alignas(512) static __cc__ float src_data[1024] = {};
+    alignas(512) static __gm__ float dst_data[1024] = {};
+    auto src = make_tensor_at<location::l0c>(
+        src_data, make_frame_layout<nz_layout_ptn, layout_trait_default<float, _16>>(32, 32));
+    auto src_coord = make_coord(0, 0);
+    auto oversized_shape = make_shape(32, 32);
+
+    auto nhwc = make_tensor_at<location::gm>(dst_data, make_frame_layout<nhwc_layout_ptn, float>(1, 2, 8, 64));
+    EXPECT_THROW(
+        (copy_tensor_with_shape<copy_l0c_to_gm>(nhwc, src, make_coord(0, 0, 0, 0), src_coord, oversized_shape)),
+        TrapException);
+
+    auto nchw = make_tensor_at<location::gm>(dst_data, make_frame_layout<nchw_layout_ptn, float>(1, 64, 2, 8));
+    EXPECT_THROW(
+        (copy_tensor_with_shape<copy_l0c_to_gm>(nchw, src, make_coord(0, 0, 0, 0), src_coord, oversized_shape)),
+        TrapException);
+
+    auto ncdhw = make_tensor_at<location::gm>(dst_data, make_frame_layout<ncdhw_layout_ptn, float>(1, 64, 1, 2, 8));
+    EXPECT_THROW(
+        (copy_tensor_with_shape<copy_l0c_to_gm>(ncdhw, src, make_coord(0, 0, 0, 0, 0), src_coord, oversized_shape)),
+        TrapException);
+
+    auto nc1hwc0 = make_tensor_at<location::gm>(dst_data, make_frame_layout<nc1hwc0_layout_ptn>(1, 4, 2, 8, 16));
+    EXPECT_THROW(
+        (copy_tensor_with_shape<copy_l0c_to_gm>(nc1hwc0, src, make_coord(0, 0, 0, 0, 0), src_coord, oversized_shape)),
+        TrapException);
+}
+
+TEST_F(TensorApiCubeRuntimeValidation, CopyGM2L1RejectsNDC1HWC0DestinationOverflow)
+{
+    using namespace asc::te;
+
+    alignas(512) static __gm__ float src_data[1024] = {};
+    alignas(512) static __cbuf__ float dst_data[1024] = {};
+    auto src = make_tensor_at<location::gm>(src_data, make_frame_layout<ncdhw_layout_ptn, float>(1, 32, 2, 4, 4));
+    auto dst = make_tensor_at<location::l1>(dst_data, make_frame_layout<ndc1hwc0_layout_ptn>(1, 2, 4, 2, 4, 16));
+    auto copy_shape = make_shape(1, 32, 2, 4, 4);
+
+    EXPECT_THROW(
+        (copy_tensor_with_shape<copy_gm_to_l1>(
+            dst, src, make_coord(0, 0, 0, 0, 0, 0), make_coord(0, 0, 0, 0, 0), copy_shape)),
+        TrapException);
+}
 } // namespace
