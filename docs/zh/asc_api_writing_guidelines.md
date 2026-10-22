@@ -983,11 +983,8 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
  
  
  【级别】强制 
- 
- 
- 【描述】样例代码中不应出现`using namespace AscendC`等不规范用法，在调用接口、枚举时需要加上命名空间限定。
 
- 【级别】强制
+ 【描述】样例代码中不应出现`using namespace AscendC`等不规范用法，在调用接口、枚举时需要加上命名空间限定。
 
  【正例】枚举值和接口名都加上AscendC命名空间。
 

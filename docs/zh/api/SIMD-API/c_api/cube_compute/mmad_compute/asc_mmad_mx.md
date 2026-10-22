@@ -60,29 +60,29 @@ $$
 ```c
 // 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式（占位符形式）
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ <a_dtype>* a_matrix,
-                                    __cb__ <b_dtype>* b_matrix,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv,
-                                    bool c_matrix_source,
-                                    bool c_matrix_init_val)
+                                   __ca__ <a_dtype>* a_matrix,
+                                   __cb__ <b_dtype>* b_matrix,
+                                   uint16_t m,
+                                   uint16_t k,
+                                   uint16_t n,
+                                   asc_unit_flag_mode unit_flag_mode,
+                                   bool disable_gemv,
+                                   bool c_matrix_source,
+                                   bool c_matrix_init_val)
 
 // 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化（占位符形式）
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ <a_dtype>* a_matrix,
-                                    __cb__ <b_dtype>* b_matrix,
-                                    uint64_t bias,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv)
+                                   __ca__ <a_dtype>* a_matrix,
+                                   __cb__ <b_dtype>* b_matrix,
+                                   uint64_t bias,
+                                   uint16_t m,
+                                   uint16_t k,
+                                   uint16_t n,
+                                   asc_unit_flag_mode unit_flag_mode,
+                                   bool disable_gemv)
 ```
 
-**dtype支持的数据类型：**
+### dtype支持数据类型
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -99,31 +99,31 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `fp8_e8m0_t` | `float` | `float` |
 
-**典型示例：**
+### 函数原型典型示例
 
 ```c
 // 不显式传入Bias起始地址
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ fp4x2_e1m2_t* a_matrix,
-                                    __cb__ fp4x2_e2m1_t* b_matrix,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv,
-                                    bool c_matrix_source,
-                                    bool c_matrix_init_val)
+                                   __ca__ fp4x2_e1m2_t* a_matrix,
+                                   __cb__ fp4x2_e2m1_t* b_matrix,
+                                   uint16_t m,
+                                   uint16_t k,
+                                   uint16_t n,
+                                   asc_unit_flag_mode unit_flag_mode,
+                                   bool disable_gemv,
+                                   bool c_matrix_source,
+                                   bool c_matrix_init_val)
 
 // 显式传入Bias起始地址
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ fp4x2_e1m2_t* a_matrix,
-                                    __cb__ fp4x2_e2m1_t* b_matrix,
-                                    uint64_t bias,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv)
+                                   __ca__ fp4x2_e1m2_t* a_matrix,
+                                   __cb__ fp4x2_e2m1_t* b_matrix,
+                                   uint64_t bias,
+                                   uint16_t m,
+                                   uint16_t k,
+                                   uint16_t n,
+                                   asc_unit_flag_mode unit_flag_mode,
+                                   bool disable_gemv)
 ```
 
 ## 参数说明

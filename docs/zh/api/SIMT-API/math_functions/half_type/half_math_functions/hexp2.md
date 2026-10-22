@@ -29,7 +29,7 @@
 
 指定输入x，获取2的x次方。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533360279.png)
+![](../../../../figures/formulaimage_0000002533360279.png)
 
 ## 函数原型
 
@@ -92,3 +92,10 @@ inline half hexp2(half x)
         dst[idx] = hexp2(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: 0.42041, 1.41406, 5.65625, 0.0743408
+```

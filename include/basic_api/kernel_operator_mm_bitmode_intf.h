@@ -30,7 +30,8 @@
 
 namespace AscendC {
 class Load2DBitModeParam {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 public:
     __aicore__ inline Load2DBitModeParam();
     __aicore__ inline Load2DBitModeParam(const LoadData2DParamsV2& loadData2DParams_);
@@ -68,7 +69,8 @@ private:
 };
 
 class Load3DBitModeParam {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 public:
     __aicore__ inline Load3DBitModeParam();
     template <typename T>
@@ -122,7 +124,8 @@ private:
 };
 
 class SetFMatrixBitModeParams {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 public:
     __aicore__ inline SetFMatrixBitModeParams();
     template <typename T>
@@ -142,7 +145,7 @@ private:
 };
 
 class MmadBitModeParams {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 public:
     __aicore__ inline MmadBitModeParams();
     __aicore__ inline MmadBitModeParams(const MmadParams& mmadParams_);

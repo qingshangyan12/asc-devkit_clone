@@ -57,7 +57,7 @@
 
 **场景2：DataBlock归约**
 
-- 样例功能：分别对8个32BDataBlock内的8个float元素求和。
+- 样例功能：分别对8个32B DataBlock内的8个float元素求和。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -69,9 +69,9 @@
   </table>
 
 - 样例实现：
-  `reduce_kernel`函数内调用`asc_datablock_reduce_sum`接口，分别对8个32BDataBlock内的8个float元素求和，具体流程如下：
+  `reduce_kernel`函数内调用`asc_datablock_reduce_sum`接口，分别对8个32B DataBlock内的8个float元素求和，具体流程如下：
   - 搬入：调用`asc_copy_gm2ub_align`将64个float元素从GM搬入UB。
-  - 计算：调用`asc_datablock_reduce_sum`接口对每个32BDataBlock内的8个float元素求和。
+  - 计算：调用`asc_datablock_reduce_sum`接口对每个32B DataBlock内的8个float元素求和。
   - 搬出：调用`asc_copy_ub2gm_align`接口将结果从UB搬回GM。
   - 调用实现：使用内核调用符`<<<>>>`调用核函数。
 

@@ -42,7 +42,7 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ <dst_dtype>* dst,
                                         const asc_fill_value_config& config)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 dst dtype与value dtype支持以下组合：
 

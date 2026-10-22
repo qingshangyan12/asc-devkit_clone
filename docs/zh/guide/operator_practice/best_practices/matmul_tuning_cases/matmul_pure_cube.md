@@ -64,11 +64,11 @@ Tiling参数如下：
 
 -   优化前的Profiling数据如下，从C列的aic\_time数据可以看出，多个核中最大算子执行耗时为17.85us。从G列的aic\_scalar\_time数据可以看出，Scalar平均耗时为15.02us，性能瓶颈在Scalar流水。
 
-    ![](../../../figures/zh-cn_image_0000002411013306.png)
+    ![](../../../figures/image_0000002411013306.png)
 
 -   优化前的流水图如下，由于默认为MIX模式，每次Matmul计算均涉及消息通信框架对消息进行处理，Scalar流水重，性能开销较大，如下图红框所示。
 
-    ![](../../../figures/zh-cn_image_0000002390760922.png)
+    ![](../../../figures/image_0000002390760922.png)
 
 ## 设计优化方案<a name="section81265422311"></a>
 
@@ -156,11 +156,11 @@ Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样�
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为11.21us，较优化前的17.85us有较大提升。从G列的aic\_scalar\_time数据来看，Scalar平均耗时从优化前的15.02us降低至5.17us。
 
-    ![](../../../figures/zh-cn_image_0000002411013940.png)
+    ![](../../../figures/image_0000002411013940.png)
 
 -   优化后的流水图如下。对比优化前的流水图，红框所示位置的Scalar流水明显变稀疏。纯Cube模式相较于MIX模式，减少了对消息通信的处理，优化了整体Scalar性能开销。
 
-    ![](../../../figures/zh-cn_image_0000002377887318.png)
+    ![](../../../figures/image_0000002377887318.png)
 
 ## 总结<a name="section252011820413"></a>
 

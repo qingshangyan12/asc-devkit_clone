@@ -22,6 +22,9 @@ DEFINE_WEAK_FUNC(
     HcclResult, HcclThreadExportToCommEngine, HcclComm comm, uint32_t threadNum, const ThreadHandle* threads,
     CommEngine dstCommEngine, ThreadHandle* exportedThreads);
 DEFINE_WEAK_FUNC(
+    HcclResult, HcclDedicatedThreadAcquire, HcclComm comm, HcclDedicatedThreadType useType, uint32_t notifyNumPerThread,
+    ThreadHandle* thread);
+DEFINE_WEAK_FUNC(
     HcclResult, HcclChannelGetRemoteMems, HcclComm comm, ChannelHandle channel, uint32_t* memNum, CommMem** remoteMems,
     char*** memTags);
 DEFINE_WEAK_FUNC(
@@ -40,6 +43,7 @@ void HcclResDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcclTaskUnRegister);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclDevMemAcquire);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclThreadExportToCommEngine);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclDedicatedThreadAcquire);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclChannelGetRemoteMems);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommMemReg);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclEngineCtxDestroy);

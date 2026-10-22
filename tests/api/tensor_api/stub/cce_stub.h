@@ -14,6 +14,10 @@
 
 using float8_e8m0_t = fp8_e8m0_t;
 
+template <typename T>
+inline void asc_mem_bar(T)
+{}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
 using vector_uint8_t = uint8_t;
 using vector_uint16_t = uint8_t;

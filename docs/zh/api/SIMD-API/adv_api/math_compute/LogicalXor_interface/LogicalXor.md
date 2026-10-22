@@ -27,7 +27,7 @@
 
 按元素进行逻辑异或操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
-![](../../../../figures/zh-cn_formulaimage_0000002475452485.png)
+![](../../../../figures/formulaimage_0000002475452485.png)
 
 ## 函数原型
 

@@ -33,11 +33,11 @@
 
 ReGlu是一种GLU变体，使用Relu作为激活函数，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002316175130.png)
+![](../../../../figures/formulaimage_0000002316175130.png)
 
 其中Relu激活函数的计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000001792534088.png)
+![](../../../../figures/formulaimage_0000001792534088.png)
 
 ## 函数原型
 

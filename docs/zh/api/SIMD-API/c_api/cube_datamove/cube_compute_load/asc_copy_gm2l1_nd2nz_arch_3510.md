@@ -47,17 +47,17 @@
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
-                                             uint64_t src_d_value,
-                                             asc_load_l2_cache_mode l2_cache_mode,
-                                             uint16_t n_value,
-                                             uint32_t d_value,
-                                             uint64_t src_nd_matrix_stride,
-                                             bool enable_small_c0)
+                                            uint64_t src_d_value,
+                                            asc_load_l2_cache_mode l2_cache_mode,
+                                            uint16_t n_value,
+                                            uint32_t d_value,
+                                            uint64_t src_nd_matrix_stride,
+                                            bool enable_small_c0)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 
@@ -65,12 +65,12 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 // 示例：half类型的ND到Nz格式搬运。
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ half* dst,
                                             __gm__ half* src,
-                                             uint64_t src_d_value,
-                                             asc_load_l2_cache_mode l2_cache_mode,
-                                             uint16_t n_value,
-                                             uint32_t d_value,
-                                             uint64_t src_nd_matrix_stride,
-                                             bool enable_small_c0)
+                                            uint64_t src_d_value,
+                                            asc_load_l2_cache_mode l2_cache_mode,
+                                            uint16_t n_value,
+                                            uint32_t d_value,
+                                            uint64_t src_nd_matrix_stride,
+                                            bool enable_small_c0)
 ```
 
 ## 参数说明
@@ -109,7 +109,7 @@ PIPE_MTE2
 - 本接口非AIC调用直接返回。
 - `dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
 - `src`起始地址需要按照1字节对齐（GM对齐要求），否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，`dst`偏移量与搬运大小之和不可越界，否则触发异常。
 
 ### ND2Nz搬运约束

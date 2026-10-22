@@ -18,7 +18,10 @@
 
 namespace HcclSim {
 
-class HcclException : std::exception {
+// public 继承修正：原私有继承（漏写 public）使 catch(const std::exception&) 无法捕获
+// HcclSim 异常族（私有基类不可隐式上转型），fixture 的编排期/执行期异常保护均退化为
+// catch(...) 丢失 what() 信息——ST 框架所有 THROW 异常必须可按 std::exception 多态捕获
+class HcclException : public std::exception {
 public:
     explicit HcclException(const ExceptionType& exceptionType, const std::string& userDefinedMsg);
 

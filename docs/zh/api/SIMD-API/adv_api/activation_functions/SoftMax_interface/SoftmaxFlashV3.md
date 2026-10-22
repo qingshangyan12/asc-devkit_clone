@@ -29,11 +29,11 @@ SoftmaxFlash增强版本，对应Softmax PASA算法。将输入tensor\[m<sub>0</
 
 -   update为false：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002466346798.png)
+    ![](../../../../figures/formulaimage_0000002466346798.png)
 
 -   update为true：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002122846977.png)
+    ![](../../../../figures/formulaimage_0000002122846977.png)
 
 本接口当前只支持ND格式的输入，内部的reduce过程按last轴处理。
 

@@ -44,13 +44,13 @@
 
 如下图所示，总共包含16个Region Proposals。
 
-![](../../../../figures/zh-cn_image_0000001820284977.png)
+![](../../../../figures/image_0000001820284977.png)
 
 对于数据类型float，每一个Region Proposal占32Bytes，Byte\[31:24\]是无效数据，Byte\[23:0\]包含6个float类型的元素，其中Byte\[23:20\]定义为label，Byte\[19:16\]定义为score，Byte\[15:12\]定义为y2，Byte\[11:8\]定义为x2，Byte\[7:4\]定义为y1，Byte\[3:0\]定义为x1。
 
 如下图所示，总共包含16个Region Proposals。
 
-![](../../../../figures/zh-cn_image_0000001820324937.png)
+![](../../../../figures/image_0000001820324937.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -137,6 +137,7 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
 -   用户需保证dst中存储的proposal数目大于等于实际所需数目，否则会存在tensor越界错误。
 -   用户需保证src中存储的元素大于等于实际所需数目，否则会存在tensor越界错误。
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/ProposalConcat_res.md#id2 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

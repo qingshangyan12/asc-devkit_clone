@@ -66,8 +66,6 @@ def asc_half2hif8_rna_v2(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
-
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_half2hif8_<round_mode><sat_mode><position_mode>(vector_hifloat8_t& dst,

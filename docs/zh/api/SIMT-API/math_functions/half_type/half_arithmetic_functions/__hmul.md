@@ -125,3 +125,11 @@ half __hmul(const half x, const half y)
         dst[idx] = __hmul(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+y: -0.5, 0.5, 1.25, 2.0
+result: 0.625, 0.25, 3.125, -7.5
+```

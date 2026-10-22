@@ -36,8 +36,6 @@
 
 ## 函数原型
 
-### 模板原型
-
 ```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
@@ -45,14 +43,14 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                       uint16_t m_step,
-                                       uint16_t k_step,
-                                       asc_load_l2_cache_mode l2_cache_mode)
+                                      uint16_t m_step,
+                                      uint16_t k_step,
+                                      asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
+`dtype`取值为：`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
 
 ### 函数原型典型示例
 
@@ -63,9 +61,9 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                       uint16_t m_step,
-                                       uint16_t k_step,
-                                       asc_load_l2_cache_mode l2_cache_mode)
+                                      uint16_t m_step,
+                                      uint16_t k_step,
+                                      asc_load_l2_cache_mode l2_cache_mode)
 ```
 
 ## 参数说明
@@ -98,7 +96,7 @@ PIPE_MTE2
 - 本接口非AIC调用直接返回。
 - dst起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
 - src起始地址需1字节对齐（Global Memory对齐要求），否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，dst偏移量与搬运大小之和不可越界，否则触发异常。
 
 ### 2D矩阵搬运模式约束

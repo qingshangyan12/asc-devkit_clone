@@ -100,3 +100,10 @@ half2 __isnanx2(half2 x)
         asc_vf_call<simt_isnanx2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (nan, 1.25), (0.75, nan)
+result: (0, 0), (0, 0), (1, 0), (0, 1)
+```

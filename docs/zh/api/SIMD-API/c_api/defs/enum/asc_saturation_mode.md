@@ -2,6 +2,8 @@
 
 asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。
 
+头文件路径为：`"c_api/defs/enum.h"`。
+
 ## 枚举类具体定义
 
 ```cpp

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor API编程范式实现多核矩阵乘计算，使用Tensor API的高层次抽象接口完成矩阵搬运、切片和乘加流程。计算沿K轴切分，各核的计算结果通过原子加法累加到输出矩阵。
+本样例基于静态Tensor API编程范式实现多核矩阵乘计算，使用Tensor API的高层次抽象接口完成矩阵搬运、切片和乘加流程。计算沿k轴切分，各核的计算结果通过原子加法累加到输出矩阵。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -31,13 +31,13 @@
   C = A * B
   $$
 - 样例规格：
-  本样例参数M = 16, N = 16, K = 1024，沿K轴均匀切分为4份，调用4个核完成计算，输入输出规格如下表所示。
+  本样例参数m = 16, n = 16, k = 1024，沿k轴均匀切分为4份，调用4个核完成计算，输入输出规格如下表所示。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  <tr><td align="center">A</td><td align="center">[m, k]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[k, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[m, n]</td><td align="center">float32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_split_k_kernel</td></tr>
   </table>
 
@@ -46,10 +46,10 @@
     <table>
     <tr><th align="left">步骤</th><th align="left">Tensor API操作</th><th align="left">功能</th><th align="left">布局转换</th></tr>
     <tr><td align="left">1</td><td align="left">常量化Tiling参数</td><td align="left">通过编译期常量定义kernel所需参数</td><td align="left">不涉及</td></tr>
-    <tr><td align="left">2</td><td align="left">make_tensor + slice</td><td align="left">创建GM张量，沿K轴均匀切分为4份，并根据核索引切片获取当前核处理的数据块</td><td align="left">ND格式</td></tr>
-    <tr><td align="left">3</td><td align="left">copy(copy_gm_to_l1)</td><td align="left">将A矩阵和B矩阵的当前K轴分片从GM搬运到L1</td><td align="left">ND->NZ格式转换</td></tr>
+    <tr><td align="left">2</td><td align="left">make_tensor + slice</td><td align="left">创建GM张量，沿k轴均匀切分为4份，并根据核索引切片获取当前核处理的数据块</td><td align="left">ND格式</td></tr>
+    <tr><td align="left">3</td><td align="left">copy(copy_gm_to_l1)</td><td align="left">将A矩阵和B矩阵的当前k轴分片从GM搬运到L1</td><td align="left">ND->NZ格式转换</td></tr>
     <tr><td align="left">4</td><td align="left">copy(copy_l1_to_l0a/copy_l1_to_l0b)</td><td align="left">将数据从L1搬运到L0A和L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
-    <tr><td align="left">5</td><td align="left">mmad</td><td align="left">完成当前K轴分片的矩阵乘加计算</td><td align="left">矩阵乘结果为NZ格式</td></tr>
+    <tr><td align="left">5</td><td align="left">mmad</td><td align="left">完成当前k轴分片的矩阵乘加计算</td><td align="left">矩阵乘结果为NZ格式</td></tr>
     <tr><td align="left">6</td><td align="left">asc_set_atomic_add_float + copy(copy_l0c_to_gm)</td><td align="left">启用float原子加法，将各核的L0C结果累加到同一个GM输出矩阵</td><td align="left">NZ->ND格式转换</td></tr>
     </table>
 
@@ -69,10 +69,10 @@
        - 自动管理累加控制（init_with_zero参数）
 
     4. **切片接口**：使用slice + make_coord + make_shape获取张量的子区域
-       - 实现分核逻辑：沿K轴均匀切分，每个核处理一个K轴分片
+       - 实现分核逻辑：沿k轴均匀切分，每个核处理一个k轴分片
 
     5. **原子累加接口**：使用asc_set_atomic_add_float配置L0C到GM的float原子加法
-       - 将各K轴分片的计算结果累加到同一个输出矩阵，写回完成后使用asc_disable_dma_atomic关闭原子加法
+       - 将各k轴分片的计算结果累加到同一个输出矩阵，写回完成后使用asc_disable_dma_atomic关闭原子加法
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数。
@@ -87,7 +87,7 @@
 | 张量表示 | 使用张量对象直接描述GM、L1、L0数据 |
 | 数据搬运 | 使用copy完成跨层搬运 |
 | 格式转换 | 依赖布局模式自动完成 NZ / ZN 转换 |
-| 分核逻辑 | 使用slice沿K轴获取当前核处理的数据分片 |
+| 分核逻辑 | 使用slice沿k轴获取当前核处理的数据分片 |
 | 计算接口 | 使用mmad完成矩阵乘加，使用原子加法累加各分片结果 |
 
 ## 编译运行

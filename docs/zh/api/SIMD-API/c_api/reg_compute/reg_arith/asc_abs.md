@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "根据mask对源操作数矢量数据寄存器按元素取绝对值，结果写入目的操作数或通过函数返回值返回；输入为有符号整数类型最小负值时结果保留原值不变。"
+tag:
+  - roles: [compute]
+  - operations: [absolute]
+dependencies: []
+version: ">=9.2.0"
+---
 # asc_abs
 
 ## 产品支持情况
@@ -41,7 +50,7 @@ $$
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_abs(vector_<dtype> src,
-                                               vector_bool mask)
+                                              vector_bool mask)
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_abs(vector_<dtype>& dst,

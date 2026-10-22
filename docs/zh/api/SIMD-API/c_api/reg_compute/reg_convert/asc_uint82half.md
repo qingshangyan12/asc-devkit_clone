@@ -50,23 +50,23 @@ def asc_uint82half(dst, src, mask, src_pos):
 ```c
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_uint82half(vector_half& dst,
-                                             vector_uint8_t src,
-                                             vector_bool mask,
-                                             std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+                                           vector_uint8_t src,
+                                           vector_bool mask,
+                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 
 __simd_callee__ inline void asc_uint82half(vector_half& dst,
-                                             vector_uint8_t src,
-                                             vector_bool mask,
-                                             std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+                                           vector_uint8_t src,
+                                           vector_bool mask,
+                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_half asc_uint82half(vector_uint8_t src,
-                                             vector_bool mask,
-                                             std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+                                                  vector_bool mask,
+                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 
 __simd_callee__ inline vector_half asc_uint82half(vector_uint8_t src,
-                                             vector_bool mask,
-                                             std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+                                                  vector_bool mask,
+                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
 ## 参数说明

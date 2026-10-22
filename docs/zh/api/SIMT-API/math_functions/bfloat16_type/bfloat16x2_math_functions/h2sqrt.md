@@ -29,7 +29,7 @@
 
 获取输入数据x各元素的平方根。
 
-![](../../../../figures/zh-cn_formulaimage_0000002545900884.png)
+![](../../../../figures/formulaimage_0000002545900884.png)
 
 ## 函数原型
 

@@ -56,9 +56,9 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        uint16_t dst_stride)
 ```
 
-### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 
@@ -87,27 +87,27 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
                                                  uint16_t dst_stride)
 ```
 
-### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 
 ```cpp
 // 示例：half类型的2D搬运。
 __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ half* dst,
-                                       __cbuf__ half* src,
-                                       uint16_t m_start_position,
-                                       uint16_t k_start_position,
-                                       uint8_t m_step,
-                                       uint8_t k_step,
-                                       int16_t src_stride,
-                                       uint16_t dst_stride)
+                                                 __cbuf__ half* src,
+                                                 uint16_t m_start_position,
+                                                 uint16_t k_start_position,
+                                                 uint8_t m_step,
+                                                 uint8_t k_step,
+                                                 int16_t src_stride,
+                                                 uint16_t dst_stride)
 ```
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | --- | --- | --- |
@@ -134,7 +134,7 @@ PIPE_MTE1
 
 - 本接口非AIC调用直接返回。
 - src位于L1 Buffer，dst位于L0B Buffer，二者位于不同的物理存储单元，不存在地址重叠。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - L0B Buffer容量上限：L0B Buffer总容量64KB，dst偏移量与搬运大小之和不可越界，否则触发写溢出异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移量与源矩阵占用大小之和不可越界，否则触发异常。
 

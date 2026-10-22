@@ -325,3 +325,6 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../example
         AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
     ```
 <!-- end id30 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id4 -->
+

@@ -108,7 +108,7 @@ __global__ __vector__ void asc_sync_mte3_kernel(__gm__ float* dst0, __gm__ float
         asc_copy_gm2ub_align(y, src1 + iter * ELEMENTS, BYTES);
         asc_copy_gm2ub_align(w, src2 + iter * ELEMENTS, BYTES);
 
-        // PIPE_MTE2到PIPE_V的同步，需分别分别编写notify与wait。
+        // PIPE_MTE2到PIPE_V的同步，需分别编写notify与wait。
         asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 

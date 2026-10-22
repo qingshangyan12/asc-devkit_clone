@@ -40,8 +40,8 @@
 
 - Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
 - Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../cube_store_aux_config/asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
-- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
+- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用；
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用；
 - 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
 
 `quant_pre_mode`量化模式参数支持的枚举值如下：
@@ -97,7 +97,7 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ <dst_dtype>* dst,
                                        bool enable_clip_relu_pre)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 src dtype与dst dtype支持以下组合：
 
@@ -160,7 +160,7 @@ PIPE_FIX
 - 本接口非AIC调用直接返回。
 - `src`起始地址需64字节对齐，否则会导致搬运异常。
 - `dst`起始地址需1字节对齐，否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令，详见[核内同步](../../sync/system_sync_overview.md)。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - L0C Buffer容量上限：L0C Buffer总容量256KB，src偏移量与搬运大小之和不可超过L0C Buffer容量，否则触发源地址越界异常。
 - Nz矩阵以16×16个元素为一个基本分形。边界分形中超出`n_size`或`m_size`指定范围的数据不属于有效搬运结果。
 

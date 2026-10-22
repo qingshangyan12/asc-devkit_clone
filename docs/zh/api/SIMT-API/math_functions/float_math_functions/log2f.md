@@ -29,7 +29,7 @@
 
 获取以2为底，输入数据的对数。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776380.png)
+![](../../../figures/formulaimage_0000002484776380.png)
 
 ## 函数原型
 
@@ -99,6 +99,6 @@ inline float log2f(float x)
 输入输出示例如下：
 
 ```
-x：1, 2, 3, 4
-result: 0 1 1.584962 2
+x: 1, 2, 3, 4
+result: 0, 1, 1.584962, 2
 ```

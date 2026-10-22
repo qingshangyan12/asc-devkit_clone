@@ -46,7 +46,7 @@ __aicore__ inline <dtype> asc_atomic_cas(__gm__ <dtype>* address,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。
 
 ### 函数原型典型示例
 
@@ -63,7 +63,7 @@ __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | compare | 输入 | 源操作数，做比较的值。 |
 | val | 输入 | 源操作数，用于赋值的值。 |
 

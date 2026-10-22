@@ -104,3 +104,19 @@ int __popc(unsigned long x)
         dst[idx] = __popc(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+- 当输入数据类型为`unsigned int`时：
+
+    ```text
+    x: 0, 1, 2, 8, 15
+    result: 0, 1, 1, 1, 4
+    ```
+
+- 当输入数据类型为`unsigned long long`时：
+
+    ```text
+    x: 0, 1, 2, 8, 15
+    result: 0, 1, 1, 1, 4
+    ```

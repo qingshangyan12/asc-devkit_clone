@@ -76,3 +76,10 @@ inline long long int llabs(long long int x)
         dst[idx] = llabs(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+result: 12, 0, 23, 7
+```

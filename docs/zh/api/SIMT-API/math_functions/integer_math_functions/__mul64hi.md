@@ -29,7 +29,7 @@
 
 获取输入int64类型数据x和y乘积的高64位。
 
-![](../../../figures/zh-cn_formulaimage_0000002562010435.png)
+![](../../../figures/formulaimage_0000002562010435.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ long long __mul64hi(long long x, long long y)
         dst[idx] = __mul64hi(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 23, -7, 6
+y: 6, 3, 4, 15
+result: -1, 0, -1, 0
+```

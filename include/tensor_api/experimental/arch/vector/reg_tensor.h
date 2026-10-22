@@ -39,19 +39,37 @@ struct reg_tensor {
     /** @brief Architecture-specific vector register type for the element type. */
     using reg_type = typename detail::type_get<elem_type>::type;
 
-    /** @brief Default-constructs a register tensor. */
+    /**
+     * @ingroup simd_api.tensor_api.reg_vector_compute.reg_tensor
+     * @brief Default-constructs a register tensor.
+     *
+     * @override_id te_experimental_reg_tensor_reg_tensor__void
+     * @archs 3510
+     */
     __simd_callee__ reg_tensor() = default;
 
     /**
+     * @ingroup simd_api.tensor_api.reg_vector_compute.reg_tensor
      * @brief Constructs a register tensor with the specified active-lane mask.
-     * @param maskValue Raw vector predicate used as the active-lane mask.
+     *
+     * @override_id te_experimental_reg_tensor_reg_tensor__const_vector_bool_R
+     * @archs 3510
+     * @param [in] maskValue Raw vector predicate used as the active-lane mask.
+     * @note A mask value of 1 enables the corresponding element; a value of 0 disables it. Setting the mask does not
+     * modify the underlying register data.
      */
     __simd_callee__ reg_tensor(const vector_bool& maskValue) : mask(maskValue) {}
 
     /**
+     * @ingroup simd_api.tensor_api.reg_vector_compute.reg_tensor
      * @brief Sets the active-lane mask from a Boolean register tensor.
-     * @param maskReg Register tensor whose register value supplies the mask.
+     *
+     * @override_id te_experimental_reg_tensor_with_mask__const_reg_tensor_bool_R
+     * @archs 3510
      * @return A reference to this register tensor.
+     * @param [in] maskReg Register tensor whose register value supplies the mask.
+     * @note A mask value of 1 enables the corresponding element; a value of 0 disables it. Setting the mask does not
+     * modify the underlying register data.
      */
     __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
 

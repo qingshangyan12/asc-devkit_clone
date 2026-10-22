@@ -107,3 +107,11 @@ $$
         asc_vf_call<simt_fast_div>(dim3(1024), output, value, magic, shift, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+value: 100, 256, 1024, 2048
+divisor: 5, 6, 7, 8
+result: 20, 42, 146, 256
+```

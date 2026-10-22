@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_H
 #endif
 
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_H
@@ -30,6 +30,15 @@ struct histogram_options {
 
 inline constexpr histogram_options default_histogram_options{};
 
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.histogram_compute
+ * @brief Returns histogram or cumulative histogram counts accumulated onto dst for the masked source values.
+ *
+ * @override_id te_experimental_histograms__const_reg_tensor_T_R_const_reg_tensor_U_R__template_options_T_U
+ * @archs 3510
+ * @param [in] dst Destination tensor.
+ * @param [in] src Source operand.
+ */
 template <const histogram_options& options = default_histogram_options, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const reg_tensor<U>& src);
 
@@ -43,7 +52,7 @@ __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const 
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_H
 #endif

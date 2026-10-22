@@ -3,7 +3,7 @@
 ## 产品支持情况<a name="section73648168211"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR&950DT系列产品：不支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
 - Atlas A3系列产品：支持
@@ -52,7 +52,7 @@ T* GetDataPtr()
 
 示例中待解析的srcGm内存排布如下图所示：
 
-![](../../../../figures/zh-cn_image_0000002340320301.png)
+![](../../../../figures/image_0000002340320301.png)
 
 ```cpp
 AscendC::ListTensorDesc listTensorDesc(reinterpret_cast<__gm__ void *>(srcGm)); // srcGm为待解析的gm地址

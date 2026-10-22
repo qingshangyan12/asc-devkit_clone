@@ -76,3 +76,10 @@ inline bool __hisinf(half x)
         dst[idx] = __hisinf(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, inf, -inf, nan
+result: false, true, true, false
+```

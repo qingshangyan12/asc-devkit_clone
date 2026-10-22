@@ -94,3 +94,10 @@ inline half hfloor(half x)
         asc_vf_call<kernel_hfloor>(dim3(1024), dst, x, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: -2, 0, 2, -4
+```

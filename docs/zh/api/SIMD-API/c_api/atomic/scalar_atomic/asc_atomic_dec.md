@@ -45,7 +45,7 @@ __aicore__ inline <dtype> asc_atomic_dec(__gm__ <dtype>* address,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`uint32_t`、`uint64_t`。
+`dtype`取值为：`uint32_t`、`uint64_t`。
 
 ### 函数原型典型示例
 
@@ -61,7 +61,7 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | val | 输入 | 源操作数。 |
 
 ## 返回值说明

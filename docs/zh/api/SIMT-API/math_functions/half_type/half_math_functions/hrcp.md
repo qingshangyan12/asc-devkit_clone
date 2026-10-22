@@ -29,7 +29,7 @@
 
 获取输入数据x的倒数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533480329.png)
+![](../../../../figures/formulaimage_0000002533480329.png)
 
 ## 函数原型
 
@@ -92,3 +92,10 @@ inline half hrcp(half x)
         dst[idx] = hrcp(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: -0.799805, 2, 0.399902, -0.266602
+```

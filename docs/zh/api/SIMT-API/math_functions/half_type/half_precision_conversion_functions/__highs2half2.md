@@ -105,3 +105,11 @@ inline half2 __highs2half2(const half2 x, const half2 y)
         asc_vf_call<simt_highs2half2>(dim3(1024), (__gm__ half2*)input1, (__gm__ half2*)input2, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (-2, 1.25), (0.75, -0.25)
+y: (0.5, -2), (1.25, 3), (1.5, -1), (-0.5, 2.25)
+result: (0.5, -2), (-3.75, 3), (1.25, -1), (-0.25, 2.25)
+```

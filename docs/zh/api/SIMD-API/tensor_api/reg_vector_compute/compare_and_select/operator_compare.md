@@ -183,7 +183,7 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void compare_example(InputTensor input, OutputTensor output)

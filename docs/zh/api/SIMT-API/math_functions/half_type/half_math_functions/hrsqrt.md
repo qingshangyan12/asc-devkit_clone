@@ -29,7 +29,7 @@
 
 获取输入数据x的平方根的倒数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533360289.png)
+![](../../../../figures/formulaimage_0000002533360289.png)
 
 ## 函数原型
 
@@ -87,3 +87,10 @@ inline half hrsqrt(half x)
         dst[idx] = hrsqrt(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: nan, 1.41406, 0.632324, nan
+```

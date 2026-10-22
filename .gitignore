@@ -33,6 +33,7 @@ build_device/
 .cursor/
 .opencode/
 docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
+.agent/skills/asc-search/index/
 
 oat_reports/
 

@@ -38,8 +38,8 @@
 
 ```c
 __aicore__ inline void asc_set_l0c_copy_nz_para(uint16_t matrix_num,
-                                            uint16_t src_nz_matrix_stride,
-                                            uint32_t dst_matrix_stride)
+                                                uint16_t src_nz_matrix_stride,
+                                                uint32_t dst_matrix_stride)
 ```
 
 ## 参数说明

@@ -45,7 +45,7 @@ $$
 ```cpp
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_trunc(vector_<dtype> src,
-                                                 vector_bool mask)
+                                                vector_bool mask)
 
 // 通过引用和参数输出结果（占位符形式）
 __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
@@ -55,14 +55,14 @@ __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-`<dtype>`取值为：`half`、`bfloat16_t`、`float`。
+`dtype`取值为：`half`、`bfloat16_t`、`float`。
 
 ### 函数原型典型示例
 
 ```cpp
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_half asc_trunc(vector_half src,
-                                              vector_bool mask)
+                                             vector_bool mask)
 
 // 通过引用和参数输出结果
 __simd_callee__ inline void asc_trunc(vector_half& dst,

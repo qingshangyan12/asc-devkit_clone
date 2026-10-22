@@ -40,8 +40,8 @@
 
 - Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
 - Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../cube_store_aux_config/asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
-- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
+- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用；
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用；
 - 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
 
 `quant_pre_mode`量化模式参数支持的枚举值如下：
@@ -80,8 +80,6 @@
 
 ## 函数原型
 
-### 模板原型
-
 ```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
@@ -101,7 +99,7 @@ __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
                                        bool enable_clip_relu_pre)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 src dtype与dst dtype支持以下组合：
 
@@ -139,7 +137,7 @@ __aicore__ inline void asc_copy_l0c2ub(__ubuf__ half* dst,
 | src | 输入 | 源操作数，存储位置为L0C Buffer。起始地址需要按照64字节对齐。 |
 | n_size | 输入 | 源Nz矩阵在N方向上的大小，取值范围为$[1, 2^{12}-1]$。<br>对于Nz输出场景：<br>&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。<br>对于ND输出场景：<br>&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。<br> |
 | m_size | 输入 | 源Nz矩阵在M方向上的大小，取值范围为$[1, 2^{16}-1]$。<br>对于DN输出场景：<br>&nbsp;&nbsp;&bull; $m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。<br> |
-| dst_stride | 输入 | 目的矩阵步长，取值范围为$[1, 2^{32}-1]$，对应的字节长度需32字节对齐。<br>&nbsp;&nbsp;&bull; 若不开启Nz2ND功能，`dst_stride`表示目的Nz矩阵中相邻Z排布的起始地址偏移，单位为元素。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，`dst_stride`表示目的ND/DN矩阵每一行中的元素个数，单位为元素。对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
+| dst_stride | 输入 | 目的矩阵步长，取值范围为$[1, 2^{32}-1]$，对应的字节长度需32字节对齐。<br>&nbsp;&nbsp;&bull; 若不开启Nz2ND功能，`dst_stride`表示目的Nz矩阵中相邻Z排布的起始地址偏移，单位为元素。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，`dst_stride`表示目的ND/DN矩阵每一行中的元素个数，单位为元素。不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
 | src_stride | 输入 | 源Nz矩阵中相邻Z排布的起始地址偏移，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。取值范围为$[0, 2^{16}-1]$。 |
 | sub_blockid | 输入 | 启用单目标模式时用于指示目标UB的SUB BLOCK ID。取值为0或1，取值为0时写入SUB BLOCK0，为1时写入SUB BLOCK1。 |
 | dual_dst_ctrl | 输入 | 双目标模式控制参数。当同一AI Core内有一个Cube Core和两个Vector Core时，如果启用双目标模式控制，L0C Buffer中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。参数取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_dual_dst_mode::DUAL_DST_DISABLE`：单目标模式，将整个矩阵写入通过`sub_blockid`参数配置的目标UB。<br>&nbsp;&nbsp;&bull; `asc_dual_dst_mode::DUAL_DST_SPLIT_M`：双目标模式，按M维度拆分成形状为$M/2\times N$的两个矩阵，分别写入两个UB，M必须为2的倍数。<br>&nbsp;&nbsp;&bull; `asc_dual_dst_mode::DUAL_DST_SPLIT_N`：双目标模式，按N维度拆分成形状为$M\times N/2$的两个矩阵，分别写入两个UB，N须为32的倍数。<br>该参数仅支持普通搬运模式（Nz2Nz）或Nz2ND搬运场景，不支持其他随路功能场景。<br>拆分方向及约束见[L0C Buffer到UB双目标模式](../cube_store_key_features/L0C_to_UB_dual_target_mode.md)。 |
@@ -166,7 +164,7 @@ PIPE_FIX
 - 本接口非AIC调用直接返回。
 - `dst`起始地址需要按照32字节对齐，否则触发异常。
 - `src`起始地址需要按照64字节对齐，否则触发异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD与SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst偏移量与搬运大小之和不可超过实际可用容量，否则触发写溢出异常。
 - L0C Buffer容量上限：L0C Buffer总容量256KB，src偏移量与搬运大小之和不可超过L0C Buffer容量，否则触发读溢出异常。
 - Nz矩阵以16×16个元素为一个基本分形。边界分形中超出`n_size`或`m_size`指定范围的数据不属于有效搬运结果。
