@@ -26,6 +26,15 @@
 
 namespace asc {
 namespace te {
+namespace detail {
+
+template <typename Pattern>
+constexpr bool is_conv_layout_pattern_v =
+    Std::is_same_v<Pattern, nchw_layout_ptn> || Std::is_same_v<Pattern, nhwc_layout_ptn> ||
+    Std::is_same_v<Pattern, nc1hwc0_layout_ptn> || Std::is_same_v<Pattern, ncdhw_layout_ptn> ||
+    Std::is_same_v<Pattern, ndc1hwc0_layout_ptn>;
+
+} // namespace detail
 
 template <typename LayoutPattern, typename Trait, typename Shape, typename Stride>
 __aicore__ inline constexpr auto make_pattern_layout(const Shape& shape, const Stride& stride)
