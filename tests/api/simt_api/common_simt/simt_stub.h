@@ -32,10 +32,6 @@ constexpr int16_t HALF_MAX_EXP = 31;
 const float HALF_SUBNORMAL_THRESHOLD = std::pow(2, -14);
 } // namespace
 
-static half __hmax_nan(half x, half y) { return half(0); }
-
-static half __hmin_nan(half x, half y) { return half(0); }
-
 template <typename T>
 T __shfl(T var, int32_t src_lane, int32_t width)
 {
@@ -624,22 +620,6 @@ float8_e5m2x2_t __cvt_float8_e5m2x2_t(SRC_TYPE src)
     static_assert(std::is_same_v<SRC_TYPE, float2>, "stc type can only be float2");
     static_assert(rnd == ROUND::CAST_RINT, "rnd type can only be: ROUND_R");
     float8_e5m2x2_t res{fp8_e5m2_t(src.x), fp8_e5m2_t(src.y)};
-    return res;
-}
-
-static half2 __float22half2_rz(float2 const x)
-{
-    half2 res;
-    res.x = __cvt_half<ROUND::CAST_TRUNC, RoundingSaturation::RS_DISABLE_VALUE>(x.x);
-    res.y = __cvt_half<ROUND::CAST_TRUNC, RoundingSaturation::RS_DISABLE_VALUE>(x.y);
-    return res;
-}
-
-static float2 __half22float2(half2 const x)
-{
-    float2 res;
-    res.x = __cvt_float<ROUND::CAST_RINT, RoundingSaturation::RS_DISABLE_VALUE>(x.x);
-    res.y = __cvt_float<ROUND::CAST_RINT, RoundingSaturation::RS_DISABLE_VALUE>(x.y);
     return res;
 }
 
