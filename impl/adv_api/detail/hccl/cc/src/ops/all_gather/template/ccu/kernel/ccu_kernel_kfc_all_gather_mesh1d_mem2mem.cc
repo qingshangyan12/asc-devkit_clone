@@ -310,8 +310,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     // 按芯片版本选择本卡数据拷贝方式：Ascend950(CCU_V1) 使用 GroupCopy，
     // Ascend960(CCU_V2) 使用 LocalCopy。
     const CcuVersion ccuVersion = GetCcuVersion();
-    const bool isUseGroupCopy = (ccuVersion == CcuVersion::CCU_V1);
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, isUseGroupCopy)); }
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
