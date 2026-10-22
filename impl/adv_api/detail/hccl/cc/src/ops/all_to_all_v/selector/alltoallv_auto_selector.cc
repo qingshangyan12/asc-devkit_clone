@@ -16,6 +16,9 @@ namespace {
 constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
 constexpr u32 A2AV_CCU_MAX_RANK_SIZE = 64U; // 与 hccl A2AV_CCU_MAX_RANK_SIZE 一致
 constexpr u32 TOPO_LEVEL_NUM_3 = 3U;
+// 对齐模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 元数据守卫（alg_param.h）：
+// kernel 虽为多 event 可支持更多 rank，模板层仍限 16，selector 前置拒绝
+constexpr u32 CCU_MESH1D_MAX_RANK_SIZE = 16U;
 } // namespace
 
 SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
@@ -93,6 +96,16 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
         SelectorStatus::NOT_MATCH);
     if (topoInfo->topoLevelNums > 1U) {
         if (topoInfo->level0Topo != Level0Shape::CLOS) {
+            // 非 pcieMix 的 MESH_1D_CLOS：SoleMesh（TopoMatch1D 扁平 hierarchy）被 executor 的
+            // MESH_1D_CLOS 双实例契约阻塞（BuildResourceHierarchyInfo 要求 infos[0].size()==2，
+            // 资源阶段必报错），selector 前置拒绝；pcieMix 场景走扁平分支不受影响
+            if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+                HCCL_WARNING(
+                    "[AlltoAllVAutoSelector][%s] multi-level non-pcieMix MESH_1D_CLOS is blocked by executor "
+                    "hierarchy contract.",
+                    __func__);
+                return SelectorStatus::NOT_MATCH;
+            }
             // hccl 侧 int8 判断借 union 重叠读 all2AllDataDes.sendType，此处直接用 all2AllVDataDes 语义等价
             if (opParam.all2AllVDataDes.sendType == HcclDataType::HCCL_DATA_TYPE_INT8) {
                 HCCL_WARNING("[Algo][AlltoAllVAutoSelector] int8 is not supported yet for ccu_schedule mode.");
@@ -138,6 +151,14 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
         }
         if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
             HCCL_DEBUG("[AlltoAllVAutoSelector][%s] TWO_DIE_NOT_REGULAR not match", __func__);
+            return SelectorStatus::NOT_MATCH;
+        }
+        // 模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 元数据守卫（alg_param.h）：
+        // 超限会在资源阶段报错且 CCU 路径无回退，selector 前置拒绝
+        if (topoInfo->userRankSize > CCU_MESH1D_MAX_RANK_SIZE) {
+            HCCL_WARNING(
+                "[AlltoAllVAutoSelector][%s] rankSize[%u] exceeds CCU_MESH1D_MAX_RANK_SIZE[%u].", __func__,
+                topoInfo->userRankSize, CCU_MESH1D_MAX_RANK_SIZE);
             return SelectorStatus::NOT_MATCH;
         }
         selectAlgName = "CcuSchedAllToAllVSoleMesh";

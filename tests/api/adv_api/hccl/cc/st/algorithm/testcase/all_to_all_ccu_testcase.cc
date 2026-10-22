@@ -204,4 +204,28 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_pcie_mix_connectivity_co
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
 }
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_single_level_mesh1d_over_rank_limit_never_matches_ccu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(17U); // 单级 MESH_1D，超模板 rank 上限
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    // 模板 CalcRes 有 CCU_MAX_RANK_SIZE=16 元数据守卫（alg_param.h），超限会在资源阶段报错；
+    // selector 需前置拒绝（kernel 虽为多 event，模板守卫仍限 16）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
+}
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_mesh1d_clos_non_pcie_mix_never_matches_ccu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(4U); // MESH_1D_CLOS 非 pcieMix
+    topo.topoLevelNums = 2U;
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    // SoleMesh（TopoMatch1D 扁平 hierarchy）被 executor 的 MESH_1D_CLOS 双实例契约阻塞
+    // （BuildResourceHierarchyInfo 要求 infos[0].size()==2，资源阶段必报错），selector 需前置拒绝；
+    // pcieMix 场景不受影响（走 else 扁平分支，见 pcie_mix_connectivity_contract 用例）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
+}
 } // namespace checker
