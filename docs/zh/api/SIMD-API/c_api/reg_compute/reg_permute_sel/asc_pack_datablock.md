@@ -3,7 +3,7 @@
 ## 产品支持情况
 
 <!-- npu="960" id8 -->
-- Ascend 960PR&960DT系列产品：支持
+- Ascend 960PR&960DT系列产品：Ascend 960DT支持，Ascend 960PR不支持
 <!-- end id8 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：不支持
@@ -33,7 +33,7 @@
 
 按照DataBlock粒度对矢量数据寄存器中的数据进行打包，源操作数和目的操作数的数据类型一致。每个DataBlock长度为32B。
 
-本接口为Reg矢量计算接口，仅在AIV上生效，仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+本接口为Reg矢量计算接口，仅在AIV上生效，仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 
 ## 函数原型
 
@@ -81,7 +81,7 @@ __simd_callee__ inline vector_<dtype> asc_pack_datablock(vector_<dtype> src)
 ## 约束说明
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- 仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+- 仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 - 源操作数和目的操作数的数据类型必须一致。
 
 ## 调用示例

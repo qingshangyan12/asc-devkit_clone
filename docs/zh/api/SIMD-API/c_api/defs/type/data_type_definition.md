@@ -46,6 +46,8 @@
 
 - `vector_int4x2_t`、`vector_fp4x2_e2m1_t`和`vector_fp4x2_e1m2_t`均为打包类型，两个4 bit元素共用一个字节的存储空间，因此归入`b8`位宽类别。
 
+- `vector_fp8_e6m2_t`要求Ascend C DevKit 9.2.0及以上版本。
+
 - 矢量数据寄存器的数量上限为32。超出上限的寄存器数据会写入预留的8KB Unified Buffer（UB）空间中，可能会引发性能劣化。编译器会自动复用生命周期结束的寄存器和预留空间；若两者均可用，则优先复用寄存器。
 
 - 寄存器的生命周期限定于单个Vector Function（VF）内部。

@@ -3,7 +3,7 @@
 ## 产品支持情况
 
 <!-- npu="960" id9 -->
-- Ascend 960PR&960DT系列产品：支持
+- Ascend 960PR&960DT系列产品：Ascend 960DT支持，Ascend 960PR不支持
 <!-- end id9 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
@@ -34,7 +34,7 @@
 将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）或低32位（b64）写入目的操作数的低半部分。
 当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的低半部分。
 
-其中，b64重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+其中，b64重载仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 
 ![](../../../../figures/pack_low_draft.png)
 
@@ -102,7 +102,7 @@ __simd_callee__ inline vector_uint8_t asc_pack_to_low(vector_uint16_t src)
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
-- `uint64_t`和`int64_t`源操作数对应的b64重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+- `uint64_t`和`int64_t`源操作数对应的b64重载仅支持Ascend 960DT产品的`dav-9201`架构，且要求Ascend C DevKit 9.2.0及以上版本。
 
 ## 调用示例
 
