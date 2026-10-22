@@ -7,6 +7,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 
 """Check every result and both packed comparison masks."""
+
 import sys
 from pathlib import Path
 import numpy as np
