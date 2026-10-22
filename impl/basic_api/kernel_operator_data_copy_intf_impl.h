@@ -1196,6 +1196,24 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif // ASCENDC_CPU_DEBUG
 }
 
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
+{
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    if (srcHWPos == Hardware::L1 && dstHWPos == Hardware::UB) {
+        DataCopyL12UBNZ2NDImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+        return;
+    }
+    ASCENDC_CHECK_TPOSITION(
+        false, "src/dst", "L1/UB", "DataCopy with Nz2DnParamsFull",
+        GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+}
+#endif
+
 /*
  * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2dn, applicable to simulated cube data(such as data from l0c, 16*16)
@@ -1205,7 +1223,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #if defined(__NPU_ARCH__) && \
     ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+__aicore__ inline void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2DnParamsFull& intriParams)
 {
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
@@ -1214,7 +1232,22 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         return;
     }
     ASCENDC_CHECK_TPOSITION(
-        false, "src", "UB(VECOUT)", "DataCopy with Nz2DnParamsFull",
+        false, "src", "L1", "DataCopy with Nz2DnParamsFull",
+        GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+}
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nz2DnParamsFull& intriParams)
+{
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    if (srcHWPos == Hardware::L1 && dstHWPos == Hardware::UB) {
+        DataCopyL12UBNZ2DNImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+        return;
+    }
+    ASCENDC_CHECK_TPOSITION(
+        false, "src/dst", "L1/UB", "DataCopy with Nz2DnParamsFull",
         GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
 }
 #endif
