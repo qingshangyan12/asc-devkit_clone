@@ -230,7 +230,7 @@ __aicore__ inline void Exp(
 template <
     typename T, bool isSetMask, const ExpConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -266,7 +266,7 @@ __aicore__ inline void Exp(
 template <
     typename T, bool isSetMask, const ExpConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -307,7 +307,7 @@ __aicore__ inline void Exp(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -347,7 +347,7 @@ __aicore__ inline void Exp(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -390,7 +390,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 template <
     typename T, const ExpConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -425,7 +425,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 template <
     typename T, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -475,7 +475,7 @@ __aicore__ inline void Ln(
 template <
     typename T, bool isSetMask, const LnConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -511,7 +511,7 @@ __aicore__ inline void Ln(
 template <
     typename T, bool isSetMask, const LnConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -552,7 +552,7 @@ __aicore__ inline void Ln(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -592,7 +592,7 @@ __aicore__ inline void Ln(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -635,7 +635,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 template <
     typename T, const LnConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -670,7 +670,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 template <
     typename T, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -900,7 +900,7 @@ __aicore__ inline void Reciprocal(
 template <
     typename T, bool isSetMask, const ReciprocalConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -936,7 +936,7 @@ __aicore__ inline void Reciprocal(
 template <
     typename T, bool isSetMask, const ReciprocalConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -978,7 +978,7 @@ __aicore__ inline void Reciprocal(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1018,7 +1018,7 @@ __aicore__ inline void Reciprocal(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1061,7 +1061,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 template <
     typename T, const ReciprocalConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1096,7 +1096,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 template <
     typename T, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1146,7 +1146,7 @@ __aicore__ inline void Rsqrt(
 template <
     typename T, bool isSetMask, const RsqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1182,7 +1182,7 @@ __aicore__ inline void Rsqrt(
 template <
     typename T, bool isSetMask, const RsqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1223,7 +1223,7 @@ __aicore__ inline void Rsqrt(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1263,7 +1263,7 @@ __aicore__ inline void Rsqrt(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1306,7 +1306,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 template <
     typename T, const RsqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1341,7 +1341,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 template <
     typename T, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1391,7 +1391,7 @@ __aicore__ inline void Sqrt(
 template <
     typename T, bool isSetMask, const SqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1427,7 +1427,7 @@ __aicore__ inline void Sqrt(
 template <
     typename T, bool isSetMask, const SqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1468,7 +1468,7 @@ __aicore__ inline void Sqrt(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1508,7 +1508,7 @@ __aicore__ inline void Sqrt(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1551,7 +1551,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 template <
     typename T, const SqrtConfig& config, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
@@ -1586,7 +1586,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 template <
     typename T, typename Operand0, typename Operand1,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),

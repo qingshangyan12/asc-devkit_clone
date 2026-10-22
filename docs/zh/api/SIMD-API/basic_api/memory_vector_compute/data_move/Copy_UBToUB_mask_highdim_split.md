@@ -63,6 +63,38 @@
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
+### 指针与LocalTensor混合调用
+
+本接口增加以下指针重载。dst和src可独立选择`__ubuf__ T*`或LocalTensor，至少一个操作数为指针；全LocalTensor调用继续使用原接口。指针形式沿用本页的产品支持、数据类型、32字节对齐和地址重叠约束。调用者须保证指针所指缓冲区容量有效。
+
+```cpp
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+```
+
+模板参数T默认从目的操作数推导，显式指定时须与源、目的元素类型一致；目的操作数必须可写。Operand0/Operand1由实参推导，enable_if用于检查合法组合，无需调用者填写。其他参数及返回值与原形式一致。公共约束和完整核函数示例见[VECTOR Basic API指针接口](../vector_pointer.md)。
+
 ## 参数说明<a name="zh-cn_topic_0000002567699435_section16128134420472"></a>
 
 **表1**  模板参数说明
@@ -223,3 +255,16 @@
 ```
 
 完整样例请参考[Copy样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)。
+
+### 指针调用示例
+
+```cpp
+// dstLocal/srcLocal为按本页要求分配并同步的UB缓冲区，容量至少为64个float。
+__ubuf__ float* dstPtr = (__ubuf__ float*)dstLocal.GetPhyAddr();
+__ubuf__ float* srcPtr = (__ubuf__ float*)srcLocal.GetPhyAddr();
+AscendC::CopyRepeatParams params{1, 1, 8, 8};
+AscendC::Copy(dstPtr, srcLocal, uint64_t(64), uint8_t(1), params);
+AscendC::PipeBarrier<PIPE_V>();
+uint64_t bits[2] = {0xFFFFFFFFFFFFFFFF, 0};
+AscendC::Copy(dstLocal, srcPtr, bits, uint8_t(1), params);
+```

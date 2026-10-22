@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_gather.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -54,7 +54,6 @@ __aicore__ inline void Gatherb(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& offset, const uint8_t repeatTime,
     const GatherRepeatParams& repeatParams);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -66,7 +65,6 @@ template <
         int>::type = 0>
 __aicore__ inline void Gatherb(
     Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime, const GatherRepeatParams& repeatParams);
-#endif
 
 /*
  * @ingroup gather Level 0
@@ -84,7 +82,6 @@ __aicore__ inline void Gather(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset,
     const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -97,7 +94,6 @@ template <
 __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask,
     const uint8_t repeatTime, const uint16_t dstRepStride);
-#endif
 
 /*
  * @ingroup gather Level 0
@@ -115,7 +111,6 @@ __aicore__ inline void Gather(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset,
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -128,7 +123,6 @@ template <
 __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask[],
     const uint8_t repeatTime, const uint16_t dstRepStride);
-#endif
 
 /*
  * @ingroup gather Level 2
@@ -159,7 +153,6 @@ __aicore__ inline void GatherDataCopy(
     GatherPadParams<T>& gatherPadParam);
 #endif
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -171,7 +164,6 @@ template <
         int>::type = 0>
 __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint32_t count);
-#endif
 } // namespace AscendC
 #pragma end_pipe
 #if defined(__NPU_ARCH__)

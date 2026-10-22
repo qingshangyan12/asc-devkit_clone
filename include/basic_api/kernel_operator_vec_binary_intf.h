@@ -27,14 +27,10 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_binary.h"
 
-#if defined(__NPU_ARCH__) &&                                                                         \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || \
-     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
-#include "reg_compute/kernel_reg_compute_utils.h"
-#endif
+#include "basic_api/reg_compute/kernel_reg_compute_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -318,32 +314,45 @@ __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
-template <
-    typename T = VectorOperand::DefaultType, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG,
-    typename Operand0, typename Operand1, typename Operand2,
-    typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-            VectorOperand::IsWritable<Operand0>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
-        int>::type = 0>
-__ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
-__aicore__ inline void Div(
-    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams);
-
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
+#else
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Div(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Div(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
+
+#endif
+
 template <
     typename T = VectorOperand::DefaultType, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG,
     typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Div(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG,
+    typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -353,17 +362,12 @@ __ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disa
 __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
-#else
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Div(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <
     typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
     typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -373,16 +377,11 @@ __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
-template <typename T, bool isSetMask = true>
-__aicore__ inline void Div(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask,
-    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
-
 template <
     typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
     typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -391,7 +390,6 @@ template <
 __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
-#endif
 
 /*
  * @ingroup Div Level 2
@@ -407,33 +405,35 @@ template <typename T, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
 
-template <
-    typename T = VectorOperand::DefaultType, const DivConfig& config = DEFAULT_DIV_CONFIG, typename Operand0,
-    typename Operand1, typename Operand2,
-    typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
-            VectorOperand::IsWritable<Operand0>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
-            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
-        int>::type = 0>
-__aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count);
 #else
 template <typename T>
 __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
 
+#endif
+
 template <
-    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename T = VectorOperand::DefaultType, const DivConfig& config = DEFAULT_DIV_CONFIG, typename Operand0,
+    typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
         int>::type = 0>
 __aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count);
-#endif
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type = 0>
+__aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count);
 
 /* **************************************************************************************************
  * MulAddDst                                             *

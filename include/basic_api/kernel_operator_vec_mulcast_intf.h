@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_binary.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -43,7 +43,6 @@ __aicore__ inline void MulCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
     typename Operand0, typename Operand1, typename Operand2,
@@ -58,7 +57,6 @@ __ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-
 __aicore__ inline void MulCast(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
-#endif
 
 template <typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -66,7 +64,6 @@ __aicore__ inline void MulCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, bool isSetMask = true,
     typename Operand0, typename Operand1, typename Operand2,
@@ -81,13 +78,11 @@ __ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-
 __aicore__ inline void MulCast(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
-#endif
 
 template <typename T, typename U>
 __aicore__ inline void MulCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint32_t count);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType, typename Operand0,
     typename Operand1, typename Operand2,
@@ -99,7 +94,6 @@ template <
             VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
         int>::type = 0>
 __aicore__ inline void MulCast(Operand0 dst, Operand1 src0, Operand2 src1, uint32_t count);
-#endif
 } // namespace AscendC
 #pragma end_pipe
 

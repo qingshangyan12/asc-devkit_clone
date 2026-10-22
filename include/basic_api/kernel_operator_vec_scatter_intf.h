@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -51,7 +51,6 @@ __aicore__ inline void Scatter(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
     const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -64,7 +63,6 @@ template <
 __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask,
     const uint8_t repeatTime, const uint8_t srcRepStride);
-#endif
 
 /*
  * @ingroup scatter Level 0
@@ -81,7 +79,6 @@ __aicore__ inline void Scatter(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
     const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -94,7 +91,6 @@ template <
 __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask[],
     const uint8_t repeatTime, const uint8_t srcRepStride);
-#endif
 
 /*
  * @ingroup scatter Level 2
@@ -123,7 +119,6 @@ __aicore__ inline void ScatterDataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offset, ScatterParams& scatterParams);
 #endif
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -135,7 +130,6 @@ template <
         int>::type = 0>
 __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint32_t count);
-#endif
 } // namespace AscendC
 #pragma end_pipe
 

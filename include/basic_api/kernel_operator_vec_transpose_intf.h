@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_transpose.h"
 #include "../../impl/basic_api/utils/kernel_utils_constants.h"
 
@@ -101,7 +101,6 @@ __aicore__ inline void Transpose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const TransposeParamsExt& transposeParams);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -113,7 +112,6 @@ template <
         int>::type = 0>
 __aicore__ inline void Transpose(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const TransposeParamsExt& transposeParams);
-#endif
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __check_sync_alias__ __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(

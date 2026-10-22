@@ -13,6 +13,14 @@
 
 namespace AscendC {
 namespace VectorOperand {
+// Select the existing Config/non-Config overload family in the implementation layer.
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
+constexpr bool HAS_CONFIG = true;
+#else
+constexpr bool HAS_CONFIG = false;
+#endif
+
 struct DefaultType {};
 template <typename T>
 struct Identity {

@@ -22,8 +22,8 @@ for dir in "${repo_root}" "${repo_root}/include" "${repo_root}/include/basic_api
 done
 flags+=(-I "${repo_root}")
 : > "${log_dir}/command.txt"
-for fixture in kernel_vector_pointer kernel_vector_pointer_conversion; do
-    source_file="${repo_root}/tests/api/basic_api/ascendc_header_checker/${fixture}.cpp"
+for fixture in target_arithmetic target_conversion; do
+    source_file="${repo_root}/tests/api/basic_api/vector_pointer/${fixture}.cpp"
     printf '%q ' "${compiler}" "${flags[@]}" "${source_file}" -o "${log_dir}/${fixture}.o" >> "${log_dir}/command.txt"
     printf '\n' >> "${log_dir}/command.txt"
     if ! "${compiler}" "${flags[@]}" "${source_file}" -o "${log_dir}/${fixture}.o" > "${log_dir}/${fixture}.log" 2>&1; then
@@ -41,7 +41,7 @@ root = root.resolve()
 entries = json.loads((root / 'tests/api/basic_api/vector_pointer/scope.json').read_text())['entries']
 expected = {e['header'] for e in entries}
 seen = set()
-for log in logdir.glob('kernel_vector_pointer*.log'):
+for log in logdir.glob('target_*.log'):
     for raw in re.findall(r'^\.+\s+([^\n]+\.h)\s*$', log.read_text(errors='replace'), re.M):
         path = Path(raw.strip()).resolve()
         if path.name in expected or path.name.replace('_intf_impl.h', '_intf.h') in expected:

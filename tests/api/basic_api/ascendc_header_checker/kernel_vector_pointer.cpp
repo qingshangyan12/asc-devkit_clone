@@ -8,11 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#ifndef VERIFY_SINGLE_HEADER
+#include "kernel_operator.h"
+#else
 #include "basic_api/kernel_operator_vec_binary_intf.h"
 #include "basic_api/kernel_operator_vec_unary_intf.h"
+#endif
 
-// Target code-generation and provenance checks: vector_pointer/run_target_headers.sh.
-#if __NPU_ARCH__ == 3510
+// Cross-architecture checks use data types and operations shared by the supported backends.
+// Complete dav-3510 instantiation coverage is in vector_pointer/target_arithmetic.cpp.
 namespace {
 using namespace AscendC;
 
@@ -49,13 +53,7 @@ DEFINE_POINTER_CHECK(Max)
 DEFINE_POINTER_CHECK(Min)
 DEFINE_POINTER_CHECK(And)
 DEFINE_POINTER_CHECK(Or)
-DEFINE_POINTER_CHECK(AddRelu)
-DEFINE_POINTER_CHECK(SubRelu)
 DEFINE_POINTER_CHECK(Div)
-DEFINE_POINTER_CHECK(FusedMulAdd)
-DEFINE_POINTER_CHECK(FusedMulAddRelu)
-DEFINE_POINTER_CHECK(MulAddDst)
-DEFINE_POINTER_CHECK(MulAddRelu)
 
 #undef DEFINE_POINTER_CHECK
 #undef CHECK_POINTER_COMBINATIONS
@@ -70,18 +68,12 @@ __aicore__ void CheckVectorPointerFloat(
     CheckMul(dst, src0, src1);
     CheckMax(dst, src0, src1);
     CheckMin(dst, src0, src1);
-    CheckAddRelu(dst, src0, src1);
-    CheckSubRelu(dst, src0, src1);
     CheckDiv(dst, src0, src1);
-    CheckFusedMulAdd(dst, src0, src1);
-    CheckFusedMulAddRelu(dst, src0, src1);
-    CheckMulAddDst(dst, src0, src1);
-    CheckMulAddRelu(dst, src0, src1);
 }
 
 __aicore__ void CheckVectorPointerInteger(
-    const AscendC::LocalTensor<int32_t>& dst, const AscendC::LocalTensor<int32_t>& src0,
-    const AscendC::LocalTensor<int32_t>& src1)
+    const AscendC::LocalTensor<int16_t>& dst, const AscendC::LocalTensor<int16_t>& src0,
+    const AscendC::LocalTensor<int16_t>& src1)
 {
     CheckAnd(dst, src0, src1);
     CheckOr(dst, src0, src1);
@@ -109,12 +101,6 @@ __aicore__ void CheckVectorPointerUnary(const AscendC::LocalTensor<float>& dst, 
     CHECK_UNARY(Sqrt);
     CHECK_UNARY(Rsqrt);
     CHECK_UNARY(Reciprocal);
-    AscendC::Abs<float, float>(pd, ps, int32_t(32));
-    AscendC::Neg(pd, ps, uint32_t(32));
-    __ubuf__ float arrayDst[32];
-    __ubuf__ float arraySrc[32];
-    AscendC::Add(arrayDst, arraySrc, arraySrc, int32_t(32));
-    AscendC::Abs(arrayDst, arraySrc, int32_t(32));
 }
 #undef CHECK_UNARY
 
@@ -129,4 +115,3 @@ __aicore__ void CheckVectorPointerNot(
     AscendC::Not(dst, ps, uint64_t(32), uint8_t(1), params);
     AscendC::Not(pd, ps, bits, uint8_t(1), params);
 }
-#endif

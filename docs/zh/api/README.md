@@ -196,6 +196,7 @@
                 -   [SetFixPipeClipRelu](SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeClipRelu.md)
                 -   [SetFixPipeAddr](SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeAddr.md)
         -   [Memory矢量计算](SIMD-API/basic_api/memory_vector_compute/memory_vector_compute.md)
+            -   [VECTOR Basic API指针接口](SIMD-API/basic_api/memory_vector_compute/vector_pointer.md)
             -   [Vector逻辑架构](SIMD-API/basic_api/memory_vector_compute/Vector_logical_arch/Vector_logical_arch.md)
             -   [SIMD计算说明](SIMD-API/basic_api/memory_vector_compute/SIMD_compute/SIMD_compute.md)
                 -   [概述](SIMD-API/basic_api/memory_vector_compute/SIMD_compute/overview.md)

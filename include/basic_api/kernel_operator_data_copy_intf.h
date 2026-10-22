@@ -30,7 +30,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
@@ -270,6 +270,8 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline __inout_pipe__(V) void Copy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
 
+#endif
+
 template <
     typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
     typename Std::enable_if<
@@ -279,7 +281,6 @@ template <
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
         int>::type = 0>
 __aicore__ inline __inout_pipe__(V) void Copy(Operand0 dst, Operand1 src, const uint32_t count);
-#endif
 /*
  * @ingroup DataCopy Level 1
  * @brief datacopy from src to dst, applicable to vector data

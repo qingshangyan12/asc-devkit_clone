@@ -12,6 +12,8 @@
 
 接口声明位于 `include/basic_api/`，实现及公共适配器 `impl/basic_api/utils/kernel_vector_operand.h` 位于 `impl/basic_api/`。
 
+接口原型、操作数约束和示例见 [VECTOR Basic API指针接口资料](../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/vector_pointer.md)。
+
 ```cpp
 // 按原接口要求分配 TPipe/TBuf 缓冲区并执行同步。
 __ubuf__ float* dstPtr = (__ubuf__ float*)dst.GetPhyAddr();
@@ -50,6 +52,8 @@ python3 tests/api/basic_api/vector_pointer/run_precision_regressions.py --output
 ```
 
 脚本包含编译命令，并在指定目录生成编译及运行日志。八组设备程序位于 `examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_arithmetic/`。补充签名和精度程序由对应脚本生成后编译。运行时需要设备 0 可用。
+
+`ascendc_header_checker/kernel_vector_pointer*.cpp`面向仓库的多架构头文件检查，包含公开接口并实例化通用调用，不使用架构宏跳过检查。`target_arithmetic.cpp`与`target_conversion.cpp`保留dav-3510的完整类型和混合操作数组合，由`run_target_headers.sh`生成设备目标文件；不支持的产品不应将这些专项用例当作可运行示例。
 
 | 测试组 | 用途 |
 | --- | --- |

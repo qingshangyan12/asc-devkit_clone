@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -116,6 +116,8 @@ __aicore__ inline void Duplicate(Operand0 dst, const T& scalarValue, const int32
 template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 
+#endif
+
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
     typename Std::enable_if<
@@ -125,7 +127,6 @@ template <
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
         int>::type = 0>
 __aicore__ inline void Duplicate(Operand0 dst, Operand1 src, const int32_t& count);
-#endif
 
 /* **************************************************************************************************
  * Interleave                                            *

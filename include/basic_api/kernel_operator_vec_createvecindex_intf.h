@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -41,7 +41,6 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     LocalTensor<T>& dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride,
     uint8_t dstRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0,
     typename Std::enable_if<
@@ -51,14 +50,12 @@ template <
         int>::type = 0>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     Operand0 dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride);
-#endif
 
 template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     LocalTensor<T>& dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
     uint8_t dstRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0,
     typename Std::enable_if<
@@ -69,13 +66,11 @@ template <
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     Operand0 dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
     uint8_t dstRepStride);
-#endif
 
 template <typename T>
 __aicore__ inline __in_pipe__(S)
     __out_pipe__(V) void CreateVecIndex(LocalTensor<T> dst, const T& firstValue, uint32_t count);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0,
     typename Std::enable_if<
@@ -84,7 +79,6 @@ template <
             VectorOperand::IsWritable<Operand0>(),
         int>::type = 0>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(Operand0 dst, const T& firstValue, uint32_t count);
-#endif
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

@@ -79,8 +79,8 @@ struct MrgSortSrcList {
 } // namespace AscendC
 
 // CPU_DEBUG tensor checks require the proposal types to be declared first.
-#include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "basic_api/kernel_tensor.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 
 namespace AscendC {
 template <typename Source1, typename Source2, typename Source3, typename Source4>

@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
 #include "include/utils/common_types.h"
 
@@ -249,7 +249,6 @@ __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
     const int32_t repeatTime, const int32_t srcRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -263,7 +262,6 @@ template <
 __aicore__ inline void ReduceSum(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride);
-#endif
 
 template <typename T>
 __aicore__ inline void ReduceMax(
@@ -306,7 +304,6 @@ __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
     const int32_t repeatTime, const int32_t srcRepStride);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
@@ -320,7 +317,6 @@ template <
 __aicore__ inline void ReduceSum(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride);
-#endif
 
 /*
  * @ingroup ReduceMin Level 2
@@ -388,7 +384,6 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
     typename Operand2,
@@ -401,7 +396,6 @@ template <
             VectorOperand::IsWritable<Operand2>(),
         int>::type = 0>
 __aicore__ inline void ReduceSum(Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count);
-#endif
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T& maxMinValue, T& maxMinIndex);

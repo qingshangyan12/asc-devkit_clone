@@ -27,7 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#include "impl/basic_api/utils/kernel_vector_operand.h"
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_vdeq.h"
@@ -451,7 +451,6 @@ __aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode);
 template <typename T>
 __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo);
 
-#if __NPU_ARCH__ == 3510
 template <
     typename T = VectorOperand::DefaultType, typename Operand0,
     typename Std::enable_if<
@@ -460,7 +459,6 @@ template <
             VectorOperand::IsWritable<Operand0>(),
         int>::type = 0>
 __aicore__ inline void SetDeqScale(Operand0 vdeq, const VdeqInfo& vdeqInfo);
-#endif
 
 /*
  * @ingroup Truncate Level 2

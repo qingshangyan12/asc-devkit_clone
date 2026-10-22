@@ -558,7 +558,7 @@ __aicore__ inline void Div(
 template <
     typename T, bool isSetMask, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -598,7 +598,7 @@ __aicore__ inline void Div(
 template <
     typename T, bool isSetMask, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -642,7 +642,7 @@ __aicore__ inline void Div(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -686,7 +686,7 @@ __aicore__ inline void Div(
 template <
     typename T, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -735,7 +735,7 @@ __aicore__ inline void Div(
 template <
     typename T, const DivConfig& config, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
@@ -775,7 +775,7 @@ __aicore__ inline void Div(
 template <
     typename T, typename Operand0, typename Operand1, typename Operand2,
     typename Std::enable_if<
-        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+        !VectorOperand::HAS_CONFIG && VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&

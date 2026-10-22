@@ -113,6 +113,8 @@
 
 ## Memory矢量计算
 
+指针与LocalTensor的混合调用规则、接口范围及示例见[VECTOR Basic API指针接口](memory_vector_compute/vector_pointer.md)。
+
 ### 数据搬运
 
 | 接口名 | 功能描述 |
