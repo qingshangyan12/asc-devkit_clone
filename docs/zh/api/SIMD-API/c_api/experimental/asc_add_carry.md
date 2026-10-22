@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/experimental/reg_arith.h"`。
+头文件路径为：`"c_api/experimental/reg_arith_exp.h"`。
 
 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。编译时需定义`CANN_ASC_USE_EXPERIMENTAL`宏，并显式包含指定的试验头文件。
 
@@ -111,7 +111,7 @@ __simd_callee__ inline asc_uint32_t_bool_pair asc_add_carry(vector_uint32_t src0
 
 ## 约束说明
 
-- 使用本接口前，需要包含头文件：`#include "c_api/experimental/reg_arith.h"`。
+- 使用本接口前，需要包含头文件：`#include "c_api/experimental/reg_arith_exp.h"`。
 - 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
 - Reg矢量计算C API通用约束请参见[通用约束](../reg_compute/overview.md#通用约束)。
 - 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../spr/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
@@ -137,7 +137,7 @@ bisheng -DCANN_ASC_USE_EXPERIMENTAL example.asc -o main --npu-arch=dav-3510 && .
 #include <vector>
 
 #include "c_api/asc_simd.h"
-#include "c_api/experimental/reg_arith.h"
+#include "c_api/experimental/reg_arith_exp.h"
 #include "acl/acl.h"
 
 namespace {

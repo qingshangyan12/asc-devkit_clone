@@ -9,16 +9,16 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "reg_permute_sel.h cannot be used with compile flag --enable-simt enabled."
+#error "reg_permute_sel_exp.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_EXP_H
 #endif
 
-#ifndef INCLUDE_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_H
-#define INCLUDE_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_H
+#ifndef INCLUDE_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_EXP_H
+#define INCLUDE_C_API_EXPERIMENTAL_REG_PERMUTE_SEL_EXP_H
 
 #ifndef CANN_ASC_USE_EXPERIMENTAL
 #error "this is experimental feature, pls set CANN_ASC_USE_EXPERIMENTAL = ON to use it"
@@ -29,7 +29,7 @@
 #include "c_api/experimental/pair.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/experimental/reg_permute_sel_intf_impl.h"
+#include "impl/c_api/experimental/reg_permute_sel_intf_impl_exp.h"
 #endif
 
 __simd_callee__ inline asc_uint8_t_uint8_t_pair asc_intlv(vector_uint8_t src0, vector_uint8_t src1);
@@ -99,7 +99,7 @@ __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0, vect
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_EXP_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_REG_PERMUTE_SEL_EXP_H
 #endif
