@@ -58,6 +58,20 @@ struct l0c_to_ub_trait {
     dual_dst_mode dual_dst_ctl = dual_dst_mode::disable;
 };
 
+struct l0c_to_ub_trait_arch9202 : l0c_to_ub_trait {
+    __aicore__ constexpr l0c_to_ub_trait_arch9202() = default;
+    __aicore__ constexpr l0c_to_ub_trait_arch9202(
+        asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split, dual_dst_mode dual_dst_ctl,
+        bool enable_row_max, bool enable_group_max)
+        : l0c_to_ub_trait(round_mode, enable_relu, enable_channel_split, dual_dst_ctl),
+          enable_row_max(enable_row_max),
+          enable_group_max(enable_group_max)
+    {}
+
+    bool enable_row_max = false;
+    bool enable_group_max = false;
+};
+
 struct l0c_to_l1_trait {
     __aicore__ constexpr l0c_to_l1_trait() = default;
     __aicore__ constexpr l0c_to_l1_trait(asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split);
