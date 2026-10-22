@@ -10,7 +10,7 @@
 
   **图1 内存布局示意图**
 
-<img src="../../../figures/内存布局示意图.drawio.png">
+<img src="../../../figures/soa_aos_layout.png">
 
 图1以本样例的哈希表结构为例，展示了不同的内存布局。
 
