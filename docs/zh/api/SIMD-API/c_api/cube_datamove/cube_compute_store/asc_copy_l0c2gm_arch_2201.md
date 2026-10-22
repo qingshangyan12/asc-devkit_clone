@@ -69,7 +69,7 @@ Scalar量化参数通过[asc_set_l0c_copy_prequant(uint64_t config)](../cube_sto
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | n_size | 输入 | 源NZ矩阵在N方向上的大小。<br> - 不开启NZ2ND功能：若开启channel_split功能，n_size必须为8的倍数，取值范围为[1, 4095]。若不开启channel_split功能，n_size必须为16的倍数，取值范围为[1, 4095]。<br>- 开启NZ2ND功能：n_size的取值范围为[1, 4095]。 |
 | m_size | 输入 | 源NZ矩阵在M方向上的大小。<br> - 不开启NZ2ND功能：取值范围为[1, 65535]。<br> - 开启NZ2ND功能，m_size的取值范围为[1, 8192]。 |
-| dst_stride_dst_d | 输入 | <br> - 不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br> - 开启NZ2ND/NZ2DN功能，目的ND矩阵每一行中的元素个数，取值不为0，单位：element。|
+| dst_stride_dst_d | 输入 | <br> - 不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：32字节。<br> - 开启NZ2ND功能，目的ND矩阵每一行中的元素个数，取值不为0，单位：element。|
 | src_stride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位：C0_Size(16*sizeof(T), T为src的数据类型)。 |
 | unit_flag_mode | 输入 | 与unit_flag参数相关，取值如下：<br>0：保留值；<br>2：开启unit_flag，硬件执行完指令之后，不会设置寄存器；<br>3：开启unit_flag，硬件执行完指令后，会将unit_flag关闭。<br>与计算指令的配合方式见[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。 |
 | quant_pre |输入|量化参数。取值见[功能说明](asc_copy_l0c2gm_arch_2201.md#功能说明)。<br>系数含义及配置步骤见[随路量化](../cube_store_key_features/accompanying_quantization.md)。 |
@@ -82,7 +82,7 @@ Scalar量化参数通过[asc_set_l0c_copy_prequant(uint64_t config)](../cube_sto
 
 ## 流水类型
 
-PIPE_MTE1
+PIPE_FIX
 
 ## 约束说明
 
@@ -101,8 +101,8 @@ __cc__ int32_t src[total_length];
 // 其余入参均已默认数值传入
 uint16_t n_size = 16;
 uint16_t m_size = 16;
-uint32_t dst_stride_dst_d = 0;
-uint16_t src_stride = 8;
+uint32_t dst_stride_dst_d = 32;
+uint16_t src_stride = 1;
 uint8_t unit_flag_mode = 0;
 uint64_t quant_pre = QuantMode_t::NoQuant;
 uint8_t relu_pre = 0;

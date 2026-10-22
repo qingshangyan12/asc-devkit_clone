@@ -41,7 +41,7 @@
 
 - 当输出为浮点数时（浮点数计算、浮点数精度转换、整数转浮点数），数值超出目标浮点类型表示范围时（如高精度转低精度时绝对值过大）产生INF，非法运算（如0/0、INF-INF）或输入为INF/NAN时产生INF/NAN：开启饱和模式后，INF被饱和为±MAX（目标类型能表示的最大/最小有限值）、NAN被饱和为0；关闭饱和模式时，INF/NAN保持原输出。
 
-本接口通过模板参数`SaturationMode`设置全局饱和模式，并可通过[GetSaturationFlag](GetSaturationFlag_ISASI.md)查询其开启状态。该配置主要用于支持饱和模式的计算和精度转换接口；精度转换场景可配合Memory矢量计算的[Cast](../memory_vector_compute/type_conversion/Cast.md)、[Truncate](../memory_vector_compute/type_conversion/Truncate_ISASI.md)，以及Reg矢量计算的[Cast](../reg_vector_compute/type_conversion/Cast.md)、[Truncate](../reg_vector_compute/type_conversion/Truncate.md)使用。
+本接口通过模板参数`SaturationMode`设置全局饱和模式，并可通过[GetSaturationFlag](GetSaturationFlag_ISASI.md)查询其开启状态。该配置主要用于支持饱和模式的计算和精度转换接口，Mmad计算场景可配合[Mmad](../cube_compute_ISASI/mmad_compute/Mmad.md)使用；Mmad的饱和模式由CTRL[48]直接决定，不受CTRL[60]限制，具体受控输入组合以Mmad接口的数据类型说明为准；精度转换场景可配合Memory矢量计算的[Cast](../memory_vector_compute/type_conversion/Cast.md)、[Truncate](../memory_vector_compute/type_conversion/Truncate_ISASI.md)，以及Reg矢量计算的[Cast](../reg_vector_compute/type_conversion/Cast.md)、[Truncate](../reg_vector_compute/type_conversion/Truncate.md)使用。
 
 <!-- npu="950" id10 -->
 在Ascend 950PR&950DT系列产品上，部分精度转换接口可以使用接口自身的饱和配置，也可以使用本接口设置的全局饱和配置。可通过[SetSaturationStrategy](SetSaturationStrategy.md)选择使用接口自身的饱和配置或全局饱和配置。
@@ -77,15 +77,15 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
 - `SaturationMode::FLOAT`：
 
   <!-- npu="950" id11 -->
-  - 对于Ascend 950PR&950DT系列产品，影响的数据类型为：浮点数计算时仅half；浮点数精度转换时为hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t，其中`fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`的NAN处理需配合`SaturationMode::FLOAT8`。
+  - 对于Ascend 950PR&950DT系列产品，影响的数据类型为：浮点数计算时为half、bfloat16_t、float、fp8_e4m3fn_t、fp8_e5m2_t和hifloat8_t；Mmad计算时，其输入数据类型需为Mmad接口支持的浮点类型。浮点数精度转换时为hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t，其中`fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`的NAN处理需配合`SaturationMode::FLOAT8`。
   <!-- end id11 -->
 
   <!-- npu="A3" id12 -->
-  - 对于Atlas A3系列产品，影响的数据类型为：half、bfloat16_t。
+  - 对于Atlas A3系列产品，影响的数据类型为：half、bfloat16_t、float。
   <!-- end id12 -->
 
   <!-- npu="910b" id13 -->
-  - 对于Atlas A2系列产品，影响的数据类型为：half、bfloat16_t。
+  - 对于Atlas A2系列产品，影响的数据类型为：half、bfloat16_t、float。
   <!-- end id13 -->
 
 - `SaturationMode::FLOAT8`：
