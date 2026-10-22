@@ -6,16 +6,17 @@
 - AoS布局：每个结构体中包含一个对象的完整信息，多个结构体排列成数组存储在内存中。
 - SoA布局：将对象的同种信息排列成数组，多个对象的同种信息存储在相邻内存中。
 
-
 【样例介绍】以[hashtable_lookup样例](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup)为例，实现哈希表查找算子，该哈希表处理哈希冲突基于开放寻址法，具体参考[背景知识](../../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table#%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86)，此样例通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。
-
-  【反例】一个Bucket共40B，AoS将8B的key和32B的value存放在同一个Bucket里，查找逻辑逐Bucket读8B key进行比较。每个线程独立负责一条查询key。
 
   **图1** AoS与SoA内存布局示意图
 
 <img src="../../../figures/内存布局示意图.drawio.png">
 
-图1以本样例的哈希表结构为例，展示了不同的内存布局。哈希表结构体代码实现如下所示：
+图1以本样例的哈希表结构为例，展示了不同的内存布局。
+
+【反例】AoS内存排布场景，8B的key和32B的value连续排布，组成一个Bucket结构，多个Bucket连续排布组成一个数组，查找逻辑逐Bucket读8B key进行比较。每个线程独立负责一条查询key。
+
+哈希表结构体代码实现如下所示：
 
   ```cpp
 struct AoSBucket {
@@ -37,7 +38,7 @@ __aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key
 }
   ```
 
-在上述实现中，AoS中key和value交替存储，查询key时会将相邻的value一同加载；SoA中所有key连续存储，单条128B Cache Line可容纳更多key，例如16个8B的key，从而减少查找过程中不必要的value数据加载，降低Cache Line搬运开销，提高缓存利用率。
+在上述实现中，AoS中key和value交替存储，查询key时会将相邻的value一同加载。
 
 在Ascend 950PR产品上，该实现的性能数据如下：
 
