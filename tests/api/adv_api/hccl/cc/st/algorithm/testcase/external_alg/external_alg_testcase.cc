@@ -132,6 +132,8 @@ TEST(ExtAlgClassify, FourStates)
     std::string errMsg;
 
     EXPECT_EQ(ClassifyForcedAlgConfig("", bareName, spec, errMsg), ForcedAlgKind::NONE);
+    // "default" 字面量与空串同义（tiling 侧空 algConfig 约定填 "default"）
+    EXPECT_EQ(ClassifyForcedAlgConfig("default", bareName, spec, errMsg), ForcedAlgKind::NONE);
     EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", bareName, spec, errMsg), ForcedAlgKind::LEGACY);
     EXPECT_EQ(ClassifyForcedAlgConfig("InsReduceScatterMesh1D", bareName, spec, errMsg), ForcedAlgKind::BARE_NAME);
     EXPECT_EQ(bareName, "InsReduceScatterMesh1D");
