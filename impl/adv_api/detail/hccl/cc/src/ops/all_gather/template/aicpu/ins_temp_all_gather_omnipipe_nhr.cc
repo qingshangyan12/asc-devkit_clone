@@ -104,45 +104,45 @@ HcclResult InsTempAllGatherOmniPipeNHR::SyncInterThreads(const std::vector<Threa
 }
 
 namespace {
-    // NHR 单步通信中一对 tx/rx slice 在 ccl scratch 与 user output 布局上的读写偏移。
-    struct NhrSliceOffsets {
-        u64 txScratchBase = 0; // ccl scratch 上发送 slice 基址（仅供日志打印）
-        u64 rxScratchBase = 0; // ccl scratch 上接收 slice 基址（仅供日志打印）
-        u64 txScratchOff = 0;  // ccl scratch 上发送 slice 偏移
-        u64 rxScratchOff = 0;  // ccl scratch 上接收 slice 偏移
-        u64 txOutOff = 0;      // user output 上发送 slice 偏移（含已处理数据量推进）
-        u64 rxOutOff = 0;      // user output 上接收 slice 偏移（含已处理数据量推进）
-    };
+// NHR 单步通信中一对 tx/rx slice 在 ccl scratch 与 user output 布局上的读写偏移。
+struct NhrSliceOffsets {
+    u64 txScratchBase = 0; // ccl scratch 上发送 slice 基址（仅供日志打印）
+    u64 rxScratchBase = 0; // ccl scratch 上接收 slice 基址（仅供日志打印）
+    u64 txScratchOff = 0;  // ccl scratch 上发送 slice 偏移
+    u64 rxScratchOff = 0;  // ccl scratch 上接收 slice 偏移
+    u64 txOutOff = 0;      // user output 上发送 slice 偏移（含已处理数据量推进）
+    u64 rxOutOff = 0;      // user output 上接收 slice 偏移（含已处理数据量推进）
+};
 
-    NhrSliceOffsets CalcNhrSliceOffsets(
-        const TemplateDataParams& tempAlgParams, const std::vector<std::vector<std::vector<u64>>>& dataOffsetVec,
-        u32 txIdx, u32 rxIdx, u32 rpt, u32 channelIdx, u32 dataTypeSize, bool needOutputOffset)
-    {
-        NhrSliceOffsets off;
-        off.txScratchBase = tempAlgParams.buffInfo.inBuffBaseOff
-                            + tempAlgParams.stepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt]
-                            + dataOffsetVec[txIdx][rpt][channelIdx];
-        off.rxScratchBase = tempAlgParams.buffInfo.outBuffBaseOff
-                            + tempAlgParams.stepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt]
-                            + dataOffsetVec[rxIdx][rpt][channelIdx];
-        off.txScratchOff = off.txScratchBase + tempAlgParams.stepSliceInfo.stepInputSliceStride[txIdx];
-        off.rxScratchOff = off.rxScratchBase + tempAlgParams.stepSliceInfo.stepInputSliceStride[rxIdx];
-        if (!needOutputOffset) {
-            return off;
-        }
-
-        const u64 txOutBase = tempAlgParams.buffInfo.inBuffBaseOff
-                              + tempAlgParams.omniReadDstStepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt]
-                              + dataOffsetVec[txIdx][rpt][channelIdx];
-        const u64 rxOutBase = tempAlgParams.buffInfo.outBuffBaseOff
-                              + tempAlgParams.omniReadDstStepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt]
-                              + dataOffsetVec[rxIdx][rpt][channelIdx];
-        off.txOutOff = txOutBase + tempAlgParams.omniReadDstStepSliceInfo.stepInputSliceStride[txIdx]
-                       + tempAlgParams.processedDataCount * dataTypeSize;
-        off.rxOutOff = rxOutBase + tempAlgParams.omniReadDstStepSliceInfo.stepInputSliceStride[rxIdx]
-                       + tempAlgParams.processedDataCount * dataTypeSize;
+NhrSliceOffsets CalcNhrSliceOffsets(
+    const TemplateDataParams& tempAlgParams, const std::vector<std::vector<std::vector<u64>>>& dataOffsetVec, u32 txIdx,
+    u32 rxIdx, u32 rpt, u32 channelIdx, u32 dataTypeSize, bool needOutputOffset)
+{
+    NhrSliceOffsets off;
+    off.txScratchBase = tempAlgParams.buffInfo.inBuffBaseOff +
+                        tempAlgParams.stepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt] +
+                        dataOffsetVec[txIdx][rpt][channelIdx];
+    off.rxScratchBase = tempAlgParams.buffInfo.outBuffBaseOff +
+                        tempAlgParams.stepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt] +
+                        dataOffsetVec[rxIdx][rpt][channelIdx];
+    off.txScratchOff = off.txScratchBase + tempAlgParams.stepSliceInfo.stepInputSliceStride[txIdx];
+    off.rxScratchOff = off.rxScratchBase + tempAlgParams.stepSliceInfo.stepInputSliceStride[rxIdx];
+    if (!needOutputOffset) {
         return off;
     }
+
+    const u64 txOutBase = tempAlgParams.buffInfo.inBuffBaseOff +
+                          tempAlgParams.omniReadDstStepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt] +
+                          dataOffsetVec[txIdx][rpt][channelIdx];
+    const u64 rxOutBase = tempAlgParams.buffInfo.outBuffBaseOff +
+                          tempAlgParams.omniReadDstStepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt] +
+                          dataOffsetVec[rxIdx][rpt][channelIdx];
+    off.txOutOff = txOutBase + tempAlgParams.omniReadDstStepSliceInfo.stepInputSliceStride[txIdx] +
+                   tempAlgParams.processedDataCount * dataTypeSize;
+    off.rxOutOff = rxOutBase + tempAlgParams.omniReadDstStepSliceInfo.stepInputSliceStride[rxIdx] +
+                   tempAlgParams.processedDataCount * dataTypeSize;
+    return off;
+}
 } // namespace
 
 HcclResult InsTempAllGatherOmniPipeNHR::DoLastStepCopyNhr(

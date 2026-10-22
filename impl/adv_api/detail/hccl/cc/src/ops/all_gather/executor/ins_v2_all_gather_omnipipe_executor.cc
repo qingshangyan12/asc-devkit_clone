@@ -67,10 +67,11 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     HCCL_INFO("[BuildSubCommAndTempMap]infos,%s", ThreeDVecToStrOmni(algHierarchyInfo_.infos).c_str());
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         HCCL_INFO("[BuildSubCommAndTempMap] topoUBX");
-        if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].empty()
-            || algHierarchyInfo_.infos[0][0].empty()) {
+        if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].empty() ||
+            algHierarchyInfo_.infos[0][0].empty()) {
             HCCL_ERROR(
-                "[%s] invalid MESH_1D_CLOS algHierarchyInfo, infosSize[%zu].", __func__, algHierarchyInfo_.infos.size());
+                "[%s] invalid MESH_1D_CLOS algHierarchyInfo, infosSize[%zu].", __func__,
+                algHierarchyInfo_.infos.size());
             return HCCL_E_PARA;
         }
         if (algHierarchyInfo_.infos[0].size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[0][1].empty()) {
@@ -83,8 +84,7 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
                     closRanks.push_back(rank);
                 }
             }
-            CHK_PRT_RET(
-                closRanks.empty(), HCCL_ERROR("[%s] MESH_1D_CLOS closRanks is empty.", __func__), HCCL_E_PARA);
+            CHK_PRT_RET(closRanks.empty(), HCCL_ERROR("[%s] MESH_1D_CLOS closRanks is empty.", __func__), HCCL_E_PARA);
             subCommRanks1 = {closRanks};
             // V1 的 infos[1] 是第三层级（V1 的 infos[0] 打包了 mesh+clos 两级）
             if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
@@ -296,10 +296,10 @@ HcclResult InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
     // 按本 rank 与对端 rank 所属的子通信域重新归层（对齐 hccl :401-405）
     // 兼容 CalcRes 按层序列化和对称内存合并到 channels[0] 两种资源布局
-    const std::vector<const std::vector<std::vector<u32>>*> subCommsByLevel
-        = {&subCommRanks0, &subCommRanks1, &subCommRanks2};
-    const std::vector<uint64_t> rankSizesByLevel
-        = {rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1], rankSizeLevel_[OMNIPIPE_LEVEL2]};
+    const std::vector<const std::vector<std::vector<u32>>*> subCommsByLevel = {
+        &subCommRanks0, &subCommRanks1, &subCommRanks2};
+    const std::vector<uint64_t> rankSizesByLevel = {
+        rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1], rankSizeLevel_[OMNIPIPE_LEVEL2]};
     CHK_RET(ClassifyOmniPipeChannelsByLevel(
         myRank_, resCtx.channels, subCommsByLevel, rankSizesByLevel, remoteRankToChannelInfo_));
     if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
@@ -679,8 +679,8 @@ REGISTER_EXEC_V2_MULTI(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, InsV2AllGatherOmniPipeExecutor, TopoMatchTwoLevel,
     InsTempAllGatherOmniPipeMesh1D, InsTempAllGatherOmniPipeNHR, InsTempAllGatherOmniPipeNHRDPU);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, AlgEngine::AICPU, "pipeline[mesh,nhr]",
-    COND_NONE, FLAG_UBX, 0);
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, AlgEngine::AICPU, "pipeline[mesh,nhr]", COND_NONE,
+    FLAG_UBX, 0);
 
 REGISTER_EXEC_V2_MULTI(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLinePcie, InsV2AllGatherOmniPipeExecutor, TopoMatchPcieMix,

@@ -41,18 +41,18 @@ enum class AlgoType : uint8_t {
 };
 
 // Mesh 类算法集合
-const std::set<AlgoType> MESH_ALGO_TYPES
-    = {AlgoType::MESH,
-       AlgoType::MESH_2DIE,
-       AlgoType::MESH_ONESHOT,
-       AlgoType::MESH_TWOSHOT,
-       AlgoType::MESH_CONCUR,
-       AlgoType::MESH_MULTILINK,
-       AlgoType::MESH_CHUNK,
-       AlgoType::MESH_CHUNK_TWOSHOT,
-       AlgoType::MESH_SINGLE_CHANNEL,
-       AlgoType::MESH_CONCURRENT,
-       AlgoType::MESH_MULTIJETTY};
+const std::set<AlgoType> MESH_ALGO_TYPES = {
+    AlgoType::MESH,
+    AlgoType::MESH_2DIE,
+    AlgoType::MESH_ONESHOT,
+    AlgoType::MESH_TWOSHOT,
+    AlgoType::MESH_CONCUR,
+    AlgoType::MESH_MULTILINK,
+    AlgoType::MESH_CHUNK,
+    AlgoType::MESH_CHUNK_TWOSHOT,
+    AlgoType::MESH_SINGLE_CHANNEL,
+    AlgoType::MESH_CONCURRENT,
+    AlgoType::MESH_MULTIJETTY};
 
 // MeshConcur 类算法集合（触发 CLOS 双层规则）
 const std::set<AlgoType> MESH_CONCUR_ALGO_TYPES = {AlgoType::MESH_CONCUR, AlgoType::MESH_CONCURRENT};

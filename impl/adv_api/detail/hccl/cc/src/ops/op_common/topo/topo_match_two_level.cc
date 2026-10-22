@@ -2,7 +2,7 @@
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details on using this file in compliance with the License.
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
@@ -15,51 +15,51 @@
 namespace mc2_ops_hccl {
 
 namespace {
-    // 计算内层维度 d0：LOCAL 取 localRanks.size()；GLOBAL 对称取 localRanks.size()，非对称 GCD 打平
-    HcclResult CalcLevel0Dim(
-        const PhysicalLevelInfo& level0, u32 myRank, u32& d0, bool& asymmetric, u32& gcd, const AlgAttrs& algAttrs)
-    {
-        if (level0.view == PhysicalLevelView::LOCAL) {
-            d0 = static_cast<u32>(level0.localRanks.size());
-            return HcclResult::HCCL_SUCCESS;
-        }
-        if (level0.instSizeListByLayer.empty()) {
-            HCCL_INFO("[TopoMatchTwoLevel] netLayer [ref = %u] instSizeListByLayer is empty.", level0.ref.netLayer);
-            return HcclResult::HCCL_E_NOT_SUPPORT;
-        }
-        if (IsInstListSymmetric(level0.instSizeListByLayer)) {
-            d0 = static_cast<u32>(level0.localRanks.size());
-            asymmetric = false;
-            return HcclResult::HCCL_SUCCESS;
-        }
-        // GLOBAL 非对称：对 instSizeListByLayer 取 GCD 打平为对称子组
-        asymmetric = true;
-        gcd = CalcGcd(level0.instSizeListByLayer);
-        HCCL_INFO("[TopoMatchTwoLevel] Rank [%u], asymmetric level0, instList GCD[%u], d0=gcd.", myRank, gcd);
-        if (gcd == 1 && algAttrs.engine != OpExecuteConfig::HOSTCPU) {
-            HCCL_INFO("[TopoMatchTwoLevel] Rank [%u], asymmetric GCD=1, not support.", myRank);
-            return HcclResult::HCCL_E_NOT_SUPPORT;
-        }
-        d0 = gcd;
+// 计算内层维度 d0：LOCAL 取 localRanks.size()；GLOBAL 对称取 localRanks.size()，非对称 GCD 打平
+HcclResult CalcLevel0Dim(
+    const PhysicalLevelInfo& level0, u32 myRank, u32& d0, bool& asymmetric, u32& gcd, const AlgAttrs& algAttrs)
+{
+    if (level0.view == PhysicalLevelView::LOCAL) {
+        d0 = static_cast<u32>(level0.localRanks.size());
         return HcclResult::HCCL_SUCCESS;
     }
-
-    // 构造含 myRank 的内层组；非对称时按 gcd 从 localRanks 切子组
-    std::vector<u32> BuildLevel0Group(const PhysicalLevelInfo& level0, u32 myRank, bool asymmetric, u32 gcd)
-    {
-        if (!asymmetric) {
-            return level0.localRanks;
-        }
-        const auto& ranks = level0.localRanks;
-        auto it = std::find(ranks.begin(), ranks.end(), myRank);
-        if (it == ranks.end()) {
-            return {};
-        }
-        u32 myIdx = static_cast<u32>(it - ranks.begin());
-        u32 startIdx = (myIdx / gcd) * gcd;
-        u32 endIdx = std::min(startIdx + gcd, static_cast<u32>(ranks.size()));
-        return std::vector<u32>(ranks.begin() + startIdx, ranks.begin() + endIdx);
+    if (level0.instSizeListByLayer.empty()) {
+        HCCL_INFO("[TopoMatchTwoLevel] netLayer [ref = %u] instSizeListByLayer is empty.", level0.ref.netLayer);
+        return HcclResult::HCCL_E_NOT_SUPPORT;
     }
+    if (IsInstListSymmetric(level0.instSizeListByLayer)) {
+        d0 = static_cast<u32>(level0.localRanks.size());
+        asymmetric = false;
+        return HcclResult::HCCL_SUCCESS;
+    }
+    // GLOBAL 非对称：对 instSizeListByLayer 取 GCD 打平为对称子组
+    asymmetric = true;
+    gcd = CalcGcd(level0.instSizeListByLayer);
+    HCCL_INFO("[TopoMatchTwoLevel] Rank [%u], asymmetric level0, instList GCD[%u], d0=gcd.", myRank, gcd);
+    if (gcd == 1 && algAttrs.engine != OpExecuteConfig::HOSTCPU) {
+        HCCL_INFO("[TopoMatchTwoLevel] Rank [%u], asymmetric GCD=1, not support.", myRank);
+        return HcclResult::HCCL_E_NOT_SUPPORT;
+    }
+    d0 = gcd;
+    return HcclResult::HCCL_SUCCESS;
+}
+
+// 构造含 myRank 的内层组；非对称时按 gcd 从 localRanks 切子组
+std::vector<u32> BuildLevel0Group(const PhysicalLevelInfo& level0, u32 myRank, bool asymmetric, u32 gcd)
+{
+    if (!asymmetric) {
+        return level0.localRanks;
+    }
+    const auto& ranks = level0.localRanks;
+    auto it = std::find(ranks.begin(), ranks.end(), myRank);
+    if (it == ranks.end()) {
+        return {};
+    }
+    u32 myIdx = static_cast<u32>(it - ranks.begin());
+    u32 startIdx = (myIdx / gcd) * gcd;
+    u32 endIdx = std::min(startIdx + gcd, static_cast<u32>(ranks.size()));
+    return std::vector<u32>(ranks.begin() + startIdx, ranks.begin() + endIdx);
+}
 } // namespace
 
 TopoMatchTwoLevel::TopoMatchTwoLevel() {}

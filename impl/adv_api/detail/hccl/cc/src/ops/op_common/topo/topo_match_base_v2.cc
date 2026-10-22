@@ -2,7 +2,7 @@
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details on using this file in compliance with the License.
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
@@ -98,8 +98,8 @@ static bool HasUbgLink(const std::vector<CommProtocol>& protocols)
 std::vector<u32> CollectEffectiveIndices(const std::vector<PhysicalLevelInfo>& physicalLevels, OpExecuteConfig engine)
 {
     bool isHostdpu = (engine == OpExecuteConfig::HOSTCPU);
-    bool isAivOrCcu
-        = (engine == OpExecuteConfig::AIV || engine == OpExecuteConfig::CCU_MS || engine == OpExecuteConfig::CCU_SCHED);
+    bool isAivOrCcu =
+        (engine == OpExecuteConfig::AIV || engine == OpExecuteConfig::CCU_MS || engine == OpExecuteConfig::CCU_SCHED);
     std::vector<u32> effIdx;
     for (u32 i = 0; i < physicalLevels.size(); i++) {
         if (!physicalLevels[i].hasTopoInst) {
@@ -355,8 +355,8 @@ HcclResult FillPhysicalIdxForAlgoLevels(
                 HCCL_INFO("[FillPhysicalIdx] level[%u] MeshConcur no upper encompassing layer, not support.", i);
                 return HcclResult::HCCL_E_NOT_SUPPORT;
             }
-            physicalIdxForAlgoLevels[i]
-                = {static_cast<PhysicalLevelIndex>(physIdx), static_cast<PhysicalLevelIndex>(effIdx[upperPos])};
+            physicalIdxForAlgoLevels[i] = {
+                static_cast<PhysicalLevelIndex>(physIdx), static_cast<PhysicalLevelIndex>(effIdx[upperPos])};
         } else {
             physicalIdxForAlgoLevels[i] = {static_cast<PhysicalLevelIndex>(physIdx)};
         }

@@ -58,8 +58,7 @@ HcclResult InsTempAllGatherOmniPipeNHRDPU::KernelRun(
     u32 sendMsgId = 0;
     if (HcommSendRequest(
             reinterpret_cast<uint64_t>(templateResource.npu2DpuShmemPtr), param.algTag,
-            static_cast<void*>(dpuRunInfoSeqData.data()), dpuRunInfoSeqData.size(), &sendMsgId)
-        != 0) {
+            static_cast<void*>(dpuRunInfoSeqData.data()), dpuRunInfoSeqData.size(), &sendMsgId) != 0) {
         HCCL_ERROR("[InsTempAllGatherOmniPipeNHRDPU] HcommSendRequest failed");
         return HCCL_E_INTERNAL;
     }
@@ -121,10 +120,10 @@ HcclResult InsTempAllGatherOmniPipeNHRDPU::RunNHR(
             const u32 rxIdx = stepInfo.rxSliceIdxs[i];
             for (uint32_t rpt = 0; rpt < tempAlgParams.stepSliceInfo.inputOmniPipeSliceStride[myAlgRank].size();
                  ++rpt) {
-                uint64_t txScratchBase = tempAlgParams.buffInfo.inBuffBaseOff
-                                         + tempAlgParams.stepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt];
-                uint64_t rxScratchBase = tempAlgParams.buffInfo.outBuffBaseOff
-                                         + tempAlgParams.stepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt];
+                uint64_t txScratchBase = tempAlgParams.buffInfo.inBuffBaseOff +
+                                         tempAlgParams.stepSliceInfo.inputOmniPipeSliceStride[txIdx][rpt];
+                uint64_t rxScratchBase = tempAlgParams.buffInfo.outBuffBaseOff +
+                                         tempAlgParams.stepSliceInfo.outputOmniPipeSliceStride[rxIdx][rpt];
 
                 const u64 txScratchOff = txScratchBase + tempAlgParams.stepSliceInfo.stepInputSliceStride[txIdx];
                 const u64 rxScratchOff = rxScratchBase + tempAlgParams.stepSliceInfo.stepOutputSliceStride[rxIdx];

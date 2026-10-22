@@ -28,7 +28,8 @@ public:
         return info;
     }
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource) override;
 
 private:
     void InitKernelParams(const OpParam& param, const TemplateDataParams& tempAlgParams);
