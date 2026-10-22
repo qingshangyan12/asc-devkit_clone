@@ -297,7 +297,6 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_o
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
 }
 
-// devkit tiling 链路 DataDes.count=0（盲选）：两级 MESH_1D 塌缩到 hccl 小数据量侧的 SoleNHR
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_blind_select_uses_sole_nhr_on_two_level_mesh)
 {
     AllGatherAutoSelector selector;

@@ -267,26 +267,19 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         } else if (topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1) {
             selectAlgName = "AicpuAllGatherSoleNHR";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            // 分支结构与 hccl 对齐。hccl 在本链路之前还有对称+Uboe 前置段
-            // （AicpuAllGatherPipeLineMeshNHR/NHRNHR、AicpuAllGatherParallelNHRNHR），
-            // asc 未迁移这些算法，省略后落入本链路，盲选数据量时等效 hccl 小数据量侧。
             constexpr u64 AICPU_MAX_RANKSIZE = 1024;
             constexpr u64 AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE = 1ULL * 1024 * 1024 * 1024;
             if (topoInfo->topoLevelNums >= TOPO_LEVEL_NUM_3) {
-                // hccl 对称三级选 AicpuAllGatherSequenceMeshConcurNHRNHR（asc 未迁移），
-                // 统一按 hccl 非对称三级语义选 SoleNHR。
                 selectAlgName = "AicpuAllGatherSoleNHR";
             } else if (
                 dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE
                 && topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
-                // hccl 选 AicpuAllGatherParallelMeshNHR，asc 注册名为 InsAllGatherParallelMesh1DNHR。
                 selectAlgName = "InsAllGatherParallelMesh1DNHR";
             } else if (dataSize > AG_AICPU_SMALL_DATA_SIZE) {
                 selectAlgName = (dataSize * topoInfo->userRankSize > AG_AICPU_SEQUENCE_DATA_SIZE) ?
                                     "AicpuAllGatherSequenceMeshConcurNHR" :
                                     "InsAllGatherParallelMesh1DNHR";
             } else {
-                // 数据量未知（tiling 链路 count=0，盲选塌缩至此）或 ≤1MB：与 hccl 小数据量选择一致。
                 selectAlgName = "AicpuAllGatherSoleNHR";
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
