@@ -867,6 +867,27 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf(float x)
     return c;
 }
 
+// Cody-Waite-only cosine: identical to cosf for |x| <= 71476.0625f (its
+// Payne-Hanek threshold). Callers that can prove the argument is inside the
+// range use this to keep the trig_radian_reduction threshold branch (and the
+// Payne-Hanek table-index branch) out of their instruction stream.
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cosf_cody_waite(float x)
+{
+    x = fmaf(x, 0.0f, x); // NaN for Inf
+    int quadrant;
+    float y = __internal_cody_waite_radian_reduction(x, &quadrant);
+    float c = __internal_cos_poly(y);
+    float s = __internal_sin_poly(y);
+    if (quadrant & 2) { // 2: quadrants where cos and sin flip sign
+        c = 0.0f - c;
+        s = 0.0f - s;
+    }
+    if (quadrant & 1) { // 1: quadrants where cos(pi/2 + y) = -sin(y)
+        c = 0.0f - s;
+    }
+    return c;
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x)
 {
     int quadrant;
@@ -2098,7 +2119,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0f_huge_range(float ax)
     }
 
     float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
-    return amp * cosf(r - 0.785398185253143310546875f);
+    // PH leaves r in [0, 2*pi), so r - pi/4 is deep inside cosf's Cody-Waite
+    // range.
+    return amp * __internal_cosf_cody_waite(r - 0.785398185253143310546875f);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1f_huge_range(float ax)
@@ -2125,7 +2148,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1f_huge_range(float ax)
     }
 
     float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
-    return amp * cosf(r - 2.35619449615478515625f);
+    // cos(r - 3pi/4). PH leaves r in [0, 2*pi), so r - 3pi/4 is deep inside
+    // cosf's Cody-Waite range.
+    return amp * __internal_cosf_cody_waite(r - 2.35619449615478515625f);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0f_less8(float x)
@@ -2214,8 +2239,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_y0f_huge_range(float ax)
     }
 
     float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
-    // cos(r - 3pi/4) = sin(r - pi/4)
-    return amp * cosf(r - 2.35619449615478515625f);
+    // cos(r - 3pi/4) = sin(r - pi/4). PH leaves r in [0, 2*pi), so r - 3pi/4 is
+    // deep inside cosf's Cody-Waite range.
+    return amp * __internal_cosf_cody_waite(r - 2.35619449615478515625f);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_y1f_middle_range(float x)
@@ -2253,7 +2279,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_y1f_huge_range(float ax)
 
     float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
     // cos(r - 5pi/4) = sin(r - 3pi/4) = -cos(r - pi/4)
-    return amp * cosf(r - 3.9269907474517822265625f);
+    return amp * __internal_cosf_cody_waite(r - 3.9269907474517822265625f);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_jn_yn_asymptotic_bessel_amplitude(int n, float x, int index)
@@ -2560,11 +2586,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
     }
     float ax = __fabsf(x);
     if (__isinf(ax)) {
-        if (x < 0.0f) {
-            uint32_t neg_zero_bits = 0x80000000U;
-            return reinterpret_cast<float&>(neg_zero_bits);
-        }
-        return 0.0f;
+        return __internal_with_sign_bit(0.0f, x); // +inf -> +0.0, -inf -> -0.0
     }
     float y;
     if (ax <= 8.0f) {
@@ -2589,7 +2611,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float jnf(int n, float x)
         return j1f(x);
     }
     if (n < 0 || isnan(x)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
     if (x == 0) {
         return 0;
@@ -2620,7 +2642,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float y0f(float x)
         return x;
     }
     if (x < 0.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
     if (x == 0.0f) {
         return -ASCRT_INF_F;
@@ -2649,7 +2671,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float y1f(float x)
         return x;
     }
     if (x < 0.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
     if (x == 0.0f) {
         return -ASCRT_INF_F;
@@ -2678,15 +2700,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float y1f(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x)
 {
-    if (n < 0 || x < 0 || isnan(x)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    if (x == 0) {
-        return -ASCRT_INF_F;
-    }
-    if (isinf(x)) {
-        return 0;
-    }
     if (n == 0) {
         return y0f(x);
     }
@@ -2694,10 +2707,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x)
         return y1f(x);
     }
 
+    float res;
     if (x > n * 10.0f) {
-        return __internal_yn_asymptotic(n, x); // large x asymptotic
+        res = __internal_yn_asymptotic(n, x); // large x asymptotic
+    } else {
+        res = __internal_yn_recurrence(n, x); // small/medium x forward recurrence
     }
-    return __internal_yn_recurrence(n, x); // small/medium x forward recurrence
+
+    if (x == 0.0f) {
+        res = -ASCRT_INF_F;
+    }
+    if (isinf(x)) {
+        res = 0.0f;
+    }
+    if (n < 0 || x < 0.0f || isnan(x)) {
+        res = ASCRT_NAN_F;
+    }
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int labs(long int x) { return abs(x); }
@@ -3681,10 +3707,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_float_mantissa_expone
     // Subnormals are treated as exponent -149, normals as unbiased exponent minus 23.
     const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
     // aligning the biased exponent field to the integer mantissa (value = mantissa * 2^exp)
-    return exponent_bits == 0U ?
-               -149 :
-               (static_cast<int32_t>(exponent_bits >> __internal_fp32_exponent_shift) -
-                150); // -149: min subnormal exp, -150: bias + mantissa shift, 23: exponent field low bit
+    //-149: min subnormal exp
+    return exponent_bits == 0U ? -149 :
+                                 (static_cast<int32_t>(exponent_bits >> __internal_fp32_exponent_shift) -
+                                  150); // -150: bias + mantissa shift
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_uint_floor_log2(uint32_t x)
@@ -3732,8 +3758,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantiss
 
     uint32_t bits = is_normal ? normal_bits : subnormal_bits;
     bits = is_subnormal ? subnormal_bits : bits;
-    bits = (result_exponent > 127) ? ASCRT_INF_U : bits;           // beyond max normal exponent overflows to inf
-    bits = (mantissa == 0U || result_exponent < -149) ? 0U : bits; // zero mantissa or below min subnormal
+    bits = (result_exponent > 127) ? ASCRT_INF_U : bits;           // 127: max normal exp
+    bits = (mantissa == 0U || result_exponent < -149) ? 0U : bits; //-149: min subnormal exp
     return __uint_as_float(bits);
 }
 
@@ -4268,58 +4294,41 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
 {
-    // Shared scaling constants used to keep the squared sum numerically safe.
-    constexpr float rsqrt_subnormal_scale = 4096.0f; // 2^12, compensates the temporary scaling after rsqrt refinement.
-
     // Work with absolute values so the norm depends only on magnitudes.
     const float abs_a = fabsf(a);
     const float abs_b = fabsf(b);
     const float abs_c = fabsf(c);
     const float abs_d = fabsf(d);
+
     if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c) || isinf(abs_d)) {
         return 0.0f;
     }
     if (isnan(abs_a) || isnan(abs_b) || isnan(abs_c) || isnan(abs_d)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
 
-    // Sort magnitudes so the largest term determines the scaling exponent.
-    const float max_ab = fmaxf(abs_a, abs_b);
-    const float min_ab = fminf(abs_a, abs_b);
-    const float max_abc = fmaxf(abs_c, max_ab);
-    const float max_abs = fmaxf(abs_d, max_abc);
-    const float second_abs = fminf(abs_d, max_abc);
-    const float third_abs = fminf(abs_c, max_ab);
+    const float max_ab = (abs_a > abs_b) ? abs_a : abs_b;
+    const float max_cd = (abs_c > abs_d) ? abs_c : abs_d;
+    const float max_abs = (max_ab > max_cd) ? max_ab : max_cd;
     const uint32_t max_bits = __float_as_uint(max_abs);
     const float scale =
         __uint_as_float(__internal_norm_scale_anchor_bits - (max_bits & __internal_norm_exponent_bucket_mask));
 
-    // Accumulate the scaled sum of squares in magnitude order.
-    const float scaled_min = min_ab * scale;
-    const float scaled_second = second_abs * scale;
-    const float scaled_third = third_abs * scale;
-    const float scaled_max = max_abs * scale;
-    float square_sum = scaled_second * scaled_second;
-    square_sum = fmaf(scaled_third, scaled_third, square_sum);
-    square_sum = fmaf(scaled_min, scaled_min, square_sum);
-    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+    // Accumulate the scaled sum of squares directly in input order.
+    const float t_a = abs_a * scale;
+    const float t_b = abs_b * scale;
+    const float t_c = abs_c * scale;
+    const float t_d = abs_d * scale;
+    float square_sum = fmaf(t_a, t_a, fmaf(t_b, t_b, fmaf(t_c, t_c, t_d * t_d)));
 
-    // Subnormal squared sums are temporarily lifted before rsqrtf.
-    const bool is_subnormal_square_sum = fabsf(square_sum) < __internal_subnormal_boundary;
-    if (is_subnormal_square_sum) {
-        square_sum *= __internal_fp32_scale_2p24;
-    }
     // Zero norm means the reciprocal norm is infinite.
     if (square_sum == 0.0f) {
         return ASCRT_INF_F;
     }
 
     // Compute an approximate reciprocal norm and refine it with one Newton step.
-    float inv_norm = rsqrtf(square_sum);
+    float inv_norm = 1.0f / __sqrtf(square_sum);
     inv_norm = inv_norm * fmaf(-0.5f * square_sum, inv_norm * inv_norm, 1.5f);
-    if (is_subnormal_square_sum) {
-        inv_norm *= rsqrt_subnormal_scale;
-    }
     // Restore the outer scale factor.
     return scale * inv_norm;
 }
@@ -4669,7 +4678,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
     // Integer inputs on the negative side are poles of gamma.
     const float truncated_x = truncf(x);
     if (truncated_x == x) {
-        result = x < 0.0f ? ASCRT_INF_F / ASCRT_INF_F : result;
+        result = x < 0.0f ? ASCRT_NAN_F : result;
     }
 
     // For large negative non-integers, odd integer truncations force a sign correction to zero.
@@ -4688,7 +4697,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
         result = ASCRT_INF_F;
     }
     if (x == -ASCRT_INF_F) {
-        result = ASCRT_INF_F / ASCRT_INF_F;
+        result = ASCRT_NAN_F;
     }
     if (x == 0.0f) {
         result = 1.0f / x;
@@ -5191,91 +5200,85 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
     ux &= 0x7FFFFFFFU;
     uy &= 0x7FFFFFFFU;
 
-    // Invalid divisor, NaN, or infinity cases follow IEEE-style NaN propagation.
+    // IEEE special-value handling: a zero divisor, an infinite/NaN dividend,
+    // or a NaN divisor yields NaN.
     if (uy == 0U || ux >= 0x7F800000U || uy > 0x7F800000U) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    // If |x| < |y|, the remainder is x itself.
-    if (ux < uy) {
-        return x;
-    }
-    // If |x| == |y|, the remainder is signed zero with the sign of x.
-    if (ux == uy) {
-        return reinterpret_cast<float&>(sx);
+        return ASCRT_NAN_F;
     }
 
-    // Extract exponents and build mantissas in normalized form.
-    int32_t ex = static_cast<int32_t>(ux >> 23);
-    int32_t ey = static_cast<int32_t>(uy >> 23);
-    uint32_t mx = ux;
-    uint32_t my = uy;
+    // From here on 1 <= uy <= ux < 0x7F800000, i.e. the plain finite domain:
+    //   - |x| < |y| implies ex <= ey, so the alignment loop is skipped
+    //     outright and the computation stays bounded.
+    //   - |x| == |y| implies mx == my and ex == ey, so the post-loop
+    //     subtraction yields exactly zero and the exact-select produces the
+    //     signed zero of x.
+    const bool x_normal = (ux >= 0x00800000U);
+    const int32_t x_log2 = __asc_uint_floor_log2(ux != 0U ? ux : 1U);
+    const uint32_t x_shift = x_normal ? 0U : static_cast<uint32_t>(__internal_fp32_exponent_shift - x_log2);
+    uint32_t mx = x_normal ? ((ux & 0x007FFFFFU) | 0x00800000U) : (ux << x_shift);
+    int32_t ex = x_normal ? static_cast<int32_t>(ux >> __internal_fp32_exponent_shift) : (x_log2 - 22);
 
-    // Normalize subnormal x so the hidden leading bit is restored.
-    if (ex == 0) {
-        int32_t i = 0;
-        mx = ux;
-        while ((mx & 0x00800000U) == 0U) {
-            mx <<= 1;
-            i++;
-        }
-        ex = 1 - i;
-    } else {
-        mx = (ux & 0x007FFFFFU) | 0x00800000U;
-    }
+    // Same normalization for the divisor; uy >= 1 holds after the invalid
+    // check above, so the log2 input is never zero.
+    const bool y_normal = (uy >= 0x00800000U);
+    const int32_t y_log2 = __asc_uint_floor_log2(uy);
+    const uint32_t y_shift = y_normal ? 0U : static_cast<uint32_t>(__internal_fp32_exponent_shift - y_log2);
+    uint32_t my = y_normal ? ((uy & 0x007FFFFFU) | 0x00800000U) : (uy << y_shift);
+    int32_t ey = y_normal ? static_cast<int32_t>(uy >> __internal_fp32_exponent_shift) : (y_log2 - 22);
 
-    // Normalize subnormal y in the same way.
-    if (ey == 0) {
-        int32_t i = 0;
-        my = uy;
-        while ((my & 0x00800000U) == 0U) {
-            my <<= 1;
-            i++;
-        }
-        ey = 1 - i;
-    } else {
-        my = (uy & 0x007FFFFFU) | 0x00800000U;
-    }
-
-    // Align x to y by repeatedly subtracting the divisor mantissa while
-    // shifting the dividend down one binary exponent step at a time.
+    // Align x to y: for each binary exponent step above ey, subtract the
+    // divisor mantissa when it fits (top bit of the difference stays clear)
+    // and shift the dividend left one place. A remainder that reaches zero
+    // keeps iterating with mx == 0 — every later subtraction borrows, so the
+    // value no longer changes — while the exact flag records the zero.
+    bool exact = false;
     while (ex > ey) {
-        uint32_t d = mx - my;
-        if ((d & 0x80000000U) == 0U) {
-            if (d == 0U) {
-                return reinterpret_cast<float&>(sx);
-            }
-            mx = d;
-        }
+        const uint32_t d = mx - my;
+        const bool fits = (d & 0x80000000U) == 0U;
+        mx = fits ? d : mx;
+        exact |= fits && (d == 0U);
         mx <<= 1;
         ex--;
     }
 
     // Finish the aligned subtraction once exponents match.
-    uint32_t d = mx - my;
-    if ((d & 0x80000000U) == 0U) {
-        if (d == 0U) {
-            return reinterpret_cast<float&>(sx);
-        }
-        mx = d;
-    }
+    const uint32_t d = mx - my;
+    const bool fits = (d & 0x80000000U) == 0U;
+    exact |= fits && (d == 0U);
+    mx = fits ? d : mx;
 
-    // Renormalize the remainder mantissa so it can be packed back to float.
-    while ((mx & 0x00800000U) == 0U) {
-        mx <<= 1;
-        ex--;
-    }
+    // Renormalize the remainder mantissa: floor(log2) gives the position of
+    // the leading bit, so one shift brings it back to bit 23. A zero
+    // significand (exact-zero remainder) is guarded to 1 so the shift count
+    // stays in [0, 23].
+    const int32_t r_log2 = __asc_uint_floor_log2(mx != 0U ? mx : 1U);
+    const int32_t r_shift = __internal_fp32_exponent_shift - r_log2;
+    mx <<= static_cast<uint32_t>(r_shift);
+    ex -= r_shift;
 
-    // Rebuild the float result, restore the sign of x, and return the remainder.
+    // Rebuild the float result: pack the renormalized mantissa with the
+    // adjusted exponent, or shift down when the exponent is subnormal. A
+    // shift of 32 or more yields zero.
     uint32_t out;
     if (ex > 0) {
         mx -= 0x00800000U;
-        out = mx | (static_cast<uint32_t>(ex) << 23); // 23: fp32 exponent field offset.
+        out = mx | (static_cast<uint32_t>(ex) << __internal_fp32_exponent_shift);
     } else {
-        mx >>= static_cast<uint32_t>(1 - ex);
-        out = mx;
+        const int32_t sub_shift = 1 - ex;
+        out = (sub_shift < 32) ? (mx >> static_cast<uint32_t>(sub_shift)) : 0U; // 32: the width of uint32_t.
     }
     out |= sx;
-    return reinterpret_cast<float&>(out);
+    float res = reinterpret_cast<float&>(out);
+    if (exact) {
+        // The remainder is exactly zero: return the signed zero of x.
+        res = reinterpret_cast<float&>(sx);
+    }
+    if (ux < uy) {
+        // |x| < |y|: the remainder is x itself. This check runs last so it
+        // wins over the exact-select; x == 0 also reaches it.
+        res = x;
+    }
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)

@@ -67,13 +67,11 @@ T shfl_xor(T var, unsigned int lane_mask) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
-        ...
+        result[threadIdx.x] = tile4.shfl_xor(threadIdx.x + 100, 1);
     }
     ```
 
@@ -83,12 +81,16 @@ T shfl_xor(T var, unsigned int lane_mask) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
-        ...
+        result[threadIdx.x] = tile4.shfl_xor(threadIdx.x + 100, 1);
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 101, 100, 103, 102, 105, 104, 107, 106, 109, 108, 111, 110, 113, 112, 115, 114
+```

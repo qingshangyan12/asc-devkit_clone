@@ -237,3 +237,10 @@ inline half2 asc_ldca(half2* address)
         dst[idx] = asc_ldca(src + idx);
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: -12.5, 0, 23.5, -7.25
+dst: -12.5, 0, 23.5, -7.25
+```

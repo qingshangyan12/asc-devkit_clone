@@ -175,6 +175,7 @@ $dst_i = src0_i / src1_i$
 <!-- npu="9030" id27 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id27 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Div_res.md#id3 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -206,6 +207,7 @@ $dst_i = src0_i / src1_i$
   - tensor高维切分计算占用8KB UB。
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 <!-- end id32 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Div_res.md#id4 -->
 
 <!-- npu="950" id35 -->
 

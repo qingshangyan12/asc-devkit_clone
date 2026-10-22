@@ -13,7 +13,8 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-__aicore__ inline void copy_gm_to_cbuf_v2_enable_pre_load_ignore_sync_stub(
+template <bool expect_pre_load>
+__aicore__ inline void copy_gm_to_cbuf_v2_pre_load_stub(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride, bool enable_pre_load_ignore_sync)
 {
@@ -26,7 +27,7 @@ __aicore__ inline void copy_gm_to_cbuf_v2_enable_pre_load_ignore_sync_stub(
     EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(0));
     EXPECT_EQ(src_stride, static_cast<uint64_t>(66));
     EXPECT_EQ(dst_stride, static_cast<uint32_t>(77));
-    EXPECT_TRUE(enable_pre_load_ignore_sync);
+    EXPECT_EQ(enable_pre_load_ignore_sync, expect_pre_load);
 }
 
 class TEST_COPY_GM_TO_L1 : public testing::Test {
@@ -35,7 +36,7 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-template <typename DTYPE>
+template <typename DTYPE, bool expect_pre_load>
 __aicore__ inline void load_gm_to_cbuf_2dv2_stub(
     __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
@@ -50,7 +51,7 @@ __aicore__ inline void load_gm_to_cbuf_2dv2_stub(
     EXPECT_EQ(k_step, static_cast<uint16_t>(77));
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(decomp_mode, static_cast<uint8_t>(0));
-    EXPECT_TRUE(enable_pre_load_ignore_sync);
+    EXPECT_EQ(enable_pre_load_ignore_sync, expect_pre_load);
     EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
 }
 
@@ -67,9 +68,28 @@ __aicore__ inline void load_gm_to_cbuf_2dv2_stub(
                           __cbuf__ dtype*, __gm__ dtype*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, \
                           uint8_t, bool, uint8_t))                                                                   \
             .times(1)                                                                                                \
-            .will(invoke(load_gm_to_cbuf_2dv2_stub<dtype>));                                                         \
+            .will(invoke(load_gm_to_cbuf_2dv2_stub<dtype, true>));                                                   \
                                                                                                                      \
         asc_copy_gm2l1(dst, src, 33, 44, 55, 66, 77, true, l2_cache_mode);                                           \
+        GlobalMockObject::verify();                                                                                  \
+    }
+
+#define TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(cce_name, dtype)                                                         \
+                                                                                                                     \
+    TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_##dtype##_Short)                                                   \
+    {                                                                                                                \
+        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                                 \
+        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                     \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                                \
+                                                                                                                     \
+        MOCKER_CPP(                                                                                                  \
+            cce_name, void(                                                                                          \
+                          __cbuf__ dtype*, __gm__ dtype*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, \
+                          uint8_t, bool, uint8_t))                                                                   \
+            .times(1)                                                                                                \
+            .will(invoke(load_gm_to_cbuf_2dv2_stub<dtype, false>));                                                  \
+                                                                                                                     \
+        asc_copy_gm2l1(dst, src, 33, 44, 55, 66, 77, l2_cache_mode);                                                 \
         GlobalMockObject::verify();                                                                                  \
     }
 
@@ -79,11 +99,25 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_ENABLE_PRE_LOAD_IGNORE_SYNC)
         copy_gm_to_cbuf_v2,
         void(__cbuf__ void*, __gm__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, uint64_t, uint32_t, bool))
         .times(1)
-        .will(invoke(copy_gm_to_cbuf_v2_enable_pre_load_ignore_sync_stub));
+        .will(invoke(copy_gm_to_cbuf_v2_pre_load_stub<true>));
 
     asc_copy_gm2l1(
         reinterpret_cast<__cbuf__ void*>(11), reinterpret_cast<__gm__ void*>(22), 33, 44,
         static_cast<asc_channel_pad_mode>(55), true, 66, 77);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_SHORT)
+{
+    MOCKER_CPP(
+        copy_gm_to_cbuf_v2,
+        void(__cbuf__ void*, __gm__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, uint64_t, uint32_t, bool))
+        .times(1)
+        .will(invoke(copy_gm_to_cbuf_v2_pre_load_stub<false>));
+
+    asc_copy_gm2l1(
+        reinterpret_cast<__cbuf__ void*>(11), reinterpret_cast<__gm__ void*>(22), 33, 44,
+        static_cast<asc_channel_pad_mode>(55), 66, 77);
     GlobalMockObject::verify();
 }
 
@@ -117,3 +151,19 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2, uint8_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, fp4x2_e1m2_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, fp4x2_e2m1_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, void);
+
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, bfloat16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, float);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, fp8_e4m3fn_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, fp8_e5m2_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, half);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, hifloat8_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, int16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, int32_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, int8_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, uint16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, uint32_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2, uint8_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2_s4, fp4x2_e1m2_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2_s4, fp4x2_e2m1_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_SHORT(load_gm_to_cbuf_2dv2_s4, void);
