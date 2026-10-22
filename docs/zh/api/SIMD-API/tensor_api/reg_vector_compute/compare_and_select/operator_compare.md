@@ -174,11 +174,10 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 ## 约束说明
 
-- 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - 本接口应在Vector Function（`__simd_vf__`标记的函数）内调用。
 - 输入mask比特位为0时，计算结果对应比特位写0。
 - 浮点比较时，+0.0与-0.0视为相等。
-- 浮点比较输入含nan时，计算结果对应比特位写0。
+- 浮点比较输入含nan时，`operator==`、`operator<`、`operator<=`、`operator>`和`operator>=`的计算结果对应比特位写0，`operator!=`的计算结果对应比特位写1。
 
 ## 调用示例
 
