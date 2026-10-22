@@ -44,49 +44,25 @@
 ```cpp
 __simd_callee__ inline void asc_half2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline void asc_half2e4m3_rn_sat(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_half2e4m3_rn(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_half2e4m3_rn_sat(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_half2e4m3_rn(
     vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_half2e4m3_rn_sat(
     vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline vector_fp8_e4m3fn_t asc_half2e4m3_rn(
-    vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline vector_fp8_e4m3fn_t asc_half2e4m3_rn_sat(
-    vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
@@ -102,93 +78,35 @@ __simd_callee__ inline void asc_half2e4m3_rn_sat_v2(
 ```cpp
 __simd_callee__ inline void asc_half2e4m3_rn_merge(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline void asc_half2e4m3_rn_sat_merge(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_half2e4m3_rn_merge(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_half2e4m3_rn_sat_merge(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline void asc_cast(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    std::integral_constant<asc_cast_saturation_mode, <saturation_mode>> saturation_mode,
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 ```cpp
 __simd_callee__ inline void asc_cast_merge(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast_merge(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast_merge(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast_merge(
-    vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
-    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    std::integral_constant<asc_cast_saturation_mode, <saturation_mode>> saturation_mode,
+    std::integral_constant<asc_position_mode, <dst_pos>> dst_pos)
 ```
 
 **接口说明如下：**
 
+- `dst_pos`为占位符，支持`EVEN`和`ODD`。
+- `saturation_mode`为占位符，支持`NO_SAT`和`SAT`。
 - `asc_half2e4m3_rn`和`asc_half2e4m3_rn_sat`分别为非饱和和饱和版本。
 - `asc_half2e4m3_rn_merge`和`asc_half2e4m3_rn_sat_merge`各包含`EVEN/ODD`两个位置重载。
 - `asc_cast`和`asc_cast_merge`各包含`NO_SAT/SAT`与`EVEN/ODD`的全部组合重载。

@@ -102,7 +102,7 @@ __simd_callee__ inline vector_uint8_t asc_pack_to_high(vector_uint16_t src)
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
-- `uint64_t`和`int64_t`源操作数对应的b64重载仅支持Ascend DevKit 9.2.0及以上版本，并仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+- `uint64_t`和`int64_t`源操作数对应的b64重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
 
 ## 调用示例
 

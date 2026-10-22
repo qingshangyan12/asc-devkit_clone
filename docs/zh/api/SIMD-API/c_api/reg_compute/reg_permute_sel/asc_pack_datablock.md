@@ -38,13 +38,16 @@
 ## 函数原型
 
 ```cpp
-// 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_pack_datablock(vector_<dtype>& dst,
-                                               vector_<dtype> src)
+// 通过引用参数输出结果。
+__simd_callee__ inline void asc_pack_datablock(vector_<dtype>& dst, vector_<dtype> src)
+```
 
-// 通过函数返回值返回结果（占位符形式）
+```cpp
+// 通过函数返回值返回结果。
 __simd_callee__ inline vector_<dtype> asc_pack_datablock(vector_<dtype> src)
 ```
+
+其中，`dtype`为占位符，`src`和`dst`的数据类型必须相同，支持的数据类型如下。
 
 ### dtype支持数据类型
 
@@ -58,17 +61,6 @@ __simd_callee__ inline vector_<dtype> asc_pack_datablock(vector_<dtype> src)
 | float |
 | uint64_t |
 | int64_t |
-
-### 函数原型典型示例
-
-```cpp
-// 按DataBlock粒度打包uint16_t类型数据。
-__simd_callee__ inline void asc_pack_datablock(vector_uint16_t& dst,
-                                               vector_uint16_t src)
-
-// 通过函数返回值返回打包结果。
-__simd_callee__ inline vector_float asc_pack_datablock(vector_float src)
-```
 
 ## 参数说明
 

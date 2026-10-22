@@ -44,25 +44,13 @@
 ```cpp
 __simd_callee__ inline void asc_e8m02bfloat16(
     vector_bfloat16_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_e8m02bfloat16(
-    vector_bfloat16_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+    std::integral_constant<asc_position_mode, <src_pos>> src_pos)
 ```
 
 ```cpp
 __simd_callee__ inline vector_bfloat16_t asc_e8m02bfloat16(
     vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
-```
-
-```cpp
-__simd_callee__ inline vector_bfloat16_t asc_e8m02bfloat16(
-    vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+    std::integral_constant<asc_position_mode, <src_pos>> src_pos)
 ```
 
 ```cpp
@@ -73,17 +61,12 @@ __simd_callee__ inline void asc_e8m02bfloat16_v2(
 ```cpp
 __simd_callee__ inline void asc_cast(
     vector_bfloat16_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
-```
-
-```cpp
-__simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_fp8_e8m0_t src, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+    std::integral_constant<asc_position_mode, <src_pos>> src_pos)
 ```
 
 **接口说明如下：**
 
+- `src_pos`为占位符，支持`EVEN`和`ODD`。
 - `asc_e8m02bfloat16_v2`等价于使用`ODD`位置的引用输出版本。
 - `asc_cast`提供`EVEN`和`ODD`两个位置重载，不支持饱和模式和合并写入版本。
 

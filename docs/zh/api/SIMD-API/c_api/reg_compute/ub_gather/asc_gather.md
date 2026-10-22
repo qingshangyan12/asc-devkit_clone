@@ -138,7 +138,7 @@ __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src,
 
     src：-40 = 0b11011000 -> 0b0000000011011000，扩充至16位后等于216，即对应dst为216。
 
-- `fp8_e6m2_t`数据类型重载仅支持Ascend DevKit 9.2.0及以上版本，并仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+- `fp8_e6m2_t`数据类型重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
 
 - 当`src`与`dst`数据类型一致，但是与`index`数据类型不一致时，数据写入`dst`索引为偶数的位置，奇数索引位置置零。例如`src`为`int8_t`数据类型，`index`为`uint16_t`数据类型时，适用场景如下图：
 
