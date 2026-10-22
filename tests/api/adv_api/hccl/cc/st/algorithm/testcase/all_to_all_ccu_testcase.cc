@@ -56,6 +56,18 @@ TopoInfoWithNetLayerDetails MakeConcurrentTopo(u32 rankSize = 4U)
     return topo;
 }
 
+// 框架行为无关的断言：CCU 分支不得命中。
+// 当前框架 CCU NOT_MATCH 后降级 AICPU（整链 MATCH + Aicpu 名）；框架计划取消该兜底改为直接报错
+// （整链 NOT_MATCH，且 algName 可能残留"设名后拒绝"的 CCU 名）。两版共同不变量：
+// 只有 MATCH 且结果为 CCU 算法名才表示 CCU 分支命中——此情况绝不允许发生。
+::testing::AssertionResult CcuNotMatched(SelectorStatus status, const std::string& algName)
+{
+    if (status == SelectorStatus::MATCH && algName.rfind("CcuSched", 0) == 0) {
+        return ::testing::AssertionFailure() << "CCU algorithm unexpectedly matched: " << algName;
+    }
+    return ::testing::AssertionSuccess();
+}
+
 } // namespace
 
 class ST_ALL_TO_ALL_CCU_TEST : public ::testing::Test {
@@ -74,15 +86,14 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_mesh1d_clos_nullptr_sendcounts_selects_smalle
     EXPECT_EQ(algName, "CcuSchedAllToAllMesh1DMultiJetty"); // dataSize=0 → 非并发
 }
 
-TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_multilevel_mesh1d_falls_back_to_aicpu_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_multilevel_mesh1d_never_matches_ccu)
 {
     AlltoAllAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U, 2U); // 多级 MESH_1D ≤64
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
     std::string algName;
-    // CCU MultiLink 未注册 → NOT_MATCH → AICPU 兜底 MESH_1D → SoleMesh（路径守护用例）
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllSoleMesh");
+    // CCU MultiLink 未注册 → CCU 分支必须拒绝（断言与框架兜底行为无关，见 CcuNotMatched）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
 TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_single_level_mesh1d_selects_sole_mesh)
@@ -125,27 +136,26 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_algos_stay
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
     // CCU: MultiJetty 未注册 NOT_MATCH；AICPU: mesh!=clos 也 NOT_MATCH → 整链 NOT_MATCH
+    // （该形态 AICPU 同样不支持，断言在框架取消兜底前后一致）
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
 
-    // mesh == clos 且 4P：CCU Concurrent 未注册 NOT_MATCH → AICPU Concurrent 兜底 MATCH
+    // mesh == clos 且 4P：CCU Concurrent 未注册 → CCU 分支必须拒绝（断言与框架兜底行为无关）
     topo = MakeConcurrentTopo();
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
-TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_int8_multilevel_falls_back_to_aicpu)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_int8_multilevel_never_matches_ccu)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U);
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     param.all2AllVDataDes.sendType = HCCL_DATA_TYPE_INT8;
     std::string algName;
-    // CCU: int8 NOT_MATCH（对齐 hccl）→ AICPU 兜底 SoleMesh（守护用例）
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    // CCU: int8 拒绝（对齐 hccl）→ CCU 分支必须拒绝（断言与框架兜底行为无关）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
-TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_inplace_never_matches_ccu)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U);
@@ -157,24 +167,21 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
     param.outputSize = sizeof(inplaceBuf);
     std::string algName;
     // ccu_schedule 不支持原地算子（与 alltoall/all_gather 等兄弟实现契约一致）：
-    // 应 NOT_MATCH → 框架置 CCU_FAIL → AICPU 兜底 SoleMesh，绝不能 MATCH 出 CCU 算法
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    // CCU 分支必须拒绝（断言与框架兜底行为无关）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
-TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_2die_falls_back_to_aicpu)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_2die_never_matches_ccu)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U); // 多级 MESH_1D ≤4P
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
-    // 2Die 形态未经 SoleMesh 验证（单级路径同样拒绝），对齐单级契约：NOT_MATCH → AICPU 兜底
+    // 2Die 形态未经 SoleMesh 验证（单级路径同样拒绝），对齐单级契约：CCU 分支必须拒绝
     topo.level0MeshType = Level0MeshType::TWO_DIE_REGULAR;
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
     topo.level0MeshType = Level0MeshType::TWO_DIE_NOT_REGULAR;
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
 
 TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_pcie_mix_connectivity_contract)
@@ -183,12 +190,12 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_pcie_mix_connectivity_co
     OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
 
-    // 多级 pcie 混插未全连通：与单级契约一致拒绝（SoleMesh 走不了 pcie 通道）→ AICPU 兜底
+    // 多级 pcie 混插未全连通：与单级契约一致拒绝（SoleMesh 走不了 pcie 通道），
+    // 断言与框架兜底行为无关
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(4U);
     topo.topoLevelNums = 2U;
     topo.level0PcieMix = true; // 未设 localNetInsSizeOfLayer → 非全连通
-    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 
     // 多级 pcie 混插全连通：与单级一致，仍可 MATCH CCU SoleMesh
     // （Select 会按降级链改写 opParam.opExecuteConfig，二次调用前需重置）
