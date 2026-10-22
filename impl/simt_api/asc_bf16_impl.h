@@ -1630,7 +1630,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hfmax2(
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hnegx2(const bfloat16x2_t a)
 {
-    bfloat16xt ret = {__hneg(a.x), __hneg(a.y)};
+    bfloat16x2_t ret = {__hneg(a.x), __hneg(a.y)};
     return ret;
 }
 
