@@ -30,8 +30,8 @@ inline constexpr bool is_fill_support_type = Std::is_one_of_v<
     float>;
 }
 
-template <size_t N, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask)
+template <size_t N, merge_mode Mode = merge_mode::zeroing, typename T>
+__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask)
 {
     static_assert(
         detail::is_fill_support_type<T>,
@@ -39,14 +39,17 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
         "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
-    reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, value, mask.reg);
+    if constexpr (Mode == merge_mode::zeroing) {
+        asc_duplicate_scalar(dst.reg, value, mask.reg);
+    } else {
+        asc_duplicate_scalar_merge(dst.reg, value, mask.reg);
+    }
     dst.mask = mask.reg;
     return dst;
 }
 
-template <size_t N, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask)
+template <size_t N, merge_mode Mode = merge_mode::zeroing, typename T>
+__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(
         detail::is_fill_support_type<T>,
@@ -54,8 +57,11 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
         "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
-    reg_tensor<T> dst;
-    asc_duplicate(dst.reg, src.reg, mask.reg);
+    if constexpr (Mode == merge_mode::zeroing) {
+        asc_duplicate(dst.reg, src.reg, mask.reg);
+    } else {
+        asc_duplicate_merge(dst.reg, src.reg, mask.reg);
+    }
     dst.mask = mask.reg;
     return dst;
 }

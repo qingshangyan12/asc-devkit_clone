@@ -67,8 +67,10 @@ asc::te::experimental::reg_tensor<bool> second = result.second;
 接收[add_carry](../basic_arithmetic/add_carry.md)接口返回的两种元素类型的寄存器Tensor，`first`保存`uint32_t`类型的加法结果低32位，`second`保存`bool`类型的进位。
 
 ```cpp
-auto src0 = asc::te::experimental::fill(uint32_t{0xffffffff});
-auto src1 = asc::te::experimental::fill(uint32_t{1});
+asc::te::experimental::reg_tensor<uint32_t> src0;
+asc::te::experimental::reg_tensor<uint32_t> src1;
+asc::te::experimental::fill(src0, uint32_t{0xffffffff});
+asc::te::experimental::fill(src1, uint32_t{1});
 asc::te::experimental::reg_pair<uint32_t, bool> result =
     asc::te::experimental::add_carry(src0, src1);
 asc::te::experimental::reg_tensor<uint32_t> sum = result.first;

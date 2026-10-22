@@ -31,15 +31,16 @@ namespace experimental {
  * @override_id te_experimental_fill__const_T_R_const_reg_tensor_bool_R__template_N_T
  * @archs 3510
  * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode Mask handling mode. zeroing clears unselected elements; merging preserves them.
  * @tparam T Element type of the register tensor.
  * @return A register tensor containing the filled elements and the input mask.
  * @param [in] value Scalar value copied to each enabled element.
  * @param [in] mask Mask that specifies the elements to fill.
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
- * excludes it. Unselected elements are set to zero. The result preserves the active-lane mask.
+ * excludes it. The result preserves the active-lane mask.
  */
-template <size_t N = 1, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask = all_mask<T>());
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.data_padding
@@ -48,15 +49,16 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
  * @override_id te_experimental_fill__const_reg_tensor_T_R_const_reg_tensor_bool_R__template_N_T
  * @archs 3510
  * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode Mask handling mode. zeroing clears unselected elements; merging preserves them.
  * @tparam T Element type of the register tensor.
  * @return A register tensor containing the copied elements and the input mask.
  * @param [in] src Source register tensor.
  * @param [in] mask Mask that specifies the elements to copy.
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
- * excludes it. Unselected elements are set to zero. The result preserves the active-lane mask.
+ * excludes it. The result preserves the active-lane mask.
  */
-template <size_t N = 1, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
 } // namespace te
 } // namespace asc

@@ -20,33 +20,55 @@ template <typename T>
 __aicore__ inline void TestFillScalar()
 {
     auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
-    auto dst = asc::te::experimental::fill(T{}, mask);
-    static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
+    asc::te::experimental::reg_tensor<T> dst{};
+    auto result = asc::te::experimental::fill(dst, T{}, mask);
+    static_assert(AscendC::Std::is_same_v<decltype(result), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, mask.reg);
+    EXPECT_EQ(result.mask, mask.reg);
 }
 
 template <typename T>
 __aicore__ inline void TestFillRegTensor()
 {
     asc::te::experimental::reg_tensor<T> src{};
+    asc::te::experimental::reg_tensor<T> dst{};
     auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
-    auto dst = asc::te::experimental::fill(src, mask);
-    static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
+    auto result = asc::te::experimental::fill(dst, src, mask);
+    static_assert(AscendC::Std::is_same_v<decltype(result), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, mask.reg);
+    EXPECT_EQ(result.mask, mask.reg);
 }
 
 template <typename T>
 __aicore__ inline void TestFillDefaultMask()
 {
     asc::te::experimental::reg_tensor<T> src{};
+    asc::te::experimental::reg_tensor<T> scalar_dst{};
+    asc::te::experimental::reg_tensor<T> reg_tensor_dst{};
 
-    auto scalar_dst = asc::te::experimental::fill(T{});
-    auto reg_tensor_dst = asc::te::experimental::fill(src);
-    static_assert(AscendC::Std::is_same_v<decltype(scalar_dst), asc::te::experimental::reg_tensor<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(reg_tensor_dst), asc::te::experimental::reg_tensor<T>>);
+    auto scalar_result = asc::te::experimental::fill(scalar_dst, T{});
+    auto reg_tensor_result = asc::te::experimental::fill(reg_tensor_dst, src);
+    static_assert(AscendC::Std::is_same_v<decltype(scalar_result), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(reg_tensor_result), asc::te::experimental::reg_tensor<T>>);
     auto mask = asc::te::experimental::all_mask<T>();
     EXPECT_EQ(scalar_dst.mask, mask.reg);
     EXPECT_EQ(reg_tensor_dst.mask, mask.reg);
+}
+
+template <typename T>
+__aicore__ inline void TestFillMerging()
+{
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    asc::te::experimental::reg_tensor<T> scalar_dst{};
+    asc::te::experimental::reg_tensor<T> src{};
+    asc::te::experimental::reg_tensor<T> reg_dst{};
+    auto scalar_result = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(
+        scalar_dst, T{}, mask);
+    auto reg_result = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(reg_dst, src, mask);
+    EXPECT_EQ(scalar_dst.mask, mask.reg);
+    EXPECT_EQ(reg_dst.mask, mask.reg);
+    EXPECT_EQ(scalar_result.mask, mask.reg);
+    EXPECT_EQ(reg_result.mask, mask.reg);
 }
 
 #define DATA_PADDING_TEST(Function, DataType)                     \
@@ -61,6 +83,9 @@ __aicore__ inline void TestFillDefaultMask()
     DATA_PADDING_TEST(FillRegTensor, DataType) \
     DATA_PADDING_TEST(FillDefaultMask, DataType)
 
+#define DATA_PADDING_MERGING_TEST(DataType) \
+    DATA_PADDING_TEST(FillMerging, DataType)
+
 DATA_PADDING_TYPE_TESTS(uint8_t)
 DATA_PADDING_TYPE_TESTS(int8_t)
 DATA_PADDING_TYPE_TESTS(fp8_e4m3fn_t)
@@ -73,3 +98,6 @@ DATA_PADDING_TYPE_TESTS(bfloat16_t)
 DATA_PADDING_TYPE_TESTS(uint32_t)
 DATA_PADDING_TYPE_TESTS(int32_t)
 DATA_PADDING_TYPE_TESTS(float)
+
+DATA_PADDING_MERGING_TEST(uint16_t)
+DATA_PADDING_MERGING_TEST(float)

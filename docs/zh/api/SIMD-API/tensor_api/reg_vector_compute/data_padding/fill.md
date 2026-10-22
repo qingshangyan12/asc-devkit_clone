@@ -30,23 +30,27 @@
 
 支持scalar和tensor两种模式：
 
-- scalar模式：将value广播到寄存器，并保存在目的寄存器中（如果有mask，则保存在目的寄存器中被mask筛选的位置）。
-- tensor模式：将src的最低位元素广播到寄存器，并保存在目的寄存器中被mask筛选的位置。
+- scalar模式：将value广播到寄存器，并写入目的寄存器中被mask筛选的位置。
+- tensor模式：将src的最低位元素广播到寄存器，并写入目的寄存器中被mask筛选的位置。
+
+mask未筛选位置的处理方式由模板参数`Mode`指定。
 
 ## 函数原型
 
 - 将value广播到目的寄存器
 
     ```cpp
-    template <size_t N = 1, typename T>
-    __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
+    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+    __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value,
+        const reg_tensor<bool>& mask = all_mask<T>());
     ```
 
 - 将寄存器src的最低位元素广播到目的寄存器
 
     ```cpp
-    template <size_t N = 1, typename T>
-    __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
+    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+    __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src,
+        const reg_tensor<bool>& mask = all_mask<T>());
     ```
 
 ## 参数说明
@@ -56,15 +60,17 @@
 | 参数名 | 描述 |
 | --- | --- |
 | N | 待填充的寄存器数量，默认值为1。 |
+| Mode | 掩码模式，默认值为`merge_mode::zeroing`。设置为`merge_mode::zeroing`时，掩码未选中的元素清零；设置为`merge_mode::merging`时，掩码未选中的元素保留`dst`中的原值。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**  函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| dst | 输入/输出 | 目的操作数，类型为`reg_tensor<T>`。`Mode`为`merge_mode::merging`时，调用前必须初始化其`reg`成员。调用后其`mask`成员更新为输入的`mask.reg`。 |
 | value | 输入 | 源操作数。<br>类型为标量。 |
 | src | 输入 | 源操作数。<br>类型为[reg_tensor]。 |
-| mask | 输入 | 源操作数中元素有效性的指示，默认值为`all_mask<T>()`。 |
+| mask | 输入 | 指示目的操作数中需要写入广播值的元素，默认值为`all_mask<T>()`。 |
 
 ## 数据类型
 
@@ -72,11 +78,12 @@
 
 ## 返回值说明
 
-返回 `reg_tensor<T>`，包含数据广播后的结果。返回值的 `mask` 与 输入的 `mask` 相同。
+返回更新后的`dst`，类型为`reg_tensor<T>`。同时，传入的`dst`也会被更新；其`mask`成员及返回值的`mask`成员均与输入的`mask.reg`相同。
 
 ## 约束说明
 
 - N当前仅支持1。
+- `Mode`为`merge_mode::merging`时，掩码未选中的元素保留`dst.reg`中的原值，因此调用前必须初始化`dst.reg`。
 - mask仅筛选dst中写入广播值的位置，不筛选src中的元素。无论mask的最低位是否有效，待广播的数据均为src的最低位元素。
 
 ## 调用示例
@@ -93,7 +100,8 @@
             auto mask = asc::te::experimental::update_mask<data_type>(count);
             uint32_t offset = i * one_repeat_size;
             const auto coord = asc::te::make_coord(offset);
-            auto y_reg = asc::te::experimental::fill(scalar, mask);
+            asc::te::experimental::reg_tensor<data_type> y_reg;
+            asc::te::experimental::fill(y_reg, scalar, mask);
             asc::te::experimental::store(y_tensor, coord, y_reg);
         }
     }
@@ -112,8 +120,19 @@
             uint32_t offset = i * one_repeat_size;
             const auto coord = asc::te::make_coord(offset);
             auto x_reg = asc::te::experimental::load(x_tensor, coord);
-            auto y_reg = asc::te::experimental::fill(x_reg, mask);
+            asc::te::experimental::reg_tensor<data_type> y_reg;
+            asc::te::experimental::fill(y_reg, x_reg, mask);
             asc::te::experimental::store(y_tensor, coord, y_reg);
         }
     }
+    ```
+
+- 示例三
+
+    以下示例使用`merge_mode::merging`，仅更新mask选中的元素，未选中的元素保留`y_reg`中的原值。
+
+    ```cpp
+    auto y_reg = asc::te::experimental::load(y_tensor, coord);
+    asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(y_reg, scalar, mask);
+    asc::te::experimental::store(y_tensor, coord, y_reg);
     ```
