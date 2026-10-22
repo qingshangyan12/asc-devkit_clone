@@ -56,7 +56,7 @@ AoS（Array of Structures，结构体数组）与SoA（Structure of Arrays，数
 
 **图1　内存布局示意图**
 
-<img src="figures/内存布局示意图.drawio.png">
+![内存布局示意图](figures/soa_aos_layout.png)
 
 图1以本样例的哈希表结构为例，展示了不同的内存布局。哈希表结构体代码实现如下所示：
 
@@ -165,7 +165,7 @@ __aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64
 
 **图2　Cacheline示意图**
 
-![Cacheline示意图](figures/Cacheline示意图.drawio.png)
+![Cacheline示意图](figures/cacheline.png)
 
 图2对比了AoS与SoA布局在Cache Line利用上的差异：AoS中key和value交替存储，查询key时会将相邻的value一同加载；SoA中所有key连续存储，单条128B Cache Line可容纳更多key，例如16个8B的key，从而减少查找过程中不必要的value数据加载，降低Cache Line搬运开销，提高缓存利用率。
 
@@ -263,7 +263,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
 
 **图3　协作组查找示意图**
 
-![协作组查找示意图](figures/协作组查找示意图.drawio.png)
+![协作组查找示意图](figures/cooperative_group.png)
 
 图3展示了协作组查询key的过程：多个线程读取连续存储的候选key到寄存器，再通过组内投票生成匹配位图，选出命中线程，由其负责处理命中的key，例如key3，从而减少访存开销并避免多个线程重复处理同一结果。
 
@@ -306,7 +306,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 
 **图4　性能对比示意图**
 
-![性能对比示意图](figures/性能对比示意图.png)
+![性能对比示意图](figures/performance_comparison.png)
 
 图4展示了不同优化方案在不同负载因子下的查找性能变化。当负载因子较低时，协作探测的查找性能始终低于其它Case；但随着负载因子增加，哈希冲突增多、探测序列变长，此时协作探测通过扩大单轮探测范围、合并访存请求，缓解了高负载下的性能退化。
 
