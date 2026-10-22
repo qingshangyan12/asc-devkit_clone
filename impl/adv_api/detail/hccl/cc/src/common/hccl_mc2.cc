@@ -850,11 +850,12 @@ namespace {
 CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
-    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
+    HcclResult hcclRet =
+        haclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        aclRet != ACL_SUCCESS,
+        hcclRet != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
+            "[CcuKernelLaunch] haclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", hcclRet, opResCtx,
             sizeof(OpResCtx)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
