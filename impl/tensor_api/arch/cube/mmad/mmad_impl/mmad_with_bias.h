@@ -30,7 +30,7 @@ namespace te {
 class mmad_with_bias {
 public:
     template <
-        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
         typename Params>
     __aicore__ inline static void run(
         const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)
@@ -39,14 +39,14 @@ public:
     }
 
 private:
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
     __aicore__ inline static constexpr void check_template_for_normal()
     {
         check_layout_pattern<CTensor, ATensor, BTensor, BiasTensor>();
         check_data_type::check_mmad_bias_data_type<CTensor, ATensor, BTensor, BiasTensor>();
     }
 
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
     __aicore__ inline static constexpr void check_template_for_mx()
     {
         check_layout_pattern<CTensor, ATensor, BTensor, BiasTensor>();
@@ -54,7 +54,7 @@ private:
     }
 
     template <
-        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
         typename Params>
     __aicore__ inline static void mmad_impl(
         const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)

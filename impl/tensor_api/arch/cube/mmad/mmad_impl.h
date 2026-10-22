@@ -33,7 +33,7 @@ __aicore__ inline void mmad_operation::mmad(const Args&... args)
     mmad_impl<traits>(args...);
 }
 
-template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor>
+template <auto& trait, typename CTensor, typename ATensor, typename BTensor>
 __aicore__ inline void mmad_operation::mmad_impl(
     const CTensor& c, const ATensor& a, const BTensor& b, const mmad_params& params)
 {
@@ -59,7 +59,7 @@ __aicore__ inline void mmad_operation::mmad_impl(
     mmad_impl::template run<trait>(c, a, b, params);
 }
 
-template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
 __aicore__ inline void mmad_operation::mmad_impl(
     const CTensor& c, const ATensor& a, const BTensor& b, const BiasTensor& bias, const mmad_params& params)
 {

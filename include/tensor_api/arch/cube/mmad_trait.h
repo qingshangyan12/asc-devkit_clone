@@ -45,6 +45,24 @@ struct mmad_trait_default {
     static constexpr const trait_type value = {};
 };
 
+struct mmad_trait_arch9202 : mmad_trait {
+    __aicore__ constexpr mmad_trait_arch9202() = default;
+
+    __aicore__ constexpr mmad_trait_arch9202(
+        int32_t fm_offset, bool k_direction_align, bool init_with_btbuf, bool disable_gemv,
+        asc::te::mmad_type mmad_type, bool enable_hif4_a_model = false, bool enable_hif4_b_model = false,
+        bool enable_c_scale = false)
+        : mmad_trait(fm_offset, k_direction_align, init_with_btbuf, disable_gemv, mmad_type),
+          enable_hif4_a_model(enable_hif4_a_model),
+          enable_hif4_b_model(enable_hif4_b_model),
+          enable_c_scale(enable_c_scale)
+    {}
+
+    bool enable_hif4_a_model = false;
+    bool enable_hif4_b_model = false;
+    bool enable_c_scale = false;
+};
+
 } // namespace te
 } // namespace asc
 
