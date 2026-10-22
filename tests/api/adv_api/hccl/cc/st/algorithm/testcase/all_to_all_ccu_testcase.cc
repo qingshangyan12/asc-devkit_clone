@@ -161,4 +161,40 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_2die_falls_back_to_aicpu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U); // 多级 MESH_1D ≤4P
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    // 2Die 形态未经 SoleMesh 验证（单级路径同样拒绝），对齐单级契约：NOT_MATCH → AICPU 兜底
+    topo.level0MeshType = Level0MeshType::TWO_DIE_REGULAR;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+    topo.level0MeshType = Level0MeshType::TWO_DIE_NOT_REGULAR;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_pcie_mix_connectivity_contract)
+{
+    AlltoAllVAutoSelector selector;
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+
+    // 多级 pcie 混插未全连通：与单级契约一致拒绝（SoleMesh 走不了 pcie 通道）→ AICPU 兜底
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(4U);
+    topo.topoLevelNums = 2U;
+    topo.level0PcieMix = true; // 未设 localNetInsSizeOfLayer → 非全连通
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+
+    // 多级 pcie 混插全连通：与单级一致，仍可 MATCH CCU SoleMesh
+    // （Select 会按降级链改写 opParam.opExecuteConfig，二次调用前需重置）
+    topo.netLayerDetails.localNetInsSizeOfLayer = {4U};
+    param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
+}
 } // namespace checker

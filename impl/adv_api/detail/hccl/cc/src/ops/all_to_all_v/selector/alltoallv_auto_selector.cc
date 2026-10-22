@@ -106,6 +106,20 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
                 HCCL_WARNING("[Algo][AlltoAllVAutoSelector] rankSize > 64 is not supported yet for ccu_schedule mode.");
                 return SelectorStatus::NOT_MATCH;
             }
+            // 与单级路径契约一致：2Die 形态与 pcie 混插未全连通的 level0 不选 SoleMesh
+            // （hccl 多级分支缺此检查属其既有缺口，不照抄）
+            if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_REGULAR ||
+                topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
+                HCCL_WARNING(
+                    "[AlltoAllVAutoSelector][%s] 2-die level0 mesh is not supported by SoleMesh in multi-level topo.",
+                    __func__);
+                return SelectorStatus::NOT_MATCH;
+            }
+            if (topoInfo->level0PcieMix && !IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+                HCCL_WARNING(
+                    "[AlltoAllVAutoSelector] pcie mixed topo is not fully connected with 1dmesh in multi-level topo.");
+                return SelectorStatus::NOT_MATCH;
+            }
             if (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT) {
                 selectAlgName = "CcuSchedAllToAllVSoleMesh";
                 HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
