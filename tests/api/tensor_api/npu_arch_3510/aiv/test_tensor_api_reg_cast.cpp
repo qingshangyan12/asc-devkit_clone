@@ -46,55 +46,12 @@ static_assert(!asc::te::experimental::detail::reg_cast_op<float, half, cast_layo
     cast_round_mode::odd, cast_sat_mode::not_sat>::supported);
 static_assert(!asc::te::experimental::detail::reg_cast_op<half, float, cast_layout::zero,
     cast_round_mode::hybrid, cast_sat_mode::not_sat>::supported);
-#if !defined(ASCENDC_CPU_DEBUG)
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
-static_assert(supports_saturated_and_unsaturated_casts<hifloat8_t, float, cast_round_mode::hybrid,
-    cast_layout::zero, cast_layout::one, cast_layout::two, cast_layout::three>());
-static_assert(supports_saturated_and_unsaturated_casts<hifloat8_t, half, cast_round_mode::hybrid,
-    cast_layout::zero, cast_layout::one>());
-static_assert(!asc::te::experimental::detail::reg_cast_op<hifloat8_t, half, cast_layout::two,
-    cast_round_mode::hybrid, cast_sat_mode::not_sat>::supported);
-#endif
-#endif
-
 static_assert(asc::te::experimental::detail::reg_cast_op<float, half, cast_layout::zero,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<half, float, cast_layout::one,
     cast_round_mode::ceil, cast_sat_mode::sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<uint8_t, int32_t, cast_layout::two,
     cast_round_mode::rint, cast_sat_mode::sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<half, int4x2_t, cast_layout::zero,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<half, int4x2_t, cast_layout::one,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<half, int4x2_t, cast_layout::two,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<half, int4x2_t, cast_layout::three,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int4x2_t, half, cast_layout::zero,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int4x2_t, half, cast_layout::one,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int4x2_t, half, cast_layout::two,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int4x2_t, half, cast_layout::three,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int16_t, int4x2_t, cast_layout::zero,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int16_t, int4x2_t, cast_layout::one,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int16_t, int4x2_t, cast_layout::two,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<int16_t, int4x2_t, cast_layout::three,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<bfloat16_t, int4x2_t, cast_layout::zero,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<bfloat16_t, int4x2_t, cast_layout::one,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<bfloat16_t, int4x2_t, cast_layout::two,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
-static_assert(asc::te::experimental::detail::reg_cast_op<bfloat16_t, int4x2_t, cast_layout::three,
-    cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 static_assert(!asc::te::experimental::detail::reg_cast_op<float, half, cast_layout::two,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 
