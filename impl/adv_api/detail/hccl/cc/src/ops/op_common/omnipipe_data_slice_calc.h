@@ -58,7 +58,7 @@ struct OmniPipeSplitSliceInfo {
 struct OmniPipeSliceParam {
     std::vector<u64> levelRankSize;      // 依次为三个维度的rankSize
     std::vector<double> endpointAttrBw;  // 依次为三个维度的平均带宽
-    std::vector<u64> dataSizePerLoop{0}; // 一次loop总数据量大小
+    std::vector<u64> dataSizePerLoop{0
     u64 dataTypeSize{0};                 // 数据类型大小
     // 如果是aicpu的单算子模式，和dataSize一样，每次都在ccl做。其他模式都是总数据量。
     std::vector<u64> dataWholeSize{0};
@@ -67,19 +67,21 @@ struct OmniPipeSliceParam {
     OpMode opMode;
     CommEngine engine;
     OmniNeedSetStepNum needSetStepNum = OmniNeedSetStepNum::OMNIPIPE_DEFAULT;
+    double multipleDimensionSplitRatio = -1.0; // 多维切分比例，用于覆盖带宽比；(0,1)时生效，否则用原始带宽比
 };
 
 // 计算ScratchInfo的入参，只给RS用
 struct OmniPipeScratchParam {
     std::vector<u64> levelRankSize;     // 依次为三个维度的rankSize
     std::vector<double> endpointAttrBw; // 依次为三个维度的平均带宽
-    std::vector<u64> dataSize{0};       // 做之前的数据量大小
+    std::vector<u64> dataSize{0
     u64 dataTypeSize{0};                // 数据类型大小
     u64 maxTmpMemSize{0};               // 最大scratch大小
     std::vector<u64> levelAlgType;      // 依次为三个维度的算法类型，MESH是1 or NHR是0
     OpMode opMode;
     CommEngine engine;
     OmniNeedSetStepNum needSetStepNum = OmniNeedSetStepNum::OMNIPIPE_DEFAULT;
+    double multipleDimensionSplitRatio = -1.0; // 多维切分比例，用于覆盖带宽比；(0,1)时生效，否则用原始带宽比
 };
 
 std::string ThreeDVecToStrOmni(const std::vector<std::vector<std::vector<u32>>>& infos);

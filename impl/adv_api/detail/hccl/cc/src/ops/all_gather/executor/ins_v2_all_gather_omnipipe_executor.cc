@@ -400,7 +400,12 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     omniPipeSliceParam.opMode = opMode_;
     omniPipeSliceParam.engine = CommEngine::COMM_ENGINE_AICPU_TS;
     omniPipeSliceParam.dataWholeSize = dataWholeSize;
-    omniPipeSliceParam.needSetStepNum = omniNeedSetStepNum_;
+    omniPipeSliceParam.needSetStepNum = omniNeedStepNum_;
+    // PCIE 混布 + 用户显式配置切分比例时，覆盖步数计算的带宽比（对齐 hccl :515-516）
+    if (resCtx.topoInfo.level0PcieMix
+        && param.opConfig.multipleDimensionSplitRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        omniPipeSliceParam.multipleDimensionSplitRatio = param.opConfig.multipleDimensionSplitRatio;
+    }
 
     OmniPipeSliceInfo alignSliceInfo = CalcAGOmniPipeSliceInfo(omniPipeSliceParam);
 
@@ -418,6 +423,10 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     std::vector<u64> dataWholeSizeLocalcopy(rankSize_, rankStrideBytes);
     localcopySliceParam.dataWholeSize = dataWholeSizeLocalcopy;
     localcopySliceParam.needSetStepNum = omniNeedSetStepNum_;
+    if (resCtx.topoInfo.level0PcieMix
+        && param.opConfig.multipleDimensionSplitRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        localcopySliceParam.multipleDimensionSplitRatio = param.opConfig.multipleDimensionSplitRatio;
+    }
 
     OmniPipeSliceInfo localcopySliceInfo = CalcAGOmniPipeSliceInfo(localcopySliceParam);
 

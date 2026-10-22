@@ -14,6 +14,12 @@
 #include <cmath>
 
 namespace mc2_ops_hccl {
+
+static bool IsValidMultipleDimensionSplitRatio(double ratio)
+{
+    return ratio > 0.0 && ratio < 1.0;
+}
+
 constexpr double BANDWIDTH_RATIO_BOUND = 10;
 constexpr double LOOP_SCALING_FACTOR = 0.9;
 
@@ -246,7 +252,7 @@ u64 CalAllgatherDataSizeRatio2D(
 // yRankSize快轴卡数，dataSizeEachRank单卡数据量，maxStep设定的最大步数
 u64 CalAllgatherDataSize2D(
     u64* xStepP2pDataSize, u64* yStepP2pDataSize, double xB, double yB, u64 xRankSize, u64 yRankSize,
-    u64 dataSizeEachRank, u64 maxStep, CommEngine engine)
+    u64 dataSizeEachRank, u64 maxStep, CommEngine engine, double multipleDimensionSplitRatio)
 {
     HCCL_INFO("[CalAllgatherDataSize2D] start");
     u64 step = 1;
@@ -259,7 +265,10 @@ u64 CalAllgatherDataSize2D(
         yStepP2pDataSize[0] = dataSizeEachRank;
     } else {
         u64 finStepMark = 2;
-        double bandwidthRatio = yB / xB; // 带宽比例
+        double bandwidthRatio = yB / xB;
+        if (IsValidMultipleDimensionSplitRatio(multipleDimensionSplitRatio)) {
+            bandwidthRatio = (xRankSize - 1) / (1.0 - multipleDimensionSplitRatio);
+        } // 带宽比例
         u64 wholeRankSize = xRankSize * yRankSize;
         (void)wholeRankSize;
         // 计算斜对角等比
@@ -344,7 +353,7 @@ u64 CalAllgatherDataSize2D(
 // dataSize总数据量，maxStep设定的最大步数,两轴数据量最大的一步的数据量
 u64 CalReducescatterDataSize2D(
     u64* xStepP2pDataSize, u64* yStepP2pDataSize, double xB, double yB, u64 xRankSize, u64 yRankSize,
-    u64 dataSizeEachRank, u64 maxStep, CommEngine engine)
+    u64 dataSizeEachRank, u64 maxStep, CommEngine engine, double multipleDimensionSplitRatio)
 {
     HCCL_INFO("[CalReducescatterDataSize2D] start");
     u64 step = 1;
@@ -357,7 +366,10 @@ u64 CalReducescatterDataSize2D(
         yStepP2pDataSize[0] = dataSizeEachRank;
     } else {
         u64 finStepMark = 2;
-        double bandwidthRatio = yB / xB; // 带宽比例
+        double bandwidthRatio = yB / xB;
+        if (IsValidMultipleDimensionSplitRatio(multipleDimensionSplitRatio)) {
+            bandwidthRatio = (xRankSize - 1) / (1.0 - multipleDimensionSplitRatio);
+        } // 带宽比例
         // 计算斜对角等比
         double omniPipeRatio = (xRankSize - 1) / bandwidthRatio;
         // 计算放大系数
@@ -554,7 +566,7 @@ std::vector<u64> CalcOmniPipeScratchInfo(OmniPipeScratchParam& omniPipeScratchPa
     // 先计算数据量
     if (zB > xyB) {
         outerStepNum = CalReducescatterDataSize2D(
-            xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, dataSize, maxStepNum, engine);
+            xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, dataSize, maxStepNum, engine, omniPipeScratchParam.multipleDimensionSplitRatio);
         HCCL_INFO("[CalcOmniPipeScratchInfo] zB>xyB,outerStepNum=[%llu]", outerStepNum);
     } else {
         outerStepNum = CalReducescatterDataSize2D(
@@ -630,7 +642,7 @@ std::vector<u64> CalcOmniPipeScratchInfo(OmniPipeScratchParam& omniPipeScratchPa
         if (zB > xyB) {
             outerStepNum = CalReducescatterDataSize2D(
                 xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, maxDataSizePerLoop, maxStepNum,
-                engine);
+                engine, omniPipeScratchParam.multipleDimensionSplitRatio);
             HCCL_INFO("[CalcOmniPipeScratchInfo] zB>xyB,outerStepNum=[%llu]", outerStepNum);
         } else {
             outerStepNum = CalReducescatterDataSize2D(
@@ -1016,13 +1028,13 @@ OmniPipeSliceInfo CalcAGOmniPipeSliceInfo(OmniPipeSliceParam& omniPipeSliceParam
             // 先计算通信步数和每步每一小片数据量
             outerStepNum = CalAllgatherDataSize2D(
                 zAGDataSize[rs], xyAGDataSize[rs], zB, xyB, zRankSize, xRankSize * yRankSize,
-                omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine);
+                omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionSplitRatio);
             if (yB >= xB) {
                 // 这里认为y一定大
                 for (u64 i = 0; i < outerStepNum; i++) {
                     innerStepNum = CalAllgatherDataSize2D(
                         xAGDataSize[rs][i], yAGDataSize[rs][i], xB, yB, xRankSize, yRankSize, xyAGDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine);
+                        maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionSplitRatio);
                 }
                 // 这里判断下，步数为1的时候只进上面的循环，否则这里走一步
                 if (innerStepNum > 1) {
