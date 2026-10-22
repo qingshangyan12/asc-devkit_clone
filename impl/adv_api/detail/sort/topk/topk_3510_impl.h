@@ -541,7 +541,7 @@ __simd_callee__ inline void FilterDataAndGivenByteFromOri(
 }
 
 template <typename T>
-__simd_vf__ inline void GenerateAccumulateData(
+__simd_vf__ inline void GenerateAccumulateDataTwoParts(
     __ubuf__ T* src, __ubuf__ uint16_t* hist, __ubuf__ T* tmpSrcData, uint32_t count, T value, uint32_t byteNum)
 {
     using ConvType = typename AscendC::Internal::ExtractTypeBySize<sizeof(T)>::T;
@@ -574,6 +574,48 @@ __simd_vf__ inline void GenerateAccumulateData(
 
     Reg::StoreAlign((__ubuf__ uint16_t*&)hist, acumHistLow, b16FullMask);
     Reg::StoreAlign((__ubuf__ uint16_t*&)hist + GetVecLen() / sizeof(uint16_t), acumHistHigh, b16FullMask);
+}
+
+template <typename T>
+__simd_vf__ inline void GenerateAccumulateDataMultiBin(
+    __ubuf__ T* src, __ubuf__ uint16_t* hist, __ubuf__ T* tmpSrcData, uint32_t count, T value, uint32_t byteNum)
+{
+    using ConvType = typename AscendC::Internal::ExtractTypeBySize<sizeof(T)>::T;
+    auto unsignedValue = static_cast<ConvType>(value);
+    uint16_t repeatTimes = DivCeil(count, GetVecLen());
+    ConvType workingUnsignedValue = 0;
+    if (byteNum != sizeof(T)) {
+        workingUnsignedValue = unsignedValue >> (byteNum * 8);
+    }
+
+    constexpr uint32_t partNum = 512 / GetVecLen();
+    RegTensor<uint16_t> acumHist[partNum];
+    MaskReg b16FullMask = CreateMask<uint16_t>();
+    internal::HistZeroCumAll<0, partNum>(acumHist, b16FullMask);
+
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        MaskReg maskReg = UpdateMask<uint8_t>(count);
+
+        MaskReg filterMask;
+        RegTensor<uint8_t> colWorkBits;
+        FilterDataAndGivenByteFromOri(
+            filterMask, colWorkBits, src, maskReg, workingUnsignedValue, byteNum, i * GetVecLen(), tmpSrcData);
+
+        internal::HistAccumAll<0, partNum>(acumHist, colWorkBits, filterMask);
+    }
+
+    internal::HistStoreAll<0, partNum>(acumHist, hist, b16FullMask);
+}
+
+template <typename T>
+__aicore__ inline void GenerateAccumulateData(
+    __ubuf__ T* src, __ubuf__ uint16_t* hist, __ubuf__ T* tmpSrcData, uint32_t count, T value, uint32_t byteNum)
+{
+    if constexpr ((512 / GetVecLen()) == 2) {
+        GenerateAccumulateDataTwoParts<T>(src, hist, tmpSrcData, count, value, byteNum);
+    } else {
+        GenerateAccumulateDataMultiBin<T>(src, hist, tmpSrcData, count, value, byteNum);
+    }
 }
 
 __simd_vf__ inline void GatherGreaterAndEqualKData(
