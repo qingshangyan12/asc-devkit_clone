@@ -2,9 +2,12 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR&950DT系列产品：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR&960DT系列产品：支持
 <!-- end id1 -->
+<!-- npu="950" id8 -->
+- Ascend 950PR&950DT系列产品：不支持
+<!-- end id8 -->
 <!-- npu="A3" id2 -->
 - Atlas A3系列产品：不支持
 <!-- end id2 -->
@@ -28,7 +31,7 @@
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-本接口在Ascend 950PR&950DT系列产品的`dav-9201`架构上支持。
+本接口仅在Ascend 960PR&960DT系列产品的`dav-9201`架构上支持。
 
 根据`mask`将`src`中参与计算的`half`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为2:1，`dst`中的元素按索引分为偶数位置和奇数位置，参数`dst_pos`选择转换结果的写入位置，未选中的位置清零。
 
@@ -39,11 +42,17 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_half2e5m2_rn<sat_mode>(
+__simd_callee__ inline void asc_half2e5m2_rn(
+    vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_position_mode, <position>> dst_pos)
+__simd_callee__ inline void asc_half2e5m2_rn_sat(
     vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_position_mode, <position>> dst_pos)
 
-__simd_callee__ inline vector_fp8_e5m2_t asc_half2e5m2_rn<sat_mode>(
+__simd_callee__ inline vector_fp8_e5m2_t asc_half2e5m2_rn(
+    vector_half src, vector_bool mask,
+    std::integral_constant<asc_position_mode, <position>> dst_pos)
+__simd_callee__ inline vector_fp8_e5m2_t asc_half2e5m2_rn_sat(
     vector_half src, vector_bool mask,
     std::integral_constant<asc_position_mode, <position>> dst_pos)
 
@@ -74,8 +83,9 @@ __simd_callee__ inline void asc_cast_merge(
 
 **占位符说明如下：**
 
-- `<sat_mode>`支持`NO_SAT`和`SAT`。
 - `<position>`支持`EVEN`和`ODD`，对应常量`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
+- `<sat_mode>`支持`asc_cast_saturation_mode::NO_SAT`和`asc_cast_saturation_mode::SAT`，对应常量`ASC_CAST_NO_SAT`和`ASC_CAST_SAT`。
+- `asc_half2e5m2_rn`和`asc_half2e5m2_rn_sat`分别为非饱和和饱和版本。
 - `asc_half2e5m2_rn_merge`和`asc_half2e5m2_rn_sat_merge`各包含`EVEN/ODD`两个位置重载。
 - `asc_cast`和`asc_cast_merge`各包含`<sat_mode>`与`<position>`的全部组合重载。
 - `asc_half2e5m2_rn_v2`和`asc_half2e5m2_rn_sat_v2`等价于使用`ODD`位置的引用输出版本。
@@ -111,7 +121,7 @@ __simd_callee__ inline void asc_cast_merge(
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签仅能使用编译期常量。
-- `asc_half2e5m2_rn_*`和`asc_cast`在`mask`对应位为0或未选中位置时将结果置零；`asc_cast_merge`保留未选中位置的原值。
+- `asc_half2e5m2_rn`、`asc_half2e5m2_rn_sat`及其`_v2`变体和`asc_cast`在`mask`对应位为0或未选中位置时将结果置零；`asc_half2e5m2_rn_merge`、`asc_half2e5m2_rn_sat_merge`和`asc_cast_merge`保留未选中位置的原值。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
 
 ## 调用示例

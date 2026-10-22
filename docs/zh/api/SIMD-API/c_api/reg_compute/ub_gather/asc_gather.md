@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id9 -->
+- Ascend 960PR&960DT系列产品：支持
+<!-- end id9 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -38,6 +41,8 @@
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
+其中，`fp8_e6m2_t`数据类型重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
+
 ## 函数原型
 
 ```c
@@ -67,6 +72,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather(__ubuf__ <src_dtype>* src,
 | fp8_e8m0_t | fp8_e8m0_t | uint16_t |
 | fp8_e5m2_t | fp8_e5m2_t | uint16_t |
 | fp8_e4m3fn_t | fp8_e4m3fn_t | uint16_t |
+| fp8_e6m2_t | fp8_e6m2_t | uint16_t |
 | int16_t | int16_t | uint16_t |
 | int16_t | int16_t | uint32_t |
 | uint16_t | uint16_t | uint16_t |
@@ -131,6 +137,8 @@ __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src,
     src：40 = 0b00101000 -> 0b0000000000101000，扩充至16位后等于40，即对应dst为40；
 
     src：-40 = 0b11011000 -> 0b0000000011011000，扩充至16位后等于216，即对应dst为216。
+
+- `fp8_e6m2_t`数据类型重载仅支持Ascend DevKit 9.2.0及以上版本，并仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
 
 - 当`src`与`dst`数据类型一致，但是与`index`数据类型不一致时，数据写入`dst`索引为偶数的位置，奇数索引位置置零。例如`src`为`int8_t`数据类型，`index`为`uint16_t`数据类型时，适用场景如下图：
 
