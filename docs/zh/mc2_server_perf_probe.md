@@ -20,11 +20,11 @@ unset MC2_PERF_ACCEPTANCE
 变量在 Host 每次组装 Server launch 参数时读取，不依赖 Device 进程继承 Host 环境变量。
 
 - 关闭：args[0] 保持原 `MC2_AICPU_SIMPLE_CTX_PROTOCOL`。
-- 开启：args[0] 编码为 `CommKfcParamDesc`，version=15、itemNum=1；验收 cache 策略见下文，其余字段清零。
+- 开启：args[0] 编码为 `CommKfcParamDesc`，version=15（count）或14（detail）、itemNum=1；验收 cache 策略见下文，其余字段清零。
 - args[1] 仍为 Device OpResCtx 地址，参数块长度及 OpResCtx 布局不变。
-- Device 仅在普通描述符 version=15 时开启本次 kernel 的探针；其他版本和旧 simple-context 协议关闭。退出时清除线程启用状态。
+- Device 仅在普通描述符 version=14/15 时开启本次 kernel 的探针；其他版本和旧 simple-context 协议关闭。退出时清除线程启用状态。
 
-15 是本功能保留的协议版本，不能作为其他描述符用途重复分配。旧版 Mc2ServerKernel 可能继续执行而忽略此版本的打点语义；无日志必须判为未覆盖，不能宣称采集成功。该约定限于 Mc2ServerKernel，不适用于其他 AICPU 入口。
+14/15 是本功能保留的协议版本，不能作为其他描述符用途重复分配。旧版 Mc2ServerKernel 可能继续执行而忽略此版本的打点语义；无日志必须判为未覆盖，不能宣称采集成功。该约定限于 Mc2ServerKernel，不适用于其他 AICPU 入口。
 
 ## 指标与限制
 
@@ -44,7 +44,7 @@ unset MC2_PERF_ACCEPTANCE
 
 ## 受控热态缓存对照
 
-Host 设置 `MC2_PERF_ACCEPTANCE=1` 且 `MC2_PERF_CACHE_POLICY=paired` 时，在 version=15
+Host 设置 `MC2_PERF_ACCEPTANCE=1` 且 `MC2_PERF_CACHE_POLICY=paired` 时，在 version=14/15
 描述符的 isDyn bit0 编码 paired；仅该验收版本、单 context 使用此语义，结构体大小不变。
 未指定/非 paired 或未开启打点时保持自然缓存路径。
 
@@ -56,3 +56,18 @@ miss 捕获后不清理，下一轮可 replay；hit 后清理，下一轮可重�
 每 launch 输出 `[MC2_PERF_CACHE_CONTROL] launch=... policy=paired cleared=0|1 status=...`。
 新脚本要求每组进程每 rank 热态覆盖两种真实 cache 状态；不支持 cache 的算法、未适配旧包、日志缺失均会报不完整。
 该控制仅服务每 kernel 一次 collective、repeat=1 的验收载荷，不适用于多 context/多消息使用方式。
+
+## 两档细分诊断（配套 HCOMM）
+
+`MC2_PERF_ACCEPTANCE=1` 为总开关，新增 `MC2_PERF_LEVEL=count|detail`，默认 count。
+Host 将 detail 编码为描述符 version=14；count 保留 version=15。当前 MC2 参数读写路径未发现既有 version=14 使用，其他协议版本用途不受影响。
+
+Device 不改变 HCOMM 的资源参数结构；沿现有 libmc2_server.so 及其依赖的查找路径解析 HCOMM 的 `HcommAicpuPerfBegin/End`，通过 ABI=1、level=1/2 开始/结束同线程统计。缺少符号或数组 ABI 不匹配时诊断输出非零 status，测试框架拒绝作为完整结果。关闭探针时不调用 Begin/End。
+
+count 保留原三段耗时，增加 13 个 HCOMM 计数；detail 增加 10 个 HCOMM 累计时间和 13 个 Server 细分时间，共36个新增指标。六个连续区间为：解析→Wait前、Wait提交、Wait后→算法前、算法调用、算法后→Record前、Record提交→Submitted，和等于原 server_parsed_to_submit。另7个算法内嵌套时间为缓存计划、查找、executor、捕获开始/结束、命中重放和 BatchModeEnd 累计时间。
+
+日志使用独立的 MC2_PERF_STAT/MC2_PERF_STAT_END，原三条 MC2_PERF 格式不变。统计快照和日志在总计时终点之后，paired cache 清理仍在通信完成之后且不计入。细分计时开销未扣除，六段及内部嵌套计时不能相加。
+
+完整执行指导和每列定义在配套 hccl_api_test 的 perf_acceptance/SERVER_DETAIL.md；suite 使用 --perf-level 或 server.perf_level，measurement_schema=3 严格审计新增记录。必须同时更新 asc-devkit、HCOMM 与测试脚本；旧包的旧数据仍可按原 schema 解析。
+
+新增改动的目标 Linux 构建与签名包/NPU 验证需要分别确认，不沿用上文旧版本验证结论。

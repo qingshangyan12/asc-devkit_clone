@@ -1069,9 +1069,11 @@ HcclResult Mc2PrepareAicpuHostArgs(Mc2AicpuHostArgs& hostArgs, void* opResCtx)
     const char* perfEnv = std::getenv("MC2_PERF_ACCEPTANCE");
     if (perfEnv != nullptr && std::strcmp(perfEnv, "1") == 0) {
         HcclApi::CommKfcParamDesc desc{};
-        desc.version = HcclApi::MC2_PERF_DESC_VERSION;
+        const char* level = std::getenv("MC2_PERF_LEVEL");
+        desc.version = level != nullptr && std::strcmp(level, "detail") == 0 ? HcclApi::MC2_PERF_DETAIL_DESC_VERSION :
+                                                                               HcclApi::MC2_PERF_DESC_VERSION;
         desc.itemNum = 1;
-        // Version 15 only: isDyn bit 0 requests controlled hot hit/miss pairs.
+        // Performance versions 14/15 only: isDyn bit 0 requests controlled hot hit/miss pairs.
         const char* cachePolicy = std::getenv("MC2_PERF_CACHE_POLICY");
         desc.isDyn = cachePolicy != nullptr && std::strcmp(cachePolicy, "paired") == 0 ? 1 : 0;
         static_assert(sizeof(desc) == sizeof(hostArgs.ctxArgs[0]), "descriptor must fit args[0]");
