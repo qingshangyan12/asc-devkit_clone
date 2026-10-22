@@ -22,6 +22,7 @@
 #ifndef IMPL_TENSOR_API_UTILS_NPU_DEBUG_CHECK_H
 #define IMPL_TENSOR_API_UTILS_NPU_DEBUG_CHECK_H
 
+#include "impl/tensor_api/utils/copy_layout_utils.h"
 #include "impl/tensor_api/utils/npu_debug_report.h"
 
 #ifdef ASCENDC_DEBUG
@@ -124,28 +125,172 @@ __aicore__ inline constexpr void debug_check_copy_shape(
             api_name));
 }
 
+template <typename SrcPattern, typename SrcShape>
+__aicore__ inline constexpr auto debug_copy_logical_rows(const SrcShape& src_shape)
+{
+    if constexpr (Std::is_same_v<SrcPattern, nhwc_layout_ptn>) {
+        return get<1>(src_shape) * get<2>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, nchw_layout_ptn>) {
+        return get<2>(src_shape) * get<3>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, ncdhw_layout_ptn>) {
+        return get<2>(src_shape) * get<3>(src_shape) * get<4>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, nc1hwc0_layout_ptn>) {
+        return get<2>(src_shape) * get<3>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, ndc1hwc0_layout_ptn>) {
+        return get<1>(src_shape) * get<3>(src_shape) * get<4>(src_shape);
+    } else {
+        constexpr auto depth = nesting_depth_v<SrcShape>;
+        if constexpr (depth == two_dim_data) {
+            return get<0>(src_shape);
+        } else if constexpr (depth == three_dim_data) {
+            return get<1, 0>(src_shape);
+        } else if constexpr (depth == four_dim_data) {
+            return get<0, 0>(src_shape) * get<0, 1>(src_shape);
+        } else if constexpr (depth == five_dim_data) {
+            return get<1, 0, 0>(src_shape) * get<1, 0, 1>(src_shape);
+        } else {
+            static_assert(depth == two_dim_data, "Only support 2D to 5D matrix shapes");
+        }
+    }
+}
+
+template <typename SrcPattern, typename SrcShape>
+__aicore__ inline constexpr auto debug_copy_logical_columns(const SrcShape& src_shape)
+{
+    if constexpr (Std::is_same_v<SrcPattern, nhwc_layout_ptn>) {
+        return get<3>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, nchw_layout_ptn>) {
+        return get<1>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, ncdhw_layout_ptn>) {
+        return get<1>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, nc1hwc0_layout_ptn>) {
+        return get<1>(src_shape) * get<4>(src_shape);
+    } else if constexpr (Std::is_same_v<SrcPattern, ndc1hwc0_layout_ptn>) {
+        return get<2>(src_shape) * get<5>(src_shape);
+    } else {
+        constexpr auto depth = nesting_depth_v<SrcShape>;
+        if constexpr (depth == two_dim_data) {
+            return get<1>(src_shape);
+        } else if constexpr (depth == three_dim_data) {
+            return get<1, 1>(src_shape);
+        } else if constexpr (depth == four_dim_data) {
+            return get<1, 0>(src_shape) * get<1, 1>(src_shape);
+        } else if constexpr (depth == five_dim_data) {
+            return get<1, 1, 0>(src_shape) * get<1, 1, 1>(src_shape);
+        } else {
+            static_assert(depth == two_dim_data, "Only support 2D to 5D matrix shapes");
+        }
+    }
+}
+
+template <typename DstCoord, typename Shape>
+__aicore__ inline constexpr auto debug_copy_nhwc_remaining_size(const Shape& dst_shape, const DstCoord& dst_coord)
+{
+    // NHWC is interpreted as a logical (H * W, C) matrix.
+    return Std::make_tuple(
+        get<1>(dst_shape) * get<2>(dst_shape) - get<1>(dst_coord) * get<2>(dst_shape) - get<2>(dst_coord),
+        get<3>(dst_shape) - get<3>(dst_coord));
+}
+
+template <typename DstCoord, typename Shape>
+__aicore__ inline constexpr auto debug_copy_nchw_remaining_size(const Shape& dst_shape, const DstCoord& dst_coord)
+{
+    // NCHW is interpreted as a column-major logical (H * W, C) matrix.
+    return Std::make_tuple(
+        get<2>(dst_shape) * get<3>(dst_shape) - get<2>(dst_coord) * get<3>(dst_shape) - get<3>(dst_coord),
+        get<1>(dst_shape) - get<1>(dst_coord));
+}
+
+template <typename DstCoord, typename Shape>
+__aicore__ inline constexpr auto debug_copy_ncdhw_remaining_size(const Shape& dst_shape, const DstCoord& dst_coord)
+{
+    // NCDHW is interpreted as a column-major logical (D * H * W, C) matrix.
+    return Std::make_tuple(
+        get<2>(dst_shape) * get<3>(dst_shape) * get<4>(dst_shape) -
+            get<2>(dst_coord) * get<3>(dst_shape) * get<4>(dst_shape) - get<3>(dst_coord) * get<4>(dst_shape) -
+            get<4>(dst_coord),
+        get<1>(dst_shape) - get<1>(dst_coord));
+}
+
+template <typename DstCoord, typename Shape>
+__aicore__ inline constexpr auto debug_copy_nc1hwc0_remaining_size(const Shape& dst_shape, const DstCoord& dst_coord)
+{
+    // NC1HWC0 is interpreted as a logical (H * W, C1 * C0) matrix.
+    return Std::make_tuple(
+        get<2>(dst_shape) * get<3>(dst_shape) - get<2>(dst_coord) * get<3>(dst_shape) - get<3>(dst_coord),
+        get<1>(dst_shape) * get<4>(dst_shape) - get<1>(dst_coord) * get<4>(dst_shape) - get<4>(dst_coord));
+}
+
+template <typename DstCoord, typename Shape>
+__aicore__ inline constexpr auto debug_copy_ndc1hwc0_remaining_size(const Shape& dst_shape, const DstCoord& dst_coord)
+{
+    // NDC1HWC0 is interpreted as a logical (D * H * W, C1 * C0) matrix.
+    return Std::make_tuple(
+        get<1>(dst_shape) * get<3>(dst_shape) * get<4>(dst_shape) -
+            get<1>(dst_coord) * get<3>(dst_shape) * get<4>(dst_shape) - get<3>(dst_coord) * get<4>(dst_shape) -
+            get<4>(dst_coord),
+        get<2>(dst_shape) * get<5>(dst_shape) - get<2>(dst_coord) * get<5>(dst_shape) - get<5>(dst_coord));
+}
+
+template <typename DstLayout, typename DstCoord>
+__aicore__ inline constexpr auto debug_copy_dst_remaining_size(const DstLayout& dst_layout, const DstCoord& dst_coord)
+{
+    static_assert(is_layout_v<DstLayout>, "DstLayout must be Layout");
+    using pattern_type = get_layout_pattern<DstLayout>;
+    auto dst_shape = dst_layout.shape();
+    if constexpr (Std::is_same_v<pattern_type, nhwc_layout_ptn>) {
+        return debug_copy_nhwc_remaining_size(dst_shape, dst_coord);
+    } else if constexpr (Std::is_same_v<pattern_type, nchw_layout_ptn>) {
+        return debug_copy_nchw_remaining_size(dst_shape, dst_coord);
+    } else if constexpr (Std::is_same_v<pattern_type, ncdhw_layout_ptn>) {
+        return debug_copy_ncdhw_remaining_size(dst_shape, dst_coord);
+    } else if constexpr (Std::is_same_v<pattern_type, nc1hwc0_layout_ptn>) {
+        return debug_copy_nc1hwc0_remaining_size(dst_shape, dst_coord);
+    } else if constexpr (Std::is_same_v<pattern_type, ndc1hwc0_layout_ptn>) {
+        return debug_copy_ndc1hwc0_remaining_size(dst_shape, dst_coord);
+    } else {
+        static_assert(sizeof(DstLayout) == 0, "Unsupported convolution destination layout");
+    }
+}
+
 template <typename SrcLayout, typename DstLayout, typename SrcCoord, typename DstCoord, typename CopyShape>
 __aicore__ inline constexpr void debug_check_copy_region(
     const tensor_api_assert_context& context, const SrcLayout& src_layout, const DstLayout& dst_layout,
     const SrcCoord& src_coord, const DstCoord& dst_coord, const CopyShape& copy_shape, __gm__ const char* api_name)
 {
+    using dst_pattern_type = get_layout_pattern<DstLayout>;
+    using src_pattern_type = get_layout_pattern<SrcLayout>;
+    constexpr bool is_conv_dst_layout = is_conv_layout_pattern_v<dst_pattern_type>;
     auto actual_src_shape = make_slice_shape(src_coord, src_layout, copy_shape);
-    auto actual_dst_shape = make_slice_shape(dst_coord, dst_layout, copy_shape);
     auto requested_size = product{}(copy_shape);
     auto actual_src_size = product{}(actual_src_shape);
-    auto actual_dst_capacity = product{}(actual_dst_shape);
     TENSOR_API_DEBUG_ASSERT_AT(
         context, (actual_src_size == requested_size),
         TENSOR_API_LOG_INTERNAL(
             "Failed to check source copy region in %s; src_coord and copy_shape must fit within the source tensor "
             "boundary.",
             api_name));
-    TENSOR_API_DEBUG_ASSERT_AT(
-        context, (actual_dst_capacity == requested_size),
-        TENSOR_API_LOG_INTERNAL(
-            "Failed to check destination copy region in %s; dst_coord and copy_shape must fit within the destination "
-            "tensor boundary.",
-            api_name));
+
+    if constexpr (is_conv_dst_layout) {
+        auto dst_remaining_size = debug_copy_dst_remaining_size(dst_layout, dst_coord);
+        TENSOR_API_DEBUG_ASSERT_AT(
+            context,
+            (Std::get<0>(dst_remaining_size) >= debug_copy_logical_rows<src_pattern_type>(actual_src_shape) &&
+             Std::get<1>(dst_remaining_size) >= debug_copy_logical_columns<src_pattern_type>(actual_src_shape)),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check destination copy region in %s; dst_coord and copy_shape must fit within the "
+                "destination tensor boundary.",
+                api_name));
+    } else {
+        auto actual_dst_shape = make_slice_shape(dst_coord, dst_layout, copy_shape);
+        auto actual_dst_capacity = product{}(actual_dst_shape);
+        TENSOR_API_DEBUG_ASSERT_AT(
+            context, (actual_dst_capacity == requested_size),
+            TENSOR_API_LOG_INTERNAL(
+                "Failed to check destination copy region in %s; dst_coord and copy_shape must fit within the "
+                "destination tensor boundary.",
+                api_name));
+    }
 }
 
 template <typename SrcTensor, typename DstTensor, typename DstCoord, typename SrcCoord, typename CopyShape>
