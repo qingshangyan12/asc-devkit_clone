@@ -57,23 +57,23 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
             __func__);
     }
 
-    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64
-                                         || opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64
-                                         || opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64
-                                         || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+                                         opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
 
     if (topoInfo->topoLevelNums > 1) {
         bool level0AndLevel1Symetric = topoInfo->level0Symmetric && topoInfo->level1Symmetric;
         if (isDataTypeOrReduceTypeSpecial) {
             selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
         } else if (
-            level0AndLevel1Symetric && topoInfo->deviceNumPerModule == DEVICE_NUM_PER_MODULE_8
-            && topoInfo->topLevelUboe) {
+            level0AndLevel1Symetric && topoInfo->deviceNumPerModule == DEVICE_NUM_PER_MODULE_8 &&
+            topoInfo->topLevelUboe) {
             // hccl：topoLevelNums==2 选 AicpuAllReducePipeLineMeshNHR，否则选 AicpuAllReducePipeLineMeshNHRNHR。
             // devkit 均未迁移这两个算法，保留选路逻辑，返回 NOT_MATCH。
             HCCL_WARNING(
-                "[AllReduceAutoSelector] hccl algos[AicpuAllReducePipeLineMeshNHR/AicpuAllReducePipeLineMeshNHRNHR] are "
-                "not migrated to devkit, levelNum[%u].",
+                "[AllReduceAutoSelector] hccl algos[AicpuAllReducePipeLineMeshNHR/AicpuAllReducePipeLineMeshNHRNHR]"
+                " are not migrated to devkit, levelNum[%u].",
                 topoInfo->topoLevelNums);
             return SelectorStatus::NOT_MATCH;
         } else if (level0AndLevel1Symetric && topoInfo->topoLevelNums == TOPO_LEVEL_NUM_3 && topoInfo->topLevelUboe) {
@@ -113,7 +113,8 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
             // hccl：AicpuAllReduceSoleNHRMultiLink；devkit 未迁移，返回 NOT_MATCH。
-            HCCL_WARNING("[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
             return SelectorStatus::NOT_MATCH;
         } else {
             return SelectorStatus::NOT_MATCH;
@@ -157,9 +158,9 @@ SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpuUBX(
     } else if (isDataTypeOrReduceTypeSpecial) {
         selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
     } else if (isClosNumMultipleOfMeshNum && IsLargeData(dataSize)) {
-        if (opParam.supportSymmetricMemory
-            && ((dataSize >= OMNI_UBX_AR_LARGE_SIZE && topoInfo->userRankSize < OMNI_UBX_AR_RANK_SIZE)
-                || dataSize >= OMNI_UBX_AR_16P_LARGE_SIZE)) {
+        if (opParam.supportSymmetricMemory &&
+            ((dataSize >= OMNI_UBX_AR_LARGE_SIZE && topoInfo->userRankSize < OMNI_UBX_AR_RANK_SIZE) ||
+             dataSize >= OMNI_UBX_AR_16P_LARGE_SIZE)) {
             // hccl：AicpuAllReducePipeLineMeshNHR；devkit 未迁移，返回 NOT_MATCH。
             HCCL_WARNING(
                 "[AllReduceAutoSelector] hccl algo[AicpuAllReducePipeLineMeshNHR] is not migrated to devkit, "
@@ -191,10 +192,10 @@ SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpu(
     // SelectAicpuAlgo 入口说明
     u64 dataSize = opParam.DataDes.count * perDataSize;
 
-    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64
-                                         || opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64
-                                         || opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64
-                                         || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+                                         opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
 
     double ratio;
     if (topoInfo->userRankSize == 0) {
@@ -238,7 +239,8 @@ SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpu(
             selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
         } else {
             // hccl：AicpuAllReduceSoleNHRMultiLink；devkit 未迁移，返回 NOT_MATCH。
-            HCCL_WARNING("[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
             return SelectorStatus::NOT_MATCH;
         }
     } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
@@ -257,9 +259,8 @@ SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpu(
             } else {
                 if (isDataTypeOrReduceTypeSpecial) {
                     // hccl：AicpuAllReduceSequenceMeshNHRAicpuReduce；devkit 未迁移，返回 NOT_MATCH。
-                    HCCL_WARNING(
-                        "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSequenceMeshNHRAicpuReduce] is not migrated to "
-                        "devkit.");
+                    HCCL_WARNING("[AllReduceAutoSelector] hccl algo[AicpuAllReduceSequenceMeshNHRAicpuReduce] is not "
+                                 "migrated to devkit.");
                     return SelectorStatus::NOT_MATCH;
                 }
                 // hccl：< 32M 选 AicpuAllReduceParallelMeshNHR，>= 32M 选 AicpuAllReducePipeLineMeshNHR。
