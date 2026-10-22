@@ -90,6 +90,13 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
         vsel((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, mask);
     }
 }
+
+template <typename T>
+__simd_callee__ inline void SlideImpl(
+    RegTensor<T>& dstReg, RegTensor<T>& srcReg0, RegTensor<T>& srcReg1, uint16_t slideAmount)
+{
+    vslide(dstReg, srcReg0, srcReg1, slideAmount);
+}
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_CMPSEL_IMPL_H
