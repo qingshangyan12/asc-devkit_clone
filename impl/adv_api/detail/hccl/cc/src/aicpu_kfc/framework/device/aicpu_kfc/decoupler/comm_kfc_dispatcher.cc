@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "../../../../../common/mc2_perf_probe.h"
 #include "comm_kfc_dispatcher.h"
 
 #include "hccl_msg.h"
@@ -124,6 +125,7 @@ HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum)
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
+        Mc2PerfProbe::Receive(seqNum);
         CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
@@ -191,6 +193,7 @@ u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
 
     u32 finishCnt = 0U;
     u32 expectSeqNum = 0U;
+    Mc2PerfProbe::PollBegin();
     while (finishCnt != serverList.size()) {
         for (u32 i = 0U; i < serverList.size(); ++i) {
             HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
@@ -198,5 +201,5 @@ u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
         }
     }
 
-    return HCCL_SUCCESS;
+    return static_cast<u32>(Mc2PerfProbe::Finish());
 }

@@ -27,6 +27,8 @@
 #include "hcomm_host_profiling_dl.h"
 #include "runtime/rt.h"
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 using namespace mc2_ops_hccl;
 
@@ -1063,6 +1065,20 @@ HcclResult Mc2PrepareAicpuHostArgs(Mc2AicpuHostArgs& hostArgs, void* opResCtx)
 {
     hostArgs = {};
     hostArgs.ctxArgs[0] = HcclApi::MC2_AICPU_SIMPLE_CTX_PROTOCOL;
+    // Read at launch time; only the exact value "1" enables collection.
+    const char* perfEnv = std::getenv("MC2_PERF_ACCEPTANCE");
+    if (perfEnv != nullptr && std::strcmp(perfEnv, "1") == 0) {
+        HcclApi::CommKfcParamDesc desc{};
+        const char* level = std::getenv("MC2_PERF_LEVEL");
+        desc.version = level != nullptr && std::strcmp(level, "detail") == 0 ? HcclApi::MC2_PERF_DETAIL_DESC_VERSION :
+                                                                               HcclApi::MC2_PERF_DESC_VERSION;
+        desc.itemNum = 1;
+        // Performance versions 14/15 only: isDyn bit 0 requests controlled hot hit/miss pairs.
+        const char* cachePolicy = std::getenv("MC2_PERF_CACHE_POLICY");
+        desc.isDyn = cachePolicy != nullptr && std::strcmp(cachePolicy, "paired") == 0 ? 1 : 0;
+        static_assert(sizeof(desc) == sizeof(hostArgs.ctxArgs[0]), "descriptor must fit args[0]");
+        std::memcpy(&hostArgs.ctxArgs[0], &desc, sizeof(desc));
+    }
     hostArgs.ctxArgs[1] = reinterpret_cast<uint64_t>(opResCtx);
 
     int32_t soRet = strcpy_s(hostArgs.soName, sizeof(hostArgs.soName), MC2_AICPU_SERVER_SO_NAME);

@@ -193,6 +193,9 @@ struct HcclMsgArea {
 };
 
 constexpr uint32_t DECOUPLED_CTX_VER = 2U;
+// Reserved descriptor version for opt-in MC2 Server performance collection.
+constexpr uint32_t MC2_PERF_DESC_VERSION = 15U;
+constexpr uint32_t MC2_PERF_DETAIL_DESC_VERSION = 14U;
 struct CommKfcParamDesc {
     uint64_t version : 4;
     uint64_t itemNum : 4;

@@ -10,6 +10,7 @@
 #ifndef MC2_AICPU_TASK_CACHE_RUNNER_H
 #define MC2_AICPU_TASK_CACHE_RUNNER_H
 
+#include "../../../../../common/mc2_perf_probe.h"
 #include "hcomm_primitives.h"
 #include "log.h"
 #include "mc2_aicpu_task_cache.h"
@@ -36,13 +37,34 @@ inline void ClearMc2TaskCacheBestEffort(
     manager.Unregister(plan.comm, plan.tag);
 }
 
+// Acceptance-only cleanup, invoked after dispatcher completion, never during replay.
+inline int ClearMc2PerfCache(void* managerPtr, void* comm, const std::string& tag)
+{
+    Mc2AicpuTaskCachePlan plan;
+    plan.comm = comm;
+    plan.tag = tag;
+    const HcclResult ret = Mc2AicpuTaskCacheClear(plan);
+    if (ret == HCCL_SUCCESS) {
+        static_cast<Mc2AicpuTaskCacheManager*>(managerPtr)->Unregister(comm, tag);
+    }
+    return static_cast<int>(ret);
+}
+
 template <typename Func>
 HcclResult RunWithMc2TaskCache(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Func func,
     Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance())
 {
-    if (!IsMc2TaskCacheOp(param.opType)) {
+    auto timedFunc = [&]() {
+        Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::EXECUTOR);
         return func();
+    };
+    auto batchEnd = [&]() {
+        Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::BATCH_END);
+        return static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    };
+    if (!IsMc2TaskCacheOp(param.opType)) {
+        return timedFunc();
     }
 
     HCCL_DEBUG(
@@ -58,13 +80,16 @@ HcclResult RunWithMc2TaskCache(
 
     bool batchActive = true;
     Mc2AicpuTaskCachePlan plan;
-    HcclResult policyRet = BuildMc2AicpuTaskCachePlan(param, resCtx, plan);
+    HcclResult policyRet = [&]() {
+        Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::CACHE_POLICY);
+        return BuildMc2AicpuTaskCachePlan(param, resCtx, plan);
+    }();
     if (policyRet != HCCL_SUCCESS || !plan.enabled) {
         if (policyRet != HCCL_SUCCESS) {
             HCCL_WARNING("[MC2_TASK_CACHE][Policy] failed and fallback to executor, ret[%d].", policyRet);
         }
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult execRet = timedFunc();
+        HcclResult endRet = batchEnd();
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -73,8 +98,8 @@ HcclResult RunWithMc2TaskCache(
 
     const Mc2TaskCacheReserveResult reserveResult = manager.TryReserve(plan.comm, plan.tag);
     if (reserveResult == Mc2TaskCacheReserveResult::FULL) {
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult execRet = timedFunc();
+        HcclResult endRet = batchEnd();
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -82,13 +107,16 @@ HcclResult RunWithMc2TaskCache(
     }
 
     bool isHit = false;
-    HcclResult lookupRet = Mc2AicpuTaskCacheLookup(plan, isHit);
+    HcclResult lookupRet = [&]() {
+        Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::CACHE_LOOKUP);
+        return Mc2AicpuTaskCacheLookup(plan, isHit);
+    }();
     if (lookupRet != HCCL_SUCCESS) {
         HCCL_WARNING(
             "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(), lookupRet);
         ClearMc2TaskCacheBestEffort(plan, "lookup", manager);
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult execRet = timedFunc();
+        HcclResult endRet = batchEnd();
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
@@ -96,8 +124,12 @@ HcclResult RunWithMc2TaskCache(
     }
 
     if (isHit) {
-        const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
-        const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        Mc2PerfProbe::Cache(true);
+        const HcclResult executeRet = [&]() {
+            Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::CACHE_EXECUTE);
+            return Mc2AicpuTaskCacheExecute(plan);
+        }();
+        const HcclResult endRet = batchEnd();
         HCCL_INFO(
             "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet, endRet);
         if (executeRet != HCCL_SUCCESS) {
@@ -108,26 +140,33 @@ HcclResult RunWithMc2TaskCache(
             ClearMc2TaskCacheBestEffort(plan, "hit batch end", manager);
             return endRet;
         }
+        if (Mc2PerfProbe::Paired()) {
+            Mc2PerfProbe::DeferClear(&manager, plan.comm, std::move(plan.tag), ClearMc2PerfCache);
+        }
         return HCCL_SUCCESS;
     }
 
-    const HcclResult cacheStartRet = Mc2AicpuTaskCacheStart(plan);
+    const HcclResult cacheStartRet = [&]() {
+        Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::CAPTURE_START);
+        return Mc2AicpuTaskCacheStart(plan);
+    }();
     if (cacheStartRet != HCCL_SUCCESS) {
         HCCL_WARNING(
             "[MC2_TASK_CACHE][Start] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(),
             cacheStartRet);
         ClearMc2TaskCacheBestEffort(plan, "start", manager);
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        HcclResult execRet = timedFunc();
+        HcclResult endRet = batchEnd();
         if (execRet != HCCL_SUCCESS) {
             return execRet;
         }
         return endRet;
     }
 
-    HcclResult execRet = func();
+    Mc2PerfProbe::Cache(false);
+    HcclResult execRet = timedFunc();
 
-    HcclResult flushRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    HcclResult flushRet = batchEnd();
     batchActive = false;
     HcclResult restartRet = HCCL_SUCCESS;
     if (flushRet == HCCL_SUCCESS) {
@@ -137,7 +176,10 @@ HcclResult RunWithMc2TaskCache(
 
     HcclResult cacheEndRet = HCCL_SUCCESS;
     if (execRet == HCCL_SUCCESS && flushRet == HCCL_SUCCESS && restartRet == HCCL_SUCCESS) {
-        cacheEndRet = Mc2AicpuTaskCacheEnd(plan);
+        cacheEndRet = [&]() {
+            Mc2PerfProbe::DetailScope timer(Mc2PerfProbe::CAPTURE_END);
+            return Mc2AicpuTaskCacheEnd(plan);
+        }();
         if (cacheEndRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "cache end", manager);
         }
@@ -147,7 +189,7 @@ HcclResult RunWithMc2TaskCache(
 
     HcclResult endRet = HCCL_SUCCESS;
     if (batchActive) {
-        endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        endRet = batchEnd();
         if (endRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "final batch end", manager);
         }

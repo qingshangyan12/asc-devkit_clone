@@ -20,6 +20,18 @@ using HcommAicpuTsTaskCacheEndFunc = int32_t (*)(const char*);
 using HcommAicpuTsTaskCacheExecuteFunc = int32_t (*)(const char*, void**, uint64_t*, uint64_t);
 using HcommAicpuTsTaskCacheClearFunc = int32_t (*)(const char*);
 
+using PerfBeginFunc = int32_t (*)(uint32_t, uint32_t);
+using PerfEndFunc = int32_t (*)(uint32_t, uint64_t*, uint32_t);
+static PerfBeginFunc g_perfBegin = nullptr;
+static PerfEndFunc g_perfEnd = nullptr;
+extern "C" int32_t Mc2HcommPerfBegin(uint32_t abi, uint32_t level)
+{
+    return g_perfBegin && g_perfEnd ? g_perfBegin(abi, level) : HCCL_E_NOT_SUPPORT;
+}
+extern "C" int32_t Mc2HcommPerfEnd(uint32_t abi, uint64_t* values, uint32_t count)
+{
+    return g_perfEnd ? g_perfEnd(abi, values, count) : HCCL_E_NOT_SUPPORT;
+}
 static bool g_HcommBatchTransferOnThreadSupported = false;
 static HcclHcommBatchTransferOnThreadFunc g_HcommBatchTransferOnThread = nullptr;
 static HcommAicpuTsTaskCacheLookupFunc g_HcommAicpuTsTaskCacheLookup = nullptr;
@@ -153,6 +165,8 @@ extern "C" int32_t Mc2HcommAicpuTsTaskCacheClear(const char* tag)
 
 extern "C" void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle)
 {
+    g_perfBegin = reinterpret_cast<PerfBeginFunc>(dlsym(libHcommHandle, "HcommAicpuPerfBegin"));
+    g_perfEnd = reinterpret_cast<PerfEndFunc>(dlsym(libHcommHandle, "HcommAicpuPerfEnd"));
     g_HcommAicpuTsTaskCacheLookup =
         reinterpret_cast<HcommAicpuTsTaskCacheLookupFunc>(dlsym(libHcommHandle, "HcommAicpuTsTaskCacheLookup"));
     g_HcommAicpuTsTaskCacheStart =

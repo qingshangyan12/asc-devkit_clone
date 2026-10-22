@@ -108,6 +108,8 @@ int32_t HcclHcommBatchTransferOnThread(
 
 void HcommPrimitivesDlInit(void* libHcommHandle); // 本模块独立初始化
 void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle);
+int32_t Mc2HcommPerfBegin(uint32_t abi, uint32_t level);
+int32_t Mc2HcommPerfEnd(uint32_t abi, uint64_t* values, uint32_t count);
 
 #ifdef UT_TEST
 void Mc2HcommAicpuTsTaskCacheSetTestFunctions(
