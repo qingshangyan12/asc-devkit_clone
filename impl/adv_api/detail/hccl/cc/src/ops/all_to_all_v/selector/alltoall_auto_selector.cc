@@ -18,6 +18,9 @@ constexpr uint64_t BIG_DATA_SIZE_LIMIT = 512;
 constexpr u32 TOPO_LEVEL_NUM_3 = 3;
 constexpr uint64_t SMALL_COUNT_16M = 16 * 1024 * 1024;
 constexpr uint32_t CCU_MESH1D_MAX_RANK_SIZE = 16; // uint16_t event mask 最多支持 16 rank
+// 大禹纯 CLOS 单层 CCU 上限：event mask 已按 16 rank 一组拆分（ccu_kernel_all_to_all_mesh1d.cc），
+// 通道数组受 CcuKernelArgBase::channels[CCU_MAX_RANK_SIZE] 限制（CCU_MAX_RANK_SIZE=64）
+constexpr uint32_t CCU_CLOS_MAX_RANK_SIZE = 64;
 
 namespace {
 bool IsDevType960() { return false; } // 960设备类型检测待实现
@@ -111,6 +114,12 @@ SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(
     }
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
         return SelectMesh1DClosAlgo(topoInfo, opParam, selectAlgName);
+    }
+    if (topoInfo->level0Topo == Level0Shape::CLOS && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
+        // 大禹纯 CLOS 单层：CCU SoleMesh（DIE0-only 建链，模板内做 die 过滤）
+        selectAlgName = "CcuSchedAllToAllSoleMesh";
+        HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
     }
     HCCL_DEBUG("[Algo][AlltoAllAutoSelector] algo is not supported yet for ccu_schedule mode, reset to default.");
     return SelectorStatus::NOT_MATCH;
