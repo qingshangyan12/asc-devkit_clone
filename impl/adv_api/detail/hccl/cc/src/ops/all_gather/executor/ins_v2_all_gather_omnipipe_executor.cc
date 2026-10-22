@@ -384,6 +384,10 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     u64 perLoopSize = maxCountPerLoop * dataTypeSize_;
     std::vector<u64> dataSizePerLoop(rankSize_, perLoopSize);
     std::vector<u64> dataWholeSize(rankSize_, perLoopSize);
+    for (int i = 0; i < rankSize_; i++) {
+        dataSizePerLoop.push_back(perLoopSize);
+        dataWholeSize.push_back(perLoopSize);
+    }
 
     OmniPipeSliceParam omniPipeSliceParam;
     omniPipeSliceParam.levelRankSize = {
