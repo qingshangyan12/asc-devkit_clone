@@ -29,7 +29,7 @@
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">hashmap_lookup</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">keys</td><td align="center">[1, 1048576]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">keys</td><td align="center">[1, 1048576]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">indices</td><td align="center">[1, 1048576]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">预置数据</td><td colspan="4" align="center">AoS表40MB / SoA表40MB / SoA+digest表41MB——按Case构建其一</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">lookup_aos_kernel / lookup_soa_kernel / lookup_soa_digest_swar_kernel / lookup_coop_swar_kernel</td></tr>
@@ -66,6 +66,7 @@ struct AoSBucket {
   float value[DIM];
 };
 AoSBucket buckets[CAPACITY];
+
 struct SoaTableNoDigest {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
@@ -297,7 +298,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 
 **图4　不同负载因子下各优化方案的查找性能对比图**
 
-![image-20261016155256161](figures/性能对比示意图.png)
+![不同负载因子下各优化方案的查找性能对比图](figures/性能对比示意图.png)
 
 图4展示了不同优化方案在不同负载因子下的查找性能变化。当负载因子较低时，协作探测的查找性能始终低于其它Case；但随着负载因子增加，哈希冲突增多、探测序列变长，此时协作探测通过扩大单轮探测范围、合并访存请求，缓解了高负载下的性能退化。
 
@@ -315,7 +316,7 @@ Case 3的关键在于：在保持访存指令数量不变的前提下，减少�
 
 ## 调优建议
 
-1. 内存布局优化：当workload存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率。
+1. 内存布局优化：当算子存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率。
 2. digest预过滤：本质是以少量额外空间换取查找时间。对于哈希值这类可提取digest的场景，可先并行比较digest，筛除大部分不匹配项，再读取完整key精确确认，减少不必要的访存。
 3. 协作探测：当查询存在较长的探测序列时，可让多个线程协作查询同一个key，使各线程访问连续地址，将分散的访存请求合并为更少的事务，从而缩短串行探测时间并提高访存效率。
 

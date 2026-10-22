@@ -86,6 +86,6 @@ AoS中key和value交替存储，查询key时会将相邻的value一同加载；S
 
 **适用场景扩展**
 
-SoA布局不局限于哈希表查找：当workload存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率，详见[样例README](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup/README.md)。
+SoA布局不局限于哈希表查找：当算子存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率，详见[样例README](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup/README.md)。
 
-【总结】在SIMT算子中，通过将哈希表槽内的key与value分区存储（SoA），可以降低Cache Line搬运开销，提高缓存利用率。
+【总结】在SIMT编程中，SoA的内存布局时同类字段连续存储，针对高频访问局部数据的场景，SoA的内存排布可显著提高Cache Line利用率，从而提升整体性能。
