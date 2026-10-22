@@ -41,6 +41,8 @@
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
+通过函数返回值输出两个结果的重载为试验接口，请参见[试验接口asc_deintlv](../../experimental/asc_deintlv.md)。
+
 ## 函数原型
 
 ### 矢量数据寄存器解交织模式
@@ -51,10 +53,6 @@ __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
                                         vector_<dtype>& dst1,
                                         vector_<dtype> src0,
                                         vector_<dtype> src1)
-
-// 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline asc_<dtype>_<dtype>_pair asc_deintlv(vector_<dtype> src0,
-                                                              vector_<dtype> src1)
 ```
 
 #### dtype支持数据类型
@@ -69,10 +67,6 @@ __simd_callee__ inline void asc_deintlv(vector_half& dst0,
                                         vector_half& dst1,
                                         vector_half src0,
                                         vector_half src1)
-
-// 通过函数返回值返回结果示例：对half矢量数据寄存器执行解交织。
-__simd_callee__ inline asc_half_half_pair asc_deintlv(vector_half src0,
-                                                           vector_half src1)
 ```
 
 ### 掩码寄存器解交织模式
@@ -91,16 +85,6 @@ __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0,
                                             vector_bool& dst1,
                                             vector_bool src0,
                                             vector_bool src1)
-
-// 通过函数返回值返回结果
-__simd_callee__ inline asc_bool_bool_pair asc_deintlv_b8(vector_bool src0,
-                                                            vector_bool src1)
-
-__simd_callee__ inline asc_bool_bool_pair asc_deintlv_b16(vector_bool src0,
-                                                              vector_bool src1)
-
-__simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0,
-                                                              vector_bool src1)
 ```
 
 ## 参数说明
@@ -127,10 +111,7 @@ __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0,
 
 ## 返回值说明
 
-- 通过引用参数输出结果的函数原型无返回值。
-- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。
-    - 操作数为矢量数据寄存器时，返回类型为`asc_<dtype>_<dtype>_pair`。例如，输入为`vector_half`时，`asc_deintlv`函数的返回值类型为`asc_half_half_pair`，两个成员的类型均为`vector_half`。`result.first`对应引用参数版本的`dst0`，保存解交织后的偶数索引元素集合；`result.second`对应引用参数版本的`dst1`，保存解交织后的奇数索引元素集合。
-    - 操作数为掩码寄存器时，b8、b16和b32模式的返回类型均为`asc_bool_bool_pair`。`result.first`和`result.second`的类型均为`vector_bool`，分别对应引用参数版本的`dst0`和`dst1`，保存对应粒度下解交织后的偶数索引位集合和奇数索引位集合。
+无。
 
 ## 约束说明
 

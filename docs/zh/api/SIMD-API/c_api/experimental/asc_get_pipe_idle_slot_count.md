@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/experimental/asc_get_pipe_idle_slot_count.h"`。
 
-本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。编译时需定义`CANN_ASC_USE_EXPERIMENTAL`宏，并显式包含指定的试验头文件。
 
 本接口用于获取指定流水线对应发射队列（Issue Queue）当前的空闲槽位数量。空闲槽位表示发射队列还能接收的待发射指令数量，可用于观察队列占用情况。包含以下六个函数，各函数查询的流水线、适用的AI Core和最大空闲槽位数量如下：
 
@@ -46,7 +46,7 @@
 
 ## 函数原型
 
-  ```cpp
+  ```c
   // 获取PIPE_MTE2发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count()
   // 获取PIPE_MTE3发射队列的空闲槽位数量。
@@ -75,6 +75,7 @@ PIPE_S。
 
 ## 约束说明
 
+- 使用本接口前，需要包含头文件：`#include "c_api/composite/loadunalign_composite.h"`。
 - 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
 - 各接口仅支持[表1 接口、流水线与最大值对应关系](#table1)所列的AI Core类型。在不支持的AI Core类型上调用时，接口返回0。此时无法区分发射队列没有空闲槽位和当前AI Core类型不支持该接口这两种情况。
 
