@@ -420,7 +420,7 @@ public:
         }
         cpuL0AMx = new uint8_t[4 * 1024]; // 4k
         cpuL0BMx = new uint8_t[4 * 1024]; // 4k
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
         cpuUB = new uint8_t[bufferInitLen.at(Hardware::UB)];
         cpuL1 = new uint8_t[bufferInitLen.at(Hardware::L1)];
 #endif
@@ -558,7 +558,7 @@ inline std::string GetPositionDisplay(TPosition pos)
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
 enum class AntiQuantMode {
     DEFAULT,
     INPUT_INTLV,

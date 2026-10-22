@@ -296,7 +296,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
     ASCENDC_DEBUG_ASSERT(
         (pool != Hardware::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer pos can not be Hardware::MAX"));
     auto curPoolAddr = this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
     if constexpr (T::dstPosition == TPosition::C2PIPE2GM) {
         curPoolAddr = 0;
     }

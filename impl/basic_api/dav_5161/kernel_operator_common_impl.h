@@ -20,6 +20,13 @@
 #include "../kernel_utils.h"
 #include "../../../include/basic_api/kernel_struct_mm.h"
 #include "../../../include/basic_api/kernel_base_types.h"
+
+using namespace __cce_simd;
+
+#define GetLoopBoundB8(x) (((x) - 1) / VECTOR_REG_WIDTH)
+#define GetLoopBoundB16(x) (((x) - 1) / (VECTOR_REG_WIDTH / B16_BYTE_SIZE))
+#define GetLoopBoundB32(x) (((x) - 1) / (VECTOR_REG_WIDTH / B32_BYTE_SIZE))
+
 namespace AscendC {
 
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
@@ -204,6 +211,54 @@ __aicore__ inline CacheMode GetScalarCacheModeImpl()
             return CacheMode::CACHE_MODE_NORMAL;
     }
 }
+
+
+template <typename T>
+struct TypeGet;
+template <>
+struct TypeGet<uint32_t> {
+    using T = vector_u32;
+};
+template <>
+struct TypeGet<int32_t> {
+    using T = vector_s32;
+};
+template <>
+struct TypeGet<float> {
+    using T = vector_f32;
+};
+template <>
+struct TypeGet<uint16_t> {
+    using T = vector_u16;
+};
+template <>
+struct TypeGet<half> {
+    using T = vector_f16;
+};
+template <>
+struct TypeGet<int16_t> {
+    using T = vector_s16;
+};
+template <>
+struct TypeGet<uint8_t> {
+    using T = vector_u8;
+};
+template <>
+struct TypeGet<int8_t> {
+    using T = vector_s8;
+};
+template <>
+struct TypeGet<bool> {
+    using T = vector_s8;
+};
+template <>
+struct TypeGet<int4x2_t> {
+    using T = vector_s4x2;
+};
+using MaskReg = vector_bool;
+using UnalignReg = vector_align;
+using AddrReg = vector_address;
+#define LocalMem __ubuf__
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H

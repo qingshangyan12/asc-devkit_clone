@@ -137,6 +137,27 @@ __aicore__ inline void TransDataTo5HDIntrinsicsImpl<uint8_t>(
     TransDataTo5HDB8IntrinsicsImpl<uint8_t>(dstList, srcList, transDataTo5HDParams);
 }
 
+template <typename T>
+__aicore__ inline void SetVaReg(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16])
+{
+    uint64_t vaRegArray1[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray2[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray3[VA_REG_ARRAY_LEN];
+    uint64_t vaRegArray4[VA_REG_ARRAY_LEN];
+
+    for (int32_t i = 0; i < VA_REG_ARRAY_LEN; i++) {
+        vaRegArray1[i] = (uint64_t)dstList[i];
+        vaRegArray2[i] = (uint64_t)dstList[VA_REG_ARRAY_LEN + i];
+        vaRegArray3[i] = (uint64_t)srcList[i];
+        vaRegArray4[i] = (uint64_t)srcList[VA_REG_ARRAY_LEN + i];
+    }
+
+    set_va_reg_sb(VA0, vaRegArray1);
+    set_va_reg_sb(VA1, vaRegArray2);
+    set_va_reg_sb(VA2, vaRegArray3);
+    set_va_reg_sb(VA3, vaRegArray4);
+}
+
 __aicore__ inline void SetVaReg(uint64_t dst[NCHW_CONV_ADDR_LIST_SIZE], uint64_t src[NCHW_CONV_ADDR_LIST_SIZE])
 {
     set_va_reg_sb(VA0, dst);
@@ -152,6 +173,135 @@ __aicore__ inline void TransDataTo5HDImpl(
 {
     SetVaReg(dstList, srcList);
     TransDataTo5HDIntrinsicsImpl<T>(dstList, srcList, transDataTo5HDParams);
+}
+
+template <typename T>
+__aicore__ inline void TransDataTo5HDImpl(
+    __ubuf__ T* dstList[16], __ubuf__ T* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
+{
+    SetVaReg(dstList, srcList);
+    TransDataTo5HDIntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
+}
+
+#define TRANSDATA_IMPL(TYPE, WIDTH)                                                                               \
+    __aicore__ inline void TransDataTo5HDIntrinsicsImpl(                                                          \
+        __ubuf__ TYPE* dstList[16], __ubuf__ TYPE* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams) \
+    {                                                                                                             \
+        scatter_vnchwconv_b##WIDTH(                                                                               \
+            VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,                        \
+            transDataTo5HDParams.srcRepStride);                                                                   \
+    }
+#define TRANSDATA_LIST_IMPL(TYPE, WIDTH)                                                              \
+    template <>                                                                                       \
+    __aicore__ inline void TransDataTo5HDIntrinsicsImpl<TYPE>(                                        \
+        uint64_t dstList[16], uint64_t srcList[16], const TransDataTo5HDParams& transDataTo5HDParams) \
+    {                                                                                                 \
+        scatter_vnchwconv_b##WIDTH(                                                                   \
+            VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,            \
+            transDataTo5HDParams.srcRepStride);                                                       \
+    }
+
+TRANSDATA_IMPL(float, 32);
+TRANSDATA_IMPL(int32_t, 32);
+TRANSDATA_IMPL(uint32_t, 32);
+TRANSDATA_IMPL(half, 16);
+TRANSDATA_IMPL(int16_t, 16);
+TRANSDATA_IMPL(uint16_t, 16);
+
+__aicore__ inline void VldVaReg(__ubuf__ uint64_t* dst, __ubuf__ uint64_t* src)
+{
+    ldva(VA0, (uint64_t)dst, false); // false refers to low 128 bit;
+    ldva(VA1, (uint64_t)dst, true);  // true refers to high 128 bit;
+    ldva(VA2, (uint64_t)src, false);
+    ldva(VA3, (uint64_t)src, true);
+}
+template <typename T>
+__aicore__ inline void TransDataTo5HDVldVaRegImpl(
+    __ubuf__ uint64_t* dst, __ubuf__ uint64_t* src, const TransDataTo5HDParams& transDataTo5HDParams)
+{
+    VldVaReg(dst, src);
+    uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE] = {0};
+    uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE] = {0};
+    TransDataTo5HDIntrinsicsImpl<T>(dstList, srcList, transDataTo5HDParams);
+}
+template <typename T>
+__aicore__ inline void TransposeIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src)
+{
+    vtranspose((__ubuf__ uint16_t*)dst, (__ubuf__ uint16_t*)src);
+}
+template <typename T>
+__aicore__ inline void TransposeImpl(__ubuf__ T* dst, __ubuf__ T* src)
+{
+    TransposeIntrinsicsImpl((__ubuf__ uint16_t*)dst, (__ubuf__ uint16_t*)src);
+}
+template <typename T>
+__aicore__ inline void TransposeUB2UBImpl(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
+{
+    static_assert((SupportBytes<T, 1, 2, 4>()), "Transpose only supports type fp4/b8/b16/b32 on current device");
+    DataCopyUB2UBImpl(dst, src, intriParams);
+}
+template <typename T>
+typename std::enable_if<(sizeof(T) == 1)>::type __aicore__ inline Transpose4DImpl(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams)
+{
+    uint16_t imageSize = transposeParams.hSize * transposeParams.wSize;
+    uint32_t channelImageSize = imageSize * transposeParams.cSize;
+    if (transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint8_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint8_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, false);
+        }
+    } else if (transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint8_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint8_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, true);
+        }
+    }
+}
+template <typename T>
+typename std::enable_if<(sizeof(T) == 2)>::type __aicore__ inline Transpose4DImpl(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams)
+{
+    uint16_t imageSize = transposeParams.hSize * transposeParams.wSize;
+    uint32_t channelImageSize = imageSize * transposeParams.cSize;
+    if (transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint16_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint16_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, false);
+        }
+    } else if (transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint16_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint16_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, true);
+        }
+    }
+}
+template <typename T>
+typename std::enable_if<(sizeof(T) == 4)>::type __aicore__ inline Transpose4DImpl(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const TransposeParamsExt& transposeParams)
+{
+    uint16_t imageSize = transposeParams.hSize * transposeParams.wSize;
+    uint32_t channelImageSize = imageSize * transposeParams.cSize;
+    if (transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint32_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint32_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, false);
+        }
+    } else if (transposeParams.transposeType == TransposeType::TRANSPOSE_NHWC2NCHW) {
+        for (int i = 0; i < transposeParams.nSize; i++) {
+            v4dtrans(
+                (__ubuf__ uint32_t*)dst[channelImageSize * i].GetPhyAddr(),
+                (__ubuf__ uint32_t*)src[channelImageSize * i].GetPhyAddr(), imageSize, transposeParams.cSize, true);
+        }
+    }
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_IMPL_H
