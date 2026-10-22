@@ -70,7 +70,7 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_KIRINDEV0003 = 20,\n"
                                           "    SOC_VERSION_ASCEND960PR = 21,\n"
                                           "    SOC_VERSION_ASCEND5162A = 22,\n"
-                                          "    SOC_VERSION_KIRIN9030 = 23,\n"
+                                          "    SOC_VERSION_KIRIN9020 = 23,\n"
                                           "    SOC_VERSION_INVALID = 99\n"
                                           "};\n";
 constexpr const char* OP_ACLNN_SOC_MATCH_HELPER =
