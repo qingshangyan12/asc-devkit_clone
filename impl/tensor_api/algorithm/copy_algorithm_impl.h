@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ALGORITHM_COPY_ALGORITHM_IMPL_H
 
 #include "impl/tensor_api/atom/copy_atom_impl.h"
+#include "impl/tensor_api/tensor/layout_pattern.h"
 
 namespace asc {
 namespace te {
@@ -45,12 +46,6 @@ template <typename Coord, typename CopyShape>
 constexpr bool is_copy_coord_shape_compatible_v =
     Std::is_same_v<Std::remove_cvref_t<Coord>, zero_coord_type> || is_same_structure_v<Coord, CopyShape>;
 
-template <typename Pattern>
-constexpr bool is_conv_layout_pattern_v =
-    Std::is_same_v<Pattern, nchw_layout_ptn> || Std::is_same_v<Pattern, nhwc_layout_ptn> ||
-    Std::is_same_v<Pattern, nc1hwc0_layout_ptn> || Std::is_same_v<Pattern, ncdhw_layout_ptn> ||
-    Std::is_same_v<Pattern, ndc1hwc0_layout_ptn>;
-
 template <typename SrcTensor, typename CopyShape>
 struct is_copy_shape_compatible_with_src_layout {
 private:
@@ -66,11 +61,11 @@ private:
     static constexpr size_t batch_num = src_rank - 1;
 
     static constexpr bool is_same_structure = is_same_structure_v<src_shape, shape>;
-    static constexpr bool is_logical_matrix = !is_conv_layout_pattern_v<pattern> && src_rank == two_dim_data &&
+    static constexpr bool is_logical_matrix = !detail::is_conv_layout_pattern_v<pattern> && src_rank == two_dim_data &&
                                               src_depth == four_dim_data && shape_depth == two_dim_data;
-    static constexpr bool is_logical_flat_batch = !is_conv_layout_pattern_v<pattern> && src_rank == shape_rank &&
-                                                  src_rank >= two_dim_data && src_depth == batch_num + four_dim_data &&
-                                                  shape_depth == batch_num + two_dim_data;
+    static constexpr bool is_logical_flat_batch =
+        !detail::is_conv_layout_pattern_v<pattern> && src_rank == shape_rank && src_rank >= two_dim_data &&
+        src_depth == batch_num + four_dim_data && shape_depth == batch_num + two_dim_data;
 
 public:
     static constexpr bool value = is_same_structure || is_logical_matrix || is_logical_flat_batch;
