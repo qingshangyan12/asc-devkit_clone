@@ -14,8 +14,9 @@ namespace mc2_ops_hccl {
 namespace {
 constexpr uint16_t A2A_OUTPUT_XN_ID = 1U;
 constexpr uint16_t A2A_TOKEN_XN_ID = 2U;
-constexpr uint16_t A2A_POST_SYNC_BIT = static_cast<uint16_t>(1U << 5U);
+constexpr uint16_t A2A_POST_SYNC_BIT = static_cast<uint16_t>(1U << 3U);
 constexpr uint16_t A2A_CKE_IDX = 0U;
+constexpr uint16_t A2A_POST_SYNC_CKE_IDX = 1U;
 
 struct AllToAllMesh1DMultiJettyContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
@@ -81,10 +82,10 @@ CcuResult PreSync(AllToAllMesh1DMultiJettyContext& ctx)
 CcuResult PostSync(AllToAllMesh1DMultiJettyContext& ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
-        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
+        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], A2A_POST_SYNC_CKE_IDX, A2A_POST_SYNC_BIT));
     }
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
-        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2A_POST_SYNC_CKE_IDX, A2A_POST_SYNC_BIT));
     }
     return CCU_SUCCESS;
 }
@@ -147,7 +148,7 @@ CcuResult DoAllToAll(AllToAllMesh1DMultiJettyContext& ctx)
     localDst.token = ctx.token;
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize));
+        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize, GetCcuVersion()));
         CCU_CHK_RET(ccu::EventRecord(ctx.eventList[ctx.rankId], 1U));
         CCU_CHK_RET(ccu::EventWait(ctx.eventList[ctx.rankId], 1U));
     }

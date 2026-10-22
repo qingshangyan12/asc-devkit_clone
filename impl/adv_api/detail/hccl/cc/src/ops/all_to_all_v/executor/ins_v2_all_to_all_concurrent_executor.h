@@ -41,7 +41,8 @@ private:
         const AlgResourceCtxSerializable& resCtx, const std::vector<u32>& meshRanks, const std::vector<u32>& closRanks);
     HcclResult SplitSendRecvData(const OpParam& param, std::vector<SendRecvData>& splitData) const;
     HcclResult CalcMaxDataCountPerLoop(
-        const std::vector<u64>& scratchMultipliers, std::vector<u64>& maxDataCountPerLoop) const;
+        const OpParam& param, const std::vector<u64>& scratchMultipliers,
+        std::vector<u64>& maxDataCountPerLoop) const;
     HcclResult SetTemplateDataParams(
         TemplateDataParams& params, const SendRecvData& splitData, u64 currentCount, u64 processedCount,
         u64 maxDataCountPerLoop) const;

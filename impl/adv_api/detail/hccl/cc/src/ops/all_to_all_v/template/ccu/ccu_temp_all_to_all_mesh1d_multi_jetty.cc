@@ -86,7 +86,7 @@ HcclResult CcuTempAllToAllMesh1DMultiJetty::KernelRun(
     config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
-    const auto goSize = CalGoSize(sliceSize, config);
+    const auto goSize = CalGoSize(sliceSize, config, GetCcuVersion());
 
     const uint64_t sliceSizePerJetty = sliceSize / A2A_JETTY_NUM / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
     const uint64_t lastSliceSizePerJetty = sliceSize - sliceSizePerJetty * (A2A_JETTY_NUM - 1U);
