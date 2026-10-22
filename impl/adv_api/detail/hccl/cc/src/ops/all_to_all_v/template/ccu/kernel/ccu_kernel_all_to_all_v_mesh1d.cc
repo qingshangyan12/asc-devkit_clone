@@ -357,6 +357,8 @@ static CcuResult DoAll2AllVMultiLoop(AlltoAllVMesh1DContext& ctx)
     // rankSize<=16 时与老实现等价（单 event 全位收齐）；>16 按 16 位一组拆 event 逐组等待
     const uint32_t eventNum = (ctx.rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT;
     ctx.events.resize(eventNum);
+    ctx.eventMaskOfRank.resize(ctx.rankSize);
+    ctx.eventIdxOfRank.resize(ctx.rankSize);
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         const uint32_t eventIdx = rankIdx / A2AV_BITS_PER_EVENT;
         const uint16_t rankMask = static_cast<uint16_t>(1U << (rankIdx % A2AV_BITS_PER_EVENT));

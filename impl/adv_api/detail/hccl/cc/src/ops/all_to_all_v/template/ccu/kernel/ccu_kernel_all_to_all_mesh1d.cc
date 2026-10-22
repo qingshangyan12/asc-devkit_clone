@@ -134,15 +134,17 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
     auto rankMaskOf = [](uint32_t rankIdx) {
         return static_cast<uint16_t>(1U << (rankIdx % A2A_BITS_PER_EVENT));
     };
-    auto eventWaitAll = [&events, &ctx]() {
+    auto eventMaskOfGroup = [&ctx](uint32_t eventIdx) {
+        const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2A_BITS_PER_EVENT;
+        const uint32_t bitCount = std::min(remainingRanks, A2A_BITS_PER_EVENT);
+        return bitCount == A2A_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
+                                                static_cast<uint16_t>((1U << bitCount) - 1);
+    };
+    auto eventWaitAll = [&events, &eventMaskOfGroup]() -> CcuResult {
         for (uint32_t eventIdx = 0; eventIdx < events.size(); eventIdx++) {
-            const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2A_BITS_PER_EVENT;
-            const uint32_t bitCount = std::min(remainingRanks, A2A_BITS_PER_EVENT);
-            const uint16_t eventMask = bitCount == A2A_BITS_PER_EVENT ?
-                                           static_cast<uint16_t>(UINT16_MAX) :
-                                           static_cast<uint16_t>((1U << bitCount) - 1);
-            CCU_CHK_RET(ccu::EventWait(events[eventIdx], eventMask));
+            CCU_CHK_RET(ccu::EventWait(events[eventIdx], eventMaskOfGroup(eventIdx)));
         }
+        return CCU_SUCCESS;
     };
 
     uint32_t channelId = 0;
@@ -158,7 +160,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
                 channelId++;
             }
         }
-        eventWaitAll();
+        CCU_CHK_RET(eventWaitAll());
     } else {
         HCCL_INFO(
             "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
@@ -172,10 +174,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
         GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, GetCcuVersion());
         // 本 rank 位无需等待（GroupCopy 同步完成），只收远端位
         for (uint32_t eventIdx = 0; eventIdx < events.size(); eventIdx++) {
-            const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2A_BITS_PER_EVENT;
-            const uint32_t bitCount = std::min(remainingRanks, A2A_BITS_PER_EVENT);
-            uint16_t eventMask = bitCount == A2A_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
-                                                                  static_cast<uint16_t>((1U << bitCount) - 1);
+            uint16_t eventMask = eventMaskOfGroup(eventIdx);
             if (eventIdx == ctx.rankId / A2A_BITS_PER_EVENT) {
                 eventMask &= static_cast<uint16_t>(~rankMaskOf(ctx.rankId));
             }

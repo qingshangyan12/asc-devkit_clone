@@ -312,6 +312,11 @@ HcclResult CalcChannelRequestMesh1DOnDie(
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
+            // die 过滤仅在 NetLayer0 有意义（die 是设备侧端点属性，L0 是设备直连层）；
+            // L1/L2 的链路（如跨 server 出框链路）不经由本 die 的设备端口，不做 die 比较。
+            if (netLayer != 0U) {
+                continue;
+            }
             CommLink* linkList = nullptr;
             u32 listSize;
             CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, rank, &linkList, &listSize));
