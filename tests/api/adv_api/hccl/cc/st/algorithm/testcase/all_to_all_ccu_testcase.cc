@@ -228,4 +228,17 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_mesh1d_clos_non_pcie_mix
     // pcieMix 场景不受影响（走 else 扁平分支，见 pcie_mix_connectivity_contract 用例）
     EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_pcie_mix_all_connected_over_rank_limit_never_matches_ccu)
+{
+    AlltoAllVAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(17U); // pcieMix 全连通但超模板 rank 上限
+    topo.level0PcieMix = true;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {17U};
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+    // 与单级 MESH_1D 分支命中同一算法/模板（CcuTempAlltoAllVMesh1D），
+    // 模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 守卫同样生效，selector 需一致前置拒绝
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
+}
 } // namespace checker

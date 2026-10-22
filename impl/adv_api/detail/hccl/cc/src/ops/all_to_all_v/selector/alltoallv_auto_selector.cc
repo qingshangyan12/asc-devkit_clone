@@ -169,6 +169,14 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
         // PCIE-SW定制机型，Mesh无法链接全卡时需跨pcie链路，仅全连通1DMESH支持ccu
         if (topoInfo->level0PcieMix) {
             if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+                // 与单级 MESH_1D 分支命中同一算法/模板，rank 上限契约一致：
+                // 模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 守卫同样生效，前置拒绝
+                if (topoInfo->userRankSize > CCU_MESH1D_MAX_RANK_SIZE) {
+                    HCCL_WARNING(
+                        "[AlltoAllVAutoSelector][%s] rankSize[%u] exceeds CCU_MESH1D_MAX_RANK_SIZE[%u].", __func__,
+                        topoInfo->userRankSize, CCU_MESH1D_MAX_RANK_SIZE);
+                    return SelectorStatus::NOT_MATCH;
+                }
                 selectAlgName = "CcuSchedAllToAllVSoleMesh";
                 HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
                 return SelectorStatus::MATCH;
