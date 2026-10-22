@@ -86,6 +86,8 @@ __simd_callee__ inline vector_<dtype> asc_pack_datablock(vector_<dtype> src)
 
 ## 调用示例
 
+以下示例以`uint16_t`为例。输入寄存器包含8个32B的DataBlock，每个DataBlock的首个元素分别为`0`、`16`、…、`112`；打包后，这8个首元素连续写入结果寄存器的前8个元素。
+
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需指定为`dav-9201`。
 
 ```bash
@@ -93,6 +95,19 @@ bisheng example.asc -o main --npu-arch=dav-9201 && ./main
 ```
 
 ```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "acl/acl.h"
+#include "c_api/asc_simd.h"
+
+namespace {
+constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
+constexpr uint32_t DATABLOCK_BYTES = 32;
+constexpr uint32_t VALID_RESULT_COUNT = BUFFER_BYTES / DATABLOCK_BYTES;
+constexpr uint32_t ELEMENTS_PER_DATABLOCK = DATABLOCK_BYTES / sizeof(uint16_t);
+
 __simd_vf__ inline void pack_datablock_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ uint16_t* src_addr)
 {
     vector_uint16_t src;
@@ -101,5 +116,61 @@ __simd_vf__ inline void pack_datablock_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ 
     asc_loadalign(src, src_addr);
     asc_pack_datablock(dst, src);
     asc_storealign(dst_addr, dst, mask);
+}
+
+__global__ __vector__ void asc_pack_datablock_kernel(__gm__ uint16_t* output, __gm__ uint16_t* input)
+{
+    asc_init();
+    __ubuf__ uint16_t input_local[ELEMENT_COUNT];
+    __ubuf__ uint16_t output_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    pack_datablock_vf(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint16_t> input(ELEMENT_COUNT);
+    std::vector<uint16_t> output(ELEMENT_COUNT, 0);
+    std::vector<uint16_t> golden(VALID_RESULT_COUNT);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        input[i] = static_cast<uint16_t>(i);
+    }
+    for (uint32_t i = 0; i < VALID_RESULT_COUNT; ++i) {
+        golden[i] = input[i * ELEMENTS_PER_DATABLOCK];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint16_t* input_device = nullptr;
+    uint16_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_pack_datablock_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    bool passed = true;
+    for (uint32_t i = 0; i < VALID_RESULT_COUNT; ++i) {
+        if (output[i] != golden[i]) {
+            passed = false;
+            break;
+        }
+    }
+    std::cout << (passed ? "[Success] asc_pack_datablock passed."
+                         : "[Failed] asc_pack_datablock failed.")
+              << std::endl;
+    aclrtFree(output_device);
+    aclrtFree(input_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

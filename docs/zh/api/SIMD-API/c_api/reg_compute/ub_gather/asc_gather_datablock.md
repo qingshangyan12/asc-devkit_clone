@@ -39,8 +39,6 @@
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
-其中，`fp8_e6m2_t`数据类型重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
-
 ## 函数原型
 
 ### 支持掩码控制
@@ -186,7 +184,6 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 - 索引可以存在相同的值，即可以多次读取源操作数中同一个DataBlock的数据。
 - 索引值对应的数据必须在UB有效地址范围内。
 - index仅前8个元素有效。
-- `fp8_e6m2_t`数据类型重载仅支持Ascend 960PR&960DT系列产品的`dav-9201`架构。
 
 ## 调用示例
 

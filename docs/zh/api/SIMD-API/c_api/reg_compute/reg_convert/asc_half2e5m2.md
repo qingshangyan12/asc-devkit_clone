@@ -144,21 +144,86 @@ __simd_callee__ inline void asc_cast_merge(
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签仅能使用编译期常量。
 - `asc_half2e5m2_rn`、`asc_half2e5m2_rn_sat`及其`_v2`变体和`asc_cast`在`mask`对应位为0或未选中位置时将结果置零；`asc_half2e5m2_rn_merge`、`asc_half2e5m2_rn_sat_merge`和`asc_cast_merge`保留这些位置的原值。
-- 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
 
 ## 调用示例
 
+以下示例将`half`类型的`1.0`转换为`fp8_e5m2_t`。先通过具名接口写入偶数位置，再通过`asc_cast_merge`写入奇数位置，因此输出的每个字节均为`fp8_e5m2_t`类型`1.0`的编码`0x3c`。
+
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需指定为`dav-9201`。
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-9201 && ./main
+```
+
 ```cpp
-__simd_vf__ inline void convert(vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "acl/acl.h"
+#include "c_api/asc_simd.h"
+
+namespace {
+constexpr uint32_t BUFFER_BYTES = 256;
+
+__simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    // 具名接口：RN舍入、饱和模式，写入偶数位置。
-    asc_half2e5m2_rn_sat(dst, src, mask, ASC_POSITION_EVEN);
-    // _v2固定写入奇数位置。
-    asc_half2e5m2_rn_sat_v2(dst, src, mask);
-    // merge接口保留未选中位置的原值。
-    asc_half2e5m2_rn_merge(dst, src, mask, ASC_POSITION_ODD);
-    // 通用cast接口使用编译期标签选择舍入、饱和和位置模式。
-    asc_cast(dst, src, mask, ASC_CAST_RN, ASC_CAST_SAT, ASC_POSITION_EVEN);
-    asc_cast_merge(dst, src, mask, ASC_CAST_RN, ASC_CAST_NO_SAT, ASC_POSITION_ODD);
+    vector_bool half_mask = asc_create_mask_b16(PAT_ALL);
+    vector_bool fp8_mask = asc_create_mask_b8(PAT_ALL);
+    vector_half src;
+    vector_fp8_e5m2_t dst;
+    asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
+    // 写入偶数位置，未写入的奇数位置清零。
+    asc_half2e5m2_rn_sat(dst, src, half_mask, ASC_POSITION_EVEN);
+    // 合并写入奇数位置，保留上一步已经写入的偶数位置。
+    asc_cast_merge(dst, src, half_mask, ASC_CAST_RN, ASC_CAST_SAT, ASC_POSITION_ODD);
+    asc_storealign(reinterpret_cast<__ubuf__ fp8_e5m2_t*>(output), dst, fp8_mask);
+}
+
+__global__ __vector__ void asc_half2e5m2_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t input_local[BUFFER_BYTES];
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    convert(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    constexpr uint8_t half_one[] = {0x00, 0x3c};
+    constexpr uint8_t fp8_one[] = {0x3c, 0x3c};
+    std::vector<uint8_t> input(BUFFER_BYTES);
+    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
+    std::vector<uint8_t> golden(BUFFER_BYTES);
+    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) {
+        input[i] = half_one[i % sizeof(half_one)];
+        golden[i] = fp8_one[i % sizeof(fp8_one)];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_half2e5m2_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_half2e5m2 passed." : "[Failed] asc_half2e5m2 failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtFree(input_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

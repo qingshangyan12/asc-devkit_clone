@@ -103,14 +103,85 @@ __simd_callee__ inline void asc_cast(
 
 ## 调用示例
 
+以下示例先将`bfloat16_t`类型的`1.0`转换为`fp8_e8m0_t`并写入偶数位置，再通过`asc_e8m02bfloat16`和`asc_cast`从偶数位置转换回`bfloat16_t`。输出与输入的原始字节一致，为`0x3f80`。
+
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需指定为`dav-9201`。
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-9201 && ./main
+```
+
 ```cpp
-__simd_vf__ inline void convert(vector_bfloat16_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "acl/acl.h"
+#include "c_api/asc_simd.h"
+
+namespace {
+constexpr uint32_t BUFFER_BYTES = 256;
+
+__simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    // 具名接口：从源操作数偶数位置读取e8m0。
-    asc_e8m02bfloat16(dst, src, mask, ASC_POSITION_EVEN);
-    // _v2固定从源操作数奇数位置读取e8m0。
-    asc_e8m02bfloat16_v2(dst, src, mask);
-    // e8m0到bfloat16的通用cast。
-    asc_cast(dst, src, mask, ASC_POSITION_ODD);
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    vector_bfloat16_t bfloat_src;
+    vector_fp8_e8m0_t e8m0_src;
+    vector_bfloat16_t dst;
+    asc_loadalign(bfloat_src, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
+    // 构造写入偶数位置的e8m0源数据。
+    asc_bfloat162e8m0_rz(e8m0_src, bfloat_src, mask, ASC_POSITION_EVEN);
+    asc_e8m02bfloat16(dst, e8m0_src, mask, ASC_POSITION_EVEN);
+    // 通用cast与具名接口使用相同的位置选择。
+    asc_cast(dst, e8m0_src, mask, ASC_POSITION_EVEN);
+    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst, mask);
+}
+
+__global__ __vector__ void asc_e8m02bfloat16_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t input_local[BUFFER_BYTES];
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    convert(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    constexpr uint8_t bfloat_one[] = {0x80, 0x3f};
+    std::vector<uint8_t> input(BUFFER_BYTES);
+    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
+    std::vector<uint8_t> golden(BUFFER_BYTES);
+    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) {
+        input[i] = bfloat_one[i % sizeof(bfloat_one)];
+        golden[i] = bfloat_one[i % sizeof(bfloat_one)];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_e8m02bfloat16_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_e8m02bfloat16 passed."
+                         : "[Failed] asc_e8m02bfloat16 failed.")
+              << std::endl;
+    aclrtFree(output_device);
+    aclrtFree(input_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
