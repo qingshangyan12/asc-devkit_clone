@@ -81,7 +81,7 @@ __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src);
 
 ## 调用示例
 
-以下代码片段在VF中调用。`src.reg`已初始化，先为源寄存器绑定全有效掩码，再提取低8位并写入结果低半部分。通过[make_mask](../mask_reg_compute/make_mask.md)为结果构造uint8_t类型的低半部分掩码，避免使用另一半部分的数据。示例同时使用[all_mask](../mask_reg_compute/all_mask.md)。
+以下代码片段在VF中调用。`src.reg`已初始化，先为源寄存器绑定全有效掩码，再提取低8位并写入结果低半部分。通过[make_mask](../mask_reg_compute/make_mask.md)为结果构造uint8_t类型的低半部分掩码，避免使用另一半的数据。示例同时使用[all_mask](../mask_reg_compute/all_mask.md)。
 
 ```cpp
 __simd_callee__ inline asc::te::experimental::reg_tensor<uint8_t> pack_example(

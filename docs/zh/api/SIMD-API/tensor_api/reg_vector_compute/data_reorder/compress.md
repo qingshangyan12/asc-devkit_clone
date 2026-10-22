@@ -64,7 +64,7 @@ T支持：int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t
 ## 约束说明
 
 - `src.mask`须按T的元素位宽构造并初始化，且须保证被选中的源元素已初始化。可通过[with_mask](../reg_tensor/reg_tensor.md#with_mask)绑定筛选掩码。
-- 返回对象的`mask`直接继承`src.mask`，。若后续计算或搬出只需处理被选中的元素，须先通过[with_mask](../reg_tensor/reg_tensor.md#with_mask)重新绑定结果低位连续的有效元素掩码，不能直接沿用原筛选掩码。
+- 返回对象的`mask`直接继承`src.mask`。若后续计算或搬出只需处理被选中的元素，须先通过[with_mask](../reg_tensor/reg_tensor.md#with_mask)重新绑定结果低位连续的有效元素掩码，不能直接沿用原筛选掩码。
 
 ## 调用示例
 
