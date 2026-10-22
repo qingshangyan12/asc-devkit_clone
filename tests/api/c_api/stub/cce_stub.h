@@ -13,8 +13,6 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
-using hif4x2_t = hifloat4x2_t;
-
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
@@ -125,14 +123,14 @@ inline void mad_mx(
 {}
 
 inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
-    uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
-    bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, uint64_t bias, __ca__ hifloat4x2_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ hifloat4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
 inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
+    __cb__ hifloat4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
@@ -149,7 +147,7 @@ inline void mad_mx(
 {}
 
 inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
+    __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ hifloat4x2_t* b_matrix,
     uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
     bool c_matrix_source, bool c_matrix_init_val)
 {}
@@ -162,7 +160,7 @@ inline void mad_mx(
 
 inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
+    __cb__ hifloat4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
