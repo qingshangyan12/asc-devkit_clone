@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ALGORITHM_COPY_ALGORITHM_IMPL_H
 
 #include "impl/tensor_api/atom/copy_atom_impl.h"
+#include "impl/tensor_api/utils/copy_layout_utils.h"
 
 namespace asc {
 namespace te {
@@ -44,12 +45,6 @@ constexpr bool is_valid_shape_v = Std::is_tuple_v<Std::remove_cvref_t<CopyShape>
 template <typename Coord, typename CopyShape>
 constexpr bool is_copy_coord_shape_compatible_v =
     Std::is_same_v<Std::remove_cvref_t<Coord>, zero_coord_type> || is_same_structure_v<Coord, CopyShape>;
-
-template <typename Pattern>
-constexpr bool is_conv_layout_pattern_v =
-    Std::is_same_v<Pattern, nchw_layout_ptn> || Std::is_same_v<Pattern, nhwc_layout_ptn> ||
-    Std::is_same_v<Pattern, nc1hwc0_layout_ptn> || Std::is_same_v<Pattern, ncdhw_layout_ptn> ||
-    Std::is_same_v<Pattern, ndc1hwc0_layout_ptn>;
 
 template <typename SrcTensor, typename CopyShape>
 struct is_copy_shape_compatible_with_src_layout {
