@@ -213,6 +213,10 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuScheduleAlgo(
                 HCCL_INFO("[ReduceScatterAutoSelector] Level1Nhr=true, select [%s]", selectAlgName.c_str());
                 return SelectorStatus::MATCH;
             }
+            if (topoInfo->is2DieFullMesh) {
+                HCCL_DEBUG("[ReduceScatterAutoSelector] 2DieFullMesh is not supported yet for ccu schedule mode.");
+                return SelectorStatus::NOT_MATCH;
+            }
             if (topoInfo->netLayerDetails.localNetInsSizeOfLayer.at(0) > 1) {
                 CHK_PRT_RET(
                     opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8,
