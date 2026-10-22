@@ -97,6 +97,11 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
+class ST_ALL_TO_ALL_CCU_TEST : public ::testing::Test {
+protected:
+    void SetUp() override { ResetAlgEnvConfigInitState(); }
+};
+
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_bridge_routes)
 {
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
@@ -252,7 +257,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_mesh1d_clos_nullptr_sendcounts_sel
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX"); // 0 > 512 为假 → 最小路径
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
 {
     AlltoAllAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
@@ -276,7 +281,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_selects_sol
     EXPECT_EQ(algName, "AicpuAllToAllSoleMesh"); // 多级对齐 hccl：不做 Concurrent 判断
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_multilevel_mesh1d_falls_back_to_aicpu_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_multilevel_mesh1d_falls_back_to_aicpu_sole_mesh)
 {
     AlltoAllAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U, 2U); // 多级 MESH_1D ≤64
@@ -298,7 +303,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_s
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_single_level_mesh1d_selects_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_single_level_mesh1d_selects_sole_mesh)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U); // 单级 MESH_1D，alltoallv kernel 多event无rank上限
@@ -308,7 +313,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_single_level_mesh1d_select
     EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_multilevel_small_rank_selects_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_multilevel_small_rank_selects_sole_mesh)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U); // 多级 ≤4P
@@ -318,7 +323,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_multilevel_small_rank_sele
     EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_pcie_mix_all_connected_selects_sole_mesh)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_pcie_mix_all_connected_selects_sole_mesh)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
@@ -330,7 +335,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_pcie_mix_all_connected_sel
     EXPECT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_algos_stay_not_match)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_algos_stay_not_match)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
@@ -346,7 +351,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_mesh1d_clos_unregistered_a
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_int8_multilevel_falls_back_to_aicpu)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_int8_multilevel_falls_back_to_aicpu)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(4U, 2U);
@@ -358,7 +363,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_int8_multilevel_falls_back
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_inplace_falls_back_to_aicpu)
 {
     AlltoAllVAutoSelector selector;
     TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo(8U);
