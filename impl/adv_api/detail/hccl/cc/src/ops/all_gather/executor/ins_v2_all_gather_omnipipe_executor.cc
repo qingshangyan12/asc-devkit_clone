@@ -403,8 +403,8 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     omniPipeSliceParam.needSetStepNum = omniNeedStepNum_;
     // PCIE 混布 + 用户显式配置切分比例时，覆盖步数计算的带宽比（对齐 hccl :515-516）
     if (resCtx.topoInfo.level0PcieMix
-        && param.opConfig.multipleDimensionSplitRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
-        omniPipeSliceParam.multipleDimensionSplitRatio = param.opConfig.multipleDimensionSplitRatio;
+        && param.opConfig.multipleDimensionRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        omniPipeSliceParam.multipleDimensionRatio = param.opConfig.multipleDimensionRatio;
     }
 
     OmniPipeSliceInfo alignSliceInfo = CalcAGOmniPipeSliceInfo(omniPipeSliceParam);
@@ -424,8 +424,8 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     localcopySliceParam.dataWholeSize = dataWholeSizeLocalcopy;
     localcopySliceParam.needSetStepNum = omniNeedSetStepNum_;
     if (resCtx.topoInfo.level0PcieMix
-        && param.opConfig.multipleDimensionSplitRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
-        localcopySliceParam.multipleDimensionSplitRatio = param.opConfig.multipleDimensionSplitRatio;
+        && param.opConfig.multipleDimensionRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        localcopySliceParam.multipleDimensionRatio = param.opConfig.multipleDimensionRatio;
     }
 
     OmniPipeSliceInfo localcopySliceInfo = CalcAGOmniPipeSliceInfo(localcopySliceParam);

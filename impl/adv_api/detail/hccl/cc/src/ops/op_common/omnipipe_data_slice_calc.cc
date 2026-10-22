@@ -566,7 +566,7 @@ std::vector<u64> CalcOmniPipeScratchInfo(OmniPipeScratchParam& omniPipeScratchPa
     // 先计算数据量
     if (zB > xyB) {
         outerStepNum = CalReducescatterDataSize2D(
-            xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, dataSize, maxStepNum, engine, omniPipeScratchParam.multipleDimensionSplitRatio);
+            xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, dataSize, maxStepNum, engine, omniPipeScratchParam.multipleDimensionRatio);
         HCCL_INFO("[CalcOmniPipeScratchInfo] zB>xyB,outerStepNum=[%llu]", outerStepNum);
     } else {
         outerStepNum = CalReducescatterDataSize2D(
@@ -642,7 +642,7 @@ std::vector<u64> CalcOmniPipeScratchInfo(OmniPipeScratchParam& omniPipeScratchPa
         if (zB > xyB) {
             outerStepNum = CalReducescatterDataSize2D(
                 xyRSDataSize, zRSDataSize, xyB, zB, xRankSize * yRankSize, zRankSize, maxDataSizePerLoop, maxStepNum,
-                engine, omniPipeScratchParam.multipleDimensionSplitRatio);
+                engine, omniPipeScratchParam.multipleDimensionRatio);
             HCCL_INFO("[CalcOmniPipeScratchInfo] zB>xyB,outerStepNum=[%llu]", outerStepNum);
         } else {
             outerStepNum = CalReducescatterDataSize2D(
@@ -1028,13 +1028,13 @@ OmniPipeSliceInfo CalcAGOmniPipeSliceInfo(OmniPipeSliceParam& omniPipeSliceParam
             // 先计算通信步数和每步每一小片数据量
             outerStepNum = CalAllgatherDataSize2D(
                 zAGDataSize[rs], xyAGDataSize[rs], zB, xyB, zRankSize, xRankSize * yRankSize,
-                omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionSplitRatio);
+                omniPipeSplitSliceInfoListPerLoop[rs].size, maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionRatio);
             if (yB >= xB) {
                 // 这里认为y一定大
                 for (u64 i = 0; i < outerStepNum; i++) {
                     innerStepNum = CalAllgatherDataSize2D(
                         xAGDataSize[rs][i], yAGDataSize[rs][i], xB, yB, xRankSize, yRankSize, xyAGDataSize[rs][i],
-                        maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionSplitRatio);
+                        maxStepNum, omniPipeSliceParam.engine, omniPipeScratchParam.multipleDimensionRatio);
                 }
                 // 这里判断下，步数为1的时候只进上面的循环，否则这里走一步
                 if (innerStepNum > 1) {
