@@ -187,6 +187,14 @@ enum class CcuProtocolVersion : uint8_t {
     INVALID = 2U,
 };
 
+// Context-only initialization has no tiling devType. Use the target architecture
+// so every CalcGoSize caller uses the same protocol as the CCU kernel.
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+constexpr CcuProtocolVersion CCU_DEFAULT_PROTOCOL_VERSION = CcuProtocolVersion::CCU_V2;
+#else
+constexpr CcuProtocolVersion CCU_DEFAULT_PROTOCOL_VERSION = CcuProtocolVersion::CCU_V1;
+#endif
+
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
     GM_ADDR xnAddr;

@@ -18,7 +18,7 @@ std::vector<uint64_t> CalGoSize(uint64_t size)
     config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount = CCU_MS_DEFAULT_LOOP_COUNT;
     config.memSlice = CCU_MS_SIZE;
-    return CalGoSize(size, config);
+    return CalGoSize(size, config, GetCcuVersion());
 }
 
 std::vector<uint64_t> CalGoSize(uint64_t size, CcuVersion ccuVersion)
@@ -1027,10 +1027,12 @@ CcuResult GroupCopy(
     if (ccuVersion == CcuVersion::CCU_V1) {
         HCCL_INFO("select GroupCopyV1");
         return GroupCopyV1(ctx, dst, src, goSize);
-    } else {
+    } else if (ccuVersion == CcuVersion::CCU_V2) {
         HCCL_INFO("select GroupCopyV2");
         return GroupCopyV2(ctx, dst, src, goSize);
     }
+    HCCL_ERROR("GroupCopy: invalid CCU version[%u]", static_cast<uint32_t>(ccuVersion));
+    return CcuResult::CCU_E_NOT_SUPPORT;
 }
 
 CcuResult GroupCopyV1(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize)

@@ -160,7 +160,7 @@ private:
 
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
     bool newCcuFlag_ = false;
-    CcuProtocolVersion ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
+    CcuProtocolVersion ccuProtocolVersion_ = CCU_DEFAULT_PROTOCOL_VERSION;
 
     uint8_t workingFlag_ = false;
     bool isInited_ = false;

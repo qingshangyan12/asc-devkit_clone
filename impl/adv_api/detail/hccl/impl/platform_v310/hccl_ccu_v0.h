@@ -207,6 +207,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::Init(
     GM_ADDR context, __gm__ void* initTiling)
 {
+    ccuProtocolVersion_ = CCU_DEFAULT_PROTOCOL_VERSION;
     HcclTilingVersion version =
         (initTiling != nullptr ? HcclTilingVersion::NEW_TILING_VERSION : HcclTilingVersion::DEPRECATED_TILING_VERSION);
     InitInner(context, version);
@@ -217,6 +218,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     GM_ADDR context, const void* initTiling)
 {
     newCcuFlag_ = false;
+    ccuProtocolVersion_ = CCU_DEFAULT_PROTOCOL_VERSION;
     HcclTilingVersion version = HcclTilingVersion::DEPRECATED_TILING_VERSION;
     if (initTiling != nullptr) {
         version = HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION;
