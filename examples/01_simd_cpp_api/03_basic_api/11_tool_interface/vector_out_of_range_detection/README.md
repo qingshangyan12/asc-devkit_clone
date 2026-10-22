@@ -32,8 +32,8 @@ vector_out_of_range_detection
 
   | 比较结果 | 判断条件 | 实现 |
   | --- | --- | --- |
-  | 正无穷大 | `z[i] == +Inf` | 使用NumericLimits<float>::Infinity矢量接口生成用于比较的正无穷矢量，使用Compare接口与矢量z进行逐元素比较 |
-  | 负无穷大 | `z[i] == -Inf` | 使用NumericLimits<float>::NegativeInfinity标量接口生成用于比较的负无穷标量值，使用Compares接口与矢量z进行逐元素比较 |
+  | 正无穷大 | `z[i] == +Inf` | 使用`NumericLimits<float>::Infinity`矢量接口生成用于比较的正无穷矢量，使用Compare接口与矢量z进行逐元素比较 |
+  | 负无穷大 | `z[i] == -Inf` | 使用`NumericLimits<float>::NegativeInfinity`标量接口生成用于比较的负无穷标量值，使用Compares接口与矢量z进行逐元素比较 |
 
 - 样例规格
 

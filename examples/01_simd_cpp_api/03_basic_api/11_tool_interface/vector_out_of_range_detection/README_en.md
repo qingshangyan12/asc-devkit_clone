@@ -32,8 +32,8 @@ The kernel computes `z = x + y` and produces two comparison masks:
 
 | Mask | Condition | Implementation |
 | --- | --- | --- |
-| Positive infinity | `z[i] == +Inf` | NumericLimits<float>::Infinity vector interface, Compare with EQ |
-| Negative infinity | `z[i] == -Inf` | NumericLimits<float>::NegativeInfinity scalar interface, Compares with EQ |
+| Positive infinity | `z[i] == +Inf` | `NumericLimits<float>::Infinity` vector interface, Compare with EQ |
+| Negative infinity | `z[i] == -Inf` | `NumericLimits<float>::NegativeInfinity` scalar interface, Compares with EQ |
 
 Maximum and lowest finite values are not marked.
 
