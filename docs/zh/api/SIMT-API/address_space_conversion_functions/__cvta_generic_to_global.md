@@ -68,6 +68,8 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_global(uint32_t*
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     size_t addr_val = __cvta_generic_to_global(src + idx);
-    printf("GM(src)的偏移量为：%lu\n", addr_val);
+    if (idx < 4) {
+        printf("src[%u]的GM内存空间的地址值为：0x%lx\n", idx, addr_val);
+    }
 }
 ```
