@@ -24,8 +24,15 @@ private:
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
         std::string& selectAlgName) const override;
-    SelectorStatus SelectMeshAlgoCcuSchedule(
-        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const;
+    // 与 hccl 同构的 ccu_sched 单层选算拆分（Mesh1D / MESH_1D_CLOS-UBX / CLOS 分发）
+    SelectorStatus SelectCcuScheduleLevel0Algo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName,
+        const u64 dataSize) const;
+    SelectorStatus SelectCcuScheduleLevel0AlgoMesh1D(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName,
+        const u64 dataSize) const;
+    SelectorStatus SelectCcuScheduleLevel0UBXAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const;
 };
 
 } // namespace mc2_ops_hccl
