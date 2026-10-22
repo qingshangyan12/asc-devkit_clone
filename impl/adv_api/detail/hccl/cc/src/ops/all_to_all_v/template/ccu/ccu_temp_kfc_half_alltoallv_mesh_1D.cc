@@ -12,6 +12,7 @@
 #include "hccl_res.h"
 #include "ccu_assist_pub.h"
 #include "ccu_kernel_alg_base.h"
+#include "kfc_server_protocol.h"
 #include "ccu_temp_kfc_half_alltoallv_mesh_1D.h"
 
 namespace mc2_ops_hccl {
