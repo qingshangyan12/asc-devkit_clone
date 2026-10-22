@@ -155,10 +155,10 @@ __simd_vf__ inline void scatter_vf(__ubuf__ uint16_t* output,
     asc_loadalign(src, input);
     asc_loadalign(index, indices);
     for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        // 每次重新遍历输入时重置计数，内层循环由asc_update_mask_b16自动更新。
+        uint32_t remaining_length = ELEMENT_COUNT;
         for (uint16_t i = 0; i < repeat_time; ++i) {
             const uint32_t offset = i * one_repeat_size;
-            uint32_t remaining_length = (offset + ELEMENTS_PER_REGISTER < ELEMENT_COUNT) ?
-                ELEMENTS_PER_REGISTER : ELEMENT_COUNT - offset;
             vector_bool mask = asc_update_mask_b16(remaining_length);
             asc_loadalign(src, input + offset);
             asc_loadalign(index, indices + offset);

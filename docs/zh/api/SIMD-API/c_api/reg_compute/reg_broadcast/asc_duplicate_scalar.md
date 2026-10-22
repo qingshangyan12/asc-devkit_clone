@@ -160,12 +160,18 @@ constexpr float FILL_VALUE = 3.5f;
 __simd_vf__ inline void duplicate_scalar(__ubuf__ float* dst, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
+    // 剩余有效元素数由asc_update_mask_b32逐轮更新，无需按offset重新计算。
+    uint32_t remaining_length = TOTAL_LENGTH;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         const uint32_t offset = i * one_repeat_size;
-        const uint32_t remaining = TOTAL_LENGTH - offset;
-        uint32_t remaining_length = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        // active_mask控制本轮广播的生效位置：最多启用前ACTIVE_COUNT个元素，尾块不足时只启用有效元素。
+        // 例如133个元素按每轮64个处理，ACTIVE_COUNT为16时，三轮分别启用16、16、5个元素。
+        // remaining_length_active是本轮的独立计数；update_mask会将它扣减到0，因此每轮都要重新计算。
+        // 必须在生成store_mask之前计算，因为生成store_mask会更新跨轮使用的remaining_length。
         uint32_t remaining_length_active = remaining_length < ACTIVE_COUNT ? remaining_length : ACTIVE_COUNT;
         vector_bool active_mask = asc_update_mask_b32(remaining_length_active);
+        // store_mask控制写回范围，三轮分别写回64、64、5个有效元素，并自动更新剩余数量。
+        // 广播未生效的位置也可能需要写回，因此不能直接用active_mask代替store_mask。
         vector_bool store_mask = asc_update_mask_b32(remaining_length);
         asc_duplicate_scalar(dst_reg, FILL_VALUE, active_mask);
         asc_storealign(dst + offset, dst_reg, store_mask);
