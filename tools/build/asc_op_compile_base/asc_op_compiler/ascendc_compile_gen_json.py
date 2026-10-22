@@ -34,7 +34,7 @@ import struct
 import hashlib
 from asc_op_compile_base.common.context import get_context
 from .get_op_tiling import OpInfo
-from .ascendc_compile_dfx import DFXSectionGenerator
+from .ascendc_compile_dfx import DFXSectionGenerator, oom_tiling_size
 from .super_kernel_sub_op_compile import add_sub_super_kernel_info
 from .super_kernel_constants import SuperKernelStreamFusionMode
 from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
@@ -822,11 +822,10 @@ the superkernel cannot be integrated with the operator.",
     if "oom" in get_current_build_config("tir.op_debug_config"):
         # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
         # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
-        op_param_size = (
-            ((max_tiling_size + 7) // 8) * 8
-            + 8
-            + 8 * DFXSectionGenerator().param_placeholder_num
-            + 2  # Optional OOM storage-shape extension header.
+        op_param_size = oom_tiling_size(
+            max_tiling_size,
+            DFXSectionGenerator().param_placeholder_num,
+            not tiling_info.static_shape_flag,
         )
         js["oom"] = {"version": 1, "tensor_version": 1}
     else:

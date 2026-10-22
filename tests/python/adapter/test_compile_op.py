@@ -95,6 +95,12 @@ class MockMatch:
 
 
 class TestCompileOp(unittest.TestCase):
+    def test_oom_tiling_size_storage_shape_header_only_for_dynamic(self):
+        from adapter.ascendc_compile_dfx import oom_tiling_size
+
+        self.assertEqual(oom_tiling_size(16, 2, True), 42)
+        self.assertEqual(oom_tiling_size(16, 2, False), 40)
+
     def test_oom_storage_shape_patterns(self):
         init_source = ascendc_compile_gen_code.OOM_STORAGE_SHAPE_INIT_PATTERN.format(legacy_len_offset=32)
         tensor_source = ascendc_compile_gen_code.OOM_TENSOR_REGISTER_PATTERN.format(

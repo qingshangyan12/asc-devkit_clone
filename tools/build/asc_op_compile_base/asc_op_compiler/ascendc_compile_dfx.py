@@ -97,6 +97,12 @@ class DFXArgInfo:
         self.args_dfx_info: list = []
 
 
+def oom_tiling_size(tiling_size: int, param_placeholder_num: int, storage_shape_enabled: bool) -> int:
+    """Return the OOM tiling parameter size for the selected metadata layout."""
+    extension_header_size = 2 if storage_shape_enabled else 0
+    return ((tiling_size + 7) // 8) * 8 + 8 + 8 * param_placeholder_num + extension_header_size
+
+
 @_ascendc_singleton
 class DFXSectionGenerator:
     def dfx_info_reset(self, op_info: OpInfo):
@@ -236,7 +242,9 @@ class DFXSectionGenerator:
             if "oom" in get_current_build_config("tir.op_debug_config"):
                 # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
                 # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
-                tiling_size = ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
+                tiling_size = oom_tiling_size(
+                    tiling_size, self.param_placeholder_num, not tiling_info.static_shape_flag
+                )
             else:
                 tiling_size = tiling_size + 8
             parameter.args_dfx_info[-8:] = self._tran_dfx_info_to_uint8_t(tiling_size, ArgTypeSize.U64)
