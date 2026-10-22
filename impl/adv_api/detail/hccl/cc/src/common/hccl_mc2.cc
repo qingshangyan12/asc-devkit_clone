@@ -747,10 +747,10 @@ HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs)
     CHK_RET(BuildMc2CcTiling(comm, ccType, *args, ccTiling));
     const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {&ccTiling};
 
-    Mc2InitTilingInner initTiling{}; // DispatchAllocByCommEngine内都是按照Mc2InitTilingInner类型去处理
+    Mc2InitTilingInner initTiling{};                  // DispatchAllocByCommEngine内都是按照Mc2InitTilingInner类型去处理
     initTiling.version = INIT_TILING_CCU_NEW_VERSION; // check只支持是新版本
-    initTiling.mc2HcommCnt = 1U; // CheckCcuKfcFlow 要求等于tilingNum 否则报错，tilingNum为1
-    initTiling.offset[0] = 0U;   // 占位符，check场景下提前返回，不会被使用
+    initTiling.mc2HcommCnt = 1U;                      // CheckCcuKfcFlow 要求等于tilingNum 否则报错，tilingNum为1
+    initTiling.offset[0] = 0U;                        // 占位符，check场景下提前返回，不会被使用
 
     // stream参数在check且ccu场景使用不到，所以直接传nullptr；
     void* opResCtx = nullptr;
