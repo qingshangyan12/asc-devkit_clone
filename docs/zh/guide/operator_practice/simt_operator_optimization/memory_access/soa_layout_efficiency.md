@@ -8,17 +8,19 @@
 
 【样例介绍】以[hashtable_lookup样例](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup)为例，实现哈希表查找算子，该哈希表处理哈希冲突基于开放寻址法，具体参考[背景知识](../../../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table#%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86)，此样例通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。
 
-  **图1 内存布局示意图**
+下图展示了本样例中不同内存布局的哈希表结构。
+
+**图1 内存布局示意图**
 
 <img src="../../../figures/soa_aos_layout.png">
 
-图1以本样例的哈希表结构为例，展示了不同的内存布局。
+下文性能数据均使用msOpProf工具在Ascend 950PR产品上采集，指标为Task Duration（Task整体耗时，即算子端到端耗时）。
 
 【反例】AoS内存排布场景，8B的key和32B的value连续排布，组成一个Bucket结构，多个Bucket连续排布组成一个数组，查找逻辑逐Bucket读8B key进行比较。每个线程独立负责一条查询key。
 
 哈希表结构体代码实现如下所示：
 
-  ```cpp
+```cpp
 struct AoSBucket {
   uint64_t key;
   float value[DIM];
@@ -36,9 +38,9 @@ __aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key
   idx = (idx + 1) & (CAPACITY - 1);  
   ...
 }
-  ```
+```
 
-在Ascend 950PR产品上，该实现的性能数据如下：
+上述实现中，每个线程独立负责一条查询key，查找逻辑逐Bucket读8B key进行比较。该实现的性能数据如下：
 
   | Case | Task Duration(μs) | read_main_memory_data(MB) |
 | ---- | :---------------: | :-----------------------: |
@@ -47,7 +49,7 @@ __aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key
 
 【正例】使用SoA布局，key与value分区存储，探测路径与value区解耦，消除value存放在Bucket中对探测访存跨度的干扰。
 
-  ```cpp
+```cpp
 struct SoaTableNoDigest {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
@@ -65,13 +67,11 @@ __aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64
   idx = (idx + 1) & (CAPACITY - 1);  
   ...
 }
-  ```
+```
 
-算法实现与反例查找算法完全一致。唯一差异是内存布局。SoA把所有共8MB的key连续存在一起，所有共32MB的value连续存在一起，key和value分开存放。
+算法实现与反例查找算法完全一致。唯一差异是内存布局。SoA布局中所有8MB的key连续存放，所有32MB的value连续存放，key和value分开存储。使用SoA布局后的性能数据如下：
 
-在Ascend 950PR产品上，使用SoA布局后的性能数据如下：
-
-  | Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
+| Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
 | ---- | :---------------: | :-----------------------: | :------: |
 | 0    |     1311.297      |          672.645          |    -     |
 | 1    |      783.029      |          239.765          |  x1.67   |
@@ -84,6 +84,6 @@ AoS中key和value交替存储，查询key时会将相邻的value一同加载；S
 
 **适用场景扩展**
 
-SoA布局不局限于哈希表查找：当算子存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率，详见[样例README](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup/README.md)。
+SoA布局不局限于哈希表查找：当算子存在局部同字段批量访问时，优先考虑SoA而非AoS，将同类字段连续存储，减少无关数据的加载，提高Cache Line利用率，详见[哈希表查找性能优化样例](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup/README.md)。
 
-【总结】在SIMT编程中，SoA的内存布局时同类字段连续存储，针对高频访问局部数据的场景，SoA的内存排布可显著提高Cache Line利用率，从而提升整体性能。
+【总结】在SIMT编程中，使用SoA的内存布局时同类字段连续存储，针对高频访问局部数据的场景，SoA的内存排布可显著提高Cache Line利用率，从而提升整体性能。

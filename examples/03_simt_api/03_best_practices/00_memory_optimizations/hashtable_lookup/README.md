@@ -157,7 +157,7 @@ __aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64
 | Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 0    |    1311.297    |          672.645           |  -   |
-| 1    |    783.029    |          239.765           | x1.67 |
+| 1    |    783.029    |          239.765           | 1.67x |
 
 **分析**：
 
@@ -246,7 +246,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
 | Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 1    |    783.029    |          239.765           |  -   |
-| 2    |    483.379     |          279.439           | x1.62 |
+| 2    |    483.379     |          279.439           | 1.62x |
 
 **分析**：
 
@@ -298,7 +298,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 | Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 2    |    483.379     |          279.439           |  -   |
-| 3    |    423.152    |          283.177           | x1.14 |
+| 3    |    423.152    |          283.177           | 1.14x |
 
 **分析**：
 
@@ -317,10 +317,10 @@ Case 3的关键在于：在保持访存指令数量不变的前提下，减少�
 
 | Case | 核函数 | Task Duration(μs) | read_main_memory_data(MB) | 相对Case 0 |
 | ---- | ------ | :---------------: | :------------------------: | :--------: |
-| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | x1.00 |
-| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | x1.67 |
-| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | x2.71 |
-| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | x3.10 |
+| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | 1.00x |
+| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | 1.67x |
+| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | 2.71x |
+| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | 3.10x |
 
 ## 调优建议
 
