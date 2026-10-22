@@ -32,11 +32,11 @@ static bool IsNeedStrictModeForOrderPreserved(const OpParam& opParam, u32 rankSi
     u8 deterministicLevel = GetExternalInputHcclDeterministic();
     HcclDataType dataType = opParam.DataDes.dataType;
     HcclReduceOp reduceType = opParam.reduceType;
-    return (deterministicLevel == static_cast<u8>(DeterministicEnableLevel::DETERMINISTIC_STRICT))
-           && (dataType == HcclDataType::HCCL_DATA_TYPE_FP16 || dataType == HcclDataType::HCCL_DATA_TYPE_FP32
-               || dataType == HcclDataType::HCCL_DATA_TYPE_BFP16 || dataType == HcclDataType::HCCL_DATA_TYPE_FP64)
-           && (reduceType == HcclReduceOp::HCCL_REDUCE_SUM || reduceType == HcclReduceOp::HCCL_REDUCE_PROD)
-           && rankSize > MIN_STRICT_RANK_NUM_ORDER_PRESERVED;
+    return (deterministicLevel == static_cast<u8>(DeterministicEnableLevel::DETERMINISTIC_STRICT)) &&
+           (dataType == HcclDataType::HCCL_DATA_TYPE_FP16 || dataType == HcclDataType::HCCL_DATA_TYPE_FP32 ||
+            dataType == HcclDataType::HCCL_DATA_TYPE_BFP16 || dataType == HcclDataType::HCCL_DATA_TYPE_FP64) &&
+           (reduceType == HcclReduceOp::HCCL_REDUCE_SUM || reduceType == HcclReduceOp::HCCL_REDUCE_PROD) &&
+           rankSize > MIN_STRICT_RANK_NUM_ORDER_PRESERVED;
 }
 
 // hccl 选路命中但 devkit 未迁移的算法：按迁移约定直接报错不匹配，不做本地替代兜底
@@ -264,8 +264,8 @@ SelectorStatus ReduceScatterAutoSelector::SelectAicpuAlgo(
         if (Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD) {
             selectAlgName = "InsReduceScatterAicpuReduceNHR";
         } else if (
-            level0AndLevel1Symetric && topoInfo->deviceNumPerModule == DEVICE_NUM_PER_MODULE_8
-            && topoInfo->topLevelUboe) {
+            level0AndLevel1Symetric && topoInfo->deviceNumPerModule == DEVICE_NUM_PER_MODULE_8 &&
+            topoInfo->topLevelUboe) {
             if (topoInfo->topoLevelNums == TOPO_LEVEL_NUM_2) {
                 return AlgoNotMigrated("AicpuReduceScatterPipeLineMeshNHR", "symmetric 2-level uboe");
             } else {
@@ -290,8 +290,8 @@ SelectorStatus ReduceScatterAutoSelector::SelectAicpuAlgo(
                     selectAlgName = "InsReduceScatterNHR";
                 }
             } else if (
-                dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE
-                && topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
+                dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE &&
+                topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
                 selectAlgName = "InsReduceScatterParallelMesh1DNHR";
             } else if (dataSize > RS_AICPU_1D_MIN_DATA_SIZE) {
                 selectAlgName = (dataSize * topoInfo->userRankSize > RS_AICPU_SEQUENCE_SIZE_THRESHOLD) ?
