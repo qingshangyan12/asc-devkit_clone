@@ -77,7 +77,7 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, uint32_t,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, uint8_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, fp4x2_e2m1_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, fp4x2_e1m2_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, hif4x2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, hifloat4x2_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, int4b_t, __ca__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, bfloat16_t, __ca__);
@@ -94,7 +94,7 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, uint8_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, fp4x2_e2m1_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, fp4x2_e1m2_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, hif4x2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, hifloat4x2_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, int4b_t, __ca__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, bfloat16_t, __cb__);
@@ -111,7 +111,7 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, uint32_t,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, uint8_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, fp4x2_e2m1_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, fp4x2_e1m2_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, hif4x2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, hifloat4x2_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, int4b_t, __cb__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, bfloat16_t, __cb__);
@@ -128,5 +128,5 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, uint8_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, fp4x2_e2m1_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, fp4x2_e1m2_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, hif4x2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, hifloat4x2_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0_S4_VOID(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, int4b_t, __cb__);

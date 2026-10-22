@@ -856,9 +856,9 @@ __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
 __aicore__ inline void asc_prefetch_stop() { __prefetch_stop(); }
 
 // ==========asc_copy_l12l0a==========
-// hif4x2_t
+// hifloat4x2_t
 __aicore__ inline void asc_copy_l12l0a(
-    __ca__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    __ca__ hifloat4x2_t* dst, __cbuf__ hifloat4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -870,7 +870,7 @@ __aicore__ inline void asc_copy_l12l0a(
 
 // transpose
 __aicore__ inline void asc_copy_l12l0a_transpose(
-    __ca__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    __ca__ hifloat4x2_t* dst, __cbuf__ hifloat4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -881,9 +881,9 @@ __aicore__ inline void asc_copy_l12l0a_transpose(
 }
 
 // ==========asc_copy_l12l0b==========
-// hif4x2_t
+// hifloat4x2_t
 __aicore__ inline void asc_copy_l12l0b(
-    __cb__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    __cb__ hifloat4x2_t* dst, __cbuf__ hifloat4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -895,7 +895,7 @@ __aicore__ inline void asc_copy_l12l0b(
 
 // transpose
 __aicore__ inline void asc_copy_l12l0b_transpose(
-    __cb__ hif4x2_t* dst, __cbuf__ hif4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
+    __cb__ hifloat4x2_t* dst, __cbuf__ hifloat4x2_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
