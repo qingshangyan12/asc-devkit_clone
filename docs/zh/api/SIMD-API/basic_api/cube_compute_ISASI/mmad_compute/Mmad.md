@@ -332,17 +332,19 @@ Atlas A2系列产品
 
 - **特殊值/边界值约束说明**
 
-  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式：
+  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式。该配置适用于浮点类型输入，不适用于整数类型输入，且由CTRL\[48\]直接决定：
 
   - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
   - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
     ```cpp
-    // 设置CTRL[48]为0，开启浮点数计算饱和模式
-    AscendC::AscendCUtils::SetOverflow(0);
+    // 设置CTRL[48]为0，开启浮点数饱和模式。
+    AscendC::SetCtrlSpr<48, 48>(0);
     ```
 
     注：Mmad指令应避免NaN输入，否则可能会产生执行报错。
+
+  - 边界值计算结果请见[Mmad接口边界值汇总](../../../../appendix/mmad_interface_boundary_value_summary.md)。
 
   对于整数类型只有饱和模式。
 
