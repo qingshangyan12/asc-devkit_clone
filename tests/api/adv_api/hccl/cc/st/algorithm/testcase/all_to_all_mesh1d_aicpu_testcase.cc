@@ -250,13 +250,26 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_keeps_concu
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_is_not_supported)
 {
     AlltoAllVAutoSelector selector;
-    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
-    topo.topoLevelNums = 2U;
     OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
     std::string algName;
-    // 多级 MESH_1D_CLOS 不支持：对齐 hccl 走 SoleMesh 被 executor 的
-    // MESH_1D_CLOS 双实例 hierarchy 契约阻塞（TopoMatch1D 为扁平结构），保持 NOT_MATCH
+
+    // 对应实现：alltoallv_auto_selector.cc SelectAicpuAlgo 的 MESH_1D_CLOS 非 pcieMix 路径
+    // （多级 MATCH 分支已删除，多级由末尾 topoLevelNums != 1U 判断拒绝——被 executor 的
+    // MESH_1D_CLOS 双实例 hierarchy 契约阻塞，TopoMatch1D 为扁平结构）
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U;
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+
+    // 3 级及以上同样拒绝
+    topo.topoLevelNums = 3U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+
+    // pcieMix 不受级数限制（该路径按 mesh1d 算法处理，且绕开 executor 双实例契约）
+    TopoInfoWithNetLayerDetails pcieMixTopo = MakeConcurrentTopo();
+    pcieMixTopo.topoLevelNums = 2U;
+    pcieMixTopo.level0PcieMix = true;
+    EXPECT_EQ(selector.Select(param, &pcieMixTopo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
 
 } // namespace checker
