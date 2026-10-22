@@ -436,7 +436,13 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
     const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, algName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
+    if (kind == ForcedAlgKind::NONE) {
+        // 空/"default"：不强制算法，由 SelectCcuAlgorithm 内的默认 selector 兜底选路。
+        HCCL_INFO("[MC2_EXT_ALG] algConfig[%s] is empty/default, use default selector.", ccTiling->algConfig);
+        return true;
+    }
+    if (kind == ForcedAlgKind::LEGACY) {
+        // LEGACY 语法（含 '='）在 CCU 路径无定义，按配置错误拒绝
         HCCL_WARNING("[MC2_EXT_ALG] algConfig[%s] is not supported in mc2_client.", ccTiling->algConfig);
         return false;
     }
@@ -603,7 +609,11 @@ HcclResult DispatchAllocByCommEngine(
             return HCCL_E_NOT_SUPPORT;
         }
         if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
-            HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
+            // 指定错误（LEGACY 语法/未注册裸名/词法错误外部名/无 CCU 候选）必须报错终止，
+            // 不再静默回退——回退会掩盖配置错误，用户侧拿到的是预期外的算法。
+            HCCL_ERROR(
+                "[HcclAllocComResourceByTiling] algConfig is invalid or not registered in mc2_client, "
+                "please check the algConfig.");
             return HCCL_E_ALG_NOT_SUPPORTED;
         }
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));

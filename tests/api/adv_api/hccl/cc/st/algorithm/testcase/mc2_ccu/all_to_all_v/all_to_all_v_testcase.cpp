@@ -43,6 +43,23 @@ TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_2Rank_Fp16_100B)
     VerifyScenario(MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 100));
 }
 
+// ===== 不指定算法（algConfig="default"）：默认 selector 兜底到 CcuSchedAllToAllVSoleMesh =====
+// CCU 引擎 + A2AV 原语下不指定算法时，走 SelectCcuScheduleAlgo 默认选路而非失败。
+
+TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_DefaultAlgConfig_2Rank_Fp16_100B)
+{
+    CcuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 100);
+    scenario.algConfig = "default";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_DefaultAlgConfig_8Rank_Fp16_64B)
+{
+    CcuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 64);
+    scenario.algConfig = "default";
+    VerifyScenario(scenario);
+}
+
 TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_4Rank_Fp16_64B)
 {
     VerifyScenario(MakeScenario(TopoMeta{{{{0, 1, 2, 3}}}}, HCCL_DATA_TYPE_FP16, 64));

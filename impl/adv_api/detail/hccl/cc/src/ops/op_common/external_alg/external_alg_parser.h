@@ -217,6 +217,11 @@ inline ForcedAlgKind ClassifyForcedAlgConfig(
     if (algConfig.empty()) {
         return ForcedAlgKind::NONE;
     }
+    if (algConfig == "default") {
+        // 显式 "default" 与空串同义：不强制算法，走默认 selector 兜底。
+        // （tiling 侧空 algConfig 约定填 "default"，见 CcuStFixture::BuildTiling）
+        return ForcedAlgKind::NONE;
+    }
     if (algConfig.find('=') != std::string::npos) {
         return ForcedAlgKind::LEGACY;
     }

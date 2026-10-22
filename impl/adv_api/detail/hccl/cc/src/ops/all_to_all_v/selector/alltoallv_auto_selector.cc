@@ -14,6 +14,46 @@
 namespace mc2_ops_hccl {
 namespace {
 constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
+// CCU 单层上限：event mask 已按 16 rank 一组拆分（ccu_kernel_all_to_all_v_mesh1d.cc），
+// 通道数组受 CcuKernelArgBase::channels[CCU_MAX_RANK_SIZE] 限制（CCU_MAX_RANK_SIZE=64）
+constexpr u32 CCU_CLOS_MAX_RANK_SIZE = 64U;
+}
+
+SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)configAlgMap;
+    CHK_PRT_RET(
+        topoInfo == nullptr, HCCL_ERROR("[AlltoAllVAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
+    if (topoInfo->userRankSize <= 1U) {
+        HCCL_WARNING(
+            "[AlltoAllVAutoSelector] rankSize[%u] is not supported by local CCU AllToAllV.", topoInfo->userRankSize);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->topoLevelNums > 1U) {
+        // 多层拓扑（2 层 level0=CLOS 等）暂不支持 CCU A2AV
+        HCCL_WARNING(
+            "[AlltoAllVAutoSelector] topoLevelNums[%u] > 1 is not supported by local CCU AllToAllV.",
+            topoInfo->topoLevelNums);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
+        // 单层 MESH_1D：CCU SoleMesh（通道 per peer 直连）
+        selectAlgName = "CcuSchedAllToAllVSoleMesh";
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::CLOS && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
+        // 大禹纯 CLOS 单层：CCU SoleMesh（DIE0-only 建链，模板内做 die 过滤）
+        selectAlgName = "CcuSchedAllToAllVSoleMesh";
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    HCCL_WARNING(
+        "[AlltoAllVAutoSelector] level0Topo[%u] is not supported by local CCU AllToAllV.",
+        static_cast<u32>(topoInfo->level0Topo));
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
