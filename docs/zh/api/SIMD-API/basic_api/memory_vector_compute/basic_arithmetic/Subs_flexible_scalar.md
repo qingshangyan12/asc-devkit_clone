@@ -88,6 +88,7 @@ $dst_i = scalar - src_i$
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为int16_t、half、bfloat16_t、int32_t、float、complex32、int64_t、uint64_t、complex64。其中complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Subs_flexible_scalar_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -111,6 +112,7 @@ $dst_i = scalar - src_i$
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 - 针对Ascend 950PR&950DT系列产品，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Subs_flexible_scalar_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

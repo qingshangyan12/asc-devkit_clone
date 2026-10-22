@@ -22,8 +22,8 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_BITMODE_INTF_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_BITMODE_INTF_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 
 namespace AscendC {
 __aicore__ inline ConvKernelBitModeParams::ConvKernelBitModeParams() { config0 = 0; }

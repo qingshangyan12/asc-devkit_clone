@@ -181,6 +181,7 @@ Atlas A2系列产品
 | enSsparse | 开启结构化稀疏特性，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradA | 指示矩阵a是否通过winograd_feature_map_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradB | 指示矩阵b是否通过winograd_weight_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id2 -->
 
 ## 数据类型<a id="zh_cn_topic_mmad_section5"></a>
 
@@ -297,6 +298,7 @@ Atlas A2系列产品
     数据为half类型，当M=30，K=70，N=40的时候，L0A Buffer（A2）中有2x5个16x16矩阵，L0B Buffer（B2）中有5x3个16x16矩阵，L0C Buffer（CO1）中有2x3个16x16矩阵。在这种场景下M、K和N都不是16的倍数，A2中右下角的矩阵实际有效的数据只有14x6个，但是也需要占一个16x16矩阵的空间，其他无效数据在计算中会被忽略。一个16x16分形的数据块中，无效数据与有效数据排布的方式示意如下：
 
     ![有效数据相乘示意图](../../../../figures/mmad_validshape_demo.png)
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id4 -->
 
 - **同步优化说明**
 
@@ -347,3 +349,4 @@ Atlas A2系列产品
 ## 调用示例
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id3 -->

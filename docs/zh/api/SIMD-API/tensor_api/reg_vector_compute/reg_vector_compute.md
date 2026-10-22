@@ -5,7 +5,9 @@
 - **[寄存器reg_tensor](reg_tensor/reg_tensor_list.md)**
 - **[Mask寄存器计算](mask_reg_compute/mask_reg_compute.md)**
 - **[寄存器数据搬入](reg_data_load/reg_data_load.md)**
+- **[寄存器数据复制](reg_data_copy/reg_data_copy.md)**
 - **[寄存器数据搬出](reg_data_store/reg_data_store.md)**
+- **[寄存器同步控制](reg_sync_control/reg_sync_control.md)**
 - **[类型转换](type_conversion/type_conversion.md)**
 - **[基础算术](basic_arithmetic/basic_arithmetic.md)**
 - **[归约计算](reduction_compute/reduction_compute.md)**
