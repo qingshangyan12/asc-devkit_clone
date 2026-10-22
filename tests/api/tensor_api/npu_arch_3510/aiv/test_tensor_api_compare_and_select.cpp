@@ -36,9 +36,9 @@ void compare_result_stub(vector_bool& dst, RegT, OtherT, vector_bool mask)
     dst = Result;
 }
 
-#define MOCK_COMPARE_INSTR(Instr, RegT, OtherT, Result)                    \
-    MOCKER_CPP(Instr, void(vector_bool&, RegT, OtherT, vector_bool))       \
-        .times(1)                                                        \
+#define MOCK_COMPARE_INSTR(Instr, RegT, OtherT, Result)              \
+    MOCKER_CPP(Instr, void(vector_bool&, RegT, OtherT, vector_bool)) \
+        .times(1)                                                    \
         .will(invoke(compare_result_stub<RegT, OtherT, Result>))
 
 template <typename RegT>
@@ -162,13 +162,13 @@ __aicore__ inline void test_select(vector_bool maskValue)
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-#define COMPARE_AND_SELECT_TEST(Function, DataType)                         \
+#define COMPARE_AND_SELECT_TEST(Function, DataType)                          \
     TEST_F(tensor_api_vector_compare_and_select_3510, Function##_##DataType) \
-    {                                                                      \
-        for (vector_bool maskValue = 0; maskValue < 2; ++maskValue) {         \
-            SCOPED_TRACE(maskValue);                                       \
-            test_##Function<DataType>(maskValue);                          \
-        }                                                                  \
+    {                                                                        \
+        for (vector_bool maskValue = 0; maskValue < 2; ++maskValue) {        \
+            SCOPED_TRACE(maskValue);                                         \
+            test_##Function<DataType>(maskValue);                            \
+        }                                                                    \
     }
 
 #define SELECT_TYPE_TEST(DataType) COMPARE_AND_SELECT_TEST(select, DataType)
