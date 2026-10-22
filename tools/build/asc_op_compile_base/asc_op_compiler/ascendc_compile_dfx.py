@@ -199,7 +199,7 @@ class DFXSectionGenerator:
     def _tran_dfx_info_to_string(self, string_value: str):
         if "oom" in get_current_build_config("tir.op_debug_config"):
             return [
-                f"(((((sizeof({string_value}) + 7) / 8) * 8 + 8 + 8 * {self.param_placeholder_num} + 2) >> \
+                f"(((((sizeof({string_value}) + 7) / 8) * 8 + 8 + 8 * {self.param_placeholder_num}) >> \
 {int((7 - i) * 8)}) & 0xff)"
                 for i in range(8)
             ]
@@ -208,7 +208,7 @@ class DFXSectionGenerator:
 
     def _tran_dfx_info_to_value_string(self, size_value: int):
         if "oom" in get_current_build_config("tir.op_debug_config"):
-            total_size = ((size_value + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
+            total_size = ((size_value + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num
         else:
             total_size = size_value + 8
         return [str((total_size >> ((7 - i) * 8)) & 0xFF) for i in range(8)]
@@ -235,8 +235,8 @@ class DFXSectionGenerator:
                 tiling_size = tiling_info.tiling_key_data_size[tiling_key]
             if "oom" in get_current_build_config("tir.op_debug_config"):
                 # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
-                # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
-                tiling_size = ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
+                # oom needs 8 * (input + output + shape_tensor + workspace)
+                tiling_size = ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num
             else:
                 tiling_size = tiling_size + 8
             parameter.args_dfx_info[-8:] = self._tran_dfx_info_to_uint8_t(tiling_size, ArgTypeSize.U64)

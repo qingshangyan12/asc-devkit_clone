@@ -8669,14 +8669,14 @@ void add_custom()
             cfg.current()["tir.op_debug_config"] = ["oom"]
             dfx_string = DFXSectionGenerator()._tran_dfx_info_to_string("tiling")
             compare_string = [
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 56) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 48) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 40) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 32) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 24) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 16) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 8) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 0) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 56) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 48) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 40) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 32) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 24) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 16) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 8) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0) >> 0) & 0xff)",
             ]
             self.assertEqual(dfx_string, compare_string)
 
@@ -8766,7 +8766,7 @@ void add_custom()
             value_string = DFXSectionGenerator()._tran_dfx_info_to_value_string(size_value)
 
             aligned_size = ((size_value + 7) // 8) * 8  # 16 -> 16
-            total_size = aligned_size + 8 + 8 * 0 + 2  # 16 + 8 + 0 + 2 = 26
+            total_size = aligned_size + 8 + 8 * 0  # 16 + 8 + 0 = 24
             expected_string = [
                 str((total_size >> 56) & 0xFF),
                 str((total_size >> 48) & 0xFF),
