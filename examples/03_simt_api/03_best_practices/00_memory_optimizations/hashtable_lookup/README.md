@@ -81,7 +81,7 @@ SoaTableNoDigest table;
 | Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间 |
 | read_main_memory_data(KB) | 任务执行期间每个block从GM读取的总数据量 |
 
-### Case 0：AoS逐槽探测基线
+### Case 0：AoS逐Bucket探测
 
 **优化目标**：使用哈希表查找的基本实现建立性能基线。
 
