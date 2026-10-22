@@ -999,7 +999,8 @@ CcuResult CreateMultiOpCopyV2(CcuKernelCtxBase& ctx, GroupCopyVar& var)
         uint32_t bufBase = index * ctx.moConfig.msInterleave;
         ccu::Event loopEvt0 = ctx.moRes.completedEvent[index * CCU_LOOP_CKE_NUM_COPY_V2 + 0];
         ccu::Event loopEvt1 = ctx.moRes.completedEvent[index * CCU_LOOP_CKE_NUM_COPY_V2 + 1];
-
+        HCCL_INFO("skip ccu::Func");
+        /*
         loops.body[index].reset(new ccu::Func([&ctx, index, bufBase, loopEvt0, loopEvt1, usedBufNum, &var]() {
             ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase], var.loopSrc[index], var.loopLen[index], loopEvt0, 1);
             ccu::EventWait(loopEvt0, 1);
@@ -1008,6 +1009,7 @@ CcuResult CreateMultiOpCopyV2(CcuKernelCtxBase& ctx, GroupCopyVar& var)
         }));
 
         loops.loops[index].reset(new ccu::Loop(loops.loopParam[index], loops.addrOffset[index], *loops.body[index]));
+        */
     }
     return CCU_SUCCESS;
 }
