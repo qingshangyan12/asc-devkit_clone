@@ -33,7 +33,7 @@ dst[i] = src0[i] + src1[i]
   - Key kernel steps
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct one-dimensional Tensors in GM and UB.
-    2. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` to move both inputs from GM to UB.
+    2. Use `asc::te::mutex` around the MTE2 pipeline and `asc::te::copy` to move both inputs from GM to UB.
     3. Use `all_mask` and `load` to load the UB data into Reg Tensors.
     4. Call the experimental `operator+` to perform element-wise addition.
     5. Use `store` and `asc::te::copy` to write the result back to UB and GM.

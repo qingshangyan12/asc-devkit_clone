@@ -49,7 +49,7 @@ Only the first element of each result region is valid. The remaining elements ar
   - Key kernel steps
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and layouts to construct the GM and UB Tensors.
-    2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `make_copy(copy_gm_to_ub{})` and `copy` to move the input from GM to UB.
+    2. Wrap the MTE2 pipeline with `asc::te::mutex`, and use `make_copy(copy_gm_to_ub{})` and `copy` to move the input from GM to UB.
     3. Use `all_mask<float>` and `load` to load 64 `float` values into a Reg Tensor.
     4. Call `reduce_sum<reduce_scope::element, float>`, `reduce_max`, and `reduce_min` to perform element-scope reductions.
     5. Use `store` to write the three UB result regions, then use `make_copy(copy_ub_to_gm{})` and `copy` to write them back to GM.
