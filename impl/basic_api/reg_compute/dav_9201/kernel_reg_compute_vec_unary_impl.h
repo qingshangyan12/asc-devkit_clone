@@ -25,6 +25,7 @@
 
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_cmpsel_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_vconv_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_pack_intf.h"
 #include "kernel_reg_compute_common_impl.h"
@@ -271,7 +272,9 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
         RegTensor<float> f32Src;
         RegTensor<float> f32Dst;
         RegTensor<half> f16Tmp;
+        RegTensor<half> f16High;
         MaskReg f32Mask;
+        MaskReg selectMask = CreateMask<half, MaskPattern::H>();
 
         UnPack<HighLowPart::LOWEST>(f32Mask, mask);
         UnPack<uint32_t, uint16_t, HighLowPart::LOWEST>((RegTensor<uint32_t>&)f16Tmp, (RegTensor<uint16_t>&)srcReg);
@@ -285,7 +288,8 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
         Cast<float, half, Internal::expHalf2FloatCastTrait>(f32Src, f16Tmp, f32Mask);
         ExpImpl<DefaultType, &normalMode, RegTensor<float>>(f32Dst, f32Src, f32Mask);
         Cast<half, float, Internal::expFloat2HalfCastTrait>(f16Tmp, f32Dst, f32Mask);
-        Pack<uint16_t, uint32_t, HighLowPart::HIGHEST>((RegTensor<uint16_t>&)dstReg, (RegTensor<uint32_t>&)f16Tmp);
+        Pack<uint16_t, uint32_t, HighLowPart::HIGHEST>((RegTensor<uint16_t>&)f16High, (RegTensor<uint32_t>&)f16Tmp);
+        Select(dstReg, dstReg, f16High, selectMask);
     } else if constexpr (sprMode.algo == ExpAlgo::PRECISION_1ULP_FTZ_FALSE) {
         MaskReg maskInf;
         MaskReg maskNegInf;
