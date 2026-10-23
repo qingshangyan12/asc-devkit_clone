@@ -17,7 +17,8 @@
 │   ├── figures                          // README中的图片资源
 │   ├── CMakeLists.txt                   // 编译工程文件
 │   ├── hashtable_lookup.asc              // SIMT哈希表查找优化路径实现
-│   └── README.md                        // 样例说明文档
+│   ├── README.md                  	     // 样例说明文档
+│   └── README_en.md               	     // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -112,11 +113,11 @@ __aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_ke
 
 **性能数据**：
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) |
 | ---- | :---------------: | :------------------------: |
 | 0    |     1311.297      |          672.645           |
 
-> read_main_memory_data(MB)为`Memory.csv`中各block的read_main_memory_datas(KB)求和。
+> read_main_memory_data_all(MB)为`Memory.csv`中各block的read_main_memory_data(KB)求和。
 
 **分析**：
 
@@ -154,7 +155,7 @@ __aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uin
 
 **性能数据**：
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 0    |    1311.297    |          672.645           |  -   |
 | 1    |    783.029    |          239.765           | 1.67x |
@@ -243,7 +244,7 @@ __aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTable* table,
 
 **性能数据**：
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 1    |    783.029    |          239.765           |  -   |
 | 2    |    483.379     |          279.439           | 1.62x |
@@ -295,7 +296,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 
 **性能数据**：
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | 性能对比 |
 | ---- | :---------------: | :------------------------: | :--: |
 | 2    |    483.379     |          279.439           |  -   |
 | 3    |    423.152    |          283.177           | 1.14x |

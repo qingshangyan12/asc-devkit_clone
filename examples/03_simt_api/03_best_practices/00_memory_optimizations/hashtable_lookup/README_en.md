@@ -112,11 +112,11 @@ __aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_ke
 
 **Performance Data**:
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) |
 | ---- | :---------------: | :------------------------: |
 | 0    |     1311.297      |          672.645           |
 
-> read_main_memory_data(MB) is the sum of read_main_memory_datas(KB) of all blocks in `Memory.csv`.
+> read_main_memory_data_all(MB) is the sum of read_main_memory_datas(KB) of all blocks in `Memory.csv`.
 
 **Analysis**:
 
@@ -154,10 +154,10 @@ __aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uin
 
 **Performance Data**:
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | Performance Comparison |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | Performance Comparison |
 | ---- | :---------------: | :------------------------: | :--: |
 | 0    |    1311.297    |          672.645           |  -   |
-| 1    |    783.029    |          239.765           | x1.67 |
+| 1    |    783.029    |          239.765           | 1.67x |
 
 **Analysis**:
 
@@ -243,10 +243,10 @@ __aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTable* table,
 
 **Performance Data**:
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | Performance Comparison |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | Performance Comparison |
 | ---- | :---------------: | :------------------------: | :--: |
 | 1    |    783.029    |          239.765           |  -   |
-| 2    |    483.379     |          279.439           | x1.62 |
+| 2    |    483.379     |          279.439           | 1.62x |
 
 **Analysis**:
 
@@ -295,10 +295,10 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
 
 **Performance Data**:
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | Performance Comparison |
+| Case | Task Duration(μs) | read_main_memory_data_all(MB) | Performance Comparison |
 | ---- | :---------------: | :------------------------: | :--: |
 | 2    |    483.379     |          279.439           |  -   |
-| 3    |    423.152    |          283.177           | x1.14 |
+| 3    |    423.152    |          283.177           | 1.14x |
 
 **Analysis**:
 
@@ -315,12 +315,12 @@ The key to Case 3 is reducing the actual number of memory access transactions wh
 
 ## Performance Comparison Summary
 
-| Case | Kernel Function | Task Duration(μs) | read_main_memory_data(MB) | vs. Case 0 |
+| Case | Kernel Function | Task Duration(μs) | read_main_memory_data_all(MB) | vs. Case 0 |
 | ---- | ------ | :---------------: | :------------------------: | :--------: |
-| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | x1.00 |
-| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | x1.67 |
-| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | x2.71 |
-| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | x3.10 |
+| 0    | `lookup_aos_kernel` | 1311.297 | 672.645 | 1.00x |
+| 1    | `lookup_soa_kernel` | 783.029 | 239.765 | 1.67x |
+| 2    | `lookup_soa_digest_swar_kernel` | 483.379 | 279.439 | 2.71x |
+| 3    | `lookup_coop_swar_kernel` | 423.152 | 283.177 | 3.10x |
 
 ## Tuning Recommendations
 
