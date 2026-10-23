@@ -86,6 +86,7 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aiv
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector

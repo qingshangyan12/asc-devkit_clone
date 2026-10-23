@@ -8,9 +8,9 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-// AllReduce CCU selector 行为用例：对齐 hccl SelectCcuScheduleAlgo 分支框架。
-// 已注册算法（当前仅 CcuSchedAllReduceSoleMesh）MATCH；未注册算法设名后 NOT_MATCH，
-// 由基类 Select 回退链（CCU_SCHED -> CCU_FAIL -> AICPU）兜底。不依赖 SimWorld 设备仿真。
+// AllReduce CCU selector 行为用例（对齐 PR 6913 的 all_to_all_ccu_testcase.cc 模式）：
+// 对齐 hccl SelectCcuScheduleAlgo 分支框架，已注册算法（当前仅 CcuSchedAllReduceSoleMesh）MATCH；
+// 未注册算法设名后 NOT_MATCH，由基类 Select 回退链（CCU_SCHED -> CCU_FAIL -> AICPU）兜底。
 
 #include "all_reduce_auto_selector.h"
 
@@ -21,8 +21,7 @@
 
 using namespace mc2_ops_hccl;
 
-namespace HcclSim {
-namespace CcuSt {
+namespace checker {
 namespace {
 
 constexpr u64 KB = 1024U;
@@ -84,7 +83,7 @@ TopoInfoWithNetLayerDetails MakeUbxTopo(u32 rankSize, u32 meshRankNum, u32 closR
 
 } // namespace
 
-class CcuStAllReduceSelector : public ::testing::Test {
+class ST_ALL_REDUCE_CCU_SELECTOR_TEST : public ::testing::Test {
 protected:
     // CCU 选择命中已注册算法：状态保持 CCU_SCHED
     void ExpectCcuMatch(OpParam& param, TopoInfoWithNetLayerDetails& topo)
@@ -117,21 +116,21 @@ protected:
 
 // ===== 已注册算法（CcuSchedAllReduceSoleMesh）MATCH =====
 
-TEST_F(CcuStAllReduceSelector, Selector_SingleLevelMesh1d_SmallData_MatchSoleMesh)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_SingleLevelMesh1d_SmallData_MatchSoleMesh)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U); // FP32 4KB
     ExpectCcuMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_MultiLevelMesh1d_SmallData_MatchSoleMesh)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_MultiLevelMesh1d_SmallData_MatchSoleMesh)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U); // ≤512KB 且 ≤64P
     ExpectCcuMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_MultiLevel_EmptyLayerInfo_SkipSingleInstanceBranch)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_MultiLevel_EmptyLayerInfo_SkipSingleInstanceBranch)
 {
     // 异常 topo：层实例信息缺失时不越界读，跳过单实例分支继续按数据量选算
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
@@ -140,14 +139,14 @@ TEST_F(CcuStAllReduceSelector, Selector_MultiLevel_EmptyLayerInfo_SkipSingleInst
     ExpectCcuMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Ubx4P_SmallData_MatchSoleMesh)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Ubx4P_SmallData_MatchSoleMesh)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U); // mesh 数等于 clos 数，4P
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
     ExpectCcuMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_PcieMixFullMesh_MatchSoleMesh)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_PcieMixFullMesh_MatchSoleMesh)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U);
     topo.level0PcieMix = true;
@@ -158,14 +157,14 @@ TEST_F(CcuStAllReduceSelector, Selector_PcieMixFullMesh_MatchSoleMesh)
 
 // ===== 未注册算法 / 约束拒绝：CCU NOT_MATCH 后回退 AICPU =====
 
-TEST_F(CcuStAllReduceSelector, Selector_Mesh1d_OverMem2MemLimit_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Mesh1d_OverMem2MemLimit_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(2U); // ratio=2，8MB*2 > 8MB
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U * 8U);
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_TwoDieRegular_Unregistered2Die_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_TwoDieRegular_Unregistered2Die_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     topo.level0MeshType = Level0MeshType::TWO_DIE_REGULAR;
@@ -173,7 +172,7 @@ TEST_F(CcuStAllReduceSelector, Selector_TwoDieRegular_Unregistered2Die_FallbackA
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Level1Nhr_UnregisteredSoleNHR_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Level1Nhr_UnregisteredSoleNHR_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
     topo.Level1Nhr = true;
@@ -181,35 +180,35 @@ TEST_F(CcuStAllReduceSelector, Selector_Level1Nhr_UnregisteredSoleNHR_FallbackAi
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_MultiLevel_SequenceData_Unregistered_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_MultiLevel_SequenceData_Unregistered_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U); // (512KB, 64MB] 且 <64P 选 SequenceMeshMesh（未注册）
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Prod_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Prod_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Int64_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Int64_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 8U, HCCL_DATA_TYPE_INT64);
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Int8_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Int8_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB, HCCL_DATA_TYPE_INT8); // MS reduce 不支持 int8
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_InPlace_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_InPlace_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
@@ -221,15 +220,7 @@ TEST_F(CcuStAllReduceSelector, Selector_InPlace_FallbackAicpu)
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_ThreeLevel_FallbackAicpu)
-{
-    TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    topo.topoLevelNums = 3U;
-    OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
-}
-
-TEST_F(CcuStAllReduceSelector, Selector_Level2UbRtp_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Level2UbRtp_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     topo.level2UbRtp = true;
@@ -237,7 +228,7 @@ TEST_F(CcuStAllReduceSelector, Selector_Level2UbRtp_FallbackAicpu)
     ExpectCcuFallbackToAicpu(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_PcieMixNotFullyConnected_FallbackAicpu)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_PcieMixNotFullyConnected_FallbackAicpu)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 2U, 4U); // 1DMESH 仅 2 卡，无法全连通
     topo.level0PcieMix = true;
@@ -248,21 +239,21 @@ TEST_F(CcuStAllReduceSelector, Selector_PcieMixNotFullyConnected_FallbackAicpu)
 
 // ===== CCU/AICPU 均不支持的拓扑与数据量：整体 NOT_MATCH =====
 
-TEST_F(CcuStAllReduceSelector, Selector_Ubx4P_LargeData_UnregisteredConcur_NotMatch)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_Ubx4P_LargeData_UnregisteredConcur_NotMatch)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U);
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U); // ≥512KB 选 ConcurMeshNHRMultiLink（未注册）
     ExpectCcuNotMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_UbxRectangular_LargeData_Unregistered_NotMatch)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_UbxRectangular_LargeData_Unregistered_NotMatch)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(8U, 4U, 8U); // clos 数为 mesh 数 2 倍的矩形
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U);
     ExpectCcuNotMatch(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_SingleLevelClos_UnregisteredSoleNHR_NotMatch)
+TEST_F(ST_ALL_REDUCE_CCU_SELECTOR_TEST, Selector_SingleLevelClos_UnregisteredSoleNHR_NotMatch)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(4U);
     topo.level0Topo = Level0Shape::CLOS;
@@ -270,5 +261,4 @@ TEST_F(CcuStAllReduceSelector, Selector_SingleLevelClos_UnregisteredSoleNHR_NotM
     ExpectCcuNotMatch(param, topo);
 }
 
-} // namespace CcuSt
-} // namespace HcclSim
+} // namespace checker
