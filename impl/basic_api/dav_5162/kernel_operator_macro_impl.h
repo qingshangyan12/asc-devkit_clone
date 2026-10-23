@@ -511,16 +511,7 @@ __aicore__ inline void matmul(
     }
 }
 
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void MmadFixCal(
-    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixBitModeParams& mmadFixParams)
-{
-    matmul(dst, left, right, (__cbuf__ int32_t*)get_imm(0), (uint64_t)0, mmadFixParams.GetConfig0());
-}
-
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void MmadFixCal(
-    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixParams& mmadFixParams)
+__aicore__ inline uint64_t EncodeMmadFixConfig0Dav5162(const MmadFixParams& mmadFixParams)
 {
     constexpr uint8_t POS_BIAS_MATRIX_INITVAL = 0;
     constexpr uint8_t POS_BIAS_MATRIX_BROADCAST = 1;
@@ -566,6 +557,21 @@ __aicore__ inline void MmadFixCal(
     config0 |= (uint64_t)(mmadFixParams.postProcHalfEnable ? 1 : 0) << POS_POST_PROC_HALF_ENABLE;
     config0 |= (uint64_t)(mmadFixParams.layoutCtrl ? 1 : 0) << POS_LAYOUT_CTRL;
     config0 |= (uint64_t)(mmadFixParams.n) << POS_N;
+    return config0;
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixBitModeParams& mmadFixParams)
+{
+    matmul(dst, left, right, (__cbuf__ int32_t*)get_imm(0), (uint64_t)0, mmadFixParams.GetConfig0());
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixParams& mmadFixParams)
+{
+    uint64_t config0 = EncodeMmadFixConfig0Dav5162(mmadFixParams);
 
     matmul(dst, left, right, (__cbuf__ int32_t*)get_imm(0), (uint64_t)0, config0);
 }
@@ -586,50 +592,7 @@ template <typename DstT, typename Src0T, typename Src1T, typename BiasT>
 __aicore__ inline void MmadFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, uint64_t bias, const MmadFixParams& mmadFixParams)
 {
-    constexpr uint8_t POS_BIAS_MATRIX_INITVAL = 0;
-    constexpr uint8_t POS_BIAS_MATRIX_BROADCAST = 1;
-    constexpr uint8_t POS_PRE_QUANT_MODE = 2;
-    constexpr uint8_t POS_PRE_RELU_MODE = 7;
-    constexpr uint8_t POS_POST_QUANT_MODE = 10;
-    constexpr uint8_t POS_ACT_POST_ENABLE = 15;
-    constexpr uint8_t POS_PRE_CLIP_RELU_MODE = 18;
-    constexpr uint8_t POS_ELTWISE_OP = 20;
-    constexpr uint8_t POS_ELTWISE_ANTIQ_ENABLE = 23;
-    constexpr uint8_t POS_ELTWISE_BROADCAST_ENABLE = 24;
-    constexpr uint8_t POS_ITA_ENABLE = 25;
-    constexpr uint8_t POS_BIAS_S32_ENABLE = 26;
-    constexpr uint8_t POS_HMAX_ENABLE = 27;
-    constexpr uint8_t POS_LSB_MASK = 28;
-    constexpr uint8_t POS_GEMV_CTRL = 31;
-    constexpr uint8_t POS_GROUP_MODE = 32;
-    constexpr uint8_t POS_DEPEND_ENABLE = 36;
-    constexpr uint8_t POS_INSTRI_D = 37;
-    constexpr uint8_t POS_POST_PROC_HALF_ENABLE = 39;
-    constexpr uint8_t POS_LAYOUT_CTRL = 40;
-    constexpr uint8_t POS_N = 48;
-
-    uint64_t config0 = 0;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixInitVal ? 1 : 0) << POS_BIAS_MATRIX_INITVAL;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixBroadcast ? 1 : 0) << POS_BIAS_MATRIX_BROADCAST;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preQuantMode)) << POS_PRE_QUANT_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preReluMode)) << POS_PRE_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.postQuantMode)) << POS_POST_QUANT_MODE;
-    config0 |= (uint64_t)(mmadFixParams.actPostMode) << POS_ACT_POST_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preClipReluMode)) << POS_PRE_CLIP_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.eltwiseOp)) << POS_ELTWISE_OP;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseAntiqEnable ? 1 : 0) << POS_ELTWISE_ANTIQ_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseBroadcastEnable ? 1 : 0) << POS_ELTWISE_BROADCAST_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.itaEnable ? 1 : 0) << POS_ITA_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.biasS32Enable ? 1 : 0) << POS_BIAS_S32_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.hmaxEnable ? 1 : 0) << POS_HMAX_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.lsbMask)) << POS_LSB_MASK;
-    config0 |= (uint64_t)(mmadFixParams.gemvCtrl ? 1 : 0) << POS_GEMV_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.groupMode) << POS_GROUP_MODE;
-    config0 |= (uint64_t)(mmadFixParams.dependEnable ? 1 : 0) << POS_DEPEND_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.instrId)) << POS_INSTRI_D;
-    config0 |= (uint64_t)(mmadFixParams.postProcHalfEnable ? 1 : 0) << POS_POST_PROC_HALF_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.layoutCtrl ? 1 : 0) << POS_LAYOUT_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.n) << POS_N;
+    uint64_t config0 = EncodeMmadFixConfig0Dav5162(mmadFixParams);
 
     if (mmadFixParams.biasMatrixBroadcast) {
         matmul(dst, left, right, (__cbuf__ int32_t*)get_imm(0), bias, config0);
@@ -649,50 +612,7 @@ template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadMxFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixParams& mmadFixParams)
 {
-    constexpr uint8_t POS_BIAS_MATRIX_INITVAL = 0;
-    constexpr uint8_t POS_BIAS_MATRIX_BROADCAST = 1;
-    constexpr uint8_t POS_PRE_QUANT_MODE = 2;
-    constexpr uint8_t POS_PRE_RELU_MODE = 7;
-    constexpr uint8_t POS_POST_QUANT_MODE = 10;
-    constexpr uint8_t POS_ACT_POST_ENABLE = 15;
-    constexpr uint8_t POS_PRE_CLIP_RELU_MODE = 18;
-    constexpr uint8_t POS_ELTWISE_OP = 20;
-    constexpr uint8_t POS_ELTWISE_ANTIQ_ENABLE = 23;
-    constexpr uint8_t POS_ELTWISE_BROADCAST_ENABLE = 24;
-    constexpr uint8_t POS_ITA_ENABLE = 25;
-    constexpr uint8_t POS_BIAS_S32_ENABLE = 26;
-    constexpr uint8_t POS_HMAX_ENABLE = 27;
-    constexpr uint8_t POS_LSB_MASK = 28;
-    constexpr uint8_t POS_GEMV_CTRL = 31;
-    constexpr uint8_t POS_GROUP_MODE = 32;
-    constexpr uint8_t POS_DEPEND_ENABLE = 36;
-    constexpr uint8_t POS_INSTRI_D = 37;
-    constexpr uint8_t POS_POST_PROC_HALF_ENABLE = 39;
-    constexpr uint8_t POS_LAYOUT_CTRL = 40;
-    constexpr uint8_t POS_N = 48;
-
-    uint64_t config0 = 0;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixInitVal ? 1 : 0) << POS_BIAS_MATRIX_INITVAL;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixBroadcast ? 1 : 0) << POS_BIAS_MATRIX_BROADCAST;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preQuantMode)) << POS_PRE_QUANT_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preReluMode)) << POS_PRE_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.postQuantMode)) << POS_POST_QUANT_MODE;
-    config0 |= (uint64_t)(mmadFixParams.actPostMode) << POS_ACT_POST_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preClipReluMode)) << POS_PRE_CLIP_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.eltwiseOp)) << POS_ELTWISE_OP;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseAntiqEnable ? 1 : 0) << POS_ELTWISE_ANTIQ_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseBroadcastEnable ? 1 : 0) << POS_ELTWISE_BROADCAST_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.itaEnable ? 1 : 0) << POS_ITA_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.biasS32Enable ? 1 : 0) << POS_BIAS_S32_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.hmaxEnable ? 1 : 0) << POS_HMAX_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.lsbMask)) << POS_LSB_MASK;
-    config0 |= (uint64_t)(mmadFixParams.gemvCtrl ? 1 : 0) << POS_GEMV_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.groupMode) << POS_GROUP_MODE;
-    config0 |= (uint64_t)(mmadFixParams.dependEnable ? 1 : 0) << POS_DEPEND_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.instrId)) << POS_INSTRI_D;
-    config0 |= (uint64_t)(mmadFixParams.postProcHalfEnable ? 1 : 0) << POS_POST_PROC_HALF_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.layoutCtrl ? 1 : 0) << POS_LAYOUT_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.n) << POS_N;
+    uint64_t config0 = EncodeMmadFixConfig0Dav5162(mmadFixParams);
 
     matmul_mx_to_cbuf(dst, left, right, (__cbuf__ int32_t*)get_imm(0), (uint64_t)0, config0);
 }
@@ -713,50 +633,7 @@ template <typename DstT, typename Src0T, typename Src1T, typename BiasT>
 __aicore__ inline void MmadMxFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, uint64_t bias, const MmadFixParams& mmadFixParams)
 {
-    constexpr uint8_t POS_BIAS_MATRIX_INITVAL = 0;
-    constexpr uint8_t POS_BIAS_MATRIX_BROADCAST = 1;
-    constexpr uint8_t POS_PRE_QUANT_MODE = 2;
-    constexpr uint8_t POS_PRE_RELU_MODE = 7;
-    constexpr uint8_t POS_POST_QUANT_MODE = 10;
-    constexpr uint8_t POS_ACT_POST_ENABLE = 15;
-    constexpr uint8_t POS_PRE_CLIP_RELU_MODE = 18;
-    constexpr uint8_t POS_ELTWISE_OP = 20;
-    constexpr uint8_t POS_ELTWISE_ANTIQ_ENABLE = 23;
-    constexpr uint8_t POS_ELTWISE_BROADCAST_ENABLE = 24;
-    constexpr uint8_t POS_ITA_ENABLE = 25;
-    constexpr uint8_t POS_BIAS_S32_ENABLE = 26;
-    constexpr uint8_t POS_HMAX_ENABLE = 27;
-    constexpr uint8_t POS_LSB_MASK = 28;
-    constexpr uint8_t POS_GEMV_CTRL = 31;
-    constexpr uint8_t POS_GROUP_MODE = 32;
-    constexpr uint8_t POS_DEPEND_ENABLE = 36;
-    constexpr uint8_t POS_INSTRI_D = 37;
-    constexpr uint8_t POS_POST_PROC_HALF_ENABLE = 39;
-    constexpr uint8_t POS_LAYOUT_CTRL = 40;
-    constexpr uint8_t POS_N = 48;
-
-    uint64_t config0 = 0;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixInitVal ? 1 : 0) << POS_BIAS_MATRIX_INITVAL;
-    config0 |= (uint64_t)(mmadFixParams.biasMatrixBroadcast ? 1 : 0) << POS_BIAS_MATRIX_BROADCAST;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preQuantMode)) << POS_PRE_QUANT_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preReluMode)) << POS_PRE_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.postQuantMode)) << POS_POST_QUANT_MODE;
-    config0 |= (uint64_t)(mmadFixParams.actPostMode) << POS_ACT_POST_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.preClipReluMode)) << POS_PRE_CLIP_RELU_MODE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.eltwiseOp)) << POS_ELTWISE_OP;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseAntiqEnable ? 1 : 0) << POS_ELTWISE_ANTIQ_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.eltwiseBroadcastEnable ? 1 : 0) << POS_ELTWISE_BROADCAST_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.itaEnable ? 1 : 0) << POS_ITA_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.biasS32Enable ? 1 : 0) << POS_BIAS_S32_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.hmaxEnable ? 1 : 0) << POS_HMAX_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.lsbMask)) << POS_LSB_MASK;
-    config0 |= (uint64_t)(mmadFixParams.gemvCtrl ? 1 : 0) << POS_GEMV_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.groupMode) << POS_GROUP_MODE;
-    config0 |= (uint64_t)(mmadFixParams.dependEnable ? 1 : 0) << POS_DEPEND_ENABLE;
-    config0 |= (uint64_t)(static_cast<uint8_t>(mmadFixParams.instrId)) << POS_INSTRI_D;
-    config0 |= (uint64_t)(mmadFixParams.postProcHalfEnable ? 1 : 0) << POS_POST_PROC_HALF_ENABLE;
-    config0 |= (uint64_t)(mmadFixParams.layoutCtrl ? 1 : 0) << POS_LAYOUT_CTRL;
-    config0 |= (uint64_t)(mmadFixParams.n) << POS_N;
+    uint64_t config0 = EncodeMmadFixConfig0Dav5162(mmadFixParams);
 
     if (mmadFixParams.biasMatrixBroadcast) {
         matmul_mx_to_cbuf(dst, left, right, (__cbuf__ int32_t*)get_imm(0), bias, config0);
