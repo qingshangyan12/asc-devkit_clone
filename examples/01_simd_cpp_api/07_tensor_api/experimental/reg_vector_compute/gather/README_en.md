@@ -48,7 +48,7 @@ Indexes range from 0 to 127 and represent element positions within the source re
   - Key kernel steps
 
     1. Construct GM and UB Tensors using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and a layout.
-    2. Enclose the MTE2 pipeline operations with `asc_lock/asc_unlock`, and transfer source data and indexes from GM to UB using `make_copy(copy_gm_to_ub{})` and `copy`.
+    2. Enclose the MTE2 pipeline operations with `asc::te::mutex`, and transfer source data and indexes from GM to UB using `make_copy(copy_gm_to_ub{})` and `copy`.
     3. Use `update_mask<half>` to create a mask with 128 active elements, load source data and indexes with `load`, and set the active elements with `with_mask`.
     4. Call `gather(source_reg, index_reg)` to gather elements by index. The result inherits the index register mask.
     5. Use `store` to write to the UB output Tensor, then transfer the result to GM using `make_copy(copy_ub_to_gm{})` and `copy`.
