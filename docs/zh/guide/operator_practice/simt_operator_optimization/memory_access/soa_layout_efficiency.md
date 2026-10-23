@@ -12,7 +12,7 @@
 
 **图1 内存布局示意图**
 
-<img src="../../../figures/soa_aos_layout.png">
+![内存布局示意图](../../../figures/soa_aos_layout.png)
 
 下文性能数据均使用msOpProf工具在Ascend 950PR产品上采集，指标为Task Duration（Task整体耗时，即算子端到端耗时）。
 
