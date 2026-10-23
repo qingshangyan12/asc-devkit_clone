@@ -14,7 +14,9 @@
 
 ![内存布局示意图](../../../figures/soa_aos_layout.png)
 
+<!-- npu="950" id1 -->
 下文性能数据均使用msOpProf工具在Ascend 950PR产品上采集，指标为Task Duration（Task整体耗时，即算子端到端耗时）。
+<!-- end id1 -->
 
 【反例】AoS内存排布场景，8B的key和32B的value连续排布，组成一个Bucket结构，多个Bucket连续排布组成一个数组，查找逻辑逐Bucket读8B key进行比较。每个线程独立负责一条查询key。
 
