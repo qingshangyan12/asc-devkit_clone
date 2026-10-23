@@ -538,6 +538,16 @@ HcclResult SendRecvRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& th
     const ChannelInfo& recvChannel = sendRecvInfo.sendRecvChannels_.rxChannel_;
     const std::vector<DataSlice>& srcSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.srcSlices_;
     const std::vector<DataSlice>& dstSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.dstSlices_;
+    HCCL_ERROR(
+        "[PROBE] wr SendRecvRead enter, thread[%llu], txCh[%llu], rxCh[%llu], repeatNum[%zu].", thread,
+        sendChannel.handle, recvChannel.handle, srcSlices.size());
+    for (size_t i = 0; i < srcSlices.size() && i < 2U; ++i) {
+        HCCL_ERROR(
+            "[PROBE] wr SendRecvRead slice[%zu], src[%p]+%llu, dst[%p]+%llu, size[%llu].", i, srcSlices[i].addr_,
+            static_cast<unsigned long long>(srcSlices[i].offset_), dstSlices[i].addr_,
+            static_cast<unsigned long long>(dstSlices[i].offset_),
+            static_cast<unsigned long long>(srcSlices[i].size_));
+    }
     u32 repeatNum = srcSlices.size();
     // 向read rank发送rx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
@@ -735,6 +745,10 @@ HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const
 
 HcclResult LocalCopy(const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice)
 {
+    HCCL_ERROR(
+        "[PROBE] wr LocalCopy enter, thread[%llu], src[%p]+%llu, dst[%p]+%llu, size[%llu].", thread, srcSlice.addr_,
+        static_cast<unsigned long long>(srcSlice.offset_), dstSlice.addr_,
+        static_cast<unsigned long long>(dstSlice.offset_), static_cast<unsigned long long>(srcSlice.size_));
     CHK_PRT_RET(
         srcSlice.size_ == 0, HCCL_WARNING("[AlgDataTransWrapper] LocalCopy: src slice size is [%u].", srcSlice.size_),
         HcclResult::HCCL_SUCCESS);
