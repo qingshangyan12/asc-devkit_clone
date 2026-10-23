@@ -95,7 +95,6 @@ struct AoSBucket {
   uint64_t key;
   float value[DIM];
 };
-AoSBucket table[CAPACITY];
 
 __aicore__ inline uint32_t find_aos(const AoSBucket* table, uint64_t target_key, uint32_t start) {
   ...
@@ -127,7 +126,7 @@ Data load and store are performed in units of Cache Lines. AoS stores the key an
 
 ### Case 1: Pure SoA Layout Refactoring
 
-**Optimization Objective**: Store the key and value fields in separate partitions (SoA, Structure of Arrays), completely decoupling the probing path from the value region, and eliminating the interference of storing the value inside the Bucket on the probing memory access span.
+**Optimization Objective**: Adopt SoA (Structure of Arrays) to optimize the memory layout and improve the memory access efficiency of key lookup.
 
 **Core Implementation**: The algorithm is identical to Case 0; the only difference is the memory layout. SoA stores all 8MB of keys contiguously together and all 32MB of values contiguously together, with keys and values stored separately.
 
@@ -138,7 +137,7 @@ struct SoaTable {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTable table;
+
 __aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
@@ -188,7 +187,6 @@ struct SoaTableWithDigest {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTableWithDigest table;
 
 // digest: the high 8 bits of the key's hash value
 __host__ __aicore__ inline uint8_t digest_of(uint64_t hashed) {
