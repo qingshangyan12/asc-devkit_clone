@@ -42,7 +42,6 @@ English | [简体中文](./README.md)
 - Vector computation API documentation optimized, with instruction constraints supplemented ([PR#2676](https://gitcode.com/cann/asc-devkit/pull/2676)).
 - VitePress documentation site built to provide AscendC document preview capability ([PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)).
 - Overview of performance optimization for hybrid SIMD and SIMT programming added ([PR#2736](https://gitcode.com/cann/asc-devkit/pull/2736)).
-- C API Reg dual-return documentation added for `asc_add_carry`, `asc_sub_carry`, `asc_intlv`, `asc_deintlv`, and `asc_loadalign_deintlv`; see the [CANN 9.2.0 release notes](./docs/zh/api/appendix/Release_Notes/CANN_9_2_0.md).
 
 For detailed information on all historical releases and updates, please refer to [CHANGELOG_en.md](./CHANGELOG_en.md).
 

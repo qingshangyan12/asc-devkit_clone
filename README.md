@@ -39,7 +39,6 @@
 - 优化矢量计算API文档，补充指令约束等（[PR#2676](https://gitcode.com/cann/asc-devkit/pull/2676)）。
 - 搭建VitePress文档站点，提供AscendC资料预览功能（[PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)）。
 - 增加SIMD与SIMT混合编程性能优化概述（[PR#2736](https://gitcode.com/cann/asc-devkit/pull/2736)）。
-- 补充C API Reg双返回值接口资料，涵盖`asc_add_carry`、`asc_sub_carry`以及`asc_intlv`、`asc_deintlv`、`asc_loadalign_deintlv`的返回值重载，详见[CANN 9.2.0版本说明](./docs/zh/api/appendix/Release_Notes/CANN_9_2_0.md)。
 
 有关所有历史版本及更新的详细信息，请参阅[CHANGELOG.md](./CHANGELOG.md)。
 
