@@ -548,7 +548,7 @@ ResourceStatus ValidateManifestFileTable(
 
 bool CheckRegistryLimits(const StagedResources& staged, ResourceSourceType sourceType, uint64_t& bytes, uint64_t& files)
 {
-    if (!staged.discovered || staged.conflict) {
+    if (!staged.discovered) {
         return true;
     }
     const uint64_t currentBytes = bytes;
@@ -1197,9 +1197,6 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
         }
         ++loaded;
     }
-    if (stage.external.conflict || stage.custom.conflict || stage.builtIn.conflict) {
-        return ResourceStatus::Conflict;
-    }
     if (loaded == 0U && !libraries.empty()) {
         ASCENDLOGW(
             "No compile resource SO was loaded successfully: total=%zu skipped=%zu first_failure=%s(%d)",
@@ -1297,27 +1294,16 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     ASCENDLOGI(
         "Committing compile resources: external=%zu custom=%zu built_in=%zu", stage.external.resources.size(),
         stage.custom.resources.size(), stage.builtIn.resources.size());
-    ResourceStatus status = ResourceStatus::Success;
-    auto checkCategory = [&status](StagedResources& staged, ResourceStore& committed, ResourceSourceType sourceType) {
-        if (!staged.discovered && !staged.conflict) {
+    auto checkCategory = [](StagedResources& staged, ResourceStore& committed) {
+        if (!staged.discovered) {
             return;
         }
-        if (!staged.conflict) {
-            DiscardDuplicateResources(staged, committed);
-        }
-        if (staged.conflict) {
-            ASCENDLOGW(
-                "Compile resource category will not be committed because conflicts were detected: source_type=%s "
-                "resource_count=%zu",
-                SourceTypeName(sourceType), staged.resources.size());
-            status = ResourceStatus::Conflict;
-            return;
-        }
+        DiscardDuplicateResources(staged, committed);
         committed.reserve(committed.size() + staged.resources.size());
     };
-    checkCategory(stage.external, externalResources_, ResourceSourceType::External);
-    checkCategory(stage.custom, customResources_, ResourceSourceType::Custom);
-    checkCategory(stage.builtIn, builtInResources_, ResourceSourceType::BuiltIn);
+    checkCategory(stage.external, externalResources_);
+    checkCategory(stage.custom, customResources_);
+    checkCategory(stage.builtIn, builtInResources_);
     uint64_t bytes = resourceBytes_;
     uint64_t files = resourceFileCount_;
     if (!CheckRegistryLimits(stage.external, ResourceSourceType::External, bytes, files) ||
@@ -1326,7 +1312,7 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
         return ResourceStatus::InvalidResource;
     }
     auto commitCategory = [](StagedResources& staged, ResourceStore& committed) {
-        if (!staged.discovered || staged.conflict) {
+        if (!staged.discovered) {
             return;
         }
         committed.merge(staged.resources);
@@ -1339,9 +1325,10 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     ASCENDLOGI(
         "Finished committing compile resources: status=%s(%d) registered_external=%zu registered_custom=%zu "
         "registered_built_in=%zu total_files=%" PRIu64 " total_bytes=%" PRIu64,
-        ResourceStatusName(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
-        builtInResources_.size(), resourceFileCount_, resourceBytes_);
-    return status;
+        ResourceStatusName(ResourceStatus::Success), static_cast<int>(ResourceStatus::Success),
+        externalResources_.size(), customResources_.size(), builtInResources_.size(), resourceFileCount_,
+        resourceBytes_);
+    return ResourceStatus::Success;
 }
 
 ResourceStatus ResourceRegistry::Load(const char* directory)
@@ -1370,11 +1357,8 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
             libraries.size());
         StageState stage;
         status = LoadLibraries(libraries, stage);
-        if (status == ResourceStatus::Success || status == ResourceStatus::Conflict) {
-            const ResourceStatus commitStatus = Commit(stage);
-            if (status == ResourceStatus::Success || commitStatus != ResourceStatus::Success) {
-                status = commitStatus;
-            }
+        if (status == ResourceStatus::Success) {
+            status = Commit(stage);
         }
     }
     if (automatic) {

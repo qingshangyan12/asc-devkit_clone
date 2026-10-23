@@ -1034,7 +1034,6 @@ TEST_F(ResourceRegistryTest, LoadLibrariesKeepsFirstDuplicateIdDespiteContentDif
         EXPECT_EQ(
             ResourceRegistry::LoadLibraries({{second.string(), ResourceSourceType::External}}, stage),
             ResourceStatus::Success);
-        EXPECT_FALSE(stage.external.conflict);
         EXPECT_EQ(stage.external.resources.size(), 2U);
         EXPECT_EQ(stage.external.bytes, 2U);
         EXPECT_EQ(stage.external.files, 2U);
@@ -1134,16 +1133,8 @@ TEST_F(ResourceRegistryTest, CommitKeepsFirstResourceAndRejectsInvalidTransactio
     conflict.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
     conflict.external.resources.emplace("unique", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Success);
-    EXPECT_FALSE(conflict.external.conflict);
     EXPECT_EQ(registry_->FindResource("existing"), first);
     EXPECT_NE(registry_->FindResource("unique"), nullptr);
-
-    StageState preconflicted;
-    preconflicted.custom.discovered = true;
-    preconflicted.custom.conflict = true;
-    preconflicted.custom.resources.emplace("preconflict", MakeEntry(ResourceSourceType::Custom));
-    EXPECT_EQ(registry_->Commit(preconflicted), ResourceStatus::Conflict);
-    EXPECT_EQ(registry_->FindResource("preconflict"), nullptr);
 
     StageState bytes;
     bytes.external.discovered = true;
@@ -1201,7 +1192,6 @@ TEST_F(ResourceRegistryTest, CommitKeepsFirstDuplicateIdDespiteContentDifference
             category.resources.emplace("shared", std::move(incoming));
             category.resources.emplace("unique", MakeEntry(type));
             EXPECT_EQ(registry_->Commit(stage), ResourceStatus::Success);
-            EXPECT_FALSE(category.conflict);
             EXPECT_EQ(registry_->FindResource("shared"), committed);
             EXPECT_NE(registry_->FindResource("unique"), nullptr);
             EXPECT_EQ(registry_->resourceBytes_, 1U);

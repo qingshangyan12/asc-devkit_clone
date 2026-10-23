@@ -38,7 +38,7 @@ aclError KernelSpecializationSession::LoadAndMaterializeCompilationResource(
 {
     ResourceRegistry& resourceRegistry = ResourceRegistry::Instance();
     const ResourceStatus loadStatus = resourceRegistry.Load(nullptr);
-    if (loadStatus != ResourceStatus::Success && loadStatus != ResourceStatus::Conflict) {
+    if (loadStatus != ResourceStatus::Success) {
         ASCENDLOGE(
             "Failed to load compilation resources before specializing resourceId '%s': status=%d; check the "
             "preceding ResourceRegistry logs and configured OPP paths",
