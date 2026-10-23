@@ -8,6 +8,7 @@
 - **[mmad计算](mmad_compute/mmad_compute.md)**
 - **[mmad计算关键特性说明](mmad_compute_key_features/mmad_compute_key_features.md)**
 - **[mmad计算辅助配置接口](mmad_compute_aux_config.md)**
+- **[Cube数据填充](cube_data_fill/cube_data_fill.md)**
 - **[矩阵计算的搬出](cube_compute_store/cube_compute_store.md)**
 - **[矩阵搬出关键特性说明](cube_store_key_features/cube_store_key_features.md)**
 

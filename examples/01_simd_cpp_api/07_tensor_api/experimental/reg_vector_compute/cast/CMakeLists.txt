@@ -37,6 +37,8 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:-iquote${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../include>
+    $<$<COMPILE_LANGUAGE:ASC>:-iquote${CMAKE_CURRENT_SOURCE_DIR}/../../../../../..>
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
