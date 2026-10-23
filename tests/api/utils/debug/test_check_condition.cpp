@@ -49,9 +49,9 @@ TEST(CheckConditionTest, ExitsWhenConditionIsFalse)
     int* nullPtr = nullptr;
 
     EXPECT_EXIT(
-        ASC_HOST_CHECK_CONDITION(nullPtr != nullptr, "warning nullPtr is nullptr"),
+        ASC_HOST_CHECK_CONDITION(nullPtr != nullptr, "error nullPtr is nullptr"),
         ::testing::ExitedWithCode(EXIT_FAILURE),
-        "ASC_HOST_CHECK_CONDITION failed: warning nullPtr is nullptr, file=.*test_check_condition.cpp, line=[0-9]+");
+        "ASC_HOST_CHECK_CONDITION failed: error nullPtr is nullptr, file=.*test_check_condition.cpp, line=[0-9]+");
 }
 
 static_assert(std::is_convertible_v<int*, const void*>);
