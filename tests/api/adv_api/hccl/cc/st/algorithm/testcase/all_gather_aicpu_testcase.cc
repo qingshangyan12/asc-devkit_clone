@@ -297,6 +297,18 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_o
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
 }
 
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_blind_select_uses_sole_nhr_on_two_level_mesh)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    param.DataDes.count = 0U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSoleNHR");
+}
+
 TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_calculates_two_level_resources)
 {
     OpParam param = MakeAicpuParam();
