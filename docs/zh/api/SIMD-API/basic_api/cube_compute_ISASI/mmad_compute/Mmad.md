@@ -347,6 +347,6 @@ Atlas A2系列产品
   对于整数类型只有饱和模式。
 
 ## 调用示例
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->
