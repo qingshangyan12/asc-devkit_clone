@@ -148,6 +148,14 @@ __aicore__ inline void Compare(
     Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<
+        PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, mask, repeatTime, repeatParams);
+#else
     using VectorElementU = VectorOperand::ElementT<U, Operand0>;
     using VectorElementT = VectorOperand::ElementT<T, Operand1>;
     using SrcPrimType = PrimT<VectorElementT>;
@@ -155,6 +163,7 @@ __aicore__ inline void Compare(
     VcmpvImpl<SrcPrimType, DstPrimType, isSetMask>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -194,6 +203,14 @@ __aicore__ inline void Compare(
     Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<
+        PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, mask, repeatTime, repeatParams);
+#else
     using VectorElementU = VectorOperand::ElementT<U, Operand0>;
     using VectorElementT = VectorOperand::ElementT<T, Operand1>;
     using SrcPrimType = PrimT<VectorElementT>;
@@ -201,6 +218,7 @@ __aicore__ inline void Compare(
     VcmpvImpl<SrcPrimType, DstPrimType, isSetMask>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -233,11 +251,18 @@ template <
 __aicore__ inline void Compare(
     Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask[], const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugSrc0, debugSrc1, cmpMode, mask, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     VcmpImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), cmpMode, mask,
         repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -270,11 +295,18 @@ template <
 __aicore__ inline void Compare(
     Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugSrc0, debugSrc1, cmpMode, mask, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     VcmpImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), cmpMode, mask,
         repeatParams);
+#endif
 }
 
 /*
@@ -336,6 +368,13 @@ template <
         int>::type>
 __aicore__ inline void Compare(Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, count);
+#else
     using VectorElementU = VectorOperand::ElementT<U, Operand0>;
     using VectorElementT = VectorOperand::ElementT<T, Operand1>;
     using SrcPrimType = PrimT<VectorElementT>;
@@ -352,6 +391,7 @@ __aicore__ inline void Compare(Operand0 dst, Operand1 src0, Operand2 src1, CMPMO
     VcmpvImpl(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, count);
+#endif
 }
 
 template <typename T>
@@ -380,6 +420,10 @@ template <
         int>::type>
 __aicore__ inline void GetCmpMask(Operand0 dst)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::GetCmpMask<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -388,6 +432,7 @@ __aicore__ inline void GetCmpMask(Operand0 dst)
     }
 #endif
     GetCmpMaskImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst));
+#endif
 }
 
 template <typename T>
@@ -415,6 +460,10 @@ template <
         int>::type>
 __aicore__ inline void SetCmpMask(Operand0 src)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::SetCmpMask<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugSrc);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -423,6 +472,7 @@ __aicore__ inline void SetCmpMask(Operand0 src)
     }
 #endif
     SetCmpMaskImpl((__ubuf__ PrimType*)GetUnderlyingPtr(src));
+#endif
 }
 
 /* **************************************************************************************************
@@ -720,11 +770,19 @@ template <
 __aicore__ inline void Select(
     Operand0 dst, Operand1 src0, Operand2 src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Select<PrimT<VectorOperand::ElementT<T, Operand0>>, selMode>(
+        debugDst, debugSrc0, debugSrc1, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     SelectCal<PrimType, selMode>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U>
@@ -755,6 +813,13 @@ template <
 __aicore__ inline void Select(
     Operand0 dst, Operand1 selMask, Operand2 src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSelMask = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(selMask);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    return AscendC::Select<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSelMask, debugSrc0, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using DataPrimType = PrimT<VectorElementT>;
@@ -762,6 +827,7 @@ __aicore__ inline void Select(
     SelectCal<DataPrimType, MaskPrimType>(
         (__ubuf__ DataPrimType*)GetUnderlyingPtr(dst), (__ubuf__ MaskPrimType*)GetUnderlyingPtr(selMask),
         (__ubuf__ DataPrimType*)GetUnderlyingPtr(src0), repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -973,9 +1039,16 @@ __aicore__ inline void Compares(
     const UnaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(
@@ -993,9 +1066,16 @@ __aicore__ inline void Compares(
     const UnaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(
@@ -1014,9 +1094,16 @@ __aicore__ inline void CompareScalar(
     const UnaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(
@@ -1035,9 +1122,16 @@ __aicore__ inline void CompareScalar(
     const UnaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(
@@ -1062,6 +1156,12 @@ template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, 
 __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, uint32_t count)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, count);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
@@ -1103,6 +1203,7 @@ __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, C
                 (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0), src1, cmpMode,
                 count);
         }
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "Compares")) {
@@ -1149,6 +1250,12 @@ template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, 
 __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, uint32_t count)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, count);
+#else
         static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
         static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
@@ -1189,6 +1296,7 @@ __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& sr
                 (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0), src1, cmpMode,
                 count);
         }
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "CompareScalar")) {
@@ -1288,7 +1396,15 @@ __aicore__ inline void Select(
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime,
+            repeatParams);
+#else
         VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         MaskSetter::Instance().SetMask(isSetMask);
@@ -1305,7 +1421,14 @@ __aicore__ inline void Select(
     const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, isSetMask, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime, repeatParams);
+#else
     VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
 }
 #endif
 
@@ -1316,7 +1439,15 @@ __aicore__ inline void Select(
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime,
+            repeatParams);
+#else
         VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         MaskSetter::Instance().SetMask(isSetMask);
@@ -1333,7 +1464,14 @@ __aicore__ inline void Select(
     const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, isSetMask, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime, repeatParams);
+#else
     VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
 }
 #endif
 
@@ -1353,7 +1491,14 @@ __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
 {
     if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, count);
+#else
         VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, count);
+#endif
     } else {
 #if ASCENDC_CPU_DEBUG
         if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Select")) {
@@ -1391,7 +1536,14 @@ template <typename T0, typename T1, const BinaryConfig& config, typename T2, typ
 __aicore__ inline void Select(
     const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, count);
+#else
     VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, count);
+#endif
 }
 #endif
 #endif

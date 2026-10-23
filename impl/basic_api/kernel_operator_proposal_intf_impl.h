@@ -218,14 +218,29 @@ template <
     typename T, typename Operand0, typename Source0, typename Source1, typename Source2, typename Source3,
     typename Std::enable_if<
         VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
-            VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() &&
-            VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>(),
         int>::type>
 __aicore__ inline void MrgSort(
     Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& src, const MrgSort4Info& params)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    MrgSortSrcList<PrimT<VectorOperand::ElementT<T, Operand0>>> debugSrc;
+    debugSrc.src1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src.src1);
+    debugSrc.src2 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src.src2);
+    if (params.validBit & 0x4) {
+        debugSrc.src3 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src.src3);
+    }
+    if (params.validBit & 0x8) {
+        debugSrc.src4 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src.src4);
+    }
+    return AscendC::MrgSort<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc, params);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
@@ -255,6 +270,7 @@ __aicore__ inline void MrgSort(
         (__ubuf__ PrimType*)GetUnderlyingPtr(src.src3), (__ubuf__ PrimType*)GetUnderlyingPtr(src.src4)};
 
     Vmrgsort4Cal((__ubuf__ PrimType*)GetUnderlyingPtr(dst), addrArray, src1, config);
+#endif
 }
 #endif
 
@@ -525,8 +541,10 @@ template <
     typename Source3,
     typename Std::enable_if<
         VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
-            VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() &&
-            VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>(),
         int>::type>
@@ -534,6 +552,20 @@ __aicore__ inline void MrgSort(
     Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& sortList,
     const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    MrgSortSrcList<PrimT<VectorOperand::ElementT<T, Operand0>>> debugSortList;
+    debugSortList.src1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sortList.src1);
+    debugSortList.src2 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sortList.src2);
+    if (validBit & 0x4) {
+        debugSortList.src3 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sortList.src3);
+    }
+    if (validBit & 0x8) {
+        debugSortList.src4 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sortList.src4);
+    }
+    return AscendC::MrgSort<PrimT<VectorOperand::ElementT<T, Operand0>>, isExhaustedSuspension>(
+        debugDst, debugSortList, elementCountList, sortedNum, validBit, repeatTime);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if (__NPU_ARCH__ != 5102)
@@ -572,6 +604,7 @@ __aicore__ inline void MrgSort(
         sortedNum[2] = (res >> (2 * shiftBase)) & validBitMask;
         sortedNum[3] = (res >> (3 * shiftBase)) & validBitMask;
     }
+#endif
 }
 #endif
 
@@ -659,6 +692,14 @@ template <
         int>::type>
 __aicore__ inline void Sort(Operand0 dst, Operand1 concat, Operand2 index, Operand3 tmp, const int32_t repeatTime)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugConcat = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(concat);
+    auto debugIndex = VectorOperand::ToDebugTensor<uint32_t>(index);
+    auto debugTmp = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(tmp);
+    return AscendC::Sort<PrimT<VectorOperand::ElementT<T, Operand0>>, isFullSort>(
+        debugDst, debugConcat, debugIndex, debugTmp, repeatTime);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ProposalIntriParams params;
@@ -672,6 +713,7 @@ __aicore__ inline void Sort(Operand0 dst, Operand1 concat, Operand2 index, Opera
             GetUnderlyingPtr(dst), GetUnderlyingPtr(concat), GetUnderlyingPtr(index), GetUnderlyingPtr(tmp),
             repeatTime);
     }
+#endif
 }
 #endif
 

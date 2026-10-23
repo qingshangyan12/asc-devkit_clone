@@ -1105,10 +1105,18 @@ __aicore__ inline void ReduceDataBlock(
     Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReduceDataBlock<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReduceDataBlockCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#endif
 }
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask>
@@ -1141,10 +1149,18 @@ __aicore__ inline void ReduceDataBlock(
     Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReduceDataBlock<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReduceDataBlockCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#endif
 }
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask>
@@ -1176,10 +1192,18 @@ __aicore__ inline void ReducePairElem(
     Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReducePairElem<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReducePairElemCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#endif
 }
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask>
@@ -1211,10 +1235,18 @@ __aicore__ inline void ReducePairElem(
     Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReducePairElem<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReducePairElemCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+#endif
 }
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask>
@@ -1247,10 +1279,18 @@ __aicore__ inline void ReduceRepeat(
     Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReduceRepeat<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReduceRepeatCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+#endif
 }
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask>
@@ -1283,10 +1323,18 @@ __aicore__ inline void ReduceRepeat(
     Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::ReduceRepeat<
+        reduceType, PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>,
+        isSetMask>(debugDst, debugSrc, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     Internal::ReduceRepeatCommon<reduceType, VectorElementT, VectorElementU, isSetMask>(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+#endif
 }
 
 /* **************************************** Reduce Interface ****************************************** */
@@ -1352,6 +1400,14 @@ __aicore__ inline void ReduceMax(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMax<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if defined(__NPU_ARCH__) && \
@@ -1373,6 +1429,7 @@ __aicore__ inline void ReduceMax(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, calIndex, ReduceMode::REDUCE_MAX);
+#endif
 #endif
 }
 
@@ -1437,6 +1494,14 @@ __aicore__ inline void ReduceMin(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMin<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
@@ -1457,6 +1522,7 @@ __aicore__ inline void ReduceMin(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, calIndex, ReduceMode::REDUCE_MIN);
+#endif
 #endif
 }
 
@@ -1521,6 +1587,14 @@ __aicore__ inline void ReduceSum(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceSum<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
@@ -1541,6 +1615,7 @@ __aicore__ inline void ReduceSum(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, 0, ReduceMode::REDUCE_SUM);
+#endif
 #endif
 }
 #endif
@@ -1597,6 +1672,14 @@ __aicore__ inline void ReduceMax(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMax<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if defined(__NPU_ARCH__) && \
@@ -1618,6 +1701,7 @@ __aicore__ inline void ReduceMax(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, calIndex, ReduceMode::REDUCE_MAX);
+#endif
 #endif
 }
 
@@ -1672,6 +1756,14 @@ __aicore__ inline void ReduceMin(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMin<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
@@ -1692,6 +1784,7 @@ __aicore__ inline void ReduceMin(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, calIndex, ReduceMode::REDUCE_MIN);
+#endif
 #endif
 }
 
@@ -1747,6 +1840,14 @@ __aicore__ inline void ReduceSum(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceSum<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, mask, repeatTime, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
@@ -1767,6 +1868,7 @@ __aicore__ inline void ReduceSum(
     ReduceImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), params, 0, ReduceMode::REDUCE_SUM);
+#endif
 #endif
 }
 #endif
@@ -1852,6 +1954,14 @@ template <
 __aicore__ inline void ReduceMin(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMin<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, count, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if defined(__NPU_ARCH__) && \
@@ -1888,6 +1998,7 @@ __aicore__ inline void ReduceMin(
     if (tailCount != 0) {
         ReduceTailCompute(dst, src, sharedTmpBuffer, count, calIndex, ReduceMode::REDUCE_MIN);
     }
+#endif
 #endif
 }
 
@@ -1973,6 +2084,14 @@ template <
 __aicore__ inline void ReduceMax(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceMax<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, count, calIndex);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if defined(__NPU_ARCH__) && \
@@ -2010,6 +2129,7 @@ __aicore__ inline void ReduceMax(
     if (tailCount != 0) {
         ReduceTailCompute(dst, src, sharedTmpBuffer, count, calIndex, ReduceMode::REDUCE_MAX);
     }
+#endif
 #endif
 }
 
@@ -2136,11 +2256,20 @@ template <
         int>::type>
 __aicore__ inline void ReduceSum(Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer =
+        VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(sharedTmpBuffer);
+    return AscendC::ReduceSum<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc, debugSharedTmpBuffer, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ReduceSumImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ PrimType*)GetUnderlyingPtr(sharedTmpBuffer), count);
+#endif
 }
 #endif
 #endif

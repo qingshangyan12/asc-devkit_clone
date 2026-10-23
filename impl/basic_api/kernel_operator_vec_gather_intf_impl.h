@@ -99,6 +99,13 @@ template <
 __aicore__ inline void Gatherb(
     Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime, const GatherRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugOffset = VectorOperand::ToDebugTensor<uint32_t>(offset);
+    return AscendC::Gatherb<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugOffset, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
@@ -110,6 +117,7 @@ __aicore__ inline void Gatherb(
     GatherbImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(offset), srcLength, repeatTime, repeatParams);
+#endif
 #endif
 }
 #endif
@@ -170,12 +178,20 @@ __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask,
     const uint8_t repeatTime, const uint16_t dstRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, mask, repeatTime, dstRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
     GatherImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
+#endif
 }
 #endif
 
@@ -235,12 +251,20 @@ __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask[],
     const uint8_t repeatTime, const uint16_t dstRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, mask, repeatTime, dstRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
     GatherImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
+#endif
 }
 #endif
 
@@ -368,11 +392,19 @@ template <
 __aicore__ inline void Gather(
     Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     GatherImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcBaseOffset, count);
+#endif
 }
 #endif
 } // namespace AscendC

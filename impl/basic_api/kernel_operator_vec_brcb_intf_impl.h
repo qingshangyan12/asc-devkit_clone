@@ -109,10 +109,16 @@ template <
         int>::type>
 __aicore__ inline void Brcb(Operand0 dst, Operand1 src, const uint8_t repeatTime, const BrcbRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Brcb<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     BrcbImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatTime, repeatParams);
+#endif
 }
 } // namespace AscendC
 #pragma end_pipe

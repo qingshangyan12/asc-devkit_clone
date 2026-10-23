@@ -108,11 +108,19 @@ __aicore__ inline void Add(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Add<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AddImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -152,11 +160,19 @@ __aicore__ inline void Add(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Add<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AddImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -200,11 +216,18 @@ template <
         int>::type>
 __aicore__ inline void Add(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Add<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AddImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -262,11 +285,19 @@ __aicore__ inline void Sub(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Sub<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     SubImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -306,11 +337,19 @@ __aicore__ inline void Sub(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Sub<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     SubImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -354,11 +393,18 @@ template <
         int>::type>
 __aicore__ inline void Sub(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Sub<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     SubImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -416,11 +462,19 @@ __aicore__ inline void Mul(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Mul<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MulImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -460,11 +514,19 @@ __aicore__ inline void Mul(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Mul<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MulImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -508,11 +570,18 @@ template <
         int>::type>
 __aicore__ inline void Mul(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Mul<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MulImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -568,11 +637,19 @@ __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask, config>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask, const DivConfig& config>
@@ -608,11 +685,19 @@ __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask, config>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl<PrimType, isSetMask, config>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 #else
 template <typename T, bool isSetMask>
@@ -652,11 +737,19 @@ __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -696,11 +789,19 @@ __aicore__ inline void Div(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 #endif
 
@@ -743,11 +844,18 @@ template <
         int>::type>
 __aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>, config>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl<PrimType, config>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 #else
 template <typename T>
@@ -783,11 +891,18 @@ template <
         int>::type>
 __aicore__ inline void Div(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Div<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DivImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 #endif
 
@@ -850,15 +965,22 @@ __aicore__ inline void MulAddDst(
     Operand0 dst, Operand1 src0, Operand2 src1, const uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulAddDst<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
     using PrimSrcType = PrimT<VectorElementU>;
-    using MaskCheckType =
-        typename Conditional<(sizeof(PrimDstType) >= sizeof(PrimSrcType)), PrimDstType, PrimSrcType>::type;
     MulAddDstImpl<PrimDstType, PrimSrcType, isSetMask>(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -901,15 +1023,22 @@ __aicore__ inline void MulAddDst(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulAddDst<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
     using PrimSrcType = PrimT<VectorElementU>;
-    using MaskCheckType =
-        typename Conditional<(sizeof(PrimDstType) >= sizeof(PrimSrcType)), PrimDstType, PrimSrcType>::type;
     MulAddDstImpl<PrimDstType, PrimSrcType, isSetMask>(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -954,6 +1083,13 @@ template <
         int>::type>
 __aicore__ inline void MulAddDst(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulAddDst<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
@@ -961,6 +1097,7 @@ __aicore__ inline void MulAddDst(Operand0 dst, Operand1 src0, Operand2 src1, con
     MulAddDstImpl(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1018,11 +1155,19 @@ __aicore__ inline void Max(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Max<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MaxImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -1062,11 +1207,19 @@ __aicore__ inline void Max(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Max<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MaxImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -1110,11 +1263,18 @@ template <
         int>::type>
 __aicore__ inline void Max(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Max<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MaxImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1172,11 +1332,19 @@ __aicore__ inline void Min(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Min<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MinImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -1216,11 +1384,19 @@ __aicore__ inline void Min(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Min<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MinImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -1264,11 +1440,18 @@ template <
         int>::type>
 __aicore__ inline void Min(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Min<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     MinImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1326,11 +1509,19 @@ __aicore__ inline void And(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::And<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AndImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -1370,11 +1561,19 @@ __aicore__ inline void And(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::And<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AndImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -1418,11 +1617,18 @@ template <
         int>::type>
 __aicore__ inline void And(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::And<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     AndImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1480,11 +1686,19 @@ __aicore__ inline void Or(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Or<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     OrImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -1524,11 +1738,19 @@ __aicore__ inline void Or(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Or<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     OrImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -1572,11 +1794,18 @@ template <
         int>::type>
 __aicore__ inline void Or(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Or<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     OrImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
@@ -1621,6 +1850,13 @@ template <
         int>::type>
 __aicore__ inline void ShiftLeft(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand2>>>(src1);
+    return AscendC::ShiftLeft<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand2>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand2>;
     using Src0PrimType = PrimT<VectorElementT>;
@@ -1644,6 +1880,7 @@ __aicore__ inline void ShiftLeft(Operand0 dst, Operand1 src0, Operand2 src1, con
     ShiftLeftImpl<Src0PrimType, Src1PrimType>(
         (__ubuf__ Src0PrimType*)GetUnderlyingPtr(dst), (__ubuf__ Src0PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1685,6 +1922,14 @@ template <
         int>::type>
 __aicore__ inline void ShiftRight(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand2>>>(src1);
+    return AscendC::ShiftRight<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand2>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand2>;
     using Src0PrimType = PrimT<VectorElementT>;
@@ -1708,6 +1953,7 @@ __aicore__ inline void ShiftRight(Operand0 dst, Operand1 src0, Operand2 src1, co
     ShiftRightImpl<Src0PrimType, Src1PrimType>(
         (__ubuf__ Src0PrimType*)GetUnderlyingPtr(dst), (__ubuf__ Src0PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 #endif
 
@@ -1771,6 +2017,13 @@ __aicore__ inline void AddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::AddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -1781,6 +2034,7 @@ __aicore__ inline void AddRelu(
     AddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -1825,6 +2079,13 @@ __aicore__ inline void AddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::AddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -1835,6 +2096,7 @@ __aicore__ inline void AddRelu(
     AddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T>
@@ -1875,6 +2137,12 @@ template <
         int>::type>
 __aicore__ inline void AddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::AddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -1885,6 +2153,7 @@ __aicore__ inline void AddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const
     AddReluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -1965,9 +2234,16 @@ __aicore__ inline void AddDeqRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<half>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<int32_t>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<int32_t>(src1);
+    return AscendC::AddDeqRelu<isSetMask>(debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     AddDeqReluImpl<isSetMask>(
         (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0),
         (__ubuf__ int32_t*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -2004,6 +2280,14 @@ __aicore__ inline void AddDeqRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddDeqRelu<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
@@ -2014,6 +2298,7 @@ __aicore__ inline void AddDeqRelu(
     AddDeqReluImpl<isSetMask>(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <bool isSetMask>
@@ -2042,9 +2327,16 @@ __aicore__ inline void AddDeqRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<half>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<int32_t>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<int32_t>(src1);
+    return AscendC::AddDeqRelu<isSetMask>(debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     AddDeqReluImpl<isSetMask>(
         (__ubuf__ half*)GetUnderlyingPtr(dst), (__ubuf__ int32_t*)GetUnderlyingPtr(src0),
         (__ubuf__ int32_t*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -2081,6 +2373,14 @@ __aicore__ inline void AddDeqRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddDeqRelu<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
@@ -2091,6 +2391,7 @@ __aicore__ inline void AddDeqRelu(
     AddDeqReluImpl<isSetMask>(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -2159,6 +2460,14 @@ template <
         int>::type>
 __aicore__ inline void AddDeqRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddDeqRelu<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using PrimDstType = PrimT<VectorElementT>;
@@ -2169,6 +2478,7 @@ __aicore__ inline void AddDeqRelu(Operand0 dst, Operand1 src0, Operand2 src1, co
     AddDeqReluImpl(
         (__ubuf__ PrimDstType*)GetUnderlyingPtr(dst), (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimSrcType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -2228,6 +2538,13 @@ __aicore__ inline void FusedMulAdd(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAdd<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2238,6 +2555,7 @@ __aicore__ inline void FusedMulAdd(
     FusedMulAddImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -2278,6 +2596,13 @@ __aicore__ inline void FusedMulAdd(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAdd<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2288,6 +2613,7 @@ __aicore__ inline void FusedMulAdd(
     FusedMulAddImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -2332,6 +2658,12 @@ template <
         int>::type>
 __aicore__ inline void FusedMulAdd(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAdd<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2342,6 +2674,7 @@ __aicore__ inline void FusedMulAdd(Operand0 dst, Operand1 src0, Operand2 src1, c
     FusedMulAddImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -2401,6 +2734,13 @@ __aicore__ inline void MulAddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::MulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2411,6 +2751,7 @@ __aicore__ inline void MulAddRelu(
     FusedMulAddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -2452,6 +2793,13 @@ __aicore__ inline void MulAddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::MulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2462,6 +2810,7 @@ __aicore__ inline void MulAddRelu(
     FusedMulAddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
@@ -2504,6 +2853,13 @@ __aicore__ inline void FusedMulAddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2514,6 +2870,7 @@ __aicore__ inline void FusedMulAddRelu(
     FusedMulAddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
@@ -2556,6 +2913,13 @@ __aicore__ inline void FusedMulAddRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2566,6 +2930,7 @@ __aicore__ inline void FusedMulAddRelu(
     FusedMulAddReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -2611,6 +2976,12 @@ template <
         int>::type>
 __aicore__ inline void MulAddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::MulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2621,6 +2992,7 @@ __aicore__ inline void MulAddRelu(Operand0 dst, Operand1 src0, Operand2 src1, co
     FusedMulAddReluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 template <typename T>
@@ -2661,6 +3033,12 @@ template <
         int>::type>
 __aicore__ inline void FusedMulAddRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedMulAddRelu<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2671,6 +3049,7 @@ __aicore__ inline void FusedMulAddRelu(Operand0 dst, Operand1 src0, Operand2 src
     FusedMulAddReluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -2733,6 +3112,13 @@ __aicore__ inline void SubRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::SubRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2743,6 +3129,7 @@ __aicore__ inline void SubRelu(
     SubReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -2787,6 +3174,13 @@ __aicore__ inline void SubRelu(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::SubRelu<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2797,6 +3191,7 @@ __aicore__ inline void SubRelu(
     SubReluImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T>
@@ -2837,6 +3232,12 @@ template <
         int>::type>
 __aicore__ inline void SubRelu(Operand0 dst, Operand1 src0, Operand2 src1, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::SubRelu<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 #if __NPU_ARCH__ == 2201
@@ -2847,6 +3248,7 @@ __aicore__ inline void SubRelu(Operand0 dst, Operand1 src0, Operand2 src1, const
     SubReluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
@@ -2890,6 +3292,12 @@ template <
         int>::type>
 __aicore__ inline void Prelu(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Prelu<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     if constexpr (!VectorOperand::Traits<Operand0>::isPointer) {
@@ -2911,6 +3319,7 @@ __aicore__ inline void Prelu(Operand0 dst, Operand1 src0, Operand2 src1, const u
     PreluImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -2960,6 +3369,14 @@ template <
         int>::type>
 __aicore__ inline void Mull(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst0);
+    auto debugDst1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst1);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Mull<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst0, debugDst1, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     if constexpr (!VectorOperand::Traits<Operand0>::isPointer) {
@@ -2985,6 +3402,7 @@ __aicore__ inline void Mull(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand
     MullImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst0), (__ubuf__ PrimType*)GetUnderlyingPtr(dst1),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -3025,6 +3443,12 @@ template <
         int>::type>
 __aicore__ inline void AbsSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::AbsSub<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     if constexpr (!VectorOperand::Traits<Operand0>::isPointer) {
@@ -3046,6 +3470,7 @@ __aicore__ inline void AbsSub(Operand0 dst, Operand1 src0, Operand2 src1, const 
     FusedAbsSubImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 // FusedAbsSub has been updated, please use AbsSub instead.
@@ -3076,6 +3501,12 @@ template <
         int>::type>
 __aicore__ inline void FusedAbsSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::FusedAbsSub<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     if constexpr (!VectorOperand::Traits<Operand0>::isPointer) {
@@ -3097,6 +3528,7 @@ __aicore__ inline void FusedAbsSub(Operand0 dst, Operand1 src0, Operand2 src1, c
     FusedAbsSubImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -3155,6 +3587,13 @@ template <
         int>::type>
 __aicore__ inline void ExpSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::ExpSub<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using DstPrimType = PrimT<VectorElementT>;
@@ -3189,6 +3628,7 @@ __aicore__ inline void ExpSub(Operand0 dst, Operand1 src0, Operand2 src1, const 
     FusedExpSubImpl<DstPrimType, SrcPrimType>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 // FusedExpSub has been updated, please use ExpSub instead.
@@ -3220,6 +3660,14 @@ template <
         int>::type>
 __aicore__ inline void FusedExpSub(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::FusedExpSub<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using DstPrimType = PrimT<VectorElementT>;
@@ -3243,6 +3691,7 @@ __aicore__ inline void FusedExpSub(Operand0 dst, Operand1 src0, Operand2 src1, c
     FusedExpSubImpl<DstPrimType, SrcPrimType>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 #endif

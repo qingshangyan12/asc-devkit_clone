@@ -105,11 +105,17 @@ __aicore__ inline void Duplicate(
     Operand0 dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
     const uint8_t dstRepeatStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::Duplicate<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CheckDuplicateSupportedType<VectorElementT>();
     DuplicateImpl<VectorElementT, isSetMask>(
         (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride,
         dstRepeatStride);
+#endif
 }
 
 template <typename T, bool isSetMask>
@@ -147,11 +153,17 @@ __aicore__ inline void Duplicate(
     Operand0 dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
     const uint8_t dstRepeatStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::Duplicate<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CheckDuplicateSupportedType<VectorElementT>();
     DuplicateImpl<VectorElementT, isSetMask>(
         (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, mask, repeatTime, dstBlockStride,
         dstRepeatStride);
+#endif
 }
 
 /*
@@ -189,9 +201,14 @@ template <
         int>::type>
 __aicore__ inline void Duplicate(Operand0 dst, const T& scalarValue, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::Duplicate<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, scalarValue, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CheckDuplicateSupportedType<VectorElementT>();
     DuplicateImpl<VectorElementT>((__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), scalarValue, count);
+#endif
 }
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
@@ -229,11 +246,17 @@ template <
         int>::type>
 __aicore__ inline void Duplicate(Operand0 dst, Operand1 src, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Duplicate<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     CheckDuplicateSupportedType<PrimType>();
     DuplicateImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -272,11 +295,20 @@ template <
         int>::type>
 __aicore__ inline void Interleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst0);
+    auto debugDst1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst1);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Interleave<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst0, debugDst1, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     InterleaveImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst0), (__ubuf__ PrimType*)GetUnderlyingPtr(dst1),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -315,11 +347,20 @@ template <
         int>::type>
 __aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src0, Operand3 src1, const int32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst0);
+    auto debugDst1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst1);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::DeInterleave<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst0, debugDst1, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DeInterleaveImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst0), (__ubuf__ PrimType*)GetUnderlyingPtr(dst1),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /*
@@ -352,11 +393,18 @@ template <
         int>::type>
 __aicore__ inline void DeInterleave(Operand0 dst0, Operand1 dst1, Operand2 src, const int32_t srcCount)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst0);
+    auto debugDst1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst1);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::DeInterleave<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst0, debugDst1, debugSrc, srcCount);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     DeInterleaveImpl<PrimType>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst0), (__ubuf__ PrimType*)GetUnderlyingPtr(dst1),
         (__ubuf__ PrimType*)GetUnderlyingPtr(src), srcCount);
+#endif
 }
 #endif
 } // namespace AscendC

@@ -102,11 +102,19 @@ __aicore__ inline void Axpy(
     Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, scalarValue, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
         (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
         mask, repeatTime, repeatParams);
+#endif
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -145,11 +153,19 @@ __aicore__ inline void Axpy(
     Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, scalarValue, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
         (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
         mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -189,11 +205,18 @@ template <
         int>::type>
 __aicore__ inline void Axpy(Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc, scalarValue, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     AxpyImpl<VectorElementT, VectorElementU>(
         (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
         count);
+#endif
 }
 } // namespace AscendC
 #pragma end_pipe

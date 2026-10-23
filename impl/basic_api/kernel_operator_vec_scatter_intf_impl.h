@@ -128,6 +128,13 @@ __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask,
     const uint8_t repeatTime, const uint8_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugDstOffset = VectorOperand::ToDebugTensor<uint32_t>(dstOffset);
+    return AscendC::Scatter<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugDstOffset, dstBaseAddr, mask, repeatTime, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ScatterCheck<VectorElementT>();
@@ -135,6 +142,7 @@ __aicore__ inline void Scatter(
     ScatterImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+#endif
 }
 #endif
 
@@ -181,6 +189,13 @@ __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint64_t mask[],
     const uint8_t repeatTime, const uint8_t srcRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugDstOffset = VectorOperand::ToDebugTensor<uint32_t>(dstOffset);
+    return AscendC::Scatter<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugDstOffset, dstBaseAddr, mask, repeatTime, srcRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ScatterCheck<VectorElementT>();
@@ -188,6 +203,7 @@ __aicore__ inline void Scatter(
     ScatterImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+#endif
 }
 #endif
 
@@ -299,11 +315,19 @@ template <
 __aicore__ inline void Scatter(
     Operand0 dst, Operand1 src, Operand2 dstOffset, const uint32_t dstBaseAddr, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugDstOffset = VectorOperand::ToDebugTensor<uint32_t>(dstOffset);
+    return AscendC::Scatter<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugDstOffset, dstBaseAddr, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     ScatterImpl(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
         (__ubuf__ uint32_t*)GetUnderlyingPtr(dstOffset), dstBaseAddr, count);
+#endif
 }
 #endif
 } // namespace AscendC

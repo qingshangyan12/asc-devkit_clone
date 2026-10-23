@@ -188,11 +188,3 @@ PASS Compare count=1 form=0 modes=16 tensor_equal=true tail_unchanged=true
 ```
 
 全部 CTest 用例成功时输出 `100% tests passed, 0 tests failed out of 8`。完整逐用例输出保存在 `build-vector/Testing/Temporary/LastTest.log`；也可使用 `ctest -V` 显示详细输出。出现 `FAIL`、`Tensor/pointer mismatch`、`ACL failure` 或非零退出码时，应保留日志排查，不计为通过。
-
-如需单独保存编译命令、源文件哈希和各组设备日志，可在仓库根目录运行已有回归脚本：
-
-```bash
-bash tests/api/basic_api/vector_pointer/run_target_regressions.sh /tmp/vector-runtime
-```
-
-该脚本直接调用编译器构建并运行同一批 8 个源文件。更完整的接口范围、头文件编译、非法入参及精度测试说明见[测试 README](../../../../../tests/api/basic_api/vector_pointer/README.md)。

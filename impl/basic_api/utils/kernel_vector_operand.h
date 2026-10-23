@@ -12,6 +12,9 @@
 #define ASCENDC_KERNEL_VECTOR_OPERAND_H
 
 namespace AscendC {
+#if ASCENDC_CPU_DEBUG
+inline uint8_t* GetBaseAddrCpu(int8_t logicPos);
+#endif
 namespace VectorOperand {
 // Select the existing Config/non-Config overload family in the implementation layer.
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
@@ -113,6 +116,62 @@ template <typename Operand>
 __aicore__ constexpr bool IsWritable()
 {
     return Traits<Operand>::isOperand && !Std::is_const<typename Traits<Operand>::Element>::value;
+}
+
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+// Diagnostic paths share the existing Tensor checks and MSTX reporting. Raw pointers
+// carry no allocation length: only the remaining physical UB range is known here.
+// Mixed LocalTensor operands retain their own position, allocation bounds and offsets.
+template <typename T, typename U>
+__aicore__ inline LocalTensor<T> ToDebugTensor(const LocalTensor<U>& value)
+{
+    if constexpr (Std::is_same<T, U>::value) {
+        return value;
+    } else {
+        return value.template ReinterpretCast<T>();
+    }
+}
+
+template <typename T, typename U>
+__aicore__ inline LocalTensor<T> ToDebugTensor(__ubuf__ U* value)
+{
+    TBuffAddr address{};
+    address.logicPos = static_cast<uint8_t>(TPosition::VECCALC);
+    uint64_t offset = reinterpret_cast<uint64_t>(value);
+#if ASCENDC_CPU_DEBUG
+    const uint64_t base = reinterpret_cast<uint64_t>(GetBaseAddrCpu(static_cast<int8_t>(TPosition::VECCALC)));
+    ASCENDC_DEBUG_ASSERT(
+        (offset >= base && offset - base < TOTAL_UB_SIZE),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "VECTOR pointer is outside the simulated UB address range."));
+    offset -= base;
+    address.absAddr = reinterpret_cast<uint8_t*>(const_cast<Std::remove_const_t<U>*>(value));
+#endif
+    address.bufferAddr = static_cast<uint32_t>(offset);
+    address.dataLen = offset < TOTAL_UB_SIZE ? TOTAL_UB_SIZE - static_cast<uint32_t>(offset) : 0;
+    LocalTensor<T> tensor;
+    tensor.SetAddr(address);
+    return tensor;
+}
+
+template <typename Operand>
+__aicore__ inline auto ToDebugOperand(const Operand& value)
+{
+    if constexpr (Traits<Operand>::isOperand) {
+        return ToDebugTensor<Std::remove_const_t<Primitive<Operand>>>(value);
+    } else {
+        return value;
+    }
+}
+#endif
+
+template <typename Operand>
+__aicore__ inline auto Offset(const Operand& value, uint32_t offset)
+{
+    if constexpr (Traits<Operand>::isPointer) {
+        return value + offset;
+    } else {
+        return value[offset];
+    }
 }
 } // namespace VectorOperand
 

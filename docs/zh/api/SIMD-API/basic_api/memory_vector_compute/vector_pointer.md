@@ -83,7 +83,7 @@ Copy的三种指针原型分别见[连续搬运](data_move/Copy_UBToUB_continuou
 
 - 保留原API的数据类型、对齐、容量、地址空间、地址重叠及同步限制。例如Copy要求UB起始地址32字节对齐；其他接口的具体要求请查阅各自资料。
 - 对指针做`ptr + n`时，n的单位为元素。偏移后的地址仍需满足原API的对齐要求。
-- 适配层不持有指针的容量或生命周期信息，不能替调用者完成LocalTensor大小检查。调用者须保证所有访问和工作空间均在有效缓冲区内。
+- 开启ASCENDC_DEBUG、CPU_DEBUG或MSTX时，指针调用通过临时Tensor视图复用原接口的参数检查及上报；混用的LocalTensor保留原有位置、长度和偏移。原始指针不携带分配长度，视图仅记录从该地址到UB末尾的范围，无法检查某次分配的边界。调用者仍须保证所有访问和工作空间均在有效缓冲区内。
 - `__gm__`、`__cbuf__`、L0地址不能作为普通VECTOR接口的UB操作数。不要通过强制转换掩盖错误地址空间。
 - 指针重载不扩大原接口允许的数值域。例如Ln应使用有效输入，除法应避开非法除数；排序和转置仍需满足块大小要求。
 - `isSetMask=false`时，仍须按原API要求预先设置掩码。输入/输出之间的流水同步由调用者负责。
@@ -125,15 +125,18 @@ __aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& init
 ```cpp
 // src0Ptr指向UB，其余三个源为同元素类型的LocalTensor。
 AscendC::MrgSortSrcList sources(src0Ptr, src1, src2, src3);
+AscendC::MrgSort(dstPtr, sources, params);
 ```
 
-排序记录布局、每路长度、有效位和工作空间约束沿用原接口。Transpose/TransDataTo5HD的指针列表和地址列表仍需满足原有排列与对齐要求，不改变列表中地址的含义。
+排序记录布局、每路长度、有效位和工作空间约束沿用原接口。MrgSort的元素类型可从源列表推导，也可显式指定。
+
+Transpose/TransDataTo5HD的指针列表和地址列表仍需满足原有排列与对齐要求。类型化指针数组可推导元素类型；uint64_t地址表只保存地址，必须显式指定实际数据类型，例如`TransDataTo5HD<half>(dstAddressTable, srcAddressTable, params)`。CPU_DEBUG沿用原Tensor接口的参数检查及调用分支，不将地址表改写为设备VA寄存器的打包格式；设备侧仍按原接口规则打包。
 
 ### NumericLimits与GetAbsAddr
 
 DeNormMin、Infinity、Lowest、NegativeInfinity、QuietNaN、SignalingNaN为`NumericLimits<T>`的成员函数，其指针形式向目的UB地址写入对应特殊值，元素类型和数量限制沿用原接口。
 
-GetAbsAddr的指针形式包括TPipe成员和同名自由函数，仅在CPU_DEBUG中用于查询模拟地址。默认地址空间为Hardware::UB；查询L1时需显式指定Hardware::L1。不要将该CPU调试接口用于设备侧地址转换。具体使用及UB/L1偏移检查见[CPU地址测试](../../../../../../tests/api/basic_api/vector_pointer/get_abs_addr_cpu.cpp)。
+GetAbsAddr的指针形式包括TPipe成员和同名自由函数，仅在CPU_DEBUG中用于查询模拟地址。默认地址空间为Hardware::UB；查询L1时需显式指定Hardware::L1。不要将该CPU调试接口用于设备侧地址转换。UB/L1偏移、参数检查和转置地址表行为见[CPU单元测试](../../../../../../tests/api/basic_api/ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/test_operator_vector_pointer.cpp)。
 
 ## 调用示例
 
@@ -168,6 +171,6 @@ extern "C" __global__ __vector__ void VectorPointerExample()
 
 ## 测试与复现
 
-[测试说明](../../../../../../tests/api/basic_api/vector_pointer/README.md)提供范围检查、主机适配检查、设备编译、非法操作数检查、设备回归、精度记录和CPU_DEBUG测试命令。
+`ascendc_header_checker`在现有头文件检查配置中编译公开声明、通用指针调用及模板推导用例。CPU单元测试由现有Ascend 950PR AIV Basic测试目标收集，覆盖地址表保护、非法掩码、未对齐指针、混用Tensor的容量检查及UB/L1地址偏移。
 
-`ascendc_header_checker`在各配置中包含公开声明并检查通用调用；`vector_pointer/target_arithmetic.cpp`和`target_conversion.cpp`保留Ascend 950的完整实例化组合，由`run_target_headers.sh`编译。设备回归与精度检查另行运行；头文件编译通过不能替代设备执行结果。
+设备执行使用[样例README](../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_arithmetic/README.md)中的CMake与CTest入口，运行8组指针与Tensor对照用例。头文件编译通过不能替代设备执行结果。

@@ -675,11 +675,18 @@ template <
 __aicore__ inline __inout_pipe__(V) void Copy(
     Operand0 dst, Operand1 src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Copy<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     CopyImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime,
         repeatParams);
+#endif
 }
 
 // Copy::Level 0 - mask count mode
@@ -713,11 +720,18 @@ template <
 __aicore__ inline __inout_pipe__(V) void Copy(
     Operand0 dst, Operand1 src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Copy<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     CopyImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime,
         repeatParams);
+#endif
 }
 
 /*
@@ -752,9 +766,15 @@ template <
         int>::type>
 __aicore__ inline __inout_pipe__(V) void Copy(Operand0 dst, Operand1 src, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Copy<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(debugDst, debugSrc, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
     CopyImpl<PrimType>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+#endif
 }
 #endif
 

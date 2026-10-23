@@ -98,12 +98,18 @@ __aicore__ inline void MulCast(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using DstPrimType = PrimT<VectorElementT>;
     using SrcPrimType = PrimT<VectorElementU>;
-    using MaskCheckType =
-        typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
     ASCENDC_DEBUG_ASSERT(
         (SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()),
         KERNEL_LOG_INTERNAL(
@@ -113,6 +119,7 @@ __aicore__ inline void MulCast(
     MulCastImpl<PrimT<VectorElementT>, PrimT<VectorElementU>, isSetMask>(
         (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 #endif
 
@@ -160,12 +167,18 @@ __aicore__ inline void MulCast(
     Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     using DstPrimType = PrimT<VectorElementT>;
     using SrcPrimType = PrimT<VectorElementU>;
-    using MaskCheckType =
-        typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
     ASCENDC_DEBUG_ASSERT(
         (SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()),
         KERNEL_LOG_INTERNAL(
@@ -175,6 +188,7 @@ __aicore__ inline void MulCast(
     MulCastImpl<PrimT<VectorElementT>, PrimT<VectorElementU>, isSetMask>(
         (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 #endif
 
@@ -209,11 +223,19 @@ template <
         int>::type>
 __aicore__ inline void MulCast(Operand0 dst, Operand1 src0, Operand2 src1, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::MulCast<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand1>;
     MulCastImpl<PrimT<VectorElementT>, PrimT<VectorElementU>>(
         (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src0),
         (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src1), count);
+#endif
 }
 #endif
 } // namespace AscendC

@@ -133,6 +133,11 @@ template <
         int>::type>
 __aicore__ inline void Transpose(Operand0 dst, Operand1 src)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Transpose<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, debugSrc);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     ASCENDC_ASSERT((SupportType<PrimT<VectorElementT>, int16_t, uint16_t, half>()), {
         KERNEL_LOG(
@@ -141,6 +146,7 @@ __aicore__ inline void Transpose(Operand0 dst, Operand1 src)
     });
     TransposeImpl(
         (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(src));
+#endif
 }
 
 /* **************************************************************************************************
@@ -199,6 +205,18 @@ __aicore__ inline void TransDataTo5HD(
     const Operand0 (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const Operand1 (&srcList)[NCHW_CONV_ADDR_LIST_SIZE],
     const TransDataTo5HDParams& nchwconvParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    LocalTensor<PrimT<VectorOperand::ElementT<T, Operand0>>> debugDstList[NCHW_CONV_ADDR_LIST_SIZE];
+    for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; ++i) {
+        debugDstList[i] = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dstList[i]);
+    }
+    LocalTensor<PrimT<VectorOperand::ElementT<T, Operand0>>> debugSrcList[NCHW_CONV_ADDR_LIST_SIZE];
+    for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; ++i) {
+        debugSrcList[i] = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(srcList[i]);
+    }
+    return AscendC::TransDataTo5HD<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDstList, debugSrcList, nchwconvParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
 
     __ubuf__ PrimT<VectorElementT>* dstAddrList[NCHW_CONV_ADDR_LIST_SIZE];
@@ -210,6 +228,7 @@ __aicore__ inline void TransDataTo5HD(
     }
 
     TransDataTo5HDImpl(dstAddrList, srcAddrList, nchwconvParams);
+#endif
 }
 
 template <typename T>
@@ -316,6 +335,13 @@ template <
 __aicore__ inline void Transpose(
     Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const TransposeParamsExt& transposeParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSharedTmpBuffer = VectorOperand::ToDebugTensor<uint8_t>(sharedTmpBuffer);
+    return AscendC::Transpose<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSharedTmpBuffer, transposeParams);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
         (transposeParams.hSize == NCHW_CONV_ADDR_LIST_SIZE) && (transposeParams.wSize == NCHW_CONV_ADDR_LIST_SIZE)) {
@@ -350,6 +376,7 @@ __aicore__ inline void Transpose(
                 GetUnderlyingPtr(dst), GetUnderlyingPtr(src), GetUnderlyingPtr(sharedTmpBuffer), transposeParams);
         }
     }
+#endif
 }
 #endif
 #pragma end_pipe
@@ -415,6 +442,11 @@ template <
 __aicore__ inline __in_pipe__(S)
     __out_pipe__(V) void TransDataTo5HD(Operand0 dst, Operand1 src, const TransDataTo5HDParams& nchwconvParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<uint64_t>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<uint64_t>(src);
+    return AscendC::TransDataTo5HD<T>(debugDst, debugSrc, nchwconvParams);
+#else
     constexpr uint32_t vaRegSize = VA_REG_ARRAY_LEN / HALF_FACTOR;
     constexpr uint32_t vaOne = 1;
     constexpr uint32_t vaTwo = 2;
@@ -446,6 +478,7 @@ __aicore__ inline __in_pipe__(S)
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     TransDataTo5HDVldVaRegImpl<T>(
         (__ubuf__ uint64_t*)GetUnderlyingPtr(dst), (__ubuf__ uint64_t*)GetUnderlyingPtr(src), nchwconvParams);
+#endif
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_INTERFACE_IMPL_H

@@ -16,7 +16,7 @@
 #endif
 
 // Cross-architecture checks use data types and operations shared by the supported backends.
-// Complete dav-3510 instantiation coverage is in vector_pointer/target_arithmetic.cpp.
+// Device execution is covered by the VECTOR pointer examples in element_wise_arithmetic.
 namespace {
 using namespace AscendC;
 

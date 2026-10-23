@@ -85,6 +85,11 @@ template <
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     Operand0 dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
         KERNEL_LOG(
@@ -93,6 +98,7 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
             "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");
     });
     CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#endif
 }
 #endif
 
@@ -129,6 +135,11 @@ template <
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     Operand0 dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
         KERNEL_LOG(
@@ -137,6 +148,7 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
             "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");
     });
     CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#endif
 }
 #endif
 
@@ -165,8 +177,13 @@ template <
         int>::type>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(Operand0 dst, const T& firstValue, uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, firstValue, count);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, count);
+#endif
 }
 #endif
 } // namespace AscendC

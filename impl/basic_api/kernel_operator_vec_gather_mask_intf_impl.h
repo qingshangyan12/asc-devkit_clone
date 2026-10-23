@@ -100,6 +100,14 @@ __aicore__ inline void GatherMask(
     Operand0 dst, Operand1 src0, Operand2 src1Pattern, const bool reduceMode, const uint32_t mask,
     const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1Pattern = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand2>>>(src1Pattern);
+    return AscendC::GatherMask<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand2>>, mode>(
+        debugDst, debugSrc0, debugSrc1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using VectorElementU = VectorOperand::ElementT<U, Operand2>;
     using DstPrimType = PrimT<VectorElementT>;
@@ -114,6 +122,7 @@ __aicore__ inline void GatherMask(
     GatherMaskCal<DstPrimType, Src1PrimType, mode>(
         (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ DstPrimType*)GetUnderlyingPtr(src0),
         (__ubuf__ Src1PrimType*)GetUnderlyingPtr(src1Pattern), reduceMode, mask, gatherMaskParams, rsvdCnt);
+#endif
 #endif
 }
 
@@ -160,6 +169,12 @@ __aicore__ inline void GatherMask(
     Operand0 dst, Operand1 src0, const uint8_t src1Pattern, const bool reduceMode, const uint32_t mask,
     const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    return AscendC::GatherMask<PrimT<VectorOperand::ElementT<T, Operand0>>, mode>(
+        debugDst, debugSrc0, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
+#else
     using VectorElementT = VectorOperand::ElementT<T, Operand0>;
     using PrimType = PrimT<VectorElementT>;
 
@@ -172,6 +187,7 @@ __aicore__ inline void GatherMask(
     GatherMaskCal<PrimType, mode>(
         (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0), src1Pattern, reduceMode,
         mask, gatherMaskParams, rsvdCnt);
+#endif
 #endif
 }
 

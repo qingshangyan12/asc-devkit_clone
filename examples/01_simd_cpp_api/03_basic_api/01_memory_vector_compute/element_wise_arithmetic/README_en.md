@@ -188,11 +188,3 @@ PASS Compare count=1 form=0 modes=16 tensor_equal=true tail_unchanged=true
 ```
 
 When all CTest cases succeed, the summary is `100% tests passed, 0 tests failed out of 8`. Full per-case output is saved in `build-vector/Testing/Temporary/LastTest.log`; use `ctest -V` to display it. Preserve logs for any `FAIL`, `Tensor/pointer mismatch`, `ACL failure`, or nonzero exit code, and do not count such runs as passed.
-
-To save compiler commands, source hashes, and per-group device logs separately, run the existing regression script from the repository root:
-
-```bash
-bash tests/api/basic_api/vector_pointer/run_target_regressions.sh /tmp/vector-runtime
-```
-
-This script directly invokes the compiler to build and run the same eight sources. See the [test README](../../../../../tests/api/basic_api/vector_pointer/README_en.md) for the broader interface scope, header compilation, invalid operand cases, and precision tests.

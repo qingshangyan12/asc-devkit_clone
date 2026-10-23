@@ -83,8 +83,10 @@ template <
     typename Source3,
     typename Std::enable_if<
         VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
-            VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() &&
-            VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>(),
         int>::type = 0>
@@ -178,8 +180,10 @@ template <
     typename Source1, typename Source2, typename Source3,
     typename Std::enable_if<
         VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
-            VectorOperand::Matches<T, Source0>() && VectorOperand::Matches<T, Source1>() &&
-            VectorOperand::Matches<T, Source2>() && VectorOperand::Matches<T, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
             VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
             VectorOperand::IsWritable<Operand0>(),
         int>::type = 0>
