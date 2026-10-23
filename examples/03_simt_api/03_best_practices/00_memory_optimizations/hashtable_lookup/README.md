@@ -16,7 +16,7 @@
 ├── hashtable_lookup
 │   ├── figures                          // README中的图片资源
 │   ├── CMakeLists.txt                   // 编译工程文件
-│   ├── hashtable_lookup.asc              // SIMT哈希表查找优化路径实现
+│   ├── hashtable_lookup.asc             // SIMT哈希表查找优化路径实现
 │   ├── README.md                  	     // 样例说明文档
 │   └── README_en.md               	     // 英文样例说明文档
 ```
