@@ -88,10 +88,10 @@ y[i] = trunc(x[i])
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造GM、UB上的二维Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
+    2. 使用 `asc::te::mutex` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据寄存器字节数和元素类型大小计算单次处理元素数，使用 `asc::te::experimental::all_mask<T>()` 生成全有效掩码。
     4. 使用 `asc::te::experimental::load` 将UB数据加载到寄存器，调用 `asc::te::experimental::trunc` 向零取整，再通过 `asc::te::experimental::store` 写回UB。
-    5. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
+    5. 使用同一个asc::te::mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心计算代码如下：
 
