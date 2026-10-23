@@ -22,6 +22,8 @@
 #include "kernel_utils.h"
 #include "kernel_operator_mm_bitmode_intf.h"
 #include "kernel_operator_sys_var_intf.h"
+#include "kernel_struct_aipp.h"
+#include "kernel_struct_waipp.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -620,6 +622,35 @@ __aicore__ inline void LoadData3DV2L12UBCal(
     ASCENDC_ASSERT(
         false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UB is not supported 3DParamsV2Pro on current device"); });
 }
+
+/* **************************************************************************************************
+ * Aipp/Waipp                                                                                        *
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline void LoadImageToLocalCal(__cbuf__ T* dst, const LoadImageToLocalParams& params, const uint8_t sid = 3)
+{
+    static_assert(
+        (SupportType<T, uint8_t, int8_t, int16_t>()),
+        "LoadImageToLocal only support uint8_t/int8_t/int16_t on current device");
+    load_image_to_cbuf(
+        dst, static_cast<uint16_t>(params.horizSize - 1), static_cast<uint16_t>(params.vertSize - 1),
+        params.horizStartPos, params.vertStartPos, static_cast<uint16_t>(params.srcHorizSize - 1), params.topPadSize,
+        params.botPadSize, params.leftPadSize, params.rightPadSize, sid);
+}
+
+template <typename T, typename U>
+__aicore__ inline void StoreImageToGlobalCal(
+    __gm__ T* dst, __cbuf__ U* src, const StoreImageToGlobalParams& params, const uint8_t sid = 3)
+{
+    static_assert(
+        (SupportType<T, uint8_t, int16_t>()), "StoreImageToGlobal only support uint8_t/int16_t on current device");
+    store_l1_to_out_image(
+        (__gm__ void*)dst, src, static_cast<uint16_t>(params.dstImageWidth - 1),
+        static_cast<uint8_t>(params.outputDataType), static_cast<uint16_t>(params.dstImageHeight - 1),
+        static_cast<uint8_t>(params.channelTransformMode), params.dstImageStride, sid, params.dtcParams.roundingMode,
+        params.dtcParams.dtcOffset, params.dtcParams.dtcGain, params.srcImageStride, params.cOffset);
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)

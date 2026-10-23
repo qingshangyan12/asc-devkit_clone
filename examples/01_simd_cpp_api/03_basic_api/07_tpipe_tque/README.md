@@ -10,3 +10,4 @@
 | ----------------------------------------------------------- | --------------------------------------------------- | --- |
 | [get_tpipe_ptr](./get_tpipe_ptr) |  样例基于GetTPipePtr获取全局TPipe指针，核函数无需显式传入TPipe指针，即可进行TPipe相关的操作。 | Ascend 950PR&950DT系列产品<br>Atlas A3系列产品<br>Atlas A2系列产品 |
 | [tpipe_reuse](./tpipe_reuse) |  本样例基于TPipe::Init和TPipe::Destroy，实现TPipe重复申请与使用。 | Ascend 950PR&950DT系列产品<br>Atlas A3系列产品<br>Atlas A2系列产品 |
+| [tpipe_matmul_leakyrelu_basic_api](./tpipe_matmul_leakyrelu_basic_api) | 基于TPipe-TQue和Double Buffer实现Matmul与LeakyRelu融合，展示Cube/Vector协同计算。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |

@@ -24,8 +24,8 @@
 
 #ifndef ASCENDC_MODULE_STRUCT_MACRO_H
 #define ASCENDC_MODULE_STRUCT_MACRO_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_constants.h"
 
@@ -342,6 +342,40 @@ struct MmadFixParams {
     instr_id_t instrId = instr_id_t::ID_0;
     bool postProcHalfEnable = false;
     bool layoutCtrl = false;
+    uint16_t n = 0;
+};
+
+struct PostProcParams {
+    __aicore__ PostProcParams() {}
+
+    __aicore__ PostProcParams(
+        const pre_quant_t preQuantModeIn, const uint8_t actPreModeIn, const post_quant_t postQuantModeIn,
+        const uint8_t preClipReluModeIn, const eltwise_op_t eltwiseOpIn, const bool eltwiseAntiqEnableIn,
+        const bool eltwiseBroadcastEnableIn, const lsb_mask_t lsbMaskIn, const bool dependEnableIn,
+        const instr_id_t instrIdIn, const uint16_t nIn)
+        : preQuantMode(preQuantModeIn),
+          actPreMode(actPreModeIn),
+          postQuantMode(postQuantModeIn),
+          preClipReluMode(preClipReluModeIn),
+          eltwiseOp(eltwiseOpIn),
+          eltwiseAntiqEnable(eltwiseAntiqEnableIn),
+          eltwiseBroadcastEnable(eltwiseBroadcastEnableIn),
+          lsbMask(lsbMaskIn),
+          dependEnable(dependEnableIn),
+          instrId(instrIdIn),
+          n(nIn)
+    {}
+
+    pre_quant_t preQuantMode = pre_quant_t::No_Quant;
+    uint8_t actPreMode = 0;
+    post_quant_t postQuantMode = post_quant_t::No_Quant;
+    uint8_t preClipReluMode = 0;
+    eltwise_op_t eltwiseOp = eltwise_op_t::No_Eltwise;
+    bool eltwiseAntiqEnable = false;
+    bool eltwiseBroadcastEnable = false;
+    lsb_mask_t lsbMask = lsb_mask_t::Disable;
+    bool dependEnable = false;
+    instr_id_t instrId = instr_id_t::ID_0;
     uint16_t n = 0;
 };
 } // namespace AscendC

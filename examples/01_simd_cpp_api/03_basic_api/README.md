@@ -18,3 +18,4 @@
 | [07_tpipe_tque](./07_tpipe_tque) | 本路径下包含了与tpipe和tque相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [09_utils](./09_utils) | 本路径下包含了与工具相关API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [10_cache_control](./10_cache_control) | 本路径下包含了与缓存控制相关的样例，介绍了DataCachePreload、L2 Cache切分等缓存控制接口的使用，展示如何通过预加载数据、调整数据访问顺序等方式提升缓存命中率、降低访存延迟。|
+| [11_tool_interface](./11_tool_interface) | 调用NumericLimits、Compare和Compares，逐元素检测矢量加法结果中的正无穷大和负无穷大。 |

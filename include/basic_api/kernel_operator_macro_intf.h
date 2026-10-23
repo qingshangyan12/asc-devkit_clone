@@ -25,8 +25,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/common_types.h"
 #include "../../impl/basic_api/kernel_operator_macro_base_impl.h"
@@ -256,6 +256,19 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMxFix(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixParams& mmadFixParams);
+
+/*
+ * @ingroup MacroCube
+ * @brief post process
+ * @param [out] dst
+ * @param [in] src
+ * @param [in] params register
+ */
+template <typename T, typename U>
+__aicore__ inline void PostProc(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params);
+template <typename T, typename U>
+__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
