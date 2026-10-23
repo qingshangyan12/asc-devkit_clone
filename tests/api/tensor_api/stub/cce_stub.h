@@ -14,6 +14,37 @@
 
 using float8_e8m0_t = fp8_e8m0_t;
 
+inline void vgather2(vector_s16& dst, __ubuf__ int8_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_u16& dst, __ubuf__ uint8_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_s8& dst, __ubuf__ int8_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_u8& dst, __ubuf__ uint8_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_s16& dst, __ubuf__ int16_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_u16& dst, __ubuf__ uint16_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_s32& dst, __ubuf__ int32_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2(vector_u32& dst, __ubuf__ uint32_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2(vector_f16& dst, __ubuf__ half* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_f32& dst, __ubuf__ float* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_f8e4m3& dst, __ubuf__ float8_e4m3_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_f8e5m2& dst, __ubuf__ float8_e5m2_t* src, vector_u16 index, vector_bool mask) {}
+inline void vgather2(vector_f8e8m0& dst, __ubuf__ float8_e8m0_t* src, vector_u16 index, vector_bool mask) {}
+inline void vselr(vector_s8& dst, vector_s8 src, vector_u8 index) {}
+inline void vselr(vector_u8& dst, vector_u8 src, vector_u8 index) {}
+inline void vselr(vector_s16& dst, vector_s16 src, vector_u16 index) {}
+inline void vselr(vector_u16& dst, vector_u16 src, vector_u16 index) {}
+inline void vselr(vector_s32& dst, vector_s32 src, vector_u32 index) {}
+inline void vselr(vector_u32& dst, vector_u32 src, vector_u32 index) {}
+inline void vselr(vector_f16& dst, vector_f16 src, vector_u16 index) {}
+inline void vselr(vector_bf16& dst, vector_bf16 src, vector_u16 index) {}
+inline void vselr(vector_f8e4m3& dst, vector_f8e4m3 src, vector_u8 index) {}
+inline void vselr(vector_f8e5m2& dst, vector_f8e5m2 src, vector_u8 index) {}
+inline void vselr(vector_f8e8m0& dst, vector_f8e8m0 src, vector_u8 index) {}
+inline void vci(vector_s8& dst, int8_t offset, Literal order) {}
+inline void vci(vector_s16& dst, int16_t offset, Literal order) {}
+inline void vci(vector_s32& dst, int32_t offset, Literal order) {}
+inline void vci(vector_f16& dst, half offset, Literal order) {}
+inline void vci(vector_f32& dst, float offset, Literal order) {}
+
 template <typename T>
 inline void asc_mem_bar(T)
 {}

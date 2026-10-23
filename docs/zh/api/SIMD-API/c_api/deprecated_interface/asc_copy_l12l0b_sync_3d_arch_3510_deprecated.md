@@ -220,7 +220,7 @@ __global__ __cube__ void asc_copy_l12l0b_3d_bside_kernel(
     asc_copy_l0c2gm(
         output, output_l0, M, COUT, M, COUT, 0, 0, 0, static_cast<uint64_t>(QuantMode_t::F322F16), 0, false,
         true, 0, 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

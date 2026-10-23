@@ -166,13 +166,13 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, ccu_selector_uses_parallel_mesh_nhr_multilink_i
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "CcuSchedAllGatherParallelMeshNHRMultiLink");
 
-    // The upstream selector switches to Pipeline at 16 MiB. Pipeline has not
-    // yet been migrated to asc-devkit, so the CCU branch declines and the
-    // common selector falls back to the existing AICPU implementation.
+    // The upstream selector switches to Pipeline at 16 MiB. Only the AICPU
+    // PipeLineMeshNHR variant is migrated, so the CCU branch declines and the
+    // common selector selects the migrated AICPU pipeline implementation.
     param.DataDes.count = (16U * 1024U * 1024U) / sizeof(float);
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::AICPU_TS);
-    EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHRMultiJetty");
+    EXPECT_EQ(algName, "AicpuAllGatherPipeLineMeshNHR");
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)

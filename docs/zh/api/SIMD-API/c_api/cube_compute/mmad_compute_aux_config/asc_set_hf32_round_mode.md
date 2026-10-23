@@ -112,7 +112,7 @@ __global__ __cube__ void asc_set_hf32_round_mode_kernel(
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM,
         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::NoQuant,
         asc_relu_pre_mode::NONE, false, true, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* label, const std::vector<float>& data)

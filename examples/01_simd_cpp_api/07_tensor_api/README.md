@@ -2,7 +2,7 @@
 
 ## 概述
 
-本目录收录直接包含`tensor_api/tensor.h`并使用Tensor API编程方式实现的样例，涵盖数据搬运、矩阵计算、卷积计算和高性能矩阵乘实践。
+本目录收录直接包含`tensor_api/tensor.h`并使用Tensor API编程方式实现的样例，涵盖数据搬运、矩阵计算、卷积计算、寄存器矢量计算和高性能矩阵乘实践。
 
 ## 样例列表
 
@@ -27,8 +27,10 @@
 | [data_reorder](./experimental/reg_vector_compute/data_reorder) | 基于Tensor API的deinterleave实现数据重排 | Ascend 950PR&950DT系列产品 |
 | [fill](./experimental/reg_vector_compute/fill) | 基于Tensor API实现fill标量填充运算 | Ascend 950PR&950DT系列产品 |
 | [fma](./experimental/reg_vector_compute/fma) | 基于Tensor API对三组float Tensor执行逐元素融合乘加计算 | Ascend 950PR&950DT系列产品 |
+| [gather](./experimental/reg_vector_compute/gather) | 基于Tensor API按照索引Tensor收集源寄存器中的half元素 | Ascend 950PR&950DT系列产品 |
 | [histograms](./experimental/reg_vector_compute/histograms) | 基于Tensor API实现高半区累计直方图统计 | Ascend 950PR&950DT系列产品 |
 | [mull](./experimental/reg_vector_compute/mull) | 基于Tensor API实现逐元素乘法并输出乘积的高32位和低32位 | Ascend 950PR&950DT系列产品 |
 | [reduction_compute](./experimental/reg_vector_compute/reduction_compute) | 基于Tensor API实现reduce_sum/reduce_max/reduce_min归约计算 | Ascend 950PR&950DT系列产品 |
+| [reg_load_store_unalign](./experimental/reg_vector_compute/reg_load_store_unalign) | 基于Tensor API实现UB与寄存器之间的非对齐加载与存储，展示非对齐复制和分块最大值归约 | Ascend 950PR&950DT系列产品 |
 | [shift_left](./experimental/reg_vector_compute/shift_left) | 基于Tensor API按照Tensor移位量执行逐元素左移 | Ascend 950PR&950DT系列产品 |
 | [trunc](./experimental/reg_vector_compute/trunc) | 基于Tensor API对浮点输入执行逐元素向零取整 | Ascend 950PR&950DT系列产品 |

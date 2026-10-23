@@ -54,7 +54,11 @@ public:
         this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT16}).Format({ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-        this->AICore().SetTiling(optiling::TilingFunc).AddConfig("ascend910b");
+        this->AICore()
+            .SetTiling(optiling::TilingFunc)
+            .AddConfig("ascend910b")
+            .AddConfig("ascend910_93")
+            .AddConfig("ascend950");
     }
 };
 OP_ADD(AddCustom);

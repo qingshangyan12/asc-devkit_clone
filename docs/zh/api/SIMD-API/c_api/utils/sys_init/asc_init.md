@@ -132,13 +132,15 @@ __global__ __vector__ void asc_init_kernel(__gm__ uint64_t* output, __gm__ uint6
     asc_init();
     __ubuf__ uint32_t local[BYTES / sizeof(uint32_t)];
     asc_copy_gm2ub_align(local, reinterpret_cast<__gm__ uint32_t*>(input), BYTES);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_set_atomic_add_int32();
-    // Reinitialize the core and clear persistent state such as the atomic mode.
+    // 再次初始化以清除前面设置的原子模式，避免该状态影响后续普通搬出。
     asc_init();
-    // asc_init resets the atomic mode, so this is an ordinary Unified Buffer（UB）-to-GM copy.
+    // 原子模式已复位，此处搬出应按普通UB到GM复制得到与输入一致的结果。
     asc_copy_ub2gm(reinterpret_cast<__gm__ uint32_t*>(output), local, BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 } // namespace
