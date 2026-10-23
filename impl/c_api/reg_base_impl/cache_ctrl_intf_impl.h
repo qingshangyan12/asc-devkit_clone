@@ -51,6 +51,14 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset) { dc_preload(address, offset); }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+__aicore__ inline void
+asc_multi_datacache_preload(__gm__ uint64_t* address, int64_t offset, uint32_t cacheline_num)
+{
+    dc_preload(address, offset, static_cast<uint16_t>(cacheline_num - 1));
+}
+#endif
+
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 } // namespace __asc_aicore
