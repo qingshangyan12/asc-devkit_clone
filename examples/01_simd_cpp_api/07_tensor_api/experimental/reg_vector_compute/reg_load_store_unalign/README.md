@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运。场景 1 完成非对齐复制，场景 2 完成非对齐加载、归约和存储GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器清零和归约使用实验性 Tensor API，流水同步使用 C API `asc_lock/asc_unlock`。
+本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运。场景 1 完成非对齐复制，场景 2 完成非对齐加载、归约和存储GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器清零和归约使用实验性 Tensor API，流水同步使用 Tensor API `asc::te::mutex`。
 
 样例包含两个场景，通过 `SCENARIO_NUM` 选择：
 
