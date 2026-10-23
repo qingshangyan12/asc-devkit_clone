@@ -272,8 +272,8 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
             if (topoInfo->topoLevelNums >= TOPO_LEVEL_NUM_3) {
                 selectAlgName = "AicpuAllGatherSoleNHR";
             } else if (
-                dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE
-                && topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
+                dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE &&
+                topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
                 selectAlgName = "InsAllGatherParallelMesh1DNHR";
             } else if (dataSize > AG_AICPU_SMALL_DATA_SIZE) {
                 selectAlgName = (dataSize * topoInfo->userRankSize > AG_AICPU_SEQUENCE_DATA_SIZE) ?
