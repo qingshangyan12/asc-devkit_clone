@@ -36,6 +36,7 @@
 #include "../../../include/basic_api/kernel_struct_data_copy.h"
 #include "../../../include/basic_api/kernel_tensor.h"
 #include "../kernel_tensor_base.h"
+#include "../utils/kernel_utils_ptr_overload.h"
 #include "../kernel_tensor_impl.h"
 #include "../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
@@ -774,6 +775,28 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& readLocal, con
         SetFlag<HardEvent::MTE1_MTE3>(eventIDMTE1ToMTE3);
         WaitFlag<HardEvent::MTE1_MTE3>(eventIDMTE1ToMTE3);
     }
+}
+
+/* Definitions of the raw-pointer ReadSpmBuffer overloads declared in kernel_tpipe.h. */
+template <typename T>
+__aicore__ inline void TPipe::ReadSpmBuffer(
+    __ubuf__ T* readBuffer, const DataCopyParams& copyParams, int32_t readOffset)
+{
+    ReadSpmBuffer<T>(CubePtrOverload::LocalTensorFromPtr<TPosition::VECCALC, T>(readBuffer), copyParams, readOffset);
+}
+
+template <typename T>
+__aicore__ inline void TPipe::ReadSpmBuffer(__ubuf__ T* readBuffer, const int32_t readSize, int32_t readOffset)
+{
+    // The Tensor overload above derives its block length from the tensor's ShapeInfo when readSize is
+    // 0.  A raw pointer carries no ShapeInfo, and this signature is documented as "readSize is the
+    // size, and 0 means 0" (include/basic_api/kernel_tpipe.h).  Forwarding a 0 into that overload
+    // would instead read an uninitialised ShapeInfo and issue a transfer of an undetermined length,
+    // so a zero-length read is taken literally here: it moves nothing.
+    if (readSize == 0) {
+        return;
+    }
+    ReadSpmBuffer<T>(CubePtrOverload::LocalTensorFromPtr<TPosition::VECCALC, T>(readBuffer), readSize, readOffset);
 }
 
 template <TPosition pos>
