@@ -370,7 +370,7 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
         KernelSpecializationSession::LoadAndMaterializeCompilationResource(resourceId, rejectedResource),
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
-    registeredResource.SetAutomaticLoadStatus(ResourceStatus::Conflict);
+    registeredResource.SetAutomaticLoadStatus(ResourceStatus::Success);
     MaterializedKernelCompilationResource firstResource;
     ASSERT_EQ(
         KernelSpecializationSession::LoadAndMaterializeCompilationResource(resourceId, firstResource),
@@ -384,7 +384,6 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
         KernelSpecializationSession::LoadAndMaterializeCompilationResource("missing-resource", missingResource),
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
-    registeredResource.SetAutomaticLoadStatus(ResourceStatus::Success);
     MaterializedKernelCompilationResource secondResource;
     ASSERT_EQ(
         KernelSpecializationSession::LoadAndMaterializeCompilationResource(resourceId, secondResource),

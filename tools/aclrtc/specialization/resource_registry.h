@@ -82,7 +82,6 @@ struct StagedResources {
     uint64_t bytes = 0U;
     uint64_t files = 0U;
     bool discovered = false;
-    bool conflict = false;
 };
 
 struct StageState {

@@ -58,7 +58,6 @@ def test_kernel_spec_producer_reads_make_results(tmp_path, monkeypatch, status):
         src_file=str(tmp_path / "add.cpp"),
         kernel_spec_mode="Normal",
         kernel_spec_dir=str(tmp_path / "resources"),
-        kernel_spec_build=None,
         compile_options="",
         debug_config="",
         config_ini=str(tmp_path / "ops.ini"),
@@ -93,7 +92,6 @@ def test_kernel_spec_producer_reads_make_results(tmp_path, monkeypatch, status):
 def test_kernel_spec_initialization_failure_is_recorded(tmp_path, monkeypatch):
     args = SimpleNamespace(
         kernel_spec_mode="Normal",
-        kernel_spec_build=None,
         kernel_spec_dir=str(tmp_path),
         op_type="Add",
         compute_unit="ascend910b",
@@ -223,6 +221,7 @@ def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monk
 
 @pytest.mark.parametrize("mode", ["Normal", "SK", "None"])
 def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch, mode):
+    monkeypatch.delattr(shlex, "join", raising=False)
     cfg_file = tmp_path / "op_info.ini"
     cfg_file.write_text("")
     opc_file = tmp_path / "custom_opc_options.ini"
