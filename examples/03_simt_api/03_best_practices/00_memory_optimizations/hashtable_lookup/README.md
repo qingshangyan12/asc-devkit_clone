@@ -141,17 +141,20 @@ struct SoaTable {
   float value[CAPACITY][DIM];
 };
 
-__aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start) {
-  ...
-  const uint64_t bucket_key = table->key[idx];
-  if (bucket_key == target_key) {
-      return idx;  
-  }
-  if (bucket_key == EMPTY_KEY) {
-      return NOT_FOUND;  
-  }
-  idx = (idx + 1) & (CAPACITY - 1);  
-  ...
+__aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start)
+{
+    uint32_t idx = start;
+    for (uint32_t i = 0; i < CAPACITY; ++i) {
+        const uint64_t bucket_key = table->key[idx];
+        if (bucket_key == target_key) {
+            return idx;
+        }
+        if (bucket_key == EMPTY_KEY) {
+            return NOT_FOUND;
+        }
+        idx = (idx + 1) & (CAPACITY - 1);
+    }
+    return NOT_FOUND;
 }
 ```
 
