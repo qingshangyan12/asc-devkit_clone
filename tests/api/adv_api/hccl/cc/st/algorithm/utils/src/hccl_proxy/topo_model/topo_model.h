@@ -79,7 +79,7 @@ private:
     std::vector<uint32_t> allRankNum_;
 
     // A5 topo
-    std::map<uint32_t, std::map<uint32_t, std::vector<uint32_t>>> dev2TopoInsts_;  // serverId->每个dev对应的实例Id
+    std::map<uint32_t, std::map<uint32_t, std::vector<uint32_t>>> dev2TopoInsts_; // serverId->每个dev对应的实例Id
     std::map<uint32_t, std::map<uint32_t, std::vector<uint32_t>>> instId2RankIds_; // serverId->每个实例对应的rankId集合
     std::map<uint32_t, std::vector<uint32_t>> level1TopoInsts_;
     std::vector<uint32_t> level2TopoInsts_;

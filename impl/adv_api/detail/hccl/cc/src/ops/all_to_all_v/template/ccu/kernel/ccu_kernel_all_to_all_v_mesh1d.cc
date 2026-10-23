@@ -148,10 +148,9 @@ static CcuResult CcuAlltoAllVMesh1DKernelV1(
                         } else {
                             CCU_IF(tailSize != 0)
                             {
-                                CCU_CHK_RET(
-                                    ccu::Write(
-                                        channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
-                                        rankMask));
+                                CCU_CHK_RET(ccu::Write(
+                                    channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
+                                    rankMask));
                             }
                             CCU_IF(tailSize == 0) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
                         }
@@ -164,10 +163,9 @@ static CcuResult CcuAlltoAllVMesh1DKernelV1(
                             CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
                             localDst.addr += maxTransportSize;
                         } else {
-                            CCU_CHK_RET(
-                                ccu::Write(
-                                    channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize,
-                                    events[eventIdx], rankMask));
+                            CCU_CHK_RET(ccu::Write(
+                                channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize, events[eventIdx],
+                                rankMask));
                             dst[rankIdx].addr += maxTransportSize;
                         }
                         src[rankIdx].addr += maxTransportSize;
