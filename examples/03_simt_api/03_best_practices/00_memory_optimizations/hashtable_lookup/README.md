@@ -95,7 +95,6 @@ struct AoSBucket {
   uint64_t key;
   float value[DIM];
 };
-AoSBucket table[CAPACITY];
 
 __aicore__ inline uint32_t find_aos(const AoSBucket* table,
                                     uint64_t target_key, uint32_t start) {
@@ -130,7 +129,7 @@ __aicore__ inline uint32_t find_aos(const AoSBucket* table,
 
 ### Case 1：SoA纯布局改造
 
-**优化目标**：将key与value字段分区存储（SoA，Structure of Arrays），使探测路径与value区完全解耦，消除value存放在Bucket中对探测访存跨度的干扰。
+**优化目标**：采用SoA（Structure of Arrays）优化内存布局，优化查找key的访存效率。
 
 **核心实现**：与Case 0算法完全一致；唯一差异是内存布局。SoA把所有共8MB的key连续存在一起，所有共32MB的value连续存在一起，key和value分开存放。
 
@@ -141,7 +140,7 @@ struct SoaTable {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTable table;
+
 __aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
@@ -191,7 +190,6 @@ struct SoaTableWithDigest {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTableWithDigest table;
 
 // digest 取 key 哈希值的高 8 位
 __host__ __aicore__ inline uint8_t digest_of(uint64_t hashed) {
