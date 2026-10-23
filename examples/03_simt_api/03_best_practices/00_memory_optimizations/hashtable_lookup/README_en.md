@@ -96,7 +96,7 @@ struct AoSBucket {
 };
 AoSBucket buckets[CAPACITY];
 
-__aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = buckets[idx].key;
   if (bucket_key == target_key) {
@@ -138,7 +138,7 @@ struct SoaTableNoDigest {
   float value[CAPACITY][DIM];
 };
 SoaTableNoDigest table;
-__aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
   if (bucket_key == target_key) {
@@ -190,20 +190,20 @@ struct SoaTable {
 SoaTable table;
 
 // digest: the high 8 bits of the key's hash value
-__host__ __aicore__ inline uint8_t DigestOf(uint64_t hashed) {
+__host__ __aicore__ inline uint8_t digest_of(uint64_t hashed) {
   return static_cast<uint8_t>(hashed >> 32);
 }
 
 // Lookup side: the target digest is replicated 4 times into a 4B word for vcmp_eq4 four-way byte-parallel comparison
-__host__ __aicore__ inline uint32_t DigestWordOf(uint64_t hashed) {
-  return static_cast<uint32_t>(DigestOf(hashed)) * 0x01010101u;
+__host__ __aicore__ inline uint32_t digest_word_of(uint64_t hashed) {
+  return static_cast<uint32_t>(digest_of(hashed)) * 0x01010101u;
 }
 
-__aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
+__aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTable* table,
                                              uint64_t target_key,
                                              uint32_t start,
                                              uint32_t target_word) {
-  const uint32_t empty_word = DigestWordOf(Murmur3Hash(EMPTY_KEY));
+  const uint32_t empty_word = digest_word_of(murmur3_hash(EMPTY_KEY));
   const uint32_t first_pos = start & (CAPACITY - STRIDE);  // align the starting bucket to a word
   for (uint32_t offset = 0; offset < CAPACITY + STRIDE; offset += STRIDE) {
     const uint32_t pos = (first_pos + offset) & (CAPACITY - 1);
@@ -212,7 +212,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
     // equal digests do not mean equal keys, the 8B key must still be read for final confirmation
     const uint32_t probe =
         *reinterpret_cast<const uint32_t*>(table->digest + pos);
-    uint32_t cmp = VcmpEq4(probe, target_word) & 0x01010101u;
+    uint32_t cmp = vcmp_eq4(probe, target_word) & 0x01010101u;
     while (cmp != 0) {
       const uint32_t idx =
           pos + (((static_cast<uint32_t>(
@@ -223,7 +223,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
       }
     }
 
-    cmp = VcmpEq4(probe, empty_word) & 0x01010101u;
+    cmp = vcmp_eq4(probe, empty_word) & 0x01010101u;
     while (cmp != 0) {
       const uint32_t idx =
           pos + (((static_cast<uint32_t>(
@@ -276,8 +276,8 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
     const SoaTable* table, const uint64_t* keys, uint32_t* indices, uint32_t query_num) {
     ...
     const uint32_t word = *reinterpret_cast<const uint32_t*>(table->digest + pos);
-    uint32_t tmask = VcmpEq4(word, target_word) & 0x01010101u;
-    uint32_t emask = VcmpEq4(word, empty_word) & 0x01010101u;
+    uint32_t tmask = vcmp_eq4(word, target_word) & 0x01010101u;
+    uint32_t emask = vcmp_eq4(word, empty_word) & 0x01010101u;
     if (round == 0) {
       const uint32_t shift = (start > pos)
           ? (kBucketsPerLane < start - pos ? kBucketsPerLane : start - pos) : 0u;

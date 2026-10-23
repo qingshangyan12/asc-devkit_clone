@@ -96,7 +96,7 @@ struct AoSBucket {
 };
 AoSBucket buckets[CAPACITY];
 
-__aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = buckets[idx].key;
   if (bucket_key == target_key) {
@@ -138,7 +138,7 @@ struct SoaTableNoDigest {
   float value[CAPACITY][DIM];
 };
 SoaTableNoDigest table;
-__aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
   if (bucket_key == target_key) {
@@ -190,20 +190,20 @@ struct SoaTable {
 SoaTable table;
 
 // digest 取 key 哈希值的高 8 位
-__host__ __aicore__ inline uint8_t DigestOf(uint64_t hashed) {
+__host__ __aicore__ inline uint8_t digest_of(uint64_t hashed) {
   return static_cast<uint8_t>(hashed >> 32);
 }
 
 // 查找侧：目标 digest 复制 4 份拼成 4B word，供 vcmp_eq4 四路字节并行比较
-__host__ __aicore__ inline uint32_t DigestWordOf(uint64_t hashed) {
-  return static_cast<uint32_t>(DigestOf(hashed)) * 0x01010101u;
+__host__ __aicore__ inline uint32_t digest_word_of(uint64_t hashed) {
+  return static_cast<uint32_t>(digest_of(hashed)) * 0x01010101u;
 }
 
-__aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
+__aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTable* table,
                                              uint64_t target_key,
                                              uint32_t start,
                                              uint32_t target_word) {
-  const uint32_t empty_word = DigestWordOf(Murmur3Hash(EMPTY_KEY));
+  const uint32_t empty_word = digest_word_of(murmur3_hash(EMPTY_KEY));
   const uint32_t first_pos = start & (CAPACITY - STRIDE);  // 起始桶对齐到 word
   for (uint32_t offset = 0; offset < CAPACITY + STRIDE; offset += STRIDE) {
     const uint32_t pos = (first_pos + offset) & (CAPACITY - 1);
@@ -211,7 +211,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
     // 比较目标 digest：__ffs 逐个取出 digest 匹配的桶位——digest 相同不代表 key 相同，还要读 8B key 最终确认
     const uint32_t probe =
         *reinterpret_cast<const uint32_t*>(table->digest + pos);
-    uint32_t cmp = VcmpEq4(probe, target_word) & 0x01010101u;
+    uint32_t cmp = vcmp_eq4(probe, target_word) & 0x01010101u;
     while (cmp != 0) {
       const uint32_t idx =
           pos + (((static_cast<uint32_t>(
@@ -222,7 +222,7 @@ __aicore__ inline uint32_t FindSoaDigestVcmp(const SoaTable* table,
       }
     }
 
-    cmp = VcmpEq4(probe, empty_word) & 0x01010101u;
+    cmp = vcmp_eq4(probe, empty_word) & 0x01010101u;
     while (cmp != 0) {
       const uint32_t idx =
           pos + (((static_cast<uint32_t>(
@@ -276,8 +276,8 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
     const SoaTable* table, const uint64_t* keys, uint32_t* indices, uint32_t query_num) {
     ...
     const uint32_t word = *reinterpret_cast<const uint32_t*>(table->digest + pos);
-    uint32_t tmask = VcmpEq4(word, target_word) & 0x01010101u;
-    uint32_t emask = VcmpEq4(word, empty_word) & 0x01010101u;
+    uint32_t tmask = vcmp_eq4(word, target_word) & 0x01010101u;
+    uint32_t emask = vcmp_eq4(word, empty_word) & 0x01010101u;
     if (round == 0) {  
       const uint32_t shift = (start > pos)
           ? (kBucketsPerLane < start - pos ? kBucketsPerLane : start - pos) : 0u;

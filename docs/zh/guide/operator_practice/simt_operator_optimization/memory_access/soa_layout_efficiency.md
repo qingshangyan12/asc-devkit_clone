@@ -26,7 +26,7 @@ struct AoSBucket {
   float value[DIM];
 };
 AoSBucket buckets[CAPACITY];
-__aicore__ inline uint32_t FindAos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = buckets[idx].key;
   if (bucket_key == target_key) {
@@ -55,7 +55,7 @@ struct SoaTableNoDigest {
   float value[CAPACITY][DIM];
 };
 SoaTableNoDigest table;
-__aicore__ inline uint32_t FindSoaNoDigest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
   if (bucket_key == target_key) {
