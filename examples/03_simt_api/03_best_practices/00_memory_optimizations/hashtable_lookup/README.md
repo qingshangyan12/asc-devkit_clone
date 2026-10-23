@@ -86,7 +86,7 @@ SoaTableNoDigest table;
 
 **优化目标**：使用哈希表查找的基本实现建立性能基线。
 
-**核心实现**：一个Bucket共40B，AoS将8B的key和32B的value存放在同一个Bucket里，查找逻辑逐Bucket读8B key进行比较。每个线程独立负责一条查询key。
+**核心实现**：采用AoS内存设计，使用开放寻址法处理哈希冲突，实现基本哈希查找功能。
 
 **关键代码**：
 
@@ -97,17 +97,20 @@ struct AoSBucket {
 };
 AoSBucket buckets[CAPACITY];
 
-__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
-  ...
-  const uint64_t bucket_key = buckets[idx].key;
-  if (bucket_key == target_key) {
-      return idx;  
+__aicore__ inline uint32_t find_aos(const AoSBucket* buckets,
+                                    uint64_t target_key, uint32_t start) {
+  uint32_t idx = start;
+  for (uint32_t i = 0; i < CAPACITY; ++i) {
+    const uint64_t bucket_key = buckets[idx].key;
+    if (bucket_key == target_key) {
+      return idx;
+    }
+    if (bucket_key == EMPTY_KEY) {
+      return NOT_FOUND;
+    }
+    idx = (idx + 1) & (CAPACITY - 1);
   }
-  if (bucket_key == EMPTY_KEY) {
-      return NOT_FOUND;  
-  }
-  idx = (idx + 1) & (CAPACITY - 1);  
-  ...
+  return NOT_FOUND;
 }
 ```
 
