@@ -174,7 +174,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float8_e6m2x2_t __bfloat1622fp8x2_e6m2_rn(
     return __cvt_float8_e6m2x2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
-
 #endif
 
 #endif
