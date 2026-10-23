@@ -27,10 +27,10 @@ struct AoSBucket {
   uint64_t key;
   float value[DIM];
 };
-AoSBucket buckets[CAPACITY];
-__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+AoSBucket table[CAPACITY];
+__aicore__ inline uint32_t find_aos(const AoSBucket* table, uint64_t target_key, uint32_t start) {
   ...
-  const uint64_t bucket_key = buckets[idx].key;
+  const uint64_t bucket_key = table[idx].key;
   if (bucket_key == target_key) {
       return idx;  
   }
@@ -52,12 +52,12 @@ __aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_ke
 【正例】使用SoA布局，key与value分区存储，探测路径与value区解耦，消除value存放在Bucket中对探测访存跨度的干扰。
 
 ```cpp
-struct SoaTableNoDigest {
+struct SoaTable {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTableNoDigest table;
-__aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+SoaTable table;
+__aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
   if (bucket_key == target_key) {

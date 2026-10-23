@@ -66,13 +66,13 @@ struct AoSBucket {
   uint64_t key;
   float value[DIM];
 };
-AoSBucket buckets[CAPACITY];
+AoSBucket table[CAPACITY];
 
-struct SoaTableNoDigest {
+struct SoaTable {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTableNoDigest table;
+SoaTable table;
 ```
 
 ### Performance Metrics Description
@@ -95,11 +95,11 @@ struct AoSBucket {
   uint64_t key;
   float value[DIM];
 };
-AoSBucket buckets[CAPACITY];
+AoSBucket table[CAPACITY];
 
-__aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_key, uint32_t start) {
+__aicore__ inline uint32_t find_aos(const AoSBucket* table, uint64_t target_key, uint32_t start) {
   ...
-  const uint64_t bucket_key = buckets[idx].key;
+  const uint64_t bucket_key = table[idx].key;
   if (bucket_key == target_key) {
       return idx;
   }
@@ -134,12 +134,12 @@ Data load and store are performed in units of Cache Lines. AoS stores the key an
 **Key Code**:
 
 ```cpp
-struct SoaTableNoDigest {
+struct SoaTable {
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTableNoDigest table;
-__aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uint64_t target_key, uint32_t start) {
+SoaTable table;
+__aicore__ inline uint32_t find_soa(const SoaTable* table, uint64_t target_key, uint32_t start) {
   ...
   const uint64_t bucket_key = table->key[idx];
   if (bucket_key == target_key) {
@@ -183,12 +183,12 @@ At this point, if the read width of the probing lookup can be further reduced, l
 **Key Code**:
 
 ```cpp
-struct SoaTable {
+struct SoaTableWithDigest {
   uint8_t digest[CAPACITY];
   uint64_t key[CAPACITY];
   float value[CAPACITY][DIM];
 };
-SoaTable table;
+SoaTableWithDigest table;
 
 // digest: the high 8 bits of the key's hash value
 __host__ __aicore__ inline uint8_t digest_of(uint64_t hashed) {
@@ -200,7 +200,7 @@ __host__ __aicore__ inline uint32_t digest_word_of(uint64_t hashed) {
   return static_cast<uint32_t>(digest_of(hashed)) * 0x01010101u;
 }
 
-__aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTable* table,
+__aicore__ inline uint32_t find_soa_digest_vcmp(const SoaTableWithDigest* table,
                                              uint64_t target_key,
                                              uint32_t start,
                                              uint32_t target_word) {
@@ -274,7 +274,7 @@ The following code introduces the cooperative group mechanism on top of digest p
 
 ```cpp
 __global__ __launch_bounds__(THREADS_PER_BLOCK) void lookup_coop_swar_kernel(
-    const SoaTable* table, const uint64_t* keys, uint32_t* indices, uint32_t query_num) {
+    const SoaTableWithDigest* table, const uint64_t* keys, uint32_t* indices, uint32_t query_num) {
     ...
     const uint32_t word = *reinterpret_cast<const uint32_t*>(table->digest + pos);
     uint32_t tmask = vcmp_eq4(word, target_word) & 0x01010101u;
