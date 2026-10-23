@@ -18,6 +18,7 @@
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
 | `asc-search` | OKF 用户侧：C API 文档索引建立与需求检索 | `skills/asc-search/SKILL.md` |
 | `public-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新公共远程 skill | `skills/public-skills/SKILL.md` |
+| `zh-doc-format` | 中文技术文档通用格式规范（称谓统一、标点、括号/斜杠/破折号书面化），源自检视意见沉淀 | `skills/zh-doc-format/SKILL.md` |
 | `gitcode-pr` | 通过公共远程 skill 处理 GitCode PR、评论、讨论和变更查询 | `skills/gitcode-pr/SKILL.md` |
 
 当前 `.agent` 通过 `asc-ar-dev` 覆盖 AscendC 需求分析、实现方案和代码评审；示例工程生成暂不单独维护 skill。
