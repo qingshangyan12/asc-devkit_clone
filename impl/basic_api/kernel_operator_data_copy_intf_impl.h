@@ -627,7 +627,11 @@ __aicore__ inline void DataCopyL1ToUB(
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
     CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    DataCopyL12UBImpl<PrimType>(
+#else
     DataCopyL12UBImpl<PrimType, subBlockId>(
+#endif
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
 #endif
 }
