@@ -10,7 +10,7 @@
 
 // AllReduce CCU selector 行为用例：对齐 hccl SelectCcuScheduleAlgo 分支框架。
 // 已注册算法（当前仅 CcuSchedAllReduceSoleMesh）MATCH；未注册算法设名后 NOT_MATCH，
-// 由基类 Select 回退链（CCU_SCHED -> CCU_FAIL -> AICPU）兜底。不依赖 SimWorld 设备仿真。
+// CCU 上下文（KFC）无法运行 AICPU 算法，选不到直接失败，不降级。不依赖 SimWorld 设备仿真。
 
 #include "all_reduce_auto_selector.h"
 
@@ -95,21 +95,20 @@ protected:
         EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::CCU_SCHED);
     }
 
-    // CCU 未命中（含未注册算法），回退链落到 AICPU 并命中
-    void ExpectCcuFallbackToAicpu(OpParam& param, TopoInfoWithNetLayerDetails& topo)
+    // CCU 未命中（含未注册算法）：直接失败，不降级 AICPU，配置保持 CCU_SCHED
+    void ExpectCcuDecline(OpParam& param, TopoInfoWithNetLayerDetails& topo)
     {
         std::string algName;
-        EXPECT_EQ(selector_.Select(param, &topo, algName), SelectorStatus::MATCH);
-        EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::AICPU_TS);
-        EXPECT_NE(algName.find("Aicpu"), std::string::npos);
+        EXPECT_EQ(selector_.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+        EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::CCU_SCHED);
     }
 
-    // CCU/AICPU 均未命中：整体 NOT_MATCH，配置停在 CCU_FAIL
+    // CCU/AICPU 均未命中：整体 NOT_MATCH，配置保持 CCU_SCHED
     void ExpectCcuNotMatch(OpParam& param, TopoInfoWithNetLayerDetails& topo)
     {
         std::string algName;
         EXPECT_EQ(selector_.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
-        EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::CCU_FAIL);
+        EXPECT_EQ(param.opExecuteConfig, OpExecuteConfig::CCU_SCHED);
     }
 
     AllReduceAutoSelector selector_;
@@ -156,60 +155,60 @@ TEST_F(CcuStAllReduceSelector, Selector_PcieMixFullMesh_MatchSoleMesh)
     ExpectCcuMatch(param, topo);
 }
 
-// ===== 未注册算法 / 约束拒绝：CCU NOT_MATCH 后回退 AICPU =====
+// ===== 未注册算法 / 约束拒绝：CCU NOT_MATCH 直接失败 =====
 
-TEST_F(CcuStAllReduceSelector, Selector_Mesh1d_OverMem2MemLimit_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Mesh1d_OverMem2MemLimit_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(2U); // ratio=2，8MB*2 > 8MB
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U * 8U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_TwoDieRegular_Unregistered2Die_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_TwoDieRegular_Unregistered2Die_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     topo.level0MeshType = Level0MeshType::TWO_DIE_REGULAR;
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Level1Nhr_UnregisteredSoleNHR_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Level1Nhr_UnregisteredSoleNHR_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
     topo.Level1Nhr = true;
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_MultiLevel_SequenceData_Unregistered_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_MultiLevel_SequenceData_Unregistered_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelMesh1DTopo(16U);
     OpParam param = MakeCcuSchedParam(ONE_MB / 4U); // (512KB, 64MB] 且 <64P 选 SequenceMeshMesh（未注册）
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Prod_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Prod_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Int64_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Int64_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 8U, HCCL_DATA_TYPE_INT64);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Int8_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Int8_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB, HCCL_DATA_TYPE_INT8); // MS reduce 不支持 int8
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_InPlace_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_InPlace_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
@@ -218,32 +217,32 @@ TEST_F(CcuStAllReduceSelector, Selector_InPlace_FallbackAicpu)
     param.outputPtr = buffer;
     param.inputSize = FOUR_KB;
     param.outputSize = FOUR_KB;
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_ThreeLevel_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_ThreeLevel_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     topo.topoLevelNums = 3U;
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_Level2UbRtp_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_Level2UbRtp_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
     topo.level2UbRtp = true;
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
-TEST_F(CcuStAllReduceSelector, Selector_PcieMixNotFullyConnected_FallbackAicpu)
+TEST_F(CcuStAllReduceSelector, Selector_PcieMixNotFullyConnected_Decline)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 2U, 4U); // 1DMESH 仅 2 卡，无法全连通
     topo.level0PcieMix = true;
     topo.netLayerDetails.localNetInsSizeOfLayer = {4U};
     OpParam param = MakeCcuSchedParam(FOUR_KB / 4U);
-    ExpectCcuFallbackToAicpu(param, topo);
+    ExpectCcuDecline(param, topo);
 }
 
 // ===== CCU/AICPU 均不支持的拓扑与数据量：整体 NOT_MATCH =====
