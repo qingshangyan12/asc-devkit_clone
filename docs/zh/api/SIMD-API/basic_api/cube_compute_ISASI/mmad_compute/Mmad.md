@@ -181,7 +181,7 @@ Atlas A2系列产品
 | enSsparse | 开启结构化稀疏特性，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradA | 指示矩阵a是否通过winograd_feature_map_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradB | 指示矩阵b是否通过winograd_weight_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id3 -->
 
 ## 数据类型<a id="zh_cn_topic_mmad_section5"></a>
 
@@ -349,4 +349,4 @@ Atlas A2系列产品
 ## 调用示例
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id3 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->
