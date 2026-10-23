@@ -23,7 +23,7 @@ using namespace mc2_ops_hccl;
 namespace {
 
 constexpr u64 KB = 1024ULL;
-constexpr u64 MB = 1024ULL * KB;
+constexpr u64 ONE_MB = 1024ULL * KB;
 
 OpParam MakeArParam(
     u64 count, HcclDataType dataType = HCCL_DATA_TYPE_FP32, HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_SUM)
@@ -130,7 +130,7 @@ protected:
 TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Prod_MatchSoleNHRAicpuReduce)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 2U, 8U);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHRAicpuReduce");
@@ -143,7 +143,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Symmetric3LevelUboe_MatchParallelM
     topo.level1Symmetric = true;
     topo.deviceNumPerModule = 4U;
     topo.topLevelUboe = true;
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceParallelMeshNHR");
@@ -153,7 +153,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Level1Nhr_MatchSoleNHR)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 2U, 8U);
     topo.Level1Nhr = true;
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
@@ -162,7 +162,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Level1Nhr_MatchSoleNHR)
 TEST_F(AicpuAllReduceSelectorTest, MultiLevel_LocalSingleInstance_MatchSoleNHR)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 2U, 1U);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
@@ -171,7 +171,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_LocalSingleInstance_MatchSoleNHR)
 TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_3Level_NonSymmetric_MatchSoleNHR)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 3U, 8U);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
@@ -180,7 +180,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_3Level_NonSymmetric_MatchSo
 TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_2Level_MidData_MatchParallelMeshNHR)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 2U, 8U);
-    OpParam param = MakeArParamByBytes(64U * MB);
+    OpParam param = MakeArParamByBytes(64U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceParallelMeshNHR");
@@ -189,7 +189,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_2Level_MidData_MatchParalle
 TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_2Level_SmallData_MatchSoleNHR)
 {
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelTopo(Level0Shape::MESH_1D, 2U, 8U);
-    OpParam param = MakeArParamByBytes(1U * MB);
+    OpParam param = MakeArParamByBytes(1U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
@@ -200,7 +200,7 @@ TEST_F(AicpuAllReduceSelectorTest, MultiLevel_Mesh1D_2Level_SmallData_MatchSoleN
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -209,7 +209,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SmallData_MatchOneShot)
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_MidData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(16U * MB);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -218,7 +218,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_MidData_MatchTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_OverMaxData_MatchChunkTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(512U * MB); // 512MB * 8/64 = 64MB > 32MB
+    OpParam param = MakeArParamByBytes(512U * ONE_MB); // 512MB * 8/64 = 64MB > 32MB
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshChunkTwoShot");
@@ -227,7 +227,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_OverMaxData_MatchChunkTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SpecialInt64_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -236,7 +236,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SpecialInt64_SmallData_MatchOneShot)
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SpecialInt64_MidData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(16U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -245,7 +245,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_SpecialInt64_MidData_MatchTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, Mesh1D_Prod_MidData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelMesh1DTopo(8U);
-    OpParam param = MakeArParamByBytes(16U * MB, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB, HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_PROD);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -256,7 +256,7 @@ TEST_F(AicpuAllReduceSelectorTest, Mesh1D_Prod_MidData_MatchTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, Clos_Special_MatchSoleNHRAicpuReduce)
 {
     TopoInfoWithNetLayerDetails topo = MakeSingleLevelClosTopo(8U);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHRAicpuReduce");
@@ -267,7 +267,7 @@ TEST_F(AicpuAllReduceSelectorTest, Clos_Special_MatchSoleNHRAicpuReduce)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 8U, 8U, true);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -276,7 +276,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_SmallData_MatchOneShot)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_MidData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 8U, 8U, true);
-    OpParam param = MakeArParamByBytes(16U * MB);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -285,7 +285,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_MidData_MatchTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_OverMaxData_MatchChunkTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 8U, 8U, true);
-    OpParam param = MakeArParamByBytes(512U * MB);
+    OpParam param = MakeArParamByBytes(512U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshChunkTwoShot");
@@ -294,7 +294,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_OverMaxData_MatchChunkTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_Special_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 8U, 8U, true);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -303,7 +303,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_Special_SmallData_MatchOneShot)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_Special_MidData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 8U, 8U, true);
-    OpParam param = MakeArParamByBytes(16U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -314,7 +314,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixFull_Special_MidData_MatchTwoShot)
 TEST_F(AicpuAllReduceSelectorTest, PcieMixNotFull_SmallData_MatchParallelMeshNHRPcie)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 2U, 8U, true);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllreduceParallelMeshNHRPcie");
@@ -323,7 +323,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixNotFull_SmallData_MatchParallelMeshNHR
 TEST_F(AicpuAllReduceSelectorTest, PcieMixNotFull_LargeData_MatchPipeLinePcie)
 {
     TopoInfoWithNetLayerDetails topo = MakePcieMeshTopo(8U, 2U, 8U, true);
-    OpParam param = MakeArParamByBytes(64U * MB);
+    OpParam param = MakeArParamByBytes(64U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReducePipeLinePcie");
@@ -334,7 +334,7 @@ TEST_F(AicpuAllReduceSelectorTest, PcieMixNotFull_LargeData_MatchPipeLinePcie)
 TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClos4P_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U);
-    OpParam param = MakeArParamByBytes(4U * MB);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -343,7 +343,7 @@ TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClos4P_SmallData_MatchOneShot)
 TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClos4P_Special_SmallData_MatchOneShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
@@ -352,7 +352,7 @@ TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClos4P_Special_SmallData_MatchOn
 TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClos4P_Special_LargeData_MatchTwoShot)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(4U, 4U, 4U);
-    OpParam param = MakeArParamByBytes(16U * MB, HCCL_DATA_TYPE_INT64);
+    OpParam param = MakeArParamByBytes(16U * ONE_MB, HCCL_DATA_TYPE_INT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleMeshTwoShot");
@@ -370,7 +370,7 @@ TEST_F(AicpuAllReduceSelectorTest, Ubx_MeshEqualClosOver4P_SmallData_MatchSoleNH
 TEST_F(AicpuAllReduceSelectorTest, Ubx_Rectangular_Special_MatchSoleNHRAicpuReduce)
 {
     TopoInfoWithNetLayerDetails topo = MakeUbxTopo(8U, 2U, 4U);
-    OpParam param = MakeArParamByBytes(4U * MB, HCCL_DATA_TYPE_UINT64);
+    OpParam param = MakeArParamByBytes(4U * ONE_MB, HCCL_DATA_TYPE_UINT64);
     std::string algName;
     EXPECT_EQ(SelectAicpu(&topo, param, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHRAicpuReduce");
