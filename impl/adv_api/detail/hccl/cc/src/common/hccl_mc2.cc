@@ -611,9 +611,8 @@ HcclResult DispatchAllocByCommEngine(
         if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
             // 指定错误（LEGACY 语法/未注册裸名/词法错误外部名/无 CCU 候选）必须报错终止，
             // 不再静默回退——回退会掩盖配置错误，用户侧拿到的是预期外的算法。
-            HCCL_ERROR(
-                "[HcclAllocComResourceByTiling] algConfig is invalid or not registered in mc2_client, "
-                "please check the algConfig.");
+            HCCL_ERROR("[HcclAllocComResourceByTiling] algConfig is invalid or not registered in mc2_client, "
+                       "please check the algConfig.");
             return HCCL_E_ALG_NOT_SUPPORTED;
         }
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));
@@ -747,10 +746,10 @@ HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs)
     CHK_RET(BuildMc2CcTiling(comm, ccType, *args, ccTiling));
     const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {&ccTiling};
 
-    Mc2InitTilingInner initTiling{};                  // DispatchAllocByCommEngine内都是按照Mc2InitTilingInner类型去处理
+    Mc2InitTilingInner initTiling{}; // DispatchAllocByCommEngine内都是按照Mc2InitTilingInner类型去处理
     initTiling.version = INIT_TILING_CCU_NEW_VERSION; // check只支持是新版本
-    initTiling.mc2HcommCnt = 1U;                      // CheckCcuKfcFlow 要求等于tilingNum 否则报错，tilingNum为1
-    initTiling.offset[0] = 0U;                        // 占位符，check场景下提前返回，不会被使用
+    initTiling.mc2HcommCnt = 1U; // CheckCcuKfcFlow 要求等于tilingNum 否则报错，tilingNum为1
+    initTiling.offset[0] = 0U;   // 占位符，check场景下提前返回，不会被使用
 
     // stream参数在check且ccu场景使用不到，所以直接传nullptr；
     void* opResCtx = nullptr;
