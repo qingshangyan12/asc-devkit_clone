@@ -695,6 +695,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)|从源地址所在的特定GM地址预加载数据到Data Cache中。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_multi_datacache_preload](cache_ctrl/asc_multi_datacache_preload.md)|从源地址开始预加载指定数量的连续Cache Line到Data Cache中。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_dcci](cache_ctrl/asc_dcci.md)|用于刷新Cache，保证Cache的一致性。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_dci](cache_ctrl/asc_dci.md)|数据缓存失效，使整个数据缓存无效化。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md)|获取ICache的Preload的状态。|`c_api/cache_ctrl/cache_ctrl.h`|

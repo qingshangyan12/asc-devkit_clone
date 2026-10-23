@@ -1328,6 +1328,7 @@
         -   [缓存控制](SIMD-API/c_api/cache_ctrl/cache_ctrl.md)
             -   [系统缓存概述](SIMD-API/c_api/cache_ctrl/system_cache_overview.md)
             -   [asc_datacache_preload](SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md)
+            -   [asc_multi_datacache_preload](SIMD-API/c_api/cache_ctrl/asc_multi_datacache_preload.md)
             -   [asc_dcci](SIMD-API/c_api/cache_ctrl/asc_dcci.md)
             -   [asc_dci](SIMD-API/c_api/cache_ctrl/asc_dci.md)
             -   [asc_get_icache_preload_status](SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md)

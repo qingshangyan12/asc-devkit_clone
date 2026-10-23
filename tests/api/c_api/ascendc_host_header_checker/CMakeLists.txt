@@ -34,7 +34,7 @@ if(tikicpulib_FOUND)
     endif()
 endif()
 
-set(ARCH_LIST 3510 2201)
+set(ARCH_LIST 3510 2201 9201)
 
 # ==========================================
 # 测试文件
