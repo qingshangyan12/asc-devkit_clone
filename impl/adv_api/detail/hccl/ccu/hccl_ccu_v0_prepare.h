@@ -309,6 +309,40 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 // 常量参数（die0LastSize=die0Size、repeatNum=1、三 stride=0）由 kernel 内联。
 // 布局见 KfcAllGatherSoleNhrParamIndex，与 KFC dispatch、kernel 形参逐槽一致。
 // TopoMatch1D 生成全域单层（sub-rank == 全局 rank），ccuParam_.rankId 口径与 kernel rankId 一致。
+//
+// 分摊拷贝（性能）：本地拷贝区与写路径 die 切分解耦——双 die 时按 50/50 配平（两 mission
+// 共享本地拷贝引擎，按带宽比切分会使大半区拷贝晚结束拖长轮次）；每轴拷贝区切成整
+// loopSize（256KB）倍数满块 + 尾块（FillAgSoleNhrCopyParams），kernel 每 step 发射一块、
+// 末步收尾剩余块 + 尾块，拷贝摊入全轮写阴影（原实现整块堆末步，大数据量下超出写掩盖
+// 窗口直接顶到关键路径）。GO_CHUNK/GO_TAIL 供 V1 GroupCopy 消费（ccuProtocolVersion_
+// 编码），CHUNK_SIZE/TAIL_SIZE 供 V2 单跳 LocalCopy 消费（mesh1d AG kernel 按芯片版本
+// 选拷贝方式的先例）。in-place 时两轴拷贝均按 0 字节计算：CHUNK_LOOP 哨兵满、TAIL_SIZE=0、
+// 尾块 goSize 全零，拷贝退化为空——kernel 无需 isInputOutputEqual 参数。
+
+// 单轴分摊拷贝参数：满块尺寸取 loopSize（CCU_LOOP_COUNT_M2M_AG × CCU_MEMSLICE_SIZE×8 = 256KB）
+// 整数倍且 ≥ ceil(copySize/stepNum)，保证 1) V1 满块 goSize 恒命中单 LoopGroup（m≥1、n=p=0），
+// 2) 块数 ≤ stepNum+1，kernel 每 step 一块即可摊完。chunkLoop 为 UINT64_MAX - 满块数哨兵
+// （CalcPeerOnlyChunkParams 同式）；copySize=0 时哨兵满、tailSize=0、尾块 goSize 全零，
+// 拷贝退化为空。
+__aicore__ inline void FillAgSoleNhrCopyParams(
+    uint64_t copySize, uint64_t stepNum, CcuProtocolVersion ccuVersion, uint64_t* chunkSizeOut, uint64_t* chunkLoopOut,
+    uint64_t* tailSizeOut, uint64_t* goChunk, uint64_t* goTail)
+{
+    constexpr uint64_t loopSize = CCU_LOOP_COUNT_M2M_AG * CCU_MEMSLICE_SIZE * 8U;
+    uint64_t chunkSize = loopSize;
+    if (copySize > 0U && stepNum > 0U) {
+        const uint64_t perStep = (copySize + stepNum - 1U) / stepNum;
+        chunkSize = (perStep + loopSize - 1U) / loopSize * loopSize;
+    }
+    const uint64_t fullChunkNum = copySize / chunkSize;
+    const uint64_t tailSize = copySize - fullChunkNum * chunkSize;
+    *chunkSizeOut = chunkSize;
+    *chunkLoopOut = UINT64_MAX - fullChunkNum;
+    *tailSizeOut = tailSize;
+    CalcGoSize(chunkSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, goChunk, ccuVersion);
+    CalcGoSize(tailSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, goTail, ccuVersion);
+}
+
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllGatherSoleNhrM2M(
     __gm__ CommonPrepareParamCcu* commParam)
@@ -331,27 +365,53 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         die0Size = sliceCount * ccuParam_.dieSplitRatioPermille / 1000U * dataTypeSize;
         die1Size = sliceSize - die0Size;
     }
+
+    // 拷贝配平：in-place（input == output + stride*rankId）拷贝量为 0；双 die 时两轴各拷一半
+    // （own slot 仅本 rank 两 mission 写、区间不相交，任意轴拷任意半区均正确），单 die 全归 axis0
+    const bool isInputOutputEqual = (inputBase == outputBase + outputSliceStride * ccuParam_.rankId);
+    const uint64_t totalCopySize = isInputOutputEqual ? 0U : sliceSize;
+    uint64_t copySizeD0 = totalCopySize;
+    uint64_t copySizeD1 = 0U;
+    if (die1Size > 0U) {
+        copySizeD0 = totalCopySize / 2U;
+        copySizeD1 = totalCopySize - copySizeD0;
+    }
+
+    // stepNum 与 template 侧 ProcessNHRStepInfo 同式（rankNum-1 位宽；TopoMatch1D 全域单层，
+    // rankNum == kernel rankSize）；rankNum=1 防御性取 1
+    uint64_t stepNum = 0U;
+    for (uint64_t ranks = ccuParam_.rankNum - 1U; ranks != 0U; ranks >>= 1U) {
+        ++stepNum;
+    }
+    if (stepNum == 0U) {
+        stepNum = 1U;
+    }
+
+    uint64_t chunkSizeD0 = 0U;
+    uint64_t chunkSizeD1 = 0U;
+    FillAgSoleNhrCopyParams(
+        copySizeD0, stepNum, ccuProtocolVersion_, &chunkSizeD0, &xnData_[KFC_AG_SOLE_NHR_CHUNK_LOOP_D0],
+        &xnData_[KFC_AG_SOLE_NHR_TAIL_SIZE_D0], &xnData_[KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_0],
+        &xnData_[KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_0]);
+    FillAgSoleNhrCopyParams(
+        copySizeD1, stepNum, ccuProtocolVersion_, &chunkSizeD1, &xnData_[KFC_AG_SOLE_NHR_CHUNK_LOOP_D1],
+        &xnData_[KFC_AG_SOLE_NHR_TAIL_SIZE_D1], &xnData_[KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_0],
+        &xnData_[KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_0]);
+
     xnData_[KFC_AG_SOLE_NHR_INPUT] = inputBase;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT] = outputBase;
     xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = die0Size;
     xnData_[KFC_AG_SOLE_NHR_DIE1_SIZE] = die1Size;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE] = outputSliceStride;
-    // in-place（input == output + stride*rankId）时两 die 的 goSize 均按 0 字节计算：
-    // CalcGoSize(0) 全零，GroupCopy 内部 CCU_IF 块均不触发——kernel 无需 isInputOutputEqual 参数
-    const bool isInputOutputEqual = (inputBase == outputBase + outputSliceStride * ccuParam_.rankId);
-    const uint64_t die0CopySize = isInputOutputEqual ? 0U : die0Size;
-    const uint64_t die1CopySize = isInputOutputEqual ? 0U : die1Size;
-    CalcGoSize(
-        die0CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_0],
-        ccuProtocolVersion_);
-    CalcGoSize(
-        die1CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_0],
-        ccuProtocolVersion_);
+    xnData_[KFC_AG_SOLE_NHR_COPY_OFFSET_D0] = 0U;
+    xnData_[KFC_AG_SOLE_NHR_COPY_OFFSET_D1] = copySizeD0;
+    xnData_[KFC_AG_SOLE_NHR_CHUNK_SIZE_D0] = chunkSizeD0;
+    xnData_[KFC_AG_SOLE_NHR_CHUNK_SIZE_D1] = chunkSizeD1;
     KERNEL_LOG(
         KERNEL_INFO,
         "AG sole-NHR prepare: slice=0x%llx, die0=0x%llx, die1=0x%llx, outStride=0x%llx, "
-        "copy(d0/d1)=0x%llu/0x%llu\n",
-        sliceSize, die0Size, die1Size, outputSliceStride, die0CopySize, die1CopySize);
+        "copy(d0/d1)=0x%llu/0x%llu, chunk(d0/d1)=0x%llu/0x%llu, stepNum=%llu\n",
+        sliceSize, die0Size, die1Size, outputSliceStride, copySizeD0, copySizeD1, chunkSizeD0, chunkSizeD1, stepNum);
 }
 
 template <const auto& config>
