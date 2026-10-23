@@ -26,6 +26,7 @@
 #include "hccl_common.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "mc2_thread_handle_compat.h"
 
 using namespace HcclApi;
 namespace {
@@ -74,7 +75,15 @@ HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& t
         HCCL_ERROR(
             "Invalid main thread for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(), execCtx.opParamKey),
         HCCL_E_PARA);
-    thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
+    ThreadHandle rawThread = 0;
+    const HcclResult ret = mc2_thread_compat::UnwrapThreadHandle(execCtx.mainThread, rawThread);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "Invalid main thread entity for commName[%s], opParamKey %#llx, ret[%d].", execCtx.commName.c_str(),
+            execCtx.opParamKey, ret),
+        ret);
+    thread = reinterpret_cast<hccl::Thread*>(rawThread);
     CHK_PTR_NULL(thread);
     streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
     CHK_PTR_NULL(streamLite);
@@ -989,19 +998,14 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
             continue;
         }
 
-        auto* thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
-        if (thread == nullptr) {
+        hccl::Thread* thread = nullptr;
+        Hccl::StreamLite* streamLite = nullptr;
+        const HcclResult ret = GetNextThreadAndStream(execCtx, thread, streamLite);
+        if (ret != HCCL_SUCCESS) {
             MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
-                execCtx.commName.c_str());
-            continue;
-        }
-
-        auto* streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
-        if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
-            MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.",
-                groupIdx_, execCtx.commName.c_str(), streamLite);
+                isHardTimeout,
+                "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], cannot resolve main thread, ret[%d].", groupIdx_,
+                execCtx.commName.c_str(), ret);
             continue;
         }
         auto* rtsq = streamLite->GetRtsq();
