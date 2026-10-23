@@ -71,7 +71,7 @@ __aicore__ inline void GatherMaskAllReduce(
                 Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                     srcReg,
                     src0 + i * reducev2Params.src0RepeatStride * ElePerBlkT +
-                        j * 8 * reducev2Params.src0BlockStride * ElePerBlkT,
+                        j * ElePerVec * reducev2Params.src0BlockStride,
                     reducev2Params.src0BlockStride, loadMask);
                 if constexpr (SupportType<T, bfloat16_t>()) {
                     Reg::GatherMask<uint16_t, Reg::GatherMaskMode::STORE_REG>(
@@ -91,37 +91,6 @@ template <typename T, uint8_t solidPattern>
 __aicore__ inline void GatherMaskSqueezeNormal(
     __ubuf__ T* dst, __ubuf__ T* src0, const GatherMaskParams& reducev2Params, uint64_t& rsvdCnt)
 {
-    if constexpr (sizeof(T) != 1) {
-        if constexpr (sizeof(T) == 2) {
-            if constexpr (solidPattern == 1) {
-                SetVectorMask<T>(0x5555555555555555, 0x5555555555555555);
-            } else if constexpr (solidPattern == 2) {
-                SetVectorMask<T>(0xaaaaaaaaaaaaaaaa, 0xaaaaaaaaaaaaaaaa);
-            } else if constexpr (solidPattern == 3) {
-                SetVectorMask<T>(0x1111111111111111, 0x1111111111111111);
-            } else if constexpr (solidPattern == 4) {
-                SetVectorMask<T>(0x2222222222222222, 0x2222222222222222);
-            } else if constexpr (solidPattern == 5) {
-                SetVectorMask<T>(0x4444444444444444, 0x4444444444444444);
-            } else if constexpr (solidPattern == 6) {
-                SetVectorMask<T>(0x8888888888888888, 0x8888888888888888);
-            }
-        } else {
-            if constexpr (solidPattern == 1) {
-                SetVectorMask<T>(0, 0x5555555555555555);
-            } else if constexpr (solidPattern == 2) {
-                SetVectorMask<T>(0, 0xaaaaaaaaaaaaaaaa);
-            } else if constexpr (solidPattern == 3) {
-                SetVectorMask<T>(0, 0x1111111111111111);
-            } else if constexpr (solidPattern == 4) {
-                SetVectorMask<T>(0, 0x2222222222222222);
-            } else if constexpr (solidPattern == 5) {
-                SetVectorMask<T>(0, 0x4444444444444444);
-            } else if constexpr (solidPattern == 6) {
-                SetVectorMask<T>(0, 0x8888888888888888);
-            }
-        }
-    }
     __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(GetRuntimeUBSize(), 32);
     __VEC_SCOPE__
     {
@@ -131,28 +100,26 @@ __aicore__ inline void GatherMaskSqueezeNormal(
         Reg::UnalignReg ureg;
         Reg::MaskReg patternMask;
         Reg::ClearSpr<SpecialPurposeReg::AR>();
-        if constexpr (sizeof(T) != 1) {
-            patternMask = Reg::MoveMask<T>();
-        } else {
-            Reg::RegTensor<uint8_t> patternReg;
-            Reg::MaskReg tmpMask = Reg::CreateMask<uint8_t, Reg::MaskPattern::VL32>();
-            if constexpr (solidPattern == 1) {
-                Reg::Duplicate(patternReg, 0x55);
-            } else if constexpr (solidPattern == 2) {
-                Reg::Duplicate(patternReg, 0xaa);
-            } else if constexpr (solidPattern == 3) {
-                Reg::Duplicate(patternReg, 0x11);
-            } else if constexpr (solidPattern == 4) {
-                Reg::Duplicate(patternReg, 0x22);
-            } else if constexpr (solidPattern == 5) {
-                Reg::Duplicate(patternReg, 0x44);
-            } else if constexpr (solidPattern == 6) {
-                Reg::Duplicate(patternReg, 0x88);
-            }
-            Reg::StoreAlign(tempBuf, patternReg, tmpMask);
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-            Reg::LoadAlign(patternMask, tempBuf);
+        // Materialise the pattern inside the vector pipeline: the scalar-side mask set-up
+        // followed by reading the pattern back in the vector pipeline is not order-safe here.
+        Reg::RegTensor<uint8_t> patternReg;
+        Reg::MaskReg tmpMask = Reg::CreateMask<uint8_t, Reg::MaskPattern::VL32>();
+        if constexpr (solidPattern == 1) {
+            Reg::Duplicate(patternReg, 0x55);
+        } else if constexpr (solidPattern == 2) {
+            Reg::Duplicate(patternReg, 0xaa);
+        } else if constexpr (solidPattern == 3) {
+            Reg::Duplicate(patternReg, 0x11);
+        } else if constexpr (solidPattern == 4) {
+            Reg::Duplicate(patternReg, 0x22);
+        } else if constexpr (solidPattern == 5) {
+            Reg::Duplicate(patternReg, 0x44);
+        } else if constexpr (solidPattern == 6) {
+            Reg::Duplicate(patternReg, 0x88);
         }
+        Reg::StoreAlign(tempBuf, patternReg, tmpMask);
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+        Reg::LoadAlign(patternMask, tempBuf);
         Reg::MaskAnd(patternMask, patternMask, loadMask, loadMask);
         for (uint16_t i = 0; i < reducev2Params.repeatTimes; ++i) {
             Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
@@ -175,37 +142,6 @@ template <typename T, uint8_t solidPattern>
 __aicore__ inline void GatherMaskSqueezeReduce(
     __ubuf__ T* dst, __ubuf__ T* src0, const uint32_t mask, const GatherMaskParams& reducev2Params, uint64_t& rsvdCnt)
 {
-    if constexpr (sizeof(T) != 1) {
-        if constexpr (sizeof(T) == 2) {
-            if constexpr (solidPattern == 1) {
-                SetVectorMask<T>(0x5555555555555555, 0x5555555555555555);
-            } else if constexpr (solidPattern == 2) {
-                SetVectorMask<T>(0xaaaaaaaaaaaaaaaa, 0xaaaaaaaaaaaaaaaa);
-            } else if constexpr (solidPattern == 3) {
-                SetVectorMask<T>(0x1111111111111111, 0x1111111111111111);
-            } else if constexpr (solidPattern == 4) {
-                SetVectorMask<T>(0x2222222222222222, 0x2222222222222222);
-            } else if constexpr (solidPattern == 5) {
-                SetVectorMask<T>(0x4444444444444444, 0x4444444444444444);
-            } else if constexpr (solidPattern == 6) {
-                SetVectorMask<T>(0x8888888888888888, 0x8888888888888888);
-            }
-        } else {
-            if constexpr (solidPattern == 1) {
-                SetVectorMask<T>(0, 0x5555555555555555);
-            } else if constexpr (solidPattern == 2) {
-                SetVectorMask<T>(0, 0xaaaaaaaaaaaaaaaa);
-            } else if constexpr (solidPattern == 3) {
-                SetVectorMask<T>(0, 0x1111111111111111);
-            } else if constexpr (solidPattern == 4) {
-                SetVectorMask<T>(0, 0x2222222222222222);
-            } else if constexpr (solidPattern == 5) {
-                SetVectorMask<T>(0, 0x4444444444444444);
-            } else if constexpr (solidPattern == 6) {
-                SetVectorMask<T>(0, 0x8888888888888888);
-            }
-        }
-    }
     __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(GetRuntimeUBSize(), 32);
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
     constexpr uint32_t ElePerVec = GetVecLen() / sizeof(T);
@@ -220,28 +156,26 @@ __aicore__ inline void GatherMaskSqueezeReduce(
         Reg::MaskReg patternMask;
         Reg::MaskReg executeMask;
         Reg::ClearSpr<SpecialPurposeReg::AR>();
-        if constexpr (sizeof(T) != 1) {
-            patternMask = Reg::MoveMask<T>();
-        } else {
-            Reg::RegTensor<uint8_t> reducePatternReg;
-            Reg::MaskReg tmpMask = Reg::CreateMask<uint8_t, Reg::MaskPattern::VL32>();
-            if constexpr (solidPattern == 1) {
-                Reg::Duplicate(reducePatternReg, 0x55);
-            } else if constexpr (solidPattern == 2) {
-                Reg::Duplicate(reducePatternReg, 0xaa);
-            } else if constexpr (solidPattern == 3) {
-                Reg::Duplicate(reducePatternReg, 0x11);
-            } else if constexpr (solidPattern == 4) {
-                Reg::Duplicate(reducePatternReg, 0x22);
-            } else if constexpr (solidPattern == 5) {
-                Reg::Duplicate(reducePatternReg, 0x44);
-            } else if constexpr (solidPattern == 6) {
-                Reg::Duplicate(reducePatternReg, 0x88);
-            }
-            Reg::StoreAlign(tempBuf, reducePatternReg, tmpMask);
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-            Reg::LoadAlign(patternMask, tempBuf);
+        // Materialise the pattern inside the vector pipeline: the scalar-side mask set-up
+        // followed by reading the pattern back in the vector pipeline is not order-safe here.
+        Reg::RegTensor<uint8_t> reducePatternReg;
+        Reg::MaskReg tmpMask = Reg::CreateMask<uint8_t, Reg::MaskPattern::VL32>();
+        if constexpr (solidPattern == 1) {
+            Reg::Duplicate(reducePatternReg, 0x55);
+        } else if constexpr (solidPattern == 2) {
+            Reg::Duplicate(reducePatternReg, 0xaa);
+        } else if constexpr (solidPattern == 3) {
+            Reg::Duplicate(reducePatternReg, 0x11);
+        } else if constexpr (solidPattern == 4) {
+            Reg::Duplicate(reducePatternReg, 0x22);
+        } else if constexpr (solidPattern == 5) {
+            Reg::Duplicate(reducePatternReg, 0x44);
+        } else if constexpr (solidPattern == 6) {
+            Reg::Duplicate(reducePatternReg, 0x88);
         }
+        Reg::StoreAlign(tempBuf, reducePatternReg, tmpMask);
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+        Reg::LoadAlign(patternMask, tempBuf);
         for (uint16_t i = 0; i < reducev2Params.repeatTimes; ++i) {
             maskValue = mask;
             for (uint16_t j = 0; j < innerRepeatTimes; ++j) {
@@ -249,7 +183,7 @@ __aicore__ inline void GatherMaskSqueezeReduce(
                 Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                     srcReg,
                     src0 + i * reducev2Params.src0RepeatStride * ElePerBlkT +
-                        j * 8 * reducev2Params.src0BlockStride * ElePerBlkT,
+                        j * ElePerVec * reducev2Params.src0BlockStride,
                     reducev2Params.src0BlockStride, loadMask);
                 Reg::MaskAnd(executeMask, patternMask, loadMask, loadMask);
                 if constexpr (SupportType<T, bfloat16_t>()) {
@@ -343,7 +277,7 @@ __aicore__ inline void GatherMaskReduce(
                 Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                     srcReg,
                     src0 + i * reducev2Params.src0RepeatStride * ElePerBlkT +
-                        j * 8 * reducev2Params.src0BlockStride * ElePerBlkT,
+                        j * ElePerVec * reducev2Params.src0BlockStride,
                     reducev2Params.src0BlockStride, loadMask);
                 if constexpr (sizeof(T) == 1) { // 1bit in ub, 1bit in register
                     Reg::LoadAlign(patternMask, src1 + i * oneRepMaskOffset + j * ElePerBlkU);
