@@ -235,6 +235,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_ERROR("%s param is nullptr", __func__);
         return 1;
     }
+    HCCL_ERROR("[PROBE] enter HcclLaunchAicpuKernel, algName[%s].", param->algName);
     HCCL_INFO("Entry-%s, commName[%s], tag[%s], algTag[%s]", __func__, param->commName, param->tag, param->algTag);
     if (HcommAcquireComm(param->commName) != HCCL_SUCCESS) {
         HCCL_ERROR("%s HcommAcquireComm fail, commName[%s]", __func__, param->commName);
@@ -326,10 +327,24 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
         // 获取Device测主thread
         ThreadHandle thread = resCtx.threads[0];
+        HCCL_ERROR(
+            "[PROBE] kl res dump, threads[0][%llu], unfoldThread[%llu], threadNum[%zu], chRows[%zu].", thread,
+            resCtx.unfoldThread, resCtx.threads.size(), resCtx.channels.size());
+        for (size_t r = 0; r < resCtx.channels.size() && r < 2U; ++r) {
+            for (size_t c = 0; c < resCtx.channels[r].size() && c < 2U; ++c) {
+                const ChannelInfo& chProbe = resCtx.channels[r][c];
+                HCCL_ERROR(
+                    "[PROBE] kl ch[%zu][%zu], handle[%llu], valid[%u], remoteRank[%u], proto[%u], loc[%u].", r, c,
+                    chProbe.handle, static_cast<u32>(chProbe.isValid), chProbe.remoteRank,
+                    static_cast<u32>(chProbe.protocol), static_cast<u32>(chProbe.locationType));
+            }
+        }
         if (asccomm_batch_mode_start(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
         }
+        HCCL_ERROR("[PROBE] kl batch_start done, algTag[%s].", param->algTag);
+        HCCL_ERROR("[PROBE] p57 batch started, tag[%s].", param->algTag);
 
         // 上报主流和第一个task  wait之前
         if (HcommProfilingReportKernelStartTask(thread, param->commName) != HCCL_SUCCESS) {
@@ -350,7 +365,11 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_DEBUG(
             "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
             CUSTOM_TIMEOUT);
-        CHK_RET(static_cast<HcclResult>(asccomm_thread_notify_wait_on_thread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+        HCCL_ERROR("[PROBE] notify_wait begin, maxNotifyNum[%u].", maxNotifyNum);
+        HcclResult probeWaitRet =
+            static_cast<HcclResult>(asccomm_thread_notify_wait_on_thread(thread, maxNotifyNum, CUSTOM_TIMEOUT));
+        HCCL_ERROR("[PROBE] notify_wait after, ret[%d].", static_cast<int>(probeWaitRet));
+        CHK_RET(probeWaitRet);
 
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
         if (executor.get() == nullptr) {
@@ -359,10 +378,13 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
 
         // 执行算法编排
+        HCCL_ERROR("[PROBE] orchestrate begin, algName[%s].", param->algName);
         if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
             HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
+            HCCL_ERROR("[PROBE] orchestrate end, ret[1].");
             return 1;
         }
+        HCCL_ERROR("[PROBE] orchestrate end, ret[0].");
 
         if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
             HCCL_ERROR("%s HcommProfilingReportDeviceOp fail, commName[%s]", __func__, param->commName);
@@ -373,8 +395,10 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_DEBUG(
             "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
             exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
-        CHK_RET(static_cast<HcclResult>(
-            asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+        HcclResult probeRecordRet = static_cast<HcclResult>(
+            asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX));
+        HCCL_ERROR("[PROBE] notify_record done, ret[%d].", static_cast<int>(probeRecordRet));
+        CHK_RET(probeRecordRet);
 
         // 上报主流和最后一个task 在notify之后
         if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
@@ -388,6 +412,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("failed set eager mode, tag is %s.", param->algTag);
             return 1;
         }
+        HCCL_ERROR("[PROBE] kl batch_end done, algTag[%s].", param->algTag);
     } else {
         std::unique_ptr<ExecutorBase> executor = CollAlgExecRegistry::Instance().GetAlgExec(algName);
         if (executor.get() == nullptr) {
@@ -405,6 +430,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
         }
+        HCCL_ERROR("[PROBE] kl batch_start done, algTag[%s].", param->algTag);
+        HCCL_ERROR("[PROBE] p57 batch started, tag[%s].", param->algTag);
 
         if (exportedAicpuTsThread != 0) {
             if (HcommProfilingInit(threadHandlePtr, resCtx->slaveThreadNum + 1) != HCCL_SUCCESS) {
@@ -473,6 +500,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 HCCL_ERROR("failed set eager mode, tag is %s.", param->algTag);
                 return 1;
             }
+            HCCL_ERROR("[PROBE] kl batch_end done, algTag[%s].", param->algTag);
 
             if (HcommProfilingEnd(threadHandlePtr, resCtx->slaveThreadNum + 1) != HCCL_SUCCESS) {
                 HCCL_ERROR("failed to End Profiling");
@@ -488,6 +516,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 HCCL_ERROR("failed set eager mode, tag is %s.", param->algTag);
                 return 1;
             }
+            HCCL_ERROR("[PROBE] kl batch_end done, algTag[%s].", param->algTag);
         }
     }
 
@@ -496,6 +525,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         return 1;
     }
     HCCL_INFO("%s success, tag[%s], algTag[%s], commName[%s]", __func__, param->tag, param->algTag, param->commName);
+    HCCL_ERROR("[PROBE] exit HcclLaunchAicpuKernel, ret[0].");
     return 0;
 }
 

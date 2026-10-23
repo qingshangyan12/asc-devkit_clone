@@ -32,6 +32,41 @@ std::atomic<int> g_hcommBatchTransferSupportState{HCOMM_BATCH_TRANSFER_UNINIT};
 
 void* GetSliceAddr(const DataSlice& slice) { return static_cast<void*>(static_cast<s8*>(slice.addr_) + slice.offset_); }
 
+// p57 临时观测：读设备线程实体（HcommThreadEntity）偏移 72 的 sqContextAddr 指针本身，供与链 A 侧
+// RtsqA5::GetSqBaseAddr() 对拍两链是否同 SQ。命中实体魔数才解包，否则返回 0（老控制面句柄）。
+constexpr u32 kThreadEntityAbiMagicWord = 0x0fcf0f6fU;
+constexpr u64 kThreadEntitySqContextOffset = 72U;
+
+inline u64 ReadThreadEntitySqContextAddr(const ThreadHandle& thread)
+{
+    const auto* header = reinterpret_cast<const u32*>(static_cast<u64>(thread));
+    if (header == nullptr || header[1] != kThreadEntityAbiMagicWord) {
+        return 0U;
+    }
+    return *reinterpret_cast<const u64*>(
+        reinterpret_cast<const char*>(static_cast<u64>(thread)) + kThreadEntitySqContextOffset);
+}
+
+// p58 临时观测：读链 B 自己的 sqContext（HcommThreadSqContext，128B）内容，双写者最直接的书证。
+// 偏移以合入版 asc-comm PR268 契约头 include/aicpu/hcomm/hcomm_res_entity_defs.h 实测：
+// type@0/streamId@4/sqId@8/sqBaseAddr@16/sqDepth@24/sqHead@28/sqTail@32/
+// taskId@36/taskIdEnd@40/localSqAddr@48/localSqDepth@56/pendingSqeCnt@60。
+inline void LogProbeChainBSqContext(const ThreadHandle& thread)
+{
+    const u64 sqctx = ReadThreadEntitySqContextAddr(thread);
+    if (sqctx == 0U) {
+        HCCL_ERROR("[PROBE] p58 chainB ctx unavailable, thread[%llu].", thread);
+        return;
+    }
+    const u32* ctxU32 = reinterpret_cast<const u32*>(sqctx);
+    const u64* ctxU64 = reinterpret_cast<const u64*>(sqctx);
+    HCCL_ERROR(
+        "[PROBE] p58 chainB ctx, type[%u], streamId[%u], sqId[%u], sqBase[%#llx], depth[%u], head[%u], tail[%u], "
+        "taskId[%u], taskIdEnd[%u], localSqAddr[%#llx], localSqDepth[%u], pending[%u].",
+        ctxU32[0], ctxU32[1], ctxU32[2], static_cast<unsigned long long>(ctxU64[2]), ctxU32[6], ctxU32[7], ctxU32[8],
+        ctxU32[9], ctxU32[10], static_cast<unsigned long long>(ctxU64[6]), ctxU32[14], ctxU32[15]);
+}
+
 AsccommBatchTransferDesc MakeBatchTransDesc(AsccommTransferType transType, void* dst, void* src, u64 len)
 {
     AsccommBatchTransferDesc desc = {};
@@ -538,6 +573,17 @@ HcclResult SendRecvRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& th
     const ChannelInfo& recvChannel = sendRecvInfo.sendRecvChannels_.rxChannel_;
     const std::vector<DataSlice>& srcSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.srcSlices_;
     const std::vector<DataSlice>& dstSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.dstSlices_;
+    HCCL_ERROR(
+        "[PROBE] wr SendRecvRead enter, thread[%llu], txCh[%llu], rxCh[%llu], repeatNum[%zu].", thread,
+        sendChannel.handle, recvChannel.handle, srcSlices.size());
+    LogProbeChainBSqContext(thread);
+    for (size_t i = 0; i < srcSlices.size() && i < 2U; ++i) {
+        HCCL_ERROR(
+            "[PROBE] wr SendRecvRead slice[%zu], src[%p]+%llu, dst[%p]+%llu, size[%llu].", i, srcSlices[i].addr_,
+            static_cast<unsigned long long>(srcSlices[i].offset_), dstSlices[i].addr_,
+            static_cast<unsigned long long>(dstSlices[i].offset_),
+            static_cast<unsigned long long>(srcSlices[i].size_));
+    }
     u32 repeatNum = srcSlices.size();
     // 向read rank发送rx同步，确保该rank的hcclBuffer可用
     // 这里只是在host上向device下任务，所以实际在host侧不会因为wait而阻塞
@@ -735,6 +781,11 @@ HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const
 
 HcclResult LocalCopy(const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice)
 {
+    HCCL_ERROR(
+        "[PROBE] wr LocalCopy enter, thread[%llu], src[%p]+%llu, dst[%p]+%llu, size[%llu].", thread, srcSlice.addr_,
+        static_cast<unsigned long long>(srcSlice.offset_), dstSlice.addr_,
+        static_cast<unsigned long long>(dstSlice.offset_), static_cast<unsigned long long>(srcSlice.size_));
+    LogProbeChainBSqContext(thread);
     CHK_PRT_RET(
         srcSlice.size_ == 0, HCCL_WARNING("[AlgDataTransWrapper] LocalCopy: src slice size is [%u].", srcSlice.size_),
         HcclResult::HCCL_SUCCESS);

@@ -46,6 +46,10 @@ public:
 
     inline u32 GetTaskId() const { return taskId_; }
 
+    inline u32 GetStreamId() const { return streamId_; }
+
+    inline u64 GetSqBaseAddr() const { return sqBaseAddr_; }
+
     void SetOpExecStatusCallback(std::function<void()> callback) { checkOpExecStatusCallback_ = callback; }
 
     virtual void LaunchTask() { MACRO_THROW(NotSupportException, StringFormat("not supported.")); }
@@ -194,6 +198,10 @@ public:
     }
 
     virtual bool GetPreStreamSyncStatus() { return false; }
+
+    virtual u64 GetSqeAddr() const { return 0; }
+
+    virtual uint32_t GetPendingSqeCnt() const { return 0; }
 
     HcclResult GetStreamIdAndTaskIdBySqIdx(u32 sqIdx, uint16_t& streamId, uint16_t& taskId) const;
 
