@@ -17,7 +17,8 @@ Taking flat open-addressing hash table lookup as an example, this example introd
 │   ├── figures                          // Image resources for README
 │   ├── CMakeLists.txt                   // CMake build project file
 │   ├── hashtable_lookup.asc              // SIMT hash table lookup optimization path implementation
-│   └── README.md                        // Sample documentation
+│   ├── README.md                   // Sample documentation
+│   └── README_en.md                // English sample documentation
 ```
 
 ## Example Description
