@@ -9,16 +9,15 @@ AI Core的同步，总共分成2类：[核内同步](intra_core_sync/intra_core_
 - 核内同步用于约束同一核内不同硬件流水或同一硬件流水内指令的执行时序。
 
     例如在AIV中，MTE2单元通过`PIPE_MTE2`将数据搬入片上存储后，Vector单元才可以通过`PIPE_V`读取该数据进行计算，此时需要插入`PIPE_MTE2`到`PIPE_V`的同步，使`PIPE_V`等待`PIPE_MTE2`的前序搬入完成。
-<!-- npu="950" id1 -->
 - 核间同步用于约束不同核之间的执行时序，参与同步的对象可以是多个AI Core，也可以是同一AI Core内的AIC和AIV。
-
+    <!-- npu="950" id1 -->
     如图1所示，针对[NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，同一个AI Core内AIV通过`PIPE_MTE3`将数据从UB搬运到L1 Buffer后，AIC侧`PIPE_MTE1`才能将L1 Buffer中的数据搬入L0A Buffer和L0B Buffer并继续执行矩阵计算，此时需要让AIC等待AIV的数据搬运完成通知。
 
     核内同步和核间同步的区别在于：核内同步解决同一核内部硬件流水之间的数据依赖，关注`PIPE_MTE2`、`PIPE_V`等流水的先后关系；核间同步解决不同核或不同逻辑核之间的进度依赖，关注AIC、AIV或多个AI Core之间的先后关系。
 
     **图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图
     ![](../../../figures/npu_3510_hw_arch_sync.png)
-<!-- end id1 -->
+    <!-- end id1 -->
 
 各类同步对应的接口如下。
 
