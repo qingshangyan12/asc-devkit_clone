@@ -128,6 +128,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_mesh1d_mem2mem_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_selector_testcase.cc
+    ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/aicpu_all_reduce_selector_testcase.cc
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/all_gather_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/parallel_migration_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather_kfc_server_adapter.cc
