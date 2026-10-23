@@ -52,6 +52,8 @@ TEST(ExtAlgForced, FourStateClassification)
     std::string errMsg;
 
     EXPECT_EQ(ClassifyForcedAlgConfig("", algName, spec, errMsg), ForcedAlgKind::NONE);
+    // "default" 字面量与空串同义（tiling 侧空 algConfig 约定填 "default"）
+    EXPECT_EQ(ClassifyForcedAlgConfig("default", algName, spec, errMsg), ForcedAlgKind::NONE);
 
     EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", algName, spec, errMsg), ForcedAlgKind::LEGACY);
 
@@ -96,16 +98,42 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* nullList[] = {nullptr};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(nullList, 1U));
 
-    // 裸名/空名/legacy 现状语义不变
+    // 裸名/legacy 现状语义不变
     Mc2CcTilingInner bare = MakeTiling("CcuSchedAllGatherSoleMesh", 6U);
     const void* bareList[] = {&bare};
     EXPECT_TRUE(CheckCcuAlgorithmsRegistered(bareList, 1U));
+    // 空/"default" 均视为"不指定"：过 gate，走默认 selector 兜底（A2AV → CcuSchedAllToAllVSoleMesh）
     Mc2CcTilingInner empty = MakeTiling("", 6U);
     const void* emptyList[] = {&empty};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(emptyList, 1U));
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(emptyList, 1U));
+    Mc2CcTilingInner defaultCfg = MakeTiling("default", 6U);
+    const void* defaultList[] = {&defaultCfg};
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(defaultList, 1U));
+    // legacy 语法（含 '='）在 CCU 路径无定义 → 按配置错误拒绝
     Mc2CcTilingInner legacy = MakeTiling("allgather=level0:fullmesh", 6U);
     const void* legacyList[] = {&legacy};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
+}
+
+// CCU 引擎 + 不指定算法（空/"default"）时，默认 selector 兜底到 devkit 注册算法；
+// 指定错误（未注册裸名/跨引擎算法名）时必须报错而非静默回退。
+TEST(ExtAlgGateB, DefaultAlgConfigFallsBackToSelector)
+{
+    // 不指定：A2AV（opType=7）过 gate，由 SelectCcuAlgorithm 的默认 selector 兜底
+    Mc2CcTilingInner a2avDefault = MakeTiling("default", 7U /*ALLTOALLV*/);
+    const void* defaultList[] = {&a2avDefault};
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(defaultList, 1U));
+
+    // 指定错误：未注册裸名 → gate 拒绝，但 DispatchAllocByCommEngine 不再中断，
+    // WARNING 后继续走 AllocComResourceByTilingCcu 由默认 selector 兜底（不静默失败）
+    Mc2CcTilingInner a2avBadBare = MakeTiling("NoSuchAlgorithm", 7U);
+    const void* badBareList[] = {&a2avBadBare};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badBareList, 1U));
+
+    // 指定错误：AICPU 算法名在 CCU 引擎下不可用 → gate 拒绝（同上，兜底不中断）
+    Mc2CcTilingInner a2avAicpuName = MakeTiling("AicpuAllToAllVSoleMesh", 7U);
+    const void* aicpuNameList[] = {&a2avAicpuName};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(aicpuNameList, 1U));
 }
 
 // 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与无候选/规则全灭分叉）。

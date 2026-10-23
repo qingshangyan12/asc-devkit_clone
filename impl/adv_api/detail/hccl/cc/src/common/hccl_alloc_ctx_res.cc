@@ -1134,7 +1134,18 @@ HcclResult SelectCcuAlgorithm(
     } else if (kind == ForcedAlgKind::BARE_NAME) {
         algName = bareName;
         CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
-        forcedAccepted = true;
+        // 裸名未注册（或非 CCU 算法）时不中断：WARNING 提示后回退默认 selector 兜底。
+        // 判据与 HcclIsCcuAlgorithmRegistered 一致（algorithmMap + V2 注册表双名单）
+        if (algorithmMap.find(algName) == algorithmMap.end() ||
+            !CollAlgExecRegistryV2::Instance().IsRegistered(
+                static_cast<HcclCMDType>(ccTiling->opType), algName.c_str())) {
+            HCCL_WARNING(
+                "[MC2_FORCE_ALG] algorithm[%s] is not registered for CCU opType[%u], fallback to default selector.",
+                algName.c_str(), ccTiling->opType);
+            algName.clear();
+        } else {
+            forcedAccepted = true;
+        }
     } else if (kind == ForcedAlgKind::LEGACY) {
         HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", forcedConfig);
     }
