@@ -18,9 +18,10 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 | 2 | UB->GM | DN | 四维 | `make_copy(..., trait)` 后调用 `atom.call(dst, src)` |
 | 3 | UB->UB | NZ | 四维 | 显式 atom 与坐标/shape 区域搬运重载 |
 | 4 | GM->UB | ND | 一维 | `make_shape(1024)`、`make_stride(1)`，走 one-dim copy 路由 |
-| 5 | GM->UB | ND | 四维 | 左填充3个、右填充5个元素，并使用 `asc_set_copy_pad_val` 配置填充值-9 |
+| 5 | GM->UB | ND | 四维 | 左填充3个、右填充5个元素，并通过 `set_copy_pad_val` 配置填充值-9 |
 
 五个场景的 Kernel 均声明为 `__global__ __vector__`。
+
 
 ## 目录结构
 
