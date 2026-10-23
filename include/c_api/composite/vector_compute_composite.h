@@ -20,6 +20,7 @@
 #ifndef INCLUDE_C_API_COMPOSITE_VECTOR_COMPUTE_COMPOSITE_H
 #define INCLUDE_C_API_COMPOSITE_VECTOR_COMPUTE_COMPOSITE_H
 #include "c_api/defs/defs.h"
+#include "c_api/vector_compute/compute/vector_permute_sel.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/vector_compute_composite_intf_impl.h"

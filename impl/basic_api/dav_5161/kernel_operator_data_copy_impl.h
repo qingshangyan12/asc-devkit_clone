@@ -871,9 +871,6 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
 {
-    if ASCEND_IS_AIC {
-        return;
-    }
     if (padParams.isPad == true) {
         set_pad_val_outtoub(padParams.paddingValue);
     }

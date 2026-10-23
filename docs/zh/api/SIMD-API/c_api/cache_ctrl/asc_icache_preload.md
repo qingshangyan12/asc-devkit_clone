@@ -177,7 +177,7 @@ __global__ __mix__(1, 2) void MatmulScaleKernel(
         asc_copy_ub2gm_align(output + aiv_index * ELEMENTS_PER_AIV, output_ub, FP32_BYTES_PER_AIV);
     }
 
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 bool CheckResult(const std::vector<float>& matmul_result, const std::vector<float>& output)

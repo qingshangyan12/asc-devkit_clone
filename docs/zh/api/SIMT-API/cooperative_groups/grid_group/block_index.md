@@ -55,11 +55,21 @@ static dim3 block_index()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(dim3* result)
     {
-        ...
         grid_group g = this_grid();
-        dim3 block = g.block_index();
-        ...
+        dim3 block_index = g.block_index();
+        if (threadIdx.x == 0) {
+            result[blockIdx.x].x = block_index.x;
+            result[blockIdx.x].y = block_index.y;
+            result[blockIdx.x].z = block_index.z;
+        }
     }
     ```
+
+输入输出示例如下：
+
+```text
+使用启动参数: blocks = 4, threads = 1024
+result: dim3(0, 0, 0), dim3(1, 0, 0), dim3(2, 0, 0), dim3(3, 0, 0)
+```

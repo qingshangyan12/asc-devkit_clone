@@ -1227,8 +1227,13 @@ def _gen_tiling_copy_through_reserved_ub():
     constexpr uint32_t copy_tile_size = 8192;
     for (uint32_t stack_offset = 0; stack_offset < all_bytes; stack_offset += copy_tile_size) {
         uint32_t copy_size = stack_offset + copy_tile_size < all_bytes ? copy_tile_size : all_bytes - stack_offset;
+#if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+        copy_gm_to_ubuf_align_v2(((__ubuf__ uint8_t *)tilingdata_in_ub),
+        ((__gm__ uint8_t *)p_tilingdata) + stack_offset, 0, 1, copy_size, 0, 0, false, false, 0, 0, 0, false);
+#else
         copy_gm_to_ubuf_align_v2(((__ubuf__ uint8_t *)tilingdata_in_ub),
         ((__gm__ uint8_t *)p_tilingdata) + stack_offset, 0, 1, copy_size, 0, 0, false, 0, 0, 0);
+#endif
         set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
         wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
         copy_data_align64(((uint8_t*)tilingdata) + stack_offset, ((__ubuf__ uint8_t *)tilingdata_in_ub), copy_size);

@@ -146,6 +146,7 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Rsqrt_res.md#id3 -->
 
 ## 返回值说明<a name="section42373919454"></a>
 
@@ -179,6 +180,7 @@ T支持的数据类型为：half、float。
 
 - 如果src中的数值为非正数，可能会产生未知结果。
 - 使用Rsqrt时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)和[Sqrt](Sqrt.md)替代实现。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Rsqrt_res.md#id4 -->
 
 <!-- npu="950" id35 -->
 

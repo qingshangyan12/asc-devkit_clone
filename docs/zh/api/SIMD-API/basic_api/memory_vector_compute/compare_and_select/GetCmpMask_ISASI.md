@@ -57,6 +57,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 ## 数据类型
 
 支持数据类型为：b8、b16、b32。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GetCmpMask_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -65,6 +66,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 dst的空间大小不能少于128字节。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GetCmpMask_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 
