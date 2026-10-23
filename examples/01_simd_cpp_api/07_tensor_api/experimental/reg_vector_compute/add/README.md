@@ -33,7 +33,7 @@ dst[i] = src0[i] + src1[i]
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造 GM、UB 上的一维 Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围 MTE2 流水，通过 `asc::te::copy` 将两个输入从 GM 搬运到 UB。
+    2. 使用 `asc::te::mutex` 包围 MTE2 流水，通过 `asc::te::copy` 将两个输入从 GM 搬运到 UB。
     3. 使用 `all_mask` 和 `load` 将 UB 数据加载为 Reg Tensor。
     4. 调用实验性 `operator+` 完成逐元素加法。
     5. 使用 `store` 和 `asc::te::copy` 将结果写回 UB 和 GM。
