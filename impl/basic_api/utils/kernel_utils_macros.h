@@ -430,6 +430,7 @@ namespace AscendC {
 namespace Internal {
 constexpr uint8_t g_oomStorageShapeMagic = 0x4FU;
 constexpr uint8_t g_oomStorageShapeVersion = 1U;
+constexpr uint8_t g_oomJumpFieldMagic = 0x9EU;
 constexpr uint8_t g_oomTensorViewVersion = 1U;
 constexpr uint8_t g_oomNibbleMask = 0x0fU;
 constexpr uint8_t g_oomDescriptorTypeTensor = 1U;

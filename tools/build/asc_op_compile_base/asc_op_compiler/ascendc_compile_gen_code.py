@@ -35,8 +35,10 @@ from .ascendc_compile_dfx import DFXSectionGenerator
 
 
 OOM_STORAGE_SHAPE_INIT_PATTERN = (
-    "    __gm__ uint8_t *oomStorageShapeCursor = (__gm__ uint8_t *)tiling + "
+    "    __gm__ uint8_t *oomJumpField = (__gm__ uint8_t *)tiling + "
     "tmpTilingSizeForOOM + {legacy_len_offset};\n"
+    "    __gm__ uint8_t *oomStorageShapeCursor = AscendC::OOMGetStorageShapeCursor("
+    "oomJumpField, (__gm__ uint8_t *)tiling);\n"
     "    bool hasOomStorageShape = "
     "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
     "    if (hasOomStorageShape) {{\n"

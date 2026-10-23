@@ -197,6 +197,32 @@ __aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
 #endif
 }
 
+// 跳转字段：[magic:u8][version(low 4 bits)|reserved:u8][reserved:u16][extOffset:u32]，位于旧OOM区之后。
+// extOffset为扩展段相对tiling数据起点的偏移。校验通过返回tiling+extOffset（args尾部扩展段起点）；
+// 否则返回jumpField原址（旧host布局下该处非跳转字段、或无扩展段addr=0，后续header校验自然失败退legacy）
+__aicore__ static inline __gm__ uint8_t* OOMGetStorageShapeCursor(__gm__ uint8_t* jumpField,
+                                                                   __gm__ uint8_t* tilingBase)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    if (jumpField[0] != Internal::g_oomJumpFieldMagic) {
+        return jumpField;
+    }
+    const uint8_t version = jumpField[1] & Internal::g_oomNibbleMask;
+    if (version != Internal::g_oomStorageShapeVersion) {
+        return jumpField;
+    }
+    const uint32_t offset = OOMReadPackedValue<uint32_t>(jumpField + 4U);
+    if (offset == 0U) {
+        return jumpField;
+    }
+    return tilingBase + offset;
+#else
+    (void)jumpField;
+    (void)tilingBase;
+    return nullptr;
+#endif
+}
+
 template <typename T>
 __aicore__ static inline T OOMReadPackedValue(__gm__ uint8_t* address)
 {
