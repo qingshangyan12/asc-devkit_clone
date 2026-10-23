@@ -28,13 +28,18 @@ Tensor API提供基于Tensor的数据搬运、矩阵计算和矢量计算能力�
 - [Algorithm](algorithm.md)：介绍数据搬运和矩阵计算中Operation、Trait与Atom的作用、组合关系及使用方式。
 - [数据搬运](data_move/data_move.md)：介绍多种数据搬运通路，包括Global Memory与Unified Buffer（UB）之间的双向搬运，Global Memory到L1 Buffer的搬运等。
 - [矩阵计算](matrix_compute/matrix_compute.md)：介绍矩阵数据搬入、矩阵乘加、矩阵结果搬出和相关关键特性。
+- [Cube数据填充](matrix_compute/cube_data_fill/cube_data_fill.md)：介绍矩阵计算前的L1物理块初始化能力。
 - [reg矢量计算](reg_vector_compute/reg_vector_compute.md)：介绍矢量计算的搬入、矢量计算的搬出、寄存器数据搬入搬出、Mask寄存器计算和类型转换。
 - [工具接口](utils/tool_functions.md)：介绍编译期整数、维度保留标记、Layout Pattern查询、类型判断以及调试打印等工具接口的使用方式。
+- [同步控制](sync/sync.md)：介绍函数式核间同步、对象式流水锁和作用域锁保护接口。
+- [缓存控制](cache_control/cache_control.md)：介绍Data Cache目标域刷新和整体失效接口。
+- [原子操作](atomic/atomic.md)：介绍数据搬运到Global Memory过程中的DMA原子模式配置接口。
+- [常量填充值配置](data_move/set_copy_pad_val.md)：介绍GM到UB对齐搬运的常量填充值配置接口。
 - [废弃接口](deprecated_interface/deprecated_interface.md)：介绍用于兼容的大驼峰风格接口。
 
 ## 与C API配合使用
 
-Tensor API提供基于Tensor和Layout的数据组织、数据搬运、矩阵计算和矢量计算能力，适合构建算子的主要数据处理流程。缓存控制、同步控制、系统变量、原子操作和初始化等底层控制能力由C API提供。开发者可以在同一个核函数（Kernel）中组合使用Tensor API和C API，以实现完整的算子功能。
+Tensor API提供数据组织、数据搬运、矩阵计算、矢量计算、初始化、同步控制、缓存控制、系统变量查询和原子操作配置能力。开发者可以在同一个核函数（Kernel）中组合使用Tensor API和C API，以实现完整的算子功能。
 
 Tensor API和C API的接口支持范围及参数约束相互独立，混合使用时需要同时满足两类接口的要求。
 
@@ -44,8 +49,4 @@ Tensor API未完整覆盖的能力及对应C API资料如下。
 
 | 能力 | C API用途 | 接口示例 | 相关资料 |
 | :--- | :--- | :--- | :--- |
-| 初始化 | 将全局控制状态恢复为初始值。 | `asc_init` | [asc_init](../c_api/utils/sys_init/asc_init.md) |
-| 缓存控制 | Data Cache或Instruction Cache预加载、刷新和失效。 | `asc_datacache_preload`、`asc_dcci`、`asc_dci` | [缓存控制](../c_api/cache_ctrl/cache_ctrl.md) |
-| 同步控制 | 流水线同步和核间同步。 | `asc_lock`、`asc_unlock`、`asc_sync_notify`、`asc_sync_wait` | [同步控制](../c_api/sync/sync.md) |
-| 系统变量 | 查询核索引、核数量、系统Cycle等运行信息。 | `asc_get_arch_ver`、`asc_get_core_id`、`asc_get_system_cycle` | [系统变量](../c_api/utils/sys_var/sys_var.md) |
-| 原子操作 | 随路原子操作和指定Global Memory地址的Scalar原子更新。 | `asc_set_atomic_add`、`asc_set_atomic_none`、`asc_atomic_add` | [随路原子操作](../c_api/atomic/atomic.md)、[Scalar计算](../c_api/scalar_compute/scalar_compute.md) |
+| 系统变量 | 查询核索引、核数量、系统Cycle等运行信息。Tensor API已提供subblock和物理地址查询封装。 | `asc_get_arch_ver`、`asc_get_core_id`、`asc_get_system_cycle` | [系统变量](../c_api/utils/sys_var/sys_var.md) |

@@ -150,7 +150,7 @@ Each AIC block uses `block_idx` to locate a `single_core_m` by `single_core_n` r
 
 ### Vector-side Addition Flow
 
-Each AIV uses `asc_get_sub_block_id()` to determine its M half. After receiving the notification for the corresponding AIC slot, it processes each row and each `vector_len`-element column block. It first copies the Cube result from UB to a Vector temporary Tensor, then transfers Residual from Global Memory to UB, calls `compute_add`, and finally copies the output Tensor to the corresponding Y slice in Global Memory. The two AIVs process non-overlapping row ranges.
+Each AIV uses `asc::te::get_sub_block_id()` to determine its M half. After receiving the notification for the corresponding AIC slot, it processes each row and each `vector_len`-element column block. It first copies the Cube result from UB to a Vector temporary Tensor, then transfers Residual from Global Memory to UB, calls `compute_add`, and finally copies the output Tensor to the corresponding Y slice in Global Memory. The two AIVs process non-overlapping row ranges.
 
 ### Dual-destination L0C-to-UB Transfer and Synchronization
 
