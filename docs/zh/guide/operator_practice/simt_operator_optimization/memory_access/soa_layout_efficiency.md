@@ -74,7 +74,7 @@ __aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uin
 | Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
 | ---- | :---------------: | :-----------------------: | :------: |
 | 0    |     1311.297      |          672.645          |    -     |
-| 1    |      783.029      |          239.765          |  x1.67   |
+| 1    |      783.029      |          239.765          |  1.67x   |
 
 从性能数据可以看出，同一算法，Task Duration从1311.297μs降至783.029μs。SoA布局相对AoS布局提升x1.67。
 
