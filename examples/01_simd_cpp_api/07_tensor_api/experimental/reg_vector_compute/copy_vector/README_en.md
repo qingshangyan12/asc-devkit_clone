@@ -20,7 +20,7 @@ tensor with a shape of `[1024]`. Scenario 5 pads an input of shape `[32, 24]` to
 | 2 | UB->GM | DN | Four-dimensional | Calls `atom.call(dst, src)` after `make_copy(..., trait)` |
 | 3 | UB->UB | NZ | Four-dimensional | Uses an explicit atom and the coordinate/shape region transfer overload |
 | 4 | GM->UB | ND | One-dimensional | Uses `make_shape(1024)` and `make_stride(1)` to select the one-dimensional copy route |
-| 5 | GM->UB | ND | Four-dimensional | Pads three elements on the left and five on the right, and uses `asc_set_copy_pad_val` to set the padding value to `-9` |
+| 5 | GM->UB | ND | Four-dimensional | Pads three elements on the left and five on the right, and sets the padding value to `-9` through `set_copy_pad_val` |
 
 The kernels for all five scenarios are declared with `__global__ __vector__`.
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. Scenario 1 performs an unaligned copy, while scenario 2 performs unaligned loading, reduction, and storing. Neither scenario directly calls unaligned C APIs. GM/UB transfers use Tensor API `copy`, register zeroing and reduction use experimental Tensor APIs, and pipeline synchronization uses the C APIs `asc_lock/asc_unlock`.
+This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. Scenario 1 performs an unaligned copy, while scenario 2 performs unaligned loading, reduction, and storing. Neither scenario directly calls unaligned C APIs. GM/UB transfers use Tensor API `copy`, register zeroing and reduction use experimental Tensor APIs, and pipeline synchronization uses the Tensor API `asc::te::mutex`.
 
 Select a scenario with `SCENARIO_NUM`:
 

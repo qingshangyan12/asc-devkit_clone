@@ -22,6 +22,10 @@
 | [make_mem_ptr](tensor/make_mem_ptr.md) | 根据指针和存储位置构造Tensor API内存指针对象。 |
 | [make_tensor](tensor/make_tensor.md) | 将内存指针和Layout绑定，构造global_tensor或local_tensor。 |
 | [slice](tensor/slice.md) | 根据起始坐标和Shape或Layout描述创建原Tensor的子Tensor。 |
+| [mutex_id](sync/mutex.md) | 流水锁硬件ID类型别名。 |
+| [mutex](sync/mutex.md) | 对象式流水锁，通过编译期流水参数和运行期锁ID控制核内异步流水资源交接。 |
+| [adopt_lock_t和adopt_lock](sync/lock_guard.md) | `lock_guard`的已持有锁标记类型和常量。 |
+| [lock_guard](sync/lock_guard.md) | 作用域锁保护对象，析构时自动释放引用的mutex。 |
 
 ## Layout操作
 
@@ -70,6 +74,7 @@
 | [L0C Buffer到Unified Buffer](matrix_compute/cube_compute_store/copy_l0c_to_ub.md) | 使用`copy`将L0C Buffer中的矩阵结果搬运到UB，支持格式转换和量化输出。 |
 | [L0C Buffer到L1 Buffer](matrix_compute/cube_compute_store/copy_l0c_to_l1.md) | 使用`copy`将L0C Buffer中的矩阵结果搬运到L1 Buffer。 |
 | [Unified Buffer内部搬运](reg_vector_compute/vector_compute_load/copy_ub_to_ub.md) | 使用`copy`完成UB内部Tensor之间的数据搬运。 |
+| [fill](matrix_compute/cube_data_fill/fill.md) | 按32字节物理块单位将标量填充值写入L1 Buffer。 |
 
 ## 矩阵计算
 
@@ -183,10 +188,52 @@
 | [get_layout_pattern](utils/get_layout_pattern.md) | 从Layout类型中提取Layout Pattern类型信息。 |
 | [类型判断与提取工具](utils/type_traits.md) | 提供Layout、Tensor、Coord、Shape、量化参数等类型判断工具。 |
 | [print打印接口](utils/print.md) | 提供Tensor API调试场景下的格式化、Layout表格和Tensor元素打印能力。 |
+| [init_soc_state](utils/init_soc_state.md) | 将当前AI Core的全局控制状态恢复为初始状态。 |
+| [get_sub_block_id](utils/get_sub_block_id.md) | 获取当前逻辑AI Core上AIC或AIV的逻辑索引。 |
+| [get_sub_block_num](utils/get_sub_block_num.md) | 获取当前AI Core上AIC或AIV的数量。 |
+| [get_phy_buf_addr](utils/get_phy_buf_addr.md) | 根据偏移量获取片上实际物理地址。 |
+
+## 搬运配置
+
+**表8** 搬运配置接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [set_copy_pad_val](data_move/set_copy_pad_val.md) | 设置GM到UB对齐搬运使用的常量填充值。 |
+
+## 同步控制
+
+**表9** 同步控制接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [block、intra、inter和subblock同步](sync/block_sync.md) | 提供block、intra、inter和subblock四类到达/等待同步接口。 |
+| [sync_data_barrier](sync/data_barrier.md) | 等待前序内存访问指令执行完成。 |
+| [sync_pipe](sync/sync_pipe.md) | 等待指定流水或全部流水的前序指令执行完成。 |
+
+## 原子操作
+
+**表10** 原子操作接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [set_atomic_add](atomic/set_atomic_add.md) | 对后续受支持的目的地址为GM的搬运开启原子累加。 |
+| [set_atomic_max](atomic/set_atomic_max.md) | 对后续受支持的目的地址为GM的搬运开启原子取大。 |
+| [set_atomic_min](atomic/set_atomic_min.md) | 对后续受支持的目的地址为GM的搬运开启原子取小。 |
+| [disable_dma_atomic](atomic/disable_dma_atomic.md) | 关闭DMA原子模式。 |
+
+## 缓存控制
+
+**表11** 缓存控制接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [datacache_clean_and_invild](cache_control/datacache_clean_and_invild.md) | 按目标域清理并失效Data Cache中的缓存行。 |
+| [datacache_clean](cache_control/datacache_clean.md) | 将整个Data Cache标记为无效，不回写脏数据。 |
 
 ## 废弃接口
 
-**表8**  废弃接口列表
+**表12**  废弃接口列表
 
 | 接口名 | 功能描述 |
 | --- | --- |
