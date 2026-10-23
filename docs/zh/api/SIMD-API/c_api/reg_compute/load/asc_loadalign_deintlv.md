@@ -36,14 +36,11 @@
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
-通过函数返回值输出两个结果的重载为试验接口，请参见[试验接口asc_loadalign_deintlv](../../experimental/asc_loadalign_deintlv.md)。
-
 ## 函数原型
 
 ### 对齐搬入模式
 
 ```c
-// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src)
@@ -51,23 +48,20 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
 
 #### dtype支持数据类型
 
-`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
-
-当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`。
 
 #### 函数原型典型示例
 
 ```c
-// 通过引用参数输出结果示例：对float数据执行解交织搬入。
+// 示例：float类型。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
-                                                vector_float& dst1,
-                                                __ubuf__ float* src)
+                                                  vector_float& dst1,
+                                                  __ubuf__ float* src)
 ```
 
 ### 立即数偏移搬入模式
 
 ```c
-// 通过引用参数输出结果（占位符形式），使用立即数偏移。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src,
@@ -81,7 +75,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
 #### 函数原型典型示例
 
 ```c
-// 通过引用参数输出结果示例：对float数据执行带偏移的解交织搬入。
+// 示例：float类型。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
                                                   vector_float& dst1,
                                                   __ubuf__ float* src,
@@ -91,7 +85,6 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 ### 地址寄存器偏移搬入模式
 
 ```c
-// 通过引用参数输出结果（占位符形式），使用地址寄存器偏移。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src,
@@ -105,7 +98,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
 #### 函数原型典型示例
 
 ```c
-// 通过引用参数输出结果示例：对float数据执行带偏移的解交织搬入。
+// 示例：float类型。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
                                                   vector_float& dst1,
                                                   __ubuf__ float* src,
@@ -150,7 +143,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 
 ## 返回值说明
 
-无。
+无
 
 ## 约束说明
 

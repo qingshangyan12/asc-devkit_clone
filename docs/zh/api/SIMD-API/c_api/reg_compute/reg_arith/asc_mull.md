@@ -46,12 +46,10 @@ $$
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
-通过函数返回值输出两个结果的重载为试验接口，请参见[试验接口asc_mull](../../experimental/asc_mull.md)。
-
 ## 函数原型
 
-```cpp
-// 通过引用参数输出结果（占位符形式）
+```c
+// 占位符形式
 __simd_callee__ inline void asc_mull(vector_<dtype>& dst0,
                                      vector_<dtype>& dst1,
                                      vector_<dtype> src0,
@@ -65,8 +63,7 @@ __simd_callee__ inline void asc_mull(vector_<dtype>& dst0,
 
 ### 函数原型典型示例
 
-```cpp
-// 通过引用参数输出结果示例：uint32_t类型乘法。
+```c
 __simd_callee__ inline void asc_mull(vector_uint32_t& dst0,
                                      vector_uint32_t& dst1,
                                      vector_uint32_t src0,
@@ -90,7 +87,7 @@ __simd_callee__ inline void asc_mull(vector_uint32_t& dst0,
 
 ## 返回值说明
 
-无。
+无
 
 ## 约束说明
 

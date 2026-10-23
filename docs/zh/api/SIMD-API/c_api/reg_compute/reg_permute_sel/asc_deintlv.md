@@ -41,14 +41,12 @@
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
-通过函数返回值输出两个结果的重载为试验接口，请参见[试验接口asc_deintlv](../../experimental/asc_deintlv.md)。
-
 ## 函数原型
 
-### 矢量数据寄存器解交织模式
+### 矢量数据解交织
 
-```cpp
-// 通过引用参数输出结果（占位符形式）
+```c
+// 占位符形式
 __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
                                         vector_<dtype>& dst1,
                                         vector_<dtype> src0,
@@ -61,18 +59,17 @@ __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
 
 #### 函数原型典型示例
 
-```cpp
-// 通过引用参数输出结果示例：对half矢量数据寄存器执行解交织。
+```c
+// 示例：对half矢量数据寄存器执行解交织。
 __simd_callee__ inline void asc_deintlv(vector_half& dst0,
                                         vector_half& dst1,
                                         vector_half src0,
                                         vector_half src1)
 ```
 
-### 掩码寄存器解交织模式
+### 掩码解交织
 
-```cpp
-// 通过引用参数输出结果
+```c
 __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0,
                                             vector_bool& dst1,
                                             vector_bool src0,
@@ -111,7 +108,7 @@ __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0,
 
 ## 返回值说明
 
-无。
+无
 
 ## 约束说明
 
