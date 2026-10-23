@@ -38,8 +38,7 @@ OpParam MakeArParam(
 
 // 用字节数换算 count，保证 dataSize 精确落在被测阈值上。
 OpParam MakeArParamByBytes(
-    u64 bytes, HcclDataType dataType = HCCL_DATA_TYPE_FP32,
-    HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_SUM)
+    u64 bytes, HcclDataType dataType = HCCL_DATA_TYPE_FP32, HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_SUM)
 {
     return MakeArParam(bytes / DATATYPE_SIZE_TABLE[dataType], dataType, reduceType);
 }
