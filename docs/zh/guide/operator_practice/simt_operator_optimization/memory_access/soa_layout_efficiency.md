@@ -42,9 +42,9 @@ __aicore__ inline uint32_t find_aos(const AoSBucket* buckets, uint64_t target_ke
 
 上述实现中，每个线程独立负责一条查询key，查找逻辑逐Bucket读8B key进行比较。该实现的性能数据如下：
 
-  | Case | Task Duration(μs) | read_main_memory_data(MB) |
-| ---- | :---------------: | :-----------------------: |
-| 0    |     1311.297      |          672.645          |
+| Case | Task Duration(μs) |
+| ---- | :---------------: |
+| 0    |     1311.297      |
 
 
 【正例】使用SoA布局，key与value分区存储，探测路径与value区解耦，消除value存放在Bucket中对探测访存跨度的干扰。
@@ -71,10 +71,10 @@ __aicore__ inline uint32_t find_soa_no_digest(const SoaTableNoDigest* table, uin
 
 算法实现与反例查找算法完全一致。唯一差异是内存布局。SoA布局中所有8MB的key连续存放，所有32MB的value连续存放，key和value分开存储。使用SoA布局后的性能数据如下：
 
-| Case | Task Duration(μs) | read_main_memory_data(MB) | 性能对比 |
-| ---- | :---------------: | :-----------------------: | :------: |
-| 0    |     1311.297      |          672.645          |    -     |
-| 1    |      783.029      |          239.765          |  1.67x   |
+| Case | Task Duration(μs) | 性能对比 |
+| ---- | :---------------: | :------: |
+| 0    |     1311.297      |    -     |
+| 1    |      783.029      |  1.67x   |
 
 从性能数据可以看出，同一算法，Task Duration从1311.297μs降至783.029μs。SoA布局相对AoS布局提升x1.67。
 
