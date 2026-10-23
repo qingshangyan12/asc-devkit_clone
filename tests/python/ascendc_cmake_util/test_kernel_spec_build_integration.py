@@ -67,7 +67,7 @@ set(ASCEND_PYTHON_EXECUTABLE python3)
 set(ASCENDC_CMAKE_SCRIPTS_PATH "${FWK_MODULES_DIR}")
 include(${ASCENDC_CMAKE_SCRIPTS_PATH}/func.cmake)
 set(_ASC_KERNEL_SPEC_EXPORTER "${CMAKE_CURRENT_SOURCE_DIR}/exporter" CACHE FILEPATH "")
-set(ASCEND_COMPUTE_UNIT ascend910b ascend950)
+set(ASCEND_COMPUTE_UNIT "ascend910b;ascend950" CACHE STRING "Selected chips")
 option(ASCEND_SKIP_FAILED_COMPUTE_UNIT "Allow failed producer tasks" ON)
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_BUILD_DIR "${CMAKE_BINARY_DIR}/demo/kernel_spec_bundle")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_CPACK TRUE)
@@ -79,7 +79,7 @@ function(add_kernel kernel)
   set(KERNEL_BINARY_PATH "${CMAKE_BINARY_DIR}/${kernel}")
   set(KERNEL_DYNAMIC_PATH "${KERNEL_BINARY_PATH}/binary/dynamic")
   file(MAKE_DIRECTORY "${auto_gen_path}")
-  file(WRITE "${auto_gen_path}/custom_opc_options.ini" "")
+  file(WRITE "${auto_gen_path}/custom_opc_options.ini" "${SPEC_OPC_OPTIONS}")
   set(kernel_spec_mode "${SPEC_MODE}")
   set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "${auto_gen_path}")
   ascend_copy_kernel_source_file(TARGET ${kernel}_copy_kernel_srcs PACKAGE_TARGET ${kernel}
@@ -87,16 +87,19 @@ function(add_kernel kernel)
   set(KERNEL_COMPILE_TARGETS)
   set(kernel_spec_tasks)
   foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
-    add_custom_target(${kernel}_${soc}
-      COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/producer.py" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util"
-        "${kernel_spec_mode}" "${CMAKE_BINARY_DIR}/demo/kernel_spec_bundle" Add "${soc}"
-        "${KERNEL_SRC_BASE}/add.cpp" "${KERNEL_DYNAMIC_PATH}/add.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
-      VERBATIM)
-    add_dependencies(${kernel}_${soc} ${kernel}_copy_kernel_srcs)
-    list(APPEND KERNEL_COMPILE_TARGETS ${kernel}_${soc})
-    list(APPEND kernel_spec_tasks "[\"Add\",\"${soc}\"]")
     add_custom_target(${kernel}_ascendc_bin_${soc}_gen_ops_config)
-    add_dependencies(${kernel}_ascendc_bin_${soc}_gen_ops_config ${kernel}_${soc})
+    foreach(op IN ITEMS Add Mul)
+      string(TOLOWER "${op}" op_file)
+      add_custom_target(${kernel}_${soc}_${op}
+        COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/producer.py" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util"
+          "${kernel_spec_mode}" "${CMAKE_BINARY_DIR}/demo/kernel_spec_bundle" "${op}" "${soc}"
+          "${KERNEL_SRC_BASE}/${op_file}.cpp" "${KERNEL_DYNAMIC_PATH}/${op_file}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
+        VERBATIM)
+      add_dependencies(${kernel}_${soc}_${op} ${kernel}_copy_kernel_srcs)
+      list(APPEND KERNEL_COMPILE_TARGETS ${kernel}_${soc}_${op})
+      list(APPEND kernel_spec_tasks "[\"${op}\",\"${soc}\"]")
+      add_dependencies(${kernel}_ascendc_bin_${soc}_gen_ops_config ${kernel}_${soc}_${op})
+    endforeach()
   endforeach()
   if(NOT SPEC_MODE STREQUAL "None")
     _ascendc_kernel_spec_layout(demo "packages/vendors/demo/op_impl/dynamic/${kernel}")
@@ -117,27 +120,29 @@ import json
 import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-from ascendc_build_kernel_spec import KernelSpecBuildDirectory, task_directory
+from ascendc_build_kernel_spec import task_directory
 mode, root, op, soc, source, copied_source, fail = sys.argv[2:]
 assert Path(copied_source).read_text() == Path(source).read_text(), 'compile must see the latest copied source'
 if mode != "None":
-    build_directory = KernelSpecBuildDirectory(root)
-    directory = task_directory(str(build_directory.current_directory), op, soc)
-    assert directory.is_dir(), 'prepare must create the directory before parallel OPC variants'
-    resources = directory / 'resources'
-    resources.mkdir()
-    (resources / 'wrapper.cpp').write_text('wrapper')
-    (directory / 'add_manifest.json').write_text(json.dumps({
-        'resource_id': hashlib.sha256(soc.encode()).hexdigest(),
-        'soc_version': soc, 'source_file': 'add.cpp', 'resource_path': 'resources',
-        'options': {'common_compile': ['-I${source_file_path}']},
-        'kernels': [{'kernel_name': op, 'objects': []}]
-    }))
+    assert (Path(root) / 'input').is_dir(), 'CMake must prepare inputs before producers'
+    directory = task_directory(str(Path(root) / 'input'), op, soc)
+    directory.mkdir(parents=True, exist_ok=True)
     failure = Path(fail).read_text().strip() if Path(fail).exists() else None
+    filtered = failure in ('filtered', 'filtered:' + soc)
     failed = failure is not None and failure in ('', soc)
+    if not filtered:
+        resources = directory / 'resources'
+        resources.mkdir()
+        (resources / 'wrapper.cpp').write_text('wrapper')
+        (directory / 'add_manifest.json').write_text(json.dumps({
+            'resource_id': hashlib.sha256((soc + op).encode()).hexdigest(),
+            'soc_version': soc, 'source_file': Path(source).name, 'resource_path': 'resources',
+            'options': {'common_compile': ['-I${source_file_path}']},
+            'kernels': [{'kernel_name': op, 'objects': []}]
+        }))
     if failure != 'missing':
         (directory / '.producer-result.json').write_text(json.dumps({
-            'source': source, 'status': 'failed' if failed else 'completed',
+            'source': source, 'status': 'filtered' if filtered else ('failed' if failed else 'completed'),
             'reason': 'simulated compile failure' if failed else ''
         }))
 """
@@ -160,8 +165,8 @@ def _run(*arguments, success=True):
     return result
 
 
-@pytest.fixture
-def project(tmp_path):
+@pytest.fixture(params=["Unix Makefiles", "Ninja"])
+def project(tmp_path, request):
     source = tmp_path / "source with spaces"
     source.mkdir()
     (source / "CMakeLists.txt").write_text(PROJECT)
@@ -171,8 +176,19 @@ def project(tmp_path):
     exporter.chmod(0o755)
     (source / "kernel_a").mkdir()
     (source / "kernel_a/add.cpp").write_text("void kernel_a() {}\n")
+    (source / "kernel_a/mul.cpp").write_text("void kernel_mul() {}\n")
     build = tmp_path / "build with spaces"
-    _run("cmake", "-S", source, "-B", build, f"-DFWK_MODULES_DIR={FWK_MODULES_DIR}", "-DSPEC_MODE=Normal")
+    _run(
+        "cmake",
+        "-G",
+        request.param,
+        "-S",
+        source,
+        "-B",
+        build,
+        f"-DFWK_MODULES_DIR={FWK_MODULES_DIR}",
+        "-DSPEC_MODE=Normal",
+    )
     return source, build, tmp_path / "installed"
 
 
@@ -188,33 +204,36 @@ def _configure(source, build, *options):
     _run("cmake", "-S", source, "-B", build, *options)
 
 
-def test_package_builds_use_fresh_directories_and_install_resources(project):
+def test_package_reuses_fixed_paths_and_replaces_resource_inputs(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
     work = build / "demo/kernel_spec_bundle"
-
-    def current():
-        return Path(json.loads((work / "current_build.json").read_text())["directory"])
-
+    inputs = work / "input"
+    output = work / "op_spec/libcust_compile_resource.so"
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
+    assert inputs.is_dir()
+    assert output.read_bytes() == installed.read_bytes()
+    assert not (work / "current_build.json").exists()
+    assert not list(work.glob("build-*"))
     data = json.loads(installed.read_bytes()[4:])
-    assert len(data) == 2
-    assert all("kernel-spec" not in path.read_text() for path in build.glob("*/autogen/custom_opc_options.ini"))
-    assert {manifest["source_file"] for manifest in data} == {"op_impl/dynamic/kernel_a/add.cpp"}
-    first = current()
-    assert len(list(work.glob("build-*"))) == 1
-    assert all((first / soc / "Add/.producer-result.json").is_file() for soc in ("ascend910b", "ascend950"))
+    assert len(data) == 4
+    assert {m["source_file"] for m in data} == {"op_impl/dynamic/kernel_a/add.cpp", "op_impl/dynamic/kernel_a/mul.cpp"}
+    assert all(
+        (inputs / soc / op / ".producer-result.json").is_file()
+        for soc in ("ascend910b", "ascend950")
+        for op in ("Add", "Mul")
+    )
+    stale = inputs / "obsolete/resources/old.cpp"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("old resource")
+    timestamp = output.stat().st_mtime_ns
     _build(build)
-    second = current()
-    assert second != first
-    assert not first.exists()
-    assert (second / "op_spec/libcust_compile_resource.so").is_file()
-    assert not list(work.glob("*.tasks.json"))
+    assert not stale.exists()
+    assert output.stat().st_mtime_ns == timestamp
     (source / "kernel_a/add.cpp").write_text("changed source")
     _build(build)
-    assert current() not in {first, second}
-    assert len(list(work.glob("build-*"))) == 1
+    assert output.stat().st_mtime_ns != timestamp
     assert (build / "kernel_a/binary/dynamic/add.cpp").read_text() == "changed source"
 
 
@@ -225,13 +244,10 @@ def test_skipped_producers_remove_old_result_and_reconfigure_requires_build(proj
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     previous = installed.read_bytes()
     work = build / "demo/kernel_spec_bundle"
-    previous_build = json.loads((work / "current_build.json").read_text())["directory"]
     (source / "fail").touch()
     result = _build(build)
-    assert "producer failed" in result.stderr
-    skipped_build = json.loads((work / "current_build.json").read_text())["directory"]
-    assert skipped_build != previous_build
-    assert not (Path(skipped_build) / "op_spec/libcust_compile_resource.so").exists()
+    assert "producer failed" in result.stdout + result.stderr
+    assert not (work / "op_spec/libcust_compile_resource.so").exists()
     _install(build, prefix)
     assert not installed.exists()
     (source / "fail").unlink()
@@ -249,14 +265,16 @@ def test_producer_result_failures_preserve_previous_delivery(project, failure):
     _build(build)
     _install(build, prefix)
     work = build / "demo/kernel_spec_bundle"
-    previous = Path(json.loads((work / "current_build.json").read_text())["directory"])
+    output = work / "op_spec/libcust_compile_resource.so"
+    previous = output.read_bytes()
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     data = installed.read_bytes()
     (source / "fail").write_text(failure)
     _configure(source, build, "-DASCEND_SKIP_FAILED_COMPUTE_UNIT=OFF")
     result = _build(build, success=False)
-    assert ("producer result is missing" if failure == "missing" else "producer Add/ascend950: failed") in result.stderr
-    assert previous.is_dir()
+    message = "producer result is missing" if failure == "missing" else "producer Add/ascend950: failed"
+    assert message in result.stdout + result.stderr
+    assert output.read_bytes() == previous
     assert installed.read_bytes() == data
     _install(build, prefix, success=False)
     if failure != "missing":
@@ -264,12 +282,14 @@ def test_producer_result_failures_preserve_previous_delivery(project, failure):
         _build(build)
         _install(build, prefix)
         resources = json.loads(installed.read_bytes()[4:])
-        assert [resource["soc_version"] for resource in resources] == ["ascend910b"]
-        assert not previous.exists()
+        assert len(resources) == 2
+        assert {resource["soc_version"] for resource in resources} == {"ascend910b"}
+        assert output.is_file()
     else:
         _configure(source, build, "-DASCEND_SKIP_FAILED_COMPUTE_UNIT=ON")
-        assert "producer result is missing" in _build(build, success=False).stderr
-        assert previous.is_dir()
+        result = _build(build, success=False)
+        assert "producer result is missing" in result.stdout + result.stderr
+        assert output.read_bytes() == previous
 
 
 def test_package_none_removes_stale_delivery(project):
@@ -282,3 +302,51 @@ def test_package_none_removes_stale_delivery(project):
     _build(build)
     _install(build, prefix)
     assert not installed.exists()
+
+
+def test_fixed_inputs_handle_filtering_and_chip_selection_changes(project):
+    source, build, prefix = project
+    _build(build)
+    (source / "fail").write_text("filtered:ascend950")
+    _build(build)
+    _install(build, prefix)
+    work = build / "demo/kernel_spec_bundle"
+    output = work / "op_spec/libcust_compile_resource.so"
+    assert {m["soc_version"] for m in json.loads(output.read_bytes()[4:])} == {"ascend910b"}
+    (source / "fail").write_text("filtered")
+    _build(build)
+    _install(build, prefix)
+    assert not output.exists()
+    assert not output.with_suffix(".so.cache.json").exists()
+    assert not (prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so").exists()
+    (source / "fail").unlink()
+    _configure(source, build, "-DASCEND_COMPUTE_UNIT=ascend910b", "-DSPEC_MODE=SK")
+    _build(build)
+    assert not (work / "input/ascend950").exists()
+    assert len(json.loads(output.read_bytes()[4:])) == 2
+
+
+def test_fixed_output_preserves_diagnostics_and_blocks_failed_export_install(project):
+    source, build, prefix = project
+    _build(build)
+    _install(build, prefix)
+    work = build / "demo/kernel_spec_bundle"
+    output = work / "op_spec/libcust_compile_resource.so"
+    previous = output.read_bytes()
+    exporter = source / "exporter"
+    original = exporter.read_text()
+    exporter.write_text("#!/bin/sh\nexit 1\n")
+    _build(build, success=False)
+    assert output.read_bytes() == previous
+    _install(build, prefix, success=False)
+    exporter.write_text(original)
+    _configure(source, build, "-DSPEC_OPC_OPTIONS=ALL@@--op_debug_config=dump_cce\n")
+    _build(build)
+    diagnostics = list((work / "work").glob(".bundle-*"))
+    assert len(diagnostics) == 1
+    retained = diagnostics[0] / "collected/00000000/resource_manifest.json"
+    manifest = retained.read_bytes()
+    _build(build)
+    assert retained.read_bytes() == manifest
+    assert len(list((work / "work").glob(".bundle-*"))) == 2
+    _install(build, prefix)

@@ -20,7 +20,6 @@ import shutil
 import subprocess
 import multiprocessing
 import re
-import shlex
 from collections import namedtuple
 from dataclasses import dataclass
 from asc_op_compile_base.asc_op_compiler import cce_runtime
@@ -331,7 +330,7 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check),
     else:
         ascendc_self_par_job_num = _get_parallel_job_without_op_project(len(tiling_key_list))
         cmd = ["make", "-f", mk_file, "-j", f"{ascendc_self_par_job_num}"]
-    cmd_str = shlex.join(cmd)
+    cmd_str = " ".join(cmd)
     file_name = ""
     if global_var_storage.get_variable("ascendc_enable_build_log") is True:
         file_name, kernel_name, hash_name = CommonUtility.get_build_file_name(cmds_list[0], CompileStage.COMPILE)
@@ -339,7 +338,11 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check),
             with open(file_name, mode="at") as f:
                 os.chmod(file_name, stat.S_IRUSR + stat.S_IWUSR)
                 f.write("%s\n" % (cmd_str))
-                cmd_str += " 2>&1 | tee -a " + shlex.quote(file_name)
+                cmd.append("2>&1")
+                cmd.append("|")
+                cmd.append("tee -a")
+                cmd.append(file_name)
+                cmd_str = " ".join(cmd)
         except Exception as err:
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason is:", err))
     ret = os.system(f"{cmd_str} > /dev/null")

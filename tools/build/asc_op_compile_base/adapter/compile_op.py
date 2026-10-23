@@ -1211,6 +1211,9 @@ def compile_op_common_part(
     kernel_spec = KernelSpecCompilation.create(compile_info, compile_option_tuple, tiling_info)
 
     with kernel_spec:
+        if kernel_spec.record_sk_commands:
+            # SK resource recording compiles the normal ELF first; refresh its metadata support.
+            DFXSectionGenerator().update_is_support(op_info)
         # generate tiling struct size, dfx section
         if global_var_storage.get_variable("ascendc_tiling_no_register"):
             file_name_tag = distinct_tag + "_meta_info.cpp"
