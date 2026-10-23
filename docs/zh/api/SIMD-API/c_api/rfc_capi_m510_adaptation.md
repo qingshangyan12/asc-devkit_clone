@@ -22,7 +22,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 
 - **3510**：cube/vector 分离；独立 scalar 单元（c310，见 `impl/basic_api/dav_3510/kernel_tpipe_impl_c310*.h`）；拥有专属 `expdiff`（Vexpdif）fp16 指令。
 - **M510**：cube/vector **耦合**（`PRE_COMPILE_KERNEL_MIX_COUPLING`，核心宏 `__DAV_M200__` / `__DAV_M200_VEC__`）；scalar 单元走通用路径（`dav_m510/` 下无 tpipe/scalar 专属文件）。
-- **vector 侧差距（原判断有误，已按 §4.10 修正）**：基础_api 中 M510 的 vector impl 多数可直接复用 3510。早期曾判断「M510 缺 expdiff/fp4/fp8/s4 一整类数据类型专用指令」（`UNPK4_B8`、`vsel`/`vintlv`/`vselr`/`vstar`、`vcvt_s42*`、`vexpdif`），并据此在共享通用头加了大规模「排除仅 5102」守卫。**该判断后被 `impl/basic_api/reg_compute/dav_m510/` 的实证推翻**——这些指令 M510 均实现，仅个别类型组合不同（如 expdiff 仅支持 `Tuple<half,half>`/`Tuple<float,float>`）。详见 **§4.10「前提修正与守卫收缩」**：守卫已从 1114 个收缩至 83 个，非 cube 域分发链已补齐。
+- **vector 侧差距（原判断有误，已按 §4.10 修正）**：基础_api 中 M510 的 vector impl 多数可直接复用 3510。早期曾判断「M510 缺 expdiff/fp4/fp8/s4 一整类数据类型专用指令」（`UNPK4_B8`、`vsel`/`vintlv`/`vselr`/`vstar`、`vcvt_s42*`、`vexpdif`），并据此在共享通用头加了大规模「排除仅 5102」守卫。**该判断后被 `impl/basic_api/reg_compute/dav_m510/` 的实证推翻**——这些指令 M510 均实现，仅个别类型组合不同（如 expdiff 仅支持 `Tuple<half,half>`/`Tuple<float,float>`）。详见 **§4.10「前提修正与守卫收缩」**：§4.7 的 1114 个守卫已收缩至 4 个（§4.8 的 261 个 cube 守卫不受影响、全部保留），非 cube 域分发链已补齐。
 - **cube 侧差距很大**：`impl/basic_api/dav_m510/kernel_operator_mm_impl.h` 已对 M510 将多条 cube 路径桩化/报错（`LoadData2DL12L0ACal` 直接 `ASSERT(false)`；GM→L0A、L1→L0A transpose、InitL0A 等路径返回"not supported on current device"）。
 
 **问题**：能否基于 3510 的 capi 代码，搞出一套适配 M510 的 capi？如果可行，产出 RFC，并为该芯片 capi 准备一套测试用例。
@@ -38,7 +38,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 1. **分发机制完全一致**：capi 的架构选择是 100% 编译期行为，靠 `__NPU_ARCH__` 宏 + 通用头内的 `#if / #elif / #include` 链，与已落地的 3510 / 9201 机制完全相同。新增 M510 分支是机械操作，无需改 CMake 编译逻辑（`impl/c_api/CMakeLists.txt` 仅 `install(DIRECTORY)`，新增文件自动纳入）。
 2. **`memory_base_impl/` 基本架构无关**：25 个文件整体无 `__NPU_ARCH__` 分支；其中 `cube_datamove_intf_impl.h` 的 L1→L0 / GM→L0 加载函数按 §4.8 加「排除仅 5102」守卫（其余零改动）。
 3. **大量 reg/vector/scalar 类实现可直接复用 3510**：`npu_arch_3510/` 下 20 个文件中的 vector / reg / scalar / sys_var / sync / spr / ub_scatter / loadalign / storealign 等，与 M510 行为一致，复制后基本原样保留即可。
-4. **数据类型专用指令（expdiff / fp4 / fp8 / s4）M510 实际支持**：依赖 `vexpdif`、`UNPK4_B8`、`vsel`/`vintlv`、`vcvt_s42*` 等指令的函数，绝大多数定义在**共享通用头**而非 `npu_arch_3510/` 内。早期据「M510 不支持」加过大范围守卫，后经 `dav_m510` basic_api 逐指令核对确认**均支持**（唯一例外：expdiff 的 `Tuple<float,half>` 组合），守卫已按 §4.10 收缩至 83 个。
+4. **数据类型专用指令（expdiff / fp4 / fp8 / s4）M510 实际支持**：依赖 `vexpdif`、`UNPK4_B8`、`vsel`/`vintlv`、`vcvt_s42*` 等指令的函数，绝大多数定义在**共享通用头**而非 `npu_arch_3510/` 内。早期据「M510 不支持」加过大范围守卫，后经 `dav_m510` basic_api 逐指令核对确认**均支持**（唯一例外：expdiff 的 `Tuple<float,half>` 组合），守卫已按 §4.10 收缩至 4 个。
 5. **cube 差异已有 basic_api 基准**：M510 不支持的 cube 路径在 `dav_m510/kernel_operator_mm_impl.h` 中已有明确 ASSERT/报错实现，可作为 capi `npu_arch_5102/cube_*` 的裁剪依据（§4.8 据此保留 79 个守卫）。
 
 **主要风险**（详见 §6，均可在 Phase 0/1 化解）：通用层"总是编译"的 additive-only 机制无法用 arch 文件"覆盖"已存在的通用函数体；测试实际运行依赖外部 `tikicpulib::ascendm510` CPU 模型库（当前不存在）。
@@ -109,7 +109,7 @@ capi（`impl/c_api/`）当前仅通过编译期宏 `__NPU_ARCH__` 支持两类�
 
 ### 4.5 数据类型专用指令缺口决策（expdiff / fp4 / fp8 / s4）—— **结论已修正，见 §4.10**
 
-> ⚠️ **本节原结论已被推翻**。原判断「M510 缺 expdiff / fp4 / fp8 / s4 一整类数据类型专用指令」与仓库自身的 `impl/basic_api/reg_compute/dav_m510/` 实现矛盾。经逐指令核对，**这些指令 M510 均支持**，仅个别**类型组合**与 3510 不同。因此基于本节落地的大规模「排除仅 5102」守卫（§4.7，1114 个函数）已大部分回退，详见 **§4.10「前提修正与守卫收缩」**。本节保留作为历史记录。
+> ⚠️ **本节原结论已被推翻**。原判断「M510 缺 expdiff / fp4 / fp8 / s4 一整类数据类型专用指令」与仓库自身的 `impl/basic_api/reg_compute/dav_m510/` 实现矛盾。经逐指令核对，**这些指令 M510 均支持**，仅个别**类型组合**与 3510 不同。因此基于本节落地的大规模「排除仅 5102」守卫（§4.7，1114 个守卫块）已收缩至 4 个，详见 **§4.10「前提修正与守卫收缩」**。本节保留作为历史记录。
 
 （原文，存档）M510 缺一组数据类型专用指令（expdiff / fp4 / fp8 / s4）。
 
@@ -187,7 +187,7 @@ Phase 2 将 §4.7 的守卫机制应用到 **cube 数据搬运** 路径。依据
 | 文件 | 守卫数 | 说明 |
 |------|--------|------|
 | `impl/c_api/memory_base_impl/cube_datamove_intf_impl.h` | 66 | 共享架构无关头；L1→L0 / GM→L0 加载函数加守卫，其余零改动 |
-| `impl/c_api/reg_base_impl/cube_datamove_intf_impl.h` | 79 | 通用分发头；同一批 10 族函数加守卫 |
+| `impl/c_api/reg_base_impl/cube_datamove_intf_impl.h` | 79 | 通用分发头；同一批 10 族函数加守卫。**注**：rebase 到 trunk 后，trunk 提交 `477d3bca2` 已把 `asc_copy_gm2l1*` 家族（100 个定义）从本文件下沉到 `npu_arch_3510/cube_datamove_intf_impl.h`；本文件的 79 个守卫仍完整保护留在此处的 L0 加载家族（`l12l0a` 27 / `l12l0b` 27 / `l12l0b_trans` 13 / `l12bt` 10 / `l12fb` 2），M510 的 `gm2l1*` 改由 5102 分支经 `npu_arch_3510` 取得（实测 M510 `gm2l1`=48、`gm2l1_align`=30、`gm2l1_dn2nz`=36、`gm2l1_nd2nz`=36） |
 | `impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h` | 2 | 9201 专属路径；守卫恒真、保留 |
 | `impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_intf_impl.h` | 0 | 3510 专属头不含这 10 族（定义落在共享/通用头），无需改动 |
 
@@ -246,7 +246,9 @@ ccec `-E` 实测（pp 输出按「定义体」计数，声明不算）：
 **修正动作（已落地）**：
 
 1. **补齐 18 个非 cube 顶层分发头的 5102 分支**（§4.9 遗留的缺口）：`vector_datamove`、`reg_convert`、`reg_fused`、`reg_logic`、`reg_permute_sel`、`loadalign`、`storealign`、`storeunalign`、`sync`、`spr`、`sys_var`、`ub_scatter`、`datamove_atomic`、`scalar_atomic`、`reg_addr_reg`、`vector_compute_composite`、`cube_compute_composite`、`cube_datamove_composite`（`reg_arith` / `reg_reduce` 仅 9201 有 arch 专属实现，无 3510 对应，不补）。此前 §4.9 曾判断「补这些分支会把不支持的 s4/expdiff 路径拉进 5102」——该判断同样基于 §4.5 的错误前提，实测（5102 预处理 0 错误、`vexpdif`/`vcvt_s42bf16` 计数不再因补分支而上升）证明不成立。
-2. **收缩 §4.7 守卫**：移除 1031 个守卫块，仅保留 83 个——`cube_datamove_intf_impl.h` 的 79 个（§4.8，M510 basic_api 对这些 L0 加载路径确实是 ASSERT/报错桩）与 `reg_fused_intf_impl.h` 的 4 个 `asc_exp_sub_half2float`（`Tuple<float,half>`，M510 不支持）。
+2. **收缩 §4.7 守卫**：移除 1031 个守卫块。§4.7 原有 1114 个守卫块中仅保留 4 个（`reg_fused_intf_impl.h` 的 `asc_exp_sub_half2float`，`Tuple<float,half>` M510 不支持）。
+
+   > 计数说明：全仓库现存 5102 守卫共 **265** 个，构成为——§4.8 cube L0 加载 261 个（`reg_base_impl/cube_datamove_intf_impl.h` 79 + `memory_base_impl/cube_datamove_intf_impl.h` 66 + `npu_arch_9201/cube_datamove_intf_impl.h` 2 + `npu_arch_3510/cube_compute_composite_intf_impl.h` 8 + `npu_arch_3510/cube_datamove_composite_intf_impl.h` 106）+ §4.7 遗留 4 个。§4.8 的 cube 守卫本就依据 `dav_m510/kernel_operator_mm_impl.h` 的 ASSERT/报错桩，不受本次前提修正影响，全部保留。
 
 **验证（ccec CANN 9.3.0，dav-510r2 / dav-920r2 预处理 `c_api/asc_simd.h`）**：
 
@@ -282,7 +284,7 @@ ccec `-E` 实测（pp 输出按「定义体」计数，声明不算）：
 - [x] __NPU_ARCH__ == 5102 已确认：用户确认 5102 即宏值、编译器认识（--cce-aicore-arch=dav-510r2 配合 -D__NPU_ARCH__=5102）；编译工程 mc62cm12a.py 已注入该宏。注意 ccec 不会自动预定义该宏，须显式 -D 传入（与构建工程一致）。5101/5161/5163/5165 兄弟族沿用同一 npu_arch_5102 分支。
 - [ ] tikicpulib::ascendm510 CPU 模型库就绪时间（阻塞测试实际运行）。但已验证：不依赖 tikicpulib，ccec（CANN 9.3.0）即可编译验证 M510 capi 实现，故 impl 工作不受该库阻塞。
 - [x] cube 耦合裁剪（Phase 2）：完成并验证。①按 §4.8 在共享/通用 cube_datamove 头对 M510 不支持的 L0 加载函数族加「排除仅 5102」守卫（10 族约 147 个定义）；②按 §4.9 在顶层 cube 分发链补 5102 分支，修复 M510 取不到支持算子（l0c2gm/l0c2l1 0→28/27）的缺陷；fp4 MX（asc_mmad_mx*）按 §4.5 Drop。ccec 双向验证：5102 全量 0 错误、Drop 家族定义数 0、支持算子定义数 >0、不支持指令 0；9201 零回归。
-- [x] expdiff / fp4 / fp8 / s4 指令支持性：**原结论已修正（§4.10）**。原判断「M510 缺这些指令」被 `dav_m510` basic_api 实证推翻——`vexpdif` / `vstar` / `DIST_UNPACK4_B8` / `vcvt_s42*` / `vcvt_f162s4` / `vselr` / `vintlv` 等 M510 均实现。唯一确认不支持的是 expdiff 的 `Tuple<float,half>` 类型组合（对应 `asc_exp_sub_half2float`，4 个函数，守卫保留）。§4.7 的 1114 个守卫已收缩为 83 个。
+- [x] expdiff / fp4 / fp8 / s4 指令支持性：**原结论已修正（§4.10）**。原判断「M510 缺这些指令」被 `dav_m510` basic_api 实证推翻——`vexpdif` / `vstar` / `DIST_UNPACK4_B8` / `vcvt_s42*` / `vcvt_f162s4` / `vselr` / `vintlv` 等 M510 均实现。唯一确认不支持的是 expdiff 的 `Tuple<float,half>` 类型组合（对应 `asc_exp_sub_half2float`，4 个函数，守卫保留）。§4.7 的 1114 个守卫已收缩为 4 个。
 - [x] fp4 MX（asc_mmad_mx*）确认不支持：用户确认 M510 对 fp4 等数据类型确实不支持（非缺开关），故首期 Drop（与 §4.5 一致）。经验证 `asc_mmad_mx` 在 M510 编出中定义数为 0、9201 为 30，Drop 生效。
 - [ ] `impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h` 为 105 行存根，缺 VF-debug / ring-buffer 调试设施（4 个函数，见 §4.10 已知缺口）。需 M510 dump 设施领域知识，留作后续。
 - [ ] `asc_copy_l12l0c` / `asc_copy_l12gm` 在 3510/9201/5102 下均只有声明无定义（`memory_base_impl/cube_datamove_intf_impl.h` 仅被 `__NPU_ARCH__ == 2201` 引用）。上游既有问题，非 M510 回归，建议单独反馈。
@@ -296,7 +298,7 @@ ccec `-E` 实测（pp 输出按「定义体」计数，声明不算）：
 **实施状态（截至本 RFC 修订）**：
 
 - Phase 0（审计）：完成。确认分发机制、公共门控、通用头需补 5102 分支。（其中「M510 缺 expdiff/fp4/fp8/s4 指令」一项后被 §4.10 推翻。）
-- Phase 1（骨架）+ §4.7（排除守卫）：骨架完成并验证（新增 `npu_arch_5102/` 薄包含 shim、公共门控与通用头分发链加 5102 分支）。**§4.7 的大规模守卫（1035 个函数）后被 §4.10 判定为误伤，已收缩至 83 个。**
+- Phase 1（骨架）+ §4.7（排除守卫）：骨架完成并验证（新增 `npu_arch_5102/` 薄包含 shim、公共门控与通用头分发链加 5102 分支）。**§4.7 的大规模守卫（1035 个函数）后被 §4.10 判定为误伤，已收缩至 4 个。**
 - 验证：ccec（CANN 9.3.0，`--cce-aicore-arch=dav-510r2 -D__NPU_ARCH__=5102 -std=c++17`）对 `c_api/asc_simd.h` 预处理 **0 错误**；同法以 `dav-920r2 -D__NPU_ARCH__=9201` 预处理 **零回归**。注：本环境 `-E` 预处理可行但 `-c` 全量编译缺 ccec 内建类型头（`float4_e2m1x2_t` 等），故以「定义体计数 + 指令计数」作为编出证据。
 - Phase 2（cube 裁剪 + 分发修复 + 前提修正）：完成并验证。①§4.8：cube 10 族 L0 加载加守卫（约 147 个定义，保留）；②§4.9：顶层 cube 分发链补 5102 分支，修复 M510 取不到支持算子（l0c2gm/l0c2l1 0→28/27）的缺陷；③§4.10：补齐 18 个非 cube 分发头 5102 分支 + 收缩 §4.7 守卫（1031 移除 / 4 保留）；fp4 MX（asc_mmad_mx*）Drop 保留。最终 M510 与 9201 的函数名集合差异仅 4 个 VF-debug 函数。
 - Phase 3（expdiff）：原按「M510 无 vexpdif」处理；§4.10 修正后仅需保留 `asc_exp_sub_half2float`（`Tuple<float,half>`）守卫，其余 expdiff 路径恢复。
