@@ -365,16 +365,17 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif (__NPU_ARCH__ == 3102)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5162))
+#elif (__NPU_ARCH__ == 3510)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
+#elif (__NPU_ARCH__ == 5102)
 constexpr size_t RESERVED_WORKSPACE = 1024;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
+#elif (__NPU_ARCH__ == 5162)
+constexpr size_t RESERVED_WORKSPACE = 1024;
+#elif (__NPU_ARCH__ == 3003)
 constexpr size_t RESERVED_WORKSPACE = 0;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
+#elif (__NPU_ARCH__ == 3113)
 constexpr size_t RESERVED_WORKSPACE = 0;
-#elif defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 constexpr size_t RESERVED_WORKSPACE = 2 * 1024 * 1024;
 #endif
 
