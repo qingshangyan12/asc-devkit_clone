@@ -627,7 +627,11 @@ __aicore__ inline void DataCopyL1ToUB(
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
     CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    DataCopyL12UBImpl<PrimType>(
+#else
     DataCopyL12UBImpl<PrimType, subBlockId>(
+#endif
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
 #endif
 }
@@ -2313,82 +2317,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
             "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
-#endif
-}
-
-/*
- * @ingroup DataCopy Level 0
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] repeatParams.blockCount number of blocks
- * @param [in] repeatParams.blockLen Length of blocks
- * @param [in] repeatParams.srcGap src block gap
- * @param [in] repeatParams.dstGap dst block gap
- */
-
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
-    const DataCopyParams& repeatParams)
-{
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9202
-    using PrimType = PrimT<T>;
-
-    const Hardware dstHWPos0 = GetPhyType((TPosition)dst0.GetPosition());
-    const Hardware dstHWPos1 = GetPhyType((TPosition)dst1.GetPosition());
-    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
-
-    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst0, src, repeatParams));
-    ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst1, src, repeatParams));
-    if (srcHWPos == Hardware::UB && dstHWPos0 == Hardware::L1 && dstHWPos1 == Hardware::L1) {
-        DataCopyUB2L1Impl(
-            (__cbuf__ PrimType*)dst0.GetPhyAddr(), (__cbuf__ PrimType*)dst1.GetPhyAddr(),
-            (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams);
-    } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "src", "UB(VECIN/VECCALC/VECOUT)",
-            "DataCopy from LocalTensor to LocalTensor with DataCopyParams only supports UB -> L1",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
-        ASCENDC_CHECK_TPOSITION(
-            false, "dst", "L1 Buffer(A1/B1/C1)",
-            "DataCopy from LocalTensor to LocalTensor with DataCopyParams only supports UB -> L1",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst0.GetPosition())));
-    }
-#endif
-}
-
-/*
- * @ingroup DataCopy Level 2
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] count Number of operands
- */
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
-{
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9202
-    using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "Failed to check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B "
-            "align, "
-            "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
-            count);
-    });
-    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst0, src, count)));
-    ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst1, src, count)));
-    const Hardware dstHWPos0 = GetPhyType((TPosition)dst0.GetPosition());
-    const Hardware dstHWPos1 = GetPhyType((TPosition)dst1.GetPosition());
-    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
-    struct DataCopyParams repeatParams;
-    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
-    repeatParams.srcStride = 0;
-    repeatParams.dstStride = 0;
-    DataCopy(dst0, dst1, src, repeatParams);
 #endif
 }
 
