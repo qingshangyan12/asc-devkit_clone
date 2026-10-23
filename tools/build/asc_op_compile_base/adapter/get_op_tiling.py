@@ -1391,10 +1391,8 @@ len_burst, 0, 0);\n"
         "all_bytes", "__ubuf__", "(__ubuf__ uint8_t *)tilingdata_in_ub"
     )
     class_body += "#else\n"
-    class_body += (
-        "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+    class_body += "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
 __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
-    )
     class_body += "    constexpr uint64_t bytes_align64 = (all_bytes + 63) / 64 * 64 + 8;\n"
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__ubuf__ uint8_t *)tilingdata_in_ub, bytes_align64);\n"
     class_body += "#else\n"
