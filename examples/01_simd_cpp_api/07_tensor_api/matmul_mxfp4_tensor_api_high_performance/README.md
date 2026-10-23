@@ -263,7 +263,7 @@ asc::te::copy(l0c2gm_atom.with(fixpipe_params), c.slice(asc::te::make_coord(m_bl
 
 ### 流水同步
 
-使用静态Tensor编程时，同步是性能和正确性的关键。本样例通过`asc_lock`和`asc_unlock`管理不同流水之间的生产者和消费者依赖，并为各级Ping/Pong Buffer分配独立slot：
+使用静态Tensor编程时，同步是性能和正确性的关键。本样例通过`asc::te::mutex`管理不同流水之间的生产者和消费者依赖，并为各级Ping/Pong Buffer分配独立slot：
 
 | 数据 | 写流水 | 读流水 | slot |
 |------|--------|--------|------|
@@ -278,16 +278,16 @@ A/B Data的生命周期一致，因此按Ping/Pong相位绑定到同一组slot�
 
 ```cpp
 if (k_offset_in_data_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_data_slot(data_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_data_slot(data_read_idx)).lock();
 }
 if (((k_offset_in_data_chunk + 1) == data_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_data_slot(data_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_data_slot(data_read_idx)).unlock();
 }
 if (k_offset_in_scale_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_scale_slot(scale_read_idx)).lock();
 }
 if (((k_offset_in_scale_chunk + 1) == scale_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_scale_slot(scale_read_idx)).unlock();
 }
 ```
 

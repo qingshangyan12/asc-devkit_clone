@@ -95,7 +95,7 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
     4. **Register movement interface:** Use `asc_loadalign` to read one row of 128 half elements and the `block_stride` parameter of `asc_storealign` to control the non-contiguous writes of eight DataBlocks. `block_stride` is the direct control parameter for the bank-conflict comparison in this example.
 
-    5. **Pipeline interface:** Use `asc_lock` and `asc_unlock` to protect the MTE2, Vector, and MTE3 stages, and use two UB buffers to process tiles in ping-pong mode.
+    5. **Pipeline interface:** Use `mutex` to protect the MTE2, Vector, and MTE3 stages, and use two UB buffers to process tiles in ping-pong mode. The sample entry calls `init_soc_state` to initialize the device state first.
 
   - Core ND-to-NZ implementation:
 
