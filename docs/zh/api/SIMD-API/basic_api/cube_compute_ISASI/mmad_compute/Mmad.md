@@ -299,10 +299,7 @@ Atlas A2系列产品
 
     ![有效数据相乘示意图](../../../../figures/mmad_validshape_demo.png)
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id4 -->
-<<<<<<< HEAD
-=======
 
->>>>>>> upstream/master
 - **同步优化说明**
 
     当矩阵计算沿K轴进行累加时，中间结果通常需要写入同一块L0C Buffer。理论上，在连续两次Mmad接口调用之间，应插入PipeBarrier\(PIPE\_M\)，以确保前一次Mmad的写操作已完成，再进行下一轮Mmad的读操作，从而保证数据一致性。
@@ -353,4 +350,3 @@ Atlas A2系列产品
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id3 -->
