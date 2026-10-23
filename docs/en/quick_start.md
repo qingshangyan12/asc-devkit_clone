@@ -11,7 +11,7 @@ Choose the appropriate environment preparation method based on **whether you hav
 
 > [!TIP] Recommendations
 >
-> - To ensure development environment quality, we recommend users complete **environment preparation** based on **containerization technology**.
+> - To ensure development environment quality, we recommend users complete **environment preparation** based on  **containerization technology**.
 > - If you prefer not to use containers, you can also complete **environment preparation** on a host with NPU device. Refer to [CANN Software Installation Guide - Install on Physical Machine](https://www.hiascend.com/cann/download).
 > - For users who only want to experience "compile and install this open source repository + run operators in simulation environment", the host does not require an NPU device. You can skip NPU driver and firmware installation and directly install the CANN package. Refer to [Download and Install CANN Package](#📥-download-and-install-cann-package).
 
