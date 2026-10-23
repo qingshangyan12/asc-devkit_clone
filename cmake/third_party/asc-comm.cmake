@@ -127,3 +127,24 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
 endif()
+
+# 构建 asc-comm AICPU 数据面共享库并交付到设备侧运行目录(lib64/device/lib64)。
+# 经CUSTAICPUKernel下发的kernel以DT_NEEDED引用libasccomm_aicpu.so，设备侧AICPU
+# 加载器在该目录解析依赖(与runtime交付约定一致)；host侧样例链接亦复用该位置。
+set(ASC_COMM_AICPU_CMAKE_DIR ${ASC_COMM_SOURCE_PATH}/src/aicpu)
+if(EXISTS "${ASC_COMM_AICPU_CMAKE_DIR}/CMakeLists.txt")
+    if(NOT TARGET asccomm_aicpu)
+        add_subdirectory(${ASC_COMM_AICPU_CMAKE_DIR} ${CMAKE_BINARY_DIR}/asccomm_aicpu)
+    endif()
+
+    if(TARGET asccomm_aicpu)
+        if(NOT TARGET asccomm_aicpu_build)
+            add_custom_target(asccomm_aicpu_build ALL DEPENDS asccomm_aicpu)
+        endif()
+        install(TARGETS asccomm_aicpu
+            LIBRARY DESTINATION lib64/device/lib64 ${INSTALL_OPTIONAL}
+            COMPONENT asc-devkit)
+    endif()
+else()
+    message(STATUS "[ThirdPartyLib][asc-comm] Missing AICPU cmake dir: ${ASC_COMM_AICPU_CMAKE_DIR}, skip AICPU so build")
+endif()
