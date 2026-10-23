@@ -239,16 +239,27 @@ static void DispatchKfcSubKernel(
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR) {
             // SoleNHR（CcuSchedAllGatherSoleNHR）单帧布局见 KfcAllGatherSoleNhrParamIndex
-            // （D4：13 槽，[0]=INPUT 兼作哨兵，常量参数 kernel 内联，双 die 参数 die1Size/GO_D1，
-            //  goSize 组按 kernelArg.axisId 选档；token 由 server ctx 注入；turnEndAddr 由
-            //  server 传入，kernel 末步同步后、PostSync 前写 turn-end——D3）。
-            const uint32_t goSizeBase =
-                (ctx.arg->axisId == 0U) ? KFC_AG_SOLE_NHR_GO_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_D1_SIZE_0;
+            // （D4：29 槽，[0]=INPUT 兼作哨兵，常量参数 kernel 内联；分摊拷贝参数
+            //  COPY_OFFSET/CHUNK_SIZE/CHUNK_LOOP/TAIL_SIZE/GO_CHUNK/GO_TAIL 按 kernelArg.axisId
+            //  选 D0/D1 组——拷贝区由 AIV 按双 die 50/50 配平，与写路径 die 半区解耦；
+            //  token 由 server ctx 注入；turnEndAddr 由 server 传入，kernel 末步同步后、
+            //  PostSync 前写 turn-end——D3）。
+            const bool isAxis0 = (ctx.arg->axisId == 0U);
+            const uint32_t copyOffsetIdx =
+                isAxis0 ? KFC_AG_SOLE_NHR_COPY_OFFSET_D0 : KFC_AG_SOLE_NHR_COPY_OFFSET_D1;
+            const uint32_t chunkSizeIdx = isAxis0 ? KFC_AG_SOLE_NHR_CHUNK_SIZE_D0 : KFC_AG_SOLE_NHR_CHUNK_SIZE_D1;
+            const uint32_t chunkLoopIdx = isAxis0 ? KFC_AG_SOLE_NHR_CHUNK_LOOP_D0 : KFC_AG_SOLE_NHR_CHUNK_LOOP_D1;
+            const uint32_t tailSizeIdx = isAxis0 ? KFC_AG_SOLE_NHR_TAIL_SIZE_D0 : KFC_AG_SOLE_NHR_TAIL_SIZE_D1;
+            const uint32_t goChunkBase =
+                isAxis0 ? KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_0;
+            const uint32_t goTailBase = isAxis0 ? KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_0 : KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_0;
             CcuKernelKfcAllGatherNHR1DMem2MemKernel(
                 param[KFC_AG_SOLE_NHR_INPUT], param[KFC_AG_SOLE_NHR_OUTPUT], ctx.token,
                 param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_DIE1_SIZE],
-                param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[goSizeBase], param[goSizeBase + 1U],
-                param[goSizeBase + 2U], param[goSizeBase + 3U], ctx.arg->channels, ctx.arg->channelCount,
+                param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[copyOffsetIdx], param[chunkSizeIdx],
+                param[chunkLoopIdx], param[tailSizeIdx], param[goChunkBase], param[goChunkBase + 1U],
+                param[goChunkBase + 2U], param[goChunkBase + 3U], param[goTailBase], param[goTailBase + 1U],
+                param[goTailBase + 2U], param[goTailBase + 3U], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->axisId, ctx.arg->nhrStepInfoVector,
                 ctx.arg->nhrRank2ChannelIdx, turnEndAddr);
         } else {

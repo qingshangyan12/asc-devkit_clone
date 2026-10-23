@@ -194,15 +194,22 @@ enum KfcReduceScatterSoleNhr2DieParamIndex : uint32_t {
     KFC_RS_SOLE_NHR_2DIE_PARAM_NUM = 29,
 };
 
-// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局（N2 常量内联 + D4 双 die，13 槽）：
+// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局（N2 常量内联 + D4 双 die + 分摊拷贝，29 槽）：
 //  [0]=INPUT 兼作轮次有效哨兵——server 仅检查 param[0] != INVALID_U64（真实地址必不等于），
 //  原 opId 槽纯哨兵用途（kernel 不接收 opId），故由 INPUT 占位。
 //  常量参数不占槽、由 kernel LoadNhr1DArgs 内联（sole executor 恒定）：
 //  die0LastSize=die0Size、repeatNum=1、三 stride=0。
-//  isInputOutputEqual 不占槽：in-place 时 AIV 将两 die 的 goSize 均按 0 字节计算
-//  （CalcGoSize(0) → m=n=p=0 全零），GroupCopy 内部两个 CCU_IF 块均不触发，kernel 无需该参数。
-//  D4 双 die：die1Size/GO_D1 为 die1 半区参数（dispatch 按 kernelArg.axisId 选 goSize 组）；
-//  单 die 时 die1Size=0、GO_D1 全零（无 mission1 消费，安全）。
+//  isInputOutputEqual 不占槽：in-place 时 AIV 将两 die 的拷贝参数均按 0 字节计算
+//  （CHUNK_LOOP=UINT64_MAX 哨兵满、TAIL_SIZE=0、尾块 goSize 全零），V1 GroupCopy 内部
+//  两个 CCU_IF 块均不触发、V2 LocalCopy 经 CCU_IF(len!=0) 跳过，kernel 无需该参数。
+//  D4 双 die：D1 组槽为 die1 半区参数（dispatch 按 kernelArg.axisId 选参数组）；
+//  单 die 时 die1Size=0、D1 组槽安全零值（无 mission1 消费）。
+//  分摊拷贝（性能）：本地拷贝与写路径的 die 切分解耦——COPY_OFFSET/CHUNK/TAIL/GO 组按
+//  双 die 50/50 配平（两 mission 共享本地拷贝引擎，按带宽比切分会使大半区拷贝晚结束拖长
+//  轮次）；每轴拷贝区切成整 256KB（loopSize）倍数满块 + 尾块，kernel 每 step 发射一块、
+//  末步收尾，拷贝摊入全轮写阴影。拷贝引擎按芯片版本选择（mesh1d AG kernel 先例）：
+//  Ascend950(CCU_V1) 走 GroupCopy（消费 GO_CHUNK/GO_TAIL，满块 goSize 恒单 LoopGroup），
+//  Ascend960(CCU_V2) 走单跳 LocalCopy（消费 CHUNK_SIZE/TAIL_SIZE，GO 组忽略）。
 // AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、KFC dispatch 逐槽转发、
 // kernel 形参三处索引必须一致。
 enum KfcAllGatherSoleNhrParamIndex : uint32_t {
@@ -211,15 +218,31 @@ enum KfcAllGatherSoleNhrParamIndex : uint32_t {
     KFC_AG_SOLE_NHR_DIE0_SIZE = 2,
     KFC_AG_SOLE_NHR_DIE1_SIZE = 3,
     KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE = 4,
-    KFC_AG_SOLE_NHR_GO_D0_SIZE_0 = 5,
-    KFC_AG_SOLE_NHR_GO_D0_SIZE_1 = 6,
-    KFC_AG_SOLE_NHR_GO_D0_SIZE_2 = 7,
-    KFC_AG_SOLE_NHR_GO_D0_SIZE_3 = 8,
-    KFC_AG_SOLE_NHR_GO_D1_SIZE_0 = 9,
-    KFC_AG_SOLE_NHR_GO_D1_SIZE_1 = 10,
-    KFC_AG_SOLE_NHR_GO_D1_SIZE_2 = 11,
-    KFC_AG_SOLE_NHR_GO_D1_SIZE_3 = 12,
-    KFC_AG_SOLE_NHR_PARAM_NUM = 13,
+    KFC_AG_SOLE_NHR_COPY_OFFSET_D0 = 5,
+    KFC_AG_SOLE_NHR_COPY_OFFSET_D1 = 6,
+    KFC_AG_SOLE_NHR_CHUNK_SIZE_D0 = 7,
+    KFC_AG_SOLE_NHR_CHUNK_SIZE_D1 = 8,
+    KFC_AG_SOLE_NHR_CHUNK_LOOP_D0 = 9,
+    KFC_AG_SOLE_NHR_CHUNK_LOOP_D1 = 10,
+    KFC_AG_SOLE_NHR_TAIL_SIZE_D0 = 11,
+    KFC_AG_SOLE_NHR_TAIL_SIZE_D1 = 12,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_0 = 13,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_1 = 14,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_2 = 15,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D0_SIZE_3 = 16,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_0 = 17,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_1 = 18,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_2 = 19,
+    KFC_AG_SOLE_NHR_GO_CHUNK_D1_SIZE_3 = 20,
+    KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_0 = 21,
+    KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_1 = 22,
+    KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_2 = 23,
+    KFC_AG_SOLE_NHR_GO_TAIL_D0_SIZE_3 = 24,
+    KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_0 = 25,
+    KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_1 = 26,
+    KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_2 = 27,
+    KFC_AG_SOLE_NHR_GO_TAIL_D1_SIZE_3 = 28,
+    KFC_AG_SOLE_NHR_PARAM_NUM = 29,
 };
 
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
