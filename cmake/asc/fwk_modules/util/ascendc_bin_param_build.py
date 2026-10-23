@@ -748,8 +748,8 @@ def gen_bin_param_file(
             directory = task_directory(kernel_spec_dir, op_desc.op_type, soc)
             directory.mkdir(parents=True, exist_ok=True)
             op_desc.kernel_spec_directory = directory
-            op_desc.kernel_spec_options = " " + shlex.join(
-                ["--kernel-spec=" + kernel_spec_mode, "--kernel-spec-dir=" + str(directory)]
+            op_desc.kernel_spec_options = " " + " ".join(
+                shlex.quote(arg) for arg in ["--kernel-spec=" + kernel_spec_mode, "--kernel-spec-dir=" + str(directory)]
             )
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])

@@ -22,7 +22,7 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
-from ascendc_build_kernel_spec import kernel_spec_current_directory, task_directory
+from ascendc_build_kernel_spec import task_directory
 from opdesc_parser import _trans_soc_ver_to_short
 
 
@@ -39,8 +39,6 @@ class CompileKernel:
         self.op_type = args.op_type
         self.kernel_spec_mode = getattr(args, "kernel_spec_mode", "None")
         self.kernel_spec_dir = getattr(args, "kernel_spec_dir", None)
-        if self.kernel_spec_mode != "None" and getattr(args, "kernel_spec_build", None):
-            self.kernel_spec_dir = str(kernel_spec_current_directory(args.kernel_spec_build))
         self.op_cpp_file = os.path.realpath(args.src_file)
         self.impl_path = os.path.dirname(self.op_cpp_file)
         self.op_soc_ver = args.compute_unit
@@ -270,7 +268,6 @@ def args_parse():
     parser.add_argument("-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path.")
     parser.add_argument("--kernel-spec-mode", choices=("None", "Normal", "SK"), default="None")
     parser.add_argument("--kernel-spec-dir", default=None)
-    parser.add_argument("--kernel-spec-build", default=None, help="Internal package build directory pointer.")
     return parser.parse_args()
 
 
@@ -293,13 +290,11 @@ def main():
         if kernel_builder is not None:
             kernel_builder.record_kernel_spec_result("failed", str(error))
         elif args.kernel_spec_mode != "None":
-            root = (
-                kernel_spec_current_directory(args.kernel_spec_build)
-                if args.kernel_spec_build
-                else args.kernel_spec_dir
-            )
             record_kernel_spec_result(
-                task_directory(str(root), args.op_type, args.compute_unit), args.src_file, "failed", str(error)
+                task_directory(args.kernel_spec_dir, args.op_type, args.compute_unit),
+                args.src_file,
+                "failed",
+                str(error),
             )
         raise
 

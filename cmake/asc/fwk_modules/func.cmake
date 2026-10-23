@@ -230,9 +230,9 @@ function(simple_kernel_compile)
   if(kernel_spec_mode AND NOT kernel_spec_mode STREQUAL "None")
     get_property(kernel_spec_work GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_KERNEL_SPEC_BUILD_DIR)
     set(kernel_spec_options "--kernel-spec-mode=${kernel_spec_mode}"
-      "--kernel-spec-build=${kernel_spec_work}")
+      "--kernel-spec-dir=${kernel_spec_work}/input")
     string(REPLACE "'" "'\\''" kernel_spec_work_shell "${kernel_spec_work}")
-    set(kernel_spec_shell_options "--kernel-spec-mode=${kernel_spec_mode} --kernel-spec-build='${kernel_spec_work_shell}'")
+    set(kernel_spec_shell_options "--kernel-spec-mode=${kernel_spec_mode} --kernel-spec-dir='${kernel_spec_work_shell}/input'")
   endif()
   set(BINCMP_TILING_LIB_TMP ${BINCMP_TILING_LIB})
   set(BINCMP_TILING_LIB $<TARGET_FILE:${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB}>)
@@ -501,7 +501,7 @@ function(npu_op_kernel_library target_name)
 endfunction()
 
 # This target graph deliberately matches the existing always-run kernel producers.
-# A full reset is followed by every producer; bundle content caching remains independent.
+# Fixed resource inputs are cleared before every producer; the published SO retains its content cache.
 
 # Quote paths for the package's internal JSON registration (CMake 3.16 compatible).
 function(_ascendc_kernel_spec_json_string output_var value)
@@ -525,8 +525,9 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   # A reconfigure invalidates installation until the new configuration is built.
   file(REMOVE "${spec_install_script}")
   add_custom_target(${prepare_target}
-    COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" prepare
-      --build-config "${spec_build_config}" --work-dir "${spec_work}"
+    COMMAND "${CMAKE_COMMAND}" -E remove -f "${spec_install_script}"
+    COMMAND "${CMAKE_COMMAND}" -E remove_directory "${spec_work}/input"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${spec_work}/input"
     VERBATIM)
   # exporter and make run on the build host; the SO compiler targets the package consumer.
   # Tools are used only when this round contains effective export tasks.

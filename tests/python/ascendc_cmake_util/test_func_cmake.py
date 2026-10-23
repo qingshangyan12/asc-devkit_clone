@@ -286,4 +286,4 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
         assert recorded["ccache"] == str(launcher)
     arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
-    assert f"--kernel-spec-build={root}" in arguments
+    assert f"--kernel-spec-dir={root}/input" in arguments
