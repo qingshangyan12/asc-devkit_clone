@@ -198,7 +198,7 @@ const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9202)
+#elif (__NPU_ARCH__ == 3510)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
 const uint32_t TMP_UB_OFFSET = 248 * 1024;
