@@ -242,6 +242,19 @@ __aicore__ inline void MmadMxFixImpl(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
+
+template <typename T, typename U>
+__aicore__ inline void PostProcImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params)
+{
+    PostProcCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProcImpl(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params)
+{
+    PostProcCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
+}
 } // namespace AscendC
 
 #endif // __NPU_ARCH__

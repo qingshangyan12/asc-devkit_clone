@@ -88,6 +88,7 @@ $dst_i = \operatorname{Max}(scalar, src_i)$
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为int8_t、uint8_t、int16_t、half、bfloat16_t、int32_t、float、int64_t、uint64_t。其中int8_t、uint8_t、int64_t、uint64_t数据类型仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Maxs_flexible_scalar_res.md#id2 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -108,6 +109,7 @@ $dst_i = \operatorname{Max}(scalar, src_i)$
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 - 针对Ascend 950PR&950DT系列产品，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Maxs_flexible_scalar_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

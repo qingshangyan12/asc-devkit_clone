@@ -289,11 +289,11 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, co
 
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src)
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
 {
     static_assert(detail::supports_carry_v<T>, "sub_carry supports int32_t and uint32_t");
     reg_pair<T, bool> result;
-    asc_subc(result.second.reg, result.first.reg, src0.reg, src1.reg, borrow_src.reg, src0.mask);
+    asc_subc(result.second.reg, result.first.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     result.first.mask = src0.mask;
     result.second.mask = src0.mask;
     return result;

@@ -66,14 +66,14 @@ T shfl_up(T var, unsigned int delta) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_up(threadIdx.x + 100, 2);
+            result[threadIdx.x] = active.shfl_up(active.thread_rank() + 100, 2);
+        } else {
+            result[threadIdx.x] = 0;
         }
-        ...
     }
     ```
 
@@ -83,13 +83,19 @@ T shfl_up(T var, unsigned int delta) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_up(threadIdx.x + 100, 2);
+            result[threadIdx.x] = active.shfl_up(active.thread_rank() + 100, 2);
+        } else {
+            result[threadIdx.x] = 0;
         }
-        ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 100, 0, 101, 0, 100, 0, 101, 0, 102, 0, 103, 0, 104, 0, 105, 0, 106, 0, 107, 0, 108, 0, 109, 0, 110, 0, 111, 0, 112, 0, 113, 0
+```

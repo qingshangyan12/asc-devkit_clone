@@ -197,6 +197,7 @@
     - T支持的数据类型为：half（所有CMPMODE都支持）、float（所有CMPMODE都支持）、int32_t（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
 <!-- end id26 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_res.md#id2 -->
 
 ## 返回值说明<a name="section128671456102513"></a>
 
@@ -234,6 +235,7 @@
   - Atlas A2系列产品
   <!-- end id34 -->
 <!-- end id32 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

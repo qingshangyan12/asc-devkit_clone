@@ -313,6 +313,7 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
     <!-- npu="kirin3" id43 -->
     KirinDev0003处理器系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
     <!-- end id43 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/Transpose_res.md#id2 -->
 
 ## 返回值说明
 
@@ -327,6 +328,7 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 - 增强转置接口，transposeType为TRANSPOSE\_NCHW2NHWC、TRANSPOSE\_NHWC2NCHW时，如果nSize、cSize、hSize、wSize为0，不会执行计算操作，不会对目的操作数进行写入。
 - \[N,C,H,W\]与\[N,H,W,C\]数据格式互相转换，参数取值范围：nSize∈[0, 65535]，cSize∈[0, 4095]，hSize \* wSize ∈[0, 4095]，hSize \* wSize \* sizeof(T)需要保证32B对齐。
 - 转置增强接口中，入参sharedTmpBuffer的大小不得小于计算所需的最小阈值。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/Transpose_res.md#id3 -->
 
 ## 调用示例
 
