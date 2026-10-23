@@ -16,7 +16,7 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| algConfig | 输入 | 通信算法配置。string类型，支持的最大长度为128字节。<!-- npu="950" id1 --><br><br>针对Ascend 950PR&950DT系列产品，当前支持的取值如下，具体含义请参考下方说明：<br>AllGather通信任务（AI CPU服务端）："sole[mesh]"、"sole[nhr]"、"concur[mesh,nhr]"、"parallel[mesh,nhr]"、"pipeline[mesh,nhr]"。<br>AllGather通信任务（CCU服务端）："sole[mesh]"、"concur[mesh,nhr.multi_channel]"、"parallel[mesh,nhr.multi_channel]"。<br>ReduceScatter通信任务（AI CPU服务端）："sole[mesh]"、"sole[nhr]"、"parallel[mesh,nhr]"、"concur[mesh,nhr]"、"pipeline[mesh,nhr]"。<br>ReduceScatter通信任务（CCU服务端）："sole[mesh]"、"sole[nhr.multi_channel]"、"concur[mesh,nhr.multi_channel]"。<br>AllReduce通信任务（CCU服务端）："sole[mesh]"。<br>AlltoAll通信任务（AI CPU服务端）："sole[mesh]"、"concur[mesh,mesh]"。<br>AlltoAll通信任务（CCU服务端）："sole[mesh]"、"sole[mesh.multi_channel]"、"concur[mesh,mesh]"。<br>AlltoAllV通信任务（CCU服务端）："sole[mesh]"。<!-- end id1 --><!-- npu="A3" id2 --><br><br>针对Atlas A3系列产品，当前支持的取值为：<br>"AllReduce=level0:doublering"：AllReduce通信任务。<br>"AllGather=level0:doublering"：AllGather通信任务。<br>"ReduceScatter=level0:doublering"：ReduceScatter通信任务。<br>"AlltoAll=level0:fullmesh;level1:pairwise"：AlltoAllV和AlltoAll通信任务。<br>"BatchWrite=level0:fullmesh"：BatchWrite通信任务。<!-- end id2 --><!-- npu="910b" id3 --><br><br>针对Atlas A2系列产品，该参数为预留字段，配置后不生效，默认仅支持FullMesh算法。FullMesh算法即NPU之间的全连接，任意两个NPU之间可以直接进行数据收发。<!-- end id3 --> |
+| algConfig | 输入 | 通信算法配置。string类型，支持的最大长度为128字节。<!-- npu="950" id1 --><br><br>针对Ascend 950PR&950DT系列产品，当前支持的取值如下，具体含义请参考下方说明：<br>AllGather通信任务（AI CPU服务端）："sole[mesh]"、"sole[nhr]"、"sole[nhr.multi_channel]"、"sequence[mesh,nhr]"、"concur[mesh,nhr]"、"parallel[mesh,nhr]"、"parallel[mesh,nhr.multi_channel]"、"pipeline[mesh,nhr]"。<br>AllGather通信任务（CCU服务端）："sole[mesh]"、"sole[nhr]"、"concur[mesh,nhr.multi_channel]"、"parallel[mesh,nhr.multi_channel]"。<br>ReduceScatter通信任务（AI CPU服务端）："sole[mesh]"、"sole[mesh.chunk]"、"sole[nhr]"、"sole[nhr.multi_channel]"、"sequence[mesh,nhr]"、"parallel[mesh,nhr]"、"concur[mesh,nhr]"、"pipeline[mesh,nhr]"。<br>ReduceScatter通信任务（CCU服务端）："sole[mesh]"、"sole[nhr]"、"sole[nhr.multi_channel]"、"concur[mesh,nhr.multi_channel]"。<br>AllReduce通信任务（AI CPU服务端）："sole[mesh.one_shot]"、"sole[mesh.two_shot]"、"sole[mesh.two_shot.chunk]"、"sole[nhr]"、"parallel[mesh,nhr]"、"pipeline[mesh,nhr]"。<br>AllReduce通信任务（CCU服务端）："sole[mesh]"。<br>AlltoAll通信任务（AI CPU服务端）："sole[mesh]"、"sole[mesh.single_channel]"、"concur[mesh,mesh]"。<br>AlltoAll通信任务（CCU服务端）："sole[mesh]"、"sole[mesh.multi_channel]"、"concur[mesh,mesh]"。<br>AlltoAllV通信任务（AI CPU服务端）："sole[mesh]"、"concur[mesh,mesh]"。<br>AlltoAllV通信任务（CCU服务端）："sole[mesh]"。<!-- end id1 --><!-- npu="A3" id2 --><br><br>针对Atlas A3系列产品，当前支持的取值为：<br>"AllReduce=level0:doublering"：AllReduce通信任务。<br>"AllGather=level0:doublering"：AllGather通信任务。<br>"ReduceScatter=level0:doublering"：ReduceScatter通信任务。<br>"AlltoAll=level0:fullmesh;level1:pairwise"：AlltoAllV和AlltoAll通信任务。<br>"BatchWrite=level0:fullmesh"：BatchWrite通信任务。<!-- end id2 --><!-- npu="910b" id3 --><br><br>针对Atlas A2系列产品，该参数为预留字段，配置后不生效，默认仅支持FullMesh算法。FullMesh算法即NPU之间的全连接，任意两个NPU之间可以直接进行数据收发。<!-- end id3 --> |
 
 <!-- npu="950" id4 -->
 针对Ascend 950PR&950DT系列产品，算法配置字段详细说明如下：
@@ -41,6 +41,8 @@ uint32_t SetAlgConfig(const std::string& algConfig)
     | `<域内遍历方式>` | `[]`中的多个取值按通信层级从低到高排列 | 至少一个 |
     | `.<附加属性>` | 该层的附加功能属性 | 可选 |
 
+    外部算法名末尾支持可选的算子级保序后缀`[order.strong]`，如`sole[mesh] [order.strong]`。当前版本该后缀仅被校验与记录，不影响算法选定结果。
+
 2. 编排方式
 
     | 取值 | 含义 | 示例 |
@@ -64,7 +66,11 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 
     | 取值 | 功能类别 | 含义 |
     |---|---|---|
+    | `mesh.chunk` | 传输 | 将数据划分为多个chunk分轮传输，减小scratch占用 |
+    | `mesh.one_shot` | 编排 | 一趟Mesh通信完成AllReduce |
+    | `mesh.two_shot` | 编排 | 同层先执行ReduceScatter，再执行AllGather |
     | `mesh.multi_channel` | 通道 | Mesh域内每对rank之间建立多条物理通道并发传输数据 |
+    | `mesh.single_channel` | 通道 | 每对rank之间仅建立1条通道传输数据 |
     | `nhr.multi_channel` | 通道 | NHR域内每对rank之间建立多条物理通道并发传输数据 |
 <!-- end id4 -->
 
@@ -75,7 +81,9 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 
 ## 约束说明
 
-无
+<!-- npu="950" id5 -->
+-   对于Ascend 950PR&950DT系列产品，外部算法名需与当前通信服务端类型及组网拓扑匹配，方可解析为唯一算法。无法解析时，AI CPU服务端将打印WARNING日志并回退至自动选路；CCU服务端将报算法不支持。
+<!-- end id5 -->
 
 ## 调用示例
 
