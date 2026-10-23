@@ -226,7 +226,7 @@ __global__ __vector__ void asc_copy_ub2gm_align_arch3510_kernel(__gm__ uint8_t* 
     asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对对齐搬出结果。
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

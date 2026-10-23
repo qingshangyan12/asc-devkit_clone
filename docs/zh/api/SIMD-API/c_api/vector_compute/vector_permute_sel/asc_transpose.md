@@ -108,7 +108,7 @@ __global__ __vector__ void AscTransposeKernel(__gm__ uint16_t* output, __gm__ ui
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, dst, BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 } // namespace
 

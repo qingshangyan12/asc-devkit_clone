@@ -144,7 +144,7 @@ __global__ __vector__ void asc_copy_ub2ub_kernel(__gm__ uint8_t* output, __gm__ 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, copied, INPUT_BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

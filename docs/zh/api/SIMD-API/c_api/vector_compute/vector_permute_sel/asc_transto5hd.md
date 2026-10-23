@@ -192,7 +192,7 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(layout_out, dst, TOTAL_ELEMENTS * sizeof(uint16_t));
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void check(aclError status, const char* operation)

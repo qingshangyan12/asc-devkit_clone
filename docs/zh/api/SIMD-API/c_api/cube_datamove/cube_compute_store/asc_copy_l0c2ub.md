@@ -254,7 +254,7 @@ __global__ __mix__(1, 2) void AscCopyL0c2ubKernel(__gm__ int8_t* a, __gm__ int8_
         asc_sync_block_wait(PIPE_MTE3, 0x8);
         asc_copy_ub2gm(output, output_ub, M, N * sizeof(int32_t),
             N * sizeof(int32_t), N * sizeof(int32_t));
-        asc_sync_pipe(PIPE_ALL);
+        asc_sync();
     }
 }
 

@@ -140,7 +140,7 @@ __global__ __vector__ void asc_init_kernel(__gm__ uint64_t* output, __gm__ uint6
     asc_init();
     // 原子模式已复位，此处搬出应按普通UB到GM复制得到与输入一致的结果。
     asc_copy_ub2gm(reinterpret_cast<__gm__ uint32_t*>(output), local, BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace
