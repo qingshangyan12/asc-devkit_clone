@@ -278,16 +278,16 @@ A/B Data的生命周期一致，因此按Ping/Pong相位绑定到同一组slot�
 
 ```cpp
 if (k_offset_in_data_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_data_slot(data_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_data_slot(data_read_idx)).lock();
 }
 if (((k_offset_in_data_chunk + 1) == data_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_data_slot(data_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_data_slot(data_read_idx)).unlock();
 }
 if (k_offset_in_scale_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_scale_slot(scale_read_idx)).lock();
 }
 if (((k_offset_in_scale_chunk + 1) == scale_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    asc::te::mutex<PIPE_MTE1>(get_scale_slot(scale_read_idx)).unlock();
 }
 ```
 
