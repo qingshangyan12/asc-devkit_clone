@@ -223,6 +223,7 @@ def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monk
 
 @pytest.mark.parametrize("mode", ["Normal", "SK", "None"])
 def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch, mode):
+    monkeypatch.delattr(shlex, "join", raising=False)
     cfg_file = tmp_path / "op_info.ini"
     cfg_file.write_text("")
     opc_file = tmp_path / "custom_opc_options.ini"

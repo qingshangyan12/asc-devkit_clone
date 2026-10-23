@@ -423,7 +423,7 @@ class KernelSpecBundleBuilder:
             collected = bundle_dir / "collected"
             for index, (_resource_id, unit) in enumerate(units):
                 # Use private ordinal directories; resource IDs are data, never filesystem paths.
-                destination = collected / str(index)
+                destination = collected / f"{index:08d}"
                 destination.mkdir(parents=True)
                 resource_path = unit.resource_root.relative_to(unit.manifest_path.parent)
                 shutil.copytree(unit.resource_root, destination / resource_path, symlinks=True)

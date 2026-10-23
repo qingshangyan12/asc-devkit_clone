@@ -237,6 +237,25 @@ def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_requ
     assert (root / "910b/add_manifest.json").read_bytes() == original
 
 
+def test_duplicate_id_order_is_preserved_past_ten_candidates(bundle_request):
+    root = Path(bundle_request.input_dir[0])
+    bundle_request.input_dir = []
+    for index in range(11):
+        candidate = root / f"candidate_{index:02d}"
+        resource_id = str(index) * 64 if index < 2 else "a" * 64
+        manifest_path = _unit(candidate, resource_id)
+        manifest = json.loads(manifest_path.read_text())
+        manifest["options"]["common_compile"].append(f"-DREVIEW_CANDIDATE={index}")
+        manifest_path.write_text(json.dumps(manifest))
+        bundle_request.input_dir.append(str(candidate))
+
+    bundle_request.build()
+
+    published = _published(bundle_request)
+    duplicate = next(manifest for manifest in published if manifest["resource_id"] == "a" * 64)
+    assert "-DREVIEW_CANDIDATE=2" in duplicate["options"]["common_compile"]
+
+
 def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request):
     root = Path(bundle_request.source_file[0]).parent
     bundle_request.source_map.append([str(root / "nested"), "extra"])
@@ -386,7 +405,7 @@ def test_preserves_empty_include_directories_in_resource_copy(bundle_request, tm
     bundle_request.opc_config = str(config)
     bundle_request.build()
     bundle_dir = next(Path(bundle_request.work_dir).glob(".bundle-*"))
-    assert (bundle_dir / "collected" / "0" / "resources/empty_include").is_dir()
+    assert (bundle_dir / "collected" / "00000000" / "resources/empty_include").is_dir()
 
 
 @pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
