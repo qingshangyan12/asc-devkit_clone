@@ -6,7 +6,7 @@
 - AoS布局：每个结构体中包含一个对象的完整信息，多个结构体排列成数组存储在内存中。
 - SoA布局：将对象的同种信息排列成数组，多个对象的同种信息存储在相邻内存中。
 
-【样例介绍】以[hashtable_lookup样例](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup)为例，实现哈希表查找算子，该哈希表处理哈希冲突基于开放寻址法，具体参考[背景知识](../../../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table#%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86)，此样例通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。
+【样例介绍】以[hashtable_lookup样例](../../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup)为例，实现哈希表查找算子，该哈希表处理哈希冲突基于开放寻址法，具体参考[背景知识](../../../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table)，此样例通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。
 
 下图展示了本样例中不同内存布局的哈希表结构。
 
