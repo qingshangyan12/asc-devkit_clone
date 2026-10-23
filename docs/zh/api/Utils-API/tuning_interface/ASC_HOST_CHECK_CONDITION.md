@@ -1,4 +1,4 @@
-# CHECK_NOT_NULL
+# ASC_HOST_CHECK_CONDITION
 
 ## 产品支持情况
 
@@ -32,14 +32,14 @@
 
 ## 功能说明
 
-头文件路径为：`"utils/debug/check_not_null.h"`。
+头文件路径为：`"utils/debug/check_condition.h"`。
 
-用于检查Host侧指针是否为空。指针非空时，程序继续执行；指针为空时，接口向标准错误流输出指针表达式、源文件名和行号，并调用`std::exit(EXIT_FAILURE)`终止当前进程，避免后续代码继续使用无效指针。
+用于检查Host侧条件是否成立。条件成立时，程序继续执行；条件不成立时，接口向标准错误流输出自定义告警信息、源文件名和行号，并调用`std::exit(EXIT_FAILURE)`终止当前进程。
 
 ## 函数原型
 
 ```cpp
-CHECK_NOT_NULL(ptr)
+ASC_HOST_CHECK_CONDITION(condition, message)
 ```
 
 ## 参数说明
@@ -48,7 +48,8 @@ CHECK_NOT_NULL(ptr)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| ptr | 输入 | 待校验的Host侧对象指针。指针类型必须能够通过`static_cast`转换为`const void *`。 |
+| condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过，条件为`false`时终止当前进程。 |
+| message | 输入 | 条件不成立时输出的自定义告警信息。 |
 
 ## 返回值说明
 
@@ -57,13 +58,12 @@ CHECK_NOT_NULL(ptr)
 ## 约束说明
 
 - 仅支持在Host侧C++代码中调用，不支持在Device侧代码中调用。
-- 指针为空时，接口终止当前进程，不返回调用方继续执行。`EXIT_FAILURE`的具体数值由C++标准库实现定义，调用方不能依赖其具体数值。
-- `ptr`表达式只求值一次。为避免难以预期的行为，传入的表达式不应包含副作用。
-- 不支持无法转换为`const void *`的指针或句柄类型。
+- 条件不成立时，接口终止当前进程，不返回调用方继续执行。`EXIT_FAILURE`的具体数值由C++标准库实现定义，调用方不能依赖其具体数值。
+- `condition`表达式只求值一次。为避免难以预期的行为，传入的表达式不应包含副作用。
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构。
 
 <!-- npu="950" id10 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -79,7 +79,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 #include "acl/acl.h"
 #include "c_api/asc_simd.h"
-#include "utils/debug/check_not_null.h"
+#include "utils/debug/check_condition.h"
 
 constexpr uint64_t TOTAL_LENGTH = 64;
 constexpr uint64_t DATA_BYTES = TOTAL_LENGTH * sizeof(half);
@@ -117,12 +117,12 @@ int main()
     half* src1_device = nullptr;
     half* dst_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&src0_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    // 在申请设备内存后，使用`CHECK_NOT_NULL`检查设备指针。
-    CHECK_NOT_NULL(src0_device);
+    // 在申请设备内存后，使用`ASC_HOST_CHECK_CONDITION`检查设备指针。
+    ASC_HOST_CHECK_CONDITION(src0_device != nullptr, "warning src0_device is nullptr");
     aclrtMalloc(reinterpret_cast<void**>(&src1_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    CHECK_NOT_NULL(src1_device);
+    ASC_HOST_CHECK_CONDITION(src1_device != nullptr, "warning src1_device is nullptr");
     aclrtMalloc(reinterpret_cast<void**>(&dst_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    CHECK_NOT_NULL(dst_device);
+    ASC_HOST_CHECK_CONDITION(dst_device != nullptr, "warning dst_device is nullptr");
 
     aclrtMemcpy(src0_device, DATA_BYTES, src0.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, DATA_BYTES, src1.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
@@ -142,11 +142,11 @@ int main()
 以`src0_device`为空为例，输出格式如下：
 
 ```text
-CHECK_NOT_NULL failed: pointer 'src0_device' is null, file=example.asc, line=44
+ASC_HOST_CHECK_CONDITION failed: warning src0_device is nullptr, file=example.asc, line=46
 ```
 
 输出中的信息来源如下：
 
-- `src0_device`：由宏参数`ptr`通过`#ptr`字符串化得到，即调用处传入的表达式文本。
-- `example.asc`：由预定义宏`__FILE__`得到，即包含`CHECK_NOT_NULL`调用的源文件名。实际输出可能是文件名、相对路径或绝对路径，取决于编译命令。
-- `44`：由预定义宏`__LINE__`得到，即`CHECK_NOT_NULL`在源文件中的调用行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第44行；代码增删后行号会相应变化。
+- `warning src0_device is nullptr`：由宏参数`message`得到，即调用方传入的自定义告警信息。
+- `example.asc`：由预定义宏`__FILE__`得到，即包含`ASC_HOST_CHECK_CONDITION`调用的源文件名。实际输出可能是文件名、相对路径或绝对路径，取决于编译命令。
+- `46`：由预定义宏`__LINE__`得到，即`ASC_HOST_CHECK_CONDITION`在源文件中的调用行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。

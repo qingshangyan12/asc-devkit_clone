@@ -9,20 +9,21 @@
  */
 
 /*!
- * \file check_not_null.h
+ * \file check_condition.h
  * \brief
  */
-#ifndef INCLUDE_UTILS_DEBUG_CHECK_NOT_NULL_H
-#define INCLUDE_UTILS_DEBUG_CHECK_NOT_NULL_H
+#ifndef INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H
+#define INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H
 
 namespace AscendC {
 
-inline void CheckNotNull(const void* ptr, const char* ptrName, const char* file, int line);
+inline void check_condition(bool condition, const char* message, const char* file, int line);
 
 } // namespace AscendC
 
-#include "impl/utils/debug/check_not_null_impl.h"
+#include "impl/utils/debug/check_condition_impl.h"
 
-#define CHECK_NOT_NULL(ptr) AscendC::CheckNotNull(static_cast<const void*>(ptr), #ptr, __FILE__, __LINE__)
+#define ASC_HOST_CHECK_CONDITION(condition, message) \
+    AscendC::check_condition((condition), (message), __FILE__, __LINE__)
 
-#endif // INCLUDE_UTILS_DEBUG_CHECK_NOT_NULL_H
+#endif // INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H

@@ -3528,7 +3528,7 @@
         -   [ASC\_CPU\_LOG](Utils-API/log/ASC_CPU_LOG.md)
 
     -   [调测接口](Utils-API/tuning_interface/tuning_interface.md)
-        -   [CHECK\_NOT\_NULL](Utils-API/tuning_interface/check_not_null.md)
+        -   [ASC\_HOST\_CHECK\_CONDITION](Utils-API/tuning_interface/ASC_HOST_CHECK_CONDITION.md)
         -   [printf](Utils-API/tuning_interface/printf.md)
         -   [assert/ascendc\_assert](Utils-API/tuning_interface/assert.md)
         -   [\_\_trap](Utils-API/tuning_interface/__trap.md)

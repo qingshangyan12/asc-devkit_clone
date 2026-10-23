@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-#include "utils/debug/check_not_null.h"
+#include "utils/debug/check_condition.h"
 
 namespace {
 
@@ -25,32 +25,33 @@ int* GetPointer(int* ptr)
     return ptr;
 }
 
-TEST(CheckNotNullTest, AcceptsNonNullObjectPointers)
+TEST(CheckConditionTest, AcceptsTrueCondition)
 {
     int value = 0;
     const int constValue = 0;
 
-    CHECK_NOT_NULL(&value);
-    CHECK_NOT_NULL(&constValue);
+    ASC_HOST_CHECK_CONDITION(&value != nullptr, "value is null");
+    ASC_HOST_CHECK_CONDITION(&constValue != nullptr, "constValue is null");
 }
 
-TEST(CheckNotNullTest, EvaluatesPointerExpressionOnce)
+TEST(CheckConditionTest, EvaluatesConditionOnce)
 {
     int value = 0;
     g_evaluationCount = 0;
 
-    CHECK_NOT_NULL(GetPointer(&value));
+    ASC_HOST_CHECK_CONDITION(GetPointer(&value) != nullptr, "value is null");
 
     EXPECT_EQ(g_evaluationCount, 1);
 }
 
-TEST(CheckNotNullTest, ExitsWhenPointerIsNull)
+TEST(CheckConditionTest, ExitsWhenConditionIsFalse)
 {
     int* nullPtr = nullptr;
 
     EXPECT_EXIT(
-        CHECK_NOT_NULL(nullPtr), ::testing::ExitedWithCode(EXIT_FAILURE),
-        "CHECK_NOT_NULL failed: pointer 'nullPtr' is null, file=.*test_check_not_null.cpp, line=[0-9]+");
+        ASC_HOST_CHECK_CONDITION(nullPtr != nullptr, "warning nullPtr is nullptr"),
+        ::testing::ExitedWithCode(EXIT_FAILURE),
+        "ASC_HOST_CHECK_CONDITION failed: warning nullPtr is nullptr, file=.*test_check_condition.cpp, line=[0-9]+");
 }
 
 static_assert(std::is_convertible_v<int*, const void*>);

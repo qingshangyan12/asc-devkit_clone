@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(ascendc_ut_debug_api
     ${ASCENDC_DIR}/tests/main.cpp
-    test_check_not_null.cpp
+    test_check_condition.cpp
 )
 
 target_include_directories(ascendc_ut_debug_api PRIVATE
