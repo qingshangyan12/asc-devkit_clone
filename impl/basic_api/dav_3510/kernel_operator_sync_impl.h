@@ -257,6 +257,24 @@ __aicore__ inline void WaitPreTaskEndV1Impl()
     return;
 }
 
+#if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
+__aicore__ inline void WaitMixToMixV2()
+{
+    if ASCEND_IS_AIC {
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+    }
+    if ASCEND_IS_AIV {
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+    }
+}
+#endif
+
 __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
 {
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
@@ -325,18 +343,7 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
             set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
-        if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-        }
-        if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
-        }
+        WaitMixToMixV2();
     }
     return;
 #endif
@@ -413,18 +420,7 @@ __aicore__ inline void WaitPreTaskEndTightV2Impl()
             set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
-        if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-        }
-        if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
-        }
+        WaitMixToMixV2();
     }
     return;
 #endif

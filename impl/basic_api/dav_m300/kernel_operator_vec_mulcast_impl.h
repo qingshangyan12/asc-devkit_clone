@@ -37,20 +37,17 @@ __aicore__ inline void MulCastCalc(
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
-template <typename T = int8_t, typename U = half, bool isSetMask = true>
-__aicore__ inline void MulCastCalc(
-    const LocalTensor<int8_t>& dst, const LocalTensor<half>& src0, const LocalTensor<half>& src1, uint64_t mask,
+template <typename DstT, typename VecT>
+__aicore__ inline void MulCastScalarMaskImpl(
+    const LocalTensor<DstT>& dst, const LocalTensor<half>& src0, const LocalTensor<half>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(SupportType<PrimT<U>, half>(), "MulCast level-0 api only support half on current device");
-    static_assert(SupportType<PrimT<T>, int8_t>(), "MulCast level-0 api only support int8_t/uint8_t on current device");
-
     __VEC_SCOPE__
     {
         vector_f16 vreg0;
         vector_f16 vreg1;
         vector_f16 vreg2;
-        vector_s8 vreg3;
+        VecT vreg3;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
         vector_bool pregLower = plt_b8(sregLower, POST_UPDATE);
@@ -68,9 +65,20 @@ __aicore__ inline void MulCastCalc(
             vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
             vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
-            vsstb(vreg3, (__ubuf__ int8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
+            vsstb(vreg3, (__ubuf__ DstT*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
         }
     }
+}
+
+template <typename T = int8_t, typename U = half, bool isSetMask = true>
+__aicore__ inline void MulCastCalc(
+    const LocalTensor<int8_t>& dst, const LocalTensor<half>& src0, const LocalTensor<half>& src1, uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    static_assert(SupportType<PrimT<U>, half>(), "MulCast level-0 api only support half on current device");
+    static_assert(SupportType<PrimT<T>, int8_t>(), "MulCast level-0 api only support int8_t/uint8_t on current device");
+
+    MulCastScalarMaskImpl<int8_t, vector_s8>(dst, src0, src1, mask, repeatTime, repeatParams);
 }
 
 template <typename T = uint8_t, typename U = half, bool isSetMask = true>
@@ -82,32 +90,7 @@ __aicore__ inline void MulCastCalc(
     static_assert(
         SupportType<PrimT<T>, uint8_t>(), "MulCast level-0 api only support int8_t/uint8_t on current device");
 
-    __VEC_SCOPE__
-    {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_u8 vreg3;
-        uint32_t sregLower = static_cast<uint32_t>(mask);
-        uint32_t sregUpper = static_cast<uint32_t>(mask);
-        vector_bool pregLower = plt_b8(sregLower, POST_UPDATE);
-        vector_bool preg = plt_b16(sregUpper, POST_UPDATE);
-        uint32_t strideConfig0 = (static_cast<uint32_t>(repeatParams.src0BlkStride) << 16);
-        uint32_t strideConfig1 = (static_cast<uint32_t>(repeatParams.src1BlkStride) << 16);
-        uint32_t strideConfig2 = (static_cast<uint32_t>(repeatParams.dstBlkStride) << 16);
-        uint32_t strideOffset0 = static_cast<uint32_t>(repeatParams.src0RepStride * 256 / 16);
-        uint32_t strideOffset1 = static_cast<uint32_t>(repeatParams.src1RepStride * 256 / 16);
-        uint32_t strideOffset2 = static_cast<uint32_t>(repeatParams.dstRepStride * 256 / 8);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            mem_bar(VST_VLD);
-            vsldb(vreg0, (__ubuf__ half*)src0.GetPhyAddr() + i * strideOffset0, strideConfig0, preg);
-            vsldb(vreg1, (__ubuf__ half*)src1.GetPhyAddr() + i * strideOffset1, strideConfig1, preg);
-            vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
-            vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
-            vsstb(vreg3, (__ubuf__ uint8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
-        }
-    }
+    MulCastScalarMaskImpl<uint8_t, vector_u8>(dst, src0, src1, mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, bool isSetMask = true>

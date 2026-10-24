@@ -21,6 +21,7 @@
 #include "adv_api/activation/logsoftmax_tilingdata.h"
 #include "utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/api_check/host_apicheck.h"
+#include "softmax_basic_block_tiling.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(LogSoftMaxTilingOpApi, LogSoftMaxTiling)
@@ -53,20 +54,6 @@ inline std::vector<uint32_t> GetLastAxisShapeND(const AscendC::TensorShape srcSh
         ret = {srcM, srcK};
     }
     return ret;
-}
-
-inline void AdjustToBasicBlockBaseM(uint32_t& baseM, const uint32_t srcM, const uint32_t srcK)
-{
-    if (baseM > BASIC_TILE_NUM && srcM % BASIC_TILE_NUM == 0 && srcK % SOFTMAX_BASICBLOCK_UNIT == 0) { // basicblock
-        baseM = baseM / BASIC_TILE_NUM * BASIC_TILE_NUM;
-        while (srcM % baseM != 0) {
-            baseM -= BASIC_TILE_NUM;
-        }
-        // max repeat only support 255
-        while (baseM * srcK >= SOFTMAX_BASICBLOCK_UNIT * SOFTMAX_BASICBLOCK_MIN_SIZE) {
-            baseM = baseM / SOFTMAX_HALF_SIZE;
-        }
-    }
 }
 
 uint32_t GetLogSoftMaxMaxTmpSize(
@@ -159,7 +146,8 @@ void LogSoftMaxTilingFunc(
         baseM = baseM / BASIC_TILE_NUM * BASIC_TILE_NUM;
     }
 
-    AdjustToBasicBlockBaseM(baseM, srcM, srcK);
+    Internal::AdjustSoftmaxBasicBlockBaseM(
+        baseM, srcM, srcK, BASIC_TILE_NUM, SOFTMAX_BASICBLOCK_UNIT, SOFTMAX_BASICBLOCK_MIN_SIZE, SOFTMAX_HALF_SIZE);
 
     softmaxTiling.set_srcM(srcM);
     softmaxTiling.set_srcK(srcK);

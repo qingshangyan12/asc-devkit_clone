@@ -29,11 +29,11 @@
 
 namespace AscendC {
 template <typename T, typename U>
-bool CheckVectorPadding(
+inline check::VectorPaddingApiParams MakeVectorPaddingParams(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint8_t padMode, const bool padSide,
-    const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, const char* intriName)
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    check::VectorPaddingApiParams chkParams{
+    return check::VectorPaddingApiParams{
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
         repeatTime,
@@ -49,6 +49,14 @@ bool CheckVectorPadding(
         static_cast<uint8_t>(src.GetPosition()),
         padMode,
         padSide};
+}
+
+template <typename T, typename U>
+bool CheckVectorPadding(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint8_t padMode, const bool padSide,
+    const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, const char* intriName)
+{
+    auto chkParams = MakeVectorPaddingParams(dst, src, padMode, padSide, repeatTime, repeatParams);
     return CheckVectorPaddingForMaskArray(chkParams, mask, intriName);
 }
 
@@ -57,22 +65,7 @@ bool CheckVectorPadding(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint8_t padMode, const bool padSide,
     const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, const char* intriName)
 {
-    check::VectorPaddingApiParams chkParams{
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
-        repeatTime,
-        static_cast<uint16_t>(repeatParams.dstBlkStride),
-        static_cast<uint16_t>(repeatParams.srcBlkStride),
-        static_cast<uint16_t>(repeatParams.dstRepStride),
-        static_cast<uint16_t>(repeatParams.srcRepStride),
-        static_cast<uint32_t>(sizeof(PrimT<T>)),
-        static_cast<uint32_t>(sizeof(PrimT<U>)),
-        static_cast<uint64_t>(dst.GetSize() * sizeof(PrimT<T>)),
-        static_cast<uint64_t>(src.GetSize() * sizeof(PrimT<U>)),
-        static_cast<uint8_t>(dst.GetPosition()),
-        static_cast<uint8_t>(src.GetPosition()),
-        padMode,
-        padSide};
+    auto chkParams = MakeVectorPaddingParams(dst, src, padMode, padSide, repeatTime, repeatParams);
     return CheckVectorPadding(chkParams, mask, intriName);
 }
 

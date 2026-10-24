@@ -25,6 +25,7 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/sys_macros_impl.h"
 #include "impl/utils/debug/asc_utils_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
+#include "impl/utils/base/version_info_impl.h"
 
 #if __NPU_ARCH__ == 2002
 #include "impl/utils/debug/npu_arch_2002/asc_debug_utils_impl.h"
@@ -296,23 +297,7 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
 
 __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint64_t& version, uint64_t& timeStamp)
 {
-#ifdef ASC_DEVKIT_VERSION_STR
-    versionStr = const_cast<__gm__ char*>(ASC_DEVKIT_VERSION_STR);
-#else
-    versionStr = const_cast<__gm__ char*>("Unknown ASC_DEVKIT version");
-#endif
-
-#ifdef ASC_DEVKIT_TIMESTAMP
-    timeStamp = static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP);
-#else
-    timeStamp = 0;
-#endif
-
-#ifdef ASC_DEVKIT_VERSION
-    version = static_cast<uint64_t>(ASC_DEVKIT_VERSION);
-#else
-    version = 0;
-#endif
+    __asc_detail::ReadDevkitVersion(versionStr, version, timeStamp);
 }
 
 } // namespace __asc_aicore

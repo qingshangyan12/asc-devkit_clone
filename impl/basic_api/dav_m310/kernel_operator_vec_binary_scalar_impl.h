@@ -39,6 +39,40 @@ __aicore__ inline void AddsImpl(
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported on current device"); });
 }
 
+template <bool isAdd>
+__aicore__ inline void AddMulFloatArrayMaskImpl(
+    __ubuf__ float* dst, __ubuf__ float* src, float scalarValue, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    __ubuf__ uint8_t* tmpBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
+    *((__ubuf__ uint64_t*)tmpBuf) = mask[0];
+    *((__ubuf__ uint64_t*)tmpBuf + 1) = mask[1];
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    SetFlag<HardEvent::S_V>(eventIdSToV);
+    WaitFlag<HardEvent::S_V>(eventIdSToV);
+    __VEC_SCOPE__
+    {
+        vector_f32 vreg0;
+        vector_f32 vreg1;
+        vector_bool preg;
+        vector_bool preg1;
+        plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
+        punpack(preg1, preg, LOWER);
+        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
+        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+            vsldb(vreg0, src + i * repeatParams.srcRepStride * 8, strideConfig0, preg1);
+            if constexpr (isAdd) {
+                vadds(vreg1, vreg0, scalarValue, preg1, MODE_ZEROING);
+            } else {
+                vmuls(vreg1, vreg0, scalarValue, preg1, MODE_ZEROING);
+            }
+            vsstb(vreg1, dst + i * repeatParams.dstRepStride * 8, strideConfig1, preg1);
+        }
+    }
+    AscendCUtils::FreeTemporaryBuffer<uint8_t>(tmpBuf);
+}
+
 template <>
 __aicore__ inline void AddsImpl<half, true>(
     __ubuf__ half* dst, __ubuf__ half* src, half scalarValue, const uint64_t mask[], const uint8_t repeatTime,
@@ -72,29 +106,7 @@ __aicore__ inline void AddsImpl<float, true>(
     __ubuf__ float* dst, __ubuf__ float* src, float scalarValue, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    __ubuf__ uint8_t* tmpBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
-    *((__ubuf__ uint64_t*)tmpBuf) = mask[0];
-    *((__ubuf__ uint64_t*)tmpBuf + 1) = mask[1];
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
-    SetFlag<HardEvent::S_V>(eventIdSToV);
-    WaitFlag<HardEvent::S_V>(eventIdSToV);
-    __VEC_SCOPE__
-    {
-        vector_f32 vreg0;
-        vector_f32 vreg1;
-        vector_bool preg;
-        vector_bool preg1;
-        plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
-        punpack(preg1, preg, LOWER);
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
-        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            vsldb(vreg0, src + i * repeatParams.srcRepStride * 8, strideConfig0, preg1);
-            vadds(vreg1, vreg0, scalarValue, preg1, MODE_ZEROING);
-            vsstb(vreg1, dst + i * repeatParams.dstRepStride * 8, strideConfig1, preg1);
-        }
-    }
-    AscendCUtils::FreeTemporaryBuffer<uint8_t>(tmpBuf);
+    AddMulFloatArrayMaskImpl<true>(dst, src, scalarValue, mask, repeatTime, repeatParams);
 }
 
 template <>
@@ -383,29 +395,7 @@ __aicore__ inline void MulsImpl<float, true>(
     __ubuf__ float* dst, __ubuf__ float* src, float scalarValue, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    __ubuf__ uint8_t* tmpBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
-    *((__ubuf__ uint64_t*)tmpBuf) = mask[0];
-    *((__ubuf__ uint64_t*)tmpBuf + 1) = mask[1];
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
-    SetFlag<HardEvent::S_V>(eventIdSToV);
-    WaitFlag<HardEvent::S_V>(eventIdSToV);
-    __VEC_SCOPE__
-    {
-        vector_f32 vreg0;
-        vector_f32 vreg1;
-        vector_bool preg;
-        vector_bool preg1;
-        plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
-        punpack(preg1, preg, LOWER);
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
-        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            vsldb(vreg0, src + i * repeatParams.srcRepStride * 8, strideConfig0, preg1);
-            vmuls(vreg1, vreg0, scalarValue, preg1, MODE_ZEROING);
-            vsstb(vreg1, dst + i * repeatParams.dstRepStride * 8, strideConfig1, preg1);
-        }
-    }
-    AscendCUtils::FreeTemporaryBuffer<uint8_t>(tmpBuf);
+    AddMulFloatArrayMaskImpl<false>(dst, src, scalarValue, mask, repeatTime, repeatParams);
 }
 
 template <>

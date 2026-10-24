@@ -1445,20 +1445,10 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
     }
 }
 
-template <
-    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
-    const AscendQuantPolicy& policy>
-__aicore__ inline void AscendQuantImpl(
-    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-    const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
+template <typename dstT, typename srcT, typename scaleT, const AscendQuantPolicy& policy>
+__aicore__ inline void CheckAscendQuantParams(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const AscendQuantParam& para)
 {
-    if ASCEND_IS_AIC {
-        return;
-    }
-    CheckTensorPosition(dstTensor, "dstTensor", "VECIN/VECOUT/VECCALC");
-    CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
-    CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
-    CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN/VECOUT/VECCALC");
     static_assert(
         SupportType<srcT, half, float, bfloat16_t>(), "AscendQuant only support half/float/bfloat16_t input dtype");
     static_assert(
@@ -1474,6 +1464,23 @@ __aicore__ inline void AscendQuantImpl(
         });
     ASCENDC_ASSERT(
         (para.calCount % para.n == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount must be an integer multiple of n!"); });
+}
+
+template <
+    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
+    const AscendQuantPolicy& policy>
+__aicore__ inline void AscendQuantImpl(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
+{
+    if ASCEND_IS_AIC {
+        return;
+    }
+    CheckTensorPosition(dstTensor, "dstTensor", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN/VECOUT/VECCALC");
+    CheckAscendQuantParams<dstT, srcT, scaleT, policy>(dstTensor, srcTensor, para);
     if constexpr (policy == AscendQuantPolicy::PER_TOKEN) {
         static_assert(
             SupportType<dstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
@@ -1513,21 +1520,7 @@ __aicore__ inline void AscendQuantImpl(
     CheckTensorPosition(dstTensor, "dstTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
-    static_assert(
-        SupportType<srcT, half, float, bfloat16_t>(), "AscendQuant only support half/float/bfloat16_t input dtype");
-    static_assert(
-        SupportType<scaleT, half, float, bfloat16_t>(), "AscendQuant only support half/float/bfloat16_t scale dtype");
-    static_assert(
-        (policy == AscendQuantPolicy::PER_TOKEN || policy == AscendQuantPolicy::PER_GROUP),
-        "unsupported policy for AscendQuant in current device!");
-    ASCENDC_ASSERT(
-        (para.calCount <= srcTensor.GetSize() && para.calCount <= dstTensor.GetSize() && para.calCount >= 0), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "calCount is %u, which should be in [0, min(%u, %u)]", para.calCount, srcTensor.GetSize(),
-                dstTensor.GetSize());
-        });
-    ASCENDC_ASSERT(
-        (para.calCount % para.n == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount must be an integer multiple of n!"); });
+    CheckAscendQuantParams<dstT, srcT, scaleT, policy>(dstTensor, srcTensor, para);
     if constexpr (policy == AscendQuantPolicy::PER_TOKEN) {
         static_assert(
             SupportType<dstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),

@@ -27,6 +27,21 @@
 
 namespace AscendC {
 
+template <typename T>
+__aicore__ inline void GetSoftmaxFlashShape(
+    const LocalTensor<T>& srcTensor, const SoftMaxShapeInfo& softmaxShapeInfo, LastAxisShapeND& srcNDinfo,
+    LastAxisShapeND& originalSrcShape)
+{
+    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
+        ShapeInfo srcShape = srcTensor.GetShapeInfo();
+        srcNDinfo = GetLastAxisShapeND(srcShape);
+        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
+    } else {
+        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
+        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
+    }
+}
+
 template <typename T1, typename T2, bool isReuseSource = false, bool isBasicBlock = false>
 __aicore__ inline void SoftmaxFlashCommonImpl(
     const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor, const LocalTensor<T2>& maxTensor,
@@ -39,14 +54,7 @@ __aicore__ inline void SoftmaxFlashCommonImpl(
     uint32_t workLocalSize = workLocal.GetSize();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        ShapeInfo srcShape = srcTensor.GetShapeInfo();
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    GetSoftmaxFlashShape(srcTensor, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (Std::is_same<T1, half>::value && Std::is_same<T2, float>::value) {
         if (srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM) {
             SoftMaxTiling newTiling = tiling;
@@ -97,14 +105,7 @@ __aicore__ inline void SoftmaxFlashTmpBufCommonImpl(
     uint32_t workLocalSize = tempBuffer.GetSize();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        ShapeInfo srcShape = srcTensor.GetShapeInfo();
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    GetSoftmaxFlashShape(srcTensor, softmaxShapeInfo, srcNDinfo, originalSrcShape);
 
     if constexpr (Std::is_same<T1, half>::value && Std::is_same<T2, float>::value) {
         if (srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM) {

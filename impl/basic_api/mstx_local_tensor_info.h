@@ -381,6 +381,33 @@ __aicore__ inline void CopyName(char b[64], __gm__ const char* a)
     b[i] = '\0';
 }
 
+template <MstxReportType reportType, typename Desc>
+__aicore__ inline void ReportMstxInfo(Desc& desc, __gm__ const char* name)
+{
+    CopyName(desc.name, name);
+    __mstx_dfx_report_stub(static_cast<uint32_t>(reportType), sizeof(desc), &desc);
+}
+
+__aicore__ inline void ReportDataCopyPadV2Info(MstxDataCopyPadV2Desc& desc, __gm__ const char* name)
+{
+    ReportMstxInfo<MstxReportType::MSTX_DATA_COPY_PAD_V2>(desc, name);
+}
+
+__aicore__ inline void FillMstxVecSelCommon(
+    MstxVecSelDesc& desc, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams, SELMODE selMode)
+{
+    desc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    desc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(desc.scalarMode ? 8192 : 0));
+    desc.blockNum = repeatParams.blockNumber;
+    desc.repeatTimes = repeatTime;
+    desc.dstBlockStride = repeatParams.dstBlkStride;
+    desc.src0BlockStride = repeatParams.src0BlkStride;
+    desc.src1BlockStride = repeatParams.src1BlkStride;
+    desc.dstRepeatStride = repeatParams.dstRepStride;
+    desc.src0RepeatStride = repeatParams.src0RepStride;
+    desc.src1RepeatStride = repeatParams.src1RepStride;
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void GetMstxVecUnaryInfo(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, uint64_t mask0, uint64_t mask1, const uint8_t repeatTime,
@@ -1345,24 +1372,8 @@ __aicore__ inline void GetMstxVecBinarySelInfo(
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
-    if (mstxVecSelDesc.scalarMode) {
-        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
-    } else {
-        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
-    }
-    mstxVecSelDesc.blockNum = repeatParams.blockNumber;
-    mstxVecSelDesc.repeatTimes = repeatTime;
-    mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
-    mstxVecSelDesc.src0BlockStride = repeatParams.src0BlkStride;
-    mstxVecSelDesc.src1BlockStride = repeatParams.src1BlkStride;
-    mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
-    mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
-    mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    CopyName(mstxVecSelDesc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
+    FillMstxVecSelCommon(mstxVecSelDesc, repeatTime, repeatParams, selMode);
+    ReportMstxInfo<MstxReportType::MSTX_VEC_SEL>(mstxVecSelDesc, name);
 }
 
 template <typename T, typename U>
@@ -1374,24 +1385,8 @@ __aicore__ inline void GetMstxVecBinarySelInfo(
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
-    if (mstxVecSelDesc.scalarMode) {
-        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
-    } else {
-        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
-    }
-    mstxVecSelDesc.blockNum = repeatParams.blockNumber;
-    mstxVecSelDesc.repeatTimes = repeatTime;
-    mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
-    mstxVecSelDesc.src0BlockStride = repeatParams.src0BlkStride;
-    mstxVecSelDesc.src1BlockStride = repeatParams.src1BlkStride;
-    mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
-    mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
-    mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    CopyName(mstxVecSelDesc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
+    FillMstxVecSelCommon(mstxVecSelDesc, repeatTime, repeatParams, selMode);
+    ReportMstxInfo<MstxReportType::MSTX_VEC_SEL>(mstxVecSelDesc, name);
 }
 
 template <typename T, typename U>
@@ -1991,11 +1986,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
     mstxDataCopyPadV2Desc.leftPad = padParams.leftPadding;
     mstxDataCopyPadV2Desc.rightPad = padParams.rightPadding;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportDataCopyPadV2Info(mstxDataCopyPadV2Desc, name);
 }
 
 template <typename T, typename U>
@@ -2014,11 +2005,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
     mstxDataCopyPadV2Desc.leftPad = 0;
     mstxDataCopyPadV2Desc.rightPad = 0;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportDataCopyPadV2Info(mstxDataCopyPadV2Desc, name);
 }
 
 template <typename T, typename U>

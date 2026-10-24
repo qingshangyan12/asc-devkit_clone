@@ -623,6 +623,13 @@ __simd_vf__ inline void SoftmaxFlashV2NZUpdateVFImpl(
     }
 }
 
+template <typename T1, typename T2, bool withTail>
+__aicore__ inline void RunSoftmaxFlashV2NZUpdateVF(
+    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
+    const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inExpSumTensor,
+    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, uint16_t offset, uint16_t offset1,
+    uint16_t srcM, uint16_t expMaxF32K, const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling);
+
 template <typename T1, typename T2>
 __aicore__ inline void SoftmaxFlashV2NZUpdateImpl(
     const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
@@ -640,24 +647,9 @@ __aicore__ inline void SoftmaxFlashV2NZUpdateImpl(
     }
     uint16_t offset1 = srcM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
 
-    __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
-    __ubuf__ T2* expSumUb = (__ubuf__ T2*)expSumTensor.GetPhyAddr();
-    __ubuf__ T2* inExpSumUb = (__ubuf__ T2*)inExpSumTensor.GetPhyAddr();
-    __ubuf__ T2* maxUb = (__ubuf__ T2*)maxTensor.GetPhyAddr();
-    __ubuf__ T2* inMaxUb = (__ubuf__ T2*)inMaxTensor.GetPhyAddr();
-    __ubuf__ T1* srcUb = (__ubuf__ T1*)srcTensor.GetPhyAddr();
-    __ubuf__ T1* expMaxUb = (__ubuf__ T1*)expMaxTensor.GetPhyAddr();
-    __ubuf__ float* expMaxF32Ub = (__ubuf__ float*)expMaxTensor.GetPhyAddr();
-    __ubuf__ float* workUb = (__ubuf__ float*)workLocal.GetPhyAddr();
-    __ubuf__ float* tmpUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset);
-    __ubuf__ float* expUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1);
-    if constexpr (sizeof(T1) == 2) {
-        expMaxF32Ub = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1 + srcM * originK);
-    }
-
-    SoftmaxFlashV2NZUpdateVFImpl<T1, T2>(
-        dstUb, expSumUb, inExpSumUb, maxUb, inMaxUb, srcUb, expMaxUb, expMaxF32Ub, workUb, tmpUb, expUb,
-        originalSrcShape, tiling);
+    RunSoftmaxFlashV2NZUpdateVF<T1, T2, false>(
+        dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal, offset,
+        offset1, srcM, originK, originalSrcShape, tiling);
 }
 
 template <typename T1, typename T2>
@@ -829,6 +821,38 @@ __simd_vf__ inline void SoftmaxFlashV2NZWithTailUpdateVFImpl(
     }
 }
 
+template <typename T1, typename T2, bool withTail>
+__aicore__ inline void RunSoftmaxFlashV2NZUpdateVF(
+    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
+    const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inExpSumTensor,
+    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, uint16_t offset, uint16_t offset1,
+    uint16_t srcM, uint16_t expMaxF32K, const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling)
+{
+    __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
+    __ubuf__ T2* expSumUb = (__ubuf__ T2*)expSumTensor.GetPhyAddr();
+    __ubuf__ T2* inExpSumUb = (__ubuf__ T2*)inExpSumTensor.GetPhyAddr();
+    __ubuf__ T2* maxUb = (__ubuf__ T2*)maxTensor.GetPhyAddr();
+    __ubuf__ T2* inMaxUb = (__ubuf__ T2*)inMaxTensor.GetPhyAddr();
+    __ubuf__ T1* srcUb = (__ubuf__ T1*)srcTensor.GetPhyAddr();
+    __ubuf__ T1* expMaxUb = (__ubuf__ T1*)expMaxTensor.GetPhyAddr();
+    __ubuf__ float* expMaxF32Ub = (__ubuf__ float*)expMaxTensor.GetPhyAddr();
+    __ubuf__ float* workUb = (__ubuf__ float*)workLocal.GetPhyAddr();
+    __ubuf__ float* tmpUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset);
+    __ubuf__ float* expUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1);
+    if constexpr (sizeof(T1) == 2) {
+        expMaxF32Ub = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1 + srcM * expMaxF32K);
+    }
+    if constexpr (withTail) {
+        SoftmaxFlashV2NZWithTailUpdateVFImpl<T1, T2>(
+            dstUb, expSumUb, inExpSumUb, maxUb, inMaxUb, srcUb, expMaxUb, expMaxF32Ub, workUb, tmpUb, expUb,
+            originalSrcShape, tiling);
+    } else {
+        SoftmaxFlashV2NZUpdateVFImpl<T1, T2>(
+            dstUb, expSumUb, inExpSumUb, maxUb, inMaxUb, srcUb, expMaxUb, expMaxF32Ub, workUb, tmpUb, expUb,
+            originalSrcShape, tiling);
+    }
+}
+
 template <typename T1, typename T2>
 __aicore__ inline void SoftmaxFlashV2NZWithTailUpdateImpl(
     const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
@@ -852,23 +876,9 @@ __aicore__ inline void SoftmaxFlashV2NZWithTailUpdateImpl(
         mask[0], originK % SOFTMAX_SHAPE_NZ_BASIC_COUNT, FLOAT_REPEAT_SIZE / SOFTMAX_SHAPE_NZ_BASIC_COUNT);
     SetVectorMask<uint32_t>(mask[1], mask[0]);
 
-    __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
-    __ubuf__ T2* expSumUb = (__ubuf__ T2*)expSumTensor.GetPhyAddr();
-    __ubuf__ T2* inExpSumUb = (__ubuf__ T2*)inExpSumTensor.GetPhyAddr();
-    __ubuf__ T2* maxUb = (__ubuf__ T2*)maxTensor.GetPhyAddr();
-    __ubuf__ T2* inMaxUb = (__ubuf__ T2*)inMaxTensor.GetPhyAddr();
-    __ubuf__ T1* srcUb = (__ubuf__ T1*)srcTensor.GetPhyAddr();
-    __ubuf__ T1* expMaxUb = (__ubuf__ T1*)expMaxTensor.GetPhyAddr();
-    __ubuf__ float* expMaxF32Ub = (__ubuf__ float*)expMaxTensor.GetPhyAddr();
-    __ubuf__ float* workUb = (__ubuf__ float*)workLocal.GetPhyAddr();
-    __ubuf__ float* tmpUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset);
-    __ubuf__ float* expUb = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1);
-    if constexpr (sizeof(T1) == 2) {
-        expMaxF32Ub = (__ubuf__ float*)workLocal.GetPhyAddr(offset + offset1 + srcM * srcK);
-    }
-    SoftmaxFlashV2NZWithTailUpdateVFImpl<T1, T2>(
-        dstUb, expSumUb, inExpSumUb, maxUb, inMaxUb, srcUb, expMaxUb, expMaxF32Ub, workUb, tmpUb, expUb,
-        originalSrcShape, tiling);
+    RunSoftmaxFlashV2NZUpdateVF<T1, T2, true>(
+        dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal, offset,
+        offset1, srcM, srcK, originalSrcShape, tiling);
 }
 
 template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false>

@@ -1299,6 +1299,24 @@ typename std::
     }
 }
 
+template <typename T>
+__aicore__ inline void SelectWithoutMaskStep(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint16_t i, uint32_t blockElm,
+    const BinaryRepeatParams& repeatParams, Reg::MaskReg& maskReg, Reg::MaskReg& selMask, Reg::RegTensor<T>& srcReg0,
+    Reg::RegTensor<T>& srcReg1, Reg::RegTensor<T>& dstReg)
+{
+    Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        srcReg0, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride),
+        maskReg);
+    Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        srcReg1, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride),
+        maskReg);
+    Reg::Select(dstReg, srcReg0, srcReg1, selMask);
+    Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
+        maskReg);
+}
+
 template <typename T, bool isCounterMode>
 __aicore__ inline void SelectWithoutMaskMode0ImplVF(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ uint64_t* tempBuf, int32_t repeatTime,
@@ -1332,16 +1350,7 @@ __aicore__ inline void SelectWithoutMaskMode0ImplVF(
         if constexpr (isCounterMode) {
             maskReg = Reg::UpdateMask<T>(sreg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg0, src0 + i * blockElm * repeatParams.src0RepStride,
-            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg1, src1 + i * blockElm * repeatParams.src1RepStride,
-            static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
-        Reg::Select(dstReg, srcReg0, srcReg1, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
-            maskReg);
+        SelectWithoutMaskStep(dst, src0, src1, i, blockElm, repeatParams, maskReg, selMask, srcReg0, srcReg1, dstReg);
     }
 }
 
@@ -1379,16 +1388,7 @@ __aicore__ inline void SelectWithoutMaskMode2ImplVF(
             Reg::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t*)selAddr + i * selOffset);
             Reg::MaskGenWithRegTensor<uint32_t, 0>(selMask, (Reg::RegTensor<uint32_t>&)selReg);
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg0, src0 + i * blockElm * repeatParams.src0RepStride,
-            static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            srcReg1, src1 + i * blockElm * repeatParams.src1RepStride,
-            static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
-        Reg::Select(dstReg, srcReg0, srcReg1, selMask);
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
-            maskReg);
+        SelectWithoutMaskStep(dst, src0, src1, i, blockElm, repeatParams, maskReg, selMask, srcReg0, srcReg1, dstReg);
     }
 }
 

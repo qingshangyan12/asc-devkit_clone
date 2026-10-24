@@ -25,11 +25,17 @@
 #include "../../../include/basic_api/kernel_struct_unary.h"
 
 namespace AscendC {
-#define BIT_BY_BIT_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTimes, repeatParams)            \
+template <typename T>
+__simd_callee__ inline MaskReg CreateBinaryScalarPredicate(uint32_t count)
+{
+    return CreatePredicate<T>(count);
+}
+
+#define BINARY_SCALAR_OP_EXEC(OP_NAME, DATA_TYPE, dst, src, scalarValue, repeatTimes, repeatParams, PREDICATE) \
     __VEC_SCOPE__                                                                                              \
     {                                                                                                          \
         RegTensor<DATA_TYPE> srcReg, dstReg;                                                                   \
-        MaskReg preg = MovePredicate<DATA_TYPE>();                                                             \
+        MaskReg preg = PREDICATE;                                                                              \
         uint32_t srcBlkStride = static_cast<uint32_t>(repeatParams.srcBlkStride);                              \
         uint32_t dstBlkStride = static_cast<uint32_t>(repeatParams.dstBlkStride);                              \
         uint32_t srcRepStride = static_cast<uint32_t>(repeatParams.srcRepStride);                              \
@@ -41,22 +47,14 @@ namespace AscendC {
         }                                                                                                      \
     }
 
-#define CONTINUOUS_MODE_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTimes, repeatParams)       \
-    __VEC_SCOPE__                                                                                              \
-    {                                                                                                          \
-        RegTensor<DATA_TYPE> srcReg, dstReg;                                                                   \
-        uint32_t sreg = (uint32_t)(mask);                                                                      \
-        MaskReg preg = CreatePredicate<DATA_TYPE>(sreg);                                                       \
-        uint32_t srcBlkStride = static_cast<uint32_t>(repeatParams.srcBlkStride);                              \
-        uint32_t dstBlkStride = static_cast<uint32_t>(repeatParams.dstBlkStride);                              \
-        uint32_t srcRepStride = static_cast<uint32_t>(repeatParams.srcRepStride);                              \
-        uint32_t dstRepStride = static_cast<uint32_t>(repeatParams.dstRepStride);                              \
-        for (uint16_t i = 0; i < (uint16_t)(repeatTimes); ++i) {                                               \
-            DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(srcReg, src, srcBlkStride, srcRepStride, preg); \
-            OP_NAME(dstReg, srcReg, scalarValue, preg);                                                        \
-            DataCopy<DATA_TYPE, PostLiteral::POST_MODE_UPDATE>(dst, dstReg, dstBlkStride, dstRepStride, preg); \
-        }                                                                                                      \
-    }
+#define BIT_BY_BIT_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTimes, repeatParams) \
+    BINARY_SCALAR_OP_EXEC(                                                                          \
+        OP_NAME, DATA_TYPE, dst, src, scalarValue, repeatTimes, repeatParams, MovePredicate<DATA_TYPE>())
+
+#define CONTINUOUS_MODE_FUNC(OP_NAME, DATA_TYPE, dst, src, scalarValue, mask, repeatTimes, repeatParams) \
+    BINARY_SCALAR_OP_EXEC(                                                                               \
+        OP_NAME, DATA_TYPE, dst, src, scalarValue, repeatTimes, repeatParams,                            \
+        CreateBinaryScalarPredicate<DATA_TYPE>((uint32_t)(mask)))
 
 // for Level 0 bit-by-bit mode binary scalar op
 #define BINARY_SCALAR_OP_LEVEL0_BIT_BY_BIT_MODE_IMPL_NOT_SUPPORT(FUNC_NAME)                                 \

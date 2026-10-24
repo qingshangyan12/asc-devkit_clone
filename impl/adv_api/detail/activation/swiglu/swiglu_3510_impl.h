@@ -25,6 +25,7 @@
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../common/check.h"
 #include "../../common/common.h"
+#include "../glu_3510_common_impl.h"
 
 namespace AscendC {
 namespace Internal {
@@ -44,27 +45,9 @@ __simd_vf__ inline void SwiGLUImplVF(
     constexpr uint32_t oneRepElm = static_cast<uint32_t>(GetVecLen() / sizeof(float));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<float>(count);
-        if constexpr (sizeof(T) == sizeof(half)) {
-            Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(srcOrigin0, src0 + i * oneRepElm);
-            Reg::Cast<float, half, castTraitB16ToB32>(srcVreg0, srcOrigin0, mask);
-            Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(srcOrigin1, src1 + i * oneRepElm);
-            Reg::Cast<float, half, castTraitB16ToB32>(srcVreg1, srcOrigin1, mask);
-        } else {
-            Reg::LoadAlign(srcVreg0, src0 + i * oneRepElm);
-            Reg::LoadAlign(srcVreg1, src1 + i * oneRepElm);
-        }
+        LoadGluOperands<T>(srcVreg0, srcVreg1, srcOrigin0, srcOrigin1, src0, src1, i * oneRepElm, mask);
         Reg::Muls(tmpReg0, srcVreg1, scalarValue, mask);
-        Reg::Exp(tmpReg1, tmpReg0, mask);
-        Reg::Adds(tmpReg1, tmpReg1, 1.0f, mask);
-        Reg::Div(tmpReg1, srcVreg1, tmpReg1, mask);
-        Reg::Mul(dstVreg, srcVreg0, tmpReg1, mask);
-        if constexpr (sizeof(T) == sizeof(half)) {
-            Reg::Cast<half, float, castTraitB32ToB16>((Reg::RegTensor<half>&)dstVreg, dstVreg, mask);
-            Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(
-                dst + i * oneRepElm, (Reg::RegTensor<half>&)dstVreg, mask);
-        } else {
-            Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
-        }
+        FinishGlu<T>(tmpReg1, dstVreg, tmpReg0, srcVreg0, srcVreg1, mask, dst, i * oneRepElm);
     }
 }
 } // namespace Internal
