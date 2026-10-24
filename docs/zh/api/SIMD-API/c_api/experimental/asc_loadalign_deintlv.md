@@ -38,20 +38,18 @@
 
 ## 函数原型
 
-### 对齐搬入模式
-
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_loadalign_deintlv(__ubuf__ <dtype>* src)
 ```
 
-#### dtype支持数据类型
+### dtype支持数据类型
 
 `dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 当`dtype`为`int4b_t`时，返回类型为`asc_int4x2_t_int4x2_t_pair`，成员类型均为`vector_int4x2_t`。
 
-#### 函数原型典型示例
+### 函数原型典型示例
 
 ```c
 // 通过函数返回值返回结果示例：对float数据执行解交织搬入。
@@ -59,8 +57,6 @@ __simd_callee__ inline asc_float_float_pair asc_loadalign_deintlv(__ubuf__ float
 ```
 
 ## 参数说明
-
-### 对齐搬入模式
 
 **表1** 参数说明
 
@@ -73,8 +69,6 @@ __simd_callee__ inline asc_float_float_pair asc_loadalign_deintlv(__ubuf__ float
 返回[双返回值结构体](pair.md)`asc_<dtype>_<dtype>_pair`，两个成员的类型均为`vector_<dtype>`。使用变量`result`接收返回值时，`result.first`保存源数据中的偶数下标元素，`result.second`保存奇数下标元素。`dtype`为`int4b_t`时，返回类型为`asc_int4x2_t_int4x2_t_pair`，成员类型为`vector_int4x2_t`。
 
 ## 约束说明
-
-### 通用约束
 
 - Reg矢量计算C API通用约束请参见[通用约束](../reg_compute/overview.md#通用约束)。
 - 实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
