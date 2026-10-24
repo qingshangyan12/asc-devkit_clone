@@ -20,6 +20,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/spr_intf_impl.h"
 #endif
 
 __aicore__ inline int64_t asc_get_squeeze_status() { return get_ar(); }

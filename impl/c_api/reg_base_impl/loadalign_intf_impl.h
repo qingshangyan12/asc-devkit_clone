@@ -22,6 +22,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/loadalign_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "impl/c_api/reg_base_impl/npu_arch_5102/loadalign_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src)

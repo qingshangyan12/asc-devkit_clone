@@ -21,6 +21,8 @@
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_mx_sync(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -30,8 +32,11 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_mx and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_mx_sync(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -41,8 +46,11 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -52,8 +60,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -63,8 +74,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -74,8 +88,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -85,8 +102,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -96,8 +116,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -107,8 +130,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -118,8 +144,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -129,8 +158,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -140,8 +172,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -151,8 +186,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -162,8 +200,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -173,8 +214,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -184,8 +228,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -195,8 +242,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -206,8 +256,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -217,8 +270,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -228,8 +284,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -239,8 +298,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -250,8 +312,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -261,8 +326,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -272,8 +340,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -283,8 +354,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -294,8 +368,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -305,8 +382,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -316,8 +396,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -327,8 +410,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -338,8 +424,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -349,8 +438,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -360,8 +452,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(
     __ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -371,8 +466,11 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -382,8 +480,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -393,8 +494,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -404,8 +508,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -415,8 +522,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -426,8 +536,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -437,8 +550,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -448,8 +564,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -459,8 +578,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -470,8 +592,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -481,8 +606,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -492,8 +620,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -503,8 +634,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -514,8 +648,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -525,8 +662,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -536,8 +676,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -547,8 +690,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -558,8 +704,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -569,8 +718,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -580,8 +732,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -591,8 +746,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -602,8 +760,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -613,8 +774,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -624,8 +788,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -635,8 +802,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -646,8 +816,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -657,8 +830,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -668,8 +844,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -679,8 +858,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -690,8 +872,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride)
@@ -701,8 +886,11 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -712,8 +900,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -723,8 +914,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -734,8 +928,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -745,8 +942,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -756,8 +956,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -767,8 +970,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -778,8 +984,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -789,8 +998,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -800,8 +1012,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -811,8 +1026,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -822,8 +1040,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -833,8 +1054,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -846,8 +1070,11 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -861,8 +1088,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -876,8 +1106,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -891,8 +1124,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -906,8 +1142,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -921,8 +1160,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -936,8 +1178,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -951,8 +1196,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -966,8 +1214,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -981,8 +1232,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -996,8 +1250,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1011,8 +1268,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1026,8 +1286,11 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1041,8 +1304,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1056,8 +1322,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1071,8 +1340,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1086,8 +1358,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1101,8 +1376,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1116,8 +1394,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1131,8 +1412,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1146,8 +1430,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1161,8 +1448,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1176,8 +1466,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1191,8 +1484,11 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1206,6 +1502,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
@@ -1647,6 +1944,8 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12fb and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1656,8 +1955,11 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12ub and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12ub_sync(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap)
@@ -1667,8 +1969,11 @@ __aicore__ inline void asc_copy_l12ub_sync(
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1678,8 +1983,11 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1689,8 +1997,11 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* sr
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1700,8 +2011,11 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uin
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1711,8 +2025,11 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, ui
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
+
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
 {
     if ASC_IS_AIC {
@@ -1722,6 +2039,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, 
         asc_sync_post_process();
     }
 }
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
