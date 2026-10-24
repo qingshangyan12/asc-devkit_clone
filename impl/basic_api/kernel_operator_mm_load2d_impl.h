@@ -94,7 +94,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     } else if (dstScope == Hardware::L0B) {
         LoadData2DGM2L0BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
     } else if (dstScope == Hardware::L1) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
         const uint8_t cacheMode = ExtractCacheMode(src);
         LoadData2DGM2L1Cal(
             (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, cacheMode);
@@ -348,8 +348,15 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
         LoadData2DGM2L0BDecompCal(
             (__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataDecompParams);
     } else if (dstScope == Hardware::L1) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        LoadData2DGM2L1DecompCal(
+            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataDecompParams, cacheMode);
+#else
         LoadData2DGM2L1DecompCal(
             (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataDecompParams);
+#endif
+        
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported LoadData2DDecomp Dst!"); });
     }
