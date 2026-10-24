@@ -101,7 +101,7 @@ __aicore__ inline void TestFillDstDefaultMask()
 #define DATA_PADDING_TYPE_TESTS(DataType)         \
     DATA_PADDING_TEST(FillScalar, DataType)       \
     DATA_PADDING_TEST(FillRegTensor, DataType)    \
-    DATA_PADDING_TEST(FillDefaultMask, DataType) \
+    DATA_PADDING_TEST(FillDefaultMask, DataType)  \
     DATA_PADDING_TEST(FillDstScalar, DataType)    \
     DATA_PADDING_TEST(FillDstRegTensor, DataType) \
     DATA_PADDING_TEST(FillDstDefaultMask, DataType)

@@ -76,7 +76,8 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
  * applies the behavior specified by Mode. The result preserves the active-lane mask.
  */
 template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
-__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask = all_mask<T>());
+__simd_callee__ inline reg_tensor<T> fill(
+    reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask = all_mask<T>());
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.data_padding
@@ -97,7 +98,8 @@ __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, co
  * applies the behavior specified by Mode. The result preserves the active-lane mask.
  */
 template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
-__simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
+__simd_callee__ inline reg_tensor<T> fill(
+    reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
 } // namespace te
 } // namespace asc
