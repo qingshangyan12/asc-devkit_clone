@@ -88,3 +88,35 @@ TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(
 
 #undef MOCK_COPY_UB2GM_ALIGN
 #undef TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN
+
+TEST(TestVectorDatamoveCopyUB2GMALIGN_fp8_e8m0_t_CApi, asc_copy_ub2gm_align_CopyConfig_Succ)
+{
+    auto dst = reinterpret_cast<__gm__ fp8_e8m0_t*>(11);
+    auto src = reinterpret_cast<__ubuf__ fp8_e8m0_t*>(22);
+    MOCKER_CPP(
+        copy_ubuf_to_gm_align_v2,
+        void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
+        .times(1)
+        .with(eq(static_cast<void*>(dst)), eq(static_cast<void*>(src)), eq(static_cast<uint8_t>(0)),
+              eq(static_cast<uint32_t>(2)), eq(static_cast<uint32_t>(44)), eq(static_cast<uint8_t>(1)),
+              eq(static_cast<uint64_t>(96)), eq(static_cast<uint32_t>(64)))
+        .will(ignoreReturnValue());
+    asc_copy_ub2gm_align(dst, src, 2, 44, static_cast<asc_store_l2_cache_mode>(1), 96, 64);
+    GlobalMockObject::verify();
+}
+
+TEST(TestVectorDatamoveCopyUB2GMALIGN_fp8_e8m0_t_CApi, asc_copy_ub2gm_align_size_Succ)
+{
+    auto dst = reinterpret_cast<__gm__ fp8_e8m0_t*>(11);
+    auto src = reinterpret_cast<__ubuf__ fp8_e8m0_t*>(22);
+    MOCKER_CPP(
+        copy_ubuf_to_gm_align_v2,
+        void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
+        .times(1)
+        .with(eq(static_cast<void*>(dst)), eq(static_cast<void*>(src)), eq(static_cast<uint8_t>(0)),
+              eq(static_cast<uint32_t>(1)), eq(static_cast<uint32_t>(44)), eq(static_cast<uint8_t>(0)),
+              eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
+        .will(ignoreReturnValue());
+    asc_copy_ub2gm_align(dst, src, 44);
+    GlobalMockObject::verify();
+}

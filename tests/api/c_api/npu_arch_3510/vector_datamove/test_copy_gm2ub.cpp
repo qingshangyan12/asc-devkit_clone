@@ -75,7 +75,7 @@ TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_CopyConfig_Succ)
         .times(1)
         .will(invoke(copy_gm_to_ubuf_align_v2_ConfigStub));
     asc_copy_gm2ub(
-        dst, src, static_cast<uint16_t>(1), static_cast<uint16_t>(1), static_cast<uint16_t>(0),
+        dst, src, static_cast<uint32_t>(1), static_cast<uint32_t>(1), static_cast<uint16_t>(0),
         static_cast<uint16_t>(0));
     GlobalMockObject::verify();
 }
@@ -106,4 +106,44 @@ TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_sync_Succ)
         .will(invoke(copy_gm_to_ubuf_align_v2_SizeStub));
     asc_copy_gm2ub_sync(dst, src, kCopySize);
     GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_LargeBursts_Succ)
+{
+    auto dst = reinterpret_cast<__ubuf__ uint8_t*>(11);
+    auto src = reinterpret_cast<__gm__ uint8_t*>(22);
+    const uint32_t burst_params[][2] = {{65535, 65536}, {65536, 65535}, {2097151, 2097151}};
+    for (const auto& params : burst_params) {
+        MOCKER_CPP(
+            copy_gm_to_ubuf_align_v2,
+            void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool,
+                     uint8_t, uint64_t, uint32_t))
+            .times(1)
+            .with(eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(params[0]), eq(params[1]),
+                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint8_t>(0)), eq(false),
+                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
+            .will(ignoreReturnValue());
+        asc_copy_gm2ub(dst, src, params[0], params[1], static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+        GlobalMockObject::verify();
+    }
+}
+
+TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_LargeSize_Succ)
+{
+    auto dst = reinterpret_cast<__ubuf__ uint8_t*>(11);
+    auto src = reinterpret_cast<__gm__ uint8_t*>(22);
+    const uint32_t copy_sizes[] = {65535, 65536, 2097151};
+    for (uint32_t size : copy_sizes) {
+        MOCKER_CPP(
+            copy_gm_to_ubuf_align_v2,
+            void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool,
+                     uint8_t, uint64_t, uint32_t))
+            .times(1)
+            .with(eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(static_cast<uint32_t>(1)), eq(size),
+                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint8_t>(0)), eq(false),
+                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
+            .will(ignoreReturnValue());
+        asc_copy_gm2ub(dst, src, size);
+        GlobalMockObject::verify();
+    }
 }
