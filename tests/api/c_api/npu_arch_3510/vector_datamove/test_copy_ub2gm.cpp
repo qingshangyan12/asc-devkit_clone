@@ -105,8 +105,9 @@ TEST_F(TestVectorDatamoveCopyUB2GMCApi, asc_copy_ub2gm_LargeBursts_Succ)
             copy_ubuf_to_gm_align_v2,
             void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
             .times(1)
-            .with(eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(params[0]), eq(params[1]),
-                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
+            .with(
+                eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(params[0]), eq(params[1]),
+                eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
             .will(ignoreReturnValue());
         asc_copy_ub2gm(dst, src, params[0], params[1], static_cast<uint16_t>(0), static_cast<uint16_t>(0));
         GlobalMockObject::verify();
@@ -123,8 +124,9 @@ TEST_F(TestVectorDatamoveCopyUB2GMCApi, asc_copy_ub2gm_LargeSize_Succ)
             copy_ubuf_to_gm_align_v2,
             void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
             .times(1)
-            .with(eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(static_cast<uint32_t>(1)), eq(size),
-                  eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
+            .with(
+                eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(static_cast<uint32_t>(1)), eq(size),
+                eq(static_cast<uint8_t>(0)), eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
             .will(ignoreReturnValue());
         asc_copy_ub2gm(dst, src, size);
         GlobalMockObject::verify();
