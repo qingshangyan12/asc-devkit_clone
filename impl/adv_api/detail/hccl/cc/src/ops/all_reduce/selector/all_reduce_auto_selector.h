@@ -20,11 +20,6 @@ private:
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
         std::string& selectAlgName) const override;
-    SelectorStatus SelectMeshAlgoAicpu(
-        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const;
-    SelectorStatus SelectMeshAlgoAicpuUBX(
-        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, const u64 dataSize,
-        std::string& selectAlgName, bool isDataTypeOrReduceTypeSpecial) const;
     SelectorStatus SelectCcuScheduleAlgo(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
