@@ -117,6 +117,7 @@ Kirin X90处理器系列产品，支持的数据类型为：half、float。
 <!-- npu="9030" id16 -->
 Kirin 9030处理器系列产品，支持的数据类型为：half、float。
 <!-- end id16 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/FusedMulAdd_res.md#id2 -->
 
 <!-- npu="9020" id24 -->
 Kirin 9020处理器系列产品，支持的数据类型为：half、float。
@@ -152,6 +153,7 @@ Kirin 9020处理器系列产品，支持的数据类型为：half、float。
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id22 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/FusedMulAdd_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

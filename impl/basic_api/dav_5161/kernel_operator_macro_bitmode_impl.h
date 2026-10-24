@@ -601,6 +601,87 @@ struct MmadFixBitModeConfig0 {
     __aicore__ inline bool GetLayoutCtrl() const { return layoutCtrl != 0; };
     __aicore__ inline uint16_t GetN() const { return n; };
 };
+
+struct PostProcBitModeConfig0 {
+    uint64_t reserved0 : 1;
+    uint64_t reserved1 : 1;
+    uint64_t preQuantMode : 5;
+    uint64_t actPreMode : 3;
+    uint64_t postQuantMode : 5;
+    uint64_t reserved2 : 3;
+    uint64_t preClipReluMode : 1;
+    uint64_t reserved3 : 1;
+    uint64_t eltwiseOp : 3;
+    uint64_t eltwiseAntiqEnable : 1;
+    uint64_t eltwiseBroadcastEnable : 1;
+    uint64_t reserved4 : 1;
+    uint64_t reserved5 : 1;
+    uint64_t reserved6 : 1;
+    uint64_t lsbMask : 3;
+    uint64_t reserved7 : 1;
+    uint64_t reserved8 : 1;
+    uint64_t reserved9 : 1;
+    uint64_t reserved10 : 1;
+    uint64_t reserved11 : 1;
+    uint64_t dependEnable : 1;
+    uint64_t instrId : 2;
+    uint64_t reserved12 : 9;
+    uint64_t n : 16;
+
+    __aicore__ inline void Init(const PostProcParams& params)
+    {
+        preQuantMode = static_cast<uint8_t>(params.preQuantMode);
+        actPreMode = params.actPreMode;
+        postQuantMode = static_cast<uint8_t>(params.postQuantMode);
+        preClipReluMode = static_cast<uint8_t>(params.preClipReluMode);
+        eltwiseOp = static_cast<uint8_t>(params.eltwiseOp);
+        eltwiseAntiqEnable = params.eltwiseAntiqEnable ? 1 : 0;
+        eltwiseBroadcastEnable = params.eltwiseBroadcastEnable ? 1 : 0;
+        lsbMask = static_cast<uint8_t>(params.lsbMask);
+        dependEnable = params.dependEnable ? 1 : 0;
+        instrId = static_cast<uint8_t>(params.instrId);
+        n = params.n;
+    }
+
+    __aicore__ inline void SetPreQuantMode(pre_quant_t preQuantMode_)
+    {
+        preQuantMode = static_cast<uint8_t>(preQuantMode_);
+    };
+    __aicore__ inline void SetActPreMode(uint8_t actPreMode_) { actPreMode = actPreMode_; };
+    __aicore__ inline void SetPostQuantMode(post_quant_t postQuantMode_)
+    {
+        postQuantMode = static_cast<uint8_t>(postQuantMode_);
+    };
+    __aicore__ inline void SetPreClipReluMode(uint8_t preClipReluMode_)
+    {
+        preClipReluMode = static_cast<uint8_t>(preClipReluMode_);
+    };
+    __aicore__ inline void SetEltwiseOp(eltwise_op_t eltwiseOp_) { eltwiseOp = static_cast<uint8_t>(eltwiseOp_); };
+    __aicore__ inline void SetEltwiseAntiqEnable(bool eltwiseAntiqEnable_)
+    {
+        eltwiseAntiqEnable = eltwiseAntiqEnable_ ? 1 : 0;
+    };
+    __aicore__ inline void SetEltwiseBroadcastEnable(bool eltwiseBroadcastEnable_)
+    {
+        eltwiseBroadcastEnable = eltwiseBroadcastEnable_ ? 1 : 0;
+    };
+    __aicore__ inline void SetLsbMask(lsb_mask_t lsbMask_) { lsbMask = static_cast<uint8_t>(lsbMask_); };
+    __aicore__ inline void SetDependEnable(bool dependEnable_) { dependEnable = dependEnable_ ? 1 : 0; };
+    __aicore__ inline void SetInstrId(instr_id_t instrId_) { instrId = static_cast<uint8_t>(instrId_); };
+    __aicore__ inline void SetN(uint16_t n_) { n = n_; };
+
+    __aicore__ inline pre_quant_t GetPreQuantMode() const { return static_cast<pre_quant_t>(preQuantMode); };
+    __aicore__ inline uint8_t GetActPreMode() const { return actPreMode; };
+    __aicore__ inline post_quant_t GetPostQuantMode() const { return static_cast<post_quant_t>(postQuantMode); };
+    __aicore__ inline uint8_t GetPreClipReluMode() const { return static_cast<uint8_t>(preClipReluMode); };
+    __aicore__ inline eltwise_op_t GetEltwiseOp() const { return static_cast<eltwise_op_t>(eltwiseOp); };
+    __aicore__ inline bool GetEltwiseAntiqEnable() const { return eltwiseAntiqEnable != 0; };
+    __aicore__ inline bool GetEltwiseBroadcastEnable() const { return eltwiseBroadcastEnable != 0; };
+    __aicore__ inline lsb_mask_t GetLsbMask() const { return static_cast<lsb_mask_t>(lsbMask); };
+    __aicore__ inline bool GetDependEnable() const { return dependEnable != 0; };
+    __aicore__ inline instr_id_t GetInstrId() const { return static_cast<instr_id_t>(instrId); };
+    __aicore__ inline uint16_t GetN() const { return n; };
+};
 } // namespace AscendC
 
 #endif // __NPU_ARCH__

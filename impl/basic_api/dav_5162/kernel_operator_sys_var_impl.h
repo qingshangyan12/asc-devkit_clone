@@ -24,32 +24,11 @@
 
 namespace AscendC {
 
-__aicore__ inline int64_t GetSubBlockIdxImpl()
-{
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return 0;
-#else
-    return 0;
-#endif
-}
+__aicore__ inline int64_t GetSubBlockIdxImpl() { return 0; }
 
-__aicore__ inline int64_t GetTaskRationImpl()
-{
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return g_taskRation;
-#else
-    return get_subblockdim();
-#endif
-}
+__aicore__ inline int64_t GetTaskRationImpl() { return 0; }
 
-__aicore__ inline int64_t TscmGetTaskRation()
-{
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return g_taskRation;
-#else
-    return get_subblockdim();
-#endif
-}
+__aicore__ inline int64_t TscmGetTaskRation() { return 0; }
 
 __aicore__ inline int64_t GetBlockIdxImpl()
 {
@@ -62,14 +41,7 @@ __aicore__ inline int64_t GetBlockIdxImpl()
 
 __aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion) { coreVersion = 5162U; }
 
-__aicore__ inline int64_t GetSubBlockNumImpl()
-{
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return g_taskRation;
-#else
-    return get_subblockdim();
-#endif
-}
+__aicore__ inline int64_t GetSubBlockNumImpl() { return 0; }
 
 __aicore__ inline int64_t GetProgramCounterImpl()
 {

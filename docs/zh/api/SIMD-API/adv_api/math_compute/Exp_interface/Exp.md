@@ -27,21 +27,21 @@
 
 按元素取自然指数，用户可以选择是否使用泰勒展开公式进行计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002223675753.png)
+![](../../../../figures/formulaimage_0000002223675753.png)
 
 -   设置泰勒展开项数为0，即不使用泰勒展开公式进行计算，公式如下：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224083545.png)
+    ![](../../../../figures/formulaimage_0000002224083545.png)
 
 -   设置泰勒展开项数不为0，即使用泰勒展开公式进行计算，公式如下：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224085413.png)
+    ![](../../../../figures/formulaimage_0000002224085413.png)
 
     xA<sub>i</sub>代表源操作数的整数部分，该值通过floor\(x\)获取。xB<sub>i</sub>代表源操作数的小数部分。
 
 泰勒展开公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002224089565.png)
+![](../../../../figures/formulaimage_0000002224089565.png)
 
 ## 函数原型
 

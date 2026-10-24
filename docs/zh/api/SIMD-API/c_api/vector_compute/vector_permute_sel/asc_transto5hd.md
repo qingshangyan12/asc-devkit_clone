@@ -129,9 +129,9 @@ constexpr uint32_t TOTAL_ELEMENTS = 2 * 32 * 16 * 16;
 constexpr uint32_t OFFSET = 16 * 16 * 16;
 
 __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
-                                              __gm__ uint16_t* matrix_in,
-                                              __gm__ uint16_t* layout_out,
-                                              __gm__ uint16_t* layout_in)
+                                             __gm__ uint16_t* matrix_in,
+                                             __gm__ uint16_t* layout_out,
+                                             __gm__ uint16_t* layout_in)
 {
     asc_init();
     __ubuf__ uint16_t src[TOTAL_ELEMENTS];
@@ -141,7 +141,9 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
 
     // 场景一：一次repeat完成16x16矩阵转置，stride为0时从地址列表起点读取。
     asc_copy_gm2ub_align(src, matrix_in, MATRIX_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte2(0);
+    // 转置前等待矩阵数据搬入完成。
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     for (int i = 0; i < 16; ++i) {
         src_list[i] = reinterpret_cast<__ubuf__ half*>(src + i * 16);
         dst_list[i] = reinterpret_cast<__ubuf__ half*>(dst + i * 16);
@@ -153,13 +155,21 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
     asc_set_va_reg(VA2, src_list);
     asc_set_va_reg(VA3, src_list + 8);
     asc_transto5hd_b16(VA0, VA2, 1, 0, 0);
-    asc_sync_vec(0);
+    // 搬出矩阵前等待转置完成。
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(matrix_out, dst, MATRIX_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte3(0);
 
     // 场景二：N=2、C=32、H=W=16，四组C0=16通道分别处理。
+    // 等待前一次转置完成，再复用src和地址列表。
+    asc_sync_notify(PIPE_V, PIPE_S, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_S, EVENT_ID0);
     asc_copy_gm2ub_align(src, layout_in, TOTAL_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte2(0);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    // 重新写入dst前，等待前一次矩阵搬出读取dst完成。
+    asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
     for (int j = 0; j < 4; ++j) {
         for (int i = 0; i < 16; ++i) {
             src_list[i] = reinterpret_cast<__ubuf__ half*>(src + OFFSET * j + i * 16 * 16);
@@ -173,10 +183,16 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
         asc_set_va_reg(VA3, src_list + 8);
         // 16次repeat沿HW方向推进，src_stride=1、dst_stride=16，单位均为DataBlock。
         asc_transto5hd_b16(VA0, VA2, 16, 16, 1);
+        if (j < 3) {
+            // 下一组将改写地址列表，需先等待PIPE_V消费本组地址完成。
+            asc_sync_notify(PIPE_V, PIPE_S, EVENT_ID0);
+            asc_sync_wait(PIPE_V, PIPE_S, EVENT_ID0);
+        }
     }
-    asc_sync_vec(0);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(layout_out, dst, TOTAL_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void check(aclError status, const char* operation)

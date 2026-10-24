@@ -120,6 +120,7 @@
 <!-- end id34 -->
 
 目的操作数与源操作数的数据类型需要保持一致。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReducePairElem_res.md#id2 -->
 
 ## 返回值说明
 
@@ -179,6 +180,7 @@
     <!-- end id27 -->
   <!-- end id25 -->
 <!-- end id20 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReducePairElem_res.md#id3 -->
 
 ## 调用示例
 

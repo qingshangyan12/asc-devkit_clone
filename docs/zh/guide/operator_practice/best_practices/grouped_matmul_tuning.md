@@ -126,11 +126,11 @@ for i in range(g):
 -   Vector计算bound，当前为减少核启动开销设置为1:1；
 -   实际优化过程中，对上述问题进行优化、Vector计算占比下降后，Cube和Vector计算各自都有间隙，相互之间都有等待耗时；
 
-    ![](../../figures/zh-cn_image_0000002110163600.png)
+    ![](../../figures/image_0000002110163600.png)
 
 -   Vector计算没有开启double buffer，计算和数据搬运部分没有并行。
 
-    ![](../../figures/zh-cn_image_0000002145980193.png)
+    ![](../../figures/image_0000002145980193.png)
 
 ## 设计优化方案<a name="section7611135813517"></a>
 
@@ -209,7 +209,7 @@ for i in range(g):
 
 -   将AI Core中的AIC和AIV启动比例设置为1:2后，执行总耗时从218.1us下降为154.2us。指令流水图显示Cube计算间等待变小。
 
-    ![](../../figures/zh-cn_image_0000002085555866.png)
+    ![](../../figures/image_0000002085555866.png)
 
 -   如上图所示，Vector计算已经不处于bound状态，但Cube和Vector计算都有间隙，未被充分利用（上述两个箭头的位置）。分析原因如下：
 
@@ -225,11 +225,11 @@ for i in range(g):
 
     优化后，总耗时由154.2us下降为131.8us。指令流水图显示Vector、Cube计算各自间隙明显减小。
 
-    ![](../../figures/zh-cn_image_0000002085558494.png)
+    ![](../../figures/image_0000002085558494.png)
 
 -   Vector计算开启double buffer，优化后执行总耗时从131.8us下降为128.1us。
 
-    ![](../../figures/zh-cn_image_0000002121330009.png)
+    ![](../../figures/image_0000002121330009.png)
 
 ## 总结<a name="section15200958526"></a>
 

@@ -29,15 +29,15 @@
 
 按元素判断输入的浮点数是否为±INF，输出结果为浮点数或布尔值。当输出为浮点类型时，对于±INF的输入数据，对应位置的结果为浮点类型的1，反之为0；当输出为bool类型时，对于±INF的输入数据，对应位置的结果为true，反之为false。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002382902989.png)
+![](../../../../figures/formulaimage_0000002382902989.png)
 
 -   当输出为浮点类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002386808777.png)
+    ![](../../../../figures/formulaimage_0000002386808777.png)
 
 -   当输出为bool类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002386809017.png)
+    ![](../../../../figures/formulaimage_0000002386809017.png)
 
 ## 函数原型
 

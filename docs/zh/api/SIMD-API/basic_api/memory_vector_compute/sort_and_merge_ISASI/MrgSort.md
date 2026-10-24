@@ -77,6 +77,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 ## 数据类型
 
 操作数支持的数据类型为：half/float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort_res.md#id2 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -99,11 +100,14 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
     - 针对Ascend 950PR&950DT系列产品，当参数repeatTimes取值为0时，不保证该接口被视为NOP（空操作）。
     <!-- end id11 -->
 <!-- end id12 -->
+
 <!-- npu="x90,9020,9030" id16 -->
 - 针对Kirin 9020处理器系列产品，支持数据类型为：half。
 - 针对Kirin 9030处理器系列产品，支持数据类型为：half。
 - 针对Kirin X90处理器系列产品，支持数据类型为：half。
 <!-- end id16 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort_res.md#id3 -->
+
 
 
 ## 调用示例<a name="section642mcpsimp"></a>

@@ -310,7 +310,9 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                     selectAlgName = "InsAllGatherMesh1D";
                 }
             } else if (isClosNumMultipleOfMeshNum && dataSize > SMALL_COUNT_512KB) {
-                selectAlgName = "InsAllGatherParallelMesh1DNHRMultiJetty";
+                // 对齐 hccl :394-396: <16MB 走 MultiJetty，≥16MB 走 PipeLineMeshNHR
+                selectAlgName = (dataSize < OMNI_UBX_AG_DATA_SIZE) ? "InsAllGatherParallelMesh1DNHRMultiJetty" :
+                                                                     "AicpuAllGatherPipeLineMeshNHR";
             } else {
                 selectAlgName = "AicpuAllGatherSoleNHR";
             }

@@ -27,9 +27,9 @@
 
 实现按元素做幂运算功能，提供3类接口，处理逻辑如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218328733.png)
+![](../../../../figures/formulaimage_0000002218328733.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002192030526.png)
+![](../../../../figures/formulaimage_0000002192030526.png)
 
 ## 函数原型
 

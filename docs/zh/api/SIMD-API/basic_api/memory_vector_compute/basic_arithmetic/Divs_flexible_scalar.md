@@ -97,6 +97,7 @@ $dst_i = scalar \div src_i$
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为half、float、complex32、int64_t、uint64_t、complex64。其中complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
+
 <!-- npu="9020" id13 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id13 -->
@@ -106,6 +107,8 @@ $dst_i = scalar \div src_i$
 <!-- npu="x90" id15 -->
 - 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id15 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Divs_flexible_scalar_res.md#id2 -->
+
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -133,6 +136,7 @@ $dst_i = scalar \div src_i$
     - --cce-ftz=false时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
     - --cce-ftz=true时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Divs_flexible_scalar_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

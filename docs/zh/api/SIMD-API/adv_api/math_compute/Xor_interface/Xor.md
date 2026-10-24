@@ -32,9 +32,9 @@
 
 计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002342367301.png)
+![](../../../../figures/formulaimage_0000002342367301.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188545700.png)
+![](../../../../figures/formulaimage_0000002188545700.png)
 
 ```
 例如：3^5=6，即0000 0011^0000 0101 = 0000 0110

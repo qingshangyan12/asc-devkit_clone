@@ -149,6 +149,7 @@ $$
 | half               | uint8_t     |
 
 <!-- end id12 -->
+
 <!-- npu="x90" id22 -->
 
 **表**  Kirin X90处理器系列产品数据类型组合情况
@@ -179,6 +180,8 @@ $$
 | half               | uint8_t     |
 
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulCast_res.md#id2 -->
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
@@ -209,6 +212,7 @@ $$
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulCast_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

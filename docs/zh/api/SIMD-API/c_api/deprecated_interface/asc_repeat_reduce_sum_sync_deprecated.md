@@ -78,16 +78,8 @@ __ubuf__ half src[total_length];
 constexpr uint32_t dst_length = 2;
 __ubuf__ half dst[dst_length];
 
-// 使用高维切分计算接口，需设置mask
-asc_set_mask_norm();
-asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个迭代内所有元素均参与计算。
-
-uint8_t repeat = 2;
-// 单位为2字节，连续存放
-uint16_t dst_repeat_stride = 1;
-uint16_t src_block_stride = 1;
-uint16_t src_repeat_stride = 8;
-asc_repeat_reduce_sum_sync(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
+// 同步接口使用 count 指定参与计算的元素总数，无需手动设置 mask。
+asc_repeat_reduce_sum_sync(dst, src, total_length);
 ```
 
 结果示例：

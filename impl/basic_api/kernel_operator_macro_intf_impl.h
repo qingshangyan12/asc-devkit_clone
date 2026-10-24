@@ -21,8 +21,8 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_reg.h"
@@ -208,6 +208,19 @@ __aicore__ inline void MmadMxFix(
     const MmadFixParams& mmadFixParams)
 {
     MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProc(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params)
+{
+    PostProcImpl(dst, src, params);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params)
+{
+    PostProcImpl(dst, src, params);
 }
 } // namespace AscendC
 

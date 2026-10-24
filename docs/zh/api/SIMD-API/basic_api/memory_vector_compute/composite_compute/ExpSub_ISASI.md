@@ -77,6 +77,7 @@ __aicore__ inline void ExpSub(const LocalTensor<T>& dst, const LocalTensor<U>& s
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，T和U支持的数据类型为：half、float。
 <!-- end id8 -->
+
 <!-- npu="x90" id13 -->
 针对Kirin X90处理器系列产品，支持的数据类型为：half、float。
 <!-- end id13 -->
@@ -86,6 +87,8 @@ Ascend 950PR&950DT系列产品，T和U支持的数据类型为：half、float。
 <!-- npu="9020" id15 -->
 针对Kirin 9020处理器系列产品，支持的数据类型为：half、float。
 <!-- end id15 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/ExpSub_ISASI_res.md#id2 -->
+
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -100,6 +103,7 @@ Ascend 950PR&950DT系列产品，T和U支持的数据类型为：half、float。
 <!-- npu="950" id9 -->
 - 该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/ExpSub_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

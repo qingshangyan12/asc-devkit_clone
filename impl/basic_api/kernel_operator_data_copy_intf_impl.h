@@ -123,8 +123,8 @@ __aicore__ inline void CheckNd2NzParams(Nd2NzParams params, const __gm__ char* m
  * @param [in] intriParams.dstNzNStride stride of n between 2 C0 in L1
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || \
     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <typename T, bool enableSmallC0>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
@@ -196,8 +196,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
         DataCopyGM2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
 #endif
     } else if (dstHWPos == Hardware::UB) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || \
     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         DataCopyGM2UBND2NZImpl(
             (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -1196,6 +1196,24 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif // ASCENDC_CPU_DEBUG
 }
 
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
+{
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    if (srcHWPos == Hardware::L1 && dstHWPos == Hardware::UB) {
+        DataCopyL12UBNZ2NDImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+        return;
+    }
+    ASCENDC_CHECK_TPOSITION(
+        false, "src/dst", "L1/UB", "DataCopy with Nz2DnParamsFull",
+        GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+}
+#endif
+
 /*
  * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2dn, applicable to simulated cube data(such as data from l0c, 16*16)
@@ -1205,7 +1223,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #if defined(__NPU_ARCH__) && \
     ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+__aicore__ inline void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2DnParamsFull& intriParams)
 {
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
@@ -1214,7 +1232,22 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         return;
     }
     ASCENDC_CHECK_TPOSITION(
-        false, "src", "UB(VECOUT)", "DataCopy with Nz2DnParamsFull",
+        false, "src", "L1", "DataCopy with Nz2DnParamsFull",
+        GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+}
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nz2DnParamsFull& intriParams)
+{
+    const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+    const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+    if (srcHWPos == Hardware::L1 && dstHWPos == Hardware::UB) {
+        DataCopyL12UBNZ2DNImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+        return;
+    }
+    ASCENDC_CHECK_TPOSITION(
+        false, "src/dst", "L1/UB", "DataCopy with Nz2DnParamsFull",
         GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
 }
 #endif
@@ -1657,7 +1690,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
-template <typename T, PaddingMode mode>
+template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
     const DataCopyPadParams& padParams)
@@ -1702,7 +1735,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     }
 }
 
-template <typename T, PaddingMode mode>
+template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& dataCopyParams)
 {
@@ -2404,7 +2437,7 @@ __aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
 #endif
 }
 
-template <typename T, PaddingMode mode>
+template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
     const DataCopyPadParams& padParams, const bool enablePreReadIgnoreSync)

@@ -29,7 +29,7 @@
 
 获取输入数据`x`的平方根。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816361.png)
+![](../../../figures/formulaimage_0000002516816361.png)
 
 ## 函数原型
 

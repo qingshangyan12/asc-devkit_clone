@@ -27,9 +27,9 @@
 
 按元素计算两个浮点数平方和的平方根。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002259196489.png)
+![](../../../../figures/formulaimage_0000002259196489.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002259356401.png)
+![](../../../../figures/formulaimage_0000002259356401.png)
 
 举例如下：
 

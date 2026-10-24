@@ -115,6 +115,7 @@ Atlas 200I/500 A2推理产品，支持的数据类型为half、float。
 <!-- npu="310p" id12 -->
 Atlas推理系列产品AI Core，支持的数据类型为：int16_t、half、float。
 <!-- end id12 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/SubRelu_res.md#id2 -->
 
 <!-- npu="x90" id22 -->
 针对Kirin X90处理器系列产品，支持的数据类型为：int16_t、half、float。
@@ -155,6 +156,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、half、flo
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/SubRelu_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

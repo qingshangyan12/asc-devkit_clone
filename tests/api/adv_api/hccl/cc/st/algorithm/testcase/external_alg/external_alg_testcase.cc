@@ -179,7 +179,7 @@ const HcclCMDType COLL_CMDS[] = {
 
 // 不变量：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
-// 52 行 sidecar——按 cmd 分布：AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3。
+// 53 行 sidecar——按 cmd 分布：AG 16 / RS 18 / AR 9 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 {
     for (HcclCMDType cmd : COLL_CMDS) {
@@ -194,13 +194,13 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
-    // 各 cmd 精确分布锚（AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3 = 52），失败时定位更直接
-    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 15U);
+    // 各 cmd 精确分布锚（AG 16 / RS 18 / AR 9 / A2A 7 / A2AV 3 = 53），失败时定位更直接
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 16U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 18U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLREDUCE).size(), 9U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALL).size(), 7U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALLV).size(), 3U);
-    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：52 行精确锚
+    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：53 行精确锚
     size_t total = 0;
     for (HcclCMDType cmd : COLL_CMDS) {
         for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
@@ -209,7 +209,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
             }
         }
     }
-    EXPECT_EQ(total, 52U);
+    EXPECT_EQ(total, 53U);
 }
 
 // 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
@@ -218,7 +218,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
-    ASSERT_FALSE(rows.empty()); // 全量编译目标：51 行产品 sidecar + 测试夹具
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：52 行产品 sidecar + 测试夹具
     for (const AlgMetaRow& row : rows) {
         ExternalAlgSpec spec;
         std::string errMsg;
@@ -631,7 +631,7 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：32 个 (op,外部名) 键（52 行归并；MultiLink
+    // 覆盖数锚（限 5 个集合通信 CMD）：32 个 (op,外部名) 键（53 行归并；MultiLink
     // 外部名修正为 sole[nhr.multi_channel] 后自 AG sole[nhr] 键分立，新增该键）；
     // 42 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。

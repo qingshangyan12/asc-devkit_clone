@@ -183,6 +183,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half         | half         | float       | 64   |
 
 <!-- end id16 -->
+
 <!-- npu="9020" id24 -->
 
 **表**  Kirin 9020处理器系列产品支持的数据类型约束
@@ -194,6 +195,8 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half         | half         | float       | 32   |
 
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulAddDst_res.md#id2 -->
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
@@ -226,6 +229,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id22 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulAddDst_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

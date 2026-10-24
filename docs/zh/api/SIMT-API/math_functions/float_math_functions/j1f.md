@@ -29,7 +29,7 @@
 
 获取输入数据x的1阶第一类贝塞尔函数j1的值。
 
-![](../../../figures/zh-cn_formulaimage_0000002516816387.png)
+![](../../../figures/formulaimage_0000002516816387.png)
 
 ## 函数原型
 

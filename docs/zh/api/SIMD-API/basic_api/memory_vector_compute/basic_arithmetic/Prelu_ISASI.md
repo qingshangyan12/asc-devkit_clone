@@ -70,6 +70,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为half、float。
 <!-- end id8 -->
+
 <!-- npu="9020" id12 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id12 -->
@@ -79,6 +80,8 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 <!-- npu="x90" id14 -->
 - 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id14 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Prelu_ISASI_res.md#id2 -->
+
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -88,6 +91,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Prelu_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

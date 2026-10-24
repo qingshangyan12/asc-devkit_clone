@@ -29,7 +29,7 @@
 
 获取输入uint32类型数据x和y乘积的高32位。
 
-![](../../../figures/zh-cn_formulaimage_0000002531050526.png)
+![](../../../figures/formulaimage_0000002531050526.png)
 
 ## 函数原型
 

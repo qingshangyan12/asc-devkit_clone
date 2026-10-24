@@ -119,6 +119,7 @@ Atlas 200I/500 A2推理产品，支持的数据类型为：int8_t、uint8_t、in
 <!-- npu="310p" id12 -->
 Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id12 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Gather_res.md#id2 -->
 
 <!-- npu="x90" id35 -->
 Kirin X90处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
@@ -203,6 +204,7 @@ Kirin 9030处理器系列产品，支持的数据类型为：int16_t、uint16_t�
   - Atlas推理系列产品AI Core
   <!-- end id31 -->
 <!-- end id28 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Gather_res.md#id3 -->
 
 
 ## 调用示例<a name="section11276201527"></a>

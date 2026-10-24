@@ -8,7 +8,7 @@
 
   Add算子的数学表达式为：
 
-  ![](../../../figures/zh-cn_formulaimage_0000002501241896.png)
+  ![](../../../figures/formulaimage_0000002501241896.png)
 
   计算逻辑为逐元素完成`z = x + y`。
 

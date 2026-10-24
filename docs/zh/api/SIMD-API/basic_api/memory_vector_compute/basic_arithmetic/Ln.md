@@ -154,6 +154,7 @@ $dst_i = \ln(src_i)$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id3 -->
 
 <!-- npu="9020" id28 -->
 - 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
@@ -194,6 +195,7 @@ T支持的数据类型为：half、float。
   - tensor高维切分计算占用8KB UB。
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 <!-- end id21 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id4 -->
 
 <!-- npu="950" id24 -->
 

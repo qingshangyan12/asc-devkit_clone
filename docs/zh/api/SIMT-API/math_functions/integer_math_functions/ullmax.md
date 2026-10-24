@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。
 
-![](../../../figures/zh-cn_formulaimage_0000002552510935.png)
+![](../../../figures/formulaimage_0000002552510935.png)
 
 ## 函数原型
 
