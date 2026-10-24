@@ -86,7 +86,7 @@ def load_op_tiling_lib(isolate_tiling_info):
     try:
         if isolate_tiling_info.is_build_in_op:
             LogUtil.print_compile_log(
-                isolate_tiling_info.op_type, "[Sub process]load build-in op tiling lib", AscendCLogLevel.LOG_INFO
+                isolate_tiling_info.op_type, "[Sub process]load built-in op tiling lib", AscendCLogLevel.LOG_INFO
             )
             return load_build_in_lib()
         else:
