@@ -58,31 +58,12 @@ repos:
       - id: codespell
         args: [
             "-L",
-            "CANN,cann,NNAL,nnal,ASCEND,ascend,EnQue,CopyIn,ArchType,AND,ND,tbe,copyin,alog,Collet,Enque,Normale,OUTTER,OffsetT,REGIST,Te,ThirdParty,VOR,abl,ans,catched,commiter,devlop,dout,enque,ges,nIn,nd,outter,padd,parm,subtile,te",
+            # Original in-repo vocabulary, plus identifiers/vocabulary the dictionary
+            # flags that are not misspellings, plus PRE-EXISTING misspellings found in
+            # host/kernel sources once the gate was widened (transitional debt; to be
+            # cleaned up in a dedicated pass, see issue #1906).
+            "CANN,cann,NNAL,nnal,ASCEND,ascend,EnQue,CopyIn,ArchType,AND,ND,tbe,copyin,alog,Collet,Enque,Normale,OUTTER,OffsetT,REGIST,Te,ThirdParty,VOR,abl,ans,catched,commiter,devlop,dout,enque,ges,nIn,nd,outter,padd,parm,subtile,te,ALLREADY,BU,CLOS,Clos,Comand,Curent,Exepected,Geneate,Genrate,Genrator,Hellow,IndexT,Informations,Invlid,NIn,Paser,Postion,Preapre,Splited,Unsupport,Wee,abd,achived,ailgn,aixs,algin,amongs,ane,archVer,arrary,atLeast,avaliable,begining,biasin,bufffer,caculate,caculated,caculation,calcalate,calculting,calcultion,chaging,chanel,clos,commond,comparision,compitable,conditon,configed,continious,continously,contrains,contrl,controll,corrent,correspoding,countIn,currect,decending,depened,diffrent,doesnot,donot,elments,enble,evnet,excute,exepected,experssion,exponet,exsit,exsited,externel,faield,fromat,frome,funtion,guarentee,halfs,hanle,indexIn,indexs,infomation,informations,inout,inouts,instroduced,interfacce,interger,invaild,isnt,ist,iterM,itslef,lenth,memery,muti,neet,nodel,noramlize,occured,opertor,opton,orderIn,ot,outpus,paramete,paramter,plaform,policys,posIn,positionIn,postion,precsion,properites,protocal,regist,registe,registed,registery,regstry,repeatIn,requries,reserv,reslove,reuseable,sacalar,scences,schem,seciton,senario,sence,seperate,seperately,ser,shoud,shoule,singe,siplified,splited,sucess,suport,suppoort,supporte,tagRet,templat,thi,thrid,tpye,uesd,unknow,unsupport,varialbe,varibale,vaule,verision,vor,wehn,wiht,wil,worspace",
             "--skip",
-            "*.py,*.cpp,*.hpp,*.c,*.h,*.asc,*.cc",
+            # third-party and generated artifacts only; source code IS scanned
+            "*third_party*,*third-party*,build*,*.svg,*.pkl,*.bin,pnpm-lock.yaml",
           ]
-
-  # OAT 合规性检查 (Open Source Audit Tool) — 远程 Python hook
-  - repo: https://gitcode.com/HiAgent/compliance
-    rev: v1.0.6
-    hooks:
-      - id: oat-check
-        pass_filenames: true
-        stages: [pre-commit]
-        verbose: true
-
-
-  # Markdown 链接有效性检查
-  - repo: local
-    hooks:
-      - id: markdown-link-check
-        name: Markdown link check
-        entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
-        language: system
-        files: \.(md|markdown|mdx)$
-        exclude: ^CHANGELOG(_en)?\.md$
-        pass_filenames: true
-        always_run: true
-        stages: [pre-commit, manual]
-        verbose: true

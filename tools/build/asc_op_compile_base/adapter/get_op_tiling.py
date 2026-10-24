@@ -571,11 +571,11 @@ def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_ke
 
     optype_tiling_def.class_def = get_dynamic_tiling_struct(optype_tiling_def, struct_tiling_def_base)
 
-    # all fields of substruct and file-item defination, just like dynamic shape scene
+    # all fields of substruct and file-item definition, just like dynamic shape scene
     codes = get_struct_shape(struct_tiling_def_base)
     if not is_optype_self:
         # when the tilingkey of this shape now use the special registered tilingkey struct, not optype struct
-        # then must add defination of optype struct itself, or has not defination
+        # then must add definition of optype struct itself, or has not definition
         codes += optype_tiling_def.class_def
     tiling_struct_dict = set()
     tiling_def_class_name = ""
@@ -589,7 +589,7 @@ def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_ke
             # when this static shape tilingkey registed special tilingkey and is just this tilingkey
             continue
         if tiling_def.class_name != tiling_def_class_name and tiling_def.class_name not in tiling_struct_dict:
-            # the defination of tilingkey-registed special struct
+            # the definition of tilingkey-registed special struct
             codes += tiling_def.class_def
             tiling_struct_dict.add(tiling_def.class_name)
     return codes
@@ -1655,7 +1655,7 @@ def get_info_by_traverse_py_stack(op_info: OpInfo, input_tiling_info_dict: dict)
             build_in_compile_file_dir = os.path.join(op_impl_path, "ai_core", "tbe", "impl")
             if build_in_compile_file_dir in op_compile_dir:
                 LogUtil.print_compile_log(
-                    op_info.op_type, "[Main process] Identified in Build-in online compile.", AscendCLogLevel.LOG_INFO
+                    op_info.op_type, "[Main process] Identified in Built-in online compile.", AscendCLogLevel.LOG_INFO
                 )
                 is_build_in_op = True
                 break

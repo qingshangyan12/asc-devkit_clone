@@ -30,7 +30,7 @@ uint16_t Bf16T::FloatToBf16(const float& fVal) const
         return BF16_ABS_MAX;
     }
     uint32_t expFp = Fp32ExtracExp(ui32Val);
-    uint32_t manFp = (ui32Val & FP32_MAN_MASK); // 23 bit mantissa dont't need to care about denormal
+    uint32_t manFp = (ui32Val & FP32_MAN_MASK); // 23 bit mantissa don't need to care about denormal
     manFp = (manFp | FP32_MAN_HIDE_BIT);
 
     uint32_t mLenDelta = FP32_MAN_LEN - BF16_MAN_LEN;
