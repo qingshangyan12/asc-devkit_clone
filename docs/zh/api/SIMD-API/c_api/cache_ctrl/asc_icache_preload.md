@@ -45,7 +45,7 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | addr | 输入 | 预取指令的Global Memory起始地址。 |
-| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte。 |
+| prefetch_len | 输入 | 预加载指令的长度，单位为2K Byte。 |
 
 ## 返回值说明
 
