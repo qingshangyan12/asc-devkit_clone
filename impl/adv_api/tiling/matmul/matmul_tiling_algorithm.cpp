@@ -1722,7 +1722,7 @@ void MatmulTilingAlgorithm::GetUsedSize(
             return;
         }
 
-        // case3: output GM/VECCAL, format is ND, for now not re-use input and output non-aligned, is related with db
+        // case3: output GM/VECCAL, format is ND, for now not reuse input and output non-aligned, is related with db
         // open (1) output GM, format is NZ/ND_ALIGN/ND, need restore in ub, ND and D is non-aligned , then add more
         // 32B, ub->gm NZ->ND format and data type transform (2) output VECCALC,format is ND_ALIGN/ND(D aligned), need
         // doNZ->ND transform in ub

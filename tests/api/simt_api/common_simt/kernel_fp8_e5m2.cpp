@@ -176,7 +176,7 @@ int8_t Fp8e5m2T::FloatToFp8e5m2(const float src) const
 
     uint16_t sRet = Fp32ExtracSign(srcVal);
     uint32_t ef = Fp32ExtracExp(srcVal);
-    uint32_t mf = (srcVal & 0x007FFFFF); // 23 bit mantissa dont't need to care about denormal
+    uint32_t mf = (srcVal & 0x007FFFFF); // 23 bit mantissa don't need to care about denormal
     uint32_t mLenDelta = FP32_MAN_LEN - FP8E5M2_MAN_LEN;
 
     bool needRound = false;
