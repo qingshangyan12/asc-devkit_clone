@@ -19,6 +19,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/div_impl.h"
 
 namespace asc {
 namespace te {
