@@ -70,8 +70,8 @@ TEST(ReturnValueVconv, FloatToE5m2KeepsQuarterSelection)
         auto fourth = api_name(src, mask, ASC_DISPERSE_FOURTH_QUARTER);       \
         static_assert(std::is_same<decltype(first), result_type>::value);     \
         static_assert(std::is_same<decltype(second), result_type>::value);    \
-        static_assert(std::is_same<decltype(third), result_type>::value);      \
-        static_assert(std::is_same<decltype(fourth), result_type>::value);     \
+        static_assert(std::is_same<decltype(third), result_type>::value);     \
+        static_assert(std::is_same<decltype(fourth), result_type>::value);    \
         (void)first;                                                          \
         (void)second;                                                         \
         (void)third;                                                          \

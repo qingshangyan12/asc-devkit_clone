@@ -91,8 +91,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -107,8 +106,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -123,8 +121,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -139,8 +136,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -155,8 +151,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -171,8 +166,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -187,8 +181,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -203,8 +196,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -219,8 +211,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -235,8 +226,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -251,8 +241,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -267,8 +256,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -279,8 +267,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -291,8 +278,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -303,8 +289,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -315,8 +300,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -327,8 +311,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -339,8 +322,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -351,8 +333,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -363,8 +344,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -375,8 +355,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -387,8 +366,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -399,8 +377,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -411,8 +388,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -423,8 +399,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -435,8 +410,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0a(
@@ -447,8 +421,7 @@ __aicore__ inline void asc_copy_l12l0a(
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
@@ -607,8 +580,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -623,8 +595,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -639,8 +610,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -655,8 +625,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -671,8 +640,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -687,8 +655,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -703,8 +670,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -719,8 +685,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -735,8 +700,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -751,8 +715,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -767,8 +730,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -783,8 +745,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -795,8 +756,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -807,8 +767,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -819,8 +778,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -831,8 +789,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -843,8 +800,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -855,8 +811,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -867,8 +822,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -879,8 +833,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -891,8 +844,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -903,8 +855,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -915,8 +866,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -927,8 +877,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -939,8 +888,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -951,8 +899,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b(
@@ -963,8 +910,7 @@ __aicore__ inline void asc_copy_l12l0b(
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
@@ -1119,8 +1065,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1131,8 +1076,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1143,8 +1087,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1155,8 +1098,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1167,8 +1109,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1179,8 +1120,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1191,8 +1131,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1203,8 +1142,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1215,8 +1153,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1227,8 +1164,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1239,8 +1175,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose_s4(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1251,8 +1186,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
         load_cbuf_to_cb_transpose_s4(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12l0b_trans(
@@ -1265,8 +1199,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(
             src_frac_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12fb(
@@ -1277,16 +1210,14 @@ __aicore__ inline void asc_copy_l12fb(
         copy_cbuf_to_fbuf(dst, src, n_burst, len_burst, src_gap_size, dst_gap_size);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12fb(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(
@@ -1297,16 +1228,14 @@ __aicore__ inline void asc_copy_l12bt(
         copy_cbuf_to_bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(
@@ -1317,16 +1246,14 @@ __aicore__ inline void asc_copy_l12bt(
         copy_cbuf_to_bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(
@@ -1337,16 +1264,14 @@ __aicore__ inline void asc_copy_l12bt(
         copy_cbuf_to_bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(
@@ -1357,16 +1282,14 @@ __aicore__ inline void asc_copy_l12bt(
         copy_cbuf_to_bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(
@@ -1377,16 +1300,14 @@ __aicore__ inline void asc_copy_l12bt(
         copy_cbuf_to_bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 5102)
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 __aicore__ inline void asc_copy_l12ub(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len,

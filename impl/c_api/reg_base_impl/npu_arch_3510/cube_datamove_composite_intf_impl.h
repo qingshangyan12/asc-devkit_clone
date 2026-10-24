@@ -32,8 +32,7 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_mx and asc_sync)
 
@@ -47,8 +46,7 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -62,8 +60,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -77,8 +74,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -92,8 +88,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -107,8 +102,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -122,8 +116,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -137,8 +130,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -152,8 +144,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -167,8 +158,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -182,8 +172,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -197,8 +186,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -212,8 +200,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -227,8 +214,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -242,8 +228,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -257,8 +242,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -272,8 +256,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -287,8 +270,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -302,8 +284,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -317,8 +298,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -332,8 +312,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -347,8 +326,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -362,8 +340,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -377,8 +354,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -392,8 +368,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -407,8 +382,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -422,8 +396,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -437,8 +410,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -452,8 +424,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -467,8 +438,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -482,8 +452,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_transpose and asc_sync)
 
@@ -497,8 +466,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -512,8 +480,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -527,8 +494,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -542,8 +508,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -557,8 +522,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -572,8 +536,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -587,8 +550,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -602,8 +564,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -617,8 +578,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -632,8 +592,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -647,8 +606,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -662,8 +620,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -677,8 +634,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -692,8 +648,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -707,8 +662,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -722,8 +676,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -737,8 +690,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -752,8 +704,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -767,8 +718,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -782,8 +732,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -797,8 +746,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -812,8 +760,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -827,8 +774,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -842,8 +788,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -857,8 +802,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -872,8 +816,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -887,8 +830,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -902,8 +844,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -917,8 +858,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -932,8 +872,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_transpose and asc_sync)
 
@@ -947,8 +886,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -962,8 +900,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -977,8 +914,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -992,8 +928,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1007,8 +942,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1022,8 +956,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1037,8 +970,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1052,8 +984,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1067,8 +998,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1082,8 +1012,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1097,8 +1026,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1112,8 +1040,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1127,8 +1054,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 
@@ -1144,8 +1070,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1163,8 +1088,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1182,8 +1106,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1201,8 +1124,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1220,8 +1142,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1239,8 +1160,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1258,8 +1178,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1277,8 +1196,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1296,8 +1214,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1315,8 +1232,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1334,8 +1250,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1353,8 +1268,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 
@@ -1372,8 +1286,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1391,8 +1304,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1410,8 +1322,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1429,8 +1340,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1448,8 +1358,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1467,8 +1376,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1486,8 +1394,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1505,8 +1412,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1524,8 +1430,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1543,8 +1448,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1562,8 +1466,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1581,8 +1484,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 
@@ -1600,8 +1502,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
@@ -2054,8 +1955,7 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12ub and asc_sync)
 
@@ -2069,8 +1969,7 @@ __aicore__ inline void asc_copy_l12ub_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
 
@@ -2084,8 +1983,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
 
@@ -2099,8 +1997,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* sr
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
 
@@ -2114,8 +2011,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uin
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
 
@@ -2129,8 +2025,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, ui
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
 
@@ -2144,8 +2039,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, 
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(

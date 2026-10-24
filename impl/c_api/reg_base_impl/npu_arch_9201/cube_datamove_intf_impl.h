@@ -868,8 +868,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 // transpose
 __aicore__ inline void asc_copy_l12l0a_transpose(
@@ -896,8 +895,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst_stride, 0);
     }
 }
-#endif  // not M510 (L1/L0 loads unsupported, see RFC 4.5)
-
+#endif // not M510 (L1/L0 loads unsupported, see RFC 4.5)
 
 // transpose
 __aicore__ inline void asc_copy_l12l0b_transpose(

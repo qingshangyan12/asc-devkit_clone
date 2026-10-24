@@ -35,8 +35,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -53,8 +52,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -71,8 +69,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -89,8 +86,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -107,8 +103,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -125,8 +120,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -143,8 +137,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
 
@@ -161,8 +154,7 @@ __aicore__ inline void asc_mmad_mx_sync(
         asc_sync_post_process();
     }
 }
-#endif  // not M510 (3510-only cube path, see RFC 4.5)
-
+#endif // not M510 (3510-only cube path, see RFC 4.5)
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
