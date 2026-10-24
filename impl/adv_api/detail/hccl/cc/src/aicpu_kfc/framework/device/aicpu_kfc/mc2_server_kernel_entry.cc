@@ -17,6 +17,12 @@
 
 using namespace HcclApi;
 
+// Package identity is emitted once at module load, outside the hot kernel loop.
+__attribute__((constructor)) static void Mc2AbcdPackageIdentity()
+{
+    HCCL_RUN_INFO("[MC2_ABCD_BUILD] variant=A base=9dfffb2ba02d3f1fb80e1f4e6b7fc4e4d1a92158 protocol=1");
+}
+
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
