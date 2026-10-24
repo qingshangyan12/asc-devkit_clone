@@ -353,7 +353,7 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
     const ChannelInfo& channelRecv = channels.at(fromRankKey)[channelIdx];
     const ChannelInfo& channelSend = channels.at(toRankKey)[channelIdx];
     HCCL_DEBUG(
-        "[InsTempAllGatherNHR] rank[%d] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]", myRank_,
+        "[InsTempAllGatherNHR] rank11[%d] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]", myRank_,
         templateRankSize_, stepInfo.fromRank, stepInfo.toRank, step, nSteps, stepInfo.nSlices);
 
     const bool readLastStepToOutput = readLastStepToOutput_ && step == nSteps - 1 && stepInfo.nSlices > 1;
