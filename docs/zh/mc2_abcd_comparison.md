@@ -22,3 +22,9 @@ B/C 只对每 kernel 一次 collective 输出有效性能；多消息会标记�
 
 已做本地 C++14 stub 编译/链接及日志条数检查、B/C 源码差异检查；目标 Linux/CANN 全量构建、
 线上签名出包、安装和 NPU 实测均未验证。此 PR 不包含性能收益结论。
+
+## 本次对照的 HCOMM ABI 基线
+
+本实验包仅配套 `9.3.0~weekly.20261021.01` toolkit/ops。为匹配该包的 Thread ABI，本分支将 `thread.h` / `aicpu_ts_thread.h` 恢复到提交 `259656eb2` 之前的接口及成员布局：不含新插入的 GetNotifySize/GetStreamId 虚接口，保留 rtStream_ 成员。四个对照分支采用完全相同的修正，不改变各自计时方案。
+
+新接口插入会把 GetStreamLitePtr 的虚表偏移从80变为88，LaunchTask 从88变为104。与旧 HCOMM 混用时会错误分派并在 CCoreWait 的 RTSQ 虚表访问中崩溃。该回退仅用于固定依赖的性能对照，不是同时兼容新旧 HCOMM 的正式实现，不应合入主线。更新 HCOMM 时必须重新核对 ABI。修复签名包的板测需重新出包后执行。
