@@ -79,6 +79,7 @@ basic_test_two_targets=(
     # ascendc_ut_simt_api_mc62cm12aa
     # ascendc_ut_basic_api_ascend950pr_9599_AIC
     ascendc_ut_basic_api_kirindev0001
+    ascendc_ut_reg_compute_kirindev0001
 )
 
 basic_test_three_targets=(
