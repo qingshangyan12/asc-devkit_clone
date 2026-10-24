@@ -697,6 +697,44 @@ __aicore__ inline void MmadMxFixCal(
         matmul_mx_to_cbuf(dst, left, right, (__cbuf__ int32_t*)bias, (uint64_t)0, config0);
     }
 }
+#else
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixBitModeParams& mmadFixParams)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMxFix is not supported on current device");
+    });
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixParams& mmadFixParams)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMxFix is not supported on current device");
+    });
+}
+
+template <typename DstT, typename Src0T, typename Src1T, typename BiasT>
+__aicore__ inline void MmadMxFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, uint64_t bias,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMxFix is not supported on current device");
+    });
+}
+
+template <typename DstT, typename Src0T, typename Src1T, typename BiasT>
+__aicore__ inline void MmadMxFixCal(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, uint64_t bias, const MmadFixParams& mmadFixParams)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMxFix is not supported on current device");
+    });
+}
+#endif
 
 template <typename DstT, typename SrcT>
 __aicore__ inline void PostProcCal(__cbuf__ DstT* dst, __cbuf__ SrcT* src, const PostProcBitModeParams& params)

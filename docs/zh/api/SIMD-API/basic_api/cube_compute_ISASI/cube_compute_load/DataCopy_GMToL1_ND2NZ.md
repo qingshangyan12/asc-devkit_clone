@@ -30,7 +30,7 @@
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="9020" id19 -->
-- Kirin 9020处理器系列产品：不支持
+- Kirin 9020处理器系列产品：支持
 <!-- end id19 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ_res.md#id1 -->
 

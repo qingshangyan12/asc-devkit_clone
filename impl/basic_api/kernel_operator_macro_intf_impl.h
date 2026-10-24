@@ -178,7 +178,6 @@ __aicore__ inline void MmadFix(
     MmadFixImpl(dst, left, right, bias, mmadFixParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMxFix(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,

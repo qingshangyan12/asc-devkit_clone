@@ -203,7 +203,6 @@ __aicore__ inline void MmadFixImpl(
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMxFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
