@@ -62,11 +62,12 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
-            except Exception:
+            except Exception as e:
                 LogUtil.print_compile_log(
-                    "", " ascend610lite execute objcopy fail!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
+                    "", f" ascend610lite execute objcopy fail: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
                 )
                 return None
             return [sym + "_start", sym + "_end"]
@@ -88,7 +89,8 @@ class PackKernel:
                         "i386",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
             elif target_platform == "aarch64":
                 subprocess.run(
@@ -102,7 +104,8 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
             else:
                 subprocess.run(["echo", "unsupported environment!"])
@@ -151,11 +154,18 @@ class PackKernel:
                 op_bin = op_info.get("op_bin")
                 if op_bin.get(soc) is None:
                     op_bin[soc] = []
-                    op_bin[soc].append(self.ascendc_gen_object(op_obj["cfg"], soc))
+                    cfg_syms = self.ascendc_gen_object(op_obj["cfg"], soc)
+                    if cfg_syms is None:
+                        raise RuntimeError(f"ascendc_gen_object failed for cfg {op_obj['cfg']} on {soc}")
+                    op_bin[soc].append(cfg_syms)
                 op_soc = op_bin.get(soc)
                 for objs in op_obj["obj"]:
-                    op_soc.append(self.ascendc_gen_object(objs + ".json", soc))
-                    op_soc.append(self.ascendc_gen_object(objs + ".o", soc))
+                    json_syms = self.ascendc_gen_object(objs + ".json", soc)
+                    o_syms = self.ascendc_gen_object(objs + ".o", soc)
+                    if json_syms is None or o_syms is None:
+                        raise RuntimeError(f"ascendc_gen_object failed for {objs}.json/.o on {soc}")
+                    op_soc.append(json_syms)
+                    op_soc.append(o_syms)
 
     def ascendc_gen_header(self: any):
         for op_type in self.op_info.keys():
@@ -218,12 +228,13 @@ class PackKernel:
             sub_objs = objs[start : start + batch_size]
             start += batch_size
             try:
-                subprocess.run(["ar", "qc", out_lib] + sub_objs)
-                subprocess.run(["ranlib", out_lib])
+                subprocess.run(["ar", "qc", out_lib] + sub_objs, check=True)
+                subprocess.run(["ranlib", out_lib], check=True)
             except Exception as e:
                 LogUtil.print_compile_log(
                     "", f"execute ar/ranlib command error: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
                 )
+                raise
 
     def ascendc_gen_opsinfo(self: any):
         ascendc_ops_config.gen_all_soc_config(self.in_path)

@@ -330,7 +330,7 @@ def localization_sub_op_func_sym(dst_file: str, sub_op_kernel_info):
             localization_symbols_cmd = (
                 ["llvm-objcopy"] + [f"--localize-symbol={symbol}" for symbol in unique_symbols[i:end_idx]] + [dst_file]
             )
-            subprocess.run(localization_symbols_cmd)
+            subprocess.run(localization_symbols_cmd, check=True)
     except Exception as err:
         raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("localize sub op func sym failed", err))
 
