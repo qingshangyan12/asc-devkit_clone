@@ -715,7 +715,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 CommonUtility.dump_compile_log(
                     ["cd", f"{kernel_meta_dir};", "ar", "x", self.bin_path], CompileStage.UNPACK, self.compile_log_path
                 )
-                subprocess.run(["ar", "x", self.bin_path])
+                subprocess.run(["ar", "x", self.bin_path], check=True)
             except Exception as err:
                 CommonUtility().ascendc_raise_python_err(ERR_CODE, ("ar extract files or mv files failed", err))
 
@@ -729,7 +729,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 CommonUtility.dump_compile_log(
                     ["cd", f"{kernel_meta_dir};", "ar", "x", self.bin_path], CompileStage.UNPACK, self.compile_log_path
                 )
-                subprocess.run(["ar", "x", self.bin_path])
+                subprocess.run(["ar", "x", self.bin_path], check=True)
             except Exception as err:
                 CommonUtility().ascendc_raise_python_err(ERR_CODE, ("ar extract files or mv files failed", err))
 

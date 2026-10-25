@@ -74,13 +74,13 @@ def split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path, i, compile
     cmds = ["cp"] + ["-rfL"] + [f"{orign_bin_path}"] + [f"{new_bin_path}"]
     try:
         CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path)
-        subprocess.run(cmds)
+        subprocess.run(cmds, check=True)
     except Exception as err:
         CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
     cmds = ["llvm-objcopy", f"--redefine-syms={rename_file_path}", f"{new_bin_path}"]
     try:
         CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path)
-        subprocess.run(cmds)
+        subprocess.run(cmds, check=True)
     except Exception as err:
         CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
     return new_bin_path
@@ -974,14 +974,14 @@ class SuperOperatorInfos:
         cmds = ["cp"] + ["-rfL"] + [f"{orign_bin_path}"] + [f"{new_bin_path}"]
         try:
             CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
-            subprocess.run(cmds)
+            subprocess.run(cmds, check=True)
         except Exception as err:
             CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
         new_kernel_name = f"{origin_kernel_name}_split{i}"
         cmds = ["llvm-objcopy", f"--redefine-sym={origin_kernel_name}={new_kernel_name}", f"{new_bin_path}"]
         try:
             CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
-            subprocess.run(cmds)
+            subprocess.run(cmds, check=True)
         except Exception as err:
             CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
         return new_bin_path, new_kernel_name
