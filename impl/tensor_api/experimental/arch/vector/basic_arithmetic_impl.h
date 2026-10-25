@@ -19,6 +19,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 
 namespace asc {
 namespace te {
@@ -201,13 +202,43 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
 {
     static_assert(detail::supports_float_math_v<T>, "log2 does not support this element type");
-    const T ln2_reciprocal = static_cast<T>(1.4426950408889634);
-    reg_tensor<T> natural_log;
-    asc_ln(natural_log.reg, src.reg, src.mask);
-    reg_tensor<T> dst;
-    asc_mul_scalar(dst.reg, natural_log.reg, ln2_reciprocal, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    constexpr float ln2_reciprocal = 1.4426950408889634;
+    if constexpr (AscendC::Std::is_same_v<T, float>) {
+        reg_tensor<T> natural_log;
+        asc_ln(natural_log.reg, src.reg, src.mask);
+        reg_tensor<T> dst;
+        asc_mul_scalar(dst.reg, natural_log.reg, ln2_reciprocal, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        vector_half f16_reg_low;
+        vector_half f16_reg_high;
+        vector_float f32_reg_low;
+        vector_float f32_reg_high;
+        vector_half tmp_reg;
+
+        asc_intlv(f16_reg_low, f16_reg_high, src.reg, src.reg);
+
+        f32_reg_low = asc_half2float(f16_reg_low, src.mask, ASC_POSITION_EVEN);
+        f32_reg_high = asc_half2float(f16_reg_high, src.mask, ASC_POSITION_EVEN);
+
+        asc_ln(f32_reg_low, f32_reg_low, src.mask);
+        asc_ln(f32_reg_high, f32_reg_high, src.mask);
+        asc_mul_scalar(f32_reg_low, f32_reg_low, ln2_reciprocal, src.mask);
+        asc_mul_scalar(f32_reg_high, f32_reg_high, ln2_reciprocal, src.mask);
+
+        f16_reg_low = asc_float2half_rn(f32_reg_low, src.mask, ASC_POSITION_EVEN);
+        f16_reg_high = asc_float2half_rn(f32_reg_high, src.mask, ASC_POSITION_EVEN);
+
+        asc_deintlv(f16_reg_low, tmp_reg, f16_reg_low, tmp_reg);
+        asc_deintlv(f16_reg_high, tmp_reg, tmp_reg, f16_reg_high);
+
+        reg_tensor<T> dst;
+        const auto select_mask = make_mask<mask_pattern::half, half>();
+        asc_select(dst.reg, f16_reg_low, f16_reg_high, select_mask.reg);
+        dst.mask = src.mask;
+        return dst;
+    }
 }
 
 template <typename T>
