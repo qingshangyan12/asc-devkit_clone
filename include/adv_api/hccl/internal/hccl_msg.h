@@ -224,6 +224,7 @@ struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
 };
+
 struct OpResCtx {
     uint64_t version;
     uint64_t workspace;
@@ -234,7 +235,7 @@ struct OpResCtx {
 
     uint64_t xnAddr;                   // Xn寄存器起始地址
     uint64_t ckeAddr;                  // CKE寄存器起始地址
-    uint64_t sprAddr;                  // spr寄存器地址，预留
+    uint64_t sprAddr;                   // spr寄存器地址，预留
     uint64_t res[HCCL_API_MAX_OP_NUM]; // MS地址，预留
     uint64_t resCtx;                   // 资源地址，用于资源下发时的处理
     uint32_t opType[HCCL_API_MAX_OP_NUM];
