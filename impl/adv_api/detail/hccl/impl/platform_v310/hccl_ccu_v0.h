@@ -331,7 +331,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR)) {
             // 2die 判定先于 missionNum（其 mission 数为动态 dieNum，勿路由到并发 prepare）
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
-            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
+            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamLocal_[handleId]);
         } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
             CcuPrepareForConcurrentReduceScatterM2M(&handleParamLocal_[handleId]);

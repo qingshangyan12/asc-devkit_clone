@@ -670,7 +670,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 // memSlice=CCU_MEMSLICE_SIZE*LOCAL_COPY_MS_PER_LOOP=32K)。
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterSoleNhr2DieM2M(
-    __gm__ CommonPrepareParamCcu* commParam)
+    const CommonPrepareParamCcu* commParam)
 {
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t sliceSize = commParam->count * dataTypeSize; // 每 rank 输出份
@@ -696,7 +696,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t die0LastSliceSize = die0Size;
     const uint64_t die1LastSliceSize = die1Size;
 
-    xnData_[KFC_RS_SOLE_NHR_2DIE_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_RS_SOLE_NHR_2DIE_OP_ID] = GetOpIdLocal(commParam);
     xnData_[KFC_RS_SOLE_NHR_2DIE_INPUT] = inputBase;
     xnData_[KFC_RS_SOLE_NHR_2DIE_OUTPUT] = outputBase;
     xnData_[KFC_RS_SOLE_NHR_2DIE_DIE0_SIZE] = die0Size;

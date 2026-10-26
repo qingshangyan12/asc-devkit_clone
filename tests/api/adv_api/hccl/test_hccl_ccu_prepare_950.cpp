@@ -202,7 +202,6 @@ TEST_F(ConcurPrepareTest, ConcurrentAllGatherUsesShadowWithTilingOverride)
     EXPECT_EQ(impl.ccuUsedXnNum_, HcclKfcProtocol::KFC_CONCURRENT_AG_PARAM_NUM);
     EXPECT_EQ(impl.handleMissionNum_[0], 2U);
 }
-
 TEST_F(ConcurPrepareTest, ConcurrentReduceScatterUsesShadowWithTilingOverride)
 {
     opResCtx.opType[0] = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
@@ -229,5 +228,36 @@ TEST_F(ConcurPrepareTest, ConcurrentReduceScatterUsesShadowWithTilingOverride)
     EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_CONCURRENT_RS_NHR_SLICE_LAST_JETTY_SIZE], 1104U);
     EXPECT_EQ(impl.ccuUsedXnNum_, HcclKfcProtocol::KFC_CONCURRENT_RS_PARAM_NUM);
     EXPECT_EQ(impl.handleMissionNum_[0], 2U);
+}
+
+TEST_F(ConcurPrepareTest, RsSoleNhr2DieUsesShadowWithTilingOverride)
+{
+    opResCtx.opType[0] = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+    opResCtx.algorithmType[0] = static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR);
+    opResCtx.res[1] = 500; // die 切分千分比：1000 份中 die0 取 500
+
+    const HcclHandle handle = impl.CommonPrepareImpl<false>(MakeParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, 1000));
+    ASSERT_EQ(handle, 0);
+    EXPECT_EQ(impl.handleParamLocal_[0].dataType, HCCL_DATA_TYPE_FP16);
+
+    impl.ccuParam_.repeatIndex = 0;
+    impl.CcuPrepareForOp(0);
+
+    // FP16: sliceSize=2000（1000 元素），permille=500 → die0/die1 各 1000B；sliceStride=2000
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_INPUT], 0x100000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_OUTPUT], 0x200000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_DIE0_SIZE], 1000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_DIE1_SIZE], 1000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_DIE0_LAST_SLICE_SIZE], 1000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_DIE1_LAST_SLICE_SIZE], 1000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_INPUT_SLICE_STRIDE], 2000U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_CURRENT_RANK_SLICE_OUTPUT_OFFSET], 0U);
+    EXPECT_EQ(impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_IS_INPUT_OUTPUT_EQUAL], 0U);
+    const uint64_t opId = impl.xnData_[HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_OP_ID];
+    EXPECT_NE(opId, 0xffffffffffffffffU);
+    EXPECT_EQ(opId & AscendC::COMM_TYPE_MASK, static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER));
+    EXPECT_EQ((opId >> AscendC::DATA_TYPE_SHIFT) & AscendC::DATA_TYPE_MASK, static_cast<uint64_t>(HCCL_DATA_TYPE_FP16));
+    EXPECT_EQ(impl.ccuUsedXnNum_, HcclKfcProtocol::KFC_RS_SOLE_NHR_2DIE_PARAM_NUM);
+    EXPECT_EQ(impl.handleMissionNum_[0], 1U); // res[2]=0 回退单 mission
 }
 } // namespace
