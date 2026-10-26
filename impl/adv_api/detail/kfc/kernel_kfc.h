@@ -25,6 +25,11 @@
 #include "../../../../include/adv_api/matmul/matmul_client.h"
 #include "../matmul/kfc/matmul_server_aux.h"
 #endif
+
+// Opt-in fixes for the MIX1_1 operator running in an SK MIX1_2 container.
+#ifndef QBMM_KFC_QUIT_FIX
+#define QBMM_KFC_QUIT_FIX 0
+#endif
 namespace AscendC {
 constexpr uint16_t WORKSPACE_SYNC_ID = 15;
 __aicore__ inline void clearWorkspace(__gm__ uint8_t* workspace)
@@ -201,7 +206,8 @@ public:
 
 #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
                     // only executed in a 1:2 mode
-                    if (quitSize == 2) {
+                    if (quitSize == 2 ||
+                        (QBMM_KFC_QUIT_FIX && MIX_NUM == 1 && msg->ubAddr == 2 && quitSize == 1)) {
                         // after receiving two exit message, AIC sends a message to AIV and performs a counter reset.
                         auto secondMsgStartPos = ptr->GetSecondBuffStart();
                         // scalar write the GM, dcci write back to GM
