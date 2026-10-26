@@ -115,8 +115,11 @@ bisheng example.asc -o main --npu-arch=dav-3510&& ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -141,10 +144,10 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 
 template <typename T>
 bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
+    size_t begin, size_t remaining_length, double tolerance = 0.0)
 {
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
+    if (begin + remaining_length > actual.size() || begin + remaining_length > expected.size()) return false;
+    for (size_t i = begin; i < begin + remaining_length; ++i) {
         if (actual[i] == expected[i]) continue;
         const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
         if (diff > tolerance || diff < -tolerance) return false;
@@ -152,41 +155,58 @@ bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expe
     return true;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
-__simd_vf__ inline void unsqueeze(__ubuf__ uint32_t* dst)
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(uint32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+__simd_vf__ inline void unsqueeze(__ubuf__ uint32_t* dst, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_uint32_t dst_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_unsqueeze(dst_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_uint32_t dst_reg;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_unsqueeze(dst_reg, mask);
+        asc_storealign(dst + offset, dst_reg, mask);
+    }
 }
 __global__ __vector__ void asc_unsqueeze_kernel(__gm__ uint32_t* dst)
 {
     asc_init();
-    __ubuf__ uint32_t dst_local[ELEMENT_COUNT];
-    unsqueeze(dst_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
+    __ubuf__ uint32_t dst_local[TOTAL_LENGTH];
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<unsqueeze>(dst_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, TOTAL_LENGTH * sizeof(uint32_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<uint32_t> input = {ELEMENT_COUNT};
-    std::vector<uint32_t> output(ELEMENT_COUNT, 0), golden(ELEMENT_COUNT);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) golden[i] = i;
+    std::vector<uint32_t> input = {TOTAL_LENGTH};
+    std::vector<uint32_t> output(TOTAL_LENGTH, 0), golden(TOTAL_LENGTH);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) golden[i] = i % ELEMENTS_PER_REGISTER;
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint32_t* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(uint32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (TOTAL_LENGTH) * sizeof(uint32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     asc_unsqueeze_kernel<<<1, 0>>>(dst_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_data("Input mask count", input);
+    print_data("Input mask remaining_length", input);
     print_data("Output", output);
     print_data("Golden", golden);
     const bool passed = compare_data(output, golden);

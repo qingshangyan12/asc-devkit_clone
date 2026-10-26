@@ -2,8 +2,8 @@
 
 指令双发指的是处理器在同一个时钟周期内，能够同时发射两条指令到执行单元进行处理。这种能力需要满足以下两个条件：
 
--   两条指令之间没有数据上的依赖关系（依赖关系指后一条指令需要使用前一条指令产生的结果）
--   硬件中拥有足够的执行资源
+- 两条指令之间没有数据上的依赖关系（依赖关系指后一条指令需要使用前一条指令产生的结果）
+- 硬件中拥有足够的执行资源
 
 这种机制可以在不改变程序逻辑的前提下，提升处理器在单位时间内的指令处理效率，是实现指令级并行的重要基础之一。
 
@@ -54,6 +54,9 @@ for (uint16_t i = 0; i < 32; ++i) { // VLoop-1
 
 优化后：
 
+> [!CAUTION]注意
+> 本示例中，`StoreAlign`写入与后续`LoadAlign`读取访问同一块UB地址空间，存在写后读依赖，后续读取需要等待前面的写入完成。同一RegTensor的寄存器保序适用于先读后写的场景，不能保证此处先写后读的UB访问顺序。因此，需要在两个循环之间插入`LocalMemBar<AscendC::Reg::MemType::VEC_STORE, AscendC::Reg::MemType::VEC_LOAD>()`同步指令，确保VLoop-1的写入完成后，VLoop-2才开始读取。相关约束请参见[LocalMemBar的约束说明](../../../../../api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md#section633mcpsimp)。
+
 ```cpp
 for (uint16_t i = 0; i < 32; ++i) { // VLoop-1
     mask = AscendC::Reg::UpdateMask<T>(count);
@@ -65,6 +68,8 @@ for (uint16_t i = 0; i < 32; ++i) { // VLoop-1
     AscendC::Reg::Adds(dstReg, dstReg, 10, mask);
     AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
 }
+// 等待VLoop-1写入UB完成，再执行VLoop-2的读取
+AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE, AscendC::Reg::MemType::VEC_LOAD>();
 for (uint16_t i = 0; i < 32; ++i) { // VLoop-2
     mask = AscendC::Reg::UpdateMask<T>(count);
     AscendC::Reg::LoadAlign(dstReg, dstAddr + i * oneRepeatSize);
@@ -83,8 +88,8 @@ for (uint16_t i = 0; i < 32; ++i) { // VLoop-2
 
 | 展开方式 | 开启方式 | 优点 | 缺点 |
 | :-- | :-- | :-- | :-- |
-| 手动展开VF循环 | / | &bull;自主可控；<br>&bull;能处理复杂循环或src/dst寄存器复用等场景； | &bull;代码复杂度高；|
-| 编译器自动展开 | #pragma unroll number （number表示展开层数）| &bull;代码复杂度低；| &bull;src/dst寄存器复用时无法展开。 |
+| 手动展开VF循环 | / | &bull;自主可控；<br>&bull;能处理复杂循环或src/dst寄存器复用等场景； | &bull;代码复杂度高； |
+| 编译器自动展开 | #pragma unroll number （number表示展开层数） | &bull;代码复杂度低； | &bull;src/dst寄存器复用时无法展开。 |
 
 >[!NOTE]说明
 >
@@ -148,12 +153,12 @@ for (uint16_t i = 0; i < 32; ++i) {
 
 优化方案：
 
--   使用布尔代数运算。比如!\(a && b\)可简化为!a || !b，!\(a || b\)可以化简为!a && !b。
--   适当等价调整指令顺序，节省寄存器。
+- 使用布尔代数运算。比如!\(a && b\)可简化为!a || !b，!\(a || b\)可以化简为!a && !b。
+- 适当等价调整指令顺序，节省寄存器。
 
 本示例用于判断两个double类型数据是否相等，需要处理两个特殊场景，NaN场景以及+0和-0相等场景。
 
-```
+```cpp
 template<typename T = Reg::DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT>
 __simd_callee__ inline void CompareDoubleImpl(Reg::MaskReg &dstMask, RegT &srcReg0, RegT &srcReg1, Reg::MaskReg &mask)
 {
@@ -214,7 +219,7 @@ __simd_callee__ inline void CompareDoubleImpl(Reg::MaskReg &dstMask, RegT &srcRe
 
 优化后：
 
-```
+```cpp
 template <typename T = Reg::DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT>
 __simd_callee__ inline void CompareDoubleImpl(Reg::MaskReg &dstMask, RegT &srcReg0, RegT &srcReg1, Reg::MaskReg &mask)
 {

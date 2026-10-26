@@ -388,13 +388,13 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, co
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
- * @param [in] borrow_src Input borrow register tensor.
+ * @param [in] carry_src Input carry register tensor. A value of 1 means no incoming borrow; 0 means an incoming borrow.
  * @note The active-lane mask is taken from src0.mask. A value of 1 selects the corresponding element; a value of 0
  * excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic

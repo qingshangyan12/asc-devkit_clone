@@ -77,24 +77,40 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 #include "acl/acl.h"
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(uint32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t STATUS_WORD_COUNT = 128;
 constexpr int32_t POST_UPDATE_OFFSET = 32;
-constexpr uint32_t SQUEEZE_STATUS_BYTES = ELEMENT_COUNT * sizeof(float);
+constexpr uint32_t SQUEEZE_STATUS_BYTES = TOTAL_LENGTH * sizeof(float);
 
 __simd_vf__ inline void store_squeeze_status(
-    __ubuf__ uint32_t* status, __ubuf__ float* packed, __ubuf__ float* input)
+    __ubuf__ uint32_t* status, __ubuf__ float* packed, __ubuf__ float* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_float src;
     vector_float squeezed;
     vector_store_unalign unalign_reg;
-    vector_bool full_mask = asc_create_mask_b32(PAT_ALL);
 
-    asc_loadalign(src, input); // 将输入数据加载到矢量数据寄存器。
     asc_squeeze_and_storeunalign_init();
-    asc_squeeze_and_storeunalign(packed, squeezed, unalign_reg, src, full_mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_float src;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src, input + offset); // 将输入数据加载到矢量数据寄存器。
+        asc_squeeze_and_storeunalign(packed, squeezed, unalign_reg, src, mask);
+    }
     asc_squeeze_and_storeunalign_finalize(packed, unalign_reg);
 
     // 每次写入状态后，status自动增加POST_UPDATE_OFFSET字节。
@@ -105,25 +121,31 @@ __simd_vf__ inline void store_squeeze_status(
 __global__ __vector__ void store_squeeze_status_kernel(__gm__ uint32_t* output, __gm__ float* input)
 {
     asc_init();
-    __ubuf__ float input_local[ELEMENT_COUNT];
-    __ubuf__ float packed_local[ELEMENT_COUNT];
+    __ubuf__ float input_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float packed_local[PADDED_ELEMENT_COUNT];
     __ubuf__ uint32_t status_local[STATUS_WORD_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, sizeof(input_local));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    store_squeeze_status(status_local, packed_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<store_squeeze_status>(status_local, packed_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, status_local, sizeof(status_local));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> input(ELEMENT_COUNT);
+    std::vector<float> input(PADDED_ELEMENT_COUNT, 0.0F);
     std::vector<uint32_t> output(STATUS_WORD_COUNT, 0U);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         input[i] = static_cast<float>(i);
     }
 

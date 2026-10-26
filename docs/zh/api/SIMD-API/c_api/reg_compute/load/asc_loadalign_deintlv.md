@@ -176,61 +176,76 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
+constexpr uint8_t MUTEX_ID = 0;
 
-constexpr uint32_t INPUT_ELEMENTS = 1024;
-constexpr uint32_t OUTPUT_ELEMENTS = 1024;
-constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint8_t);
-constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint8_t);
+constexpr uint32_t INPUT_ELEMENTS = 1030;
+constexpr uint32_t OUTPUT_ELEMENTS = 1030;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t PAIR_COUNT = (OUTPUT_ELEMENTS + 1) / 2;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = AscendC::Std::ceil_div(PAIR_COUNT, ELEMENTS_PER_REGISTER);
+constexpr uint32_t STORAGE_ELEMENTS = REPEAT_COUNT * ELEMENTS_PER_REGISTER * 2;
+constexpr uint32_t INPUT_BYTES = STORAGE_ELEMENTS * sizeof(uint8_t);
+constexpr uint32_t OUTPUT_BYTES = STORAGE_ELEMENTS * sizeof(uint8_t);
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = PAIR_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_deintlv_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input,
-                                                 uint16_t one_repeat_size, uint16_t repeat_time)
+                                                 uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_uint8_t even_reg;
     vector_uint8_t odd_reg;
+    uint32_t remaining_length_even = (OUTPUT_ELEMENTS + 1) / 2;
+    uint32_t remaining_length_odd = OUTPUT_ELEMENTS / 2;
     for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool even_mask = asc_update_mask_b8(remaining_length_even);
+        vector_bool odd_mask = asc_update_mask_b8(remaining_length_odd);
         asc_loadalign_deintlv(even_reg, odd_reg, input + i * 512);
-        asc_storealign(output + i * 512, even_reg, mask);
-        asc_storealign(output + i * 512 + one_repeat_size, odd_reg, mask);
+        asc_storealign(output + i * 512, even_reg, even_mask);
+        asc_storealign(output + i * 512 + one_repeat_size, odd_reg, odd_mask);
     }
 }
 
 __global__ __vector__ void asc_loadalign_deintlv_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t input_local[INPUT_ELEMENTS];
-    __ubuf__ uint8_t output_local[OUTPUT_ELEMENTS];
+    __ubuf__ uint8_t input_local[STORAGE_ELEMENTS];
+    __ubuf__ uint8_t output_local[STORAGE_ELEMENTS];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
-    uint16_t repeat_time = ceil_division(OUTPUT_ELEMENTS / 2, one_repeat_size);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<asc_loadalign_deintlv_vf>(output_local, input_local, one_repeat_size, repeat_time);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(INPUT_ELEMENTS);
-    std::vector<uint8_t> output(OUTPUT_ELEMENTS, 0xff);
-    std::vector<uint8_t> golden(OUTPUT_ELEMENTS, 0);
+    std::vector<uint8_t> input(STORAGE_ELEMENTS, 0);
+    std::vector<uint8_t> output(STORAGE_ELEMENTS, 0xff);
+    std::vector<uint8_t> golden(STORAGE_ELEMENTS, 0xff);
     for (uint16_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint16_t i = 0; i < OUTPUT_ELEMENTS / 2; ++i) {
-        const uint16_t repeat = i / 256;
-        const uint16_t offset = i % 256;
+    for (uint32_t i = 0; i < PAIR_COUNT; ++i) {
+        const uint32_t repeat = i / ELEMENTS_PER_REGISTER;
+        const uint32_t offset = i % ELEMENTS_PER_REGISTER;
         golden[repeat * 512 + offset] = input[repeat * 512 + 2 * offset];
-        golden[repeat * 512 + 256 + offset] = input[repeat * 512 + 2 * offset + 1];
+        if (2 * i + 1 < OUTPUT_ELEMENTS) {
+            golden[repeat * 512 + ELEMENTS_PER_REGISTER + offset] = input[repeat * 512 + 2 * offset + 1];
+        }
     }
 
     aclInit(nullptr);
@@ -244,7 +259,16 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == golden;
+    bool passed = true;
+    for (uint32_t i = 0; i < PAIR_COUNT; ++i) {
+        const uint32_t repeat = i / ELEMENTS_PER_REGISTER;
+        const uint32_t offset = i % ELEMENTS_PER_REGISTER;
+        passed = passed && output[repeat * 512 + offset] == golden[repeat * 512 + offset];
+        if (2 * i + 1 < OUTPUT_ELEMENTS) {
+            passed = passed && output[repeat * 512 + ELEMENTS_PER_REGISTER + offset] ==
+                golden[repeat * 512 + ELEMENTS_PER_REGISTER + offset];
+        }
+    }
     std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadalign_deintlv example." << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

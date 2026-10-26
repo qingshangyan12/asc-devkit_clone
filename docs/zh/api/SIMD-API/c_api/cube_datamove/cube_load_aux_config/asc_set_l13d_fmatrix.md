@@ -179,7 +179,7 @@ __global__ __cube__ void conv2d_forward_c_api(
     asc_copy_l0c2gm(output + batch_idx * OUTPUT_BATCH_SIZE, output_l0, N, M, N, M_ALIGN,
         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::F322F16,
         asc_relu_pre_mode::NONE, false, true, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 size_t fmap_index(uint32_t n, uint32_t h, uint32_t w, uint32_t c)
