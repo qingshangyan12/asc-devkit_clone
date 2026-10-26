@@ -172,10 +172,11 @@ ExecuteSelector::ExecuteSelector() {}
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
     // 复刻真实selector的不支持组合校验（与reduce_scatter_auto_selector一致）：
-    // ReduceScatter不支持64位数据类型与PROD归约，校验失败直接返回NOT_SUPPORT。
+    // ReduceScatter不支持INT8、64位数据类型与PROD归约，校验失败直接返回NOT_SUPPORT。
     // 该检查需在g_stubSelectorAlgName旁路之前，确保64位/PROD组合即使显式指定输出也被拒绝。
     if (param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
-        (param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+        (param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8 ||
+         param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
          param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
          param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
          param.reduceType == HcclReduceOp::HCCL_REDUCE_PROD)) {
@@ -186,10 +187,12 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
         algName = g_stubSelectorAlgName;
         return HcclResult::HCCL_SUCCESS;
     }
+    // CCU 侧输出须与 hccl_alloc_ctx_res.h 的 algorithmMap 对齐（CcuSelectAlg 只接受 CCU 算法名）
     static const std::map<HcclCMDType, std::string> ccuAlgMap = {
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuSchedAllGatherSoleMesh"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuSchedReduceScatterSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuSchedAllReduceSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuSchedAllToAllSoleMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuSchedAllToAllVSoleMesh"},
     };
     static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
