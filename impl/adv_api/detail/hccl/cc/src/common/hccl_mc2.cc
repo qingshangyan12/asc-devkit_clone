@@ -432,23 +432,12 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
         HCCL_WARNING("[AllocComResourceByTilingCcu] algName[] is not supported in mc2_client.");
         return false;
     }
-    std::string algName;
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
-    const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, algName, extSpec, extParseErrMsg);
+    const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, extSpec, extParseErrMsg);
     if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
         HCCL_WARNING("[MC2_EXT_ALG] algConfig[%s] is not supported in mc2_client.", ccTiling->algConfig);
         return false;
-    }
-    if (kind == ForcedAlgKind::BARE_NAME) {
-        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
-            HCCL_WARNING(
-                "[MC2_EXT_ALG] algorithm[%s] is not registered in mc2_client for opType[%u].", algName.c_str(),
-                ccTiling->opType);
-            return false;
-        }
-        HCCL_INFO("[MC2_EXT_ALG] ccu gate passed, algConfig[%s], algorithm registered.", ccTiling->algConfig);
-        return true;
     }
     if (!extParseErrMsg.empty()) {
         HCCL_WARNING(
@@ -456,32 +445,6 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
             ccTiling->opType, extParseErrMsg.c_str());
         return false;
     }
-    const std::vector<AlgCandidate>& cands =
-        GetExternalCandidates(static_cast<HcclCMDType>(ccTiling->opType), extSpec.canonical());
-    size_t ccuCount = 0U;
-    for (const AlgCandidate& cand : cands) {
-        if (cand.engine != AlgEngine::CCU) {
-            continue;
-        }
-        ccuCount++;
-        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, cand.registeredName.c_str())) {
-            HCCL_WARNING(
-                "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidate[%s] not registered "
-                "(all CCU candidates must pass algorithmMap/V2 registry, funnel may select any of them).",
-                ccTiling->algConfig, ccTiling->opType, cand.registeredName.c_str());
-            return false;
-        }
-    }
-    if (ccuCount == 0U) {
-        HCCL_WARNING(
-            "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidates[0] "
-            "(external name has no CCU candidate).",
-            ccTiling->algConfig, ccTiling->opType);
-        return false;
-    }
-    HCCL_INFO(
-        "[MC2_EXT_ALG] ccu gate passed, algConfig[%s], ccuCandidates[%zu] all registered.", ccTiling->algConfig,
-        ccuCount);
     return true;
 }
 } // namespace
