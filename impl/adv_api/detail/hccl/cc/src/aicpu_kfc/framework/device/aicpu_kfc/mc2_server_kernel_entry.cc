@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstdint>
+#include "../../../../common/mc2_probe_micro.h"
 
 #include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
 #include "common/aicpu_kfc_def.h"
@@ -24,6 +25,8 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
     }
+
+    Mc2ProbeMicro::RunOnce();
 
     constexpr int DESC_POS = 0;
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
