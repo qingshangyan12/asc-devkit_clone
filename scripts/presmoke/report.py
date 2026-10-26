@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import json
+import html
 import logging
 from dataclasses import asdict
 from pathlib import Path
@@ -94,9 +95,9 @@ def markdown_result_table(results: Iterable[RunResult]) -> List[str]:
             for step in result.steps
         )
         lines.append(
-            f"| {result.example} | {result.arch} | {result.mode} | {result.status} | "
+            f"| {_md_escape(result.example)} | {_md_escape(result.arch)} | {_md_escape(result.mode)} | {_md_escape(result.status)} | "
             f"{'' if result.rc is None else result.rc} | {result.duration_s:.1f} | {npu_wait:.1f} | "
-            f"{result.reason} | {steps} | {result.log_file} | {'<br>'.join(result.stage_log_files)} |"
+            f"{_md_escape(result.reason)} | {steps} | {_md_escape(result.log_file)} | {'<br>'.join(_md_escape(p) for p in result.stage_log_files)} |"
         )
     return lines
 
@@ -104,7 +105,9 @@ def markdown_result_table(results: Iterable[RunResult]) -> List[str]:
 def markdown_suggestions(suggestions: Iterable[Suggestion]) -> List[str]:
     lines = ["", "## Suggestions", "", "| example | severity | category | message | hint |", "|---|---|---|---|---|"]
     for item in suggestions:
-        lines.append(f"| {item.example} | {item.severity} | {item.category} | {item.message} | {item.hint} |")
+        lines.append(
+            f"| {_md_escape(item.example)} | {_md_escape(item.severity)} | {_md_escape(item.category)} | {_md_escape(item.message)} | {_md_escape(item.hint)} |"
+        )
     return lines
 
 
@@ -117,7 +120,9 @@ def write_suggestions(suggestions: Iterable[Suggestion], path: Path) -> None:
         "|---|---|---|---|---|",
     ]
     for item in suggestions:
-        lines.append(f"| {item.example} | {item.severity} | {item.category} | {item.message} | {item.hint} |")
+        lines.append(
+            f"| {_md_escape(item.example)} | {_md_escape(item.severity)} | {_md_escape(item.category)} | {_md_escape(item.message)} | {_md_escape(item.hint)} |"
+        )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -168,4 +173,11 @@ def summarize(results: Iterable[RunResult]) -> dict[str, int]:
 
 
 def _md_escape(value: str) -> str:
-    return value.replace("|", "\\|")
+    return (
+        html.escape(value, quote=False)
+        .replace("\\", "\\\\")
+        .replace("|", "\\|")
+        .replace("\r\n", "\n")
+        .replace("\r", "\n")
+        .replace("\n", "<br>")
+    )
