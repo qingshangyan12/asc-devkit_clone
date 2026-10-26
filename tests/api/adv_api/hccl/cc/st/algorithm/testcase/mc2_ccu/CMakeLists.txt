@@ -179,7 +179,7 @@ target_include_directories(
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/toolchain
-    # TODO(T1临接): ST 可执行目标编译已切 asccomm 的源文件（wrapper/alg_template_base 等），需同款头路径（与 cc/src/CMakeLists.txt 的 mc2_client 挂载保持一致）
+    # asccomm headers for sources switched to the asccomm dataplane.
     $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 

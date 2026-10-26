@@ -1105,7 +1105,7 @@ HcclResult HcommSymWinGetPeerPointer(HcclCommSymWindow winHandle, size_t offset,
     return HcclSymWinGetPeerPointer(winHandle, offset, peerRank, ptr);
 }
 
-// asccomm (T1) dataplane simulations. Each entry delegates to the mirrored
+// asccomm dataplane simulations. Each entry delegates to the mirrored
 // Hcomm*OnThread simulation above so both symbol families share one simulation
 // implementation. The reduce/batch parameters use the ABI-identical Hcomm types
 // because the asccomm public header is not on the ST include path; C linkage
