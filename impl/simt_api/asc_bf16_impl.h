@@ -1349,62 +1349,62 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hgtu(bfloat16_t x, bfloat16_t y) { 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbeqx2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbeq(x.x, y.x) && __hbeq(x.y, y.y);
+    return __heq(x.x, y.x) && __heq(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbnex2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbne(x.x, y.x) && __hbne(x.y, y.y);
+    return __hne(x.x, y.x) && __hne(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hblex2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hble(x.x, y.x) && __hble(x.y, y.y);
+    return __hle(x.x, y.x) && __hle(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbgex2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbge(x.x, y.x) && __hbge(x.y, y.y);
+    return __hge(x.x, y.x) && __hge(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbltx2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hblt(x.x, y.x) && __hblt(x.y, y.y);
+    return __hlt(x.x, y.x) && __hlt(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbgtx2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbgt(x.x, y.x) && __hbgt(x.y, y.y);
+    return __hgt(x.x, y.x) && __hgt(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbequx2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbequ(x.x, y.x) && __hbequ(x.y, y.y);
+    return __hequ(x.x, y.x) && __hequ(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbneu(x.x, y.x) && __hbneu(x.y, y.y);
+    return __hneu(x.x, y.x) && __hneu(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbleux2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbleu(x.x, y.x) && __hbleu(x.y, y.y);
+    return __hleu(x.x, y.x) && __hleu(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbgeux2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbgeu(x.x, y.x) && __hbgeu(x.y, y.y);
+    return __hgeu(x.x, y.x) && __hgeu(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbltu(x.x, y.x) && __hbltu(x.y, y.y);
+    return __hltu(x.x, y.x) && __hltu(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hbgtux2(bfloat16x2_t x, bfloat16x2_t y)
 {
-    return __hbgtu(x.x, y.x) && __hbgtu(x.y, y.y);
+    return __hgtu(x.x, y.x) && __hgtu(x.y, y.y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __heqx2(bfloat16x2_t x, bfloat16x2_t y)
