@@ -9,6 +9,8 @@
  */
 #include "channel.h"
 #include <algorithm>
+#include <arpa/inet.h>
+#include <cstdio>
 #include <cstring>
 #include <vector>
 #include <set>
@@ -25,6 +27,39 @@ namespace {
 constexpr u32 PORT_IDX = 5U;
 constexpr u8 NON_ISOLATED_PORT = 127U;
 constexpr size_t MIN_PHY_LINK_COUNT = 8U;
+
+void LogEndpoint(const char* tag, uint32_t netLayer, uint32_t linkIdx, uint32_t localRank,
+    uint32_t remoteRank, const EndpointDesc& endpoint)
+{
+    const size_t eidLen = sizeof(endpoint.commAddr.eid);
+    char eid[eidLen * 2U + 1U] = {};
+    for (size_t i = 0; i < eidLen; ++i) {
+        (void)snprintf(eid + i * 2U, sizeof(eid) - i * 2U, "%02x", endpoint.commAddr.eid[i]);
+    }
+    char address[INET6_ADDRSTRLEN] = {};
+    if (endpoint.commAddr.type == COMM_ADDR_TYPE_IP_V4) {
+        (void)inet_ntop(AF_INET, &endpoint.commAddr.addr, address, sizeof(address));
+    } else if (endpoint.commAddr.type == COMM_ADDR_TYPE_IP_V6) {
+        (void)inet_ntop(AF_INET6, &endpoint.commAddr.addr6, address, sizeof(address));
+    }
+    HCCL_INFO(
+        "[EID_DUMP][%s] netLayer=%u linkIdx=%u localRank=%u remoteRank=%u protocol=%d "
+        "addrType=%d address=%s id=%u eid=%s locType=%d devPhyId=%u superDevId=%u serverIdx=%u superPodIdx=%u",
+        tag,
+        netLayer,
+        linkIdx,
+        localRank,
+        remoteRank,
+        static_cast<int>(endpoint.protocol),
+        static_cast<int>(endpoint.commAddr.type),
+        endpoint.commAddr.type == COMM_ADDR_TYPE_EID ? eid : address,
+        endpoint.commAddr.id,
+        static_cast<int>(endpoint.loc.locType),
+        endpoint.loc.device.devPhyId,
+        endpoint.loc.device.superDevId,
+        endpoint.loc.device.serverIdx,
+        endpoint.loc.device.superPodIdx);
+}
 } // namespace
 
 HcclResult CalcLevel0ChannelRequest(
@@ -192,6 +227,8 @@ HcclResult CreateChannelFromLink(
     channelDesc.remoteEndpoint.protocol = link.dstEndpointDesc.protocol;
     channelDesc.remoteEndpoint.commAddr = link.dstEndpointDesc.commAddr;
     channelDesc.remoteEndpoint.loc = link.dstEndpointDesc.loc;
+    LogEndpoint("local", netLayer, idx, myRank, rank, channelDesc.localEndpoint);
+    LogEndpoint("remote", netLayer, idx, myRank, rank, channelDesc.remoteEndpoint);
     HCCL_DEBUG(
         "%s local device phyId: %u, remote device phyId: %u.", funcName.c_str(),
         channelDesc.localEndpoint.loc.device.devPhyId, channelDesc.remoteEndpoint.loc.device.devPhyId);
@@ -512,6 +549,8 @@ HcclResult CalcChannelRequestMesh2D(
                 channelDesc.remoteEndpoint.protocol = link.dstEndpointDesc.protocol;
                 channelDesc.remoteEndpoint.commAddr = link.dstEndpointDesc.commAddr;
                 channelDesc.remoteEndpoint.loc = link.dstEndpointDesc.loc;
+                LogEndpoint("local", 0, idx, myRank, channelDesc.remoteRank, channelDesc.localEndpoint);
+                LogEndpoint("remote", 0, idx, myRank, channelDesc.remoteRank, channelDesc.remoteEndpoint);
                 protocolExists = true;
                 HCCL_INFO(
                     "[%s]Add channel request between %zu and %zu with protocol %zu type %u", __func__, myRank,
@@ -774,6 +813,8 @@ HcclResult ProcessLinksForChannel(
         channelDesc.remoteEndpoint.protocol = link.dstEndpointDesc.protocol;
         channelDesc.remoteEndpoint.commAddr = link.dstEndpointDesc.commAddr;
         channelDesc.remoteEndpoint.loc = link.dstEndpointDesc.loc;
+        LogEndpoint("local", netLayer, priorityLink, myRank, rank, channelDesc.localEndpoint);
+        LogEndpoint("remote", netLayer, priorityLink, myRank, rank, channelDesc.remoteEndpoint);
         CHK_RET(GetTopoTypeByLink(comm, netLayer, linkList[priorityLink], topoType));
         HCCL_INFO(
             "[CalcChannelRequestWithPriorTopo]Add channel request between %u and %u with protocol %u "
