@@ -42,7 +42,7 @@
 #include "c_api/reg_compute/reg_vector.h"
 #endif
 #else
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201))
 #include "c_api/reg_compute/reg_convert.h"
 #include "c_api/reg_compute/reg_load.h"
 #include "c_api/reg_compute/reg_store.h"
