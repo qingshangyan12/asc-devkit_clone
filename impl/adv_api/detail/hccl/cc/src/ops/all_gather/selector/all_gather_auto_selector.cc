@@ -267,11 +267,20 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         } else if (topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1) {
             selectAlgName = "AicpuAllGatherSoleNHR";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            if (dataSize > AG_AICPU_SMALL_DATA_SIZE &&
-                dataSize * topoInfo->userRankSize > AG_AICPU_SEQUENCE_DATA_SIZE) {
-                selectAlgName = "AicpuAllGatherSequenceMeshConcurNHR";
-            } else {
+            constexpr u64 AICPU_MAX_RANKSIZE = 1024;
+            constexpr u64 AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE = 1ULL * 1024 * 1024 * 1024;
+            if (topoInfo->topoLevelNums >= TOPO_LEVEL_NUM_3) {
+                selectAlgName = "AicpuAllGatherSoleNHR";
+            } else if (
+                dataSize * topoInfo->userRankSize >= AICPU_2LEVEL_MAX_TOTAL_DATA_SIZE &&
+                topoInfo->userRankSize >= AICPU_MAX_RANKSIZE) {
                 selectAlgName = "InsAllGatherParallelMesh1DNHR";
+            } else if (dataSize > AG_AICPU_SMALL_DATA_SIZE) {
+                selectAlgName = (dataSize * topoInfo->userRankSize > AG_AICPU_SEQUENCE_DATA_SIZE) ?
+                                    "AicpuAllGatherSequenceMeshConcurNHR" :
+                                    "InsAllGatherParallelMesh1DNHR";
+            } else {
+                selectAlgName = "AicpuAllGatherSoleNHR";
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
             selectAlgName = "AicpuAllGatherSoleNHRMultiLink";
