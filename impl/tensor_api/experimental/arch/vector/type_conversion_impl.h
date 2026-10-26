@@ -63,9 +63,9 @@ struct cast_element_bits {
             if constexpr (dst_bits == src_bits) {                                                   \
                 FUNC(dst, src, mask);                                                               \
             } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                 \
+                dst = FUNC(src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                \
             } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                 \
+                dst = FUNC(src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                \
             } else {                                                                                \
                 static_assert(sizeof(DstReg) == 0, "unsupported register cast width ratio");        \
             }                                                                                       \

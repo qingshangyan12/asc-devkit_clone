@@ -54,6 +54,7 @@ def gen_golden_data(scenario_num):
         nibbles[0::2] = x & 0x0F
         nibbles[1::2] = x >> 4
         golden = np.where(nibbles >= 8, nibbles - 16, nibbles).astype(np.float16)
+        golden = golden.reshape(-1, 4, 2).transpose(1, 0, 2).copy().reshape(-1)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)

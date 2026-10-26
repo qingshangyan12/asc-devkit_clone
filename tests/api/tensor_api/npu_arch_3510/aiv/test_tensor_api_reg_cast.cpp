@@ -29,6 +29,23 @@ constexpr cast_options float_to_half_options = {
 constexpr cast_options int32_to_float_options = {
     cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat};
 
+template <typename DstType, typename SrcType, cast_round_mode Round, cast_layout... Layouts>
+constexpr bool supports_saturated_and_unsaturated_casts()
+{
+    return ((asc::te::experimental::detail::reg_cast_op<DstType, SrcType, Layouts,
+                 Round, cast_sat_mode::not_sat>::supported &&
+                asc::te::experimental::detail::reg_cast_op<DstType, SrcType, Layouts,
+                    Round, cast_sat_mode::sat>::supported) && ...);
+}
+
+static_assert(supports_saturated_and_unsaturated_casts<half, float, cast_round_mode::odd,
+    cast_layout::zero, cast_layout::one>());
+static_assert(!asc::te::experimental::detail::reg_cast_op<half, float, cast_layout::two,
+    cast_round_mode::odd, cast_sat_mode::not_sat>::supported);
+static_assert(!asc::te::experimental::detail::reg_cast_op<float, half, cast_layout::zero,
+    cast_round_mode::odd, cast_sat_mode::not_sat>::supported);
+static_assert(!asc::te::experimental::detail::reg_cast_op<half, float, cast_layout::zero,
+    cast_round_mode::hybrid, cast_sat_mode::not_sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<float, half, cast_layout::zero,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<half, float, cast_layout::one,
