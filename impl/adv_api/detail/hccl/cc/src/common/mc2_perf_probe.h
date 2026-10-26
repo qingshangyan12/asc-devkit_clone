@@ -47,7 +47,9 @@ inline void Submitted(int status) {
     auto& s = Get(); s.submitted = Now(); s.valid |= 8;
     if (status) s.status = status;
 }
-inline void Finish(uint32_t status) {
+struct Totals { uint64_t init, msg, sq; };
+// Shared non-inlined body keeps B/C calculation and validation identical.
+__attribute__((noinline)) inline Totals Finish(uint32_t status, bool emitLog) {
     auto& s = Get();
     if (status || s.valid != 15 || s.messages != 1) s.status = -3;
     uint64_t init = 0, msg = 0, sq = 0;
@@ -55,10 +57,11 @@ inline void Finish(uint32_t status) {
         if (s.entry == 0 || s.poll < s.entry || s.parsed < s.poll || s.submitted < s.parsed) s.status = -4;
         else { init = s.poll-s.entry; msg = s.parsed-s.poll; sq = s.submitted-s.parsed; }
     }
-    HCCL_RUN_INFO("[MC2_PERF] launch=%llu messages=%u valid=%u init_ns=%llu msg_parse_ns=%llu sq_expand_ns=%llu cache=%d status=%d",
+    if (emitLog) HCCL_RUN_INFO("[MC2_PERF] launch=%llu messages=%u valid=%u init_ns=%llu msg_parse_ns=%llu sq_expand_ns=%llu cache=%d status=%d",
         static_cast<unsigned long long>(Launch()), s.messages, s.valid,
         static_cast<unsigned long long>(init), static_cast<unsigned long long>(msg),
         static_cast<unsigned long long>(sq), s.cache, s.status);
+    return {init, msg, sq};
 }
 }
 #endif
