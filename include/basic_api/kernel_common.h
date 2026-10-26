@@ -35,7 +35,11 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
+// asc_vf_call（helpers.h）为 9.2 新增设施；CANN 9.0–9.1 无此文件且 basic_api 内无使用点，
+// 用 __has_include 守卫以兼容仅 overlay basic_api 的场景。
+#if __has_include("../utils/base/helpers.h")
 #include "../utils/base/helpers.h"
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
