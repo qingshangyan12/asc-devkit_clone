@@ -537,8 +537,6 @@ __aicore__ inline void asc_mmad_mx(
     }
 }
 
-#include "impl/c_api/reg_base_impl/utils_impl.h"
-
 __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t m, uint16_t k,
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)

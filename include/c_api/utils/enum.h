@@ -14,6 +14,12 @@
 #include <cstdint>
 #include <type_traits>
 
+#if !defined(ASC_DEPRECATED)
+#define ASC_DEPRECATED(version, removal_date, replacement)                                                     \
+    [[deprecated("Deprecated since " #version ", Will be removed after " removal_date ", Use " #replacement \
+                 " instead.")]]
+#endif
+
 enum class asc_load_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
     NORMAL_LAST_VICTIM = 1,
@@ -30,7 +36,13 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NOTALLOC_CLEAN = 4
 };
 
-enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
+enum class asc_hf32_round_mode : uint8_t {
+    NEAREST_AWAY = 0,
+    NEAREST_EVEN = 1,
+    NEAREST_ZERO = NEAREST_AWAY // Compatible with the old name; the actual behavior is equivalent to NEAREST_AWAY.
+};
+
+enum class asc_l13d_repeat_direction : uint8_t { M_DIRECTION = 0, K_DIRECTION = 1 };
 
 enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
 

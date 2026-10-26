@@ -28,7 +28,11 @@ __aicore__ inline void asc_copy_ub2gm_impl(
     uint16_t src_stride)
 {
     if ASC_IS_AIV {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        copy_ubuf_to_gm_align_v2(dst, src, 0, n_burst, len_burst, false, false, 0, 0, dst_stride, src_stride, false);
+#else
         copy_ubuf_to_gm_align_v2(dst, src, 0, n_burst, len_burst, 0, dst_stride, src_stride);
+#endif
     }
 }
 

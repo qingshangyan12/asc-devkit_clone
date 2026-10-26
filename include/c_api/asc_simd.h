@@ -35,7 +35,7 @@
 #include "c_api/vector_compute/vector_compute.h"
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201))
 #include "c_api/reg_compute/reg_convert.h"
 #include "c_api/reg_compute/reg_load.h"
 #include "c_api/reg_compute/reg_store.h"

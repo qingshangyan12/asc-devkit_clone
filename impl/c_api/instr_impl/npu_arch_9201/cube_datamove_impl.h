@@ -25,6 +25,18 @@
 
 using asc_quant_mode = QuantMode_t;
 
+union asc_3d_padding_bitcode {
+    __aicore__ asc_3d_padding_bitcode() {}
+    half input_half;
+    bfloat16_t input_bfloat16;
+    int16_t input_int16;
+    uint16_t input_uint16;
+    int32_t input_int32;
+    uint32_t input_uint32;
+    float input_float;
+    uint64_t output;
+};
+
 
 constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
 

@@ -25,8 +25,11 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
-// A6(9201) reuses the arch-common vector compute implementations provided for A5(3510).
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/instr_impl/npu_arch_9201/vector_compute_impl/asc_shift_impl.h"
+#else
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#endif
 #endif
 /*
  *   asc_create_mask_b8(pat_mode);
@@ -220,6 +223,71 @@ __simd_callee__ inline void asc_and(vector_int32_t& dst, vector_int32_t src0, ve
 
 __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+// ==========asc_shiftleft_scalar(uint8_t/int8_t/uint16_t/int16_t, uint shift)==========
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint8_t& dst, vector_uint8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_int8_t& dst, vector_int8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_int16_t& dst, vector_int16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_int32_t& dst, vector_int32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_shiftleft_scalar(vector_uint8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_shiftleft_scalar(vector_int8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_shiftleft_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_shiftleft_scalar(vector_int16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_shiftleft_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_shiftleft_scalar(vector_int32_t src, uint32_t value, vector_bool mask);
+
+// ==========asc_shiftright_scalar(uint8_t/int8_t/uint16_t/int16_t, uint shift)==========
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint8_t& dst, vector_uint8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int8_t& dst, vector_int8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int16_t& dst, vector_int16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int32_t& dst, vector_int32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_shiftright_scalar(vector_uint8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_shiftright_scalar(vector_int8_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_shiftright_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_shiftright_scalar(vector_int16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_shiftright_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_shiftright_scalar(vector_int32_t src, uint32_t value, vector_bool mask);
+#endif
+#else
 // ==========asc_shiftleft_scalar(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t)==========
 __simd_callee__ inline void asc_shiftleft_scalar(
     vector_uint8_t& dst, vector_uint8_t src, int16_t value, vector_bool mask);
@@ -257,6 +325,7 @@ __simd_callee__ inline void asc_shiftright_scalar(
 
 __simd_callee__ inline void asc_shiftright_scalar(
     vector_int32_t& dst, vector_int32_t src, int16_t value, vector_bool mask);
+#endif
 
 // ==========asc_select(bool/uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_select(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask);
@@ -858,6 +927,71 @@ __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+// ==========asc_shiftleft(u8/s8/u16/s16/u32/s32, uint shift)==========
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_int8_t& dst, vector_int8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_int16_t& dst, vector_int16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_int32_t& dst, vector_int32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_shiftleft(vector_uint8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_shiftleft(vector_int8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_shiftleft(vector_uint16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_shiftleft(vector_int16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_shiftleft(vector_uint32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_shiftleft(vector_int32_t src0, vector_uint32_t shift, vector_bool mask);
+
+// ==========asc_shiftright(u8/s8/u16/s16/u32/s32, uint shift)==========
+__simd_callee__ inline void asc_shiftright(
+    vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright(
+    vector_int8_t& dst, vector_int8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright(
+    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright(
+    vector_int16_t& dst, vector_int16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright(
+    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline void asc_shiftright(
+    vector_int32_t& dst, vector_int32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_shiftright(vector_uint8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_shiftright(vector_int8_t src0, vector_uint8_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_shiftright(vector_uint16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_shiftright(vector_int16_t src0, vector_uint16_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_shiftright(vector_uint32_t src0, vector_uint32_t shift, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_shiftright(vector_int32_t src0, vector_uint32_t shift, vector_bool mask);
+#endif
+#else
 // ==========asc_shiftleft(u8/s8/u16/s16/u32/s32)==========
 __simd_callee__ inline void asc_shiftleft(
     vector_uint8_t& dst, vector_uint8_t src0, vector_int8_t src1, vector_bool mask);
@@ -894,6 +1028,7 @@ __simd_callee__ inline void asc_shiftright(
 
 __simd_callee__ inline void asc_shiftright(
     vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+#endif
 
 // ==========asc_not(u8/s8/u16/s16/half/u32/s32/f32/bool)==========
 __simd_callee__ inline void asc_not(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
