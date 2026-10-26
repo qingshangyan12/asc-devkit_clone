@@ -425,7 +425,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             CHK_RET(static_cast<HcclResult>(
                 asccomm_thread_notify_wait_on_thread(thread, notifyNumOnMainThread, CUSTOM_TIMEOUT)));
         } else {
-            if (HcommAclrtNotifyWaitOnThread(thread, resCtx->notifyIds[0], CUSTOM_TIMEOUT) != HCCL_SUCCESS) {
+            if (asccomm_aclrt_notify_wait_on_thread(thread, resCtx->notifyIds[0], CUSTOM_TIMEOUT) != HCCL_SUCCESS) {
                 HCCL_ERROR("failed to wait notify[%d] from host main stream", resCtx->notifyIds[0]);
                 return 1;
             }
@@ -479,7 +479,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 return 1;
             }
         } else {
-            if (HcommAclrtNotifyRecordOnThread(thread, resCtx->notifyIds[1]) != HCCL_SUCCESS) {
+            if (asccomm_aclrt_notify_record_on_thread(thread, resCtx->notifyIds[1]) != HCCL_SUCCESS) {
                 HCCL_ERROR("failed to record host main stream");
                 return 1;
             }

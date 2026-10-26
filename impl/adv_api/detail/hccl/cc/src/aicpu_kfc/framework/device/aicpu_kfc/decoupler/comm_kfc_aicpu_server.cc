@@ -25,9 +25,8 @@
 #include "framework/aicpu_hccl_process.h"
 #include "sqe_build_a5.h"
 #endif
+#include "asccomm_primitives_internal.h"
 #include "hccl_common.h"
-#include "stream_lite.h"
-#include "thread.h"
 
 using namespace HcclApi;
 namespace {
@@ -66,57 +65,6 @@ HcclResult IsDevice950(bool& isDevice950)
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
     isDevice950 = (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960);
-    return HCCL_SUCCESS;
-}
-
-// AICPU 数据面公开句柄的兼容解包：5739 起公开 ThreadHandle 为设备资源实体（POD HcommThreadEntity）
-// 地址，控制面在设备侧 init 时将原始 C++ 对象地址写入实体偏移 80（compatThreadHandle）；老控制面
-// 的句柄本身就是 C++ 对象地址（实体首部魔数不命中）。按实体头魔数识别后取兼容句柄再解引用，两种
-// ABI 均可消费。布局与 hcomm 仓 aicpu_thread_ctx.h::UnwrapThreadHandle 逐字对齐（abiHeader@0:
-// version@0/magicWord@4，compatThreadHandle@80）。
-struct ThreadEntityAbiHeader {
-    u32 version;
-    u32 magicWord;
-    u32 size;
-    u32 reserved;
-};
-static constexpr u32 THREAD_ENTITY_ABI_MAGIC_WORD = 0x0fcf0f6fU;
-static constexpr u64 THREAD_ENTITY_COMPAT_HANDLE_OFFSET = 80U;
-static_assert(offsetof(ThreadEntityAbiHeader, magicWord) == 4U, "thread entity ABI magic offset mismatch");
-
-ThreadHandle UnwrapDeviceThreadHandle(ThreadHandle handle)
-{
-    const auto* entity = reinterpret_cast<const ThreadEntityAbiHeader*>(handle);
-    if (entity->magicWord != THREAD_ENTITY_ABI_MAGIC_WORD) {
-        return handle; // 老控制面句柄：即 C++ 对象地址，原样通过
-    }
-    const auto* compatHandle = reinterpret_cast<const ThreadHandle*>(
-        reinterpret_cast<const char*>(handle) + THREAD_ENTITY_COMPAT_HANDLE_OFFSET);
-    if (*compatHandle == 0U) {
-        return 0U;
-    }
-    return *compatHandle;
-}
-
-HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& thread, Hccl::StreamLite*& streamLite)
-{
-    CHK_PRT_RET(
-        execCtx.mainThread == 0U,
-        HCCL_ERROR(
-            "Invalid main thread for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(), execCtx.opParamKey),
-        HCCL_E_PARA);
-    const ThreadHandle unwrapped = UnwrapDeviceThreadHandle(execCtx.mainThread);
-    CHK_PRT_RET(
-        unwrapped == 0U,
-        HCCL_ERROR(
-            "Invalid thread entity handle for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(),
-            execCtx.opParamKey),
-        HCCL_E_PARA);
-    thread = reinterpret_cast<hccl::Thread*>(unwrapped);
-    CHK_PTR_NULL(thread);
-    streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
-    CHK_PTR_NULL(streamLite);
-    CHK_PTR_NULL(streamLite->GetRtsq());
     return HCCL_SUCCESS;
 }
 
@@ -472,76 +420,27 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         static_cast<u32>(isLast), static_cast<unsigned long long>(execCtx.mainThread), execCtx.mainStream,
         execCtx.dispatcher);
     if (execCtx.resourceType == ServerExecResourceType::NEXT_AICPU) {
-        hccl::Thread* thread = nullptr;
-        Hccl::StreamLite* streamLite = nullptr;
-        CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
         HCCL_INFO(
-            "[AICPU_ORDER_DFX][Ccore] WaitNext group[%u], commName[%s], opParamKey[%#llx], "
-            "thread[%p], streamLite[%p], rtsq[%p], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], "
-            "valueVal[%u], turnNum[%u], isLast[%u].",
-            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey), thread,
-            streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
+            "[AICPU_ORDER_DFX][Ccore] WaitNext group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
+            "waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u], isLast[%u].",
+            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
+            static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(waitAddr),
             ReadAicpuOrderDfxValue(waitAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum, static_cast<u32>(isLast));
+        CHK_RET(static_cast<HcclResult>(asccomm_addr_notify_wait_on_thread(
+            execCtx.mainThread, waitAddr, valueAddr, static_cast<uint8_t>(isLast))));
         HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcoreWaitNext] group %u, thread %p, streamLite %p, rtsq %p, "
-            "waitAddr %#llx, valueAddr %#llx.",
-            groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
-            static_cast<unsigned long long>(valueAddr));
-        EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast), return HCCL_E_INTERNAL);
-        HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcoreWaitSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
-            thread, streamLite);
-        EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
-        HCCL_INFO(
-            "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCoreWait group[%u], thread[%p], streamLite[%p], "
-            "rtsq[%p], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
-            groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
+            "[AICPU_ORDER_DFX][Ccore] WaitNextDone group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
+            "waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
+            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
+            static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(waitAddr),
             ReadAicpuOrderDfxValue(waitAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum);
-        HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcoreWaitEnd] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum, thread,
-            streamLite);
         return HCCL_SUCCESS;
     }
 
-#ifdef MC2_SERVER_ONLY
     HCCL_ERROR("Group %u: mc2_server does not support legacy CCore wait.", groupIdx_);
     return HCCL_E_INTERNAL;
-#else
-    CHK_PTR_NULL(execCtx.mainStream);
-    uint8_t* sqeBuffer = nullptr;
-    uint8_t* sqeTypeAddr = nullptr;
-    uint8_t* sqeDfxInfoAddr = nullptr;
-    uint16_t taskId16 = 0;
-
-    CHK_RET(execCtx.mainStream->GetNextSqeBufferAddr(sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr, taskId16));
-
-    auto* sqeCtx = execCtx.mainStream->GetSqeContextPtr();
-    CHK_PTR_NULL(sqeCtx);
-
-    const u32 a5TaskId = (static_cast<u32>(sqeCtx->buffer.filpNum) << 16) | taskId16;
-    HCCL_INFO(
-        "[MC2_OPEN_DIAG][CcoreWaitLegacy] group %u, turnNum %u, taskId16 %u, a5TaskId %u, "
-        "sqeBuffer %p, sqeTypeAddr %p, sqeDfxInfoAddr %p.",
-        groupIdx_, turnNum, taskId16, a5TaskId, sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr);
-
-    Hccl::BuildA5SqeCCoreNotifyWait(0, a5TaskId, waitAddr, valueAddr, isLast, sqeBuffer);
-    *sqeTypeAddr = static_cast<uint8_t>(SqeType::A5_CCORE_NOTIFY_WAIT_SQE);
-    sqeCtx->buffer.addInfo[taskId16 % hccl::HCCL_SQE_MAX_CNT] =
-        (static_cast<u32>(turnNum) << 16) | static_cast<u32>(isLast);
-    HCCL_INFO(
-        "[AICPU_ORDER_DFX][SQE] CCoreNotifyWait legacy group[%u], taskId16[%u], a5TaskId[%u], "
-        "sqeType[%u], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u], isLast[%u].",
-        groupIdx_, taskId16, a5TaskId, static_cast<u32>(SqeType::A5_CCORE_NOTIFY_WAIT_SQE),
-        static_cast<unsigned long long>(waitAddr), ReadAicpuOrderDfxValue(waitAddr),
-        static_cast<unsigned long long>(valueAddr), ReadAicpuOrderDfxValue(valueAddr), turnNum,
-        static_cast<u32>(isLast));
-
-    HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
-    HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
-    return ret;
-#endif
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
@@ -557,74 +456,27 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         static_cast<unsigned long long>(valueAddr), static_cast<unsigned long long>(turnNumsAddr),
         static_cast<unsigned long long>(execCtx.mainThread), execCtx.mainStream, execCtx.dispatcher);
     if (execCtx.resourceType == ServerExecResourceType::NEXT_AICPU) {
-        hccl::Thread* thread = nullptr;
-        Hccl::StreamLite* streamLite = nullptr;
-        CHK_RET(GetNextThreadAndStream(execCtx, thread, streamLite));
         HCCL_INFO(
-            "[AICPU_ORDER_DFX][Ccore] PostNext group[%u], commName[%s], opParamKey[%#llx], "
-            "thread[%p], streamLite[%p], rtsq[%p], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], "
-            "valueVal[%u], turnNum[%u].",
-            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey), thread,
-            streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
+            "[AICPU_ORDER_DFX][Ccore] PostNext group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
+            "recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
+            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
+            static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(recordAddr),
             ReadAicpuOrderDfxValue(recordAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum);
+        CHK_RET(static_cast<HcclResult>(
+            asccomm_addr_notify_record_on_thread(execCtx.mainThread, recordAddr, valueAddr)));
         HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcorePostNext] group %u, thread %p, streamLite %p, rtsq %p, "
-            "recordAddr %#llx, valueAddr %#llx.",
-            groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
-            static_cast<unsigned long long>(valueAddr));
-        EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
-        HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcorePostSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
-            thread, streamLite);
-        EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
-        HCCL_INFO(
-            "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCorePost group[%u], thread[%p], streamLite[%p], "
-            "rtsq[%p], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
-            groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
+            "[AICPU_ORDER_DFX][Ccore] PostNextDone group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
+            "recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
+            groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
+            static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(recordAddr),
             ReadAicpuOrderDfxValue(recordAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum);
-        HCCL_INFO(
-            "[MC2_OPEN_DIAG][CcorePostEnd] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum, thread,
-            streamLite);
         return HCCL_SUCCESS;
     }
 
-#ifdef MC2_SERVER_ONLY
     HCCL_ERROR("Group %u: mc2_server does not support legacy CCore post.", groupIdx_);
     return HCCL_E_INTERNAL;
-#else
-    CHK_PTR_NULL(execCtx.mainStream);
-    uint8_t* sqeBuffer = nullptr;
-    uint8_t* sqeTypeAddr = nullptr;
-    uint8_t* sqeDfxInfoAddr = nullptr;
-    uint16_t taskId16 = 0;
-
-    CHK_RET(execCtx.mainStream->GetNextSqeBufferAddr(sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr, taskId16));
-
-    auto* sqeCtx = execCtx.mainStream->GetSqeContextPtr();
-    CHK_PTR_NULL(sqeCtx);
-
-    const u32 a5TaskId = (static_cast<u32>(sqeCtx->buffer.filpNum) << 16) | taskId16;
-    HCCL_INFO(
-        "[MC2_OPEN_DIAG][CcorePostLegacy] group %u, turnNum %u, taskId16 %u, a5TaskId %u, "
-        "sqeBuffer %p, sqeTypeAddr %p, sqeDfxInfoAddr %p.",
-        groupIdx_, turnNum, taskId16, a5TaskId, sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr);
-
-    Hccl::BuildA5SqeCCoreNotifyRecord(0, a5TaskId, recordAddr, valueAddr, sqeBuffer);
-    *sqeTypeAddr = static_cast<uint8_t>(SqeType::A5_CCORE_NOTIFY_RECORD_SQE);
-    sqeCtx->buffer.addInfo[taskId16 % hccl::HCCL_SQE_MAX_CNT] = turnNum;
-    HCCL_INFO(
-        "[AICPU_ORDER_DFX][SQE] CCoreNotifyRecord legacy group[%u], taskId16[%u], a5TaskId[%u], "
-        "sqeType[%u], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
-        groupIdx_, taskId16, a5TaskId, static_cast<u32>(SqeType::A5_CCORE_NOTIFY_RECORD_SQE),
-        static_cast<unsigned long long>(recordAddr), ReadAicpuOrderDfxValue(recordAddr),
-        static_cast<unsigned long long>(valueAddr), ReadAicpuOrderDfxValue(valueAddr), turnNum);
-
-    HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
-    HCCL_INFO("[MC2_OPEN_DIAG][CcorePostEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
-    return ret;
-#endif
 }
 
 HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
@@ -1027,36 +879,26 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
             groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
             static_cast<u32>(execCtx.resourceType), static_cast<unsigned long long>(execCtx.mainThread),
             execCtx.mainStream, execCtx.dispatcher);
-        if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU || execCtx.mainThread == 0U) {
+
+        const ThreadEntity* threadEntity =
+            reinterpret_cast<const ThreadEntity*>(static_cast<uintptr_t>(execCtx.mainThread));
+        if (threadEntity == nullptr || threadEntity->abiHeader.magicWord != HCOMM_THREAD_ENTITY_MAGIC_WORD) {
+            MC2_TIMEOUT_LOG(
+                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] comm %s, invalid entity header, magic[%x].",
+                execCtx.commName.c_str(), threadEntity == nullptr ? 0U : threadEntity->abiHeader.magicWord);
             continue;
         }
-
-        auto* thread = reinterpret_cast<hccl::Thread*>(UnwrapDeviceThreadHandle(execCtx.mainThread));
-        if (thread == nullptr) {
+        if (threadEntity->sqContextAddr == nullptr) {
             MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
+                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] comm %s, sqContextAddr is null.",
                 execCtx.commName.c_str());
             continue;
         }
-
-        auto* streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
-        if (streamLite == nullptr || streamLite->GetRtsq() == nullptr) {
-            MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p or rtsq is nullptr.",
-                groupIdx_, execCtx.commName.c_str(), streamLite);
-            continue;
-        }
-        auto* rtsq = streamLite->GetRtsq();
-        u32 queryHead = INVALID_UINT;
-        u32 queryTail = INVALID_UINT;
-        EXECEPTION_CATCH(queryHead = rtsq->QuerySqHead(), queryHead = INVALID_UINT);
-        EXECEPTION_CATCH(queryTail = rtsq->QuerySqTail(), queryTail = INVALID_UINT);
+        const auto& rtsq = threadEntity->sqContextAddr->contextInfo.RtsqContext;
         MC2_TIMEOUT_LOG(
             isHardTimeout,
-            "[MC2_OPEN_TIMEOUT][Rtsq] group %u, commName[%s], streamLite %p, rtsq %p, cachedHead %u, "
-            "cachedTail %u, depth %u, taskId %u, queryHead %u, queryTail %u.",
-            groupIdx_, execCtx.commName.c_str(), streamLite, rtsq, rtsq->GetHead(), rtsq->GetTail(), rtsq->GetSqDepth(),
-            rtsq->GetTaskId(), queryHead, queryTail);
+            "[MC2_OPEN_TIMEOUT][Rtsq] comm %s, sqHead %u, sqTail %u, sqDepth %u, taskId %u, pendingSqeCnt %u.",
+            execCtx.commName.c_str(), rtsq.sqHead, rtsq.sqTail, rtsq.sqDepth, rtsq.taskId, rtsq.pendingSqeCnt);
     }
 }
 
