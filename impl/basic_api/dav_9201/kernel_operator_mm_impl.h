@@ -703,6 +703,95 @@ __aicore__ inline void MmadCal(
 }
 
 /* **************************************************************************************************
+ * MmadMx                                                                                           *
+ * **************************************************************************************************/
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadParams& mmadParams)
+{
+    if ASCEND_IS_AIC {
+        bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, hifloat4x2_t, hifloat4x2_t>,
+            Tuple<float, fp8_e4m3_t, hifloat4x2_t>, Tuple<float, fp8_e4m3_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e4m3_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>, Tuple<float, fp8_e4m3_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e4m3_t, fp4x2_e1m2_t>, Tuple<float, fp8_e5m2_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e5m2_t, fp4x2_e1m2_t>, Tuple<float, half, hifloat4x2_t>,
+            Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
+            Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+        constexpr uint32_t MX_BUFFER_SCALE = 8; // mx buffer size is 8KB
+        uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
+        uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
+        mad_mx(
+            c, 0, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m,
+            mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource,
+            cmatrixInitVal);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxCal(
+    __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, const MmadParams& mmadParams, bool cmatrixSource)
+{
+    if ASCEND_IS_AIC {
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, hifloat4x2_t, hifloat4x2_t>,
+            Tuple<float, fp8_e4m3_t, hifloat4x2_t>, Tuple<float, fp8_e4m3_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e4m3_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>, Tuple<float, fp8_e4m3_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e4m3_t, fp4x2_e1m2_t>, Tuple<float, fp8_e5m2_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e5m2_t, fp4x2_e1m2_t>, Tuple<float, half, hifloat4x2_t>,
+            Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
+            Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, MmadBitModeParams& mmadParams)
+{
+    if ASCEND_IS_AIC {
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, hifloat4x2_t, hifloat4x2_t>,
+            Tuple<float, fp8_e4m3_t, hifloat4x2_t>, Tuple<float, fp8_e4m3_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e4m3_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>, Tuple<float, fp8_e4m3_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e4m3_t, fp4x2_e1m2_t>, Tuple<float, fp8_e5m2_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e5m2_t, fp4x2_e1m2_t>, Tuple<float, half, hifloat4x2_t>,
+            Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
+            Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadMxCal(
+    __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
+{
+    if ASCEND_IS_AIC {
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, hifloat4x2_t, hifloat4x2_t>,
+            Tuple<float, fp8_e4m3_t, hifloat4x2_t>, Tuple<float, fp8_e4m3_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e4m3_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>, Tuple<float, fp8_e4m3_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e4m3_t, fp4x2_e1m2_t>, Tuple<float, fp8_e5m2_t, fp4x2_e2m1_t>,
+            Tuple<float, fp8_e5m2_t, fp4x2_e1m2_t>, Tuple<float, half, hifloat4x2_t>,
+            Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
+            Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+    }
+}
+
+/* **************************************************************************************************
  * BroadCastVecToMM                                             *
  * ************************************************************************************************* */
 template <typename T>
