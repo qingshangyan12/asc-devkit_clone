@@ -1679,7 +1679,6 @@
                 -   [cast_layout](SIMD-API/tensor_api/reg_vector_compute/aux_data_types/cast_layout.md)
                 -   [cast_round_mode](SIMD-API/tensor_api/reg_vector_compute/aux_data_types/cast_round_mode.md)
                 -   [cast_sat_mode](SIMD-API/tensor_api/reg_vector_compute/aux_data_types/cast_sat_mode.md)
-                -   [cast_options](SIMD-API/tensor_api/reg_vector_compute/aux_data_types/cast_options.md)
                 -   [merge_mode](SIMD-API/tensor_api/reg_vector_compute/aux_data_types/merge_mode.md)
             -   [矢量计算的搬入](SIMD-API/tensor_api/reg_vector_compute/vector_compute_load/vector_compute_load.md)
                 -   [copy（Global Memory到Unified Buffer高维切分数据搬运）](SIMD-API/tensor_api/reg_vector_compute/vector_compute_load/copy_gm_to_ub.md)
