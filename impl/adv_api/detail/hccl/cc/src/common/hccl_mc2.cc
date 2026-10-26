@@ -828,7 +828,8 @@ HcclResult Mc2AcquireCcResCtxAicpu(HcclComm comm, uint8_t ccType, void* ccArgs, 
     CHK_RET(PrepareCcOpParam(ccType, args, topoTag, commName, rankSize, opParam));
     CHK_RET(PrepareCcAlgResources(comm, args.algConfig.c_str(), opParam, true));
     // The resource storage engine is AICPU; the selected execution engine is stored in opParam.
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParam, OpExecuteConfigToCommEngine(args.commEngine), &result));
+    CHK_RET(HcclAllocOpResCtx(
+        comm, ctxTag, opParam, OpExecuteConfigToCommEngine(args.commEngine), &result));
 
     const std::string srcDataTypeName = GetDataTypeEnumStr(args.srcDataType);
     const std::string dstDataTypeName = GetDataTypeEnumStr(args.dstDataType);
@@ -1265,7 +1266,8 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
     CHK_PTR_NULL(ccResCtx);
     if (ccResCtxSize < sizeof(OpResCtx)) {
         HCCL_ERROR(
-            "[Mc2CcKernelLaunch] invalid ccResCtxSize[%u], expected at least[%zu].", ccResCtxSize, sizeof(OpResCtx));
+            "[Mc2CcKernelLaunch] invalid ccResCtxSize[%u], expected at least[%zu].", ccResCtxSize,
+            sizeof(OpResCtx));
         return HCCL_E_PARA;
     }
 
