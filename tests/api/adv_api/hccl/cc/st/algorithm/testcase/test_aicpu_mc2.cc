@@ -340,7 +340,7 @@ TEST_F(AicpuMc2Test, AcquireAicpuTsBuildsContextDecoupledOpParam)
         // engine (opParam.engine) to the thread scheduled variant. The host-side launch dispatch key
         // (opResCtx.commEngine) stays COMM_ENGINE_AICPU, which is what Mc2CcKernelLaunch switches on.
         EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
-        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
         EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
         // The AICPU path is stream decoupled: the launch stream is handed to Mc2CcKernelLaunch instead.
@@ -367,7 +367,7 @@ TEST_F(AicpuMc2Test, AcquireAcceptsPlainAicpuCommEngine)
         ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
         EXPECT_EQ(outcome.ccResCtxSize, sizeof(OpResCtx));
         EXPECT_EQ(outcome.opResCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
         EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
@@ -543,7 +543,8 @@ TEST_F(AicpuMc2Test, AllocOpResCtxSingleParamFillsContextWithoutTiling)
     EXPECT_EQ(opResCtx->rankSize, RANK_SIZE);
     EXPECT_EQ(opResCtx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_NE(opResCtx->workSpace, 0U);
-    EXPECT_NE(opResCtx->workSpaceSize, 0U);
+    EXPECT_EQ(opResCtx->workSpace % 512U, 0U);
+    EXPECT_EQ(opResCtx->workSpaceSize, 20U * 1024U * 1024U);
     EXPECT_EQ(opResCtx->opParamSize[0], sizeof(OpParam));
     ASSERT_NE(opResCtx->algInfo[0].opParam, 0U);
     // The single param overload carries no tiling, so the tiling offset stays untouched.
