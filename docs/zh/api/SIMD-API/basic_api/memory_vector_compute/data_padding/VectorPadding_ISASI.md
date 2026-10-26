@@ -85,9 +85,9 @@
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元每次读取连续的256Bytes数据进行计算。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数，类型为[UnaryRepeatParams](../../aux_data_structures/UnaryRepeatParams.md)，包含相邻迭代间相同DataBlock及同一迭代内不同DataBlock的地址步长等参数。参数说明请参考[高维切分API](../../../../../guide/programming_guide/library_api/basic_api/interface_classification/high_dim_split_api.md)。 |
 
+<!-- npu="310p" id8 -->
 ## 数据类型
 
-<!-- npu="310p" id8 -->
 - 针对Atlas推理系列产品AI Core，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id8 -->
 
