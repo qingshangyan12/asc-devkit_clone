@@ -68,12 +68,12 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
  * @tparam Mode Mask merge mode. In zeroing mode, unselected elements are set to zero. In merging mode, unselected
  * elements retain their original values in dst.
  * @tparam T Element type of the register tensor.
- * @return The destination register tensor after filling. Its active-lane mask is the input mask.
+ * @return The destination register tensor after filling. Its active-lane mask retains the original mask of dst.
  * @param [in,out] dst Destination register tensor.
  * @param [in] value Scalar value copied to each enabled element.
  * @param [in] mask Mask that specifies the elements to fill.
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
- * applies the behavior specified by Mode. The result preserves the active-lane mask.
+ * applies the behavior specified by Mode. The result retains the original active-lane mask of dst.
  */
 template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(
@@ -90,12 +90,12 @@ __simd_callee__ inline reg_tensor<T> fill(
  * @tparam Mode Mask merge mode. In zeroing mode, unselected elements are set to zero. In merging mode, unselected
  * elements retain their original values in dst.
  * @tparam T Element type of the register tensor.
- * @return The destination register tensor after filling. Its active-lane mask is the input mask.
+ * @return The destination register tensor after filling. Its active-lane mask retains the original mask of dst.
  * @param [in,out] dst Destination register tensor.
  * @param [in] src Source register tensor whose lowest element is broadcast.
  * @param [in] mask Mask that specifies the elements to fill.
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
- * applies the behavior specified by Mode. The result preserves the active-lane mask.
+ * applies the behavior specified by Mode. The result retains the original active-lane mask of dst.
  */
 template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(

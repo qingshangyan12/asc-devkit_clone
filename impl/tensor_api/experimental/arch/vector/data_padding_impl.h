@@ -74,7 +74,6 @@ __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, co
     } else {
         asc_duplicate_scalar_merge(dst.reg, value, mask.reg);
     }
-    dst.mask = mask.reg;
     return dst;
 }
 
@@ -91,7 +90,6 @@ __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T
     } else {
         asc_duplicate_merge(dst.reg, src.reg, mask.reg);
     }
-    dst.mask = mask.reg;
     return dst;
 }
 } // namespace experimental

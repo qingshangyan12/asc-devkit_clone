@@ -92,7 +92,7 @@
 
 ## 返回值说明
 
-返回 `reg_tensor<T>`，包含数据广播后的结果。返回值的 `mask` 与 输入的 `mask` 相同。
+返回`reg_tensor<T>`，包含数据广播后的结果。未指定`dst`的重载中，返回值的`mask`与输入的`mask`相同；指定`dst`的重载中，返回值保留`dst`原有的`mask`。
 
 ## 约束说明
 
@@ -134,6 +134,26 @@
             const auto coord = asc::te::make_coord(offset);
             auto x_reg = asc::te::experimental::load(x_tensor, coord);
             auto y_reg = asc::te::experimental::fill(x_reg, mask);
+            asc::te::experimental::store(y_tensor, coord, y_reg);
+        }
+    }
+    ```
+
+- 示例三
+
+    ```cpp
+    template <typename T, typename U>
+    __simd_vf__ inline void fill_vf(T y_tensor, U scalar, uint32_t repeat_times, uint32_t one_repeat_size)
+    {
+        uint32_t count = total_length;
+        using data_type = typename T::data_type;
+        for (uint16_t i = 0; i < repeat_times; ++i) {
+            auto mask = asc::te::experimental::update_mask<data_type>(count);
+            uint32_t offset = i * one_repeat_size;
+            const auto coord = asc::te::make_coord(offset);
+            auto y_reg = asc::te::experimental::load(y_tensor, coord);
+            y_reg = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(
+                y_reg, scalar, mask);
             asc::te::experimental::store(y_tensor, coord, y_reg);
         }
     }
