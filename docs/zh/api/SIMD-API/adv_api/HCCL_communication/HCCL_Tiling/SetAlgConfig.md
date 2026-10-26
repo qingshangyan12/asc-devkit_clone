@@ -41,7 +41,7 @@ uint32_t SetAlgConfig(const std::string& algConfig)
     | `<域内遍历方式>` | `[]`中的多个取值按通信层级从低到高排列 | 至少一个 |
     | `.<附加属性>` | 该层的附加功能属性 | 可选 |
 
-    外部算法名末尾支持可选的算子级保序后缀`[order.strong]`，如`sole[mesh] [order.strong]`。当前版本该后缀仅被校验与记录，不影响算法选定结果。
+    通信算法配置末尾支持可选的算子级保序后缀`[order.strong]`，如`sole[mesh] [order.strong]`。当前版本该后缀仅被校验与记录，不影响算法选定结果。
 
 2. 编排方式
 
@@ -66,7 +66,7 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 
     | 取值 | 功能类别 | 含义 |
     |---|---|---|
-    | `mesh.chunk` | 传输 | 将数据划分为多个chunk分轮传输，减小scratch占用 |
+    | `mesh.chunk` | 传输 | 将数据划分为多个chunk分轮传输 |
     | `mesh.one_shot` | 编排 | 一趟Mesh通信完成AllReduce |
     | `mesh.two_shot` | 编排 | 同层先执行ReduceScatter，再执行AllGather |
     | `mesh.multi_channel` | 通道 | Mesh域内每对rank之间建立多条物理通道并发传输数据 |
@@ -87,7 +87,7 @@ uint32_t SetAlgConfig(const std::string& algConfig)
     - `nhr`（非均衡层次环遍历）：数据沿环逐卡接力传播，适用于数据需要跨卡接力放大或收缩的原语（如AllGather、ReduceScatter），且仅在CLOS组网（经交换芯片互连、非全直连）下有收益。
     - 混合组网（如机内Mesh直连+机间经交换芯片互连）：`[]`中按level0->level1从低到高逐层指定，最多支持两个通信域，例如双层组网下AllGather使用`parallel[mesh,nhr]`。
 
-    一句话总结：AlltoAll/AlltoAllV恒配`mesh`；AllGather/ReduceScatter在Mesh组网配`mesh`、CLOS组网配`nhr`；AllReduce在CCU服务端仅支持`mesh`遍历，AI CPU服务端还支持含`nhr`层的取值。各通信任务在各服务端实际可用的取值以上方参数说明中的列表为准。
+    一句话总结：AlltoAll、AlltoAllV配置为mesh；AllGather、ReduceScatter在Mesh组网配置为mesh、CLOS组网配置为nhr；AllReduce在CCU服务端仅支持mesh遍历，AI CPU服务端还支持含nhr层的取值。各通信任务在各服务端实际可用的取值以上方参数说明中的列表为准。
 
     （3）编排方式与附加属性的选择
 
@@ -110,7 +110,7 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 ## 约束说明
 
 <!-- npu="950" id5 -->
--   对于Ascend 950PR&950DT系列产品，外部算法名需与当前通信服务端类型及组网拓扑匹配，方可解析为唯一算法。无法解析时，AI CPU服务端将打印WARNING日志并回退至自动选路；CCU服务端将报算法不支持。
+-   对于Ascend 950PR&950DT系列产品，通信算法配置需与当前通信服务端类型及组网拓扑匹配，方可解析为唯一算法。无法解析时，AI CPU服务端将打印WARNING日志并回退至自动选路；CCU服务端将报算法不支持。
 <!-- end id5 -->
 
 ## 调用示例
