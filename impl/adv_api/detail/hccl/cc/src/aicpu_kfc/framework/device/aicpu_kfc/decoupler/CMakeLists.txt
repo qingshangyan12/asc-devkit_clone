@@ -121,6 +121,7 @@ if(TARGET mc2_server)
     target_compile_definitions(mc2_server_decoupler PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_DEFINITIONS>
         MC2_SERVER_ONLY
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_compile_options(mc2_server_decoupler PRIVATE
@@ -138,6 +139,9 @@ if(TARGET mc2_server)
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu_new
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+
+        ${ASCCOMM_PRIMITIVES_HDR}
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
 
         ${MC2_SERVER_CCL_INCLUDE_LIST}
         ${MC2_SERVER_ORION_HEAD_LIST}
