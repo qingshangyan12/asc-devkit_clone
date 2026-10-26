@@ -181,6 +181,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 - 量化和ReLU参数不能为inf/nan和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
+
 <!-- npu="950" id18 -->
 - dualDstCtrl仅支持在普通搬运模式（NZ2NZ）或NZ2ND搬运场景下使用，不支持随路功能场景。
 - 当启用NZ2DN且srcNzC0Stride不等于1时，不能同时开启unitFlag。
@@ -202,9 +203,8 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
     对于整数类型只有饱和模式。
     L0C Buffer到UB搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id18 -->
-
-<!-- npu="950" id20 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id3 -->
+<!-- npu="950" id20 -->
 
 ## 关键特性说明
 
