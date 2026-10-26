@@ -107,9 +107,15 @@
     msobjdump --sass <input_file> [--lineinfo] [--source]
     ```
 
-    `--sass <input_file>`为必选，用于输出输入文件中Device侧的Ascend AICore指令。`--lineinfo`用于显示源码文件名和行号，`--source`、`-s`用于在反汇编结果中显示对应源码；使用这两个选项时需要指定`--sass`。
+    **参数说明**
 
-    `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编；`--source`还会读取调试信息中记录的源文件，源文件找不到时，`llvm-objdump`会将warning写入stderr。
+    | 参数（区分大小写） | 可选/必选 | 说明 |
+    | ---- | ---- | ---- |
+    | `--sass <input_file>` | 必选 | 反汇编输入文件中Device侧的Ascend AICore指令。<br>`<input_file>`表示待反汇编的文件路径。 |
+    | `--lineinfo` | 可选 | 与`--sass`配套使用，在反汇编结果中显示源文件名和行号。 |
+    | `--source`，`-s` | 可选 | 与`--sass`配套使用，在反汇编结果中显示对应源码。源文件需要能够按调试信息中记录的路径访问。 |
+
+    `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编。
 
 **表4**  核函数（Kernel）直调工程支持的ELF解析字段说明<a name="table94384560259"></a>
 
