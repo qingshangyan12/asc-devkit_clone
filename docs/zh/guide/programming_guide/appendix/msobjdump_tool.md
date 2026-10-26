@@ -101,6 +101,16 @@
     | ---- | ---- | ---- |
     | `--list-elf <elf_file>`，`-l` | 必选 | 获取ELF文件中包含的device信息文件列表，并打印显示。<br>`<elf_file>`表示待打印的ELF文件路径，如`/home/op_api/lib_api.so`。 |
 
+-   **反汇编Ascend AICore指令的命令**<a id="msobjdump-sass"></a>
+
+    ```
+    msobjdump --sass <input_file> [--lineinfo] [--source]
+    ```
+
+    `--sass <input_file>`为必选，用于输出输入文件中Device侧的Ascend AICore指令。`--lineinfo`用于显示源码文件名和行号，`--source`、`-s`用于在反汇编结果中显示对应源码；使用这两个选项时需要指定`--sass`。
+
+    `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编；`--source`还会读取调试信息中记录的源文件，源文件找不到时，`llvm-objdump`会将warning写入stderr。
+
 **表4**  核函数（Kernel）直调工程支持的ELF解析字段说明<a name="table94384560259"></a>
 
 | 字段名 | 含义 | 是否必选 | 打印说明 |
@@ -142,16 +152,6 @@
 | `MIX_AIV_MAIN` | AIC、AIV混合场景下，使用了多核控制相关指令时，设置核函数（Kernel）的类型为MIX，算子执行时会同时启动AI Core上的Cube核和Vector核，比如用户在host侧设置blocknum为10，且设置task_ration为1：2，则会启动10个Vector核和20个Cube核。 |
 | `AIC_ROLLBACK` | 算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Cube Core使用。 |
 | `AIV_ROLLBACK` | 算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Vector Core使用。 |
-
-## 反汇编Ascend AICore指令的命令<a id="msobjdump-sass"></a>
-
-```
-msobjdump --sass <input_file> [--lineinfo] [--source]
-```
-
-`--sass <input_file>`为必选，用于输出输入文件中Device侧的Ascend AICore指令。`--lineinfo`用于显示源码文件名和行号，`--source`、`-s`用于在反汇编结果中显示对应源码；使用这两个选项时需要指定`--sass`。
-
-`--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编；`--source`还会读取调试信息中记录的源文件，源文件找不到时，`llvm-objdump`会将warning写入stderr。
 
 ## 使用样例（核函数（Kernel）直调工程）<a name="section_fusion_compile_msobjdump"></a>
 
