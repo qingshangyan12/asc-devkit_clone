@@ -1271,3 +1271,15 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
     }
 }
 } // extern "C"
+
+Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
+{
+    uint32_t ccResCtxSize = 0U;
+    return Mc2AcquireCcResCtx(comm, ccType, ccArgs, ccResCtx, &ccResCtxSize);
+}
+
+Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
+{
+    return Mc2CcKernelLaunch(stream, ccResCtx, static_cast<uint32_t>(sizeof(OpResCtx)));
+}

@@ -195,6 +195,29 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 #endif // __cplusplus
 
 /**
+ * @brief Allocate the opaque ccResCtx object for MC2 builtin APIs.
+ * @param comm Communication domain handle.
+ * @param ccType MC2 operation type.
+ * @param ccArgs Opaque argument object created by Mc2GetCcArgs.
+ * @param ccResCtx Output pointer to store the allocated resource context.
+ * @note Same as the overload with ccResCtxSize, but does not return the context size.
+ *       Declared with C++ linkage (outside the extern "C" block) to allow overloading without
+ *       conflicting with the C-linkage overload symbol.
+ */
+extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx);
+
+/**
+ * @brief Launch MC2 builtin kernel from the prepared resource context.
+ * @param stream Stream reserved for the AICPU launch path. It is ignored by the CCU path.
+ * @param ccResCtx Device-side resource context returned by Mc2AcquireCcResCtx.
+ * @note Same as the overload with ccResCtxSize; internally uses sizeof(OpResCtx) as the context size.
+ *       Declared with C++ linkage (outside the extern "C" block) to allow overloading without
+ *       conflicting with the C-linkage overload symbol.
+ */
+extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx);
+
+/**
  * @brief Check whether communication resource can be allocated for the given MC2 ccArgs
  * @param comm A pointer identifying the communication resource based on.
  * @param ccType The MC2 operation type (HcclCMDType).
