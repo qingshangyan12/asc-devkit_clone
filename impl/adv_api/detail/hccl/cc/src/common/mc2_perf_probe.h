@@ -21,7 +21,6 @@ struct Sample {
 static_assert(sizeof(Sample) == 48, "comparison sample layout");
 inline Sample& Get() { static thread_local Sample sample; return sample; }
 inline uint64_t& Launch() { static thread_local uint64_t launch; return launch; }
-inline volatile uint64_t& Sink() { static thread_local volatile uint64_t sink; return sink; }
 inline uint64_t Now() {
     timespec ts;
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) { Get().status = -1; return 0; }
@@ -56,8 +55,6 @@ inline void Finish(uint32_t status) {
         if (s.entry == 0 || s.poll < s.entry || s.parsed < s.poll || s.submitted < s.parsed) s.status = -4;
         else { init = s.poll-s.entry; msg = s.parsed-s.poll; sq = s.submitted-s.parsed; }
     }
-    // Identical observable result retention in B/C; no optimizer-only fake work.
-    Sink() = init ^ msg ^ sq ^ s.valid ^ s.messages ^ static_cast<uint32_t>(s.status) ^ static_cast<uint32_t>(s.cache) ^ Launch();
     HCCL_RUN_INFO("[MC2_PERF] launch=%llu messages=%u valid=%u init_ns=%llu msg_parse_ns=%llu sq_expand_ns=%llu cache=%d status=%d",
         static_cast<unsigned long long>(Launch()), s.messages, s.valid,
         static_cast<unsigned long long>(init), static_cast<unsigned long long>(msg),
