@@ -91,9 +91,7 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)
     }
 }
 
-#if !(                       \
-    defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 template <
     typename T = DefaultType, typename U = DefaultType, auto mode = MaskMergeMode::ZEROING, typename S, typename V>
