@@ -1923,6 +1923,278 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedDevice)
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 0U);
 }
 
+// Overloads without ccResCtxSize: same behavior as sized APIs, size is ignored / sizeof(OpResCtx).
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_NullParameters)
+{
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = reinterpret_cast<void*>(0x1);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(nullptr, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), nullptr, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, nullptr),
+        HCCL_E_PTR);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_RejectsUnsupportedOperation)
+{
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(Mc2AcquireCcResCtx(comm_, 0xFFU, ccArgs, &ccResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_CcuOperations)
+{
+    struct CcuOperationCase {
+        uint8_t ccType;
+        const char* algConfig;
+        uint32_t expectedOpType;
+    };
+    const CcuOperationCase operationCases[] = {
+        {static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh",
+         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)},
+        {static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLREDUCE), "CcuSchedAllReduceSoleMesh",
+         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)},
+        {static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh",
+         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)},
+        {static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh",
+         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL)},
+        {static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh",
+         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV)},
+    };
+
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    for (const CcuOperationCase& operationCase : operationCases) {
+        void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), operationCase.algConfig);
+        ASSERT_NE(ccArgs, nullptr);
+
+        void* ccResCtx = nullptr;
+        ASSERT_EQ(Mc2AcquireCcResCtx(comm_, operationCase.ccType, ccArgs, &ccResCtx), HCCL_SUCCESS);
+        ASSERT_NE(ccResCtx, nullptr);
+
+        const auto* opResCtx = static_cast<const OpResCtx*>(ccResCtx);
+        ASSERT_NE(opResCtx->algInfo[0].opParam, 0U);
+        const auto* opParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
+        EXPECT_EQ(opParam->hcclComm, comm_);
+        EXPECT_EQ(opParam->engine, COMM_ENGINE_CCU);
+        EXPECT_EQ(opResCtx->version, static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION));
+        EXPECT_EQ(opResCtx->opType[0], operationCase.expectedOpType);
+        EXPECT_NE(opResCtx->workSpace, 0U);
+        EXPECT_NE(opResCtx->workSpaceSize, 0U);
+        EXPECT_EQ(opResCtx->algInfo[0].opParam, reinterpret_cast<uint64_t>(opParam));
+
+        EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+    }
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_RejectsUnsupportedDevice)
+{
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_910B;
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_CcuMs)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_MS));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_MS), "sole[mesh]");
+    ASSERT_NE(ccArgs, nullptr);
+    ASSERT_EQ(Mc2SetCcSrcDataType(ccArgs, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
+    ASSERT_EQ(Mc2SetCcDstDataType(ccArgs, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
+    ASSERT_EQ(Mc2SetCcReduceType(ccArgs, HCCL_REDUCE_SUM), HCCL_SUCCESS);
+
+    void* ccResCtx = nullptr;
+    ASSERT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_SUCCESS);
+    ASSERT_NE(ccResCtx, nullptr);
+
+    const auto* opResCtx = static_cast<const OpResCtx*>(ccResCtx);
+    ASSERT_NE(opResCtx->algInfo[0].opParam, 0U);
+    const auto* opParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
+    EXPECT_EQ(opParam->hcclComm, comm_);
+    EXPECT_EQ(opParam->engine, COMM_ENGINE_CCU);
+    EXPECT_EQ(opResCtx->version, static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION));
+    EXPECT_EQ(opParam->DataDes.dataType, HCCL_DATA_TYPE_FP32);
+    EXPECT_EQ(opParam->DataDes.outputType, HCCL_DATA_TYPE_FP32);
+    EXPECT_EQ(opParam->reduceType, HCCL_REDUCE_SUM);
+    EXPECT_EQ(opResCtx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, ccResCtx), HCCL_SUCCESS);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_UsesSelectorWhenAlgConfigIsEmpty)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    mc2_ops_hccl::g_stubSelectorAlgName = "CcuAllGatherMeshMem2Mem1D";
+    void* ccArgs = nullptr;
+    ASSERT_EQ(Mc2GetCcArgs(&ccArgs), HCCL_SUCCESS);
+    ASSERT_NE(ccArgs, nullptr);
+    ASSERT_EQ(Mc2SetCcCommEngine(ccArgs, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)), HCCL_SUCCESS);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_SUCCESS);
+    EXPECT_NE(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_PropagatesAlgorithmFailure)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    mc2_ops_hccl::g_stubCcuAlgExecNull = true;
+    mc2_ops_hccl::g_stubCcuAlgExecNullName = "CcuSchedAllGatherSoleMesh";
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_PARA);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_PropagatesOpResCtxCopyFailure)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall = 2U;
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_RUNTIME);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_NullContext)
+{
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, nullptr), HCCL_E_PTR);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_HandlesOpResCopyFailure)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
+    mc2_ops_hccl::g_stubAclrtMemcpyFail = true;
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_INTERNAL);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_HandlesOpParamCopyFailure)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
+    mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall = 2U;
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_RejectsNullCommInCcuContext)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, nullptr, COMM_ENGINE_CCU);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_RejectsInvalidOpResCtx)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
+    opResCtx.algInfo[0].opParam = 0U;
+    opResCtx.workSpace = 0U;
+    opResCtx.workSpaceSize = 0U;
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_RejectsUnsupportedEngine)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, static_cast<CommEngine>(0xFFU));
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_NOT_SUPPORT);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_CcuPath)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    ASSERT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_SUCCESS);
+    ASSERT_NE(ccResCtx, nullptr);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, ccResCtx), HCCL_SUCCESS);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 5U);
+    EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 1U);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_PropagatesCcuLaunchFailure)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    ASSERT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_SUCCESS);
+    ASSERT_NE(ccResCtx, nullptr);
+
+    mc2_ops_hccl::g_stubHcommCcuKernelLaunchFail = true;
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, ccResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 1U);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunchNoSize_RejectsUnsupportedDevice)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
+
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_910B;
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx), HCCL_E_NOT_SUPPORT);
+
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 1U);
+    EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 0U);
+}
+
 TEST_F(CcuMc2TestSuite, CcuKernelLaunch_RejectsNullParameters)
 {
     EXPECT_EQ(CcuKernelLaunch(nullptr, nullptr), CCU_E_PTR);

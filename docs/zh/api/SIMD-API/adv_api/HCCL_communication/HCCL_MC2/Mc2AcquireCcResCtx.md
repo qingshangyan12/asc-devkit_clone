@@ -27,7 +27,18 @@
 
 根据通信域、通信任务类型和MC2通信参数，完成算法选择和通信资源申请，并返回设备侧通信资源上下文。该上下文既用于启动通信服务端，也用于AI Core侧HCCL客户端初始化。
 
+本接口提供两个重载：不带`ccResCtxSize`的重载适用于仅需资源上下文地址的场景；带`ccResCtxSize`的重载额外返回上下文大小。二者申请逻辑相同。
+
 ## 函数原型
+
+推荐使用不带`ccResCtxSize`的重载（C++链接）：
+
+```cpp
+extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
+```
+
+需要获取上下文大小时，使用带`ccResCtxSize`的重载（C链接）：
 
 ```cpp
 extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
@@ -44,7 +55,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 | ccType | 输入 | 通信任务类型，取值为HcclCMDType枚举值。AI CPU和CCU路径均支持AllGather、AllReduce、ReduceScatter、AlltoAll和AlltoAllV。 |
 | ccArgs | 输入 | [Mc2GetCcArgs](Mc2GetCcArgs.md)创建并通过Mc2SetCc*接口填充的MC2通信参数对象。 |
 | ccResCtx | 输出 | 设备侧通信资源上下文地址。 |
-| ccResCtxSize | 输出 | 设备侧通信资源上下文大小，单位为字节。 |
+| ccResCtxSize | 输出 | 设备侧通信资源上下文大小，单位为字节。仅带`ccResCtxSize`的重载提供该参数。 |
 
 ## 返回值说明
 
@@ -57,8 +68,25 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 -   ccResCtx由通信域生命周期管理，用户不需要单独释放。
 -   AI CPU路径使用AICPU_TS；CCU路径使用CCU_MS或CCU_SCHED。
 -   返回的ccResCtx需要同时传给[Mc2CcKernelLaunch](Mc2CcKernelLaunch.md)和AI Core侧[InitV2](../HCCL_Kernel/InitV2.md)接口。
+-   不带`ccResCtxSize`的重载为C++链接，仅可在C++代码中调用；带`ccResCtxSize`的重载为C链接，C/C++均可调用。
+-   不带`ccResCtxSize`的重载内部调用带`ccResCtxSize`的实现，但不向调用方返回大小。
 
 ## 调用示例
+
+推荐写法（不返回大小）：
+
+```cpp
+void* ccResCtx = nullptr;
+const uint8_t ccType = static_cast<uint8_t>(AscendC::HcclCMDType::HCCL_CMD_ALLTOALL);
+
+Mc2Result ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx);
+if (ret != HCCL_SUCCESS) {
+    // 错误处理
+}
+(void)Mc2FreeCcArgs(ccArgs);
+```
+
+需要获取上下文大小时：
 
 ```cpp
 void* ccResCtx = nullptr;
