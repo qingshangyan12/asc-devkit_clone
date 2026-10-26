@@ -53,7 +53,7 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src.reg保存矢量数据，src.mask用于控制各元素是否参与计算。src.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src.reg保存矢量数据，src.mask用于控制各元素是否参与计算。src.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。half类型的mask使用限制请参考[约束说明](#约束说明)。 |
 
 ## 数据类型
 
@@ -61,13 +61,22 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
 
 ## 返回值说明
 
-返回按元素计算以2为底对数的结果，类型为reg_tensor&lt;T&gt;。返回值mask与src.mask相同；src.mask对应位置为0时，返回值的对应元素置零。
+返回按元素计算以2为底对数的结果，类型为reg_tensor&lt;T&gt;。返回值mask与src.mask相同。float类型下，src.mask对应位置为0时，返回值的对应元素置零；half类型当前仅应使用全有效mask，详见[约束说明](#约束说明)。
 
 ## 约束说明
 
-src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- src.mask需通过[with_mask](../reg_tensor/reg_tensor.md)接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 当前实现中，half类型需使用[all_mask&lt;half&gt;](../mask_reg_compute/all_mask.md)设置全有效mask。使用部分有效mask时，部分有效元素的计算结果可能错误，且无效元素不保证置零。该限制不适用于float类型。
+
+## 关键特性说明
+
+### 精度提升
+
+当源操作数数据类型为half时，将half提升为float后计算自然对数，再乘以常量`1.4426950408889634`（即`1 / ln(2)`，以float类型参与计算），最后将结果转换为half后输出。源操作数类型与返回值类型保持一致。
 
 ## 调用示例
+
+以下示例的输入和输出均为UB中的half类型Tensor，每次处理128个元素，使用全有效mask。
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -79,9 +88,11 @@ src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void log2_example(InputTensor input, OutputTensor output)
 {
-    auto mask = asc::te::experimental::all_mask<float>();
+    auto mask = asc::te::experimental::all_mask<half>();
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
     auto dst = asc::te::experimental::log2(src);
     asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```
+
+完整的half对比样例及验证结果请参考[基础API与Tensor API的Log2对比样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/experimental/reg_vector_compute/log2/README.md)。该样例包含全有效mask和部分有效mask的对比测试，其中部分有效mask用于复现上述已知限制，不作为推荐用法。
