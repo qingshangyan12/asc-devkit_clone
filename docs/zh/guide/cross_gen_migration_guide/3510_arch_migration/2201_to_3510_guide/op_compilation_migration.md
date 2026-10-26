@@ -22,7 +22,7 @@
     void AddConfig(const char *soc, OpAICoreConfig &aicore_config);
     ```
 
-    通过该接口注册AI处理器型号的样例如下，ascendxxx的取值应与算子工程编译配置中的ASCEND\_COMPUTE\_UNIT字段一致。
+    通过该接口注册AI处理器型号的样例如下，ascendxxx应填写[构建目标标识](../../../programming_guide/advanced_programming/aclnn_operator_development/aclnn_quick_start.md#target-configuration)，与ASCEND\_COMPUTE\_UNIT或ASCEND\_SOC\_SERIES归一后的目标标识对应。
 
     ```
     ...

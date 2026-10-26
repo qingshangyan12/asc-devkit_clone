@@ -66,7 +66,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 > **说明：输入输出同名场景**
 >
-> 如果算子原型中的输入和输出同名，编写核函数（Kernel）入口参数时，需要给输出参数增加`ref`后缀，用于区分输入和输出地址。
+> 如果算子原型中的输入和输出同名，编写核函数（Kernel）入口时，应使用不同的C++形参名区分地址，例如将输出参数命名为`x_ref`；同时保持框架要求的参数顺序。
 >
 > ```cpp
 > extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y,
