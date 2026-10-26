@@ -13,15 +13,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include "acl/acl.h"
-
-#define check_acl(call) do { \
-    aclError error = (call); \
-    if (error != ACL_SUCCESS) { \
-        fprintf(stderr, "%s failed: %d\n", #call, (int)error); \
-        exit(EXIT_FAILURE); \
-    } \
-} while (0)
 
 inline void read_file(const char* file_path, void* buffer, size_t file_size)
 {
