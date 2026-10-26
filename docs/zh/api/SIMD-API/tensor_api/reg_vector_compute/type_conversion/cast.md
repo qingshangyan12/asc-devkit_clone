@@ -30,11 +30,11 @@
 
 命名空间：`asc::te::experimental`。
 
-`cast`用于寄存器数据类型转换，将源操作数`reg_tensor<SrcType>`中的有效元素转换为`DstType`，支持浮点转整数、浮点转浮点、整数转浮点和整数转整数。转换过程中可能发生位宽或精度变化，可通过编译期`cast_options`配置以下行为：
+`cast`用于寄存器数据类型转换，将源操作数`reg_tensor<SrcType>`中的有效元素转换为`DstType`，支持浮点转整数、浮点转浮点、整数转浮点和整数转整数。转换过程中可能发生位宽或精度变化，可通过编译期[cast_options](../aux_data_types/cast_options.md)配置以下行为：
 
-- `cast_layout`：源类型和目的类型位宽不同时，单条指令的有效计算量以位宽较大的类型为准。该配置指定位宽较小的元素在同组元素中的位置。
-- `cast_round_mode`：指定发生精度损失时的舍入方式。
-- `cast_sat_mode`：指定转换结果超出目的类型表示范围时采用饱和还是非饱和处理。
+- [cast_layout](../aux_data_types/cast_layout.md)：源类型和目的类型位宽不同时，单条指令的有效计算量以位宽较大的类型为准。该配置指定位宽较小的元素在同组元素中的位置。
+- [cast_round_mode](../aux_data_types/cast_round_mode.md)：指定发生精度损失时的舍入方式。
+- [cast_sat_mode](../aux_data_types/cast_sat_mode.md)：指定转换结果超出目的类型表示范围时采用饱和还是非饱和处理。
 
 接口使用`src.mask`筛选源操作数中的有效元素，底层转换采用zeroing模式，mask未选中的目的元素置0。返回值保存转换结果，并原样传递`src.mask`，便于后续计算或`local_tensor::store`写回。
 
@@ -64,7 +64,7 @@ constexpr cast_options default_cast_ops = {
 | 参数名 | 描述 |
 | --- | --- |
 | `DstType` | 目的元素类型，必须与`SrcType`不同。支持的数据类型组合请参考[数据类型](#数据类型)。 |
-| `opt` | `cast_options`类型的编译期常量，默认值为`default_cast_ops`。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
+| `opt` | [cast_options](../aux_data_types/cast_options.md)类型的编译期常量，默认值为`default_cast_ops`。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
 | `SrcType` | 源元素类型，由函数实参自动推导，无需显式指定。 |
 
 **表2** 参数说明
@@ -77,9 +77,9 @@ constexpr cast_options default_cast_ops = {
 
 | 配置项 | 取值和说明 |
 | --- | --- |
-| `layout` | `cast_layout::zero`、`cast_layout::one`、`cast_layout::two`、`cast_layout::three`，分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由源、目的类型的位宽比决定；同位宽转换仅支持`zero`。 |
-| `round` | `cast_round_mode::rint`：舍入到最近值，正好位于中间值时舍入到偶数；`cast_round_mode::round`：舍入到最近值，正好位于中间值时远离0；`cast_round_mode::floor`：向负无穷方向舍入；`cast_round_mode::ceil`：向正无穷方向舍入；`cast_round_mode::trunc`：向0方向舍入。仅在转换可能损失精度且对应组合支持该模式时生效。 |
-| `sat` | `cast_sat_mode::not_sat`：非饱和模式，超出范围时按目标格式截断或保留该浮点格式支持的特殊值；`cast_sat_mode::sat`：饱和模式，超出范围时钳位到目的类型边界。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
+| `layout` | [cast_layout](../aux_data_types/cast_layout.md)枚举类型。支持`zero`、`one`、`two`、`three`，分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由源、目的类型的位宽比决定；同位宽转换仅支持`zero`。 |
+| `round` | [cast_round_mode](../aux_data_types/cast_round_mode.md)枚举类型。`rint`表示舍入到最近偶数；`round`表示舍入到最近值，中间值时远离0；`floor`表示向负无穷舍入；`ceil`表示向正无穷舍入；`trunc`表示向0舍入。仅在转换可能损失精度且对应组合支持该模式时生效。 |
+| `sat` | [cast_sat_mode](../aux_data_types/cast_sat_mode.md)枚举类型。`not_sat`表示非饱和模式；`sat`表示饱和模式。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
 
 > [!NOTE]  
 > `default_cast_ops`仅表示接口的默认参数，不表示所有类型组合均支持该配置。若默认配置不在对应转换行的支持范围内，必须显式传入`cast_options`。
@@ -132,7 +132,7 @@ constexpr cast_options default_cast_ops = {
 - 位宽比为4时，可选择`zero`、`one`、`two`或`three`，对应每组中的第0至第3个位置。
 - 源、目的类型位宽相同时，使用`zero`。
 
-`cast`只完成寄存器计算，不会隐式调整Unified Buffer（UB）中的数据排布。连续处理Tensor数据时，应使`local_tensor::load`、`cast_options::layout`和`local_tensor::store`的排布保持一致。常见用法如下：
+`cast`只完成寄存器计算，不会隐式调整Unified Buffer（UB）中的数据排布。连续处理Tensor数据时，应使`local_tensor::load`、`cast_options::layout`和`local_tensor::store`的排布保持一致。搬入模式参见[load_sideband_mode](../aux_data_types/load_sideband_mode.md)，搬出模式参见[store_sideband_mode](../aux_data_types/store_sideband_mode.md)。常见用法如下：
 
 | 转换方向 | 搬入 | 搬出 |
 | --- | --- | --- |

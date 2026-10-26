@@ -49,7 +49,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 
 | 参数名 | 描述 |
 | --- | --- |
-| Layout | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
+| Layout | [cast_layout](../aux_data_types/cast_layout.md)枚举类型，用于设置结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
 | T | 返回值元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | U | 源操作数和标量类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 

@@ -16,11 +16,10 @@ struct cast_options {
 };
 ```
 
-| 成员 | 描述 |
-| --- | --- |
-| `layout` | 数据排布，详情参见[cast_layout](cast_layout.md)。 |
-| `round` | 舍入模式，详情参见[cast_round_mode](cast_round_mode.md)。 |
-| `sat` | 饱和模式，详情参见[cast_sat_mode](cast_sat_mode.md)。 |
+| 参数名 | 描述 |
+| :-- | :-- |
+| layout | 数据排布，详情参见[cast_layout](cast_layout.md)。 |
+| round | 舍入模式，详情参见[cast_round_mode](cast_round_mode.md)。 |
+| sat | 饱和模式，详情参见[cast_sat_mode](cast_sat_mode.md)。 |
 
 `cast_options`需要定义为编译期常量，并作为`cast`的模板参数传入。各类型组合支持的配置不同，具体请参考[cast](../type_conversion/cast.md)。
-

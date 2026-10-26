@@ -15,8 +15,7 @@ enum class gather_mode {
 };
 ```
 
-| 枚举值 | 描述 |
-| --- | --- |
-| `element` | 根据索引逐元素收集，索引单位为元素。 |
-| `data_block` | 根据索引按DataBlock（32B）收集，索引单位为字节。 |
-
+| 参数名 | 描述 |
+| :-- | :-- |
+| element | 根据索引逐元素收集，索引单位为元素。 |
+| data_block | 根据索引按DataBlock（32B）收集，索引单位为字节。 |

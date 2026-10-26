@@ -15,8 +15,7 @@ enum class iota_order : uint8_t {
 };
 ```
 
-| 枚举值 | 描述 |
-| --- | --- |
-| `increase` | 生成递增索引序列。 |
-| `decrease` | 生成递减索引序列。 |
-
+| 参数名 | 描述 |
+| :-- | :-- |
+| increase | 生成递增索引序列。 |
+| decrease | 生成递减索引序列。 |

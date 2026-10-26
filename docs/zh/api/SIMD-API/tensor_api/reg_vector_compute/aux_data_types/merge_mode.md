@@ -17,10 +17,10 @@ enum class merge_mode {
 
 ## 枚举值说明
 
-| 枚举值 | 描述 |
-| --- | --- |
-| `merge_mode::zeroing` | Mask未选中的元素在目的寄存器中置0。 |
-| `merge_mode::merging` | Mask未选中的元素保留目的寄存器中的原值。 |
+| 参数名 | 描述 |
+| :-- | :-- |
+| zeroing | Mask未选择的元素在目的寄存器中置0。 |
+| merging | Mask未选择的元素在目的寄存器中保留原值。 |
 
 ## 使用说明
 
@@ -30,3 +30,8 @@ enum class merge_mode {
 dst = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(dst, value, mask);
 ```
 
+以`fill`接口为例，zeroing和merging模式图示如下：
+
+**图1** zeroing/merging对比<a id="fig1"></a>
+
+![](../../../../figures/zeroing_merging_comparison.png "zeroing/merging对比")

@@ -19,12 +19,13 @@ enum class mem_type {
 };
 ```
 
-| 枚举值 | 描述 |
-| --- | --- |
-| `vec_load`、`vec_store` | 矢量读UB流水线、矢量写UB流水线。 |
-| `scalar_load`、`scalar_store` | 标量读UB流水线、标量写UB流水线。 |
-| `vec_all` | 所有矢量读写UB流水线。 |
-| `scalar_all` | 所有标量读写UB流水线。 |
+| 参数名 | 描述 |
+| :-- | :-- |
+| vec_load | 矢量读UB流水线，对应UB到寄存器的数据搬入接口，例如`load`。 |
+| vec_store | 矢量写UB流水线，对应寄存器到UB的数据搬出接口，例如`store`。 |
+| scalar_load | 标量读UB流水线。 |
+| scalar_store | 标量写UB流水线。 |
+| vec_all | 所有矢量读写UB流水线。 |
+| scalar_all | 所有标量读写UB流水线。 |
 
 支持的源、目的流水线组合请参考[mem_bar](../reg_sync_control/mem_bar.md)。
-

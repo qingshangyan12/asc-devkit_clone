@@ -15,10 +15,9 @@ struct histogram_options {
 };
 ```
 
-| 成员 | 描述 |
-| --- | --- |
-| `half` | 统计范围，详情参见[histogram_half](histogram_half.md)。 |
-| `mode` | 统计方式，详情参见[histogram_mode](histogram_mode.md)。 |
+| 参数名 | 描述 |
+| :-- | :-- |
+| half | 统计范围，详情参见[histogram_half](histogram_half.md)。 |
+| mode | 统计方式，详情参见[histogram_mode](histogram_mode.md)。 |
 
 `histogram_options`需要定义为编译期常量，并作为`histograms`的模板参数传入。
-

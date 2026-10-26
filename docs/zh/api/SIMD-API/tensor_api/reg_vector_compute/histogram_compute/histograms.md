@@ -62,10 +62,10 @@ $$
 
 | 配置项 | 取值 | 含义 |
 | --- | --- | --- |
-| `options.half` | `histogram_half::low` | 统计输入值`[0, 127]`。 |
-| `options.half` | `histogram_half::high` | 统计输入值`[128, 255]`。 |
-| `options.mode` | `histogram_mode::frequency` | 每个输出元素表示对应输入值出现的次数。 |
-| `options.mode` | `histogram_mode::cumulative` | 每个输出元素表示当前值及之前各值的累计次数。 |
+| [histogram_half](../aux_data_types/histogram_half.md)类型的`options.half` | `histogram_half::low` | 统计输入值`[0, 127]`。 |
+| [histogram_half](../aux_data_types/histogram_half.md)类型的`options.half` | `histogram_half::high` | 统计输入值`[128, 255]`。 |
+| [histogram_mode](../aux_data_types/histogram_mode.md)类型的`options.mode` | `histogram_mode::frequency` | 每个输出元素表示对应输入值出现的次数。 |
+| [histogram_mode](../aux_data_types/histogram_mode.md)类型的`options.mode` | `histogram_mode::cumulative` | 每个输出元素表示当前值及之前各值的累计次数。 |
 
 ## 函数原型
 
@@ -80,7 +80,7 @@ __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const 
 
 | 参数名 | 描述 |
 | --- | --- |
-| options | 直方图配置，类型为histogram_options。默认统计[0, 127]范围内各数值出现的次数。 |
+| options | [histogram_options](../aux_data_types/histogram_options.md)类型的编译期常量，用于设置统计范围和统计方式。默认统计[0, 127]范围内各数值出现的次数。 |
 | T | 输出元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | U | 输入元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 

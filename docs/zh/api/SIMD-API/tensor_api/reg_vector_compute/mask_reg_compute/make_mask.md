@@ -41,7 +41,7 @@ __simd_callee__ inline reg_tensor<bool> make_mask()
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `Pattern` | 输入 | 创建掩码寄存器的模式，enum class类型。<br><code>enum class mask_pattern {<br>    all,      // 所有元素设置为有效数据<br>    vl1,      // 最低1个元素设置为有效数据<br>    vl2,      // 最低2个元素设置为有效数据<br>    vl3,      // 最低3个元素设置为有效数据<br>    vl4,      // 最低4个元素设置为有效数据<br>    vl8,      // 最低8个元素设置为有效数据<br>    vl16,     // 最低16个元素设置为有效数据<br>    vl32,     // 最低32个元素设置为有效数据<br>    vl64,     // 最低64个元素设置为有效数据<br>    vl128,    // 最低128个元素设置为有效数据<br>    every3,   // 3的倍数设置为有效数据<br>    every4,   // 4的倍数设置为有效数据<br>    half,     // 最低一半元素设置为有效数据<br>    quarter,  // 最低四分之一元素设置为有效数据<br>    none      // 所有元素设置为无效数据<br>};</code> |
+| `Pattern` | 输入 | [mask_pattern](../aux_data_types/mask_pattern.md)枚举类型，用于设置Mask寄存器的有效位模式，默认值为`mask_pattern::all`。 |
 | `DataType` | 输入 | 模板参数，支持的数据类型为b8/b16/b32。 |
 
 ## 返回值说明
