@@ -63,7 +63,7 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| n_size | 输入 | 源NZ矩阵在N方向上的大小。<br> - 不开启NZ2ND功能：若开启channel_split功能，n_size必须为8的倍数，取值范围为[1, 4095]。若不开启channel_split功能，n_size必须为16的倍数，取值范围为[1, 4095]。<br>- 开启NZ2ND功能：m_size的取值范围为[1, 4095]。 |
+| n_size | 输入 | 源NZ矩阵在N方向上的大小。<br> - 不开启NZ2ND功能：若开启channel_split功能，n_size必须为8的倍数，取值范围为[1, 4095]。若不开启channel_split功能，n_size必须为16的倍数，取值范围为[1, 4095]。<br>- 开启NZ2ND功能：n_size的取值范围为[1, 4095]。 |
 | m_size | 输入 | 源NZ矩阵在M方向上的大小。<br> - 不开启NZ2ND功能：取值范围为[1, 65535]。<br> - 开启NZ2ND功能，m_size的取值范围为[1, 8192]。 |
 | dst_stride_dst_d | 输入 | <br> - 不开启NZ2ND功能,目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br> - 开启NZ2ND/NZ2DN功能,目的ND矩阵每一行中的元素个数，取值不为0 ，单位：element。|
 | src_stride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位：C0_Size(16*sizeof(T), T为src的数据类型)。 |
