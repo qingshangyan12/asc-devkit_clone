@@ -8,4 +8,4 @@
 
 每进程每卡预期一套数据，重复线程/缺失日志由解析器拒绝，避免错误混合。每个rank独立测量，跨卡同时打印可能影响日志压力。100与1000组对比用于观察连续日志压力，异步后台落盘全部成本不一定包含。该值不代表通信端到端增量。
 
-使用 hccl_api_test feat/perf-abcd-20261024 的 perf_abcd_tmp 单包脚本。安装包放 package_root/M；python3 compare.py --all 自动安装、构建、运行和解析。新签名包和目标构建/板测待黄区验证。
+使用 hccl_api_test feat/perf-abcd-20261024 的 perf_abcd_tmp 单包脚本。由操作者安装测试包并设置 CANN/MPI/日志环境；python3 compare.py --all 继承当前环境，构建、运行和解析，不再安装或替换包。新签名包和目标构建/板测待黄区验证。
