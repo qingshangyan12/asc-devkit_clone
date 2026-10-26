@@ -2261,16 +2261,20 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 {
     if (type == DataCopyMVType::UB_TO_OUT) {
         SetLoopModeUBParaImpl(loopParams);
-    } else {
+    } else if (type == DataCopyMVType::OUT_TO_UB) {
         SetLoopModeOutParaImpl(loopParams);
+    } else if (type == DataCopyMVType::OUT_TO_L1) {
+        SetLoopModeOutToL1ParaImpl(loopParams);
     }
 }
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 {
     if (type == DataCopyMVType::UB_TO_OUT) {
         ResetUBLoopModeParaImpl();
-    } else {
+    } else if (type == DataCopyMVType::OUT_TO_UB) {
         ResetOutLoopModeParaImpl();
+    } else if (type == DataCopyMVType::OUT_TO_L1) {
+        ResetOutToL1LoopModeParaImpl();
     }
 }
 /*
