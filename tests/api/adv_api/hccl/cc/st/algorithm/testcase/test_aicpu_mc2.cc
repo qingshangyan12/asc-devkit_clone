@@ -523,6 +523,206 @@ TEST_F(AicpuMc2Test, LaunchRejectsInvalidContext)
     EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
 }
 
+// Overloads without ccResCtxSize: same behavior as sized APIs, size is ignored / sizeof(OpResCtx).
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsNullParameters)
+{
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = reinterpret_cast<void*>(0x1);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(nullptr, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), nullptr, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, nullptr),
+        HCCL_E_PTR);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsUnsupportedCcType)
+{
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(Mc2AcquireCcResCtx(comm_, 0xFFU, ccArgs, &ccResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsSingleRank)
+{
+    ReinitWorld(DevType::DEV_TYPE_950, SINGLE_RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsUnsupportedDevice)
+{
+    ReinitWorld(DevType::DEV_TYPE_910_93, RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(
+            comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeAicpuTsBuildsContext)
+{
+    DestroyComm();
+    SimWorld::Global()->Deinit();
+    topoMeta_ = BuildTopoMeta(PAIR_RANK_SIZE);
+    SimWorld::Global()->Init(topoMeta_, DevType::DEV_TYPE_950);
+
+    std::vector<HcclResult> acquireRets(PAIR_RANK_SIZE, HCCL_E_UNAVAIL);
+    std::vector<OpResCtx> opResCtxs(PAIR_RANK_SIZE);
+    std::vector<OpParam> opParams(PAIR_RANK_SIZE);
+    std::vector<std::thread> workers;
+    for (uint32_t rank = 0U; rank < PAIR_RANK_SIZE; ++rank) {
+        workers.emplace_back([this, rank, &acquireRets, &opResCtxs, &opParams]() {
+            if (aclrtSetDevice(static_cast<int32_t>(rank)) != ACL_SUCCESS) {
+                return;
+            }
+            HcclComm comm = nullptr;
+            if (Sim_HcclCommInitClusterInfo(topoMeta_, rank, &comm) != HCCL_SUCCESS || comm == nullptr) {
+                return;
+            }
+            void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), DEFAULT_ALG_CONFIG);
+            if (ccArgs != nullptr) {
+                void* ccResCtx = nullptr;
+                acquireRets[rank] = static_cast<HcclResult>(Mc2AcquireCcResCtx(
+                    comm, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx));
+                if (acquireRets[rank] == HCCL_SUCCESS && ccResCtx != nullptr) {
+                    opResCtxs[rank] = *static_cast<const OpResCtx*>(ccResCtx);
+                    if (opResCtxs[rank].algInfo[0].opParam != 0U) {
+                        opParams[rank] = *reinterpret_cast<const OpParam*>(opResCtxs[rank].algInfo[0].opParam);
+                    }
+                }
+                (void)Mc2FreeCcArgs(ccArgs);
+            }
+            (void)HcclCommDestroy(comm);
+        });
+    }
+    for (auto& worker : workers) {
+        worker.join();
+    }
+
+    for (uint32_t rank = 0U; rank < PAIR_RANK_SIZE; ++rank) {
+        ASSERT_EQ(acquireRets[rank], HCCL_SUCCESS);
+        EXPECT_EQ(opResCtxs[rank].opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+        EXPECT_EQ(opResCtxs[rank].rankSize, PAIR_RANK_SIZE);
+        EXPECT_NE(opResCtxs[rank].workSpace, 0U);
+        EXPECT_NE(opResCtxs[rank].workSpaceSize, 0U);
+        EXPECT_EQ(opResCtxs[rank].commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(opParams[rank].engine, COMM_ENGINE_AICPU_TS);
+        EXPECT_EQ(opParams[rank].opExecuteConfig, OpExecuteConfig::AICPU_TS);
+        EXPECT_EQ(opParams[rank].stream, nullptr);
+    }
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeUsesSimpleCtxProtocol)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    const auto& state = GetMc2AicpuLaunchStubState();
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.kernelType, static_cast<uint32_t>(KERNEL_TYPE_AICPU_KFC));
+    EXPECT_EQ(state.opName, SERVER_KERNEL_NAME);
+    EXPECT_EQ(state.numBlocks, 1U);
+    EXPECT_EQ(state.flags, static_cast<uint32_t>(RT_KERNEL_USE_SPECIAL_TIMEOUT));
+    EXPECT_EQ(state.stream, stream_);
+    EXPECT_EQ(state.argsSize, HOST_ARGS_SIZE);
+    EXPECT_EQ(state.soNameAddrOffset, SO_NAME_OFFSET);
+    EXPECT_EQ(state.kernelNameAddrOffset, KERNEL_NAME_OFFSET);
+    EXPECT_FALSE(state.isNoNeedH2DCopy);
+    EXPECT_EQ(state.ctxArgs[0], HcclApi::MC2_AICPU_SIMPLE_CTX_PROTOCOL);
+    EXPECT_EQ(state.ctxArgs[1], reinterpret_cast<uint64_t>(&opResCtx));
+    EXPECT_EQ(ArgsFieldAt(state, SO_NAME_OFFSET), SERVER_SO_NAME);
+    EXPECT_EQ(ArgsFieldAt(state, KERNEL_NAME_OFFSET), SERVER_KERNEL_NAME);
+    EXPECT_EQ(ArgsFieldAt(state, OP_NAME_OFFSET), SERVER_KERNEL_NAME);
+    EXPECT_EQ(state.timeout, DEFAULT_HCCL_TIMEOUT_S);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsAicpuTsEngine)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU_TS);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeTimeoutAddsOpExecuteTimeout)
+{
+    auto& state = GetMc2AicpuLaunchStubState();
+    state.opExecuteTimeoutMs = 30000U;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.opExecuteTimeoutCalls, 1U);
+    EXPECT_EQ(state.timeout, DEFAULT_HCCL_TIMEOUT_S + 30U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizePropagatesRuntimeFailure)
+{
+    auto& state = GetMc2AicpuLaunchStubState();
+    state.launchRet = RT_LAUNCH_FAILURE;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_RUNTIME);
+    EXPECT_EQ(state.launchCalls, 1U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsUnsupportedDevice)
+{
+    ReinitWorld(DevType::DEV_TYPE_910_93, RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsNullContext)
+{
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, nullptr), HCCL_E_PTR);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
 TEST_F(AicpuMc2Test, AllocOpResCtxSingleParamFillsContextWithoutTiling)
 {
     OpParam opParam{};
