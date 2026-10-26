@@ -21,7 +21,8 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 ```text
 ├── python_exception_dump
 │   ├── examples
-│   │   └── demo_ifa.py                  // Demo: normal call + fault injection + product self-check
+│   │   ├── demo_add.py                  // Add: normal call + fault injection + self-check
+│   │   └── aclnn_add.py                 // ctypes bridge to the local AddCustom package
 │   ├── npuops_exception_dump
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // Public C interface of the plugin library
@@ -60,9 +61,7 @@ Configuration (environment variables):
 
 - Install prerequisites
 
-  ```bash
-  pip3 install ascend_ops    # pip package that provides the IFA operator called by the demo
-  ```
+  The demo calls `AddCustom` built and installed from this repository's [custom operator project example](../../../../02_features/99_acl_based/00_acl_compilation/custom_op/README_en.md) through `ctypes`. The operator implementation is reused directly from the existing project.
 
 - Configure environment variables
 
@@ -79,24 +78,40 @@ Configuration (environment variables):
   In the root directory of this example, build the plugin library and run the demo.
 
   ```bash
+  # Locate the existing custom_op project from this Dump example directory
+  SAMPLE_DIR="$PWD"
+  CUSTOM_OP_DIR="$(cd ../../../../02_features/99_acl_based/00_acl_compilation/custom_op && pwd)"
+  cmake -S "$CUSTOM_OP_DIR" -B "$CUSTOM_OP_DIR/build"
+  cmake --build "$CUSTOM_OP_DIR/build" --target binary package -j8
+  bash "$CUSTOM_OP_DIR"/build/custom_opp_*.run --install-path="$SAMPLE_DIR/custom_opp"
+  source "$SAMPLE_DIR/custom_opp/vendors/customize/bin/set_env.bash"
+  export NPUOPS_ADD_LIB="$SAMPLE_DIR/custom_opp/vendors/customize/op_api/lib/libcust_opapi.so"
+
   cd npuops_exception_dump && bash build.sh && cd ..    # Build the plugin .so (output to lib/)
-  python3 examples/demo_ifa.py                          # Run the demo
+  python3 examples/demo_add.py                          # Run the demo
   ```
 
   > **Note:** The plugin .so is an environment-specific binary and is not committed to the repo — build it before running; tensor dump is pure Python and has no such requirement.
 
 - Expected results
 
-  Demo flow: a normal IFA call (input/output dumped automatically at the call boundary) → fault injection corrupts block_table to trigger an AICore kernel exception → the plugin-library callback auto-dumps exception info and args → the script self-checks the products. The exit code is 0 when all checks pass, with the following key output:
+  Demo flow: call `aclnnAddCustom` normally with two contiguous float16 ND tensors of 16384 elements (`x = (arange(16384) % 1024).to(float16)`, `y = ones(16384, dtype=float16)`), dump both inputs and the output, and verify `x + y`. In a separate subprocess, call the same Add operator with its output address replaced by the deliberately invalid, non-null aligned device address `0x100000000000`, triggering a device memory-access exception. Both input tensors remain valid and are dumped before the failing call. The plugin callback dumps exception info and raw kernel args; the parent validates all products on the CPU. Input x is reduced modulo1024 so the inputs and sums are exactly representable in float16.
 
   ```text
-  [SIZE-OK] args.bin: 1264 bytes == expected 1264
-  [INFO-OK] kernel_name / error_code / args_dumped (3 items)
-  [INPUT-OK] / [OUTPUT-OK] / query size / corrupted block_table read-back
-  [PASS] IFA exception dump OK
+  normal Add run OK
+  caught expected device execution error: aclrtSynchronizeStream failed: ...
+  [DATA-OK] normal/fault input tensors and normal x + y output
+  [INFO-OK] <actual Add kernel name>, error=<actual nonzero error code>
+  [SIZE-OK] args.bin: <actual size> bytes == callback args_bytes
+  [DATA-OK] input and injected output pointers found in raw kernel args
+  [PASS] Add exception dump OK
   ```
 
-  Products are written to `./exception_dump_ifa/` at the package root. The specific error-code value is CANN-version dependent (it may differ across versions; judge by kernel-name hit + args on disk).
+  Exit code 0 means that normal computation, device exception injection, and artifact validation all passed. A Python exception or host-side parameter validation error alone cannot pass the test.
+
+  Each invocation creates a fresh `./exception_dump_add/run_*/` directory relative to the current working directory, preventing stale files from passing validation. Use `--dump-dir /path/to/dumps` to change the parent directory. Products include normal/fault `input_add_*` files, normal `output_add_normal_*` files, callback `*_info.txt` and `*_args.bin` files, and `fault.json`, which records the deliberately invalid output address.
+
+  **Fault injection:** the Add kernel is unmodified. Only the output tensor descriptor in the fault call uses an invalid device pointer. This pointer does not represent a readable output tensor; output dumping is disabled for the fault call. The fault worker exits without reusing its failed NPU context, and the parent only reads files from the current run. Callbacks are enabled for all kernels; validation requires an actual kernel name containing `add`, a nonzero error code, an args size matching `args_bytes` in the paired info file, and both input pointers (from their tensor metadata) and the injected output pointer in raw args. No chip-specific kernel name, error code, or args length is hardcoded.
 
 ## FAQ
 
@@ -125,7 +140,7 @@ enable_exception_dump(["my_kernel"])
 out = run_with_tensor_dump(torch.ops.my_lib.my_op, tag="my_op", *args, **kwargs)
 
 # 3) (optional) manually dump specific tensors
-dump_tensors({"query": q, "block_table": bt}, stage="input")
+dump_tensors({"x": x, "y": y}, stage="input")
 ```
 
 No C++ changes and no rebuild of your project; only exception dump loads the .so, tensor dump is pure Python. To verify: after triggering a kernel exception, confirm `_args.bin` and `_info.txt` appear in the dump directory (error_code / kernel_name consistent with the runtime log); if steps 2/3 were used, also confirm `input_*` / `output_*` products.

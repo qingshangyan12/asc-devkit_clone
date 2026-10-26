@@ -77,30 +77,31 @@ inline void asc_syncthreads()
     ```cpp
     #include "simt_api/device_sync_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel_sync_threads(float* dst, int count)
+    __global__ __launch_bounds__(1024) void kernel_sync_threads(float* input, float* output, uint32_t input_total_length)
     {
-         int idx = threadIdx.x;
-         if (idx > 0 && idx < count) {
-             dst[idx] = 1;
-         }
+        extern __ubuf__ float smem[];
+        uint32_t tid = threadIdx.x;
+        uint32_t lane_id = laneid();
+        uint32_t warp_id = tid / warpSize;
 
-         // 等待block内所有thread都执行到当前代码
-         asc_syncthreads();
+        float val = (tid < input_total_length) ? input[tid] : 0.0f;
 
-         if (idx == 0) {
-             dst[0] = 0;
-             for(int i = 1023; i > 0; i--) {
-                 if (i < count) {
-                     dst[0] += dst[i];
-                 }
-             }
-         }
+        // warp内归约，asc_reduce_add返回当前warp所有线程val的总和
+        val = asc_reduce_add(val);
+        // 仅首线程写入共享内存
+        if (lane_id == 0) {
+            smem[warp_id] = val;
+        }
+
+        asc_syncthreads(); // 跨warp同步
+
+        if (tid == 0) {
+            for (int i = 1; i < blockDim.x / warpSize; i++) {
+                val += smem[i];
+            }
+            *output = val;
+        }
     }
-    ```
-
-    ```text
-    输出结果:
-    [1023, 1, 1, 1 …]
     ```
 
 - SIMD与SIMT混合编程场景：
@@ -108,28 +109,36 @@ inline void asc_syncthreads()
     ```cpp
     #include "simt_api/device_sync_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_sync_threads(__gm__ float* dst, int count)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_sync_threads(__gm__ float* input, __gm__ float* output, uint32_t input_total_length)
     {
-         int idx = threadIdx.x;
-         if (idx > 0 && idx < count) {
-             dst[idx] = 1;
-         }
+        extern __ubuf__ float smem[];
+        uint32_t tid = threadIdx.x;
+        uint32_t lane_id = laneid();
+        uint32_t warp_id = tid / warpSize;
 
-         // 等待block内所有thread都执行到当前代码
-         asc_syncthreads();
+        float val = (tid < input_total_length) ? input[tid] : 0.0f;
 
-         if (idx == 0) {
-             dst[0] = 0;
-             for(int i = 1023; i > 0; i--) {
-                 if (i < count) {
-                     dst[0] += dst[i];
-                 }
-             }
-         }
+        // warp内归约，asc_reduce_add返回当前warp所有线程val的总和
+        val = asc_reduce_add(val);
+        // 仅首线程写入共享内存
+        if (lane_id == 0) {
+            smem[warp_id] = val;
+        }
+
+        asc_syncthreads(); // 跨warp同步
+
+        if (tid == 0) {
+            for (int i = 1; i < blockDim.x / warpSize; i++) {
+                val += smem[i];
+            }
+            *output = val;
+        }
     }
     ```
 
-    ```text
-    输出结果:
-    [1023, 1, 1, 1 …]
-    ```
+输入输出示例如下：
+
+```text
+input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63
+dst: 2016
+```

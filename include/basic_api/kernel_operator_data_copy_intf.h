@@ -167,22 +167,6 @@ __aicore__ inline void DataCopy(
 
 /*
  * @ingroup DataCopy Level 0
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] repeatParams.blockCount number of blocks
- * @param [in] repeatParams.blockLen Length of blocks
- * @param [in] repeatParams.srcGap src block gap
- * @param [in] repeatParams.dstGap dst block gap
- */
-
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
-    const DataCopyParams& repeatParams);
-
-/*
- * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -317,17 +301,6 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 /*
  * @ingroup DataCopy Level 2
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] count Number of operands
- */
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count);
-
-/*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2nd, applicable to simulated cube data(such as data from l0c, 16*16)
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -459,37 +432,6 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams,
     const DataCopyEnhancedParams& enhancedParams);
-
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
-    (__NPU_ARCH__ == 9202)
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
-    const DataCopyPadParams& padParams, const bool enablePreReadIgnoreSync);
-
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
-    const DataCopyPadParams& padParams);
-
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& dataCopyParams);
-#else
-template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
-    const DataCopyPadParams& padParams);
-
-template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& dataCopyParams);
-#endif
-
-template <typename T>
-__aicore__ inline void DataCopyPad(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& dataCopyParams,
-    const Nd2NzParams& nd2nzParams);
 
 // override DataCopyPad, use new param DataCopyExtParams
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \

@@ -101,13 +101,14 @@ __global__ __vector__ void AscTransposeKernel(__gm__ uint16_t* output, __gm__ ui
     asc_init();
     __ubuf__ uint16_t src[ELEMENTS], dst[ELEMENTS];
     asc_copy_gm2ub_align(src, input, BYTES);
-    asc_sync_mte2(0);
-    // Transpose one 16x16 uint16_t matrix in UB.
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    // 输入按16x16矩阵排布，接口按矩阵行列关系重排数据，因此结果的行列索引互换。
     asc_transpose(dst, src);
-    asc_sync_notify(PIPE_V, PIPE_S, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_S, EVENT_ID0);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, dst, BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 } // namespace
 

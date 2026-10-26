@@ -2,9 +2,9 @@
 
 ## Overview
 
-This sample combines the experimental Tensor API register load/store operations with current C API conversion interfaces to perform element-wise data type conversion. Both input and output are one-dimensional tensors with shape `[256]`.
+This sample combines the experimental Tensor API register load/store operations with current C API conversion interfaces to perform element-wise data type conversion. All scenarios use one-dimensional input and output Tensors with shape `[512]` in logical elements.
 
-The sample covers six conversion scenarios between floating-point types and between integer and floating-point types. It also demonstrates the `unpack` and `unpack4` memory access modes together with `deinterleave` data reordering used for conversions between types of different widths. The computation is as follows:
+The sample covers seven conversion scenarios (numbered 1–7) between floating-point types and between integer and floating-point types. It also demonstrates the `unpack` and `unpack4` memory access modes together with `deinterleave` data reordering used for conversions between types of different widths. The computation is as follows:
 
 ```text
 y[i] = convert<To>(x[i])
@@ -12,7 +12,7 @@ y[i] = convert<To>(x[i])
 
 ## Supported Products
 
-- Ascend 950PR&950DT products
+- Ascend 950PR/Ascend 950DT
 
 ## Directory Structure
 
@@ -38,6 +38,7 @@ y[i] = convert<To>(x[i])
   | 4 | `int32_t` | `uint8_t` | `zero` | `rint` | `sat` | Saturates the value to `[0, 255]` and converts it to an 8-bit unsigned integer. |
   | 5 | `bfloat16_t` | `float` | `zero` | `rint` | `not_sat` | Extends `bfloat16_t` to `float`. |
   | 6 | `float` | `bfloat16_t` | `zero` | `rint` | `not_sat` | Rounds `float` to `bfloat16_t`. |
+  | 7 | UB: `int4b_t`; register: `int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | Directly loads 512 packed INT4 values and converts all four quarters. |
 
 - Sample Specifications:
 
@@ -55,8 +56,8 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">x</td>
-      <td align="center">[256]</td>
-      <td align="center">half/float/int8_t/int32_t/bfloat16_t</td>
+      <td align="center">[512]</td>
+      <td align="center">half/float/int8_t/int32_t/bfloat16_t/int4b_t</td>
       <td align="center">One-dimensional</td>
     </tr>
     <tr>
@@ -68,8 +69,8 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">y</td>
-      <td align="center">[256]</td>
-      <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t</td>
+      <td align="center">[512]</td>
+      <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t/half</td>
       <td align="center">One-dimensional</td>
     </tr>
     <tr>
@@ -80,18 +81,37 @@ y[i] = convert<To>(x[i])
 
   | SCENARIO_NUM | `input/input_x.bin` | Input Size | `output/output.bin` / `output/golden.bin` | Output Size |
   | --- | --- | --- | --- | --- |
-  | 1 | 256 `half` elements | 512 B | 256 `int32_t` elements | 1024 B |
-  | 2 | 256 `float` elements | 1024 B | 256 `int16_t` elements | 512 B |
-  | 3 | 256 `int8_t` elements | 256 B | 256 `int32_t` elements | 1024 B |
-  | 4 | 256 `int32_t` elements | 1024 B | 256 `uint8_t` elements | 256 B |
-  | 5 | 256 `bfloat16_t` | 512 B | 256 `float` elements | 1024 B |
-  | 6 | 256 `float` elements | 1024 B | 256 `bfloat16_t` | 512 B |
+  | 1 | 512 `half` elements | 1024 B | 512 `int32_t` elements | 2048 B |
+  | 2 | 512 `float` elements | 2048 B | 512 `int16_t` elements | 1024 B |
+  | 3 | 512 `int8_t` elements | 512 B | 512 `int32_t` elements | 2048 B |
+  | 4 | 512 `int32_t` elements | 2048 B | 512 `uint8_t` elements | 512 B |
+  | 5 | 512 `bfloat16_t` | 1024 B | 512 `float` elements | 2048 B |
+  | 6 | 512 `float` elements | 2048 B | 512 `bfloat16_t` | 1024 B |
+  | 7 | 512 packed INT4 values (256 bytes) | 256 B | Four quarters of 128 `half` elements, 512 in total | 1024 B |
+
+  Scenario 7 uses a direct load and asserts that the source is `reg_tensor<int4x2_t>`.
+  Layout `q` converts logical input elements `8 * i + 2 * q` and `8 * i + 2 * q + 1`,
+  the two INT4 values in byte q of each four-byte group. A byte-granularity full mask activates
+  all source positions; results are stored in quarter order.
+  Set both `SCENARIO_NUM` and `scenario_num` to 7 in the simulator commands below to run it.
+
+  Scenario 7 constructs `int4b_t` Tensors directly in GM and UB, both with layouts
+  describing 512 logical elements. A normal `copy(x_ub, x_gm)` uses the shared B4
+  copy implementation to transfer 256 packed bytes without a `uint8_t` view.
+  Low nibbles represent even elements; high nibbles represent odd elements.
+  A direct `load` loads all 512 logical elements. Each of the four layouts converts
+  128 elements, and normal `store` calls write four contiguous output sections. The input covers all
+  256 packed-byte combinations, and every output half is compared bit-for-bit.
+  The load result uses `auto` to infer the register type, with a `static_assert`
+  checking `reg_tensor<int4x2_t>`. The shared Tensor pointer implementation converts
+  logical offsets to byte addresses; the sample does not repeat that conversion.
+  Compilation uses the headers installed in the CANN package without local repository overrides.
 
 - Sample Implementation:
 
   - Key Kernel Steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and a one-dimensional layout with `make_shape(256)` and `make_stride(1)` to construct the GM and UB tensors.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and a one-dimensional layout with `make_shape(512)` and `make_stride(1)` to construct the GM and UB tensors.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::experimental::update_mask` to set the valid-element mask.
     4. Use normal `load/store` for equal-width conversions, `unpack` or `unpack4` for widening loads, and use `deinterleave` to compact narrowing results before a normal `store`.
@@ -115,7 +135,7 @@ y[i] = convert<To>(x[i])
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md) is supported.**
 
   ```bash
   source ${install_path}/set_env.sh
@@ -136,13 +156,15 @@ Run the following steps in the sample root directory to build and execute the op
   ./demo
   ```
 
-  The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 6.
+  All scenarios use the same build and execution steps; only `SCENARIO_NUM` changes. Valid numbers are 1–7; set `SCENARIO_NUM=7` to run scenario 7. The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation.
 
   To use NPU simulation, add the following build option:
 
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
+
+  The build uses the Tensor API and C API headers installed in CANN. Synchronize the repository code to the corresponding package directories before validating local changes.
 
   When switching the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before reconfiguring the project.
 
@@ -152,7 +174,7 @@ Run the following steps in the sample root directory to build and execute the op
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default is `dav-3510`. |
-  | `SCENARIO_NUM` | Required data type conversion scenario number. The valid range is 1 to 6. |
+  | `SCENARIO_NUM` | Required data type conversion scenario number. Valid numbers are 1–7. |
 
 - Expected Result
 

@@ -46,7 +46,7 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| address | 输入 | 源操作数在Global Memory中地址，单位为字节。 |
+| address | 输入 | 源操作数在Global Memory中的地址，单位为字节。 |
 | offset | 输入 | 相对`address`的有符号字节偏移，预取起始地址 = `address` + `offset`，单位为字节。 |
 
 ## 返回值说明

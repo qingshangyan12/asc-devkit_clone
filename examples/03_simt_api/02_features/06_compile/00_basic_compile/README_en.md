@@ -77,6 +77,7 @@ add_executable(demo
 # 5. Set linker language to ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
 
+```
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.

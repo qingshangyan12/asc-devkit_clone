@@ -830,14 +830,14 @@ TEST_F(MeshChunkTest, NhrMigrationPreservesDefaultSelectionAndFallbacks)
     topo.netLayerDetails.localNetInsSizeOfLayer = {2, 4};
     std::string name;
     ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::MATCH);
-    EXPECT_EQ(name, "InsReduceScatterNHR");
+    EXPECT_EQ(name, "AicpuReduceScatterSoleNHRMultiLink");
     topo.topoLevelNums = 2;
     ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::MATCH);
-    EXPECT_EQ(name, "InsReduceScatterNHR");
+    EXPECT_EQ(name, "AicpuReduceScatterSoleNHRMultiLink");
     topo.topLevelUboe = topo.level0Symmetric = topo.level1Symmetric = true;
     topo.deviceNumPerModule = 8;
-    ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::MATCH);
-    EXPECT_EQ(name, "InsReduceScatterNHR");
+    // 对齐 hccl：sym+module8+UBOE 选 PipeLineMeshNHR(Mesh)，devkit 未迁移 → NOT_MATCH
+    ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::NOT_MATCH);
     topo.topLevelUboe = false;
     topo.Level1Nhr = true;
     ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::MATCH);
@@ -855,6 +855,83 @@ TEST_F(MeshChunkTest, NhrMigrationPreservesDefaultSelectionAndFallbacks)
     param.reduceType = HCCL_REDUCE_PROD;
     ASSERT_EQ(base.SelectAicpuAlgo(&topo, param, {}, name), SelectorStatus::MATCH);
     EXPECT_EQ(name, "InsReduceScatterAicpuReduceNHR");
+}
+
+// 对齐 hccl 后的选路闭环：已迁移名精确命中，未迁移算法（SoleMeshConcur / PipeLineMeshNHR UBX 变体）NOT_MATCH。
+// 夹具字段语义同 external_alg_testcase.cc 的 MakeTwoLevelNetLayerTopo / MakeUbxTopo。
+TEST_F(MeshChunkTest, SelectorAlignsWithHcclAndErrorsOnUnmigratedAlgo)
+{
+    ReduceScatterAutoSelector selector;
+    const AutoSelectorBase& base = selector;
+    OpParam param{};
+    param.DataDes.dataType = HCCL_DATA_TYPE_FP32;
+    param.reduceType = HCCL_REDUCE_SUM;
+    std::string name;
+
+    // 单 topo 级 + 两层网夹具（SelectMeshAlgoAicpuForMesh1D 的 IsTwoLevelNetLayer 分支）
+    TopoInfoWithNetLayerDetails twoLevelNet{};
+    twoLevelNet.topoLevelNums = 1;
+    twoLevelNet.level0Topo = Level0Shape::MESH_1D;
+    twoLevelNet.netLayerDetails.netLayerNum = 2;
+    twoLevelNet.netLayerDetails.netLayers = {0, 1};
+    twoLevelNet.netLayerDetails.localNetInsSizeOfLayer = {2, 1};
+    twoLevelNet.topoInstDetailsOfLayer.resize(2);
+    twoLevelNet.topoInstDetailsOfLayer[1].rankNumForTopoType[COMM_TOPO_CLOS] = {16};
+
+    // 2P 且 perRank>=4MB：hccl 选 SoleMeshConcur（2P 绕行），未迁移 → NOT_MATCH
+    twoLevelNet.userRankSize = 2;
+    param.DataDes.count = 1024 * 1024; // FP32 4MB
+    EXPECT_EQ(base.SelectAicpuAlgo(&twoLevelNet, param, {}, name), SelectorStatus::NOT_MATCH);
+    // 2P 小数据仍走 InsReduceScatterMesh1D（ratio=16，4KB*16 < 16MB）
+    param.DataDes.count = 1024;
+    EXPECT_EQ(base.SelectAicpuAlgo(&twoLevelNet, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "InsReduceScatterMesh1D");
+
+    // 512 rank、perRank 4MB（total 2GB > 1536MB 且 ratio 折算未超 16MB）：对齐 hccl 选 SoleMeshChunk
+    twoLevelNet.userRankSize = 512;
+    param.DataDes.count = 1024 * 1024;
+    EXPECT_EQ(base.SelectAicpuAlgo(&twoLevelNet, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "AicpuReduceScatterSoleMeshChunk");
+
+    // UBX 单机夹具（非 pcieMix，mesh 8 卡 < CLOS 域 16 卡，closNum 为 meshNum 倍数）
+    TopoInfoWithNetLayerDetails ubx{};
+    ubx.userRankSize = 16;
+    ubx.topoLevelNums = 1;
+    ubx.level0Topo = Level0Shape::MESH_1D_CLOS;
+    ubx.level0PcieMix = false;
+    ubx.netLayerDetails.netLayerNum = 1;
+    ubx.netLayerDetails.netLayers = {0};
+    ubx.netLayerDetails.localNetInsSizeOfLayer = {16};
+    ubx.topoInstDetailsOfLayer.resize(1);
+    ubx.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {8};
+    ubx.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {16};
+
+    param.DataDes.count = 8ULL * 1024 * 1024; // FP32 32MB
+    // 对称内存 + >=16MB：hccl 选 PipeLineMeshNHR（UBX 变体），未迁移 → NOT_MATCH
+    param.supportSymmetricMemory = true;
+    EXPECT_EQ(base.SelectAicpuAlgo(&ubx, param, {}, name), SelectorStatus::NOT_MATCH);
+    // 非对称内存大数据：对齐 hccl MultiJetty 映射 → AicpuReduceScatterParallelMeshNHRUBX
+    param.supportSymmetricMemory = false;
+    EXPECT_EQ(base.SelectAicpuAlgo(&ubx, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "AicpuReduceScatterParallelMeshNHRUBX");
+
+    // 多层 mesh（topoLevelNums=2，level0 实例数>1）：序列阈值对齐 hccl 4GB
+    TopoInfoWithNetLayerDetails multiMesh = twoLevelNet;
+    multiMesh.userRankSize = 16;
+    multiMesh.topoLevelNums = 2;
+    // perRank 384MB，total 6GB > 4GB → Sequence
+    param.DataDes.count = 96ULL * 1024 * 1024;
+    EXPECT_EQ(base.SelectAicpuAlgo(&multiMesh, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "InsReduceScatterSequenceMesh1DNhr");
+    // perRank 256MB，total 恰 4GB（不超过）→ Parallel
+    param.DataDes.count = 64ULL * 1024 * 1024;
+    EXPECT_EQ(base.SelectAicpuAlgo(&multiMesh, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "InsReduceScatterParallelMesh1DNHR");
+    // 256P 前置分支：perRank 20MB、total 5GB > 4GB，仍直接选 Parallel（hccl 256P+1GB 分支）
+    multiMesh.userRankSize = 256;
+    param.DataDes.count = 5ULL * 1024 * 1024;
+    EXPECT_EQ(base.SelectAicpuAlgo(&multiMesh, param, {}, name), SelectorStatus::MATCH);
+    EXPECT_EQ(name, "InsReduceScatterParallelMesh1DNHR");
 }
 
 namespace {

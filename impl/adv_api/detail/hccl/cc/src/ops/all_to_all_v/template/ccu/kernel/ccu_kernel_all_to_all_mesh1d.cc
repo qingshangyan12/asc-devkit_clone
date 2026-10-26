@@ -11,6 +11,8 @@
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
 
+#include <algorithm>
+
 namespace mc2_ops_hccl {
 
 constexpr int INPUT_XN_ID = 0;
@@ -19,7 +21,8 @@ constexpr int TOKEN_XN_ID = 2;
 constexpr int CKE_IDX_0 = 0;
 constexpr int CKE_IDX_1 = 1;
 constexpr int CKE_IDX_2 = 2;
-constexpr int POST_SYNC_BIT = 5; // PostSync 阶段使用的 event bit
+constexpr int POST_SYNC_BIT = 5;            // PostSync 阶段使用的 event bit
+constexpr uint32_t A2A_BITS_PER_EVENT = 16; // 单个 ccu::Event 的 mask 宽度（uint16_t）
 
 static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
 {
@@ -124,32 +127,56 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
         }
     }
 
+    // uint16_t event mask 最多 16 位：rankSize>16 时按 16 rank 一组拆多个 event，逐组收齐。
+    // rankSize<=16 保持单 event（与既有路径行为一致）。
+    const uint32_t eventNum = (ctx.rankSize + A2A_BITS_PER_EVENT - 1) / A2A_BITS_PER_EVENT;
+    std::vector<ccu::Event> events(eventNum);
+    auto rankMaskOf = [](uint32_t rankIdx) { return static_cast<uint16_t>(1U << (rankIdx % A2A_BITS_PER_EVENT)); };
+    auto eventMaskOfGroup = [&ctx](uint32_t eventIdx) {
+        const uint32_t remainingRanks = ctx.rankSize - eventIdx * A2A_BITS_PER_EVENT;
+        const uint32_t bitCount = std::min(remainingRanks, A2A_BITS_PER_EVENT);
+        return bitCount == A2A_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
+                                                static_cast<uint16_t>((1U << bitCount) - 1);
+    };
+    auto eventWaitAll = [&events, &eventMaskOfGroup]() -> CcuResult {
+        for (uint32_t eventIdx = 0; eventIdx < events.size(); eventIdx++) {
+            CCU_CHK_RET(ccu::EventWait(events[eventIdx], eventMaskOfGroup(eventIdx)));
+        }
+        return CCU_SUCCESS;
+    };
+
     uint32_t channelId = 0;
-    uint16_t allBit = static_cast<uint16_t>(((1U << ctx.rankSize) - 1) & (~(1U << ctx.rankId)));
     const CcuVersion ccuVersion = GetCcuVersion();
     if (ctx.loadFromMem || ccuVersion == CcuVersion::CCU_V2) {
         HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
+            const uint32_t eventIdx = r / A2A_BITS_PER_EVENT;
             if (r == ctx.rankId) {
-                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1U << r);
+                ccu::LocalCopy(localDst, src[r], ctx.sliceSize, events[eventIdx], rankMaskOf(r));
             } else {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, events[eventIdx], rankMaskOf(r));
                 channelId++;
             }
         }
-        ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
+        CCU_CHK_RET(eventWaitAll());
     } else {
-        HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize, ctx.rankId,
-            allBit);
+        HCCL_INFO("[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r != ctx.rankId) {
-                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1U << r);
+                const uint32_t eventIdx = r / A2A_BITS_PER_EVENT;
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, events[eventIdx], rankMaskOf(r));
                 channelId++;
             }
         }
         GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, GetCcuVersion());
-        ccu::EventWait(ctx.event, allBit);
+        // 本 rank 位无需等待（GroupCopy 同步完成），只收远端位
+        for (uint32_t eventIdx = 0; eventIdx < events.size(); eventIdx++) {
+            uint16_t eventMask = eventMaskOfGroup(eventIdx);
+            if (eventIdx == ctx.rankId / A2A_BITS_PER_EVENT) {
+                eventMask &= static_cast<uint16_t>(~rankMaskOf(ctx.rankId));
+            }
+            CCU_CHK_RET(ccu::EventWait(events[eventIdx], eventMask));
+        }
     }
 
     return CCU_SUCCESS;
