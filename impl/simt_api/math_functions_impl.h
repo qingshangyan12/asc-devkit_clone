@@ -4299,7 +4299,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     const float abs_b = fabsf(b);
     const float abs_c = fabsf(c);
     const float abs_d = fabsf(d);
-
     if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c) || isinf(abs_d)) {
         return 0.0f;
     }
@@ -4320,7 +4319,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     const float t_c = abs_c * scale;
     const float t_d = abs_d * scale;
     float square_sum = fmaf(t_a, t_a, fmaf(t_b, t_b, fmaf(t_c, t_c, t_d * t_d)));
-
     // Zero norm means the reciprocal norm is infinite.
     if (square_sum == 0.0f) {
         return ASCRT_INF_F;

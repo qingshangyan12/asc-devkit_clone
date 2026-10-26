@@ -19,6 +19,9 @@ constexpr u32 TOPO_LEVEL_NUM_3 = 3U;
 // 对齐模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 元数据守卫（alg_param.h）：
 // kernel 虽为多 event 可支持更多 rank，模板层仍限 16，selector 前置拒绝
 constexpr u32 CCU_MESH1D_MAX_RANK_SIZE = 16U;
+// 大禹纯 CLOS 单层 CCU 上限：event mask 已按 16 rank 一组拆分（ccu_kernel_all_to_all_v_mesh1d.cc），
+// 通道数组受 CcuKernelArgBase::channels[CCU_MAX_RANK_SIZE] 限制（CCU_MAX_RANK_SIZE=64）
+constexpr u32 CCU_CLOS_MAX_RANK_SIZE = 64U;
 } // namespace
 
 SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
@@ -161,6 +164,12 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
                 topoInfo->userRankSize, CCU_MESH1D_MAX_RANK_SIZE);
             return SelectorStatus::NOT_MATCH;
         }
+        selectAlgName = "CcuSchedAllToAllVSoleMesh";
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::CLOS && topoInfo->userRankSize <= CCU_CLOS_MAX_RANK_SIZE) {
+        // 大禹纯 CLOS 单层：CCU SoleMesh（DIE0-only 建链，模板内做 die 过滤）
         selectAlgName = "CcuSchedAllToAllVSoleMesh";
         HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
         return SelectorStatus::MATCH;

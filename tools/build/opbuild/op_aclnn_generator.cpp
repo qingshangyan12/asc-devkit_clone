@@ -62,15 +62,15 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_BS9SX2A = 12,\n"
                                           "    SOC_VERSION_ASCEND960DT = 13,\n"
                                           "    SOC_VERSION_KIRINX90 = 14,\n"
-                                          "    SOC_VERSION_KIRIN9020 = 15,\n"
-                                          "    SOC_VERSION_KIRIN9030 = 16,\n"
-                                          "    SOC_VERSION_ASCEND350 = 17,\n"
-                                          "    SOC_VERSION_KIRINDEV0000 = 18,\n"
-                                          "    SOC_VERSION_KIRINDEV0001 = 19,\n"
-                                          "    SOC_VERSION_KIRINDEV0002 = 20,\n"
-                                          "    SOC_VERSION_KIRINDEV0003 = 21,\n"
-                                          "    SOC_VERSION_ASCEND960PR = 22,\n"
-                                          "    SOC_VERSION_ASCEND5162A = 23,\n"
+                                          "    SOC_VERSION_KIRIN9030 = 15,\n"
+                                          "    SOC_VERSION_ASCEND350 = 16,\n"
+                                          "    SOC_VERSION_KIRIN9050 = 17,\n"
+                                          "    SOC_VERSION_KIRINDEV0001 = 18,\n"
+                                          "    SOC_VERSION_KIRINDEV0002 = 19,\n"
+                                          "    SOC_VERSION_KIRINDEV0003 = 20,\n"
+                                          "    SOC_VERSION_ASCEND960PR = 21,\n"
+                                          "    SOC_VERSION_ASCEND5162A = 22,\n"
+                                          "    SOC_VERSION_KIRIN9020 = 23,\n"
                                           "    SOC_VERSION_INVALID = 99\n"
                                           "};\n";
 constexpr const char* OP_ACLNN_SOC_MATCH_HELPER =
@@ -168,7 +168,7 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"kirinx90", "SOC_VERSION_KIRINX90"},
     {"kirin9020", "SOC_VERSION_KIRIN9020"},
     {"kirin9030", "SOC_VERSION_KIRIN9030"},
-    {"kirindev0000", "SOC_VERSION_KIRINDEV0000"},
+    {"kirin9050", "SOC_VERSION_KIRIN9050"},
     {"kirindev0001", "SOC_VERSION_KIRINDEV0001"},
     {"kirindev0002", "SOC_VERSION_KIRINDEV0002"},
     {"kirindev0003", "SOC_VERSION_KIRINDEV0003"},

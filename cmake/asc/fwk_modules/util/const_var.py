@@ -32,7 +32,7 @@ SOC_MAP_EXT = {
     "kirinx90": "KirinX90",
     "kirin9020": "Kirin9020",
     "kirin9030": "Kirin9030",
-    "kirindev0000": "KirinDev0000",
+    "kirin9050": "Kirin9050",
     "kirindev0001": "KirinDev0001",
     "kirindev0002": "KirinDev0002",
     "kirindev0003": "KirinDev0003",
