@@ -18,6 +18,15 @@ Ascend C的核心设计目标之一是实现跨代兼容。然而，每一代芯
 >   copy_gm_to_ubuf(input_1_local_UB, input_1, 0, 1, 8, 0, 0);
 >   ```
 
+本手册提供以下迁移路径：
+
+| 源架构 | 目标架构 | 迁移指导 |
+|--------|----------|----------|
+| 2201（Atlas A2/A3） | 3510 | [3510架构迁移指导](./3510_arch_migration/3510_arch_migration.md) |
+| 3510 | 9201 | [9201架构迁移指导](./9201_arch_migration/9201_arch_migration.md) |
+
+3510迁移至9201时，需重点检查AIC与AIV配比、核索引与同步、存储空间布局、Regbase软仿资源开销以及fp16计算精度，不能仅以接口名称相同或编译通过判断兼容。
+
 建议开发者采用以下实践：
 - 使用兼容的API接口。
 - 若涉及特定领域的扩展特性，应在Device侧通过 [`__NPU_ARCH__`编译宏](../programming_guide/language_extension/simd_builtin_keywords.md)进行隔离，在Host侧通过`SocVersion`进行隔离。

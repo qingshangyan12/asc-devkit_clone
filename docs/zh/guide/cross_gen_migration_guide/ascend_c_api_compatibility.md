@@ -4,6 +4,8 @@
 
 若开发者希望在[NPU架构版本3510](../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)下运行原本在[NPU架构版本2201](../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)上开发的Ascend C程序，需在3510架构上重新编译并运行，并可能需要根据迁移指导进行代码调整。
 
+从3510迁移至9201同样需要针对目标架构重新编译。具体接口的兼容边界及适配方法请参考[3510迁移9201指导](./9201_arch_migration/3510_to_9201_guide/3510_to_9201_guide.md)。下表中的总体策略不代表特定参数、数据类型或体系架构相关功能可以直接沿用；通过软件仿真实现功能兼容的接口，也可能存在额外的寄存器、UB和执行时间开销。
+
 **图1**  Ascend C API层次结构<a name="fig1912418519815"></a>  
 ![](../figures/api_hierarchy.png "Ascend-C-API层次结构")
 
