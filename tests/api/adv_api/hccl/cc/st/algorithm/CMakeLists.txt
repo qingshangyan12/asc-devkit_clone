@@ -28,10 +28,10 @@ endif()
 set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
 set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
 
-# asccomm 头路径（T1临接）：下方 utils/src/aicpu 静态库与 testcase 目标编入已切 asccomm 的
-# 源文件，需 asccomm_primitives.h。test 树不经 impl/adv_api 的 asc-comm.cmake，在此按 devkit
-# 根（ASCENDC_DIR）相对探测 asc-comm 源码目录（候选集与 cmake/third_party/asc-comm.cmake 一致）；
-# ASCCOMM_PRIMITIVES_INCLUDE_DIR 环境变量优先（开发侧本地构建显式指定），未命中探测时兜底。
+# asccomm header path for the utils/src/aicpu static library and testcase
+# targets, which compile sources that include asccomm_primitives.h. Probe the
+# asc-comm source dir relative to the devkit root (same candidates as
+# cmake/third_party/asc-comm.cmake); ASCCOMM_PRIMITIVES_INCLUDE_DIR overrides.
 if(NOT DEFINED ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR})
     foreach(_asc_comm_candidate
         "${ASCENDC_DIR}/asc-comm"

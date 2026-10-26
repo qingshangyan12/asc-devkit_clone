@@ -106,11 +106,11 @@ function(configure_mc2_server_minimal_target)
             -Wl,-soname,libccl_kernel_plf.so)
     endif()
 
-    # asccomm 提供者登记（与 ccl_kernel 桩同机制）：server 数据面已切到 asccomm_*，
-    # 这些是对 libasccomm_aicpu.so 的 loose-U（不在任何已链库中定义）。AICPU 按每个 so
-    # 的 NEEDED 逐 so dlopen（OpenSo/CreateSingleSoMgr），不会预加载部署目录里的全部库，
-    # 故必须把 libasccomm_aicpu.so 登记进 NEEDED 才能拉起运行期提供者（真身由设备侧
-    # asccomm_aicpu.tar.gz 部署单元供给）。此处仅建空壳桩登记 soname，不打包其产物。
+    # mc2_server references asccomm_* symbols that are undefined in any linked
+    # library (loose-U against libasccomm_aicpu.so). The AICPU loader dlopens
+    # libraries one by one following NEEDED entries, so the soname must be
+    # registered there for the runtime provider (deployed separately) to load;
+    # the stub itself carries no asc-comm code.
     if(NOT TARGET mc2_server_asccomm_stub)
         set(MC2_SERVER_ASCCOMM_STUB_SRC
             ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_asccomm_stub.cc)

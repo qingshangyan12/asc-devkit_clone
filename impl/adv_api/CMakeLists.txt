@@ -27,9 +27,9 @@ endif()
 add_subdirectory(tiling)
 
 if (BUILD_OPEN_PROJECT)
-  # asc-comm 头树先就位（ASC_COMM_SOURCE_PATH）：host 侧消费见下方 add_subdirectory(detail/hccl/cc)。
-  # EXT_ARGS 仅在 standalone 构建生效（superbuild 下 add_cann_device_project 提前返回），
-  # 作为 device 侧（cmake/device 自探测优先）的显式覆盖入口保留。
+  # Resolve the asc-comm source tree first; consumed by the hccl/cc subtree below.
+  # EXT_ARGS only takes effect in standalone builds; kept as an explicit
+  # override for the device-side probe in cmake/device/CMakeLists.txt.
   include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
   if(ASC_COMM_SOURCE_DIR)
     add_cann_device_project(asc-devkit EXT_ARGS "-DASC_COMM_SOURCE_DIR=${ASC_COMM_SOURCE_DIR}")
@@ -106,8 +106,8 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
 endif()
 
 if (BUILD_OPEN_PROJECT)
-    # asc-comm.cmake 已在上方 add_cann_device_project 前include（ASC_COMM_SOURCE_PATH 就绪）；
-    # hccl/cc 的 mc2 构建在 include 路径中消费 asccomm 头
+    # asc-comm.cmake is included above, so ASC_COMM_SOURCE_PATH is ready; the
+    # hccl/cc mc2 build consumes the asccomm headers on its include path.
     add_subdirectory(detail/hccl/cc)
 endif()
 
