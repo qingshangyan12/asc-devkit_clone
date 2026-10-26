@@ -15,6 +15,9 @@ op compile
 """
 
 import os
+import copy
+import json
+import hashlib
 import sys
 import stat
 import shutil
@@ -350,6 +353,52 @@ class OpCompilation:
             # delete compile result(.o\.json) files by kernel_name if necessary
             self.__del_compile_res_files(op_info)
 
+    def __reuse_level_zero_as_ordinary(self, op, level_zero_info):
+        """Reuse the device implementation; only the compatibility descriptor differs."""
+        output = self.__opc_compile_args[OpcOptions.OUTPUT]
+        source_name = level_zero_info[OpcOptions.KERNEL_NAME]
+        target_name = op[OpcOptions.BIN_FILENAME]
+        source_object = get_file_real_path(output, source_name, "o")
+        target_object = get_file_real_path(output, target_name, "o")
+        shutil.copyfile(source_object, target_object)
+        source_json = get_file_real_path(output, source_name, "json")
+        descriptor = read_json_file(source_json)
+
+        def legacy_metadata(value, is_simplified_key=False):
+            if isinstance(value, dict):
+                return {
+                    key: legacy_metadata(item, key in {"simplifiedKey", "simplified_key"})
+                    for key, item in value.items()
+                    if key != "deterministicLevels"
+                }
+            if isinstance(value, list):
+                return [legacy_metadata(item, is_simplified_key) for item in value]
+            if isinstance(value, str) and is_simplified_key:
+                # dt is a reserved compile-argument field, never a tensor/attribute field.
+                parts = value.split("/", 2)
+                if len(parts) == 3 and any(field.startswith("dt=") for field in parts[1].split(",")):
+                    parts[1] = ",".join(field for field in parts[1].split(",") if not field.startswith("dt="))
+                    return "/".join(parts)
+            return value
+
+        descriptor = legacy_metadata(descriptor)
+        descriptor["binFileName"] = target_name
+        target_json = get_file_real_path(output, target_name, "json")
+        with open(target_json, "w", encoding="utf-8") as stream:
+            json.dump(descriptor, stream, indent=2)
+        with open(source_object, "rb") as stream:
+            source_sha = hashlib.sha256(stream.read()).hexdigest()
+        with open(target_object, "rb") as stream:
+            target_sha = hashlib.sha256(stream.read()).hexdigest()
+        if source_sha != target_sha:
+            raise RuntimeError("ordinary binary reuse changed device object")
+        logger.info(
+            "Reuse level0 device object as ordinary: %s -> %s, SHA256=%s (no compilation)",
+            source_name,
+            target_name,
+            source_sha,
+        )
+
     def __single_op_compile_all_deterministic(self, op, op_info, idx):
         def rename_output_op(output_name, new_output_name):
             logger.debug("Rename output kernel name %s to %s.", output_name, new_output_name)
@@ -504,6 +553,45 @@ class OpCompilation:
                     CompileParam.EXTRA_SETTINGS: op.get(CompileParam.EXTRA_SETTINGS, None),
                     OpcOptions.DETERMINISTIC_LEVEL: op.get(OpcOptions.DETERMINISTIC_LEVEL, ""),
                 }
+                from asc_op_compile_base.common.deterministic import normalize_deterministic, parse_levels
+
+                requested_levels = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC_LEVEL)
+                if requested_levels is None:
+                    requested_levels = op_info.get(OpcOptions.DETERMINISTIC_LEVEL)
+                if parse_levels(requested_levels) is not None:
+                    requested_flag = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
+                    flag, levels = normalize_deterministic(
+                        None if requested_flag == "all" else requested_flag, requested_levels
+                    )
+                    op_info[OpcOptions.DETERMINISTIC] = "true" if flag else "false"
+                    op_info[OpcOptions.DETERMINISTIC_LEVEL] = ",".join(map(str, levels))
+                    self.__single_op_compile(op, op_info, idx)
+                    continue
+                if op.get("split_deterministic_levels", False):
+                    for group in ((0,), (1, 2), (3,)):
+                        group_op, group_info = copy.deepcopy(op), copy.deepcopy(op_info)
+                        group_op[OpcOptions.BIN_FILENAME] = (
+                            op[OpcOptions.BIN_FILENAME] + "_level" + "_".join(map(str, group))
+                        )
+                        group_info[OpcOptions.DETERMINISTIC] = "false" if group == (0,) else "true"
+                        group_info[OpcOptions.DETERMINISTIC_LEVEL] = ",".join(map(str, group))
+                        self.__single_op_compile(group_op, group_info, idx)
+                        if self.__compile_res is not True:
+                            return
+                        if group == (0,):
+                            level_zero_info = group_info
+                    requested = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
+                    if requested in {None, "all", "false"}:
+                        self.__reuse_level_zero_as_ordinary(op, level_zero_info)
+                    if requested in {None, "all", "true"}:
+                        legacy_op, legacy_info = copy.deepcopy(op), copy.deepcopy(op_info)
+                        legacy_op[OpcOptions.BIN_FILENAME] = op[OpcOptions.BIN_FILENAME] + "_deterministic"
+                        legacy_info[OpcOptions.DETERMINISTIC] = "true"
+                        self.__single_op_compile(legacy_op, legacy_info, idx)
+                        if self.__compile_res is not True:
+                            return
+                    continue
+                # Keep historical dispatch unchanged for operators without opt-in.
                 deterministic = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
                 if deterministic is None:
                     self.__single_op_compile(op, op_info, idx)

@@ -11,6 +11,8 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import copy
+from asc_op_compile_base.common.buildcfg import get_current_build_config
+from asc_op_compile_base.common.deterministic import normalize_deterministic, parse_levels
 import ast
 import operator
 import re
@@ -264,6 +266,7 @@ class TilingParamType(Enum):
     TPL_KERNEL_TYPE = auto()
     TPL_SHARED_KERNEL_TYPE = auto()
     TPL_DETERMINISTIC = auto()
+    TPL_DETERMINISTIC_LEVEL = auto()
     TPL_NONE = auto()
 
 
@@ -330,6 +333,8 @@ class TilingTemplateParams:
                         self.macro_type, self.name
                     )
                 )
+        elif self.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL:
+            parse_levels(self.values)
         elif self.param_type == TilingParamType.TPL_DETERMINISTIC:
             if not set(self.values).issubset({"true", "false"}):
                 raise RuntimeError(
@@ -400,6 +405,7 @@ class TilingTemplateParams:
             TilingParamType.TPL_DATAFORMAT: "DATAFORMAT",
             TilingParamType.TPL_UINT: "UINT",
             TilingParamType.TPL_DETERMINISTIC: "DETERMINISTIC",
+            TilingParamType.TPL_DETERMINISTIC_LEVEL: "DETERMINISTIC_LEVEL",
             TilingParamType.TPL_NONE: "",
             TilingParamType.TPL_SHARED_KERNEL_TYPE: "SHARED_KERNEL_TYPE",
         }
@@ -437,6 +443,12 @@ def check_valid_select_param(tiling_param_list: List[TilingTemplateParams], name
                     tiling_declare_param.name, tiling_declare_param.get_param_type_str()
                 )
             )
+    flags = [p for p in tiling_param_list if p.param_type == TilingParamType.TPL_DETERMINISTIC]
+    levels = [p for p in tiling_param_list if p.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL]
+    if len(flags) > 1 or len(levels) > 1:
+        raise ValueError("duplicate deterministic metadata in template group")
+    if levels:
+        normalize_deterministic(flags[0].values[0] if flags else None, levels[0].values)
     total_bit_length = 0
 
     has_shared_kernel = any(p.param_type == TilingParamType.TPL_SHARED_KERNEL_TYPE for p in tiling_param_list)
@@ -448,6 +460,7 @@ def check_valid_select_param(tiling_param_list: List[TilingTemplateParams], name
             tiling_param.param_type == TilingParamType.TPL_TILING_STRUCT
             or tiling_param.param_type == TilingParamType.TPL_KERNEL_TYPE
             or tiling_param.param_type == TilingParamType.TPL_DETERMINISTIC
+            or tiling_param.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL
         ):
             continue
         name = tiling_param.name
@@ -530,6 +543,7 @@ def extract_template_tiling_params(tiling_param_list: List[str], bit_map: dict =
             or sub_str.startswith("ASCENDC_TPL_TILING_STRUCT_SEL_")
             or sub_str.startswith("ASCENDC_TPL_KERNEL_TYPE_SEL")
             or sub_str.startswith("ASCENDC_TPL_DETERMINISTIC_SEL")
+            or sub_str.startswith("ASCENDC_TPL_DETERMINISTIC_LEVEL_SEL")
             or sub_str.startswith("ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL")
             else "DECL"
         )
@@ -548,6 +562,13 @@ def extract_template_tiling_params(tiling_param_list: List[str], bit_map: dict =
             format_list = extract_num(tiling_param_list[i + 1])
             name = "KERNEL_TYPE"
             tiling_param.append(TilingTemplateParams(name, TilingParamType.TPL_KERNEL_TYPE, format_list, 8, macro_type))
+        elif sub_str.startswith("ASCENDC_TPL_DETERMINISTIC_LEVEL_SEL"):
+            levels = list(parse_levels(extract_str(tiling_param_list[i + 1])))
+            tiling_param.append(
+                TilingTemplateParams(
+                    "DETERMINISTIC_LEVEL", TilingParamType.TPL_DETERMINISTIC_LEVEL, levels, 2, macro_type
+                )
+            )
         elif sub_str.startswith("ASCENDC_TPL_DETERMINISTIC_SEL"):
             cur_deter_flag = extract_str(tiling_param_list[i + 1])
             if len(cur_deter_flag) != 1:
@@ -649,6 +670,12 @@ def get_concated_tiling_key(
             data["kernelType"] = template_param.values[0]
             encode_ = ""
             tiling_args_temp = tiling_args
+        elif template_param.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL:
+            # Metadata consumes neither key bits nor kernel template arguments.
+            data["deterministicLevels"] = template_param.values
+            return get_concated_tiling_key(
+                template_param_list, index + 1, tiling_key, tiling_args, encode_book, data, kernel_index
+            )
         elif template_param.param_type == TilingParamType.TPL_DETERMINISTIC:
             data["deterministic"] = template_param.values[0]
             encode_ = ""
@@ -765,7 +792,38 @@ def decode_tiling(tiling_key: int = None) -> dict:
             reversed_book[actual_val] = bin_encodes
         reversed_encode_book[k] = reversed_book
     decode_results = dict()
+    context = get_context()
+    selected = parse_levels(context.get_addition("deterministic_level_filter") if context else None)
+    level_aware = selected is not None or any(
+        param.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL for group in TILING_SELECT_MAP for param in group
+    )
     for tiling_template_select_param in TILING_SELECT_MAP:
+        if level_aware:
+            flags = [p for p in tiling_template_select_param if p.param_type == TilingParamType.TPL_DETERMINISTIC]
+            levels = [
+                p for p in tiling_template_select_param if p.param_type == TilingParamType.TPL_DETERMINISTIC_LEVEL
+            ]
+            flag, normalized = normalize_deterministic(
+                flags[0].values[0] if flags else None, levels[0].values if levels else None
+            )
+            if flag != bool(get_current_build_config("enable_deterministic_mode")) or (
+                selected is not None and not set(normalized).intersection(selected)
+            ):
+                continue
+            # Copy before completing metadata: repeated offline requests must be independent.
+            tiling_template_select_param = list(tiling_template_select_param)
+            if not levels:
+                tiling_template_select_param.append(
+                    TilingTemplateParams(
+                        "DETERMINISTIC_LEVEL", TilingParamType.TPL_DETERMINISTIC_LEVEL, list(normalized), 2, "SEL"
+                    )
+                )
+            if not flags:
+                tiling_template_select_param.append(
+                    TilingTemplateParams(
+                        "DETERMINISTIC", TilingParamType.TPL_DETERMINISTIC, ["true" if flag else "false"], 1, "SEL"
+                    )
+                )
         kernel_index = next(
             (
                 i

@@ -777,6 +777,13 @@ the superkernel cannot be integrated with the operator.",
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {"cubeCoreCnt": int(aicore_num), "vectorCoreCnt": int(vectorcore_num)}
         has_platform_info = True
+    from .deterministic import offline_selection
+
+    level_context = get_context()
+    levels, _ = offline_selection(level_context, get_current_build_config("enable_deterministic_mode"))
+    if levels is not None:
+        js["deterministicLevels"] = list(levels)
+        js["deterministic"] = "false" if levels == (0,) else "true"
     deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
     if deterministic_level != -1:
         if not has_platform_info:

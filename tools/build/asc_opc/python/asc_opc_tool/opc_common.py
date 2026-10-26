@@ -50,6 +50,7 @@ compiling_option_keys = [
     OpcOptions.OP_DEBUG_CONFIG,
     OpcOptions.IMPL_MODE,
     OpcOptions.DETERMINISTIC,
+    OpcOptions.DETERMINISTIC_LEVEL,
     OpcOptions.DEBUG_DIR,
     OpcOptions.CORE_TYPE,
     OpcOptions.GRAPH,
