@@ -127,9 +127,38 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
     hcclMsgArea_ = reinterpret_cast<__gm__ HcclMsgArea*>(msgAddr);
+#if __NPU_ARCH__ == 3510
+    // The handle-id table is contiguous on A5. Initialize it by wide stores to avoid 63 loop iterations.
+    constexpr uint32_t handleIdMsgPositionCnt = static_cast<uint32_t>(HCCL_MAX_HANDLE_ID);
+    constexpr uint32_t fullUint64Cnt = handleIdMsgPositionCnt / sizeof(uint64_t);
+    constexpr uint32_t tailUint32Cnt = (handleIdMsgPositionCnt % sizeof(uint64_t)) / sizeof(uint32_t);
+    constexpr uint32_t tailUint16Cnt = (handleIdMsgPositionCnt % sizeof(uint32_t)) / sizeof(uint16_t);
+    constexpr uint32_t tailUint8Cnt = handleIdMsgPositionCnt % sizeof(uint16_t);
+    static_assert(fullUint64Cnt * sizeof(uint64_t) + tailUint32Cnt * sizeof(uint32_t) +
+                      tailUint16Cnt * sizeof(uint16_t) + tailUint8Cnt == handleIdMsgPositionCnt,
+                  "The split tail initialization must exactly cover handleIdMsgPosition_");
+
+    uint64_t* msgPos64 = reinterpret_cast<uint64_t*>(handleIdMsgPosition_);
+    for (uint32_t i = 0U; i < fullUint64Cnt; ++i) {
+        msgPos64[i] = UINT64_MAX;
+    }
+    uint32_t* msgPos32 = reinterpret_cast<uint32_t*>(msgPos64 + fullUint64Cnt);
+    for (uint32_t i = 0U; i < tailUint32Cnt; ++i) {
+        msgPos32[i] = UINT32_MAX;
+    }
+    uint16_t* msgPos16 = reinterpret_cast<uint16_t*>(msgPos32 + tailUint32Cnt);
+    for (uint32_t i = 0U; i < tailUint16Cnt; ++i) {
+        msgPos16[i] = UINT16_MAX;
+    }
+    uint8_t* msgPos8 = reinterpret_cast<uint8_t*>(msgPos16 + tailUint16Cnt);
+    for (uint32_t i = 0U; i < tailUint8Cnt; ++i) {
+        msgPos8[i] = UINT8_MAX;
+    }
+#else
     for (uint32_t i = 0U; i < HCCL_MAX_HANDLE_ID; ++i) {
         handleIdMsgPosition_[i] = -1;
     }
+#endif
     InitWorkingFlag();
     curVersion_ = version;
 }
