@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
@@ -286,20 +287,46 @@ HcclResult AllocOpParamMemory(
 
 HcclResult AllocWorkspaceMemory(HcclComm comm, const std::string& ctxTag, CommEngine commEngine, OpResCtx& resCtx)
 {
-    uint64_t memSize = 20 * 1024 * 1024;
-    resCtx.workSpaceSize = memSize;
+    constexpr uint64_t workspaceAlign = 512U;
+    constexpr uint64_t workspaceSize = 20U * 1024U * 1024U;
+    constexpr uint64_t allocatedWorkspaceSize = workspaceSize + workspaceAlign;
+    uint64_t memSize = allocatedWorkspaceSize;
     std::string tagWorkSpace = ctxTag + "_workSpace";
     void* workSpacePtr = nullptr;
     if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), commEngine, &workSpacePtr, &memSize) == HCCL_SUCCESS) {
+        CHK_PRT_RET(
+            memSize < allocatedWorkspaceSize,
+            HCCL_ERROR(
+                "HcclAllocOpResCtx workSpace is too small, tagWorkSpace[%s], workSpaceSize[%llu], "
+                "expectedSize[%llu]",
+                tagWorkSpace.c_str(), static_cast<unsigned long long>(memSize),
+                static_cast<unsigned long long>(allocatedWorkspaceSize)),
+            HCCL_E_MEMORY);
         HCCL_INFO(
             "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%u]", tagWorkSpace.c_str(),
             workSpacePtr, memSize);
-        resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+        const uint64_t rawWorkspaceAddr = reinterpret_cast<uint64_t>(workSpacePtr);
+        CHK_PRT_RET(
+            rawWorkspaceAddr > UINT64_MAX - workspaceAlign,
+            HCCL_ERROR(
+                "HcclAllocOpResCtx workSpace address overflow, tagWorkSpace[%s], workSpaceAddr[%llu]",
+                tagWorkSpace.c_str(), static_cast<unsigned long long>(rawWorkspaceAddr)),
+            HCCL_E_PARA);
+        const uint64_t alignedWorkspaceAddr = (rawWorkspaceAddr + workspaceAlign - 1U) & ~(workspaceAlign - 1U);
+        resCtx.workSpace = alignedWorkspaceAddr;
     } else {
+        memSize = allocatedWorkspaceSize;
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), commEngine, memSize, &workSpacePtr));
-        resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+        const uint64_t rawWorkspaceAddr = reinterpret_cast<uint64_t>(workSpacePtr);
+        const uint64_t alignedWorkspaceAddr = (rawWorkspaceAddr + workspaceAlign - 1U) & ~(workspaceAlign - 1U);
+        resCtx.workSpace = alignedWorkspaceAddr;
     }
-    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
+    resCtx.workSpaceSize = workspaceSize;
+    HCCL_INFO(
+        "HcclAllocOpResCtx the workSpace: rawWorkSpaceAddr[%llu], workSpaceAddr[%llu], workSpaceSize[%llu]",
+        static_cast<unsigned long long>(reinterpret_cast<uint64_t>(workSpacePtr)),
+        static_cast<unsigned long long>(resCtx.workSpace),
+        static_cast<unsigned long long>(resCtx.workSpaceSize));
     return HCCL_SUCCESS;
 }
 
@@ -341,6 +368,7 @@ HcclResult AllocAndCopyOpResCtx(
     CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
     return HCCL_SUCCESS;
 }
+
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
@@ -365,6 +393,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_RET(FillRankInfo(comm, resCtx));
     return AllocAndCopyOpResCtx(comm, ctxTag, commEngine, resCtx, opResCtxPtr);
 }
+
 
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr)
