@@ -63,7 +63,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 
 | 参数名 | 描述 |
 | --- | --- |
-| scope | `reduce_scope`枚举类型，用于设置归约范围，默认值为`reduce_scope::element`。`element`表示对所有有效元素求和；`datablock`表示对每个`DataBlock`内的有效元素求和；`pair`表示对相邻两个元素求和。 |
+| scope | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求和；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求和；取值为`reduce_scope::pair`时，对相邻两个元素求和。 |
 | DstType | 返回值中数据寄存器的元素类型，需要在`scope`之后显式指定。支持的数据类型请参考[数据类型](#数据类型)。 |
 | SrcType | 源操作数的数据类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
 

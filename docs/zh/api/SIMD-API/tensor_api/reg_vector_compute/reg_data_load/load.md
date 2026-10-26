@@ -60,7 +60,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| sideband_mode | `load_sideband_mode`枚举类型，用于设置搬入模式，默认值为`load_sideband_mode::direct`。当前接口支持的取值和约束请参考[表3](#表3-load_sideband_mode参数说明)。 |
+| sideband_mode | 搬入模式，类型为`load_sideband_mode`，默认值为`load_sideband_mode::direct`。具体取值请参考[表3](#表3-load_sideband_mode参数说明)。 |
 | Tensor | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | Coord | 源Tensor的坐标类型，由函数实参自动推导。 |
 

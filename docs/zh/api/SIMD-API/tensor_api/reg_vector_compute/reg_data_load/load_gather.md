@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
-`load_gather`根据索引寄存器，从Unified Buffer（UB）Tensor的离散位置收集数据到[reg_tensor](../reg_tensor/reg_tensor.md)。通过`gather_mode`设置收集粒度，`element`表示按元素收集，`data_block`表示按DataBlock（32B）收集。
+`load_gather`根据索引寄存器，从Unified Buffer（UB）Tensor的离散位置收集数据到[reg_tensor](../reg_tensor/reg_tensor.md)。`gather_mode::element`表示按元素收集，`gather_mode::data_block`表示按DataBlock（32B）收集。
 
 传入`coord`时，以`tensor.engine() + tensor.layout()(coord)`为基地址；不传入`coord`时，以`tensor`起始地址为基地址。
 
@@ -57,7 +57,7 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 | 参数名 | 描述 |
 | --- | --- |
-| `mode` | `gather_mode`枚举类型，用于设置收集模式，默认值为`gather_mode::element`。当前接口支持的取值和约束请参考[表3](#表3-gather_mode参数说明)。 |
+| `mode` | 收集模式，类型为`gather_mode`，默认值为`gather_mode::element`。具体取值请参考[表3](#表3-gather_mode参数说明)。 |
 | `Tensor` | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | `Coord` | 源Tensor的坐标类型，由函数实参自动推导。 |
 | `Index` | 索引的数据类型，由函数实参自动推导。 |

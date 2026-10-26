@@ -94,7 +94,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| sideband_mode | `store_sideband_mode`枚举类型，用于设置搬出模式。单源操作数重载的默认值为`store_sideband_mode::direct`；双源操作数重载的默认值为`store_sideband_mode::intlv`。当前接口支持的取值和约束请参考[表3](#表3-store_sideband_mode参数说明)。 |
+| sideband_mode | 搬出模式，类型为`store_sideband_mode`。单源操作数重载的默认值为`store_sideband_mode::direct`；双源操作数重载的默认值为`store_sideband_mode::intlv`。具体取值请参考[表3](#表3-store_sideband_mode参数说明)。 |
 | Tensor | 目的Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | Coord | 目的Tensor的坐标类型，由函数实参自动推导。 |
 | RegDataType | 源寄存器元素类型，由函数实参自动推导。除`int4b_t`外，与目的Tensor的元素类型一致；目的Tensor为`int4b_t`时为`int4x2_t`。 |

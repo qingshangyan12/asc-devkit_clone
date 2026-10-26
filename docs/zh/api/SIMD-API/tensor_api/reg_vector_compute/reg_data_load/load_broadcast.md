@@ -58,7 +58,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| brc_mode | `broadcast_mode`枚举类型，用于设置广播模式，默认值为`broadcast_mode::elem`。当前接口支持的取值和约束请参考[表3](#表3-broadcast_mode参数说明)。 |
+| brc_mode | 广播模式，类型为`broadcast_mode`，默认值为`broadcast_mode::elem`。具体取值请参考[表3](#表3-broadcast_mode参数说明)。 |
 | Tensor | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | Coord | 源Tensor的坐标类型，由函数实参自动推导。 |
 

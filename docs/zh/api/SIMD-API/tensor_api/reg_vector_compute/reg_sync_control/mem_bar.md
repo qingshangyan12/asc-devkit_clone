@@ -47,8 +47,8 @@ __simd_callee__ inline void mem_bar()
 
 | 参数名 | 描述 |
 | --- | --- |
-| src | `mem_type`枚举类型，用于设置源流水线。该流水线中位于本接口之前的UB访问需要先完成，当前接口支持的取值参见[表2](#mem-type-values)。 |
-| dst | `mem_type`枚举类型，用于设置目的流水线。该流水线中位于本接口之后的UB访问等待源流水线，当前接口支持的取值参见[表2](#mem-type-values)。 |
+| src | 源流水线，类型为`mem_type`。该流水线中位于本接口之前的UB访问需要先完成，具体取值参见[表2](#mem-type-values)。 |
+| dst | 目的流水线，类型为`mem_type`。该流水线中位于本接口之后的UB访问等待源流水线，具体取值参见[表2](#mem-type-values)。 |
 
 <a id="mem-type-values"></a>
 

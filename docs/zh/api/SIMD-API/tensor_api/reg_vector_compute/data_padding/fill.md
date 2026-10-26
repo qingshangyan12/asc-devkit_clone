@@ -33,7 +33,7 @@
 - scalar模式：将value广播到寄存器，并保存在目的寄存器中（如果有mask，则保存在目的寄存器中被mask筛选的位置）。
 - tensor模式：将src的最低位元素广播到寄存器，并保存在目的寄存器中被mask筛选的位置。
 
-指定目的寄存器`dst`的重载支持通过[merge_mode](../aux_data_types/merge_mode.md)选择mask合并模式：`zeroing`模式将mask未选中的元素置0；`merging`模式保留`dst`中mask未选中元素的原值。
+指定目的寄存器`dst`的重载支持通过`Mode`选择mask合并模式：`zeroing`模式将mask未选中的元素置0；`merging`模式保留`dst`中mask未选中元素的原值。
 
 ## 函数原型
 
@@ -73,7 +73,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| Mode | [merge_mode](../aux_data_types/merge_mode.md)枚举类型，用于设置mask合并模式。支持`zeroing`和`merging`，默认值为`merge_mode::zeroing`。仅指定`dst`的重载支持该参数。 |
+| Mode | mask合并模式，支持[`merge_mode::zeroing`](../aux_data_types/merge_mode.md)和[`merge_mode::merging`](../aux_data_types/merge_mode.md)，默认值为`merge_mode::zeroing`。仅指定`dst`的重载支持该参数。 |
 | N | 待填充的寄存器数量，默认值为1。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
