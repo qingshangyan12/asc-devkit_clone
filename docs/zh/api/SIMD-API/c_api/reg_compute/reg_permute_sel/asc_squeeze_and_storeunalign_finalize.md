@@ -101,27 +101,45 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
-constexpr uint32_t REPEAT_COUNT = 2;
-constexpr uint32_t SELECTED_PER_REGISTER = 22;
-constexpr uint32_t INPUT_COUNT = ELEMENTS_PER_REGISTER * REPEAT_COUNT;
-constexpr uint32_t OUTPUT_COUNT = SELECTED_PER_REGISTER * REPEAT_COUNT;
+constexpr uint8_t MUTEX_ID = 0;
 
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t INPUT_COUNT = 139;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (INPUT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_INPUT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t SELECTED_PER_REGISTER = 22;
+constexpr uint32_t OUTPUT_COUNT = (INPUT_COUNT / ELEMENTS_PER_REGISTER) * SELECTED_PER_REGISTER +
+    ((INPUT_COUNT % ELEMENTS_PER_REGISTER) + 2) / 3;
+constexpr uint32_t PADDED_OUTPUT_COUNT = ((OUTPUT_COUNT + ELEMENTS_PER_REGISTER - 1) /
+    ELEMENTS_PER_REGISTER) * ELEMENTS_PER_REGISTER;
+constexpr uint32_t LAST_SELECTED_COUNT = ((INPUT_COUNT % ELEMENTS_PER_REGISTER) + 2) / 3;
+
+constexpr uint32_t DATA_BYTES = INPUT_COUNT * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = INPUT_COUNT;
 __simd_vf__ inline void pack_selected(
-    __ubuf__ float* output, __ubuf__ float* register_output, __ubuf__ float* input)
+    __ubuf__ float* output, __ubuf__ float* register_output, __ubuf__ float* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src;
     vector_float dst;
     vector_store_unalign unalign_reg;
-    vector_bool squeeze_mask = asc_create_mask_b32(PAT_M3);
+    vector_bool pattern_mask = asc_create_mask_b32(PAT_M3);
+    vector_bool full_mask = asc_create_mask_b32(PAT_ALL);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = INPUT_COUNT;
     vector_bool store_mask = asc_create_mask_b32(PAT_ALL);
 
     asc_squeeze_and_storeunalign_init();
-    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
-        asc_loadalign(src, input + repeat * ELEMENTS_PER_REGISTER);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool valid_mask = asc_update_mask_b32(remaining_length);
+        vector_bool squeeze_mask = asc_and(pattern_mask, valid_mask, full_mask);
+        asc_loadalign(src, input + i * ELEMENTS_PER_REGISTER);
         asc_squeeze_and_storeunalign(output, dst, unalign_reg, src, squeeze_mask);
     }
     asc_squeeze_and_storeunalign_finalize(output, unalign_reg);
@@ -132,35 +150,47 @@ __global__ __vector__ void squeeze_and_store_kernel(
     __gm__ float* output, __gm__ float* register_output, __gm__ float* input)
 {
     asc_init();
-    __ubuf__ float input_local[INPUT_COUNT];
-    __ubuf__ float output_local[ELEMENTS_PER_REGISTER];
+    __ubuf__ float input_local[PADDED_INPUT_COUNT];
+    __ubuf__ float output_local[PADDED_OUTPUT_COUNT];
     __ubuf__ float register_local[ELEMENTS_PER_REGISTER];
-    asc_copy_gm2ub_align(input_local, input, INPUT_COUNT * sizeof(float));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    pack_selected(output_local, register_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, OUTPUT_COUNT * sizeof(float));
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, PADDED_INPUT_COUNT * sizeof(float));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<pack_selected>(output_local, register_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, output_local, PADDED_OUTPUT_COUNT * sizeof(float));
     asc_copy_ub2gm_align(register_output, register_local, ELEMENTS_PER_REGISTER * sizeof(float));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> input(INPUT_COUNT);
-    std::vector<float> output(OUTPUT_COUNT, 0.0F);
+    std::vector<float> input(PADDED_INPUT_COUNT, 0.0F);
+    std::vector<float> output(PADDED_OUTPUT_COUNT, 0.0F);
     std::vector<float> register_output(ELEMENTS_PER_REGISTER, 0.0F);
     std::vector<float> golden;
     std::vector<float> register_golden(ELEMENTS_PER_REGISTER, 0.0F);
     for (uint32_t i = 0; i < INPUT_COUNT; ++i) input[i] = static_cast<float>(i) + 0.5F;
     for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
-        for (uint32_t i = 0; i < ELEMENTS_PER_REGISTER; i += 3) {
-            golden.push_back(input[repeat * ELEMENTS_PER_REGISTER + i]);
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t valid_count = INPUT_COUNT - offset > ELEMENTS_PER_REGISTER ?
+            ELEMENTS_PER_REGISTER : INPUT_COUNT - offset;
+        for (uint32_t i = 0; i < valid_count; i += 3) {
+            golden.push_back(input[offset + i]);
         }
     }
-    std::copy(golden.end() - SELECTED_PER_REGISTER, golden.end(), register_golden.begin());
+    const uint32_t last_offset = (REPEAT_COUNT - 1) * ELEMENTS_PER_REGISTER;
+    for (uint32_t i = 0; i < LAST_SELECTED_COUNT; ++i) {
+        register_golden[i] = input[last_offset + i * 3];
+    }
 
     aclInit(nullptr);
     aclrtSetDevice(0);
@@ -169,7 +199,7 @@ int main()
     float* register_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&input_device), input.size() * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), PADDED_OUTPUT_COUNT * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&register_device), register_output.size() * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
@@ -182,7 +212,8 @@ int main()
     aclrtMemcpy(register_output.data(), register_output.size() * sizeof(float), register_device,
         register_output.size() * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == golden && register_output == register_golden;
+    const bool passed = std::equal(output.begin(), output.begin() + OUTPUT_COUNT, golden.begin()) &&
+        std::equal(register_output.begin(), register_output.begin() + LAST_SELECTED_COUNT, register_golden.begin());
     std::cout << (passed ? "[Success] squeeze and unaligned store completed."
                          : "[Failed] output mismatch.") << std::endl;
     aclrtFree(input_device);

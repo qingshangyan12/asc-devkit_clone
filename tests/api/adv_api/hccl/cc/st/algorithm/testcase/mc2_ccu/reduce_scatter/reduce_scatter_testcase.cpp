@@ -282,3 +282,41 @@ TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2DieLink_2Server8Rank_Fp
     scenario.twoDieLink = true;
     VerifyScenario(scenario);
 }
+
+// ============================================================================
+// 默认 selector（algConfig 为空，走 selector 而非 forced；注册期无 count → 小数据口径）
+// ============================================================================
+
+namespace {
+
+CcuStScenario MakeSelectorScenario(
+    const TopoMeta& topoMeta, HcclDataType dataType, uint64_t count, HcclReduceOp reduceType = HCCL_REDUCE_SUM)
+{
+    const uint32_t rankSize = CcuStFixture::CountRanks(topoMeta);
+    const uint64_t typeSize = DATATYPE_SIZE_TABLE[dataType];
+    const uint64_t sliceSize = count * typeSize;
+    CcuStScenario scenario;
+    scenario.topoMeta = topoMeta;
+    scenario.dataType = dataType;
+    scenario.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    scenario.expectedAlgName = "CcuSchedReduceScatterSoleMesh";
+    scenario.count = count;
+    scenario.reduceType = reduceType;
+    scenario.sizes.assign(rankSize, std::vector<uint64_t>(rankSize, sliceSize));
+    return scenario;
+}
+
+} // namespace
+
+// 单层单 die mesh：selector 选 SoleMesh
+TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16)
+{
+    VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 32));
+}
+
+// 两级 2server×4P（GCD=4 → Level1Nhr=false，level0 双 mesh 实例）：总数据量 <512K 走多实例小数据分支，
+// 与 hccl 对齐选 SoleMesh（跨 server 对端链路由通道请求按 rank 图解析）
+TEST_F(CcuStReduceScatter, Selector_2LevelMesh_2Server8Rank_Fp16)
+{
+    VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50));
+}

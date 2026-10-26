@@ -14,6 +14,9 @@
 #include "template_utils.h"
 #include "alg_v2_template_base.h"
 #include "hccl_common.h"
+#include <algorithm>
+#include <map>
+#include <vector>
 
 namespace mc2_ops_hccl {
 
@@ -56,6 +59,66 @@ inline HcclResult PrepareOmniPipeDataSplitForMultiChannel(
         }
         dataSplitVec.push_back(dataSplitVecByRepeat);
         dataOffsetVec.push_back(dataOffsetVecByRepeat);
+    }
+    return HcclResult::HCCL_SUCCESS;
+}
+
+// 按本 rank 与对端 rank 所属的子通信域将通道归层（devkit 适配：从 hccl omnipipe_template_utils.cc 移植）
+// 兼容两种资源布局：CalcRes 按层序列化的通道 / 对称内存场景合并到 channels[0] 的通道。
+namespace {
+bool TryClassifyOmniPipeChannel(
+    u32 localRank, const ChannelInfo& channel, const std::vector<const std::vector<std::vector<u32>>*>& subCommsByLevel,
+    const std::vector<uint64_t>& rankSizesByLevel,
+    std::vector<std::map<u32, std::vector<ChannelInfo>>>& channelsByLevel)
+{
+    for (u32 level = 0; level < subCommsByLevel.size(); ++level) {
+        if (subCommsByLevel[level] == nullptr || rankSizesByLevel[level] <= 1) {
+            continue;
+        }
+
+        const auto& subComms = *subCommsByLevel[level];
+        const auto subCommIter =
+            std::find_if(subComms.begin(), subComms.end(), [localRank, &channel](const std::vector<u32>& subComm) {
+                const bool containsLocalRank = std::find(subComm.begin(), subComm.end(), localRank) != subComm.end();
+                const bool containsRemoteRank =
+                    std::find(subComm.begin(), subComm.end(), channel.remoteRank) != subComm.end();
+                return containsLocalRank && containsRemoteRank;
+            });
+        if (subCommIter == subComms.end()) {
+            continue;
+        }
+
+        channelsByLevel[level][channel.remoteRank].push_back(channel);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+inline HcclResult ClassifyOmniPipeChannelsByLevel(
+    u32 localRank, const std::vector<std::vector<ChannelInfo>>& channels,
+    const std::vector<const std::vector<std::vector<u32>>*>& subCommsByLevel,
+    const std::vector<uint64_t>& rankSizesByLevel,
+    std::vector<std::map<u32, std::vector<ChannelInfo>>>& channelsByLevel)
+{
+    if (subCommsByLevel.size() != rankSizesByLevel.size()) {
+        HCCL_ERROR(
+            "[ClassifyOmniPipeChannelsByLevel] level count mismatch, subCommLevelCount[%zu], "
+            "rankSizeLevelCount[%zu].",
+            subCommsByLevel.size(), rankSizesByLevel.size());
+        return HcclResult::HCCL_E_PARA;
+    }
+
+    channelsByLevel.assign(subCommsByLevel.size(), {});
+    for (const auto& channelGroup : channels) {
+        for (const auto& channel : channelGroup) {
+            if (!TryClassifyOmniPipeChannel(localRank, channel, subCommsByLevel, rankSizesByLevel, channelsByLevel)) {
+                HCCL_WARNING(
+                    "[ClassifyOmniPipeChannelsByLevel] discard unclassified channel, "
+                    "remoteRank[%u] is absent from every active sub-communicator.",
+                    channel.remoteRank);
+            }
+        }
     }
     return HcclResult::HCCL_SUCCESS;
 }

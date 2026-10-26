@@ -264,7 +264,7 @@ __global__ __mix__(1, 2) void asc_copy_gm2l1_align_modes_kernel(  // __mix__ï¼šä
         asc_sync_pipe(PIPE_MTE1);
         asc_sync_intra_arrive(PIPE_MTE1, AIC_TO_AIV_SYNC_ID);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 std::vector<uint8_t> MakeInput()

@@ -177,7 +177,7 @@ __global__ __cube__ void AscCopyGm2l1TwoDimNzKernel(
     // 关闭Nz2ND和Nz2DN，保持L0C Buffer中的Nz排布直接搬出至GM。
     asc_copy_l0c2gm(output, c_l0, N, M, M * CUBE, M, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
         asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 uint16_t ToHalfBits(int32_t value)
