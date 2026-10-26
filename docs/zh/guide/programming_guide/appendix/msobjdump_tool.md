@@ -111,7 +111,7 @@
 
     | 参数（区分大小写） | 可选/必选 | 说明 |
     | ---- | ---- | ---- |
-    | `--sass <input_file>` | 必选 | 反汇编输入文件中Device侧的Ascend AICore指令。<br>`<input_file>`表示待反汇编的文件路径。 |
+    | `--sass <input_file>` | 必选 | 反汇编输入的ELF文件，显示Device侧的Ascend AICore指令。<br>`<input_file>`表示待反汇编的文件路径。 |
     | `--lineinfo` | 可选 | 与`--sass`配套使用，在反汇编结果中显示源文件名和行号。 |
     | `--source`，`-s` | 可选 | 与`--sass`配套使用，在反汇编结果中显示对应源码。源文件需要能够按调试信息中记录的路径访问。 |
 
