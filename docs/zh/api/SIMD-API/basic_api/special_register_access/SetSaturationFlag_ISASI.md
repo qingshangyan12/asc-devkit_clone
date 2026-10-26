@@ -41,7 +41,7 @@
 
 - 当输出为浮点数时（浮点数计算、浮点数精度转换、整数转浮点数），数值超出目标浮点类型表示范围时（如高精度转低精度时绝对值过大）产生INF，非法运算（如0/0、INF-INF）或输入为INF/NAN时产生INF/NAN：开启饱和模式后，INF被饱和为±MAX（目标类型能表示的最大/最小有限值）、NAN被饱和为0；关闭饱和模式时，INF/NAN保持原输出。
 
-本接口通过模板参数`SaturationMode`设置全局饱和模式，并可通过[GetSaturationFlag](GetSaturationFlag_ISASI.md)查询其开启状态。该配置主要用于支持饱和模式的计算和精度转换接口；精度转换场景可配合Memory矢量计算的[Cast](../memory_vector_compute/type_conversion/Cast.md)、[Truncate](../memory_vector_compute/type_conversion/Truncate_ISASI.md)，以及Reg矢量计算的[Cast](../reg_vector_compute/type_conversion/Cast.md)、[Truncate](../reg_vector_compute/type_conversion/Truncate.md)使用。
+本接口通过模板参数`SaturationMode`设置全局饱和模式，并可通过[GetSaturationFlag](GetSaturationFlag_ISASI.md)查询其开启状态。该配置主要用于支持饱和模式的计算和精度转换接口，Cube侧计算与搬运场景可配合[Mmad](../cube_compute_ISASI/mmad_compute/Mmad.md)、[MmadMx](../cube_compute_ISASI/mmad_compute/MmadMx.md)与[Fixpipe](../cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)使用；二者的饱和模式均由CTRL[48]直接决定，不受CTRL[60]限制；精度转换场景可配合Memory矢量计算的[Cast](../memory_vector_compute/type_conversion/Cast.md)、[Truncate](../memory_vector_compute/type_conversion/Truncate_ISASI.md)，以及Reg矢量计算的[Cast](../reg_vector_compute/type_conversion/Cast.md)、[Truncate](../reg_vector_compute/type_conversion/Truncate.md)使用。
 
 <!-- npu="950" id10 -->
 在Ascend 950PR&950DT系列产品上，部分精度转换接口可以使用接口自身的饱和配置，也可以使用本接口设置的全局饱和配置。可通过[SetSaturationStrategy](SetSaturationStrategy.md)选择使用接口自身的饱和配置或全局饱和配置。
@@ -77,15 +77,15 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
 - `SaturationMode::FLOAT`：
 
   <!-- npu="950" id11 -->
-  - 对于Ascend 950PR&950DT系列产品，影响的数据类型为：浮点数计算时仅half；浮点数精度转换时为hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t，其中`fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`的NAN处理需配合`SaturationMode::FLOAT8`。
+  - 对于Ascend 950PR&950DT系列产品，对于Cube侧Mmad类计算，影响的数据类型为对应接口支持的所有浮点数据类型，对于Fixpipe搬运支持的数据类型为hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t；对于Vector侧影响的数据类型为：浮点数计算时为half；浮点数精度转换时为hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t，其中`fp8_e8m0_t`、`fp8_e5m2_t`和`fp8_e4m3fn_t`的NAN处理需配合`SaturationMode::FLOAT8`。
   <!-- end id11 -->
 
   <!-- npu="A3" id12 -->
-  - 对于Atlas A3系列产品，影响的数据类型为：half、bfloat16_t。
+  - 对于Atlas A3系列产品，Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型，浮点数精度转换时支持如下数据类型：half、bfloat16_t。
   <!-- end id12 -->
 
   <!-- npu="910b" id13 -->
-  - 对于Atlas A2系列产品，影响的数据类型为：half、bfloat16_t。
+  - 对于Atlas A2系列产品，Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型，浮点数精度转换时支持如下数据类型：half、bfloat16_t。
   <!-- end id13 -->
 
 - `SaturationMode::FLOAT8`：
