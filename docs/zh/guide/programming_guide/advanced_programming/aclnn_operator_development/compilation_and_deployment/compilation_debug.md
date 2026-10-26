@@ -30,7 +30,7 @@ build_out/autogen/
 | aclnn接口参数与原型定义不匹配 | 检查`aclnn_<op>.h`中的函数签名，确认输入输出和属性参数是否正确映射。 |
 | 入图场景算子注册信息异常 | 检查`op_proto.cc`中的注册宏，确认OpType、dtype/format是否与Host侧定义一致。 |
 | 某个算子的调用代码未生成 | 检查`npu_op_code_gen`的`SRC`参数是否包含了该算子的Host侧源文件。 |
-| JOIN_OP_DEF相关芯片型号异常 | `JOIN_OP_DEF=True`时算子构建阶段不再显式传入`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`，需结合configure日志、`op_proto.cc`中的AddConfig和CMakePresets.json中的芯片型号确认目标型号是否被覆盖。 |
+| JOIN_OP_DEF相关芯片型号异常 | `JOIN_OP_DEF=True`时算子构建阶段不再显式传入`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`，需结合configure日志、`op_proto.cc`中的AddConfig和CMakeLists.txt、命令行或可选preset中的构建目标配置确认目标型号是否被覆盖。 |
 
 ### 强制重新生成
 
@@ -255,7 +255,7 @@ ls <path>/vendors/<vendor_name>/op_proto # 可选
 
 默认情况下，核函数（Kernel）侧编译过程中的中间日志不会保留到磁盘，编译失败时终端仅打印异常抛出信息。通过设置`ASCENDC_BUILD_LOG_DIR`环境变量，可将每个编译阶段的日志写入指定目录，便于事后回溯。
 
-**开启方法**：在执行cmake或build.sh之前设置环境变量：
+**开启方法**：在执行CMake配置与编译命令之前设置环境变量：
 
 ```bash
 export ASCENDC_BUILD_LOG_DIR=/home/build_log/

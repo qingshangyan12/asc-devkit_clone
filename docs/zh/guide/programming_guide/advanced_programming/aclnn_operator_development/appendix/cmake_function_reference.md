@@ -103,13 +103,13 @@ npu_op_package_add(${package_name}
 创建Host侧库。
 
 ```cmake
-npu_op_library(<library_name> TYPE <library_type> <files>)
+npu_op_library(<library_name> <library_type> <files>)
 ```
 
 **参数说明：**
 
 - `<library_name>`（必选）：Host侧库的名称。
-- `TYPE <library_type>`（必选）：Host库的类型，可选值为`TILING`、`ACLNN`、`GRAPH`、`TF_PLUGIN`、`ONNX_PLUGIN`。
+- `<library_type>`（必选）：Host库的类型，可选值为`TILING`、`ACLNN`、`GRAPH`、`TF_PLUGIN`、`ONNX_PLUGIN`。
   - `TILING`：Tiling相关库。
   - `ACLNN`：aclnn单算子调用库。
   - `GRAPH`：算子入图所需的算子原型库。

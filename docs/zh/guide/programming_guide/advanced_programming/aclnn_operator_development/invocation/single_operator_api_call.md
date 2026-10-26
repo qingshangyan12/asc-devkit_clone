@@ -207,7 +207,7 @@ aclnnFinalize();
 
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
-    # <vendor_name>需替换为算子工程CMakePresets.json中的vendor_name
+    # <vendor_name>需替换为算子工程传给`npu_op_package`的厂商名称（快速入门默认为customize）
     export VENDOR_NAME=<vendor_name>
     # 配置自定义算子包环境变量
     # 如果是run包执行
@@ -253,7 +253,7 @@ aclnnFinalize();
 
 **找不到`aclnn_add_custom.h`**
 
-先确认`VENDOR_NAME`是否与算子工程`CMakePresets.json`中的`vendor_name`一致，再确认算子包是否已经安装：
+先确认`VENDOR_NAME`是否与算子工程传给`npu_op_package`的厂商名称（通常由`vendor_name`变量配置）一致，再确认算子包是否已经安装：
 
 ```bash
 ls $ASCEND_OPP_PATH/vendors/${VENDOR_NAME}/op_api/include/aclnn_add_custom.h

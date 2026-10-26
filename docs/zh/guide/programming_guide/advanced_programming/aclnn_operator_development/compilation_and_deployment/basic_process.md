@@ -33,10 +33,12 @@
 | 参数名称 | 参数描述 | 默认值 |
 |---------|---------|--------|
 | ASCEND_SOC_SERIES | AI处理器系列，支持配置一个或多个值。输入不区分大小写，配置值会先归一为小写。 | 无 |
-| ASCEND_COMPUTE_UNIT | AI处理器型号，按实际运行芯片配置。 | "ascendxxx" |
+| ASCEND_COMPUTE_UNIT | 构建目标的小写标识，如`ascend910b`，与Host原型中的`AddConfig`对应。 | `ascend910b` |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
 
-`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`不能同时配置，且`ASCEND_SOC_SERIES`不能为空。
+`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`不能同时配置，且`ASCEND_SOC_SERIES`不能为空。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。这些变量以及交叉编译相关变量应在`find_package(ASC)`前设置，由ASC加载时完成初始化。
+
+切换两种目标配置方式时，使用新的构建目录，避免旧`CMakeCache.txt`中的目标变量与新配置冲突。
 
 除上述必改参数外，其他可选编译配置选项详情如下：
 
@@ -59,29 +61,35 @@
 直接在顶层CMakeLists.txt中设置变量，并通过`npu_op_*`接口配置编译行为，这是推荐的默认方式，无需额外的`CMakePresets.json`文件。
 
 ```cmake
-# 设置必要变量。也可以使用变量ASCEND_SOC_SERIES，二者不能同时设置。
-set(ASCEND_COMPUTE_UNIT "ascendxxxyy") | set(ASCEND_SOC_SERIES "Ascendxxx")
-set(vendor_name "customize")
+cmake_minimum_required(VERSION 3.19.0)
+project(opp)
 
-# 配置编译产物包（通过CONFIG参数替代ENABLE_SOURCE_PACKAGE / ENABLE_BINARY_PACKAGE等变量）
+# 在加载ASC前提供默认目标；外部配置ASCEND_SOC_SERIES时不再设置另一种目标变量。
+if(NOT DEFINED ASCEND_SOC_SERIES)
+    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+endif()
+set(vendor_name "customize" CACHE STRING "Operator package vendor")
+find_package(ASC REQUIRED)
+
+# 配置编译产物包
 npu_op_package(${vendor_name}
     TYPE RUN
     CONFIG
-        ENABLE_SOURCE_PACKAGE True
-        ENABLE_BINARY_PACKAGE True
         INSTALL_PATH ${CMAKE_BINARY_DIR}/
 )
 ```
 
+以上为顶层文件的配置部分，还需按[快速入门](../aclnn_quick_start.md)或[编译组织](#编译组织)添加源文件和各类库的构建配置。`CACHE`设置提供默认值，允许命令行`-D`和preset传入的同名值生效；不要再用普通`set(...)`覆盖这些值。若要直接在文件中选择系列，可将默认目标设置替换为`set(ASCEND_SOC_SERIES "Ascend950" CACHE STRING "AI processor series")`，并使用新的构建目录。
+
 其他配置（如动态库编译、交叉编译等）也可在CMakeLists.txt中通过变量或`npu_op_package` CONFIG参数设置。完整参数说明请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
 
-### 方式二：使用CMakePresets.json
+### 方式二：使用CMakePresets.json<a id="cmake-presets"></a>
 
-如果希望将编译配置与CMakeLists.txt解耦，也可以在工程目录下自行编写`CMakePresets.json`，并修改其中的`cacheVariables`。
+如果希望将编译配置与CMakeLists.txt解耦，可以在工程根目录新建以下完整的`CMakePresets.json`，通过`cacheVariables`传入配置。CMakeLists.txt仍保留方式一中的`CACHE`默认值和全部构建声明，无需另一套构建脚本。
 
 > [!NOTE]说明
 >
-> 直接执行`cmake --preset=default`要求CMake >= 3.19。低版本CMake环境下，需要自行解析`CMakePresets.json`并转成普通`cmake -D`参数，或直接采用方式一在CMakeLists.txt中设置变量。
+> 本文示例要求CMake >= 3.19。`CMakePresets.json`是可选的配置入口；不使用preset时，可直接在CMakeLists.txt中配置默认值或通过`cmake -D`传参。
 
 **最小配置示例**：
 
@@ -96,10 +104,12 @@ npu_op_package(${vendor_name}
     "configurePresets": [
         {
             "name": "default",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "ASCEND_COMPUTE_UNIT": {
                     "type": "STRING",
-                    "value": "ascendxxyy"
+                    "value": "ascend910b"
                 },
                 "vendor_name": {
                     "type": "STRING",
@@ -111,33 +121,30 @@ npu_op_package(${vendor_name}
 }
 ```
 
-需要注意如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如方式一样例直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
+需要注意如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如自定义配置直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
 
 ## 执行编译
 
-执行cmake命令完成配置和编译：
+在工程根目录执行以下命令完成配置和编译。命令不会切换当前工作目录：
 
 ```bash
-mkdir -p build && cd build
-cmake ..
-make -j binary package
+cmake -S . -B build
+cmake --build build --target binary package --parallel 8
 ```
 
-- `cmake ..`是CMake的配置和生成阶段：从上级目录读取源码和`CMakeLists.txt`，在当前`build`目录下生成后续编译需要的构建文件。
-- `make -j binary package`是实际编译和打包阶段：`binary`负责编译算子二进制相关产物，`package`负责生成算子安装包，`-j`表示并行编译。
+- `cmake -S . -B build`是配置和生成阶段：从当前工程读取`CMakeLists.txt`，在`build`目录生成构建文件。
+- `cmake --build build --target binary package --parallel 8`执行编译和打包，使用8个并行任务；`binary`负责编译算子二进制相关产物，`package`负责生成算子安装包。并行任务数可按机器资源调整。
 
-如果工程目录下有`CMakePresets.json`（[方式二](#方式二使用cmakepresetsjson)）并使用CMake >= 3.19，也可以改用`--preset`方式执行：
+如果已按[方式二](#cmake-presets)创建`CMakePresets.json`，可在工程根目录改用以下命令，构建目录同样为`build`：
 
 ```bash
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary package -j$(nproc)
+cmake --preset=default
+cmake --build build --target binary package --parallel 8
 ```
 
-- `cmake -S . -B build_out --preset=default`是CMake的配置和生成阶段：从当前目录读取源码、`CMakeLists.txt`和`CMakePresets.json`中的`default`配置，在`build_out`目录下生成后续编译需要的构建文件。
+`cmake --preset=default`读取preset中的目标、厂商名称和构建目录；后续编译命令与不使用preset的方式一致。
 
-- `cmake --build build_out --target binary package -j$(nproc)`是实际编译和打包阶段：使用`build_out`中已经生成的构建文件，执行`binary`和`package`目标；`binary`负责编译算子二进制相关产物，`package`负责生成算子安装包，`-j$(nproc)`表示按当前机器CPU核数并行编译。
-
-编译成功后，会在编译产物目录下生成自定义算子安装包`custom_opp_<target os>_<target architecture>.run`。该run包包含算子原型库、Tiling库、aclnn API库和核函数（Kernel）二进制，部署后框架会自动扫描并加载。
+编译成功后，会在编译产物目录下生成自定义算子安装包`custom_opp_<target os>_<target architecture>.run`。该run包包含工程中声明并加入包的库和核函数（Kernel）产物：单算子调用通常包括Tiling库、aclnn API库和核函数二进制，入图场景还需加入GRAPH原型库，框架适配场景还需加入对应插件库。
 
 **编译日志存储**（可选）：
 
@@ -306,7 +313,7 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ---
 
-> 以上为编译部署的基本流程，涵盖了单算子工程最常用的CMakeLists.txt写法。以下内容介绍工程目录组织和自定义编译选项，适合算子数量较多或需要定制编译流程的开发者参考。
+> 以上为已有算子工程的编译部署流程；从零编写完整工程可先参考[快速入门](../aclnn_quick_start.md)。以下内容介绍工程目录组织和自定义编译选项，适合算子数量较多或需要定制编译流程的开发者参考。
 
 ---
 
@@ -337,17 +344,19 @@ source /usr/local/Ascend/cann/set_env.sh
 cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
-# 1. 使用find_package查找CANN软件包提供的ASC CMake modules
-find_package(ASC REQUIRED HINTS ${ASCEND_CANN_PACKAGE_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+# 1. 在加载ASC前设置配置默认值，也可由命令行或preset传入。
+if(NOT DEFINED ASCEND_SOC_SERIES)
+    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+endif()
+set(vendor_name "customize" CACHE STRING "Operator package vendor")
+find_package(ASC REQUIRED)
 
 # 2. 设置算子工程的编译产物形态
-# vendor_name在CMakePresets.json中配置，用于区分不同厂商的算子包
+# vendor_name用于区分不同厂商的算子包
 set(package_name ${vendor_name})
 npu_op_package(${package_name}
     TYPE RUN                                       #编译产物形态：RUN/STATIC/SHARED
     CONFIG
-        ENABLE_SOURCE_PACKAGE True
-        ENABLE_BINARY_PACKAGE True
         INSTALL_PATH ${CMAKE_BINARY_DIR}/
 )
 
@@ -439,13 +448,6 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)
 # 2. 指定核函数（Kernel）源码
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustom                              #算子类型
-    COMPUTE_UNIT ascendxxxyy                       # AI处理器型号
-    KERNEL_FILE add_custom.cpp                     # 核函数（Kernel）实现文件名
-)
-或者
-npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE AddCustom                              #算子类型
-    SOC_SERIES Ascendxxx                           # AI处理器型号
     KERNEL_FILE add_custom.cpp                     # 核函数（Kernel）实现文件名
 )
 
@@ -461,7 +463,7 @@ npu_op_package_add(${package_name}
 )
 ```
 
-示例中核函数（Kernel）实现文件名为`add_custom.cpp`，所以在`npu_op_kernel_sources`中同时指定了`OP_TYPE`和`KERNEL_FILE`。如果想按目录扫描核函数（Kernel）源码，可改用`KERNEL_DIR ./`，此时`KERNEL_DIR`相对于后续`npu_op_kernel_library`中的`SRC_BASE`。
+示例中的源码声明默认对工程配置的所有目标生效；如需限制生效范围，可按[CMake函数参考](../appendix/cmake_function_reference.md#npu_op_kernel_sources)添加`COMPUTE_UNIT`或`SOC_SERIES`参数（二选一）。示例中核函数（Kernel）实现文件名为`add_custom.cpp`，所以在`npu_op_kernel_sources`中同时指定了`OP_TYPE`和`KERNEL_FILE`。如果想按目录扫描核函数（Kernel）源码，可改用`KERNEL_DIR ./`，此时`KERNEL_DIR`相对于后续`npu_op_kernel_library`中的`SRC_BASE`。
 
 ### 按算子划分的目录结构
 
@@ -496,10 +498,14 @@ add_custom3/
 cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
-# 查找CANN提供的ASC CMake modules。ASCEND_CANN_PACKAGE_PATH通常在CMakePresets.json中配置。
-find_package(ASC REQUIRED HINTS ${ASCEND_CANN_PACKAGE_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+# 在加载ASC前设置默认配置，允许命令行或preset覆盖。
+if(NOT DEFINED ASCEND_SOC_SERIES)
+    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+endif()
+set(vendor_name "customize" CACHE STRING "Operator package vendor")
+find_package(ASC REQUIRED)
 
-# vendor_name在CMakePresets.json中配置，用作算子包的厂商标识。npu_op_package定义一个算子包目标
+# vendor_name用作算子包的厂商标识，npu_op_package定义一个算子包目标。
 set(package_name ${vendor_name})
 npu_op_package(${package_name}
     TYPE RUN
