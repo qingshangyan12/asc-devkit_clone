@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
-`load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照[broadcast_mode](../aux_data_types/broadcast_mode.md)指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。
+`load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。
 
 传入`coord`时，从`tensor.engine() + tensor.layout()(coord)`对应的元素开始搬入；不传入`coord`时，从`tensor`起始位置开始搬入。
 
@@ -58,7 +58,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| brc_mode | [broadcast_mode](../aux_data_types/broadcast_mode.md)枚举类型，用于设置广播模式，默认值为`broadcast_mode::elem`。当前接口支持的取值和约束请参考[表3](#表3-broadcast_mode参数说明)。 |
+| brc_mode | `broadcast_mode`枚举类型，用于设置广播模式，默认值为`broadcast_mode::elem`。当前接口支持的取值和约束请参考[表3](#表3-broadcast_mode参数说明)。 |
 | Tensor | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | Coord | 源Tensor的坐标类型，由函数实参自动推导。 |
 

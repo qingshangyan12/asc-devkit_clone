@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
-`load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../reg_tensor/reg_tensor.md)。接口通过[load_sideband_mode](../aux_data_types/load_sideband_mode.md)配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。`deintlv`模式返回`reg_pair`，其他模式返回`reg_tensor`。
+`load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../reg_tensor/reg_tensor.md)。接口通过`load_sideband_mode`配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。`deintlv`模式返回`reg_pair`，其他模式返回`reg_tensor`。
 
 接口支持以下两种寻址方式：
 
@@ -60,7 +60,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| sideband_mode | [load_sideband_mode](../aux_data_types/load_sideband_mode.md)枚举类型，用于设置搬入模式，默认值为`load_sideband_mode::direct`。当前接口支持的取值和约束请参考[表3](#表3-load_sideband_mode参数说明)。 |
+| sideband_mode | `load_sideband_mode`枚举类型，用于设置搬入模式，默认值为`load_sideband_mode::direct`。当前接口支持的取值和约束请参考[表3](#表3-load_sideband_mode参数说明)。 |
 | Tensor | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | Coord | 源Tensor的坐标类型，由函数实参自动推导。 |
 

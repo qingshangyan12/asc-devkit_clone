@@ -41,7 +41,7 @@ __simd_callee__ inline reg_tensor<bool> make_mask()
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `Pattern` | 输入 | [mask_pattern](../aux_data_types/mask_pattern.md)枚举类型，用于设置Mask寄存器的有效位模式，默认值为`mask_pattern::all`。 |
+| `Pattern` | 输入 | `mask_pattern`枚举类型，用于设置Mask寄存器的有效位模式，默认值为`mask_pattern::all`。 |
 | `DataType` | 输入 | 模板参数，支持的数据类型为b8/b16/b32。 |
 
 ## 返回值说明
