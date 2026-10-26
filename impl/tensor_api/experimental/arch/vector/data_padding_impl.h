@@ -60,7 +60,7 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
     return dst;
 }
 
-template <size_t N, merge_mode Mode, typename T>
+template <merge_mode Mode, size_t N, typename T>
 __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask)
 {
     static_assert(
@@ -77,7 +77,7 @@ __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value, co
     return dst;
 }
 
-template <size_t N, merge_mode Mode, typename T>
+template <merge_mode Mode, size_t N, typename T>
 __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(

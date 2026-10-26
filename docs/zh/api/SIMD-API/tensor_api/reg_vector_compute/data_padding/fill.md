@@ -54,7 +54,7 @@
 - 将value广播到指定的目的寄存器
 
     ```cpp
-    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+    template <merge_mode Mode = merge_mode::zeroing, size_t N = 1, typename T>
     __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const T& value,
         const reg_tensor<bool>& mask = all_mask<T>());
     ```
@@ -62,7 +62,7 @@
 - 将寄存器src的最低位元素广播到指定的目的寄存器
 
     ```cpp
-    template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+    template <merge_mode Mode = merge_mode::zeroing, size_t N = 1, typename T>
     __simd_callee__ inline reg_tensor<T> fill(reg_tensor<T>& dst, const reg_tensor<T>& src,
         const reg_tensor<bool>& mask = all_mask<T>());
     ```
@@ -73,8 +73,8 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| N | 待填充的寄存器数量，默认值为1。 |
 | Mode | mask合并模式，支持`merge_mode::zeroing`和`merge_mode::merging`，默认值为`merge_mode::zeroing`。仅指定`dst`的重载支持该参数。 |
+| N | 待填充的寄存器数量，默认值为1。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**  函数参数说明
@@ -152,7 +152,7 @@
             uint32_t offset = i * one_repeat_size;
             const auto coord = asc::te::make_coord(offset);
             auto y_reg = asc::te::experimental::load(y_tensor, coord);
-            y_reg = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(
+            y_reg = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(
                 y_reg, scalar, mask);
             asc::te::experimental::store(y_tensor, coord, y_reg);
         }

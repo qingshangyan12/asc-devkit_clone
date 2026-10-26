@@ -58,7 +58,7 @@ __aicore__ inline void TestFillDstScalar()
     dst.mask = dst_mask.reg;
 
     auto zeroing_dst = asc::te::experimental::fill(dst, T{}, mask);
-    auto merging_dst = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(dst, T{}, mask);
+    auto merging_dst = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(dst, T{}, mask);
     static_assert(AscendC::Std::is_same_v<decltype(zeroing_dst), asc::te::experimental::reg_tensor<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(merging_dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(zeroing_dst.mask, dst_mask.reg);
@@ -75,7 +75,7 @@ __aicore__ inline void TestFillDstRegTensor()
     dst.mask = dst_mask.reg;
 
     auto zeroing_dst = asc::te::experimental::fill(dst, src, mask);
-    auto merging_dst = asc::te::experimental::fill<1, asc::te::experimental::merge_mode::merging>(dst, src, mask);
+    auto merging_dst = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(dst, src, mask);
     static_assert(AscendC::Std::is_same_v<decltype(zeroing_dst), asc::te::experimental::reg_tensor<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(merging_dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(zeroing_dst.mask, dst_mask.reg);

@@ -75,7 +75,7 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
  * applies the behavior specified by Mode. The result retains the original active-lane mask of dst.
  */
-template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+template <merge_mode Mode = merge_mode::zeroing, size_t N = 1, typename T>
 __simd_callee__ inline reg_tensor<T> fill(
     reg_tensor<T>& dst, const T& value, const reg_tensor<bool>& mask = all_mask<T>());
 
@@ -97,7 +97,7 @@ __simd_callee__ inline reg_tensor<T> fill(
  * @note The active-lane mask is taken from mask.reg. A value of 1 selects the corresponding element; a value of 0
  * applies the behavior specified by Mode. The result retains the original active-lane mask of dst.
  */
-template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
+template <merge_mode Mode = merge_mode::zeroing, size_t N = 1, typename T>
 __simd_callee__ inline reg_tensor<T> fill(
     reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
