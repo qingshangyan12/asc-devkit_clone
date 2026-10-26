@@ -464,7 +464,7 @@ opbuild::Status CfgGenerator::GenerateCode(void)
         bool enableFallBack = opsDef.IsEnableFallBack();
         auto allAICoreConfig = opsDef.AICore().GetAICoreConfigs();
         for (uint32_t i = 0; i < computeUnits.size(); ++i) {
-            auto socVer = computeUnits[i];
+            auto socVer = NormalizeSupportedSoc(computeUnits[i]);
             if (VALID_SOC_SET.find(socVer) == VALID_SOC_SET.end()) {
                 ASCENDLOGW("Invlid soc version %s\n of ASCEND_COMPUTE_UNIT", socVer.c_str());
                 continue;
