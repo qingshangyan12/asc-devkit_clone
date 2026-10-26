@@ -117,7 +117,7 @@
 
     `--sass`不支持与`--dump-elf`、`--extract-elf`、`--list-elf`、`--verbose`或`--out-dir`组合；输出默认写入标准输出，如需保存结果可使用Shell重定向。
 
-    `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编。
+    `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。即使ELF不含调试信息，仍可使用`--sass`输出反汇编指令；此时`--lineinfo`无法显示源码位置，`--source`无法显示源码。使用`--source`时，若调试信息记录的源文件无法访问，工具会输出告警并继续反汇编，但不显示对应源码。
 
 **表4**  核函数（Kernel）直调工程支持的ELF解析字段说明<a name="table94384560259"></a>
 
