@@ -177,7 +177,7 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
             asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
         asc_sync_pipe(PIPE_FIX);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* name, const std::vector<float>& data)

@@ -169,12 +169,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
+constexpr uint8_t MUTEX_ID = 0;
 
 template <typename T>
 void print_data(const char* label, const std::vector<T>& dst_regs)
@@ -186,14 +184,22 @@ void print_data(const char* label, const std::vector<T>& dst_regs)
     std::cout << std::endl;
 }
 
-constexpr uint32_t BUFFER_ELEMENTS = 512;
+constexpr uint32_t BUFFER_ELEMENTS = 260;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t BUFFER_STORAGE_ELEMENTS =
+    AscendC::Std::ceil_div(BUFFER_ELEMENTS, ELEMENTS_PER_REGISTER) * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = BUFFER_ELEMENTS;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_postupdate_vf(__ubuf__ uint8_t* output,
                                                     __ubuf__ uint8_t* input,
-                                                    uint16_t one_repeat_size, uint16_t repeat_time)
+                                                    uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = BUFFER_ELEMENTS;
     for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool mask = asc_update_mask_b8(remaining_length);
         vector_uint8_t src_reg;
         asc_loadalign_postupdate(src_reg, input, one_repeat_size);
         asc_storealign(output + i * one_repeat_size, src_reg, mask);
@@ -203,20 +209,24 @@ __simd_vf__ inline void asc_loadalign_postupdate_vf(__ubuf__ uint8_t* output,
 __global__ __vector__ void asc_loadalign_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_ELEMENTS], input_local[BUFFER_ELEMENTS];
+    __ubuf__ uint8_t output_local[BUFFER_STORAGE_ELEMENTS], input_local[BUFFER_STORAGE_ELEMENTS];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
 
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
 
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
-    uint16_t repeat_time = ceil_division(BUFFER_ELEMENTS, one_repeat_size);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<asc_loadalign_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
 
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
 
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
