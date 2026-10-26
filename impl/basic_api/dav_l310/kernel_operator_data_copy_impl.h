@@ -476,8 +476,8 @@ __simd_vf__ inline void VecCopyLevel0VFImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const BasicAPIMaskStruct maskArrayStruct, const uint64_t maskCount,
     const uint8_t repeatTime, const CopyRepeatParams repeatParams, __ubuf__ uint64_t* maskBuf)
 {
-    uint32_t count =
-        Internal::VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
+    uint32_t count = Internal::VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(
+        maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
     newRepeatTimes = Internal::VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
     Reg::MaskReg maskReg;

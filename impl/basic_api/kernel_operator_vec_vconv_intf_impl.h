@@ -688,8 +688,8 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
     SetDeqScaleImpl<T>(vdeq, vdeqInfo);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 /*
  * @ingroup Truncate Level 2
  * @brief dst[i] = Precision conversion
