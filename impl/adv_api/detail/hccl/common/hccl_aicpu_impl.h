@@ -127,9 +127,19 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
     hcclMsgArea_ = reinterpret_cast<__gm__ HcclMsgArea*>(msgAddr);
+#if __NPU_ARCH__ == 3510
+    // A5 keeps this table 64B-aligned so Init can use eight wide stores.
+    static_assert(sizeof(handleIdMsgPosition_) == sizeof(uint64_t) * 8U,
+                  "A5 handle position table must occupy eight 64-bit words");
+    uint64_t* msgPos64 = reinterpret_cast<uint64_t*>(handleIdMsgPosition_);
+    for (uint32_t i = 0U; i < sizeof(handleIdMsgPosition_) / sizeof(uint64_t); ++i) {
+        msgPos64[i] = UINT64_MAX;
+    }
+#else
     for (uint32_t i = 0U; i < HCCL_MAX_HANDLE_ID; ++i) {
         handleIdMsgPosition_[i] = -1;
     }
+#endif
     InitWorkingFlag();
     curVersion_ = version;
 }
