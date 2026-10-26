@@ -22,6 +22,17 @@ else()
     set(ASCCOMM_PRIMITIVES_HDR "$ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}")
 endif()
 
+# 工单 60 附录 A：编排原语（asccomm_addr_notify_*）收敛为内部头，仅框架消费者可见。
+# 私有头位于 <asc-comm>/src/aicpu/asccomm/primitives/api_c_adpt/，在 ASCCOMM_PRIMITIVES_HDR
+# 基础上加第二路径；消费方（mc2_server_decoupler 编入 comm_kfc_aicpu_server.cc）需定义
+# ASCCOMM_ENABLE_INTERNAL_APIS 宏，否则私有头内声明不可见（编译期即报缺声明）。
+if(ASCCOMM_PRIMITIVES_HDR)
+    get_filename_component(_ASCCOMM_SOURCE_DIR "${ASCCOMM_PRIMITIVES_HDR}/../../.." ABSOLUTE)
+    set(ASCCOMM_PRIMITIVES_INTERNAL_HDR "${_ASCCOMM_SOURCE_DIR}/src/aicpu/asccomm/primitives/api_c_adpt")
+else()
+    set(ASCCOMM_PRIMITIVES_INTERNAL_HDR "")
+endif()
+
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${ASCENDC_DIR}
@@ -225,6 +236,8 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${INCLUDE_LIST}
         # TODO(T1临接): device 侧与 mc2_client 编译相同的已切 asccomm 源文件，头路径经 ASCCOMM_PRIMITIVES_HDR（见文件头）
         ${ASCCOMM_PRIMITIVES_HDR}
+        # 工单 60 附录 A：编排原语私有头目录（mc2_server_decoupler 编入 comm_kfc_aicpu_server.cc 消费）
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
     )
 
     target_compile_options(mc2_server PRIVATE
@@ -246,6 +259,7 @@ if(PRODUCT_SIDE STREQUAL "device")
     target_compile_definitions(mc2_server PRIVATE
         -DAICPU_COMPILE
         MC2_SERVER_ONLY
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_link_libraries(mc2_server PRIVATE
@@ -289,11 +303,14 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
         ${INCLUDE_LIST}
         # TODO(T1临接): 正式依赖治理走 FetchContent TAG_ID bump（Q12），此路径穿刺期联调用
         ${ASCCOMM_PRIMITIVES_HDR}
+        # 工单 60 附录 A：编排原语私有头目录
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
     )
 
     target_compile_definitions(mc2_client PRIVATE
         -DHOST_COMPILE
         MC2_CLIENT_ENABLE_CCU=$<BOOL:${MC2_CLIENT_ENABLE_CCU}>
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_compile_options(mc2_client PRIVATE

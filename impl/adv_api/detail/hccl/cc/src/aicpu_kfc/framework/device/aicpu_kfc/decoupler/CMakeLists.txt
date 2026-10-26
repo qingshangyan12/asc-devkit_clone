@@ -121,6 +121,8 @@ if(TARGET mc2_server)
     target_compile_definitions(mc2_server_decoupler PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_DEFINITIONS>
         MC2_SERVER_ONLY
+        # 工单 60 附录 A：comm_kfc_aicpu_server.cc 消费 asccomm 编排原语私有头
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_compile_options(mc2_server_decoupler PRIVATE
@@ -138,6 +140,11 @@ if(TARGET mc2_server)
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu_new
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+
+        # 工单 60：comm_kfc_aicpu_server.cc 的编排原语改用 asccomm addr 原语，
+        # 需公开头目录与私有头（api_c_adpt）目录
+        ${ASCCOMM_PRIMITIVES_HDR}
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
 
         ${MC2_SERVER_CCL_INCLUDE_LIST}
         ${MC2_SERVER_ORION_HEAD_LIST}
