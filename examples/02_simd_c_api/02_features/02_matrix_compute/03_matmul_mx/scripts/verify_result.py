@@ -25,8 +25,8 @@ def verify_result(output_path, golden_path):
     errors = 0
     max_abs = 0.0
     for start in range(0, output.size, 1024 * 1024):
-        actual = output[start:start + 1024 * 1024].astype(np.float32)
-        expected = golden[start:start + 1024 * 1024].astype(np.float32)
+        actual = output[start : start + 1024 * 1024].astype(np.float32)
+        expected = golden[start : start + 1024 * 1024].astype(np.float32)
         if not np.all(np.isfinite(actual)) or not np.all(np.isfinite(expected)):
             raise ValueError("Nonfinite output or golden")
         diff = np.abs(actual - expected)

@@ -36,7 +36,7 @@ def gen_data(seed):
     b_full = b_full.reshape(n, k)
     with open("output/golden.bin", "wb") as golden:
         for row in range(0, m, 256):
-            (a_full[row:row + 256] @ b_full.T).astype(np.float16).tofile(golden)
+            (a_full[row : row + 256] @ b_full.T).astype(np.float16).tofile(golden)
     print(f"Generated 8192 x 8192 x 8192, seed={seed}")
 
 
