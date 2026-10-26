@@ -7,9 +7,8 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-#include "comm_kfc_dispatcher.h"
-
 #include "hccl_msg.h"
+#include "comm_kfc_dispatcher.h"
 
 #include "common/aicpu_kfc_utils.h"
 #include "comm_kfc_aicpu_server.h"
@@ -34,17 +33,34 @@ HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerI
     CHK_PRT_RET(ctxNum == 0U, HCCL_ERROR("Invalid context number."), HCCL_E_PARA);
     std::unordered_map<uintptr_t, size_t> workspaceToServerIdx{};
     for (u32 i = 0U; i < ctxNum; ++i) {
-        const HcclApi::OpResCtx* ctx = static_cast<const HcclApi::OpResCtx*>(args[i]);
+        const auto* firstWord = static_cast<const uint64_t*>(args[i]);
+        CHK_PTR_NULL(firstWord);
+        HcclApi::OpResCtx legacyCtx{};
+        const HcclApi::OpResCtx* ctx = nullptr;
+        if (*firstWord == HcclApi::OP_RES_CTX_A5_AICPU_MAGIC) {
+            const auto* a5Ctx = static_cast<const HcclApi::OpResCtxA5Aicpu*>(args[i]);
+            legacyCtx.version = 0U;
+            legacyCtx.workspace = a5Ctx->workspace;
+            legacyCtx.workspaceSize = a5Ctx->workspaceSize;
+            legacyCtx.rankId = a5Ctx->rankId;
+            legacyCtx.rankSize = a5Ctx->rankSize;
+            legacyCtx.algInfo[0] = a5Ctx->algInfo[0];
+            legacyCtx.opType[0] = a5Ctx->opType;
+            legacyCtx.opParamSize[0] = a5Ctx->opParamSize[0];
+            ctx = &legacyCtx;
+        } else {
+            ctx = static_cast<const HcclApi::OpResCtx*>(args[i]);
+        }
         CHK_PTR_NULL(ctx);
-        const uintptr_t workspace = static_cast<uintptr_t>(ctx->workspace);
-        auto it = workspaceToServerIdx.find(workspace);
+        const uintptr_t actualWorkspace = static_cast<uintptr_t>(ctx->workspace);
+        auto it = workspaceToServerIdx.find(actualWorkspace);
         if (it == workspaceToServerIdx.end()) {
             const u32 serverIdx = static_cast<u32>(serverList.size());
             AscCommServerInfo server(serverIdx);
             CHK_SMART_PTR_NULL(server.extMsg);
             HCCL_INFO("Server for group %u is created.", serverIdx);
             serverList.emplace_back(server);
-            it = workspaceToServerIdx.emplace(workspace, serverList.size() - 1U).first;
+            it = workspaceToServerIdx.emplace(actualWorkspace, serverList.size() - 1U).first;
         }
         CHK_PRT_RET(
             serverList[it->second].serverIns.AddOpContext(ctx) != HCCL_SUCCESS,
