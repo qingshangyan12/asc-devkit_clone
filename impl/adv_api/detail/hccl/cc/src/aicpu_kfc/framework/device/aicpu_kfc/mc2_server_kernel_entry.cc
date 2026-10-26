@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstdint>
+#include "../../../../common/mc2_server_stage_timing.h"
 
 #include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
 #include "common/aicpu_kfc_def.h"
@@ -17,7 +18,7 @@
 
 using namespace HcclApi;
 
-extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
+static uint32_t Mc2ServerKernelBody(void* args[])
 {
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
@@ -35,4 +36,14 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
     HCCL_INFO("[Mc2ServerKernel]Finish Mc2ServerKernel.");
     return CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
+}
+
+extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
+{
+    Mc2ServerStageTiming::Start();
+    const uint32_t status = Mc2ServerKernelBody(args);
+    // Both protocol paths return from CommKfcDispatcher::Run before reporting.
+    // The message loop and all three measured intervals have ended here.
+    Mc2ServerStageTiming::Finish(status);
+    return status;
 }
