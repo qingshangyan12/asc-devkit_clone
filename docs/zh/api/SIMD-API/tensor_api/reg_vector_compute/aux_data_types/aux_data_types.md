@@ -1,0 +1,19 @@
+# 辅助数据类型
+
+- **[cast_layout](cast_layout.md)**
+- **[cast_round_mode](cast_round_mode.md)**
+- **[cast_sat_mode](cast_sat_mode.md)**
+- **[cast_options](cast_options.md)**
+- **[load_sideband_mode](load_sideband_mode.md)**
+- **[store_sideband_mode](store_sideband_mode.md)**
+- **[broadcast_mode](broadcast_mode.md)**
+- **[mask_pattern](mask_pattern.md)**
+- **[high_low_part](high_low_part.md)**
+- **[histogram_half](histogram_half.md)**
+- **[histogram_mode](histogram_mode.md)**
+- **[histogram_options](histogram_options.md)**
+- **[reduce_scope](reduce_scope.md)**
+- **[iota_order](iota_order.md)**
+- **[gather_mode](gather_mode.md)**
+- **[mem_type](mem_type.md)**
+- **[merge_mode](merge_mode.md)**
