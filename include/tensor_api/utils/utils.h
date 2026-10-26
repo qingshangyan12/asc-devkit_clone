@@ -19,7 +19,6 @@
 #include "utils/base/sys_constants.h"
 #include "utils/common_types.h"
 #include "utils/std/type_traits.h"
-#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace AscendC {
 namespace Std {}
@@ -32,7 +31,24 @@ namespace Std = AscendC::Std;
 
 enum class unit_flag_mode : uint8_t { disable = 0, enable_keep = 2, enable_update = 3 };
 
-enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent = 6 };
+/** @brief Initialize the device state of the current AI Core. */
+__aicore__ inline void init_soc_state();
+
+/** @brief Return the current sub-block ID. */
+__aicore__ inline int64_t get_sub_block_id();
+
+/** @brief Return the sub-block count. */
+__aicore__ inline int64_t get_sub_block_num();
+
+/** @brief Return the vector register length in bytes. */
+__aicore__ inline constexpr int64_t get_vf_len();
+
+/**
+ * @brief Return the physical buffer address for offset.
+ *
+ * @param offset Byte offset within the physical buffer.
+ */
+__aicore__ inline uint64_t get_phy_buf_addr(uint64_t offset);
 
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
@@ -78,5 +94,9 @@ struct ssbuf {};
 
 } // namespace te
 } // namespace asc
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/tensor_api/utils/sys_var_impl.h"
+#endif
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
