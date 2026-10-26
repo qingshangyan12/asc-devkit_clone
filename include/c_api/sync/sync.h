@@ -68,7 +68,7 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 
 #define asc_sync_intra_arrive(pipe, sync_id) set_intra_block((pipe), (sync_id))
 
