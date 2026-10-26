@@ -1200,6 +1200,68 @@ inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+#endif
 inline void copy_gm_to_ubuf_align_v2(
     __ubuf__ fp8_e8m0_t* dst_addr, __gm__ fp8_e8m0_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, uint8_t l2_cache_ctl,
