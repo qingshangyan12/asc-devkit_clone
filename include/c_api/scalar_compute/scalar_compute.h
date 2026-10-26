@@ -30,6 +30,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+#include "c_api/scalar_compute/scalar_load.h"
+
 __aicore__ inline int64_t asc_sflbits(int64_t value);
 
 __aicore__ inline int64_t asc_ffz(uint64_t value);
