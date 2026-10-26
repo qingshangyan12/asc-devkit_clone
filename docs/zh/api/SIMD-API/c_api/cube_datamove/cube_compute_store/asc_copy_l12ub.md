@@ -117,7 +117,7 @@ __global__ __mix__(1, 2) void CopyL12ubKernel(__gm__ uint8_t* input, __gm__ uint
             asc_copy_ub2gm_align(output, ub, BYTES);
         }
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 } // namespace
 

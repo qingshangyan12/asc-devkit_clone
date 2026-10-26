@@ -86,11 +86,10 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
 
         {"ascend310p1", "ascend310p"},      {"ascend310p3", "ascend310p"},      {"ascend310p5", "ascend310p"},
         {"ascend310p7", "ascend310p"},      {"ascend310p3vir01", "ascend310p"}, {"ascend310p3vir02", "ascend310p"},
-        {"ascend310p3vir04", "ascend310p"}, {"ascend310p3vir08", "ascend310p"},
-
-        {"ascend310b1", "ascend310b"},      {"ascend310b2", "ascend310b"},      {"ascend310b3", "ascend310b"},
-        {"ascend310b4", "ascend310b"},      {"kirinx90", "kirinx90"},           {"kirin9030", "kirin9030"},
-        {"kirindev0000", "kirindev0000"},   {"kirindev0001", "kirindev0001"},   {"kirindev0002", "kirindev0002"},
+        {"ascend310p3vir04", "ascend310p"}, {"ascend310p3vir08", "ascend310p"}, {"ascend310b1", "ascend310b"},
+        {"ascend310b2", "ascend310b"},      {"ascend310b3", "ascend310b"},      {"ascend310b4", "ascend310b"},
+        {"kirinx90", "kirinx90"},           {"kirin9020", "kirin9020"},         {"kirin9030", "kirin9030"},
+        {"kirin9050", "kirin9050"},         {"kirindev0001", "kirindev0001"},   {"kirindev0002", "kirindev0002"},
         {"kirindev0003", "kirindev0003"},   {"ascend5162A", "Ascend5162A"}};
 
     static const std::unordered_map<std::string, std::string> ascendcOriSocVersionMap{
@@ -130,7 +129,7 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend5162a", "Ascend5162A"},
         {"kirinx90", "KirinX90"},
         {"kirin9030", "Kirin9030"},
-        {"kirindev0000", "KirinDev0000"},
+        {"kirin9050", "Kirin9050"},
         {"kirindev0001", "KirinDev0001"},
         {"kirindev0002", "KirinDev0002"},
         {"kirindev0003", "KirinDev0003"}};

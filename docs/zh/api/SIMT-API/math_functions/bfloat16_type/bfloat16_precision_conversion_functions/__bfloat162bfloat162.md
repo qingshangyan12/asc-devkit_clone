@@ -72,7 +72,7 @@ inline bfloat16x2_t __bfloat162bfloat162(const bfloat16_t x)
     __aicore__ void simt_bfloat162bfloat162(bfloat16_t* input, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __bfloat162bfloat162(input[idx]);
@@ -92,7 +92,7 @@ inline bfloat16x2_t __bfloat162bfloat162(const bfloat16_t x)
     __simt_vf__ __launch_bounds__(1024) inline void simt_bfloat162bfloat162(__gm__ bfloat16_t* input, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __bfloat162bfloat162(input[idx]);

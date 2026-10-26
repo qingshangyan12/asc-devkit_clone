@@ -733,11 +733,18 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_sync_subblock_arrive](sync/inter_core_sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
 |[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
 
-## 其他操作
+## 试验接口
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[指令发射队列空闲槽位查询](experimental/asc_get_pipe_idle_slot_count.md)|获取指定流水线对应发射队列当前的空闲槽位数量。|`c_api/experimental/asc_get_pipe_idle_slot_count.h`|
+|[双返回值结构体](experimental/pair.md)|承载试验接口的两个寄存器返回结果。|`c_api/experimental/pair.h`|
+|[asc_add_carry](experimental/asc_add_carry.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_sub_carry](experimental/asc_sub_carry.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_mull](experimental/asc_mull.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_intlv](experimental/asc_intlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_permute_sel_exp.h`|
+|[asc_deintlv](experimental/asc_deintlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_permute_sel_exp.h`|
+|[asc_loadalign_deintlv](experimental/asc_loadalign_deintlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/loadalign_exp.h`|
 
 ## 特殊寄存器访问
 

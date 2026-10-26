@@ -18,7 +18,7 @@
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_IMPL_H
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_IMPL_H
 
-#include "impl/tensor_api/utils/constant_impl.h"
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 
 namespace asc {
 namespace te {
@@ -33,7 +33,7 @@ struct reg_cast_op {
 template <typename T>
 struct cast_element_bits {
     using data_type = Std::remove_cvref_t<T>;
-    static constexpr uint32_t value = is_b4_type<data_type> ? 4U : sizeof(data_type) * 8U;
+    static constexpr uint32_t value = is_b4_type_v<data_type> ? 4U : sizeof(data_type) * 8U;
 };
 
 } // namespace detail
@@ -63,9 +63,9 @@ struct cast_element_bits {
             if constexpr (dst_bits == src_bits) {                                                   \
                 FUNC(dst, src, mask);                                                               \
             } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                 \
+                dst = FUNC(src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                \
             } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                 \
+                dst = FUNC(src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                \
             } else {                                                                                \
                 static_assert(sizeof(DstReg) == 0, "unsupported register cast width ratio");        \
             }                                                                                       \

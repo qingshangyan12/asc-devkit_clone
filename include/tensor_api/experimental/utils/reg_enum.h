@@ -43,6 +43,8 @@ enum class cast_round_mode {
     floor,
     ceil,
     trunc,
+    odd,
+    hybrid,
 };
 
 /** @brief Saturation behavior for register cast. */
