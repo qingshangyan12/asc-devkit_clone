@@ -35,7 +35,7 @@
 
 **图1**  DCache内存层次示意图
 
-![](../figures/dcci.png "DCache内存层次示意图")
+![](../../../figures/dcci.png "DCache内存层次示意图")
 
 asc_dcci接口用于解决上述一致性问题，其功能可以拆解为两部分：
 

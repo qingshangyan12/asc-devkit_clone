@@ -33,10 +33,10 @@
 本接口支持连续数据搬运和高维切分数据搬运。连续数据搬运按`size`指定的字节数从源UB连续搬运到目的GM，如图1所示；高维切分数据搬运按`burst_count`指定搬运的数据块个数，每个数据块按`burst_len`指定的字节数搬运，并通过`src_stride`和`dst_stride`指定源操作数和目的操作数相邻数据块首地址间隔，如图2所示。
 
 **图1**  连续搬运示意图
-![](../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
 
 **图2**  高维切分搬运示意图
-![](../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 
