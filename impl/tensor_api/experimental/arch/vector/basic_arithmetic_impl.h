@@ -216,19 +216,25 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
         vector_float f32_reg_low;
         vector_float f32_reg_high;
         vector_half tmp_reg;
+        vector_bool mask_low;
+        vector_bool mask_high;
+        const auto mask_all = all_mask<float>();
+
+        asc_unpack_lower(mask_low, src.mask);
+        asc_unpack_upper(mask_high, src.mask);
 
         asc_intlv(f16_reg_low, f16_reg_high, src.reg, src.reg);
 
-        f32_reg_low = asc_half2float(f16_reg_low, src.mask, ASC_POSITION_EVEN);
-        f32_reg_high = asc_half2float(f16_reg_high, src.mask, ASC_POSITION_EVEN);
+        f32_reg_low = asc_half2float(f16_reg_low, mask_all.reg, ASC_POSITION_EVEN);
+        f32_reg_high = asc_half2float(f16_reg_high, mask_all.reg, ASC_POSITION_EVEN);
 
-        asc_ln(f32_reg_low, f32_reg_low, src.mask);
-        asc_ln(f32_reg_high, f32_reg_high, src.mask);
-        asc_mul_scalar(f32_reg_low, f32_reg_low, ln2_reciprocal, src.mask);
-        asc_mul_scalar(f32_reg_high, f32_reg_high, ln2_reciprocal, src.mask);
+        asc_ln(f32_reg_low, f32_reg_low, mask_all.reg);
+        asc_ln(f32_reg_high, f32_reg_high, mask_all.reg);
+        asc_mul_scalar(f32_reg_low, f32_reg_low, ln2_reciprocal, mask_all.reg);
+        asc_mul_scalar(f32_reg_high, f32_reg_high, ln2_reciprocal, mask_all.reg);
 
-        f16_reg_low = asc_float2half_rn(f32_reg_low, src.mask, ASC_POSITION_EVEN);
-        f16_reg_high = asc_float2half_rn(f32_reg_high, src.mask, ASC_POSITION_EVEN);
+        f16_reg_low = asc_float2half_rn(f32_reg_low, mask_low, ASC_POSITION_EVEN);
+        f16_reg_high = asc_float2half_rn(f32_reg_high, mask_high, ASC_POSITION_EVEN);
 
         asc_deintlv(f16_reg_low, tmp_reg, f16_reg_low, tmp_reg);
         asc_deintlv(f16_reg_high, tmp_reg, tmp_reg, f16_reg_high);
