@@ -16,6 +16,8 @@
 namespace {
 
 constexpr uint32_t kCopySize = 32;
+uint32_t g_expected_burst_count = 0;
+uint32_t g_expected_burst_len = 0;
 
 void VerifyCopyGm2UbParams(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len,
@@ -54,6 +56,24 @@ void copy_gm_to_ubuf_align_v2_SizeStub(
         dst, src, sid, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
         src_stride, dst_stride);
     EXPECT_EQ(burst_len, kCopySize);
+}
+
+void copy_gm_to_ubuf_align_v2_LargeParamsStub(
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len,
+    uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
+    uint64_t src_stride, uint32_t dst_stride)
+{
+    EXPECT_EQ(dst, reinterpret_cast<__ubuf__ uint8_t*>(11));
+    EXPECT_EQ(src, reinterpret_cast<__gm__ uint8_t*>(22));
+    EXPECT_EQ(sid, static_cast<uint8_t>(0));
+    EXPECT_EQ(burst_count, g_expected_burst_count);
+    EXPECT_EQ(burst_len, g_expected_burst_len);
+    EXPECT_EQ(left_padding_num, static_cast<uint8_t>(0));
+    EXPECT_EQ(right_padding_num, static_cast<uint8_t>(0));
+    EXPECT_EQ(enable_constant_pad, false);
+    EXPECT_EQ(l2_cache_mode, static_cast<uint8_t>(0));
+    EXPECT_EQ(src_stride, static_cast<uint64_t>(0));
+    EXPECT_EQ(dst_stride, static_cast<uint32_t>(0));
 }
 
 } // namespace
@@ -114,16 +134,14 @@ TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_LargeBursts_Succ)
     auto src = reinterpret_cast<__gm__ uint8_t*>(22);
     const uint32_t burst_params[][2] = {{65535, 65536}, {65536, 65535}, {2097151, 2097151}};
     for (const auto& params : burst_params) {
+        g_expected_burst_count = params[0];
+        g_expected_burst_len = params[1];
         MOCKER_CPP(
             copy_gm_to_ubuf_align_v2, void(
                                           __ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t,
                                           uint8_t, bool, uint8_t, uint64_t, uint32_t))
             .times(1)
-            .with(
-                eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(params[0]), eq(params[1]),
-                eq(static_cast<uint8_t>(0)), eq(static_cast<uint8_t>(0)), eq(false), eq(static_cast<uint8_t>(0)),
-                eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
-            .will(ignoreReturnValue());
+            .will(invoke(copy_gm_to_ubuf_align_v2_LargeParamsStub));
         asc_copy_gm2ub(dst, src, params[0], params[1], static_cast<uint16_t>(0), static_cast<uint16_t>(0));
         GlobalMockObject::verify();
     }
@@ -135,16 +153,14 @@ TEST_F(TestVectorDatamoveCopyGM2UBCApi, asc_copy_gm2ub_LargeSize_Succ)
     auto src = reinterpret_cast<__gm__ uint8_t*>(22);
     const uint32_t copy_sizes[] = {65535, 65536, 2097151};
     for (uint32_t size : copy_sizes) {
+        g_expected_burst_count = 1;
+        g_expected_burst_len = size;
         MOCKER_CPP(
             copy_gm_to_ubuf_align_v2, void(
                                           __ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t,
                                           uint8_t, bool, uint8_t, uint64_t, uint32_t))
             .times(1)
-            .with(
-                eq(dst), eq(src), eq(static_cast<uint8_t>(0)), eq(static_cast<uint32_t>(1)), eq(size),
-                eq(static_cast<uint8_t>(0)), eq(static_cast<uint8_t>(0)), eq(false), eq(static_cast<uint8_t>(0)),
-                eq(static_cast<uint64_t>(0)), eq(static_cast<uint32_t>(0)))
-            .will(ignoreReturnValue());
+            .will(invoke(copy_gm_to_ubuf_align_v2_LargeParamsStub));
         asc_copy_gm2ub(dst, src, size);
         GlobalMockObject::verify();
     }
