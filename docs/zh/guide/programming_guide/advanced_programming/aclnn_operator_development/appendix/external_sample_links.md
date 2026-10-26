@@ -9,11 +9,6 @@
 - [AddCustom算子样例](../../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)里的AddCustom样例。
   - 说明：展示基础的完整算子实现，包括TilingData定义、Tiling函数和核函数（Kernel）代码。
 
-### msOpGen工具生成自定义算子工程模板
-
-- [msOpGen样例](https://gitcode.com/cann/asc-tools/tree/master/examples/03_msopgen)。
-  - 说明：基于AddCustom算子演示如何使用msOpGen工具生成自定义算子工程模板，并通过ACLNN调用示例验证生成的自定义算子。
-
 ### TilingData传递属性
 
 - [LeakyReluCustom](../../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/op_host/leaky_relu_custom)里的leaky_relu_custom样例。

@@ -18,10 +18,10 @@
 
 ## 基本流程
 
-使用msOpGen生成的工程，已经包含完整CMake结构，不需要单独编写CMakeLists.txt处理；如果需要自行编写CMakeLists.txt，请参考[编译组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，msOpGen生成的算子工程编译部署只需三步：
+算子工程的CMakeLists.txt由开发者自行编写，详细的编写方法请参考[编译组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，算子工程编译部署只需三步：
 
-1. 修改`CMakePresets.json`，填写`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`（二选一）以及`vendor_name`（厂商名称）等编译配置选项；
-2. 执行`./build.sh`，生成`custom_opp_*.run`安装包；
+1. 在CMakeLists.txt中设置`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`（二选一）以及`vendor_name`（厂商名称）等编译配置选项；
+2. 执行`cmake`和`make`命令，生成`custom_opp_*.run`安装包；
 3. 执行`./custom_opp_*.run`，安装到运行环境。
 
 以下各节详细介绍每一步的选项和细节。
@@ -54,13 +54,34 @@
 
 修改编译配置选项的方式有两种：
 
-### 方式一：修改CMakePresets.json
+### 方式一：在CMakeLists.txt中设置
 
-工程目录下有`CMakePresets.json`时，修改其中的`cacheVariables`即可。msOpGen生成的工程默认使用此方式。
+直接在顶层CMakeLists.txt中设置变量，并通过`npu_op_*`接口配置编译行为，这是推荐的默认方式，无需额外的`CMakePresets.json`文件。
+
+```cmake
+# 设置必要变量。也可以使用变量ASCEND_SOC_SERIES，二者不能同时设置。
+set(ASCEND_COMPUTE_UNIT "ascendxxxyy") | set(ASCEND_SOC_SERIES "Ascendxxx")
+set(vendor_name "customize")
+
+# 配置编译产物包（通过CONFIG参数替代ENABLE_SOURCE_PACKAGE / ENABLE_BINARY_PACKAGE等变量）
+npu_op_package(${vendor_name}
+    TYPE RUN
+    CONFIG
+        ENABLE_SOURCE_PACKAGE True
+        ENABLE_BINARY_PACKAGE True
+        INSTALL_PATH ${CMAKE_BINARY_DIR}/
+)
+```
+
+其他配置（如动态库编译、交叉编译等）也可在CMakeLists.txt中通过变量或`npu_op_package` CONFIG参数设置。完整参数说明请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
+
+### 方式二：使用CMakePresets.json
+
+如果希望将编译配置与CMakeLists.txt解耦，也可以在工程目录下自行编写`CMakePresets.json`，并修改其中的`cacheVariables`。
 
 > [!NOTE]说明
 >
-> 直接执行`cmake --preset=default`要求CMake >= 3.19。msOpGen生成的`build.sh`会在低版本CMake环境下解析`CMakePresets.json`并转成普通`cmake -D`参数，因此优先建议使用工程自带的`build.sh`。
+> 直接执行`cmake --preset=default`要求CMake >= 3.19。低版本CMake环境下，需要自行解析`CMakePresets.json`并转成普通`cmake -D`参数，或直接采用方式一在CMakeLists.txt中设置变量。
 
 **最小配置示例**：
 
@@ -90,42 +111,22 @@
 }
 ```
 
-### 方式二：在CMakeLists.txt中设置
-
-直接在顶层CMakeLists.txt中设置变量，并通过`npu_op_*`接口配置编译行为，无需CMakePresets.json文件。
-
-```cmake
-# 设置必要变量。也可以使用变量ASCEND_SOC_SERIES，二者不能同时设置。
-set(ASCEND_COMPUTE_UNIT "ascendxxxyy") | set(ASCEND_SOC_SERIES "Ascendxxx")
-set(vendor_name "customize")
-
-# 配置编译产物包（通过CONFIG参数替代ENABLE_SOURCE_PACKAGE / ENABLE_BINARY_PACKAGE等变量）
-npu_op_package(${vendor_name}
-    TYPE RUN
-    CONFIG
-        ENABLE_SOURCE_PACKAGE True
-        ENABLE_BINARY_PACKAGE True
-        INSTALL_PATH ${CMAKE_BINARY_DIR}/
-)
-```
-
-其他配置（如动态库编译、交叉编译等）也可在CMakeLists.txt中通过变量或`npu_op_package` CONFIG参数设置。完整参数说明请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
-
-需要注意如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如本节样例直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
+需要注意如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如方式一样例直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
 
 ## 执行编译
 
-有两种编译方法：
-
-**方法一：使用build.sh脚本**
-
-如果工程目录下有`build.sh`脚本（msOpGen生成的工程默认提供），直接执行：
+执行cmake命令完成配置和编译：
 
 ```bash
-./build.sh
+mkdir -p build && cd build
+cmake ..
+make -j binary package
 ```
 
-**方法二：执行cmake命令**
+- `cmake ..`是CMake的配置和生成阶段：从上级目录读取源码和`CMakeLists.txt`，在当前`build`目录下生成后续编译需要的构建文件。
+- `make -j binary package`是实际编译和打包阶段：`binary`负责编译算子二进制相关产物，`package`负责生成算子安装包，`-j`表示并行编译。
+
+如果工程目录下有`CMakePresets.json`（[方式二](#方式二使用cmakepresetsjson)）并使用CMake >= 3.19，也可以改用`--preset`方式执行：
 
 ```bash
 cmake -S . -B build_out --preset=default
@@ -305,7 +306,7 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ---
 
-> 以上为编译部署的基本流程。以下内容涉及CMake组织和自定义编译选项，适合需要定制编译流程的开发者参考。常规场景下msOpGen生成的工程已包含完整的CMake结构，直接修改`CMakePresets.json`并执行`./build.sh`即可。
+> 以上为编译部署的基本流程，涵盖了单算子工程最常用的CMakeLists.txt写法。以下内容介绍工程目录组织和自定义编译选项，适合算子数量较多或需要定制编译流程的开发者参考。
 
 ---
 
@@ -317,10 +318,8 @@ source /usr/local/Ascend/cann/set_env.sh
 
 | 方式 | 特点 | 适用场景 |
 |------|------|----------|
-| 按Host/核函数（Kernel）划分 | Host和核函数（Kernel）代码分目录，三层CMakeLists。 | msOpGen默认生成，单算子或少量算子。 |
+| 按Host/核函数（Kernel）划分 | Host和核函数（Kernel）代码分目录，三层CMakeLists。 | 单算子或少量算子，[快速入门](../aclnn_quick_start.md)中的AddCustom示例即采用该结构。 |
 | 按算子划分 | 每个算子一个独立目录，算子目录维护自己的源文件清单和核函数（Kernel）声明。 | 多算子工程，算子间独立性高。 |
-
-msOpGen工具默认生成"按Host/核函数（Kernel）划分"的结构。
 
 ### 按Host/核函数（Kernel）划分的目录结构
 

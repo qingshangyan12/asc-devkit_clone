@@ -8,7 +8,7 @@
 
 1.  环境准备。
     1.  CANN软件安装请参考[环境准备](../../../getting_started/environment_setup.md)。
-    2.  [创建算子工程](../aclnn_operator_development/aclnn_quick_start.md#create-project)。使用msOpGen工具创建算子开发工程。
+    2.  [创建算子工程](../aclnn_operator_development/aclnn_quick_start.md#create-project)。
 
 2.  算子实现。
     -   [算子原型定义](../aclnn_operator_development/design_and_implementation/operator_prototype_definition.md)。通过原型定义来描述算子输入输出、属性等信息以及算子在AI处理器上相关实现信息，并关联tiling实现等函数。

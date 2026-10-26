@@ -22,7 +22,7 @@
 
 核函数（Kernel）入口函数可以使用非模板入口或模板化入口。
 
-**非模板入口**使用`extern "C"`指定C语言链接规则，msOpGen生成的基础模板通常采用这种形式。
+**非模板入口**使用`extern "C"`指定C语言链接规则，基础场景通常采用这种形式。
 
 ```cpp
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
@@ -66,7 +66,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 > **说明：输入输出同名场景**
 >
-> 如果算子原型中的输入和输出同名，msOpGen生成核函数（Kernel）入口参数时会给输出参数增加`ref`后缀，用于区分输入和输出地址。
+> 如果算子原型中的输入和输出同名，编写核函数（Kernel）入口参数时，需要给输出参数增加`ref`后缀，用于区分输入和输出地址。
 >
 > ```cpp
 > extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y,
