@@ -24,6 +24,8 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/reg_fused_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9202)
+#include "impl/c_api/reg_base_impl/npu_arch_9202/reg_fused_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask)

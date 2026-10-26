@@ -26,7 +26,8 @@
 #define LIB_MATMUL_MATMUL_INTF_H
 
 #include "../../impl/adv_api/detail/kfc/kfc_register_obj.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "../../impl/adv_api/detail/kfc/kernel_kfc.h"
 #else
 #include "include/adv_api/matmul/matmul.h"
@@ -41,7 +42,7 @@ namespace AscendC {
 #define REGIST_MATMUL_OBJ REGIST_CUBE_OBJ
 #ifdef ASCENDC_CPU_DEBUG
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 9202)
 #ifdef ASCENDC_CUBE_ONLY
 template <
     class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM,

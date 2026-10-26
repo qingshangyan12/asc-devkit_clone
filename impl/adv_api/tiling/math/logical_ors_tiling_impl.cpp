@@ -41,7 +41,7 @@ void GetLogicalOrsMaxMinTmpSize(
     auto npuArch = ascendcPlatform.GetCurNpuArch();
 
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_9202), return,
         "Unsupported NpuArch of LogicalOrs API.");
     maxValue = 0u;
     minValue = 0u;
@@ -54,7 +54,7 @@ void GetLogicalOrsTmpBufferFactorSize(
     HighLevelApiCheck::TypeSizeVerifyingParameters<LOGICAL_ORS_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_9202), return,
         "Unsupported NpuArch of LogicalOrs API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;
