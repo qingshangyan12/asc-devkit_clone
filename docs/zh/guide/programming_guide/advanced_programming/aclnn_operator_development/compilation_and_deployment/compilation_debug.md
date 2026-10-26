@@ -107,6 +107,8 @@ npu_op_kernel_options(ascendc_kernels AddCustom OPTIONS --save-temp-files)
 npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)
 ```
 
+编译生成带调试信息的核函数（Kernel）后，可使用[msobjdump工具](../../../appendix/msobjdump_tool.md#msobjdump-sass)的`--sass`、`--lineinfo`和`--source`选项查看设备指令及其源码定位信息。
+
 ### 保留的中间产物
 
 开启后，编译框架会在构建目录下保留每个核函数（Kernel）编译过程的中间文件。例如本文在ascendxxyy上验证的AddCustom工程中，临时文件位于：
