@@ -34,7 +34,7 @@
 
 以源操作数搬运场景为例，如下图所示。
 
-![源操作数搬运场景示例](../figures/source_operand_move_example.png)
+![源操作数搬运场景示例](../../../figures/source_operand_move_example.png)
 
 本接口仅在AIC上生效。
 

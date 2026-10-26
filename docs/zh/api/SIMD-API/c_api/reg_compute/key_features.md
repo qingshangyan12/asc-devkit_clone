@@ -61,7 +61,7 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
   **图1** half转int32_t类型转换过程<a id="fig1"></a>
 
-  ![](../figures/capi_half_to_int32_conversion.png "half转int32_t类型转换过程")
+  ![](../../../figures/capi_half_to_int32_conversion.png "half转int32_t类型转换过程")
 
   ```cpp
   __simd_vf__ inline void half_to_int32_vf(__ubuf__ int32_t* y_addr, __ubuf__ half* x_addr)
@@ -83,7 +83,7 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
   **图2** float转int16_t类型转换过程<a id="fig2"></a>
 
-  ![](../figures/capi_float_to_int16_conversion.png "float转int16_t类型转换过程")
+  ![](../../../figures/capi_float_to_int16_conversion.png "float转int16_t类型转换过程")
 
   ```cpp
   __simd_vf__ inline void float_to_int16_vf(__ubuf__ int16_t* y_addr, __ubuf__ float* x_addr)

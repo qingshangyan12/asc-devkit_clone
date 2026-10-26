@@ -90,7 +90,7 @@ ND到Nz的格式转换如[图2](#nd2nz_conversion)所示。
 
 **图2**  ND2Nz转换示意图<a id="nd2nz_conversion"></a>
 
-![ND2Nz格式转换后的数据排布](../../figures/asc_copy_gm2l1_nd2nz.png)
+![ND2Nz格式转换后的数据排布](../../../../figures/asc_copy_gm2l1_nd2nz.png)
 
 ## 返回值说明
 

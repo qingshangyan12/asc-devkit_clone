@@ -44,7 +44,7 @@ $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\}
 $$
 
-![](../../figures/asc_add.png)
+![](../../../../figures/asc_add.png)
 
 输出`carry`适用场景请参考[asc_addc功能说明](asc_addc.md#功能说明)。
 

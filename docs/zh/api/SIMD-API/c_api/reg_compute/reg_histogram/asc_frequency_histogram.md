@@ -37,7 +37,7 @@
 
 示例如下图所示：
 
-![频率统计](../../figures/asc_frequency_histogram.png)
+![频率统计](../../../../figures/asc_frequency_histogram.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

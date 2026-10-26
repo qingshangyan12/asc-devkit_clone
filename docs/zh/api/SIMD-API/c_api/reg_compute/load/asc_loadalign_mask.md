@@ -34,7 +34,7 @@
 
 **图1** 连续搬入掩码寄存器
 
-![](../../figures/capi_loadalign_mask_norm.png)
+![](../../../../figures/capi_loadalign_mask_norm.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
