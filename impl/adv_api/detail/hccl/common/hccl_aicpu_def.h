@@ -137,7 +137,11 @@ private:
     uint16_t handleIdCommitTurnCnt_[HCCL_MAX_HANDLE_ID] = {0U};
     uint16_t handleIdWaitCallNum_[HCCL_MAX_HANDLE_ID] = {0U};
     uint8_t handleId2CmdType_[HCCL_MAX_HANDLE_ID] = {0U};
+#if __NPU_ARCH__ == 3510
+    alignas(alignof(uint64_t)) int8_t handleIdMsgPosition_[HCCL_MAX_HANDLE_ID + 1];
+#else
     int8_t handleIdMsgPosition_[HCCL_MAX_HANDLE_ID];
+#endif
     uint8_t handleIdRepeat_[HCCL_MAX_HANDLE_ID] = {0U};
     uint8_t curMsgPosition_[MAX_QUE_NUM] = {0U};
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
