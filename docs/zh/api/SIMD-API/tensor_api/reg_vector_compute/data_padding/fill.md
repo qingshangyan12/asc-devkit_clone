@@ -73,7 +73,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| Mode | mask合并模式，支持[`merge_mode::zeroing`](../aux_data_types/merge_mode.md)和[`merge_mode::merging`](../aux_data_types/merge_mode.md)，默认值为`merge_mode::zeroing`。仅指定`dst`的重载支持该参数。 |
+| Mode | [merge_mode](../aux_data_types/merge_mode.md)枚举类型，mask合并模式，支持`merge_mode::zeroing`和`merge_mode::merging`，默认值为`merge_mode::zeroing`。仅指定`dst`的重载支持该参数。 |
 | N | 待填充的寄存器数量，默认值为1。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
