@@ -162,6 +162,7 @@ PIPE_FIX
 ### 通用约束
 
 - 本接口非AIC调用直接返回。
+- 本接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为1：2的配置。
 - `dst`起始地址需要按照32字节对齐，否则触发异常。
 - `src`起始地址需要按照64字节对齐，否则触发异常。
 - 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
@@ -254,7 +255,7 @@ __global__ __mix__(1, 2) void AscCopyL0c2ubKernel(__gm__ int8_t* a, __gm__ int8_
         asc_sync_block_wait(PIPE_MTE3, 0x8);
         asc_copy_ub2gm(output, output_ub, M, N * sizeof(int32_t),
             N * sizeof(int32_t), N * sizeof(int32_t));
-        asc_sync_pipe(PIPE_ALL);
+        asc_sync();
     }
 }
 

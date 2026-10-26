@@ -44,28 +44,25 @@ TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
     }
 }
 
-// 四态识别与解析失败契约
+// 三态识别与解析失败契约（裸名不再单独成态，归为 NONE）
 TEST(ExtAlgForced, FourStateClassification)
 {
-    std::string algName;
     ExternalAlgSpec spec;
     std::string errMsg;
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("", algName, spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlgConfig("", spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlgConfig("InsAllGatherMesh1D", spec, errMsg), ForcedAlgKind::NONE);
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", algName, spec, errMsg), ForcedAlgKind::LEGACY);
+    EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", spec, errMsg), ForcedAlgKind::LEGACY);
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("InsAllGatherMesh1D", algName, spec, errMsg), ForcedAlgKind::BARE_NAME);
-    EXPECT_EQ(algName, "InsAllGatherMesh1D");
-
-    EXPECT_EQ(ClassifyForcedAlgConfig("parallel[mesh, nhr]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("parallel[mesh, nhr]", spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_TRUE(errMsg.empty());
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
 
     // 解析失败: spec 复位为默认值 + errMsg 非空（ClassifyForcedAlgConfig 契约）。
     // 默认值 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
     // 失败态断言用默认值判据: layers 空 + orderStrong 复位
-    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
     EXPECT_TRUE(spec.layers.empty());
     EXPECT_FALSE(spec.orderStrong);
@@ -74,7 +71,8 @@ TEST(ExtAlgForced, FourStateClassification)
 // hccl_mc2.cc 内部自由函数，专属目标已编入该翻译单元，符号可见
 bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
 
-// CheckCcuAlgorithmsRegistered：外部名须有 CCU 候选且全部过双名单；AICPU-only 外部名被拒
+// CheckCcuAlgorithmsRegistered 新契约（f3b8b6463 起）：外部名解析通过即放行，不再校验 CCU 候选注册；
+// 仅 null tiling、NONE/LEGACY kind、解析错误被拒
 TEST(ExtAlgGateB, ExternalNameGate)
 {
     // sole[mesh] AG 有 CCU 候选 CcuSchedAllGatherSoleMesh（algorithmMap + V2 注册表均在）→ 过
@@ -82,10 +80,10 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* goodList[] = {&agSoleMesh};
     EXPECT_TRUE(CheckCcuAlgorithmsRegistered(goodList, 1U));
 
-    // AG pipeline[mesh,nhr] 仅 AICPU 候选 → 拒
+    // AG pipeline[mesh,nhr] 解析通过即放行（新契约不再校验 CCU 候选注册，候选选择交由后续 selector）
     Mc2CcTilingInner agPipeline = MakeTiling("pipeline[mesh,nhr]", 6U);
     const void* badList[] = {&agPipeline};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
     // 语法错 → 拒
     Mc2CcTilingInner badSyntax = MakeTiling("sole[ring]", 6U);
@@ -96,10 +94,10 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* nullList[] = {nullptr};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(nullList, 1U));
 
-    // 裸名/空名/legacy 现状语义不变
+    // 裸名归为 NONE（新语义：不强制 → 默认 selector / gate 拒绝）；空名/legacy 现状语义不变
     Mc2CcTilingInner bare = MakeTiling("CcuSchedAllGatherSoleMesh", 6U);
     const void* bareList[] = {&bare};
-    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(bareList, 1U));
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(bareList, 1U));
     Mc2CcTilingInner empty = MakeTiling("", 6U);
     const void* emptyList[] = {&empty};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(emptyList, 1U));
@@ -108,18 +106,18 @@ TEST(ExtAlgGateB, ExternalNameGate)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
 }
 
-// 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与无候选/规则全灭分叉）。
+// 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与候选为空/规则全灭分叉）。
 TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
 {
+    // RS sole[mesh.chunk] 解析通过即放行（新契约不再校验 CCU 候选注册，AICPU-only 外部名同样过 gate）
     Mc2CcTilingInner rsMeshChunk = MakeTiling("sole[mesh.chunk]", 7U); // RS: AICPU-only 候选
-    const void* badList[] = {&rsMeshChunk};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+    const void* goodList[] = {&rsMeshChunk};
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(goodList, 1U));
 
     // 解析层 errMsg 三要素：解析失败消息含原文
-    std::string algName;
     ExternalAlgSpec spec;
     std::string errMsg;
-    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_NE(errMsg.find("sole[ring]"), std::string::npos); // 要素1: 原文
     EXPECT_NE(errMsg.find("atom"), std::string::npos);       // 要素3: 原因（词表外原子）
 
