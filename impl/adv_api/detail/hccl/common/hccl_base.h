@@ -43,6 +43,14 @@ namespace AscendC {
     } while (0)
 #endif
 
+// Internal validation for hot AICPU paths. Enabled builds retain the same logging and early-return
+// behavior as ASCENDC_HCCL_API_ASSERT; release builds compile the whole check out.
+// #if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+// #define ASCENDC_HCCL_API_CHECK(cond, ret, fmt, ...) ASCENDC_HCCL_API_ASSERT(cond, ret, fmt, ##__VA_ARGS__)
+// #else
+#define ASCENDC_HCCL_API_CHECK(cond, ret, fmt, ...)
+// #endif
+
 template <HcclServerType serverType, const auto& config>
 class HcclImpl {
 public:
