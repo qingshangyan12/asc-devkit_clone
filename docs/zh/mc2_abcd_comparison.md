@@ -1,6 +1,6 @@
 # [WIP] 双包 Server 打点性能对照（仅实验，不得合入）
 
-共同原始基线 9dfffb2ba02d3f1fb80e1f4e6b7fc4e4d1a92158，两个包均保留 20261021 toolkit 的 Thread ABI 修正；不得与不同 HCOMM ABI 混用。
+共同原始基线 9dfffb2ba02d3f1fb80e1f4e6b7fc4e4d1a92158，两个包均保留该基线中的 Thread 定义，包含 10 月 23 日与 HCOMM 配套合入的接口变更。使用包含配套 HCOMM 变更的黄区环境，不再回退适配 A5_4p 的 20261021 toolkit。
 
 A：只有外层测试计时。B：外层区间内包含 thread_local POD 三阶段状态重置、时间戳读取、计算和一条 MC2_PERF RUN_INFO。
 两者外层均从 Mc2ServerKernel 入口读钟，到主流程（B 包括 Finish 日志返回）之后读钟；MC2_AB_TEST 日志和序号递增在区间外。错误返回也记录 status。
