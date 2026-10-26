@@ -17,3 +17,4 @@
 - **[选择与比较](compare_and_select/compare_and_select.md)**
 - **[数据填充](data_padding/data_padding.md)**
 - **[数据重排](data_reorder/data_reorder.md)**
+- **[索引生成](reg_index/reg_index.md)**
