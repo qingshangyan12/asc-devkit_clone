@@ -726,9 +726,8 @@ __aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* 
         uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
         uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
         mad_mx(
-            c, 0, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m,
-            mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource,
-            cmatrixInitVal);
+            c, 0, a, l0aMxBufferStartAddr, b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k, mmadParams.n,
+            mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource, cmatrixInitVal);
     }
 }
 
@@ -749,6 +748,19 @@ __aicore__ inline void MmadMxCal(
             Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
             Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
         static_assert(isMx, "MmadMx not support data type on current device!");
+        bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        mad_mx(
+            c, a, b, bias, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            cmatrixSource, cmatrixInitVal);
+#else
+        constexpr uint32_t MX_BUFFER_SCALE = 8; // mx buffer size is 8KB
+        uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
+        uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
+        mad_mx(
+            c, bias, a, l0aMxBufferStartAddr, b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k, mmadParams.n,
+            mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
+#endif
     }
 }
 
@@ -768,6 +780,13 @@ __aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* 
             Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
             Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
         static_assert(isMx, "MmadMx not support data type on current device!");
+        constexpr uint32_t MX_BUFFER_SCALE = 8; // mx buffer size is 8KB
+        uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
+        uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
+        mad_mx(
+            c, 0, a, l0aMxBufferStartAddr, b, l0bMxBufferStartAddr, mmadParams.GetM(), mmadParams.GetK(),
+            mmadParams.GetN(), mmadParams.GetUnitFlag(), mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(),
+            mmadParams.GetCmatrixInitVal());
     }
 }
 
@@ -788,6 +807,20 @@ __aicore__ inline void MmadMxCal(
             Tuple<float, bfloat16_t, hifloat4x2_t>, Tuple<float, half, fp4x2_e1m2_t>, Tuple<float, half, fp4x2_e2m1_t>,
             Tuple<float, bfloat16_t, fp4x2_e1m2_t>, Tuple<float, bfloat16_t, fp4x2_e2m1_t>>();
         static_assert(isMx, "MmadMx not support data type on current device!");
+        mmadParams.SetCmatrixInitVal(false);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        mad_mx(
+            c, a, b, bias, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(), mmadParams.GetUnitFlag(),
+            mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(), mmadParams.GetCmatrixInitVal());
+#else
+        constexpr uint32_t MX_BUFFER_SCALE = 8; // mx buffer size is 8KB
+        uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
+        uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
+        mad_mx(
+            c, bias, a, l0aMxBufferStartAddr, b, l0bMxBufferStartAddr, mmadParams.GetM(), mmadParams.GetK(),
+            mmadParams.GetN(), mmadParams.GetUnitFlag(), mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(),
+            mmadParams.GetCmatrixInitVal());
+#endif
     }
 }
 
