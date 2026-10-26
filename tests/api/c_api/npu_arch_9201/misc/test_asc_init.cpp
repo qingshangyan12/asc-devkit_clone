@@ -40,13 +40,13 @@ protected:
     void SetUp() override
     {
 #if defined(__DAV_VEC__)
-        g_coreType = C_API_AIV_TYPE;
+        g_coreType = AscendC::AIV;
 #elif defined(__DAV_CUBE__)
-        g_coreType = C_API_AIC_TYPE;
+        g_coreType = AscendC::AIC;
 #endif
     }
 
-    void TearDown() override { g_coreType = C_API_AIV_TYPE; }
+    void TearDown() override { g_coreType = AscendC::AIV; }
 };
 
 TEST_F(TestInitInstr9201CApi, c_api_asc_init_Succ)
@@ -63,8 +63,10 @@ TEST_F(TestInitInstr9201CApi, c_api_asc_init_Succ)
     MOCKER_CPP(set_loop_size_ubtoout, void(uint64_t)).times(1).will(invoke(set_loop_size_stub));
     MOCKER_CPP(set_loop_size_outtoub, void(uint64_t)).times(1).will(invoke(set_loop_size_stub));
     MOCKER_CPP(set_padding, void(uint64_t)).times(0);
+    MOCKER_CPP(set_loop_size_outtol1, void(uint64_t)).times(0);
 #elif defined(__DAV_CUBE__)
     MOCKER_CPP(set_padding, void(uint64_t)).times(1).will(invoke(set_padding_stub));
+    MOCKER_CPP(set_loop_size_outtol1, void(uint64_t)).times(1).will(invoke(set_loop_size_stub));
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t)).times(0);
     MOCKER_CPP(set_loop_size_ubtoout, void(uint64_t)).times(0);
     MOCKER_CPP(set_loop_size_outtoub, void(uint64_t)).times(0);
