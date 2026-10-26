@@ -1,6 +1,6 @@
 # msobjdump工具<a name="ZH-CN_TOPIC_0000002028951292"></a>
 
-本工具主要针对工程编译生成的算子ELF文件（Executable and Linkable Format）提供解析和解压功能，并将结果信息以可读形式呈现，方便开发者直观获得核函数（Kernel）文件信息。当前支持解析核函数（Kernel）直调工程和自定义算子工程生成的相关产物。
+本工具主要针对工程编译生成的算子ELF文件（Executable and Linkable Format）提供解析、解压和Ascend AICore指令反汇编功能，并将结果信息以可读形式呈现，方便开发者直观获得核函数（Kernel）文件信息。当前支持解析核函数（Kernel）直调工程和自定义算子工程生成的相关产物。
 
 >[!NOTE]说明 
 >- ELF文件是一种用于二进制文件、可执行文件、目标代码、共享库和核心转储的文件格式，包括常见的\*.a、\*.so文件等。ELF文件常见构成如下：
@@ -114,6 +114,8 @@
     | `--sass <input_file>` | 必选 | 反汇编输入的ELF文件，显示Device侧的Ascend AICore指令。<br>`<input_file>`表示待反汇编的文件路径。 |
     | `--lineinfo` | 可选 | 与`--sass`配套使用，在反汇编结果中显示源文件名和行号。 |
     | `--source`，`-s` | 可选 | 与`--sass`配套使用，在反汇编结果中显示对应源码。源文件需要能够按调试信息中记录的路径访问。 |
+
+    `--sass`不支持与`--dump-elf`、`--extract-elf`、`--list-elf`、`--verbose`或`--out-dir`组合；输出默认写入标准输出，如需保存结果可使用Shell重定向。
 
     `--lineinfo`和`--source`依赖device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。没有调试信息时仍可输出反汇编。
 
