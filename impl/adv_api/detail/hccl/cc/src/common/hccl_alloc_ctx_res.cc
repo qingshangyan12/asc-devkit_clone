@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
@@ -299,7 +300,10 @@ HcclResult AllocWorkspaceMemory(HcclComm comm, const std::string& ctxTag, CommEn
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), commEngine, memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     }
-    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
+    // A5 keeps the protocol-compatible 512B round-up on host so the device Init can skip it.
+    resCtx.workSpace = (resCtx.workSpace + 0x1ffULL) & ~0x1ffULL;
+    HCCL_INFO(
+        "HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
     return HCCL_SUCCESS;
 }
 
@@ -341,6 +345,7 @@ HcclResult AllocAndCopyOpResCtx(
     CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
     return HCCL_SUCCESS;
 }
+
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
@@ -365,6 +370,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_RET(FillRankInfo(comm, resCtx));
     return AllocAndCopyOpResCtx(comm, ctxTag, commEngine, resCtx, opResCtxPtr);
 }
+
 
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr)
