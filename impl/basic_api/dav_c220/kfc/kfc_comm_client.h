@@ -23,6 +23,10 @@
 
 #include "../../kernel_macros.h"
 #include "kfc_comm.h"
+
+#ifndef QBMM_KFC_PEER_FIX
+#define QBMM_KFC_PEER_FIX 0
+#endif
 #include "../../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -106,6 +110,11 @@ public:
             if constexpr (MIX_NUM == 1) {
                 // aic-aiv 1:1,aiv subblkidx==0,spkernelaic-aiv1:1--1:2,aiv1 no
                 if (GetSubBlockIdxImpl() == 1) {
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+                    if (QBMM_KFC_PEER_FIX && GetTaskRationImpl() == 2) {
+                        WaitForQuitNotification();
+                    }
+#endif
                     return;
                 }
             }
@@ -131,29 +140,33 @@ public:
 #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
             // only executed in 1:2 mode
             if (GetTaskRationImpl() == 2) {
-                CrossCoreWaitFlag(KFC_SYNC_ID);
-                dcci(
-                    reinterpret_cast<__gm__ int64_t*>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE,
-                    dcci_dst_t::CACHELINE_OUT);
-                // Traverse all matmul objects to compensate for waiting events
-                for (int i = 0; i < MAX_MATMUL_OBJ_CNT; i++) {
-                    uint32_t eventId = reinterpret_cast<__gm__ SuperKernelWaitEventCnt*>(this->msgRcvStart)->eventId[i];
-                    int32_t eventCnt =
-                        reinterpret_cast<__gm__ SuperKernelWaitEventCnt*>(this->msgRcvStart)->eventCnt[i];
-                    // Get the block id of the corresponding mapped object
-                    uint32_t mappedBlockId = GetSubBlockIdxImpl() ? 0 : 1;
-                    if (i * 2 + mappedBlockId == eventId && eventCnt > 0) {
-                        // After dividing the count value by 16 and taking the modulus, compensate for the waiting event
-                        int32_t waitCnt = eventCnt % 16;
-                        for (int i = 0; i < waitCnt; i++) {
-                            CrossCoreWaitFlag(eventId);
-                        }
-                    }
-                }
+                WaitForQuitNotification();
             }
 #endif
         }
     }
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+    __aicore__ inline void WaitForQuitNotification()
+    {
+        CrossCoreWaitFlag(KFC_SYNC_ID);
+        dcci(reinterpret_cast<__gm__ int64_t*>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE,
+             dcci_dst_t::CACHELINE_OUT);
+        for (int objectIndex = 0; objectIndex < MAX_MATMUL_OBJ_CNT; objectIndex++) {
+            uint32_t eventId =
+                reinterpret_cast<__gm__ SuperKernelWaitEventCnt*>(this->msgRcvStart)->eventId[objectIndex];
+            int32_t eventCnt =
+                reinterpret_cast<__gm__ SuperKernelWaitEventCnt*>(this->msgRcvStart)->eventCnt[objectIndex];
+            uint32_t mappedBlockId = GetSubBlockIdxImpl() ? 0 : 1;
+            if (objectIndex * 2 + mappedBlockId == eventId && eventCnt > 0) {
+                int32_t waitCnt = eventCnt % 16;
+                for (int waitIndex = 0; waitIndex < waitCnt; waitIndex++) {
+                    CrossCoreWaitFlag(eventId);
+                }
+            }
+        }
+    }
+#endif
 
     template <bool isAck>
     __disable_kernel_type_autoinfer__ __aicore__ inline void PostMessage(__gm__ KfcMsg* msg)
