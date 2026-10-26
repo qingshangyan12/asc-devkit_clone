@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何基于 C API，通过 L1/L0 [双缓冲（Double Buffer）](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)、大包搬运、流水同步等优化手段，实现高性能的 MXFP8 Matmul 核函数。矩阵计算的基本流程参见[Cube矩阵计算编程](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/c_pointer_programming/cube_matrix_computation.md)。
+本样例介绍如何基于 C API，通过 L1/L0 双缓冲、大包搬运、流水同步等优化手段，实现高性能的 MXFP8 Matmul 核函数。矩阵计算的基本流程参见[Cube矩阵计算编程](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/c_pointer_programming/cube_matrix_computation.md)。
 
 ## 本样例支持的产品及 CANN 软件版本
 
@@ -56,7 +56,7 @@ $$
 | scale_b | [8192, 256] | fp8_e8m0_t | ND |
 | C | [8192, 8192] | half | ND |
 
-A 和 B 在 GM 中分别按 `[M, K]`、`[N, K]` 行主序存储，B 是公式中逻辑右矩阵的转置；scale_a 和 scale_b 分别按 `[M, K/32]`、`[N, K/32]` 存储。每个 FP8 元素及量化系数占 1 字节。L0C 使用 float 累加，最后转换为 half 输出，首轮累加初始化为零。
+A 和 B 在 GM 中分别按 `[M, K]`、`[N, K]` 行主序存储。scale_a 和 scale_b 分别按 `[M, K/32]`、`[N, K/32]` 行主序存储。L0C 使用 float 累加，最后转换为 half 输出，首轮累加初始化为零。
 
 ### 关键参数
 
@@ -71,7 +71,7 @@ A 和 B 在 GM 中分别按 `[M, K]`、`[N, K]` 行主序存储，B 是公式中
 | data_k | 256 | 数据大包的逻辑 K 长度 |
 | scale_step | 8 | 一个 scale 大包覆盖的基础 K 块数 |
 | scale_chunk | 32 | 每行 scale 大包的字节数，对应逻辑 K=1024 |
-| l0_buffer_bytes | 32768 | L0A/B 单个 Ping/Pong 缓冲区 的字节数 |
+| l0_buffer_bytes | 32768 | L0A/B 单个 Ping/Pong 缓冲区的字节数 |
 
 > **约束说明**：本样例未提供任意 shape 或尾块处理。
 
@@ -244,7 +244,9 @@ asc_copy_l0c2gm(dst, c_l0, tile_n, tile_m, matrix_n, tile_m,
 
 ## 理论性能对比
 
-以下为针对**32个可用Cube核、主频1.65GHz**的Ascend 950PR&950DT系列产品上板环境的性能分析。
+以下为在具有 **32 个可用 Cube 核、主频 1.65 GHz** 的Ascend 950PR&950DT系列产品上采集的性能数据。
+
+注意，在不同环境上的性能数据会有所差异，以下数据仅供参考，实际性能以实测为准。
 
 | 指标 | 说明 |
 | --- | --- |
@@ -253,17 +255,17 @@ asc_copy_l0c2gm(dst, c_l0, tile_n, tile_m, matrix_n, tile_m,
 | aicore_time(μs) | profiler 报告的 AI Core 执行时间 |
 | aic_mac_time(μs) / aic_mac_ratio | Cube 计算时间及占比 |
 | aic_scalar_time(μs) / aic_scalar_ratio | 标量调度、地址计算等时间及占比 |
-| aic_mte1_time(μs) / aic_mte1_ratio | L1→L0 加载时间及占比 |
+| aic_mte1_time(μs) / aic_mte1_ratio | L1→L0 搬运时间及占比 |
 | aic_mte2_time(μs) / aic_mte2_ratio | GM→L1 搬运时间及占比 |
 | aic_fixpipe_time(μs) / aic_fixpipe_ratio | 输出写回时间及占比 |
 
-32 核实测数据表（空白待填）：
+实测数据：
 
 | Case version | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| C API MXFP8 Matmul | | 32 | | | | | | | | | | | |
+| C API MXFP8 Matmul | 1318.15 | 32 | 1317.12 | 1277.07 | 0.97 | 67.57 | 0.05 | 552.28 | 0.42 | 1185.64 | 0.9 | 32.26 | 0.02 |
 
-各流水可以重叠，不能把各时间相加作为任务耗时；Cube 时间占比也不等于全部物理核的全局利用率。
+注意，各流水可以重叠，不能把各时间相加作为任务耗时，Cube时间占比也不等于全部物理核的全局利用率。
 
 ### Cube 计算性能分析
 
@@ -276,9 +278,9 @@ $$T_{cube}=\frac{M\times N\times K}{16\times32\times16\times1.65\times10^9\times
 
 该值为纯计算理论下界，不含流水填充、排空、写回等开销。
 
-实测后可按下式计算 Cube 相对误差：
+实测 Cube 时间为 `1277.07 μs`，相对理论值的误差为：
 
-$$E_{cube}=\frac{T_{mac,actual}-T_{cube}}{T_{cube}}\times100\%$$
+$$E_{cube}=\frac{1277.07-1271.001}{1271.001}\times100\%\approx0.48\%$$
 
 ### MTE2 带宽分析
 
@@ -300,17 +302,11 @@ $$T_{MTE2,model}=\frac{138,412,032}{1.6\times10^{12}}+
 
 容量采用二进制 MiB/GiB，带宽采用十进制 TB/s。带宽为模型假设，不能替代目标设备实测；HBM 和 L2 数据传输可以交叠，模型也未计入格式转换、指令和缓存冲突。4.125 GiB 是逻辑搬运量，不等于实际 HBM 流量。若按原样例假设的 128 MiB L2 容量，132 MiB 输入无法全部常驻；加上输出和其他流量，实际命中率需要由 profiler 验证。
 
-实测 MTE2 数据暂留空，可在采集后与模型对照，并分析缓存复用与 ND/DN→NZ 转换开销。
+实测 `aic_mte2_time` 为 `1185.64 μs`，相对模型值 `944.662 μs` 高约 `25.51%`。差异来自缓存命中情况、ND/DN→NZ 数据搬运、指令及同步开销；MTE2 与其他流水存在交叠，不能将该时间直接加到 Cube 时间上。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-
-> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，安装命令为：
-
-```bash
-python3 -m pip install ml_dtypes==0.2.0
-```
 
 ### 配置环境变量
 

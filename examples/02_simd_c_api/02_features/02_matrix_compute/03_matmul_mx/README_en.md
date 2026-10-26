@@ -8,7 +8,7 @@ This sample implements a high-performance MXFP8 Matmul kernel using the C API, L
 
 | Product | CANN version |
 | --- | --- |
-| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
+| Ascend 950PR&950DT series products | >= CANN 9.3.0 |
 
 The sample launches a fixed number of 32 Cube blocks for `dav-3510`. Only execution on an NPU is supported; CPU debugging is not supported. API definitions and implementations come from this repository. CMake prioritizes repository headers to avoid using older APIs from the installed CANN package.
 
@@ -239,7 +239,7 @@ For each data or scale transfer block, the first K iteration waits for readiness
 
 ## Theoretical Performance Comparison
 
-The analysis assumes **32 available Cube cores at 1.65 GHz**. Measurements must be collected under these conditions before filling in the table.
+The following data was collected on an Ascend 950PR&950DT series product with **32 available Cube cores at 1.65 GHz**, using the fixed 32-block kernel and the `PipeUtilization` metrics from `msopprof`.
 
 | Metric | Description |
 | --- | --- |
@@ -252,13 +252,13 @@ The analysis assumes **32 available Cube cores at 1.65 GHz**. Measurements must 
 | aic_mte2_time(μs) / aic_mte2_ratio | GM-to-L1 transfer time and ratio |
 | aic_fixpipe_time(μs) / aic_fixpipe_ratio | Result writeback time and ratio |
 
-32-core measurements (blank pending collection):
+32-core measurements:
 
 | Case version | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| C API MXFP8 Matmul | | 32 | | | | | | | | | | | |
+| C API MXFP8 Matmul | 1318.15 | 32 | 1317.12 | 1277.07 | 0.97 | 67.57 | 0.05 | 552.28 | 0.42 | 1185.64 | 0.90 | 32.26 | 0.02 |
 
-Pipeline execution overlaps, so these times must not be summed. The Cube time ratio is not the global utilization of all physical cores.
+Pipeline execution overlaps, so these times must not be summed. The Cube time ratio is not the global utilization of all physical cores. Based on `2*M*N*K/Task Duration`, the measured end-to-end throughput is approximately `834.13 TFLOP/s`; Task Duration is about `3.71%` above the pure Cube theoretical lower bound.
 
 ### Cube Computation
 
@@ -267,9 +267,9 @@ For FP8, each core performs 16 x 32 x 16 multiply-adds per cycle:
 $$T_{cube}=\frac{M\times N\times K}{16\times32\times16\times1.65\times10^9\times32}
 =\frac{8192^3}{8192\times1.65\times10^9\times32}\approx1271.001\ \mu s$$
 
-This is the theoretical lower bound for computation alone, excluding pipeline startup, completion, and writeback overhead. After collecting measurements, calculate the relative deviation as:
+This is the theoretical lower bound for computation alone, excluding pipeline startup, completion, and writeback overhead. The measured Cube time is `1277.07 μs`; its relative deviation is:
 
-$$E_{cube}=\frac{T_{mac,actual}-T_{cube}}{T_{cube}}\times100\%$$
+$$E_{cube}=\frac{1277.07-1271.001}{1271.001}\times100\%\approx0.48\%$$
 
 ### MTE2 Bandwidth
 
@@ -291,96 +291,70 @@ $$T_{MTE2,model}=\frac{138,412,032}{1.6\times10^{12}}+
 
 Capacities use binary MiB/GiB; bandwidth uses decimal TB/s. These bandwidths are modeling assumptions, not device measurements. HBM and L2 transfers can overlap, and the model excludes format conversion, instructions, and cache conflicts. The logical volume of 4.125 GiB is not the actual HBM traffic. With the original sample's assumed 128 MiB L2 capacity, the 132 MiB input cannot all remain cached; output and other traffic also affect hit rates. Verify these effects with the profiler.
 
-MTE2 measurements are left blank. Once collected, compare them with the model and examine cache reuse and ND/DN-to-NZ conversion overhead.
+The measured `aic_mte2_time` is `1185.64 μs`, about `25.51%` above the model. The difference includes cache-hit behavior, ND/DN-to-NZ transfers, instructions, and synchronization. MTE2 overlaps with other pipelines, so its time must not be added directly to Cube time.
 
 ## Build and Run
 
-Run the following steps in the root directory of this example to build and run the example.
+### Install Dependencies
 
-> **Notice**: This example requires `ml_dtypes` library version `0.2.0`, Installation command:
+Install the Python dependency from the sample directory:
 
 ```bash
 python3 -m pip install ml_dtypes==0.2.0
 ```
 
-### Configure Environment Variables
+### Configure the Environment
 
-Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
-
+Configure CANN according to the repository [installation guide](../../../../../docs/zh/quick_start.md):
 
 ```bash
 source ${install_path}/cann/set_env.sh
 ```
 
-> **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+This sample supports NPU execution only. CPU debugging and NPU simulation are not supported.
 
-### Run the Example
-
-Run the following commands in this example directory.
+### Run the Sample
 
 ```bash
-mkdir -p build && cd build;  # Create and enter the build directory
-cmake .. -DCMAKE_ASC_RUN_MODE=npu -DCMAKE_ASC_ARCHITECTURES=dav-3510; make -j;
+mkdir -p build
+cd build
+cmake .. -DCMAKE_ASC_RUN_MODE=npu -DCMAKE_ASC_ARCHITECTURES=dav-3510
+cmake --build . -j
 python3 ../scripts/gen_data.py
 ./demo
-python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
+python3 ../scripts/verify_result.py output/output.bin output/golden.bin
 ```
 
-To use NPU simulation mode, set `-DCMAKE_ASC_RUN_MODE=sim`.
+Set `OPENBLAS_NUM_THREADS=16` before `gen_data.py` to control OpenBLAS CPU reference-computation threads. It does not affect the NPU kernel:
 
 ```bash
-cmake .. -DCMAKE_ASC_RUN_MODE=npu -DCMAKE_ASC_ARCHITECTURES=dav-3510; make -j; # NPU mode
-cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510; make -j; # NPU simulation mode
+OPENBLAS_NUM_THREADS=16 python3 ../scripts/gen_data.py
 ```
 
-Build option description:
-
-| Parameter | Values | Description |
-|------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu` / `sim` | Run mode: NPU execution, NPU simulation |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | Target SoC architecture |
-
-> **Notice:** Clear CMake cache before switching `CMAKE_ASC_RUN_MODE` / `CMAKE_ASC_ARCHITECTURES`. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
-
-The following execution result indicates that the accuracy comparison succeeded.
-
-```bash
-test pass!
-```
+The default seed is 2026. The generator uses signed FP8 data and nonuniform E8M0 scales, computes an FP64 reference, and converts it to half. Use `--seed 2027` for another input. Reference generation is not CPU kernel debugging.
 
 ### Performance Analysis
 
-### Introduction to the msOpProf Tool
-
-msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
-
-- On-device performance collection
-
-    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
-
-    Run msopprof on the `demo` executable for operator tuning:
-    ```
-    msopprof ./demo
-    ```
-
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
-
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
-
-View the detailed performance analysis results:
+From the build directory, collect operator metrics with `msopprof`:
 
 ```bash
-cat ./OPPROF_*/PipeUtilization.csv
+msopprof \
+  --application=./demo \
+  --output=./op_profile \
+  --aic-metrics=PipeUtilization \
+  --warm-up=5 \
+  --launch-count=1
 ```
+
+Read Task Duration, Block Num, and pipeline metrics from `OpBasicInfo.csv` and `PipeUtilization.csv`. The table above was collected on a 32-core machine. Record the available Cube core count and actual frequency for each measurement.
+
+If the installed tool warns that `--application` will be deprecated, use the positional form:
+
+```bash
+msopprof \
+  --output=./op_profile \
+  --aic-metrics=PipeUtilization \
+  ./demo
+```
+
+`msopprof` provides operator execution time, pipeline utilization, cache-hit rate, and transfer-bandwidth metrics. Additional metrics such as `L2Cache`, `Memory`, and `MemoryL0` can be selected according to the installed tool version. Pipeline times overlap and must not be added together.
