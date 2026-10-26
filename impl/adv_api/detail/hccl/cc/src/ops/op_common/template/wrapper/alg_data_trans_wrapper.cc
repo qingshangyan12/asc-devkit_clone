@@ -16,7 +16,7 @@
 #include <cstdint>
 #include <type_traits>
 
-// 消费侧 ABI 守护：asccomm 头自身无断言，desc 尺寸契约由此处接管
+// The asccomm header has no static assert of its own; guard the descriptor size here.
 static_assert(sizeof(AsccommBatchTransferDesc) == 64, "Asccomm batch transfer descriptor ABI size mismatch");
 
 namespace mc2_ops_hccl {

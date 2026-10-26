@@ -30,6 +30,7 @@
 #include "hccl_comm.h"
 #include "hccl_res_expt.h"
 #include "hcomm_primitives_dl.h"
+#include "asccomm_primitives.h"
 #include "task_cache_test_stub.h"
 
 using namespace mc2_ops_hccl;
@@ -1105,12 +1106,7 @@ HcclResult HcommSymWinGetPeerPointer(HcclCommSymWindow winHandle, size_t offset,
     return HcclSymWinGetPeerPointer(winHandle, offset, peerRank, ptr);
 }
 
-// asccomm (T1) dataplane simulations. Each entry delegates to the mirrored
-// Hcomm*OnThread simulation above so both symbol families share one simulation
-// implementation. The reduce/batch parameters use the ABI-identical Hcomm types
-// because the asccomm public header is not on the ST include path; C linkage
-// keeps these definitions interchangeable with the asccomm declarations consumed
-// by the wrapper. Covers every asccomm dataplane symbol the wrapper references.
+// asccomm dataplane simulations share one implementation with the mirrored Hcomm*OnThread entries.
 int32_t asccomm_channel_notify_record_on_thread(ThreadHandle thread, ChannelHandle channel, uint32_t remoteNotifyIdx)
 {
     return HcommChannelNotifyRecordOnThread(thread, channel, remoteNotifyIdx);
@@ -1148,30 +1144,34 @@ int32_t asccomm_thread_notify_wait_on_thread(ThreadHandle thread, uint32_t notif
 }
 
 int32_t asccomm_write_reduce_on_thread(
-    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, HcommDataType dataType,
-    HcommReduceOp reduceOp)
+    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, AsccommDataType dataType,
+    AsccommReduceOp reduceOp)
 {
-    return HcommWriteReduceOnThread(thread, channel, dst, src, count, dataType, reduceOp);
+    return HcommWriteReduceOnThread(
+        thread, channel, dst, src, count, static_cast<HcommDataType>(dataType), static_cast<HcommReduceOp>(reduceOp));
 }
 
 int32_t asccomm_read_reduce_on_thread(
-    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, HcommDataType dataType,
-    HcommReduceOp reduceOp)
+    ThreadHandle thread, ChannelHandle channel, void* dst, const void* src, uint64_t count, AsccommDataType dataType,
+    AsccommReduceOp reduceOp)
 {
-    return HcommReadReduceOnThread(thread, channel, dst, src, count, dataType, reduceOp);
+    return HcommReadReduceOnThread(
+        thread, channel, dst, src, count, static_cast<HcommDataType>(dataType), static_cast<HcommReduceOp>(reduceOp));
 }
 
 int32_t asccomm_local_reduce_on_thread(
-    ThreadHandle thread, void* dst, const void* src, uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp)
+    ThreadHandle thread, void* dst, const void* src, uint64_t count, AsccommDataType dataType, AsccommReduceOp reduceOp)
 {
-    return HcommLocalReduceOnThread(thread, dst, src, count, dataType, reduceOp);
+    return HcommLocalReduceOnThread(
+        thread, dst, src, count, static_cast<HcommDataType>(dataType), static_cast<HcommReduceOp>(reduceOp));
 }
 
 int32_t asccomm_batch_transfer_on_thread(
-    ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
+    ThreadHandle thread, ChannelHandle channel, const AsccommBatchTransferDesc* transferDescs,
     uint32_t transferDescNum)
 {
-    return HcclHcommBatchTransferOnThread(thread, channel, transferDescs, transferDescNum);
+    return HcclHcommBatchTransferOnThread(
+        thread, channel, reinterpret_cast<const HcclHcommBatchTransferDesc*>(transferDescs), transferDescNum);
 }
 
 #ifdef __cplusplus
