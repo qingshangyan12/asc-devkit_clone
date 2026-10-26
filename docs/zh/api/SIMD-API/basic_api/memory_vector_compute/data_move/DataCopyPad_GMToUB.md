@@ -175,16 +175,19 @@
     下面通过三个示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制，示例3（仅Ascend 950PR&950DT系列产品支持）演示负stride实现重复搬运同一数据块的场景。
 
     - 参数解释
-        - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
-        - 当blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+
+        `blockLen`的单位为字节，`leftPadding`和`rightPadding`的单位为元素个数。Normal模式下，判断显式填充后的长度是否32字节对齐时，应计算`blockLen + (leftPadding + rightPadding) * sizeof(T)`。例如，T为half、blockLen为48字节、leftPadding为0、rightPadding为8个元素时，长度为64字节。
+
+        - 当`blockLen + (leftPadding + rightPadding) * sizeof(T)`满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
+        - 当`blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     - 示例1：32字节对齐场景
 
         blockLen为64，每个连续传输数据块包含64字节；srcStride为1，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，因为目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock数量（每DataBlock为32字节），即目的操作数相邻数据块之间间隔1个dataBlock。
 
-        blockLen+leftPadding+rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。此处示例中，leftPadding、rightPadding均为0，则不填充。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。此处示例中，leftPadding、rightPadding均为0，则不填充。
 
-        blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
         ![](../../../../figures/datacopypad1.png)
 
@@ -192,9 +195,9 @@
 
         blockLen为47，每个连续传输数据块包含47字节；srcStride为1，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
 
-        blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
 
-        blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
         ![](../../../../figures/datacopypad2.png)
 
@@ -204,9 +207,9 @@
 
         blockLen为48，每个连续传输数据块包含48字节；srcStride为-48，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为-48字节（一个连续数据块长度为48字节），相当于每次传输的连续数据块都是同一块；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
 
-        blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
 
-        blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+        `blockLen + (leftPadding + rightPadding) * sizeof(T)`不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
         ![](../../../../figures/datacopypad.png)
 
@@ -222,7 +225,7 @@
 
         blockLen为48，每个连续传输数据块包含48字节；srcStride为0，源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间无间隔，注意数据块包含leftPadding/rightPadding数据。
 
-        blockLen + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，每个连续传输数据块都会在右侧填充16字节。目的操作数的总长度为192字节。
+        本例采用1字节元素类型，blockCount为3。`blockLen + (leftPadding + rightPadding) * sizeof(T)`满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，每个连续传输数据块都会在右侧填充16字节。目的操作数的总长度为192字节。
 
     - 示例2：Compact模式
 
