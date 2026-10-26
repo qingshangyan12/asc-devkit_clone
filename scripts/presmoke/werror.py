@@ -43,7 +43,6 @@ def command_env(env: Mapping[str, str], enabled: bool) -> dict[str, str]:
 
 
 def append_werror(value: str) -> str:
-    flags = value.split()
-    if "-Werror" not in flags:
-        flags.append("-Werror")
-    return " ".join(flags)
+    if "-Werror" in value.split():
+        return value
+    return f"{value.rstrip()} -Werror" if value.strip() else "-Werror"
