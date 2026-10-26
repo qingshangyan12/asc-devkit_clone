@@ -54,7 +54,6 @@ if(ENABLE_TEST)
   add_subdirectory(tests)
 endif()
 
-
 if(PACKAGE_OPEN_PROJECT)
   cmake_minimum_required(VERSION 3.16)
   project(asc-devkit VERSION 1.0.0)
