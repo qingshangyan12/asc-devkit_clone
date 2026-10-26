@@ -341,6 +341,32 @@ HcclResult AllocAndCopyOpResCtx(
     CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
     return HCCL_SUCCESS;
 }
+
+HcclResult AllocAndCopyOpResCtxA5Aicpu(
+    HcclComm comm, const std::string& ctxTag, CommEngine commEngine, const OpResCtxA5Aicpu& resCtx,
+    void** opResCtxPtr)
+{
+    std::string tagOpResCtx = ctxTag + "_opResCtxA5";
+    constexpr uint64_t opResCtxSize = sizeof(OpResCtxA5Aicpu);
+    uint64_t allocatedSize = opResCtxSize;
+    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), commEngine, opResCtxPtr, &allocatedSize) == HCCL_SUCCESS) {
+        CHK_PRT_RET(
+            allocatedSize < opResCtxSize,
+            HCCL_ERROR(
+                "A5 AICPU OpResCtx size[%llu] exceeds capacity[%llu].",
+                static_cast<unsigned long long>(opResCtxSize),
+                static_cast<unsigned long long>(allocatedSize)),
+            HCCL_E_MEMORY);
+    } else {
+        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), commEngine, opResCtxSize, opResCtxPtr));
+    }
+
+    HCCL_INFO(
+        "HcclAllocOpResCtxA5Aicpu ctxAddr[%p], ctxSize[%llu].", *opResCtxPtr,
+        static_cast<unsigned long long>(opResCtxSize));
+    CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
+    return HCCL_SUCCESS;
+}
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
@@ -364,6 +390,29 @@ HcclResult HcclAllocOpResCtx(
     CHK_RET(AllocWorkspaceMemory(comm, ctxTag, commEngine, resCtx));
     CHK_RET(FillRankInfo(comm, resCtx));
     return AllocAndCopyOpResCtx(comm, ctxTag, commEngine, resCtx, opResCtxPtr);
+}
+
+HcclResult HcclAllocOpResCtxA5Aicpu(
+    HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr)
+{
+    CHK_PTR_NULL(opResCtxPtr);
+
+    OpResCtx legacyResCtx{};
+    CHK_RET(AllocOpParamMemory(comm, ctxTag, opParam, commEngine, 0, legacyResCtx));
+    CHK_RET(AllocWorkspaceMemory(comm, ctxTag, commEngine, legacyResCtx));
+    CHK_RET(FillRankInfo(comm, legacyResCtx));
+
+    OpResCtxA5Aicpu resCtx{};
+    resCtx.magic = OP_RES_CTX_A5_AICPU_MAGIC;
+    resCtx.workspace = legacyResCtx.workSpace;
+    resCtx.workspaceSize = legacyResCtx.workSpaceSize;
+    resCtx.rankId = static_cast<uint32_t>(legacyResCtx.rankId);
+    resCtx.rankSize = static_cast<uint32_t>(legacyResCtx.rankSize);
+    resCtx.algNum = 1U;
+    resCtx.opType = static_cast<uint32_t>(opParam.opType);
+    resCtx.algInfo[0] = legacyResCtx.algInfo[0];
+    resCtx.opParamSize[0] = legacyResCtx.opParamSize[0];
+    return AllocAndCopyOpResCtxA5Aicpu(comm, ctxTag, commEngine, resCtx, opResCtxPtr);
 }
 
 HcclResult HcclAllocOpResCtx(

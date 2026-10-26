@@ -94,7 +94,7 @@ struct RankAcquireOutcome {
     HcclResult secondAcquireRet = HCCL_E_UNAVAIL;
     uint32_t ccResCtxSize = 0U;
     bool reusedCtx = false;
-    OpResCtx opResCtx{};
+    OpResCtxA5Aicpu opResCtx{};
     OpParam opParam{};
 };
 
@@ -198,7 +198,7 @@ protected:
                     outcome.acquireRet = static_cast<HcclResult>(
                         Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &outcome.ccResCtxSize));
                     if (outcome.acquireRet == HCCL_SUCCESS && ccResCtx != nullptr) {
-                        outcome.opResCtx = *static_cast<const OpResCtx*>(ccResCtx);
+                        outcome.opResCtx = *static_cast<const OpResCtxA5Aicpu*>(ccResCtx);
                         if (outcome.opResCtx.algInfo[0].opParam != 0U) {
                             outcome.opParam = *reinterpret_cast<const OpParam*>(outcome.opResCtx.algInfo[0].opParam);
                         }
@@ -327,11 +327,11 @@ TEST_F(AicpuMc2Test, AcquireAicpuTsBuildsContextDecoupledOpParam)
     for (const auto& outcome : outcomes) {
         ASSERT_EQ(outcome.initRet, HCCL_SUCCESS);
         ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
-        EXPECT_EQ(outcome.ccResCtxSize, sizeof(OpResCtx));
-        EXPECT_EQ(outcome.opResCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+        EXPECT_EQ(outcome.ccResCtxSize, sizeof(OpResCtxA5Aicpu));
+        EXPECT_EQ(outcome.opResCtx.opType, static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
         EXPECT_EQ(outcome.opResCtx.rankSize, PAIR_RANK_SIZE);
-        EXPECT_NE(outcome.opResCtx.workSpace, 0U);
-        EXPECT_NE(outcome.opResCtx.workSpaceSize, 0U);
+        EXPECT_NE(outcome.opResCtx.workspace, 0U);
+        EXPECT_NE(outcome.opResCtx.workspaceSize, 0U);
         EXPECT_EQ(outcome.opResCtx.opParamSize[0], sizeof(OpParam));
         EXPECT_NE(outcome.opResCtx.algInfo[0].opParam, 0U);
 
@@ -340,7 +340,7 @@ TEST_F(AicpuMc2Test, AcquireAicpuTsBuildsContextDecoupledOpParam)
         // engine (opParam.engine) to the thread scheduled variant. The host-side launch dispatch key
         // (opResCtx.commEngine) stays COMM_ENGINE_AICPU, which is what Mc2CcKernelLaunch switches on.
         EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
-        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
         EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
         // The AICPU path is stream decoupled: the launch stream is handed to Mc2CcKernelLaunch instead.
@@ -365,9 +365,9 @@ TEST_F(AicpuMc2Test, AcquireAcceptsPlainAicpuCommEngine)
 
     for (const auto& outcome : outcomes) {
         ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
-        EXPECT_EQ(outcome.ccResCtxSize, sizeof(OpResCtx));
-        EXPECT_EQ(outcome.opResCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.ccResCtxSize, sizeof(OpResCtxA5Aicpu));
+        EXPECT_EQ(outcome.opResCtx.opType, static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
         EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);

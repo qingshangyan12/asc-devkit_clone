@@ -21,7 +21,7 @@
 #include "platform_v310/hccl_aicpu.h"
 #include "platform_v960/hccl_ccu_v0.h"
 #elif __NPU_ARCH__ == 3510
-#include "platform_v310/hccl_aicpu.h"
+#include "platform_v310/hccl_aicpu_a5.h"
 #include "platform_v310/hccl_ccu_v0.h"
 #endif
 #include "../common/hccl_impl_dfx.h"
