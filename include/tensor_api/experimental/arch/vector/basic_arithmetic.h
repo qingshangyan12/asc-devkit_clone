@@ -18,6 +18,7 @@
 
 #include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
@@ -423,11 +424,6 @@ __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_ten
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-enum class div_algo {
-    INTRINSIC,
-    PRECISION_0ULP_FTZ_TRUE
-};
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic

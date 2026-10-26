@@ -219,8 +219,8 @@ __aicore__ inline void TestSoftwareDivModes()
 
     auto default_dst = asc::te::experimental::div(src0, src1);
     auto precise_dst = asc::te::experimental::div<true>(src0, src1);
-    auto ftz_dst = asc::te::experimental::div<true, asc::te::experimental::div_algo::PRECISION_0ULP_FTZ_TRUE>(
-        src0, src1);
+    auto ftz_dst =
+        asc::te::experimental::div<true, asc::te::experimental::div_algo::PRECISION_0ULP_FTZ_TRUE>(src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(default_dst), reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<decltype(precise_dst), reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<decltype(ftz_dst), reg_type<float>>);
