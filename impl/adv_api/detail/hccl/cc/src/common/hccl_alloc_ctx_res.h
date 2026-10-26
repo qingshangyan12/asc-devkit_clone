@@ -47,6 +47,7 @@ constexpr uint32_t MAX_HCOM_NUM = 3U;
 constexpr uint32_t INIT_TILING_VERSION = 100U;
 constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
+constexpr uint32_t A5_AICPU_ALG_NUM = 2U;
 
 struct Mc2ServerCfg {
     uint32_t version;
@@ -63,6 +64,18 @@ using Mc2CcTilingInner = HcclApi::Mc2CcTilingInner;
 struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
+};
+
+struct OpResCtxA5Aicpu {
+    uint64_t magic;
+    uint64_t workspace;
+    uint64_t workspaceSize;
+    uint32_t rankId;
+    uint32_t rankSize;
+    uint32_t algNum;
+    uint32_t opType;
+    AlgInfo algInfo[A5_AICPU_ALG_NUM];
+    uint64_t opParamSize[A5_AICPU_ALG_NUM];
 };
 
 struct OpResCtx {
@@ -159,6 +172,9 @@ HcclResult HcclAllocOpResCtx(
     const void* ccTilingList[], void** opResCtxPtr);
 
 HcclResult HcclAllocOpResCtx(
+    HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr);
+
+HcclResult HcclAllocOpResCtxA5Aicpu(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr);
 
 // AllToAll适配AllToAllV

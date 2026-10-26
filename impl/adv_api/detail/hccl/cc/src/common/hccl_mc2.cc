@@ -828,7 +828,8 @@ HcclResult Mc2AcquireCcResCtxAicpu(HcclComm comm, uint8_t ccType, void* ccArgs, 
     CHK_RET(PrepareCcOpParam(ccType, args, topoTag, commName, rankSize, opParam));
     CHK_RET(PrepareCcAlgResources(comm, args.algConfig.c_str(), opParam, true));
     // The resource storage engine is AICPU; the selected execution engine is stored in opParam.
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParam, OpExecuteConfigToCommEngine(args.commEngine), &result));
+    CHK_RET(HcclAllocOpResCtxA5Aicpu(
+        comm, ctxTag, opParam, OpExecuteConfigToCommEngine(args.commEngine), &result));
 
     const std::string srcDataTypeName = GetDataTypeEnumStr(args.srcDataType);
     const std::string dstDataTypeName = GetDataTypeEnumStr(args.dstDataType);
@@ -840,13 +841,26 @@ HcclResult Mc2AcquireCcResCtxAicpu(HcclComm comm, uint8_t ccType, void* ccArgs, 
         static_cast<uint32_t>(args.dstDataType), static_cast<uint32_t>(opParam.engine));
     CHK_RET(LogHcclExit("Mc2AcquireCcResCtx", ctxTag.c_str(), startut));
     *ccResCtx = result;
-    *ccResCtxSize = sizeof(OpResCtx);
+    *ccResCtxSize = sizeof(OpResCtxA5Aicpu);
     return HCCL_SUCCESS;
 }
 
 } // namespace
 
 namespace {
+CcuResult IsA5AicpuCtx(const void* opResCtx, bool& isA5Aicpu)
+{
+    isA5Aicpu = false;
+    uint64_t magic = 0U;
+    aclError aclRet = aclrtMemcpy(&magic, sizeof(magic), opResCtx, sizeof(magic), ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR("[Mc2CcKernelLaunch] aclrtMemcpy D2H ctx magic failed, ret[%d], src[%p].", aclRet, opResCtx),
+        CCU_E_INTERNAL);
+    isA5Aicpu = magic == HcclApi::OP_RES_CTX_A5_AICPU_MAGIC;
+    return CCU_SUCCESS;
+}
+
 CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
@@ -865,6 +879,33 @@ CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
         HCCL_ERROR(
             "invalid op resource ctx, workSpace[%llu], workSpaceSize[%llu].", opResHost.workSpace,
             opResHost.workSpaceSize),
+        CCU_E_PARA);
+    return CCU_SUCCESS;
+}
+
+CcuResult CopyA5AicpuCtxToHost(const void* opResCtx, OpResCtxA5Aicpu& opResHost)
+{
+    HCCL_INFO("[Mc2CcKernelLaunch]Obtain A5 AICPU OpResCtx.");
+    aclError aclRet =
+        aclrtMemcpy(&opResHost, sizeof(OpResCtxA5Aicpu), opResCtx, sizeof(OpResCtxA5Aicpu), ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[Mc2CcKernelLaunch] aclrtMemcpy D2H A5 AICPU ctx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
+            sizeof(OpResCtxA5Aicpu)),
+        CCU_E_INTERNAL);
+    CHK_PRT_RET(
+        opResHost.magic != HcclApi::OP_RES_CTX_A5_AICPU_MAGIC,
+        HCCL_ERROR("invalid A5 AICPU ctx magic[%llu].", static_cast<unsigned long long>(opResHost.magic)),
+        CCU_E_PARA);
+    CHK_PRT_RET(
+        opResHost.algInfo[0].opParam == 0U,
+        HCCL_ERROR("invalid A5 AICPU ctx, opParam[%llu].", opResHost.algInfo[0].opParam), CCU_E_PARA);
+    CHK_PRT_RET(
+        opResHost.workspace == 0U || opResHost.workspaceSize == 0U,
+        HCCL_ERROR(
+            "invalid A5 AICPU ctx, workspace[%llu], workspaceSize[%llu].", opResHost.workspace,
+            opResHost.workspaceSize),
         CCU_E_PARA);
     return CCU_SUCCESS;
 }
@@ -1263,9 +1304,33 @@ uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx, uint32_t ccResCtxSize)
 {
     CHK_PTR_NULL(ccResCtx);
+    if (ccResCtxSize < sizeof(OpResCtxA5Aicpu)) {
+        HCCL_ERROR(
+            "[Mc2CcKernelLaunch] invalid ccResCtxSize[%u], expected at least[%zu].", ccResCtxSize,
+            sizeof(OpResCtxA5Aicpu));
+        return HCCL_E_PARA;
+    }
+
+    bool isA5AicpuCtx = false;
+    CcuResult magicRet = IsA5AicpuCtx(ccResCtx, isA5AicpuCtx);
+    if (magicRet != CCU_SUCCESS) {
+        return HCCL_E_INTERNAL;
+    }
+    if (isA5AicpuCtx) {
+        OpResCtxA5Aicpu a5Ctx{};
+        CcuResult a5Ret = CopyA5AicpuCtxToHost(ccResCtx, a5Ctx);
+        if (a5Ret != CCU_SUCCESS) {
+            return HCCL_E_INTERNAL;
+        }
+        CHK_PTR_NULL(stream);
+        CHK_RET(LaunchAicpuKernel(stream, ccResCtx));
+        return HCCL_SUCCESS;
+    }
+
     if (ccResCtxSize < sizeof(OpResCtx)) {
         HCCL_ERROR(
-            "[Mc2CcKernelLaunch] invalid ccResCtxSize[%u], expected at least[%zu].", ccResCtxSize, sizeof(OpResCtx));
+            "[Mc2CcKernelLaunch] invalid legacy ctx size[%u], expected at least[%zu].", ccResCtxSize,
+            sizeof(OpResCtx));
         return HCCL_E_PARA;
     }
 

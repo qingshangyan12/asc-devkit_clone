@@ -224,6 +224,21 @@ struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
 };
+
+// Lightweight context for the A5 AICPU path. magic identifies the compact layout.
+struct OpResCtxA5Aicpu {
+    uint64_t magic;
+    uint64_t workspace;
+    uint64_t workspaceSize;
+    uint32_t rankId;
+    uint32_t rankSize;
+    uint32_t algNum;
+    uint32_t opType;
+    AlgInfo algInfo[HCCL_ALG_SUPPORT_NUM];
+    uint64_t opParamSize[HCCL_ALG_SUPPORT_NUM];
+};
+
+constexpr uint64_t OP_RES_CTX_A5_AICPU_MAGIC = 0x4135414943505500ULL;
 struct OpResCtx {
     uint64_t version;
     uint64_t workspace;
