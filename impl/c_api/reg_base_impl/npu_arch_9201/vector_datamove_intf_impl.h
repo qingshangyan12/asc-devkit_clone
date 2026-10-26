@@ -98,49 +98,49 @@ __aicore__ inline void asc_scatter_ub2gm(
 
 // ==========asc_gather_gm2ub===========
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool enable_constant_pad,
     __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool enable_constant_pad,
     __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool enable_constant_pad,
     __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool enable_constant_pad,
     __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
