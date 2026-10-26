@@ -115,6 +115,7 @@
     - [DCache访问优化](./simt_operator_optimization/memory_access/dcache_access.md)
     - [通过类型对齐提升搬运效率](./simt_operator_optimization/memory_access/type_alignment_transfer.md)
     - [使用短向量类型提升效率](./simt_operator_optimization/memory_access/short_vector_efficiency.md)
+    - [使用SoA布局提升哈希表查找效率](./simt_operator_optimization/memory_access/soa_layout_efficiency.md)
   - [执行配置](./simt_operator_optimization/execution_config/execution_config.md)
     - [线程块数量配置优化](./simt_operator_optimization/execution_config/thread_block_config.md)
     - [合理配置线程数避免寄存器溢出](./simt_operator_optimization/execution_config/thread_count_register_overflow.md)
