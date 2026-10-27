@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -48,7 +49,10 @@ def missing_required_dirs(ascend_home_path: Path) -> list[str]:
 
 def render_template(ascend_home_path: Path, npu_arch: str) -> str:
     template = TEMPLATE.read_text(encoding="utf-8")
-    return template.replace("@ASCEND_HOME_PATH@", ascend_home_path.as_posix()).replace("@NPU_ARCH@", npu_arch)
+    # The path is interpolated inside double-quoted YAML strings. JSON
+    # escaping is compatible with this YAML scalar style.
+    escaped_path = json.dumps(ascend_home_path.as_posix(), ensure_ascii=False)[1:-1]
+    return template.replace("@NPU_ARCH@", npu_arch).replace("@ASCEND_HOME_PATH@", escaped_path)
 
 
 def configure_logging() -> None:
