@@ -1633,22 +1633,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __isnanx2(bfloat16x2_t x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __haddx2(const bfloat16x2_t x, const bfloat16x2_t y)
 {
-    return x + y;
+    bfloat16x2_t ret = {__hadd(x.x, y.x), __hadd(x.y, y.y)};
+    return ret;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hsubx2(const bfloat16x2_t x, const bfloat16x2_t y)
 {
-    return x - y;
+    bfloat16x2_t ret = {__hsub(x.x, y.x), __hsub(x.y, y.y)};
+    return ret;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hmulx2(const bfloat16x2_t x, const bfloat16x2_t y)
 {
-    return x * y;
+    bfloat16x2_t ret = {__hmul(x.x, y.x), __hmul(x.y, y.y)};
+    return ret;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hdivx2(const bfloat16x2_t x, const bfloat16x2_t y)
 {
-    return x / y;
+    bfloat16x2_t ret = {__hdiv(x.x, y.x), __hdiv(x.y, y.y)};
+    return ret;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __habsx2(const bfloat16x2_t x)

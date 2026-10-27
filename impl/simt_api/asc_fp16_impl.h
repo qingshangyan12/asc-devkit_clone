@@ -1686,13 +1686,37 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hminx2(const half2 x, const half2 
     return h;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __haddx2(const half2 x, const half2 y) { return x + y; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __haddx2(const half2 x, const half2 y)
+{
+    half2 h;
+    h.x = __hadd(x.x, y.x);
+    h.y = __hadd(x.y, y.y);
+    return h;
+}
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hsubx2(const half2 x, const half2 y) { return x - y; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hsubx2(const half2 x, const half2 y)
+{
+    half2 h;
+    h.x = __hsub(x.x, y.x);
+    h.y = __hsub(x.y, y.y);
+    return h;
+}
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hmulx2(const half2 x, const half2 y) { return x * y; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hmulx2(const half2 x, const half2 y)
+{
+    half2 h;
+    h.x = __hmul(x.x, y.x);
+    h.y = __hmul(x.y, y.y);
+    return h;
+}
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hdivx2(const half2 x, const half2 y) { return x / y; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hdivx2(const half2 x, const half2 y)
+{
+    half2 h;
+    h.x = __hdiv(x.x, y.x);
+    h.y = __hdiv(x.y, y.y);
+    return h;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __habsx2(const half2 x)
 {
@@ -1710,7 +1734,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hfmax2(const half2 x, const half2 
     return h;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hnegx2(const half2 x) { return -x; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hnegx2(const half2 x)
+{
+    half2 h;
+    h.x = __hneg(x.x);
+    h.y = __hneg(x.y);
+    return h;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hadd(const half x, const half y) { return x + y; }
 

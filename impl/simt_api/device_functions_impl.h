@@ -1926,15 +1926,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_dcci_entire(void* dst) { dcci(dst
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long __mul64hi(long long x, long long y)
 {
-    bool x_neg = x < 0;
-    bool y_neg = y < 0;
-    unsigned long long ures = __umul64hi((unsigned long long&)x, (unsigned long long&)y);
-    long long res = (long long&)ures;
-    if (x_neg)
-        res -= (long long&)y;
-    if (y_neg)
-        res -= (long long&)x;
-    return res;
+    constexpr unsigned long long LOW = 0xFFFFFFFFULL;
+    const unsigned long long ux = static_cast<unsigned long long>(x);
+    const unsigned long long uy = static_cast<unsigned long long>(y);
+    const unsigned long long xLow = ux & LOW;
+    const unsigned long long xHigh = ux >> 32;
+    const unsigned long long yLow = uy & LOW;
+    const unsigned long long yHigh = uy >> 32;
+    const unsigned long long lowProduct = xLow * yLow;
+    const unsigned long long crossProduct = xLow * yHigh + xHigh * yLow;
+    const unsigned long long highProduct = xHigh * yHigh + (crossProduct >> 32) + (lowProduct >> 32);
+    return static_cast<long long>(highProduct >> 32);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __saturatef(float x)
