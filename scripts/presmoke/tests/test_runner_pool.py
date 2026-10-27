@@ -16,6 +16,7 @@ from __future__ import annotations
 import contextlib
 import io
 import tempfile
+import io
 import threading
 import time
 import unittest
@@ -28,6 +29,7 @@ from presmoke.report import write_json, write_markdown
 from presmoke.runner import NpuSlotPool, PipelineOptions, RunOptions
 from presmoke.runner import run_cell_with_options
 from presmoke.runner import run_cells_pipeline_with_options
+from presmoke.runner import _run_command
 
 
 def cell(tmp: Path, name: str, mode: str = "npu", commands=None) -> Cell:
@@ -44,6 +46,26 @@ def source_cell(tmp: Path, source: str, name: str, mode: str = "npu", commands=N
 
 
 class RunnerPoolTest(unittest.TestCase):
+    def test_case_runner_executes_when_project_path_contains_spaces(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="presmoke path '$x; ") as tmp:
+            root = Path(tmp)
+            runner = root / "scripts/presmoke/cases/demo/run.sh"
+            runner.parent.mkdir(parents=True)
+            runner.write_text("#!/usr/bin/env bash\nprintf 'ran %s\\n' \"$1\"\n", encoding="utf-8")
+            manifest = root / "scripts/presmoke/reports/case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                '[{"case":"demo","supported_archs":["dav-2201"],"supported_modes":["npu"]}]', encoding="utf-8"
+            )
+            cells, _, _ = build_case_runner_cells_with_skips(
+                root, CaseRunnerOptions(arch="dav-2201", modes=["npu"], includes=[], excludes=[])
+            )
+            self.assertEqual(len(cells), 1)
+            cells[0].example.path.mkdir(parents=True)
+            log = io.StringIO()
+            self.assertEqual(_run_command(cells[0].commands[1], cells[0].example.path, log, timeout=5), 0)
+            self.assertIn("ran build", log.getvalue())
+
     def test_custom_op_starts_after_static_lib_finishes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
