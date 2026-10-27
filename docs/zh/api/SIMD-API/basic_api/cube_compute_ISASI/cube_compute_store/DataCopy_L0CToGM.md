@@ -23,6 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="x90" id9 -->
+- KirinX90处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="9020" id10 -->
+- Kirin9020处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="9050" id11 -->
+- Kirin9030处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToGM_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>
@@ -135,8 +144,8 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+        // 设置CTRL[48]为0，开启浮点数饱和模式。
+        AscendC::SetCtrlSpr<48, 48>(0);
         ```
 
     对于整数类型只有饱和模式。
@@ -144,7 +153,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 <!-- npu="950" id20 -->
 - Ascend 950PR&950DT系列产品特殊值/边界值约束说明：
 
-    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式，该模式由\[48\]直接决定；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
@@ -152,8 +161,8 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+        // 该模式由CTRL[48]直接决定，不受CTRL[60]限制。
+        AscendC::SetCtrlSpr<48, 48>(0);
         ```
 
     对于整数类型只有饱和模式。
