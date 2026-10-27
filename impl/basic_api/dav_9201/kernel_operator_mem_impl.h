@@ -104,7 +104,7 @@ enum class UnitShiftOffset {
     BMU_SHIFT_16KB = 14,
 };
 
-constexpr int BMUOffsetMax = 24;
+constexpr int BMUOffsetMax = 4;
 
 constexpr int BMUOffsetShiftByte = 8;
 template <MemoryType hardType>
@@ -224,7 +224,7 @@ __aicore__ inline void BmuSegmentFree(uint64_t addr, const uint32_t bufLen)
 template <int offset, MemoryType hardType, class Argc, class... Args>
 __aicore__ inline void InitSegmentConfig(uint64_t config, Argc argc, Args... args)
 {
-    static_assert(offset <= BMUOffsetMax, "BMU only support less than 4 Seg Pool");
+    static_assert(offset < BMUOffsetMax, "BMU only support less than 4 Seg Pool");
     auto sliceConfig = TraitsSliceConfig(argc);
     auto newConfig = BmuSegmentLen2Uint<hardType>(sliceConfig);
     union {
