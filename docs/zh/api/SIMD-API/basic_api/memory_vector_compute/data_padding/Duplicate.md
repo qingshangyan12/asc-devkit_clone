@@ -29,6 +29,12 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9050,kirin1,kirin2,kirin3" id27 -->
+- Kirin9050处理器系列产品：支持
+- KirinDev0001处理器系列产品：支持
+- KirinDev0002处理器系列产品：支持
+- KirinDev0003处理器系列产品：支持
+<!-- end id27 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
