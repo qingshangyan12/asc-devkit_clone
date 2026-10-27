@@ -31,7 +31,7 @@ __aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return 
 __aicore__ constexpr inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 #if defined(__NPU_ARCH__) &&                                                                                     \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
          (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
          (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)
@@ -537,7 +537,7 @@ using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
 #if defined(__NPU_ARCH__) &&                                                                                     \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
          (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)
 namespace AscendC {
@@ -589,7 +589,7 @@ __aicore__ inline void VF_CALL(Args&&... args)
 {
 #if (                                                                                                  \
     defined(__NPU_ARCH__) &&                                                                           \
-    (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) || \
+    (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113)) || \
     defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__ { funcPtr(args...); }
 #endif
