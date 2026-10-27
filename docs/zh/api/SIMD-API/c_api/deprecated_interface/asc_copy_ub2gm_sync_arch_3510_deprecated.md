@@ -1,18 +1,32 @@
 ---
 okftype: reference.api
-description: "已废弃的同步搬运接口，将数据从Unified Buffer（UB）搬运到Global Memory（GM），前n个数据搬运时数据大小要求32字节对齐且src_stride不等于burst_len时也要求对齐，替代接口为非同步接口asc_copy_ub2gm和同步接口asc_sync。"
+description: "已废弃的同步版 UB 到 GM 搬运接口的 950PR&950DT 变体，按字节数搬运连续数据并在返回前同步等待，替代方案为 asc_copy_ub2gm 加 asc_sync。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
-  - traits: [aligned_transfer]
+  - operations: [store]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步场景"
+    condition: "替代方案中的同步部分"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "与其他指令存在 UB 地址重叠时需插入的同步指令"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "与其他指令存在 UB 地址重叠时需插入的同步指令"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
+    condition: "正文声明的替代非同步接口"
 version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.2.0 起 include 标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_copy_ub2gm and asc_sync)；声明保留，属 deprecated 而非 removed。"
 ---
 # asc_copy_ub2gm_sync_arch_3510（废弃）
 

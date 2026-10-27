@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "概述将矢量数据寄存器、掩码寄存器与非对齐寄存器数据写入Unified Buffer的各类搬出接口，按对齐与非对齐、Post Update等方式分类，并说明目的地址对齐要求及配套后处理接口。"
+description: "Reg 数据搬出概述页：汇总把矢量数据寄存器、掩码寄存器与非对齐寄存器写入 UB 的接口，按对齐与非对齐、立即数偏移、地址寄存器偏移、Post Update 等模式分类并列出各自的对齐要求，接口在 Vector Function 内使用且仅在 AIV 生效。"
 ---
 # Reg数据搬出概述
 

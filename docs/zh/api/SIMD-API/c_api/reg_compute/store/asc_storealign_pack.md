@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将矢量数据寄存器或掩码寄存器中的数据按掩码压缩搬出到Unified Buffer，有效元素的低半部分bit数据写入压缩后的目的位置，目的地址需按32字节或16字节对齐。"
+description: "把矢量或掩码寄存器数据压缩搬出到UB：矢量场景按mask把有效元素低半部分bit连续写入，掩码场景每间隔1bit丢弃1bit压缩存储，各提供三种偏移模式。"
 tag:
   - roles: [data_movement]
   - operations: [compression, store]
@@ -8,16 +8,23 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "正文据此说明矢量数据寄存器/掩码寄存器"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "通用约束"
+    kind: related
+    condition: "正文据此引用 Reg 矢量计算通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: requires
-    condition: "地址寄存器偏移压缩搬出模式"
+    kind: related
+    condition: "地址寄存器偏移模式必须先调用它生成偏移"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    kind: related
+    condition: "与其他指令存在数据依赖时插入同步指令串行化"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增 vector_bool 输出重载：CANN 9.1.0 Release Notes 明确列出 asc_storealign_pack 新增 vector_bool 输出重载，对应正文掩码寄存器压缩搬出的三种模式（偏移单位由元素改为字节）。"
 ---
 # asc_storealign_pack
 

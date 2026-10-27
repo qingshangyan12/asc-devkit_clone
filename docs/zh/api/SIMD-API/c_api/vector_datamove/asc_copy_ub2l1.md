@@ -1,21 +1,19 @@
 ---
 okftype: reference.api
-description: "将UB数据搬入L1 Buffer，支持连续搬运和高维切分搬运；起始地址需32字节对齐，高维模式下数据块长度与间隔以DataBlock（32字节）为单位。"
+description: "把数据从Unified Buffer搬运到L1 Buffer，提供按size的连续搬运与按burst_count、burst_len及DataBlock间隔的高维切分搬运两种原型，连续模式size需为32的整数倍且在32到4095乘32字节之间。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+  - traits: [aligned_transfer, datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "存储单元空间大小与对齐要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    condition: "需遵循存储单元说明与对齐要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
     kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    condition: "与其他指令存在数据依赖时需插入同步指令"
 version: ">=9.1.0"
+version_changes: []
 ---
 # asc_copy_ub2l1
 

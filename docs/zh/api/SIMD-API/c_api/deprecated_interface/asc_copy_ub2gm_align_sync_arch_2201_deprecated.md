@@ -1,18 +1,27 @@
 ---
 okftype: reference.api
-description: "已废弃的同步搬运接口，将数据从Unified Buffer（UB）搬运到Global Memory（GM）并支持8位/16位/32位分块拷贝，非32字节对齐数据会自动补齐至32字节，替代接口为非同步接口asc_copy_ub2gm_align和同步接口asc_sync。"
+description: "已废弃的同步版 UB 到 GM 非对齐搬运接口，支持 8/16/32/64 位分块拷贝并自动丢弃 dummy 补齐数据，面向 Atlas A3 与 Atlas A2，替代方案为 asc_copy_ub2gm_align 加 asc_sync。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
-  - traits: [aligned_transfer, padding]
+  - operations: [store]
+  - traits: [unaligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步场景"
+    condition: "替代方案中的同步部分"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
+    condition: "正文声明的替代非同步接口"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.2.0 起 include 标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_copy_ub2gm_align and asc_sync)；声明保留，属 deprecated 而非 removed，页面未设置可用上限。"
 ---
 # asc_copy_ub2gm_align_sync_arch_2201（废弃）
 

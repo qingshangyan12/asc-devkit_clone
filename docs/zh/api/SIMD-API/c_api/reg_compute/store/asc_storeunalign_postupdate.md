@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将矢量数据寄存器或掩码寄存器中的数据搬出到非32字节对齐的UB地址，提供立即数偏移、地址寄存器偏移和掩码三种模式，Post Update模式搬出后自动更新目的地址，尾块暂存至非对齐寄存器。"
+description: "把矢量或掩码寄存器数据连续搬出到非32字节对齐的UB地址并自动更新目的地址或地址寄存器，提供立即数偏移与地址寄存器偏移两种模式。"
 tag:
   - roles: [data_movement]
   - operations: [store]
@@ -8,22 +8,39 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "正文据此说明矢量数据寄存器与非对齐寄存器"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    kind: related
+    condition: "正文据此引用 Reg 矢量计算通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: requires
-    condition: "地址寄存器偏移搬出模式的addr_reg须预先构造"
+    kind: related
+    condition: "地址寄存器偏移模式必须先调用它生成偏移"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    kind: related
+    condition: "与其他指令存在数据依赖时插入同步指令串行化"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
-    kind: requires
-    condition: "掩码寄存器连续搬出模式与地址寄存器偏移搬出模式须使用其后处理接口收尾"
+    kind: related
+    condition: "地址寄存器偏移模式与掩码模式需配合该后处理接口收尾"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
-    kind: requires
-    condition: "立即数偏移搬出模式须使用其后处理接口收尾"
+    kind: related
+    condition: "立即数偏移模式需配合该后处理接口收尾"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: behavior_fixed
+    scope: "page"
+    scope_basis: kind_default
+    note: "补齐地址更新重载：CANN 9.1.0 Release Notes 记载在把 asc_storeunalign 目的参数修正为普通指针的同时，补齐 asc_storeunalign_postupdate 的地址更新重载，与正文立即数偏移模式按 count 更新 dst 指针的形式一致。"
+  - since: "9.1.0"
+    kind: capability_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "新增 int4b_t、vector_int4x2_t 数据重载：CANN 9.1.0 Release Notes 明确列出 asc_storeunalign_postupdate 新增低精度重载，对应正文 dtype 列表中的 int4b_t。"
+  - since: "9.2.0"
+    kind: behavior_fixed
+    scope: "page"
+    scope_basis: kind_default
+    note: "UB 目的地址改为引用传递：CANN 9.2.0 Release Notes 记载 asc_storeunalign_postupdate 的 UB 目的地址改为引用传递，确保接口执行后的更新结果可回写调用方。"
 ---
 # asc_storeunalign_postupdate
 

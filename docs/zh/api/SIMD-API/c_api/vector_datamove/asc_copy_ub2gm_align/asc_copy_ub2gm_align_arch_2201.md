@@ -1,21 +1,24 @@
 ---
 okftype: reference.api
-description: "将UB数据搬出至GM，支持前n个数据搬运和高维切分搬运；搬运长度非32字节对齐时自动补充dummy假数据补齐读取，写入GM时丢弃假数据。"
+description: "在2201架构上把UB数据按非32字节整数倍长度搬出到GM，补齐读取UB后丢弃dummy仅写有效数据，支持前n个数据与Normal模式高维切分。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [aligned_transfer, high_dimensional, padding]
+  - traits: [unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "存储单元空间大小与对齐要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    kind: related
+    condition: "正文据此引用存储单元说明"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    kind: related
+    condition: "有数据依赖时按该页插入同步指令"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增仅传入 dst、src、size 的简化重载：CANN 9.1.0 Release Notes 记载 asc_copy_ub2gm_align（含 _sync）新增简化重载，对应正文前n个数据搬运的三参数形式。"
 ---
 # asc_copy_ub2gm_align
 

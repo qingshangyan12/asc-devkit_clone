@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍NPU架构版本3510通过asc_copy_ub2ub在UB内部复制数据，说明连续与高维切分两种模式的参数取值、对齐截断规则，并用示例说明源目的DataBlock重叠判断、容量限制及PIPE_V流水同步要求。"
+description: "介绍NPU架构3510上使用asc_copy_ub2ub在Unified Buffer内部搬运数据的连续与高维切分两种模式，说明各自的参数单位、对齐与取值范围、地址重叠判定规则以及UB容量和PIPE_V同步约束。"
 ---
 # UB与UB数据搬运
 
