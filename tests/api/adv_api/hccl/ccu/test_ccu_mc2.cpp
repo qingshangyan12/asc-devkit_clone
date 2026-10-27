@@ -1082,11 +1082,11 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx;
     resourceCtx.DeSerialize(seq);
 
-    // kfcServerArgs应包含6个uint64_t元素（xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token）
-    // AcquireAlgResources 预填充所有6字段（token 占位符为0）
+    // kfcServerArgs应包含7个uint64_t元素（xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token, subKernelPc）
+    // AcquireAlgResources 预填充所有7字段（token和subKernelPc占位符为0）
     // GetAlgResCcu 内的 HcclAllocAlgResourceCcu 更新占位符为真实 token
-    ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
-    EXPECT_EQ(resourceCtx.kfcServerArgSize, 6U);
+    ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 7U);
+    EXPECT_EQ(resourceCtx.kfcServerArgSize, 7U);
 
     // xnAddr
     EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.xnAddr);
@@ -1101,6 +1101,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     // token (由GetTokenFromBuffInfo获取，stub返回基于CCL buffer地址的非零值)
     uint64_t expectedToken = cclBufferAddr + 0x1234;
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
+    EXPECT_EQ(resourceCtx.kfcServerArgs[6], 0x1000U);
 }
 
 TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
@@ -1156,7 +1157,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     std::vector<char> seq1(ctxRaw1, ctxRaw1 + opParam1.ctxSize);
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx1;
     resourceCtx1.DeSerialize(seq1);
-    EXPECT_EQ(resourceCtx1.kfcServerArgs.size(), 6U);
+    EXPECT_EQ(resourceCtx1.kfcServerArgs.size(), 7U);
     EXPECT_EQ(resourceCtx1.kfcServerArgs[5], expectedToken);
 
     // 2. 第二次调用相同配置（相同algTag）：触发资源复用
@@ -1187,7 +1188,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     std::vector<char> seq2(ctxRaw2, ctxRaw2 + opParam2.ctxSize);
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx2;
     resourceCtx2.DeSerialize(seq2);
-    EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 6U);
+    EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 7U);
     EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken);
 }
 

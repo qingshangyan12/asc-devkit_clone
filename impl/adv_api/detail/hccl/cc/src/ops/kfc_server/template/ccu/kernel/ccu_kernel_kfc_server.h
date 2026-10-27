@@ -40,6 +40,8 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    uint32_t missionIndex = 0;
 };
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
@@ -56,6 +58,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;

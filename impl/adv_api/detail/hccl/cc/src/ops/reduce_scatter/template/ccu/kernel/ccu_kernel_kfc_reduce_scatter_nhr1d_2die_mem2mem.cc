@@ -9,6 +9,9 @@
  */
 
 #include "ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.h"
+#include "../ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
+#include "ccu_func_dl.hpp"
+#include <stdexcept>
 
 namespace mc2_ops_hccl {
 namespace {
@@ -73,13 +76,12 @@ CcuResult InitResource(KfcReduceScatterNhr2DieContext& ctx)
             ctx.axisId, ctx.axisSize);
         return CCU_E_INTERNAL;
     }
-    const uint32_t localIdx = ctx.channelCount;
-    ctx.input.resize(localIdx + 1U);
-    ctx.token.resize(localIdx + 1U);
     for (uint32_t channelIdx = 0; channelIdx < ctx.channelCount; ++channelIdx) {
-        ctx.input[channelIdx] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], INPUT_XN_ID);
-        ctx.token[channelIdx] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], TOKEN_XN_ID);
+        ctx.input.push_back(ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], INPUT_XN_ID));
+        ctx.token.push_back(ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], TOKEN_XN_ID));
     }
+    ctx.input.emplace_back();
+    ctx.token.emplace_back();
     ctx.resourceAllocated = false;
     return CCU_SUCCESS;
 }
@@ -332,79 +334,70 @@ CcuResult DoRepeatReduceScatterNHR(KfcReduceScatterNhr2DieContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcReduceScatterNHR1D2DieMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
-    ccu::Variable die1Size, ccu::Variable die0LastSliceSize, ccu::Variable die1LastSliceSize,
-    ccu::Variable inputSliceStride, ccu::Variable currentRankSliceOutputOffset, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable repeatNumVar, ccu::Variable isInputOutputEqual,
-    ccu::Variable goSizeNormalAddrOffset, ccu::Variable goSizeNormalLoopParam, ccu::Variable goSizeNormalParallelParam,
-    ccu::Variable goSizeNormalResidual, ccu::Variable goSizeLastAddrOffset, ccu::Variable goSizeLastLoopParam,
-    ccu::Variable goSizeLastParallelParam, ccu::Variable goSizeLastResidual, ccu::Variable die1GoSizeNormalAddrOffset,
-    ccu::Variable die1GoSizeNormalLoopParam, ccu::Variable die1GoSizeNormalParallelParam,
-    ccu::Variable die1GoSizeNormalResidual, ccu::Variable die1GoSizeLastAddrOffset,
-    ccu::Variable die1GoSizeLastLoopParam, ccu::Variable die1GoSizeLastParallelParam,
-    ccu::Variable die1GoSizeLastResidual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, uint32_t axisId, uint32_t axisSize, const HcclDataType& dataType, const HcclDataType& outputType,
-    const HcclReduceOp& reduceType, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+CcuResult CcuKfcReduceScatterNHR1D2DieMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<const CcuKernelArgKfcReduceScatterNHR1D2Die*>(arg);
     KfcReduceScatterNhr2DieContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.axisId = axisId;
-    ctx.axisSize = axisSize;
-    ctx.dataType = dataType;
-    ctx.outputDataType = outputType;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.axisId = kernelArg->axisId;
+    ctx.axisSize = kernelArg->axisSize;
+    ctx.dataType = kernelArg->opParam.DataDes.dataType;
+    ctx.outputDataType = kernelArg->opParam.DataDes.outputType;
     if (ctx.outputDataType == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
-        ctx.outputDataType = dataType;
+        ctx.outputDataType = kernelArg->opParam.DataDes.dataType;
     }
-    ctx.reduceOp = reduceType;
-    ctx.stepInfoVector = &stepInfoVector;
-    ctx.rank2ChannelIdx = &rank2ChannelIdx;
+    ctx.reduceOp = kernelArg->opParam.reduceType;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
 
-    const uint32_t localIdx = channelCount;
-    ctx.input[localIdx] = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token[localIdx] = tokenInfo;
-    ctx.die0Size = die0Size;
-    ctx.die1Size = die1Size;
-    ctx.die0LastSliceSize = die0LastSliceSize;
-    ctx.die1LastSliceSize = die1LastSliceSize;
-    ctx.inputSliceStride = inputSliceStride;
-    ctx.currentRankSliceOutputOffset = currentRankSliceOutputOffset;
-    ctx.inputRepeatStride = inputRepeatStride;
-    ctx.outputRepeatStride = outputRepeatStride;
-    ctx.repeatNumVar = repeatNumVar;
-    ctx.isInputOutputEqual = isInputOutputEqual;
-    ctx.goSizeNormal.addrOffset = goSizeNormalAddrOffset;
-    ctx.goSizeNormal.loopParam = goSizeNormalLoopParam;
-    ctx.goSizeNormal.parallelParam = goSizeNormalParallelParam;
-    ctx.goSizeNormal.residual = goSizeNormalResidual;
-    ctx.goSizeLast.addrOffset = goSizeLastAddrOffset;
-    ctx.goSizeLast.loopParam = goSizeLastLoopParam;
-    ctx.goSizeLast.parallelParam = goSizeLastParallelParam;
-    ctx.goSizeLast.residual = goSizeLastResidual;
-    ctx.die1GoSizeNormal.addrOffset = die1GoSizeNormalAddrOffset;
-    ctx.die1GoSizeNormal.loopParam = die1GoSizeNormalLoopParam;
-    ctx.die1GoSizeNormal.parallelParam = die1GoSizeNormalParallelParam;
-    ctx.die1GoSizeNormal.residual = die1GoSizeNormalResidual;
-    ctx.die1GoSizeLast.addrOffset = die1GoSizeLastAddrOffset;
-    ctx.die1GoSizeLast.loopParam = die1GoSizeLastLoopParam;
-    ctx.die1GoSizeLast.parallelParam = die1GoSizeLastParallelParam;
-    ctx.die1GoSizeLast.residual = die1GoSizeLastResidual;
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            const uint32_t localIdx = ctx.channelCount;
+            ctx.input[localIdx] = args[1];
+            ctx.output = args[2];
+            ctx.token[localIdx] = args[KFC_FUNC_TOKEN_ARG_INDEX];
+            ctx.die0Size = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE0_SIZE)];
+            ctx.die1Size = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_SIZE)];
+            ctx.die0LastSliceSize = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE0_LAST_SLICE_SIZE)];
+            ctx.die1LastSliceSize = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_LAST_SLICE_SIZE)];
+            ctx.inputSliceStride = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_INPUT_SLICE_STRIDE)];
+            ctx.currentRankSliceOutputOffset =
+                args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_CURRENT_RANK_SLICE_OUTPUT_OFFSET)];
+            ctx.inputRepeatStride = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_INPUT_REPEAT_STRIDE)];
+            ctx.outputRepeatStride = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_OUTPUT_REPEAT_STRIDE)];
+            ctx.repeatNumVar = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_REPEAT_NUM_VAR)];
+            ctx.isInputOutputEqual = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_IS_INPUT_OUTPUT_EQUAL)];
+            ctx.goSizeNormal.addrOffset = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_0)];
+            ctx.goSizeNormal.loopParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_1)];
+            ctx.goSizeNormal.parallelParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_2)];
+            ctx.goSizeNormal.residual = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_3)];
+            ctx.goSizeLast.addrOffset = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_0)];
+            ctx.goSizeLast.loopParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_1)];
+            ctx.goSizeLast.parallelParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_2)];
+            ctx.goSizeLast.residual = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_3)];
+            ctx.die1GoSizeNormal.addrOffset = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_0)];
+            ctx.die1GoSizeNormal.loopParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_1)];
+            ctx.die1GoSizeNormal.parallelParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_2)];
+            ctx.die1GoSizeNormal.residual = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_3)];
+            ctx.die1GoSizeLast.addrOffset = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_0)];
+            ctx.die1GoSizeLast.loopParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_1)];
+            ctx.die1GoSizeLast.parallelParam = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_2)];
+            ctx.die1GoSizeLast.residual = args[KfcFuncArgIndex(KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_3)];
 
-    HCCL_INFO(
-        "[CcuKfcReduceScatterNHR1D2Die] run, rankId[%u], rankSize[%u], axisId[%u], axisSize[%u], dataType[%d]",
-        ctx.rankId, ctx.rankSize, ctx.axisId, ctx.axisSize, ctx.dataType);
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(DoRepeatReduceScatterNHR(ctx));
-    CCU_CHK_RET(PostSync(ctx));
-    HCCL_INFO("[CcuKfcReduceScatterNHR1D2Die] end.");
-
+            HCCL_INFO(
+                "[CcuKfcReduceScatterNHR1D2Die] run, rankId[%u], rankSize[%u], axisId[%u], axisSize[%u], dataType[%d]",
+                ctx.rankId, ctx.rankSize, ctx.axisId, ctx.axisSize, ctx.dataType);
+            PreSync(ctx);
+            DoRepeatReduceScatterNHR(ctx);
+            PostSync(ctx);
+            HCCL_INFO("[CcuKfcReduceScatterNHR1D2Die] end.");
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_REDUCE_SCATTER_NHR1D_2DIE_MEM2MEM_NAME);
     return CCU_SUCCESS;
 }
 

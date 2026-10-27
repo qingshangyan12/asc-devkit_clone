@@ -21,14 +21,43 @@ namespace mc2_ops_hccl {
 using namespace HcclKfcProtocol;
 
 constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
-constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
+constexpr uint32_t KFC_SERVER_ARG_NUM = 7U;
 constexpr uint32_t KFC_SERVER_XN_ADDR_ARG_INDEX = 0U;
 constexpr uint32_t KFC_SERVER_CKE_ADDR_ARG_INDEX = 1U;
 constexpr uint32_t KFC_SERVER_MISSION_NUM_ARG_INDEX = 3U;
 constexpr uint32_t KFC_SERVER_MISSION_INDEX_ARG_INDEX = 4U;
 constexpr uint32_t KFC_SERVER_TOKEN_ARG_INDEX = 5U;
+constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX = 6U;
 constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = KFC_MAX_MISSION_NUM;
 constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
+
+// Queue slots [0..2] keep their indices; token occupies [3], queue [3..29] maps to [4..30].
+constexpr uint32_t KFC_FUNC_QUEUE_ARG_NUM = 30U;
+constexpr uint32_t KFC_FUNC_TOKEN_ARG_INDEX = 3U;
+constexpr uint32_t KFC_FUNC_TURN_END_ARG_INDEX = KFC_FUNC_QUEUE_ARG_NUM + 1U;
+
+constexpr uint32_t KfcFuncArgIndex(uint32_t queueIndex)
+{
+    return queueIndex < KFC_FUNC_TOKEN_ARG_INDEX ? queueIndex : queueIndex + 1U;
+}
+
+constexpr char KFC_FUNC_ALL_GATHER_NHR1D_MEM2MEM_NAME[] = "CcuKernelKfcAllGatherNHR1DMem2Mem";
+constexpr char KFC_FUNC_REDUCE_SCATTER_NHR1D_2DIE_MEM2MEM_NAME[] = "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem";
+
+constexpr char KFC_FUNC_ALL_REDUCE_MESH1D_MEM2MEM_NAME[] = "CcuKernelAllReduceMesh1DMem2Mem";
+constexpr char KFC_FUNC_ALL_GATHER_MESH1D_MEM2MEM_NAME[] = "CcuKernelAllGatherMesh1DMem2Mem";
+constexpr char KFC_FUNC_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME[] = "CcuKernelAllGatherNHR1DMultiJettyMem2Mem";
+constexpr char KFC_FUNC_PARALLEL_ALL_GATHER_MESH1D_MEM2MEM_NAME[] = "CcuKfcParallelAllGatherMesh1DMem2Mem";
+constexpr char KFC_FUNC_PARALLEL_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME[] =
+    "CcuKfcParallelAllGatherNHR1DMultiJettyMem2Mem";
+constexpr char KFC_FUNC_REDUCE_SCATTER_MESH1D_MEM2MEM_NAME[] = "CcuKernelKfcReduceScatterMesh1DMem2Mem";
+constexpr char KFC_FUNC_REDUCE_SCATTER_NHR1D_MULTI_JETTY_MEM2MEM_NAME[] =
+    "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem";
+constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_NAME[] = "CcuKernelAlltoAllMesh1D";
+constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuAllToAllMesh1DMultiJettyKernel";
+constexpr char KFC_FUNC_ALL_TO_ALL_V_MESH1D_NAME[] = "CcuKernelAlltoAllVMesh1D";
+constexpr char KFC_FUNC_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuKernelKfcAllToAllMesh1DMultiJetty";
+constexpr char KFC_FUNC_KFC_ALL_TO_ALL_CLOS1D_MULTI_JETTY_NAME[] = "CcuKfcAllToAllClos1DMultiJetty";
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 constexpr char KFC_PARALLEL_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherParallelMeshNHRMultiLink";

@@ -19,25 +19,11 @@
 namespace mc2_ops_hccl {
 
 // KFC 版 ReduceScatter NHR 1D 2Die Mem2Mem kernel（CcuSchedReduceScatterSoleNHR）：算法逻辑与
-// hccl CcuReduceScatterNHR1DMem2MemKernel 逐行对照，参数改为 dispatch 显式传参。
+// hccl CcuReduceScatterNHR1DMem2MemKernel 逐行对照，参数由命名 Func 接收。
 // 双 die 时每个 die 一个 kernel 实例（axisId 区分），数据按 dieSplitRatio 不相交切分；
 // die0/die1 尺寸与 goSize 为 AIV prepare 运行期计算（MC2 device-driven），经 xnData 传入。
-// 21 个 Variable 形参与 hccl 模板 KernelRun 的 taskArgs 布局逐槽一致。
-CcuResult CcuKfcReduceScatterNHR1D2DieMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
-    ccu::Variable die1Size, ccu::Variable die0LastSliceSize, ccu::Variable die1LastSliceSize,
-    ccu::Variable inputSliceStride, ccu::Variable currentRankSliceOutputOffset, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable repeatNumVar, ccu::Variable isInputOutputEqual,
-    ccu::Variable goSizeNormalAddrOffset, ccu::Variable goSizeNormalLoopParam, ccu::Variable goSizeNormalParallelParam,
-    ccu::Variable goSizeNormalResidual, ccu::Variable goSizeLastAddrOffset, ccu::Variable goSizeLastLoopParam,
-    ccu::Variable goSizeLastParallelParam, ccu::Variable goSizeLastResidual, ccu::Variable die1GoSizeNormalAddrOffset,
-    ccu::Variable die1GoSizeNormalLoopParam, ccu::Variable die1GoSizeNormalParallelParam,
-    ccu::Variable die1GoSizeNormalResidual, ccu::Variable die1GoSizeLastAddrOffset,
-    ccu::Variable die1GoSizeLastLoopParam, ccu::Variable die1GoSizeLastParallelParam,
-    ccu::Variable die1GoSizeLastResidual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, uint32_t axisId, uint32_t axisSize, const HcclDataType& dataType, const HcclDataType& outputType,
-    const HcclReduceOp& reduceType, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+// Func 参数 [0..2] 为 input/output/token，[3..28] 与队列索引逐槽一致。
+CcuResult CcuKfcReduceScatterNHR1D2DieMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
