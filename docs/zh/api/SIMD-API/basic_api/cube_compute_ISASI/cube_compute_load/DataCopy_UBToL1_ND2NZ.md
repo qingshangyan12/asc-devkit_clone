@@ -24,11 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：不支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
+- Kirin9020处理器系列产品：支持
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：不支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
+- Kirin9050处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_ND2NZ_res.md#id1 -->
 
 ## 功能说明<a id="section12840195813362"></a>
@@ -103,9 +105,14 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 针对Atlas A3系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float。
 <!-- end id11 -->
 
-<!-- npu="910b" id12 -->
-针对Atlas A2系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float。
-<!-- end id12 -->
+<!-- npu="x90" id16 -->
+KirinX90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+<!-- end id16 -->
+Kirin9020处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+<!-- npu="9030" id17 -->
+Kirin9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+<!-- end id17 -->
+Kirin9050处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 
 ## 返回值说明
 

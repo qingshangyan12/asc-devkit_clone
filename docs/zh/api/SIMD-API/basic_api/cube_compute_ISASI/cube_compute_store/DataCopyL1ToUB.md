@@ -24,11 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：不支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
+- Kirin9020处理器系列产品：支持
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：不支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
+- Kirin9050处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB_res.md#id1 -->
 
 ## 功能说明
@@ -76,8 +78,14 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 ## 数据类型
 
-支持的数据类型为b8、b16、b32、b64。
-
+<!-- npu="x90" id16 -->
+KirinX90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t。
+<!-- end id16 -->
+Kirin9020处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t。
+<!-- npu="9030" id17 -->
+Kirin9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t。
+<!-- end id17 -->
+Kirin9050处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB_res.md#id1 -->
 
 ## 返回值说明
