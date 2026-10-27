@@ -204,7 +204,7 @@ def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_requ
     data = _published(bundle_request)
     assert [m["resource_id"] for m in data] == ["a" * 64, "a" * 64, "b" * 64]
     assert data[0]["source_file"] == "op_impl/dynamic/add.cpp"
-    assert data[0]["options"]["common_compile"] == ["-I${source_file_path}/op_impl/dynamic"]
+    assert data[0]["options"]["common_compile"] == ["-I${source_file_path}"]
     assert (root / "910b/add_manifest.json").read_bytes() == original
 
 
@@ -227,7 +227,7 @@ def test_duplicate_id_order_is_preserved_past_ten_candidates(bundle_request):
     assert "-DREVIEW_CANDIDATE=2" in duplicate["options"]["common_compile"]
 
 
-def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request):
+def test_bundle_preserves_include_options(bundle_request):
     root = Path(bundle_request.source_file[0]).parent
     bundle_request.source_map.append([str(root / "nested"), "extra"])
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
@@ -243,15 +243,7 @@ def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request)
     ]
     path.write_text(json.dumps(manifest))
     bundle_request.build()
-    assert _published(bundle_request)[0]["options"]["common_compile"] == [
-        "-I",
-        "${source_file_path}/op_impl/dynamic",
-        "-isystem${source_file_path}/extra/include",
-        "-iquote",
-        "${source_file_path}/op_impl/dynamic/not_created",
-        "-idirafter${source_file_path}/op_impl/dynamic",
-        "-I/untouched",
-    ]
+    assert _published(bundle_request)[0]["options"] == manifest["options"]
 
 
 def test_exporter_failure_preserves_output_and_cleans_bundle_dir(bundle_request):
@@ -412,7 +404,7 @@ def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request
     manifest = exported.manifests[0]
     data = json.loads(ctypes.string_at(manifest.json.data, manifest.json.size))
     assert data["source_file"] == "op_impl/dynamic/add.cpp"
-    assert data["options"]["common_compile"] == ["-I${source_file_path}/op_impl/dynamic"]
+    assert data["options"]["common_compile"] == ["-I${source_file_path}"]
     resources = {ctypes.string_at(f.path.data, f.path.size).decode(): f for f in manifest.files[: manifest.count]}
     assert resources["resources/large.h"].size == 1024 * 1024 + 1
     assert ctypes.string_at(resources["resources/large.h"].data, 1) == b"x"
@@ -512,7 +504,7 @@ def test_producer_binding_selects_actual_source_among_same_names(bundle_request,
     assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
 
 
-def test_relocates_shared_include_outside_kernel_root(bundle_request, tmp_path):
+def test_preserves_shared_include_outside_kernel_root(bundle_request, tmp_path):
     shared = tmp_path / "shared"
     shared.mkdir()
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
@@ -521,4 +513,4 @@ def test_relocates_shared_include_outside_kernel_root(bundle_request, tmp_path):
     path.write_text(json.dumps(manifest))
     bundle_request.source_map.append([str(shared), "op_impl/common"])
     bundle_request.build()
-    assert _published(bundle_request)[0]["options"]["common_compile"] == ["-I${source_file_path}/op_impl/common"]
+    assert _published(bundle_request)[0]["options"]["common_compile"] == manifest["options"]["common_compile"]

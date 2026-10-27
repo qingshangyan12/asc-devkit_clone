@@ -945,8 +945,8 @@ ResourceStatus ResourceRegistry::LocateSourceFile(
         if (error || !FileUtils::IsPathWithin(canonicalSource.string(), canonicalRoot)) {
             return ResourceStatus::InvalidResource;
         }
-        // New source placeholders use the installation root, not the source's parent directory.
-        located = canonicalRoot;
+        // Both installed and legacy layouts expose the source file's parent directory.
+        located = canonicalSource.parent_path().string();
         return ResourceStatus::Success;
     }
     // Relative path example:
