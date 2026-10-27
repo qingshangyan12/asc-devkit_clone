@@ -115,7 +115,7 @@
     | `--lineinfo` | 可选 | 与`--sass`配套使用，在反汇编结果中显示源文件名和行号。编译算子时需添加`-g`生成调试信息。 |
     | `--source`，`-s` | 可选 | 与`--sass`配套使用，在反汇编结果中显示对应源码。编译算子时需添加`-g`生成调试信息，并确保源文件能够按调试信息中记录的路径访问。 |
 
-    `--sass`不支持与`--dump-elf`、`--extract-elf`、`--list-elf`、`--verbose`或`--out-dir`组合使用。反汇编结果默认显示在终端，如需保存到文件，可使用Shell重定向。
+    `--sass`不支持与`--dump-elf`、`--extract-elf`、`--list-elf`、`--verbose`或`--out-dir`组合使用；输出默认写入标准输出，如需保存结果可使用Shell重定向。
 
     `--lineinfo`和`--source`依赖Device ELF中的调试信息。编译算子时请使用`-g`生成调试信息，配置方法请参见[AI Core编译中的常用编译选项](../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)和[自定义编译选项](../advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。即使ELF不含调试信息，仍可使用`--sass`输出反汇编指令；此时`--lineinfo`无法显示源码位置，`--source`无法显示源码。使用`--source`时，若调试信息记录的源文件无法访问，工具会输出告警并继续反汇编，但不显示对应源码。
 
