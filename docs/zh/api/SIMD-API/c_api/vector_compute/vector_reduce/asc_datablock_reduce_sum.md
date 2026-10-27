@@ -1,15 +1,15 @@
 ---
 okftype: reference.api
-description: "对每个DataBlock内的所有元素按二叉树方式两两求和，结果写入目的操作数，计算结果大于65504时保存为65504，起始地址需32字节对齐。"
+description: "对每个DataBlock内所有元素求和的规约C API接口，Block内两两相加采用二叉树方式且中间结果超过65504时饱和，提供两种计算形式，支持half与float，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
   - operations: [reduction]
-  - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
-version: ">=9.0.0"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_datablock_reduce_sum
 

@@ -1,15 +1,15 @@
 ---
 okftype: reference.api
-description: "执行数据块内的求最大值规约，将每个数据块中的元素聚合为最大值，支持前n个数据连续计算与高维切分计算两种形式，dst和src起始地址需32字节对齐。"
+description: "对每个DataBlock内元素求最大值的规约C API接口，提供前n个数据连续计算与高维切分计算两种形式，支持half与float，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
-  - operations: [reduction]
-  - traits: [datablock_granularity]
+  - operations: [maximum, reduction]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
-version: ">=9.0.0"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_datablock_reduce_max
 

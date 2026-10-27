@@ -1,13 +1,14 @@
 ---
 okftype: reference.api
-description: "获取asc_reduce执行后剩余的元素数量，需与asc_reduce配合并在其执行完成并通过同步后再调用本接口读取结果。"
+description: "获取asc_reduce操作后剩余元素数量的查询接口，无参数、返回int64_t，需在asc_reduce执行完成并同步后调用，流水类型为PIPE_S。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
-    kind: requires
-    condition: "需先执行asc_reduce并同步完成后再调用本接口"
-version: ">=9.0.0"
+    kind: related
+    condition: "读取该数据收集接口执行后的剩余元素数量"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_rsvd_count
 

@@ -1,17 +1,21 @@
 ---
 okftype: reference.api
-description: "以内置固定模式或用户自定义gather mask为掩码，从源操作数中选取元素写入目的操作数，该接口已废弃，请改用对应的非同步接口asc_reduce和同步接口asc_sync替代。"
+description: "已废弃的掩码收集同步接口，按内置固定模式或用户自定义 gather mask 从源操作数选取元素写入目的操作数，支持 uint16_t 与 uint32_t，替代方案为 asc_reduce 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [reduction]
+  - operations: [gather, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_reduce 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_reduce_sync（废弃）
 

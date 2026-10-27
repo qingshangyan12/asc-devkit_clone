@@ -1,18 +1,23 @@
 ---
 okftype: reference.api
-description: "对每个Repeat内所有元素求最大值及首个最大值在当前Repeat中的索引，一次Repeat计算256字节，该接口已废弃，请改用对应的非同步接口asc_repeat_reduce_max和同步接口asc_sync替代。"
+description: "已废弃的按迭代求最大值同步接口族，含 index_value、value_index、only_value、only_index 四种结果排布，返回最值与索引，支持 half 与 float，替代方案为 asc_repeat_reduce_max 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [reduction]
-  - traits: [high_dimensional]
+  - operations: [maximum, reduction, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "四个 max 归约同步接口（index_value、value_index、only_value、only_index）废弃，改用 asc_repeat_reduce_max 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的 8 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_repeat_reduce_max_sync（废弃）
 

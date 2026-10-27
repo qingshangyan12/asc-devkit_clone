@@ -1,14 +1,16 @@
 ---
 okftype: reference.api
-description: "对矢量每个Repeat内的全部元素求和，源操作数按二叉树方式两两相加，计算结果大于65504时保存为65504，单次Repeat可计算128个half类型数据。"
+description: "对每个Repeat内所有元素求和，内部采用二叉树两两相加，每个Repeat可计算128个half元素，求和结果超过65504时按65504保存，支持前n个数据计算与高维切分两种原型。"
 tag:
   - roles: [compute]
   - operations: [reduction]
-  - traits: [high_dimensional, saturation_mode]
+  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: ">=9.0.0"
+    condition: "需遵循通用地址重叠约束"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_repeat_reduce_sum
 

@@ -1,16 +1,19 @@
 ---
 okftype: reference.api
-description: "对矢量每个Repeat内的全部元素求最小值，并给出首个最小值在当前Repeat中的索引，支持index_value、value_index、only_value与only_index四种结果排布，单次Repeat处理256字节。"
+description: "对每个Repeat内元素求最小值及其首个最小值的索引，一次Repeat处理256字节，提供index_value、value_index、only_value与only_index四种输出组合，支持前n个数据计算与高维切分两种原型。"
 tag:
   - roles: [compute]
-  - operations: [reduction]
-  - traits: [high_dimensional]
+  - operations: [minimum, reduction]
+  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵循通用地址重叠约束"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md
     kind: related
-version: ">=9.0.0"
+    condition: "可继续用该接口获取全部repeat内的最小值及首个最小值索引"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_repeat_reduce_min
 

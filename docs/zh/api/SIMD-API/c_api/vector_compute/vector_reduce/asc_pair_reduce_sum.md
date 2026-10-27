@@ -1,14 +1,15 @@
 ---
 okftype: reference.api
-description: "对输入数据做归约求总和，将相邻两个（奇偶）元素两两相加，支持前n个数据连续计算与高维切分计算，操作数起始地址需32字节对齐。"
+description: "对相邻奇偶元素两两求和的规约C API接口，一个repeat归约后长度减半，提供前n个数据连续计算与高维切分计算两种形式，支持half与float，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
   - operations: [reduction]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_pair_reduce_sum
 

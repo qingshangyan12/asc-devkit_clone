@@ -1,18 +1,26 @@
 ---
 okftype: reference.api
-description: "asc_datablock_reduce_sum_sync接口已废弃，请使用对应的非同步接口asc_datablock_reduce_sum和同步接口asc_sync替代，该接口对每个DataBlock内所有元素采用二叉树方式两两相加求和。"
+description: "已废弃的同步版 DataBlock 内求和规约接口，对每个 32 字节数据块内元素按二叉树两两相加，half 溢出按 65504 饱和，替代方案为 asc_datablock_reduce_sum 加 asc_sync。"
 tag:
   - roles: [compute]
   - operations: [reduction]
-  - traits: [datablock_granularity]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "通用地址重叠约束"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步场景"
+    condition: "替代方案中的同步部分"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
-version: ">=9.0.0"
+    condition: "正文声明的替代非同步接口"
+version: ">=8.5.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.2.0 起 include 标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_datablock_reduce_sum and asc_sync)，正文同步给出替代方案；声明保留，属 deprecated 而非 removed。"
 ---
 # asc_datablock_reduce_sum_sync（废弃）
 
