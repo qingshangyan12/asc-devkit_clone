@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 枚举
 
 - **[asc_channel_pad_mode](asc_channel_pad_mode.md)**
