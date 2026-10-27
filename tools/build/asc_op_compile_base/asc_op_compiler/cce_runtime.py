@@ -698,14 +698,7 @@ def tvm_callback_cce_postproc(
     title_dict["blockDim"] = numblocks
     title_dict["opParaSize"] = args_size
 
-    if short_soc_version in [
-        "Ascend910B",
-        "Ascend910_93",
-        "Ascend950",
-        "Ascend960DT",
-        "Ascend960PR",
-        "MC62",
-    ]:
+    if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950", "Ascend960DT", "Ascend960PR", "MC62"]:
         mode_in_args_first_field = 0
         if is_ffts_id_needed or ccec.current_build_config().get(enforce_mix_mode):
             mode_in_args_first_field = 1

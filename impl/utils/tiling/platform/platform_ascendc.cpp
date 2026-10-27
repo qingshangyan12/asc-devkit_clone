@@ -427,10 +427,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
-    {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},   {"Ascend950", "3510"},
-    {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"},  {"MC62", "5102"},
-    {"KirinX90", "3003"},     {"Kirin9030", "3113"}, {"Kirin9050", "5101"},
-    {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"}, {"KirinDev0003", "5163"}, {"Ascend5162A", "5162"}};
+    {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},  {"Ascend950", "3510"},
+    {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"}, {"MC62", "5102"},
+    {"KirinX90", "3003"},     {"Kirin9030", "3113"},    {"Kirin9050", "5101"},   {"KirinDev0001", "5161"},
+    {"KirinDev0002", "5165"}, {"KirinDev0003", "5163"}, {"Ascend5162A", "5162"}};
 
 bool SwitchIntoShortSocVersion(const char* socVersionStr, std::string& shortSocVersion)
 {
