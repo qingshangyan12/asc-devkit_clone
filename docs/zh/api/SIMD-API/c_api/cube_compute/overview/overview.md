@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 概述
 
 - **[矩阵计算单元](cube_compute_unit.md)**

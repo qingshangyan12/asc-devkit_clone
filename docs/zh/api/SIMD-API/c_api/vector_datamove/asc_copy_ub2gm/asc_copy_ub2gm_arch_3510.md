@@ -1,29 +1,3 @@
----
-okftype: reference.api
-description: "在3510架构上把数据从UB搬运到GM，连续搬运按size字节、高维切分按burst_count/burst_len与字节单位stride搬运，非32字节对齐时补齐读取UB但仅写有效数据。"
-tag:
-  - roles: [data_movement]
-  - operations: [copy]
-  - traits: [aligned_transfer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: related
-    condition: "正文据此引用存储单元说明"
-  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
-    kind: related
-    condition: "有数据依赖时按该页插入同步指令"
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
-    kind: related
-    condition: "Broadcast场景配置内层循环步长"
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
-    kind: related
-    condition: "Broadcast场景配置外层循环步长"
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
-    kind: related
-    condition: "Broadcast场景用循环配置替代 src_stride=0"
-version: ">=9.1.0"
-version_changes: []
----
 # asc_copy_ub2gm
 
 ## 产品支持情况
