@@ -197,6 +197,34 @@ __aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
 #endif
 }
 
+constexpr uint64_t g_oomAtomicIndexSize = 8UL;
+
+__aicore__ static inline bool OOMCheckStorageShapeHeader(__gm__ uint8_t* cursor)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    return cursor[0] == Internal::g_oomStorageShapeMagic &&
+        (cursor[1] & Internal::g_oomNibbleMask) == Internal::g_oomStorageShapeVersion;
+#else
+    (void)cursor;
+    return false;
+#endif
+}
+
+__aicore__ static inline __gm__ uint8_t* OOMFindStorageShapeExt(__gm__ uint8_t* probePtr)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    if (OOMCheckStorageShapeHeader(probePtr)) {
+        return probePtr;
+    }
+    if (OOMCheckStorageShapeHeader(probePtr + g_oomAtomicIndexSize)) {
+        return probePtr + g_oomAtomicIndexSize;
+    }
+    return probePtr;
+#else
+    return probePtr;
+#endif
+}
+
 template <typename T>
 __aicore__ static inline T OOMReadPackedValue(__gm__ uint8_t* address)
 {
