@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 矢量数据搬运
 
 - **[asc_copy](asc_copy.md)**
