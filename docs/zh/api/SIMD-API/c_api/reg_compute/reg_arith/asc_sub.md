@@ -158,7 +158,6 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
 
 ### 带借位输出减法约束
 
-- 仅支持`uint32_t`类型。
 - 运算输出完整计算结果（包含无借位标志），不受[asc_set_ctrl](../../spr/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
 - 差值截断为32位：`dst`写入`(src0_i + ~src1_i + 0b1) & 0xFFFFFFFF`，超出32位的部分不保留。
 

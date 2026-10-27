@@ -83,7 +83,7 @@ PIPE_S
   Atlas A2系列产品
   <!-- end id11 -->
 
-  用于存储tensor量化参数的Fixpipe Buffer大小为2KB，用于存储tensor激活参数的Fixpipe Buffer大小为1KB，两块存储空间相互独立，地址均从0开始。tensor激活参数和tensor激活参数的起始地址和占用空间不能超出对应Buffer的范围。
+  用于存储tensor量化参数的Fixpipe Buffer大小为2KB，用于存储tensor激活参数的Fixpipe Buffer大小为1KB，两块存储空间相互独立，地址均从0开始。tensor量化参数和tensor激活参数的起始地址和占用空间不能超出对应Buffer的范围。
 <!-- end id9 -->
 - 若L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_compute_store/asc_copy_l0c2ub.md)需要开启随路量化或随路激活功能，则本接口需在搬出接口前调用。
 - 本接口的配置会持续生效，直至再次调用本接口覆盖。不同搬出任务使用的配置不同时，需在对应搬出接口执行前重新配置，每次调用均会同时覆盖三个参数。

@@ -27,6 +27,7 @@ namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
 const static uint32_t WORK_SPACE_SIZE_MC62 = 1024;
+const static uint32_t WORK_SPACE_SIZE_5162 = 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_960DT = 16 * 1024 * 1024;
@@ -281,6 +282,8 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
         return -1;
     } else if (npuArch == NpuArch::DAV_5102) {
         return WORK_SPACE_SIZE_MC62;
+    } else if (npuArch == NpuArch::DAV_5162) {
+        return WORK_SPACE_SIZE_5162;
     } else if (npuArch == NpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {
@@ -417,6 +420,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"KirinDev0001", "KirinDev0001"},
     {"KirinDev0002", "KirinDev0002"},
     {"KirinDev0003", "KirinDev0003"},
+    {"Ascend5162A", "Ascend5162A"},
     {"MC32DM11AA", "MC32DM11A"},
     {"MC32DM11AB", "MC32DM11A"},
     {"MC32DM11AC", "MC32DM11A"},
@@ -424,10 +428,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
-    {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},  {"Ascend950", "3510"},
-    {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"}, {"MC62", "5102"},
-    {"KirinX90", "3003"},     {"Kirin9030", "3113"},    {"MC32DM11A", "5102"},   {"Kirin9050", "5101"},
-    {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"}, {"KirinDev0003", "5163"}};
+    {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},   {"Ascend950", "3510"},
+    {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"},  {"MC62", "5102"},
+    {"KirinX90", "3003"},     {"Kirin9030", "3113"},    {"MC32DM11A", "5102"},    {"Kirin9050", "5101"},
+    {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"}, {"KirinDev0003", "5163"}, {"Ascend5162A", "5162"}};
 
 bool SwitchIntoShortSocVersion(const char* socVersionStr, std::string& shortSocVersion)
 {
