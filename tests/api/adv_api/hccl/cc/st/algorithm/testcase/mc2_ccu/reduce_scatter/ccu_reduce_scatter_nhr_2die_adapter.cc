@@ -83,33 +83,32 @@ Result CaptureCcuKfcReduceScatterNhr2DieKernel(void* kernelArg)
         config.stepInfoVector.empty()) {
         return Result::PARAM_ERROR;
     }
-    std::array<AscendC::ccu::Variable, REDUCE_SCATTER_NHR_2DIE_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1D2DieMem2MemKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14],
-        arguments[15], arguments[16], arguments[17], arguments[18], arguments[19], arguments[20], arguments[21],
-        arguments[22], arguments[23], arguments[24], arguments[25], arguments[26], arguments[27], arguments[28],
-        config.channels.data(), static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId,
-        config.axisId, config.axisSize, config.dataType, config.outputType, config.reduceType, config.stepInfoVector,
-        config.rank2ChannelIdx);
+    mc2_ops_hccl::CcuKernelArgKfcReduceScatterNHR1D2Die arg{};
+    arg.rankSize = config.rankSize;
+    arg.rankId = config.rankId;
+    arg.axisId = config.axisId;
+    arg.axisSize = config.axisSize;
+    arg.opParam.DataDes.dataType = config.dataType;
+    arg.opParam.DataDes.outputType = config.outputType;
+    arg.opParam.reduceType = config.reduceType;
+    arg.stepInfoVector = config.stepInfoVector;
+    arg.rank2ChannelIdx = config.rank2ChannelIdx;
+    arg.channelCount = static_cast<uint32_t>(config.channels.size());
+    std::copy(config.channels.begin(), config.channels.end(), arg.channels);
+    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1D2DieMem2MemKernel(&arg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
 // 29个taskArgs按kernel形参顺序排列，模拟AIV侧CcuPrepareForReduceScatterSoleNhr2DieM2M写入HBM、
-// KFC dispatch（ccu_kernel_kfc_server.cc 的 RS 分支）逐槽转发的参数：
+// KFC CallKfcSubKernel 传入命名 Func 的参数：
 // [0]=input [1]=output [2]=token [3]=die0Size [4]=die1Size [5]=die0Last [6]=die1Last
 // [7]=inputSliceStride [8]=currentRankSliceOutputOffset(=0) [9]=inputRepeatStride [10]=outputRepeatStride
 // [11]=repeatNumVar [12]=isInputOutputEqual [13..16]=die0 goSizeNormal [17..20]=die0 goSizeLast
 // [21..24]=die1 goSizeNormal [25..28]=die1 goSizeLast
 std::vector<uint64_t> PrepareReduceScatterNhr2DieTaskArgs(const ReduceScatterNhr2DieLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
         config.inputAddress,
         config.outputAddress,
         config.token,
@@ -139,6 +138,8 @@ std::vector<uint64_t> PrepareReduceScatterNhr2DieTaskArgs(const ReduceScatterNhr
         config.die1GoSizeLast[1],
         config.die1GoSizeLast[2],
         config.die1GoSizeLast[3]};
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 namespace {

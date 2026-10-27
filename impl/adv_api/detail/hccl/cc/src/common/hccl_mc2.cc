@@ -924,14 +924,15 @@ void LogKernelLaunchArgs(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "mission[%u], threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
             "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
-            "missionIndex[%llu], token[%llu]",
+            "missionIndex[%llu], token[%llu], subKernelPc[0x%llx]",
             missionIndex, static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
             resourceCtx.kfcServerArgSize, static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 1]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 2]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 3]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 4]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 5]));
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 5]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[offset + 6]));
     } else {
         HCCL_INFO(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "

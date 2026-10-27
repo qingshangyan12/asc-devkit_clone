@@ -10,6 +10,10 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "../ccu_temp_all_to_all_v_mesh_1D.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
+#include <stdexcept>
 
 #include <algorithm>
 
@@ -485,25 +489,31 @@ static CcuResult CcuAlltoAllVMesh1DKernelV2(
     return CCU_SUCCESS;
 }
 
-CcuResult CcuAlltoAllVMesh1DKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
-    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg)
 {
-    // Ascend960(CCU_V2) 使用新的多轮次 LocalCopy/Write 方案；Ascend950(CCU_V1) 保持 GroupCopy 老逻辑。
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
+    // Preserve the upstream implementation choice while recording its body in the named Func.
     const CcuVersion ccuVersion = GetCcuVersion();
     const bool useNewImpl = (ccuVersion == CcuVersion::CCU_V2);
     HCCL_INFO(
         "[CcuKernelAlltoAllVMesh1D] ccuVersion[%u], useNewImpl[%d]", static_cast<uint32_t>(ccuVersion),
         static_cast<int32_t>(useNewImpl));
-    if (useNewImpl) {
-        return CcuAlltoAllVMesh1DKernelV2(
-            inputAddr, outputAddr, tokenInfo, srcOffset, dstOffset, extAddr, goSize1, goSize2, goSize3, goSize4,
-            channels, channelCount, rankSize, rankId);
-    }
-    return CcuAlltoAllVMesh1DKernelV1(
-        inputAddr, outputAddr, tokenInfo, srcOffset, dstOffset, extAddr, goSize1, goSize2, goSize3, goSize4, channels,
-        channelCount, rankSize, rankId);
+    ccu::Func func(
+        [kernelArg, useNewImpl](ccu::Array<ccu::Variable>& args) {
+            if (useNewImpl) {
+                CcuAlltoAllVMesh1DKernelV2(
+                    args[0], args[1], args[2], args[3], args[4], args[9], args[5], args[6], args[7], args[8],
+                    kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize),
+                    kernelArg->rankId);
+            } else {
+                CcuAlltoAllVMesh1DKernelV1(
+                    args[0], args[1], args[2], args[3], args[4], args[9], args[5], args[6], args[7], args[8],
+                    kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize),
+                    kernelArg->rankId);
+            }
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_V_MESH1D_NAME);
+    return CCU_SUCCESS;
 }
 
 } // namespace mc2_ops_hccl
