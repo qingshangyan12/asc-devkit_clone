@@ -37,7 +37,7 @@
 
 **图1** 解交织实现流程
 
-![解交织实现流程](../../figures/capi_deintlv_reg.png)
+![解交织实现流程](../../../../figures/capi_deintlv_reg.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
