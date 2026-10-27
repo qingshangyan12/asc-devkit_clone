@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_IMPL_ZN2ZN_H
 
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/data_copy.h"
+#include "impl/tensor_api/arch/vector/fractal_copy_params.h"
 
 namespace asc {
 namespace te {
@@ -41,14 +42,11 @@ public:
         const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const ShapeType& copy_shape)
     {
         check_template<trait, T, U>();
-        using src_type = typename U::element_type;
-        using dst_type = typename T::element_type;
-        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
-        auto block_count =
-            get_shape_batch_size(src_shape) * Std::ceil_division(get_shape_rows(src_shape), c0_element<src_type>);
-        auto block_len = get_shape_columns(src_shape) * c0_size<>;
-        auto src_stride = get_row_stride(src.layout()) * sizeof(src_type);
-        auto dst_stride = get_row_stride(dst.layout()) * sizeof(dst_type);
+        auto copy_params = make_zn_slice_copy_params(dst, src, src_coord, copy_shape);
+        auto block_count = Std::get<0>(copy_params);
+        auto block_len = Std::get<1>(copy_params);
+        auto src_stride = Std::get<2>(copy_params);
+        auto dst_stride = Std::get<3>(copy_params);
         emit_copy(
             dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, src_stride, dst_stride);
     }

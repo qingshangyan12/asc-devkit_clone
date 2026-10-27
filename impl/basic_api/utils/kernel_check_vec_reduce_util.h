@@ -24,6 +24,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "../kernel_utils.h"
+#include "kernel_check_tensor_metadata.h"
 namespace AscendC {
 namespace check {
 struct VecReduceApiParams {
@@ -63,15 +64,8 @@ struct VecReduceApiParams {
         repeatTimes = repeatIn;
         calCount = calCountIn;
         calIndex = calIndexIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleSizeAndPosition(
+            *this, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn, src0PosIn, src1PosIn);
     }
 
     VecReduceApiParams(
@@ -87,15 +81,8 @@ struct VecReduceApiParams {
         src1DtypeBytes = src1DtypeBytesIn;
         repeatTimes = repeatIn;
         calCount = calCountIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleSizeAndPosition(
+            *this, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn, src0PosIn, src1PosIn);
     }
 
     VecReduceApiParams(
@@ -129,15 +116,8 @@ struct VecReduceApiParams {
         src1DtypeBytes = src1DtypeBytesIn;
         repeatTimes = repeatIn;
         calIndex = calIndexIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleSizeAndPosition(
+            *this, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn, src0PosIn, src1PosIn);
         src0RepeatStride = src0RepeatStrideIn;
     }
 
@@ -153,15 +133,8 @@ struct VecReduceApiParams {
         src0DtypeBytes = src0DtypeBytesIn;
         src1DtypeBytes = src1DtypeBytesIn;
         repeatTimes = repeatIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleSizeAndPosition(
+            *this, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn, src0PosIn, src1PosIn);
         src0RepeatStride = src0RepeatStrideIn;
     }
 

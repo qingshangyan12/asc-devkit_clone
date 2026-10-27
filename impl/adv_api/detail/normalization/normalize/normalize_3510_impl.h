@@ -27,6 +27,7 @@
 #include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "../../../../../include/adv_api/normalization/normalize_utils.h"
 #include "normalize_config.h"
+#include "../normalization_3510_type_check.h"
 
 namespace AscendC {
 
@@ -296,15 +297,7 @@ __aicore__ inline void NormalizeImpl(
     const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon,
     const NormalizePara& para)
 {
-    static_assert(SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
-    if constexpr (IsSameType<T, half>::value) {
-        static_assert(SupportType<U, half, float>(), "current data type is not supported on current device!");
-    } else if constexpr (IsSameType<T, bfloat16_t>::value) {
-        static_assert(SupportType<U, bfloat16_t, float>(), "current data type is not supported on current device!");
-    } else if constexpr (IsSameType<T, float>::value) {
-        static_assert(SupportType<U, float>(), "current data type is not supported on current device!");
-    }
-    static_assert(config.isOnlyOutput == false, "current value is not supported on current device!");
+    Internal::CheckNormalization3510Types<U, T, config>();
 
     static_assert(
         SupportEnum<config.reducePattern, ReducePattern::AR>(),

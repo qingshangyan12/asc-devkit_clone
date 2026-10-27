@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_IMPL_DN2ZN_H
 
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/copy_common.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/source_geometry.h"
 
 namespace asc {
 namespace te {
@@ -71,15 +72,8 @@ public:
         uint16_t n_value;
         uint32_t d_value;
         uint32_t src_row_stride;
-        if constexpr (is_satisfied_ptn_format_v<SrcTensor, dn_layout_ptn>) {
-            n_value = get_element<attr_info::shape, attr_info::column>(src_layout);
-            d_value = get_element<attr_info::shape, attr_info::row>(src_layout);
-            src_row_stride = get_element<attr_info::stride, attr_info::column>(src_layout);
-        } else {
-            n_value = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
-            d_value = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
-            src_row_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout);
-        }
+        read_gm_to_l1_source_geometry<SrcTensor, dn_layout_ptn, attr_info::column, attr_info::row, attr_info::column>(
+            src_layout, n_value, d_value, src_row_stride);
         auto dst_row_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         if constexpr (is_b4_type<type>) {
             // move fp4 as b8, need to be divided by 2

@@ -22,6 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_V2_IMPL_H
 
 #include "kernel_operator_set_spr_impl.h"
+#include "kernel_operator_fixpipe_tiling_impl.h"
 #include "../../../include/basic_api/kernel_struct_fixpipe.h"
 
 namespace AscendC {
@@ -123,20 +124,7 @@ struct FixpipeTilingV220 {
 __aicore__ inline FixpipeTilingV220 GenFixpipeTilingV220(uint16_t n)
 {
     FixpipeTilingV220 tiling;
-    // deqTensor/reluTensor in FB valid num is 256
-    uint16_t maxDeqNums = 256;
-    if (n <= maxDeqNums) {
-        tiling.nIterNum = 1;
-        tiling.nSize = n;
-        tiling.isDb = false;
-        tiling.tailNSize = 0;
-    } else {
-        tiling.isDb = true;
-        uint16_t dbMaxDeqNums = maxDeqNums / 2;
-        tiling.nIterNum = n / dbMaxDeqNums;
-        tiling.nSize = dbMaxDeqNums;
-        tiling.tailNSize = n % dbMaxDeqNums;
-    }
+    Internal::FillFixpipeTilingC220(tiling, n);
     return tiling;
 }
 

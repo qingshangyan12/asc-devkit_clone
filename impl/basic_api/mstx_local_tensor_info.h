@@ -1895,10 +1895,10 @@ __aicore__ inline void GetMstxDataCopyInfo(
         static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY), sizeof(mstxDataCopyDesc), &mstxDataCopyDesc);
 }
 
-template <typename T, typename U>
-__aicore__ inline void GetMstxDataCopyPadInfo(
-    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const DataCopyParams& dataCopyParams,
-    const DataCopyPadParams& padParams, __gm__ const char* name)
+template <typename T, typename U, typename CopyParams, typename PadParams>
+__aicore__ inline void ReportMstxCopyPadToLocal(
+    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const CopyParams& dataCopyParams, const PadParams& padParams,
+    __gm__ const char* name)
 {
     MstxDataCopyPadDesc mstxDataCopyPadDesc;
     mstxDataCopyPadDesc.dst = From(dst);
@@ -1913,6 +1913,79 @@ __aicore__ inline void GetMstxDataCopyPadInfo(
 
     __mstx_dfx_report_stub(
         static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
+}
+
+template <typename T, typename U, typename CopyParams>
+__aicore__ inline void ReportMstxCopyPadToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const CopyParams& dataCopyParams, __gm__ const char* name)
+{
+    MstxDataCopyPadDesc mstxDataCopyPadDesc;
+    mstxDataCopyPadDesc.dst = FromGm(dst);
+    mstxDataCopyPadDesc.src = From(src);
+    mstxDataCopyPadDesc.nBurst = dataCopyParams.blockCount;
+    mstxDataCopyPadDesc.lenBurst = dataCopyParams.blockLen;
+    mstxDataCopyPadDesc.srcGap = dataCopyParams.srcStride;
+    mstxDataCopyPadDesc.dstGap = dataCopyParams.dstStride;
+    mstxDataCopyPadDesc.leftPad = 0;
+    mstxDataCopyPadDesc.rightPad = 0;
+    CopyName(mstxDataCopyPadDesc.name, name);
+
+    __mstx_dfx_report_stub(
+        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
+}
+
+template <typename T, typename U, typename CopyParams, typename PadParams>
+__aicore__ inline void ReportMstxCopyPadV2ToLocal(
+    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const CopyParams& dataCopyParams, const PadParams& padParams,
+    const PaddingMode mode, __gm__ const char* name)
+{
+    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
+    mstxDataCopyPadV2Desc.dst = From(dst);
+    mstxDataCopyPadV2Desc.src = FromGm(src);
+    mstxDataCopyPadV2Desc.padMode =
+        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
+    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
+    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
+    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
+    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
+    mstxDataCopyPadV2Desc.leftPad = padParams.leftPadding;
+    mstxDataCopyPadV2Desc.rightPad = padParams.rightPadding;
+    CopyName(mstxDataCopyPadV2Desc.name, name);
+
+    __mstx_dfx_report_stub(
+        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
+        &mstxDataCopyPadV2Desc);
+}
+
+template <typename T, typename U, typename CopyParams>
+__aicore__ inline void ReportMstxCopyPadV2ToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const CopyParams& dataCopyParams, const PaddingMode mode,
+    __gm__ const char* name)
+{
+    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
+    mstxDataCopyPadV2Desc.dst = FromGm(dst);
+    mstxDataCopyPadV2Desc.src = From(src);
+    mstxDataCopyPadV2Desc.padMode =
+        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
+    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
+    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
+    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
+    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
+    mstxDataCopyPadV2Desc.leftPad = 0;
+    mstxDataCopyPadV2Desc.rightPad = 0;
+    CopyName(mstxDataCopyPadV2Desc.name, name);
+
+    __mstx_dfx_report_stub(
+        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
+        &mstxDataCopyPadV2Desc);
+}
+
+template <typename T, typename U>
+__aicore__ inline void GetMstxDataCopyPadInfo(
+    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const DataCopyParams& dataCopyParams,
+    const DataCopyPadParams& padParams, __gm__ const char* name)
+{
+    ReportMstxCopyPadToLocal(dst, src, dataCopyParams, padParams, name);
 }
 
 template <typename T, typename U>
@@ -1920,19 +1993,7 @@ __aicore__ inline void GetMstxDataCopyPadInfo(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& dataCopyParams,
     __gm__ const char* name)
 {
-    MstxDataCopyPadDesc mstxDataCopyPadDesc;
-    mstxDataCopyPadDesc.dst = FromGm(dst);
-    mstxDataCopyPadDesc.src = From(src);
-    mstxDataCopyPadDesc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadDesc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadDesc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadDesc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadDesc.leftPad = 0;
-    mstxDataCopyPadDesc.rightPad = 0;
-    CopyName(mstxDataCopyPadDesc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
+    ReportMstxCopyPadToGlobal(dst, src, dataCopyParams, name);
 }
 
 template <typename T, typename U>
@@ -1940,19 +2001,7 @@ __aicore__ inline void GetMstxDataCopyPadInfo(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<T>& padParams, __gm__ const char* name)
 {
-    MstxDataCopyPadDesc mstxDataCopyPadDesc;
-    mstxDataCopyPadDesc.dst = From(dst);
-    mstxDataCopyPadDesc.src = FromGm(src);
-    mstxDataCopyPadDesc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadDesc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadDesc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadDesc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadDesc.leftPad = padParams.leftPadding;
-    mstxDataCopyPadDesc.rightPad = padParams.rightPadding;
-    CopyName(mstxDataCopyPadDesc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
+    ReportMstxCopyPadToLocal(dst, src, dataCopyParams, padParams, name);
 }
 
 template <typename T, typename U>
@@ -1960,19 +2009,7 @@ __aicore__ inline void GetMstxDataCopyPadInfo(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyExtParams& dataCopyParams,
     __gm__ const char* name)
 {
-    MstxDataCopyPadDesc mstxDataCopyPadDesc;
-    mstxDataCopyPadDesc.dst = FromGm(dst);
-    mstxDataCopyPadDesc.src = From(src);
-    mstxDataCopyPadDesc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadDesc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadDesc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadDesc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadDesc.leftPad = 0;
-    mstxDataCopyPadDesc.rightPad = 0;
-    CopyName(mstxDataCopyPadDesc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
+    ReportMstxCopyPadToGlobal(dst, src, dataCopyParams, name);
 }
 
 template <typename T, typename U>
@@ -1980,22 +2017,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const DataCopyParams& dataCopyParams,
     const DataCopyPadParams& padParams, const PaddingMode mode, __gm__ const char* name)
 {
-    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
-    mstxDataCopyPadV2Desc.dst = From(dst);
-    mstxDataCopyPadV2Desc.src = FromGm(src);
-    mstxDataCopyPadV2Desc.padMode =
-        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
-    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadV2Desc.leftPad = padParams.leftPadding;
-    mstxDataCopyPadV2Desc.rightPad = padParams.rightPadding;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportMstxCopyPadV2ToLocal(dst, src, dataCopyParams, padParams, mode, name);
 }
 
 template <typename T, typename U>
@@ -2003,22 +2025,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& dataCopyParams, const PaddingMode mode,
     __gm__ const char* name)
 {
-    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
-    mstxDataCopyPadV2Desc.dst = FromGm(dst);
-    mstxDataCopyPadV2Desc.src = From(src);
-    mstxDataCopyPadV2Desc.padMode =
-        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
-    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadV2Desc.leftPad = 0;
-    mstxDataCopyPadV2Desc.rightPad = 0;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportMstxCopyPadV2ToGlobal(dst, src, dataCopyParams, mode, name);
 }
 
 template <typename T, typename U>
@@ -2026,22 +2033,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<T>& padParams, const PaddingMode mode, __gm__ const char* name)
 {
-    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
-    mstxDataCopyPadV2Desc.dst = From(dst);
-    mstxDataCopyPadV2Desc.src = FromGm(src);
-    mstxDataCopyPadV2Desc.padMode =
-        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
-    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadV2Desc.leftPad = padParams.leftPadding;
-    mstxDataCopyPadV2Desc.rightPad = padParams.rightPadding;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportMstxCopyPadV2ToLocal(dst, src, dataCopyParams, padParams, mode, name);
 }
 
 template <typename T, typename U>
@@ -2049,22 +2041,7 @@ __aicore__ inline void GetMstxDataCopyPadInfoV2(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyExtParams& dataCopyParams,
     const PaddingMode mode, __gm__ const char* name)
 {
-    MstxDataCopyPadV2Desc mstxDataCopyPadV2Desc;
-    mstxDataCopyPadV2Desc.dst = FromGm(dst);
-    mstxDataCopyPadV2Desc.src = From(src);
-    mstxDataCopyPadV2Desc.padMode =
-        (mode == PaddingMode::Compact) ? MstxDataCopyPadMode::COMPACT : MstxDataCopyPadMode::NORMAL;
-    mstxDataCopyPadV2Desc.nBurst = dataCopyParams.blockCount;
-    mstxDataCopyPadV2Desc.lenBurst = dataCopyParams.blockLen;
-    mstxDataCopyPadV2Desc.srcGap = dataCopyParams.srcStride;
-    mstxDataCopyPadV2Desc.dstGap = dataCopyParams.dstStride;
-    mstxDataCopyPadV2Desc.leftPad = 0;
-    mstxDataCopyPadV2Desc.rightPad = 0;
-    CopyName(mstxDataCopyPadV2Desc.name, name);
-
-    __mstx_dfx_report_stub(
-        static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD_V2), sizeof(mstxDataCopyPadV2Desc),
-        &mstxDataCopyPadV2Desc);
+    ReportMstxCopyPadV2ToGlobal(dst, src, dataCopyParams, mode, name);
 }
 } // namespace MstxTensor
 } // namespace AscendC

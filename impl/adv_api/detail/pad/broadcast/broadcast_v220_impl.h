@@ -126,6 +126,15 @@ __aicore__ inline void TwoDimBroadCastLastDimNotAlign220(
     PipeBarrier<PIPE_V>();
 }
 
+__aicore__ inline void CalculateBroadcast220LoopCounts(
+    const uint32_t firstDim, const uint32_t tmpBufferSize, const uint32_t minTmpBufferSize,
+    const uint32_t oneBlockElementNum, uint32_t& oneRepeatSize, uint32_t& rangeM, uint32_t& tailM)
+{
+    oneRepeatSize = tmpBufferSize / minTmpBufferSize * oneBlockElementNum;
+    rangeM = firstDim / oneRepeatSize;
+    tailM = firstDim - oneRepeatSize * rangeM;
+}
+
 template <typename T>
 __aicore__ inline void GetAlignLoopNumbers(
     const uint32_t firstDim, const uint32_t numBlocks, const uint32_t tmpBufferSize, uint32_t& oneRepeatSize,
@@ -140,9 +149,8 @@ __aicore__ inline void GetAlignLoopNumbers(
             "tmpBufferSize can't smaller than minTmpBufferSize, tmpBufferSize is %u, minTmpBufferSize is %u!",
             tmpBufferSize, minTmpBufferSize);
     });
-    oneRepeatSize = tmpBufferSize / minTmpBufferSize * oneBlockElementNum;
-    rangeM = firstDim / oneRepeatSize;
-    tailM = firstDim - oneRepeatSize * rangeM;
+    CalculateBroadcast220LoopCounts(
+        firstDim, tmpBufferSize, minTmpBufferSize, oneBlockElementNum, oneRepeatSize, rangeM, tailM);
 }
 
 template <typename T>
@@ -162,9 +170,8 @@ __aicore__ inline void GetNotAlignLoopNumbers(
             "tmpBufferSize can't smaller than minTmpBufferSize, tmpBufferSize is %u, minTmpBufferSize is %u!",
             tmpBufferSize, minTmpBufferSize);
     });
-    oneRepeatSize = tmpBufferSize / minTmpBufferSize * oneBlockElementNum;
-    rangeM = firstDim / oneRepeatSize;
-    tailM = firstDim - oneRepeatSize * rangeM;
+    CalculateBroadcast220LoopCounts(
+        firstDim, tmpBufferSize, minTmpBufferSize, oneBlockElementNum, oneRepeatSize, rangeM, tailM);
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>

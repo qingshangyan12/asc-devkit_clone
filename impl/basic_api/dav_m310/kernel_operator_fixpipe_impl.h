@@ -345,21 +345,35 @@ __aicore__ inline void CopyDeqTensorToFbuf(
 
 // contains loop info and cal n size for each loop
 // move data L0C->UB
-template <typename T, typename U, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0cToUB(
-    __ubuf__ T* dst, __cc__ U* src, const FixpipeParamsM310& intriParams, const FixpipeTilingM310& fixpipeTiling,
-    uint16_t calNSize, uint16_t nIterIndex = 0)
+namespace Internal {
+template <typename T, const FixpipeConfig& config>
+__aicore__ inline void ResolveFixpipeOffsetsM310(
+    const FixpipeParamsM310& intriParams, const FixpipeTilingM310& fixpipeTiling, uint16_t nIterIndex,
+    uint32_t& srcOffset, uint32_t& dstOffset, bool& nz2ndEn)
 {
     uint16_t cburstNum = fixpipeTiling.nSize / 16;
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
-    uint32_t dstOffset = 0;
-    bool nz2ndEn = false;
+    srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
+    dstOffset = 0;
+    nz2ndEn = false;
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         dstOffset = nIterIndex * fixpipeTiling.nSize;
         nz2ndEn = true;
     } else {
         dstOffset = cburstNum * nIterIndex * intriParams.dstStride * 32 / sizeof(T);
     }
+}
+} // namespace Internal
+
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0cToUB(
+    __ubuf__ T* dst, __cc__ U* src, const FixpipeParamsM310& intriParams, const FixpipeTilingM310& fixpipeTiling,
+    uint16_t calNSize, uint16_t nIterIndex = 0)
+{
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    bool nz2ndEn;
+    Internal::ResolveFixpipeOffsetsM310<T, config>(
+        intriParams, fixpipeTiling, nIterIndex, srcOffset, dstOffset, nz2ndEn);
     // LOC -> UB only n direction need tiling, m no need tiling
     return copy_matrix_cc_to_ub(
         (__ubuf__ T*)(dst + dstOffset), (__cc__ U*)(src + srcOffset), 0, calNSize, intriParams.mSize,
@@ -437,17 +451,11 @@ __aicore__ inline void FixpipeL0cToL1(
     __cbuf__ T* dst, __cc__ U* src, const FixpipeParamsM310& intriParams, const FixpipeTilingM310& fixpipeTiling,
     uint16_t calNSize, uint16_t nIterIndex = 0)
 {
-    uint16_t cburstNum = fixpipeTiling.nSize / 16;
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
-
-    uint32_t dstOffset = 0;
-    bool nz2ndEn = false;
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        dstOffset = nIterIndex * fixpipeTiling.nSize;
-        nz2ndEn = true;
-    } else {
-        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * 32 / sizeof(T);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    bool nz2ndEn;
+    Internal::ResolveFixpipeOffsetsM310<T, config>(
+        intriParams, fixpipeTiling, nIterIndex, srcOffset, dstOffset, nz2ndEn);
     // LOC -> L1 only n direction need tiling, m no need tiling
     return copy_matrix_cc_to_cbuf(
         (__cbuf__ T*)(dst + dstOffset), (__cc__ U*)(src + srcOffset), 0, calNSize, intriParams.mSize,
@@ -543,16 +551,11 @@ __aicore__ inline void FixpipeL0cToOut(
     __gm__ T* dst, __cc__ U* src, const FixpipeParamsM310& intriParams, const FixpipeTilingM310& fixpipeTiling,
     uint16_t calNSize, uint16_t nIterIndex = 0)
 {
-    uint16_t cburstNum = fixpipeTiling.nSize / 16;
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
-    uint32_t dstOffset = 0;
-    bool nz2ndEn = false;
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        dstOffset = nIterIndex * fixpipeTiling.nSize;
-        nz2ndEn = true;
-    } else {
-        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * 32 / sizeof(T);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    bool nz2ndEn;
+    Internal::ResolveFixpipeOffsetsM310<T, config>(
+        intriParams, fixpipeTiling, nIterIndex, srcOffset, dstOffset, nz2ndEn);
 
     if constexpr (g_gm_overflow_check) {
         uint64_t gmLen = GetGMLength<T>(intriParams, calNSize, nz2ndEn);

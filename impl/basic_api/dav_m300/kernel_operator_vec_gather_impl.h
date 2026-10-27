@@ -264,10 +264,10 @@ __aicore__ inline void GatherImplB8(
 }
 
 // norm mode
-template <typename T>
-__aicore__ inline void GatherImpl(
+template <typename T, typename Mask>
+__aicore__ inline void GatherImplByMaskType(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* srcOffsetLocal, const uint32_t srcLength,
-    const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+    const uint32_t srcBaseOffset, const Mask& mask, const uint8_t repeatTime, const uint8_t srcRepStride)
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Gather only support type b8/b16/b32 on current device");
     uint32_t srcBaseIndex = srcBaseOffset / sizeof(T);
@@ -280,21 +280,21 @@ __aicore__ inline void GatherImpl(
     }
 }
 
+template <typename T>
+__aicore__ inline void GatherImpl(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* srcOffsetLocal, const uint32_t srcLength,
+    const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    GatherImplByMaskType(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
+}
+
 // bit mode
 template <typename T>
 __aicore__ inline void GatherImpl(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* srcOffsetLocal, const uint32_t srcLength,
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "Gather only support type b8/b16/b32 on current device");
-    uint32_t srcBaseIndex = srcBaseOffset / sizeof(T);
-    if constexpr (sizeof(T) == 1) {
-        GatherImplB8(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
-    } else if constexpr (sizeof(T) == 2) {
-        GatherImplB16(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
-    } else if constexpr (sizeof(T) == 4) {
-        GatherImplB32(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseIndex, mask, repeatTime, srcRepStride);
-    }
+    GatherImplByMaskType(dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, srcRepStride);
 }
 
 // counter mode

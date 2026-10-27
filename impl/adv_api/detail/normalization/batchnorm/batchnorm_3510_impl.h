@@ -28,6 +28,7 @@
 #include "../../api_check/kernel_check/normalization/batchnorm/batchnorm_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
+#include "../normalization_3510_io.h"
 
 namespace AscendC {
 namespace BatchNormAPI {
@@ -37,13 +38,7 @@ template <typename T>
 __simd_callee__ inline void LoadDataWithT(
     __ubuf__ T* src, Reg::RegTensor<float>& dstReg, Reg::MaskReg& mask, uint32_t offset)
 {
-    if constexpr (IsSameType<T, half>::value) {
-        Reg::RegTensor<T> srcOrigin;
-        Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
-        Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, mask);
-    } else {
-        Reg::LoadAlign(dstReg, src + offset);
-    }
+    Internal::Normalization3510LoadDataWithT<T>(src, dstReg, mask, offset);
 }
 
 template <typename T>
@@ -63,13 +58,7 @@ template <typename T>
 __simd_callee__ inline void SaveDataWithT(
     __ubuf__ T* dst, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask, uint32_t offset)
 {
-    if constexpr (IsSameType<T, half>::value) {
-        Reg::RegTensor<T> regT;
-        Reg::Cast<T, float, LayoutZMrgZRndRSatNS>(regT, srcReg, mask);
-        Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
-    } else {
-        Reg::StoreAlign(dst + offset, srcReg, mask);
-    }
+    Internal::Normalization3510SaveDataWithT<T>(dst, srcReg, mask, offset);
 }
 
 template <typename T>

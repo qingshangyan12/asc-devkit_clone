@@ -22,6 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 
 #include "kernel_operator_common_impl.h"
+#include "kernel_operator_level0_mask_impl.h"
 #include "kernel_operator_vec_duplicate_impl.h"
 #include "kernel_operator_vec_template_impl.h"
 
@@ -523,11 +524,8 @@ __aicore__ inline void VecCopyLevel0Template(
         ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
     }
     __ubuf__ uint64_t* maskBuf = nullptr;
-    uint16_t maskArraySize = (maskArray == nullptr) ? 0 : MASK_ARRAY_SIZE;
     BasicAPIMaskStruct maskArrayStruct;
-    for (uint16_t i = 0; i < maskArraySize; i++) {
-        maskArrayStruct.maskArray[i] = maskArray[i];
-    }
+    Internal::PrepareLevel0MaskL300<isMaskBitMode>(maskArray, maskCount, maskArrayStruct);
     if (Internal::IsCounterMode()) {
         if constexpr (!isSetMask) {
             maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
@@ -721,6 +719,18 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
         intriParams.srcStride, intriParams.dstStride);
 }
 
+template <typename T, typename CopyParams>
+__aicore__ inline void DataCopyPadUB2GMCheckedCopy(__gm__ T* dst, __ubuf__ T* src, const CopyParams& intriParams)
+{
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
+    }
+    copy_ubuf_to_gm_align(
+        (__gm__ uint8_t*)dst, (__ubuf__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+}
+
 template <typename T>
 __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
@@ -730,13 +740,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which must be 32B aligned", absUbAddr);
     });
 #endif
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
-    }
-    copy_ubuf_to_gm_align(
-        (__gm__ uint8_t*)dst, (__ubuf__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
-        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadUB2GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>
@@ -748,13 +752,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which must be 32B aligned", absUbAddr);
     });
 #endif
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
-    }
-    copy_ubuf_to_gm_align(
-        (__gm__ uint8_t*)dst, (__ubuf__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
-        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadUB2GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>

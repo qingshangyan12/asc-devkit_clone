@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_IMPL_SCALEA_ND2ZZ_H
 
 #include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/copy_common.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/source_geometry.h"
 
 namespace asc {
 namespace te {
@@ -88,15 +89,8 @@ public:
         uint32_t src_row_shape;
         uint32_t src_col_shape;
         uint32_t src_row_stride;
-        if constexpr (is_satisfied_ptn_format_v<SrcTensor, nd_layout_ptn>) {
-            src_row_shape = get_element<attr_info::shape, attr_info::row>(src_layout);
-            src_col_shape = get_element<attr_info::shape, attr_info::column>(src_layout);
-            src_row_stride = get_element<attr_info::stride, attr_info::row>(src_layout);
-        } else {
-            src_row_shape = get_element<attr_info::shape, attr_info::row, 1>(src_layout);
-            src_col_shape = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
-            src_row_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout);
-        }
+        read_gm_to_l1_source_geometry<SrcTensor, nd_layout_ptn, attr_info::row, attr_info::column, attr_info::row>(
+            src_layout, src_row_shape, src_col_shape, src_row_stride);
         uint16_t dst_b_row_stride = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
 
         uint16_t n_value = (src_col_shape * sizeof(type)) >> 1; // use b16 for DN2NZ, so n_value = src_col_shape / 2

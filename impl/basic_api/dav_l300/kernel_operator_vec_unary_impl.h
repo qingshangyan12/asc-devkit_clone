@@ -21,6 +21,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #include "../kernel_utils.h"
+#include "kernel_operator_level0_mask_impl.h"
 #include "kernel_operator_common_impl.h"
 #include "../../../include/basic_api/kernel_struct_unary.h"
 
@@ -93,11 +94,8 @@ __aicore__ inline void VecUnaryLevel0Template(
         ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
     }
     __ubuf__ uint64_t* maskBuf = nullptr;
-    uint16_t maskArraySize = (maskArray == nullptr) ? 0 : MASK_ARRAY_SIZE;
     BasicAPIMaskStruct maskArrayStruct;
-    for (uint16_t i = 0; i < maskArraySize; i++) {
-        maskArrayStruct.maskArray[i] = maskArray[i];
-    }
+    PrepareLevel0MaskL300<isMaskBitMode>(maskArray, maskCount, maskArrayStruct);
     if (Internal::IsCounterMode()) {
         if constexpr (!isSetMask) {
             maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit

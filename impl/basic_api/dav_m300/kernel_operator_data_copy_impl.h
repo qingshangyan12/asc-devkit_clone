@@ -847,6 +847,18 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
         static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
 }
 
+template <typename T, typename CopyParams>
+__aicore__ inline void DataCopyPadUB2GMCheckedCopy(__gm__ T* dst, __ubuf__ T* src, const CopyParams& intriParams)
+{
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
+    }
+    copy_ubuf_to_gm_align(
+        dst, src, 0, intriParams.blockCount, intriParams.blockLen, static_cast<uint32_t>(intriParams.srcStride),
+        static_cast<uint32_t>(intriParams.dstStride));
+}
+
 template <typename T>
 __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
@@ -856,13 +868,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which must be 32B aligned", absUbAddr);
     });
 #endif
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
-    copy_ubuf_to_gm_align(
-        dst, src, 0, intriParams.blockCount, intriParams.blockLen, static_cast<uint32_t>(intriParams.srcStride),
-        static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadUB2GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>
@@ -874,13 +880,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which must be 32B aligned", absUbAddr);
     });
 #endif
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
-    copy_ubuf_to_gm_align(
-        dst, src, 0, intriParams.blockCount, intriParams.blockLen, static_cast<uint32_t>(intriParams.srcStride),
-        static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadUB2GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>

@@ -99,10 +99,11 @@ public:
         copy_l0c_to_l1_impl::template run<trait>(dst, src, quant, params);
     }
 
+private:
     template <
         const l0c_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename Quant, typename DstCoord,
         typename SrcCoord, typename CopyShape>
-    __aicore__ inline static typename Std::enable_if<Std::is_same_v<Quant, uint64_t>, void>::type data_copy_impl(
+    __aicore__ inline static void data_copy_quant_coord_impl(
         const DstTensor& dst, const SrcTensor& src, const Quant& quant, const DstCoord& dst_coord,
         const SrcCoord& src_coord, const CopyShape& copy_shape,
         const l0c_to_l1_params& params = default_l0c_to_l1_params)
@@ -122,6 +123,18 @@ public:
         auto resolved_src_coord = resolve_copy_coord(src.layout(), copy_shape, src_coord);
         copy_l0c_to_l1_impl::template run<trait>(
             dst, src, quant, resolved_dst_coord, resolved_src_coord, copy_shape, params);
+    }
+
+public:
+    template <
+        const l0c_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename Quant, typename DstCoord,
+        typename SrcCoord, typename CopyShape>
+    __aicore__ inline static typename Std::enable_if<Std::is_same_v<Quant, uint64_t>, void>::type data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const Quant& quant, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const CopyShape& copy_shape,
+        const l0c_to_l1_params& params = default_l0c_to_l1_params)
+    {
+        data_copy_quant_coord_impl<trait>(dst, src, quant, dst_coord, src_coord, copy_shape, params);
     }
 
     template <const l0c_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename Quant>
@@ -156,21 +169,7 @@ public:
         const SrcCoord& src_coord, const CopyShape& copy_shape,
         const l0c_to_l1_params& params = default_l0c_to_l1_params)
     {
-        using dst_pos = get_mem_location<DstTensor>;
-        using src_pos = get_mem_location<SrcTensor>;
-        static_assert(
-            Std::is_same_v<dst_pos, location::l1>, "For copy_l0c_to_l1, the destination tensor must be located in L1.");
-        static_assert(
-            Std::is_same_v<src_pos, location::l0c>, "For copy_l0c_to_l1, the source tensor must be located in L0C.");
-
-        using dst_pattern = get_layout_pattern<typename DstTensor::layout_type>;
-        using src_pattern = get_layout_pattern<typename SrcTensor::layout_type>;
-        using copy_l0c_to_l1_impl =
-            typename copy_l0c_to_l1_routing<current_arch_version, dst_pattern, src_pattern>::type;
-        auto resolved_dst_coord = resolve_copy_coord(dst.layout(), copy_shape, dst_coord);
-        auto resolved_src_coord = resolve_copy_coord(src.layout(), copy_shape, src_coord);
-        copy_l0c_to_l1_impl::template run<trait>(
-            dst, src, quant, resolved_dst_coord, resolved_src_coord, copy_shape, params);
+        data_copy_quant_coord_impl<trait>(dst, src, quant, dst_coord, src_coord, copy_shape, params);
     }
 };
 

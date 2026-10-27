@@ -73,6 +73,17 @@ constexpr PowTiling POW_TILING_PARAM_V200(
     POW_TENSOR_SCALAR_HALF_CALC_PROC_V200, POW_TENSOR_SCALAR_INT_CALC_PROC_V200,
     POW_TENSOR_SCALAR_FLOAT_CALC_PROC_V200);
 
+inline PowTiling GetPowerTilingParameters(const NpuArch npuArch)
+{
+    struct PowTiling param(0, 0, 0, 0, 0, 0);
+    if (npuArch == NpuArch::DAV_2201) {
+        param = POW_TILING_PARAM_V220;
+    } else if (npuArch == NpuArch::DAV_2002) {
+        param = POW_TILING_PARAM_V200;
+    }
+    return param;
+}
+
 /*
 Determine whether the input and output shapes are tensors.
 */
@@ -118,12 +129,7 @@ inline uint32_t GetPowerMinTmpSize(
     const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
-    struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (npuArch == NpuArch::DAV_2201) {
-        param = POW_TILING_PARAM_V220;
-    } else if (npuArch == NpuArch::DAV_2002) {
-        param = POW_TILING_PARAM_V200;
-    }
+    const PowTiling param = GetPowerTilingParameters(npuArch);
     const bool src1IsTensor = ShapeIsTensor(srcShape1);
     const bool src2IsTensor = ShapeIsTensor(srcShape2);
     const bool isPowTensorTensor = src1IsTensor && src2IsTensor;
@@ -146,12 +152,7 @@ inline uint32_t GetPowerMaxTmpSize(
     const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
-    struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (npuArch == NpuArch::DAV_2201) {
-        param = POW_TILING_PARAM_V220;
-    } else if (npuArch == NpuArch::DAV_2002) {
-        param = POW_TILING_PARAM_V200;
-    }
+    const PowTiling param = GetPowerTilingParameters(npuArch);
     std::vector<int64_t> shapeDims1 = srcShape1.GetDims();
     std::vector<int64_t> shapeDims2 = srcShape2.GetDims();
     const bool src1IsTensor = ShapeIsTensor(srcShape1);
@@ -194,12 +195,7 @@ void GetPowerTmpBufferFactorSize(
     const NpuArch npuArch, const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt,
     const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 {
-    struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (npuArch == NpuArch::DAV_2201) {
-        param = POW_TILING_PARAM_V220;
-    } else if (npuArch == NpuArch::DAV_2002) {
-        param = POW_TILING_PARAM_V200;
-    }
+    const PowTiling param = GetPowerTilingParameters(npuArch);
     bool isPowTensorTensor = baseIsTensor && expIsTensor;
     extraBuffer = REPEAT_BYTE_SIZE;
     if (typeIsInt) {

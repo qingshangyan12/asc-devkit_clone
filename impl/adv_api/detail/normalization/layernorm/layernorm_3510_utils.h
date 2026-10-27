@@ -25,6 +25,7 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
+#include "../normalization_3510_load.h"
 
 namespace AscendC {
 namespace Internal {
@@ -55,13 +56,7 @@ template <typename T>
 __simd_callee__ inline void LoadDataWithT(
     __ubuf__ T* src, Reg::RegTensor<float>& dstReg, Reg::MaskReg& dstPreg, uint32_t srcOffset)
 {
-    if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
-        Reg::RegTensor<T> srcOrigin;
-        Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
-        Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, dstPreg);
-    } else { // this branch: only support float
-        Reg::LoadAlign(dstReg, src + srcOffset);
-    }
+    Internal::LoadNormalization3510Input<T>(src, dstReg, dstPreg, srcOffset);
 }
 
 __aicore__ inline uint16_t CalculateHalfAddRepeatTimes(uint32_t halfAddTimes)

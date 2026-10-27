@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_COPY_IMPL_IMG2COL_H
 
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/instruction.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col_common.h"
 
 namespace asc {
 namespace te {
@@ -47,15 +48,7 @@ public:
         uint16_t l1_w = get<3>(src_layout.shape());
         uint16_t channel_size = get<1>(src_layout.shape()) * get<4>(src_layout.shape());
 
-        load_l1_to_l0a_img2col_instr::set_f_matrix(l1_h, l1_w, params.pad_list);
-        load_l1_to_l0a_img2col_instr::set_padding(params.pad_value);
-        load_l1_to_l0a_img2col_instr::set_repeat(
-            static_cast<uint16_t>(Std::ceil_division(params.m_extension, fractal_fixed)));
-        load_l1_to_l0a_img2col_instr::load_data(
-            dst.data().get(), src.data().get(), params.k_extension, params.m_extension, k_start_pos, m_start_pos,
-            params.stride_w, params.stride_h, params.filter_w, params.filter_h, params.dilation_filter_w,
-            params.dilation_filter_h, params.enable_filter_w_extend, params.enable_filter_h_extend,
-            params.enable_transpose, params.enable_f_matrix_ctrl, channel_size);
+        emit_l1_to_l0a_img2col(dst, src, params, l1_h, l1_w, k_start_pos, m_start_pos, channel_size);
     }
 
     template <

@@ -30,6 +30,7 @@
 #include "../../api_check/kernel_check/math/isnan/is_nan_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
+#include "../classification_constants.h"
 
 namespace AscendC {
 template <typename T, typename U>
@@ -42,13 +43,7 @@ __simd_vf__ inline void IsNanImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
     Reg::RegTensor<T> vReg1;
     Reg::MaskReg mask;
     Reg::MaskReg cmpMaskReg;
-    if constexpr (Std::is_same_v<T, bool>) {
-        Reg::Duplicate((Reg::RegTensor<uint8_t>&)vReg0, 0u);
-        Reg::Duplicate((Reg::RegTensor<uint8_t>&)vReg1, 1u);
-    } else {
-        Reg::Duplicate(vReg0, 0.0f);
-        Reg::Duplicate(vReg1, 1.0f);
-    }
+    ::AscendC::Internal::PrepareClassificationConstants<T>(vReg0, vReg1);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<U>(count);
         Reg::LoadAlign(srcVreg, src + i * oneRepElm);

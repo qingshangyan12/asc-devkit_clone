@@ -25,6 +25,7 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb_copy.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
+#include "impl/tensor_api/arch/cube/utils/l0c_vector_quant_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_ub/copy_impl/instruction.h"
 
 namespace asc {
@@ -226,13 +227,7 @@ private:
     template <typename SrcTensor>
     __aicore__ inline static void copy_l1_to_fixbuf(const SrcTensor& src, uint16_t cal_n_size, uint16_t n_iter_index)
     {
-        auto dst_addr = reinterpret_cast<__fbuf__ uint64_t*>(alloc_fixbuf_temp_buf(cal_n_size));
-        auto dst = make_tensor(make_mem_ptr<location::fixbuf>(dst_addr), src.layout());
-        auto coord = make_coord(_0{}, n_iter_index * main_loop_n_size);
-        auto shape = make_shape(_1{}, cal_n_size);
-        auto tile_src = src.slice(coord, shape);
-        copy_l1_to_fixbuf_nd::run<l1_to_fixbuf_trait_default::value>(dst, tile_src);
-        set_qua(dst_addr);
+        copy_l0c_vector_quant_to_fixbuf(src, cal_n_size, n_iter_index);
     }
 
     template <QuantMode_t quant_pre, typename DstTensor, typename SrcTensor, typename ParamTuple, size_t... Is>
@@ -245,29 +240,13 @@ private:
     template <typename DstTensor>
     __aicore__ inline static constexpr auto make_dst_coord(uint32_t n_offset)
     {
-        using layout_type = typename DstTensor::layout_type;
-        if constexpr (layout_type::depth == five_dim_data) {
-            return make_coord(_0{}, make_coord(make_coord(0, 0), make_coord(0, n_offset)));
-        } else if constexpr (layout_type::depth == four_dim_data) {
-            return make_coord(make_coord(0, 0), make_coord(0, n_offset));
-        } else if constexpr (layout_type::depth == three_dim_data) {
-            return make_coord(_0{}, make_coord(0, n_offset));
-        } else {
-            static_assert(layout_type::depth == two_dim_data, "Only support two-dim or four-dim dst tensor.");
-            return make_coord(0, n_offset);
-        }
+        return make_l0c_vector_quant_dst_coord<DstTensor>(n_offset);
     }
 
     template <typename SrcTensor>
     __aicore__ inline static constexpr auto make_src_coord(uint32_t n_offset)
     {
-        using layout_type = typename SrcTensor::layout_type;
-        if constexpr (layout_type::depth == five_dim_data) {
-            return make_coord(_0{}, make_coord(make_coord(0, 0), make_coord(0, n_offset)));
-        } else {
-            static_assert(layout_type::depth == four_dim_data, "Only support four-dim or five-dim src tensor.");
-            return make_coord(make_coord(0, 0), make_coord(0, n_offset));
-        }
+        return make_l0c_vector_quant_src_coord<SrcTensor>(n_offset);
     }
 
     template <

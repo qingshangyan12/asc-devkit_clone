@@ -21,6 +21,7 @@
 #include "utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/host_log.h"
 #include "../../detail/api_check/host_apicheck.h"
+#include "softmax_tiling_fields.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(SoftMaxTilingOpApi, SoftMaxTiling)
@@ -185,21 +186,7 @@ void SoftMaxTilingFunc(
 
     AdjustToBasicBlockBaseM(baseM, srcM, srcK);
 
-    softmaxTiling.set_srcM(srcM);
-    softmaxTiling.set_srcK(srcK);
-    softmaxTiling.set_srcSize(srcM * srcK);
-
-    softmaxTiling.set_outMaxM(srcM);             // output dstMax
-    softmaxTiling.set_outMaxK(elementNumPerBlk); // output dstMax
-    softmaxTiling.set_outMaxSize(srcM * elementNumPerBlk);
-
-    softmaxTiling.set_splitM(baseM);
-    softmaxTiling.set_splitK(srcK);
-    softmaxTiling.set_splitSize(baseM * srcK);
-
-    softmaxTiling.set_reduceM(baseM);
-    softmaxTiling.set_reduceK(elementNumPerBlk);
-    softmaxTiling.set_reduceSize(baseM * elementNumPerBlk);
+    Internal::SetSoftmaxBasicTilingFields(softmaxTiling, srcM, srcK, elementNumPerBlk, baseM);
 
     uint32_t tail = 0;
     if (baseM != 0) {

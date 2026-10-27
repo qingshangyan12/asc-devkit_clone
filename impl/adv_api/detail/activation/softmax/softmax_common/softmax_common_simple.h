@@ -17,6 +17,7 @@
 
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_SIMPLE_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_SIMPLE_H
+#include "softmax_shape_metadata.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 #include "../regbase/v300/simple_softmax_impl.h"
@@ -41,13 +42,7 @@ __aicore__ inline void SimpleSoftMaxBaseImpl(
     ShapeInfo srcShape = src.GetShapeInfo();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxLastAxisMetadata(srcShape, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (isDataFormatNZ) {
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
             SoftMaxTiling newTiling = tiling;

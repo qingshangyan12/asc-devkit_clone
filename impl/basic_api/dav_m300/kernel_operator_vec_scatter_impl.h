@@ -267,10 +267,10 @@ __aicore__ inline void ScatterImplB8(
 }
 
 // norm mode
-template <typename T>
-__aicore__ inline void ScatterImpl(
+template <typename T, typename Mask>
+__aicore__ inline void ScatterImplByMaskType(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
-    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+    const uint32_t dstBaseAddr, const Mask& mask, const uint8_t repeatTime, const uint8_t srcRepStride)
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "Scatter only support type b8/b16/b32 on current device");
     uint32_t dstBaseOffset = dstBaseAddr / sizeof(T);
@@ -283,21 +283,21 @@ __aicore__ inline void ScatterImpl(
     }
 }
 
+template <typename T>
+__aicore__ inline void ScatterImpl(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
+    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    ScatterImplByMaskType(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+}
+
 // bit mode
 template <typename T>
 __aicore__ inline void ScatterImpl(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
     const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "Scatter only support type b8/b16/b32 on current device");
-    uint32_t dstBaseOffset = dstBaseAddr / sizeof(T);
-    if constexpr (sizeof(T) == 1) {
-        ScatterImplB8(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseOffset, mask, repeatTime, srcRepStride);
-    } else if constexpr (sizeof(T) == 2) {
-        ScatterImplB16(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseOffset, mask, repeatTime, srcRepStride);
-    } else if constexpr (sizeof(T) == 4) {
-        ScatterImplB32(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseOffset, mask, repeatTime, srcRepStride);
-    }
+    ScatterImplByMaskType(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
 }
 
 // counter mode

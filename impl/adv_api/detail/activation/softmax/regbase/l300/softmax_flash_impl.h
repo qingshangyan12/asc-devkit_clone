@@ -25,6 +25,7 @@
 
 #include <type_traits>
 #include "softmax_common_impl.h"
+#include "../../softmax_common/softmax_tensor_shape_metadata.h"
 
 namespace AscendC {
 namespace Internal {
@@ -271,14 +272,7 @@ __aicore__ inline void SoftmaxFlashCommonImpl(
     uint32_t workLocalSize = workLocal.GetSize();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        ShapeInfo srcShape = srcTensor.GetShapeInfo();
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxTensorLastAxisMetadata(srcTensor, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (std::is_same_v<T1, half> && std::is_same_v<T2, float>) {
         if (srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM) {
             SoftMaxTiling newTiling = tiling;
@@ -319,14 +313,7 @@ __aicore__ inline void SoftmaxFlashTmpBufCommonImpl(
     uint32_t workLocalSize = tempBuffer.GetSize();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        ShapeInfo srcShape = srcTensor.GetShapeInfo();
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxTensorLastAxisMetadata(srcTensor, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (std::is_same_v<T1, half> && std::is_same_v<T2, float>) {
         if (srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM) {
             SoftMaxTiling newTiling = tiling;

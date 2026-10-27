@@ -23,6 +23,7 @@
 #define IMPL_MATH_CUMSUM_CUMSUM_C310_UTILS_H
 #include "../../../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../normalization/normalization_3510_load.h"
 
 namespace AscendC {
 
@@ -31,13 +32,7 @@ template <typename T>
 __simd_callee__ inline void LoadDataWithT(
     __ubuf__ T* src, Reg::RegTensor<float>& dstReg, Reg::MaskReg& dstPreg, uint32_t srcOffset)
 {
-    if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
-        Reg::RegTensor<T> srcOrigin;
-        Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
-        Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, dstPreg);
-    } else { // this branch: only support float
-        Reg::LoadAlign(dstReg, src + srcOffset);
-    }
+    Internal::LoadNormalization3510Input<T>(src, dstReg, dstPreg, srcOffset);
 }
 
 template <typename T>

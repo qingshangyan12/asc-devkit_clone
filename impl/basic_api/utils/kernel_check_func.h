@@ -181,9 +181,9 @@ bool CheckFuncGather(
     return CheckFuncGatherImpl(chkParams, intriName);
 }
 
-template <typename T>
-bool CheckFuncCreateVecIndex(
-    const LocalTensor<T>& dst, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlkStride,
+template <typename T, typename Mask>
+inline bool CheckFuncCreateVecIndexByMaskType(
+    const LocalTensor<T>& dst, const Mask& mask, const uint8_t repeatTime, const uint16_t dstBlkStride,
     const uint16_t dstRepStride, const char* intriName)
 {
     check::VecCreateVecIndexApiParams chkParams{
@@ -200,19 +200,18 @@ bool CheckFuncCreateVecIndex(
 
 template <typename T>
 bool CheckFuncCreateVecIndex(
+    const LocalTensor<T>& dst, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlkStride,
+    const uint16_t dstRepStride, const char* intriName)
+{
+    return CheckFuncCreateVecIndexByMaskType(dst, mask, repeatTime, dstBlkStride, dstRepStride, intriName);
+}
+
+template <typename T>
+bool CheckFuncCreateVecIndex(
     const LocalTensor<T>& dst, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlkStride,
     const uint16_t dstRepStride, const char* intriName)
 {
-    check::VecCreateVecIndexApiParams chkParams{
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
-        repeatTime,
-        dstBlkStride,
-        dstRepStride,
-        static_cast<uint32_t>(sizeof(PrimT<T>)),
-        static_cast<uint64_t>(dst.GetSize() * sizeof(PrimT<T>)),
-        static_cast<uint8_t>(dst.GetPosition()),
-        static_cast<uint32_t>(0)};
-    return CheckFuncCreateVecIndexImpl(chkParams, mask, intriName);
+    return CheckFuncCreateVecIndexByMaskType(dst, mask, repeatTime, dstBlkStride, dstRepStride, intriName);
 }
 
 template <typename T>

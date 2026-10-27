@@ -23,6 +23,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "../kernel_utils.h"
+#include "kernel_check_tensor_metadata.h"
 namespace AscendC {
 namespace check {
 struct CopyApiParams {
@@ -39,14 +40,8 @@ struct CopyApiParams {
         srcStride = srcStrideIn;
         dstRepeatSize = dstRepeatSizeIn;
         srcRepeatSize = srcRepeatSizeIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     CopyApiParams(
         uint64_t dstAddrIn, uint64_t srcAddrIn, uint32_t dstDtypeBytesIn, uint32_t srcDtypeBytesIn, uint64_t dstSizeIn,
@@ -54,14 +49,8 @@ struct CopyApiParams {
     {
         dstAddr = dstAddrIn;
         srcAddr = srcAddrIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
         calCount = calCountIn;
     }
 
