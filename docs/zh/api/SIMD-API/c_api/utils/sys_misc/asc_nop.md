@@ -1,13 +1,11 @@
 ---
 okftype: reference.api
-description: "生成一条空操作指令，不执行实际计算，每调用一次阻塞一拍流水；精确阻塞n拍流水时需在多次调用前后插入asc_sync。"
+description: "生成一条空操作指令、不执行实际计算，每调用一次阻塞一拍流水，可用于调试与流水对齐场景。"
 tag:
   - roles: [control]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: requires
-    condition: "需要精确阻塞n拍流水时"
+dependencies: []
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_nop
 

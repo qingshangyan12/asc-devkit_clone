@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "系统初始化在算子开始执行时将NPU跨任务保留的控制状态恢复为C API约定的默认值，建议在Kernel入口、数据搬运和计算之前调用asc_init，避免前序任务遗留配置影响当前任务。"
+description: "说明系统初始化的目的与使用时机：在算子开始执行时把可能跨任务保留的控制状态恢复为C API约定默认值。"
 ---
 # 系统初始化
 

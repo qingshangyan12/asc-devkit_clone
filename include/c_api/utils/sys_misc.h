@@ -29,7 +29,7 @@
 namespace __asc_aicore {
 /**
  * @ingroup simd_c_api.utils.sys_misc
- * @brief Emits a no-op instruction that performs no computation and stalls the pipeline for one beat per call; wrap n calls with asc_sync for exact n-beat stalls.
+ * @brief Emits a no-operation instruction that stalls the pipeline for one beat per call.
  *
  * @override_id asc_nop__z
  * @archs 3510

@@ -33,7 +33,7 @@
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_MTE2 instruction issue queue as uint8_t (AIC/AIV; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_MTE2 on the calling core (supported on AIC and AIV, maximum 16 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_mte2_idle_slot_count__z
  * @archs 3510
@@ -42,7 +42,7 @@ __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_MTE3 instruction issue queue as uint8_t (AIV; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_MTE3 on the calling core (supported on AIV, maximum 16 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_mte3_idle_slot_count__z
  * @archs 3510
@@ -51,7 +51,7 @@ __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count();
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_V instruction issue queue as uint8_t (AIV; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_V on the calling core (supported on AIV, maximum 32 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_v_idle_slot_count__z
  * @archs 3510
@@ -60,7 +60,7 @@ __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count();
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_M instruction issue queue as uint8_t (AIC; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_M on the calling core (supported on AIC, maximum 16 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_m_idle_slot_count__z
  * @archs 3510
@@ -69,7 +69,7 @@ __aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count();
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_MTE1 instruction issue queue as uint8_t (AIC; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_MTE1 on the calling core (supported on AIC, maximum 32 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_mte1_idle_slot_count__z
  * @archs 3510
@@ -78,7 +78,7 @@ __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count();
 
 /**
  * @ingroup simd_c_api.experimental
- * @brief Returns the current idle slot count of the PIPE_FIX instruction issue queue as uint8_t (AIC; experimental interface, non-void return, PIPE_S).
+ * @brief Returns the current number of free issue-queue slots of PIPE_FIX on the calling core (supported on AIC, maximum 32 slots; 0 on unsupported cores).
  *
  * @override_id asc_get_pipe_fix_idle_slot_count__z
  * @archs 3510

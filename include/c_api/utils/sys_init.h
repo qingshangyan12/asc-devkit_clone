@@ -29,7 +29,7 @@
 
 /**
  * @ingroup simd_c_api.utils.sys_init
- * @brief Initializes global control state that may be left over from previous operators (atomic mode, Mask mode, CTRL register, copy loop counts) without clearing user data.
+ * @brief Restores AI Core control state left over from previous kernels to the documented initial state without clearing any data memory.
  *
  * @override_id asc_init__z
  * @archs 2201 3510

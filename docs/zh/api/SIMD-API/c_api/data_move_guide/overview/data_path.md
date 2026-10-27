@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "以NPU架构版本3510为准，说明AI Core分层存储架构与GM、L1、L0A/L0B/L0C、UB、BiasTable、Fixpipe、SIMD Register File等存储单元的用途和地址空间，并用总表列出各源、目的存储单元间的搬运功能、流水与C API。"
+description: "以AI Core分层存储为基础，对比2201与3510的数据通路变化，按源、目的存储单元与硬件流水列出3510可用的搬运接口，并给出各存储单元的地址空间与用途对照。"
 ---
 # 数据通路
 
