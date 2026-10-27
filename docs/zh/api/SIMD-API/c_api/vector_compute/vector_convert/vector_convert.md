@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 类型转换
 
 - **[asc_bfloat162float](asc_bfloat162float.md)**
