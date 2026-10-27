@@ -418,7 +418,7 @@ struct ScatterOffsetDTypeEncoding {
 
 template <typename T, typename U>
 __aicore__ inline void ScatterToGlobalImpl(
-    __gm__ T* dst, __ubuf__ T* src, __ubuf__ U* offsetSrc, ScatterParams& scatterParam, const uint8_t cacheMode)
+    __gm__ T* dst, __ubuf__ T* src, __ubuf__ U* offsetSrc, const ScatterParams& scatterParam, const uint8_t cacheMode)
 {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202))
     if ASCEND_IS_AIV {
