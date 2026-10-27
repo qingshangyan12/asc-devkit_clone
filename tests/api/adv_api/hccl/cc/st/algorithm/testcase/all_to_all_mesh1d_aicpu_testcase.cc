@@ -144,6 +144,62 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
 }
 
+// pairwise 命中拓扑（对齐 hccl IsPairwiseCapable + REGISTER_ALG_ATTRS 约束）：
+// 跨框多级 MESH_1D、每框 8 卡、rankSize 为 16 的倍数、level0Symmetric、<=128P
+TopoInfoWithNetLayerDetails MakePairwiseTopo(u32 rankSize = 32U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 2U;
+    topo.level0PcieMix = false;
+    topo.level0Symmetric = true;
+    topo.deviceNumPerModule = 8U;
+    return topo;
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoallv_pairwise_selector_hits_and_guards)
+{
+    AlltoAllVAutoSelector selector;
+    OpParam param = MakeAicpuParam(HCclCMDType::HCCL_CMD_ALLTOALLV);
+    std::string algName;
+
+    // 命中：pairwise-capable 拓扑优先于 SoleMesh（对齐 hccl selector 顺序）
+    TopoInfoWithNetLayerDetails topo = MakePairwiseTopo(32U);
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSolePairwise");
+
+    // 注册闭环：选中的 algName 有本地可执行注册
+    EXPECT_NE(
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSolePairwise"),
+        nullptr);
+
+    // 128P 上限（hccl REGISTER_ALG_ATTRS 限制）：超出回落 SoleMesh
+    topo = MakePairwiseTopo(256U);
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+
+    // level0 非对称：回落 SoleMesh
+    topo = MakePairwiseTopo(32U);
+    topo.level0Symmetric = false;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+
+    // 单级拓扑不走 pairwise
+    topo = MakePairwiseTopo(32U);
+    topo.topoLevelNums = 1U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+
+    // 每框非 8 卡：逻辑板与物理框错位，回落 SoleMesh
+    topo = MakePairwiseTopo(32U);
+    topo.deviceNumPerModule = 4U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_template_uses_all_channels_per_rank)
 {
     constexpr u32 rankSize = 4U;

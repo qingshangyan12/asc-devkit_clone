@@ -22,6 +22,9 @@ constexpr u32 CCU_MESH1D_MAX_RANK_SIZE = 16U;
 // 大禹纯 CLOS 单层 CCU 上限：event mask 已按 16 rank 一组拆分（ccu_kernel_all_to_all_v_mesh1d.cc），
 // 通道数组受 CcuKernelArgBase::channels[CCU_MAX_RANK_SIZE] 限制（CCU_MAX_RANK_SIZE=64）
 constexpr u32 CCU_CLOS_MAX_RANK_SIZE = 64U;
+// 对齐 hccl AicpuAllToAllVSolePairwise REGISTER_ALG_ATTRS 的 <=128P 限制
+// （条件改变后 SoleMesh 过滤条件需同步适配，hccl 侧注释同样提示）
+constexpr u32 A2AV_PAIRWISE_MAX_RANK_SIZE = 128U;
 } // namespace
 
 SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
@@ -36,6 +39,16 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
         HCCL_WARNING(
             "[AlltoAllVAutoSelector] rankSize[%u] is not supported by local AICPU AllToAllV.", topoInfo->userRankSize);
         return SelectorStatus::NOT_MATCH;
+    }
+    // 对齐 hccl alltoallv_auto_selector.cc:110-118：跨框多级 MESH_1D 时 Pairwise 优先于 SoleMesh；
+    // hccl 侧由 REGISTER_ALG_ATTRS topoCustomCheck 承担的 level0Symmetric + <=128P 约束
+    // （hccl ins_v2_all_to_all_v_sole_executor.cc:613-620），devkit 无注册框架 attrs 注入链，
+    // 在此一并前置守卫，保持与 hccl 注册可命中面一致
+    if (topoInfo->topoLevelNums > 1U && IsPairwiseCapable(topoInfo) && topoInfo->level0Symmetric &&
+        topoInfo->userRankSize <= A2AV_PAIRWISE_MAX_RANK_SIZE) {
+        selectAlgName = "AicpuAllToAllVSolePairwise";
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
     }
     if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS) {
         selectAlgName = "AicpuAllToAllVSoleMesh";
