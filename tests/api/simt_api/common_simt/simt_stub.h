@@ -77,12 +77,14 @@ static inline int __popc(unsigned int x)
 
 static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
 {
-    uint32_t a0 = (uint32_t)a, a1 = x >> 32;
-    uint32_t b0 = (uint32_t)b, b1 = y >> 32;
+    uint32_t a0 = (uint32_t)x;
+    uint32_t a1 = x >> 32;
+    uint32_t b0 = (uint32_t)y;
+    uint32_t b1 = y >> 32;
 
     uint64_t lo0 = (uint64_t)a0 * b0;
-    uint64_t m1  = (uint64_t)a0 * b1;
-    uint64_t m2  = (uint64_t)a1 * b0;
+    uint64_t m1 = (uint64_t)a0 * b1;
+    uint64_t m2 = (uint64_t)a1 * b0;
     uint64_t hi1 = (uint64_t)a1 * b1;
 
     uint64_t mid = m1 + m2;
