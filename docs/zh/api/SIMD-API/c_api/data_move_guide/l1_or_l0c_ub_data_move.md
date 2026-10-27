@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍NPU架构版本3510上L1到UB、UB到L1与L0C到UB三条片上单向通路，覆盖UB到L1连续与高维切分搬运的接口与对齐长度约束、L1到UB通过sub_blockid选择目的AIV、L0C到UB随路量化激活与双目标写入，以及相关核间同步要求。"
+description: "说明3510的三条片上单向通路：UB到L1、L1到UB与L0C到UB，给出asc_copy_ub2l1、asc_copy_l12ub与asc_copy_l0c2ub的参数、DataBlock单位、双目标拆分约束，以及AIC与AIV之间的核间同步要求。"
 ---
 # L1/L0C与UB数据搬运
 

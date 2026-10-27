@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "矩阵计算结果搬出前后保持Nz大分形排布的格式转换特性，输出类型转换及Channel Split/Channel Merge可能改变小分形宽度，小z分形大小应为512B。"
+description: "说明Nz2Nz搬出前后保持Nz大分形排布的地址换算与参数单位：2201的目标步长以32字节计、3510以element计，并给出F32 Channel Split与B8/B4 Channel Merge开启时小分形宽度及512B小z分形约束。"
 ---
 # NZ2NZ
 

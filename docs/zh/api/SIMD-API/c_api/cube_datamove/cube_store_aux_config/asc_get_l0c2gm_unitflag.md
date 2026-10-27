@@ -1,16 +1,21 @@
 ---
 okftype: reference.api
-description: "随路量化场景下读取unit_flag设置，标志矩阵计算与搬运指令的细粒度并行，不适用于L0C Buffer累加场景，该状态由asc_set_l0c_copy_config的is_clean_unit_flag配置。"
+description: "读取 L0C Buffer 搬出使用的 UnitFlag 全局状态设置，返回 FPC 寄存器中由 asc_set_l0c_copy_config 的 is_clean_unit_flag 配置的值，用于确认搬出与矩阵计算的 UnitFlag 配合状态。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
     kind: related
-    condition: "了解UnitFlag与计算、搬出指令的配合时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
     kind: related
-    condition: "读取由asc_set_l0c_copy_config的is_clean_unit_flag配置的状态时"
-version: ">=9.0.0"
+    condition: "返回状态由该接口的 is_clean_unit_flag 参数配置"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: header_reorganized
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.1.0 的声明位于 include/c_api/cube_compute/cube_compute.h，9.2.0 起迁到 include/c_api/cube_datamove/cube_datamove.h 并延续到 9.3.0-beta.1，签名保持无参返回 uint64_t 不变。"
 ---
 # asc_get_l0c2gm_unitflag
 

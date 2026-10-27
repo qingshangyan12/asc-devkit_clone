@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "汇总矩阵搬出时随路量化与随路ReLU的组合情况与系数来源，列出量化模式、激活模式对应的配置接口，并说明Ascend 950PR&950DT系列产品扩展的Scalar与Vector激活参数来源。"
+description: "给出随路量化与随路ReLU组合时M1、M2随路系数的来源：不激活时M1与M2都取量化参数，Normal ReLU时M2置0作为NORMAL系数；并按2201与3510列出Scalar、Vector及3510额外激活模式的参数准备入口。"
 ---
 # 随路量化与随路ReLU场景组合
 

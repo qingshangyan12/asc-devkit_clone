@@ -1,57 +1,45 @@
 ---
 okftype: reference.api
-description: "将L0C Buffer矩阵计算结果经随路量化、随路激活与Nz2ND或Nz2DN格式转换后搬运至全局内存，支持通道拆分、L2 Cache策略及UnitFlag配合，仅在AIC上有效。"
+description: "在Ascend 950PR&950DT系列产品上把L0C Buffer矩阵结果搬出到Global Memory，用强类型枚举组合随路量化、随路激活、Nz2ND与Nz2DN格式转换和通道拆分，调用前需配置量化、激活及通道寄存器。"
 tag:
   - roles: [data_movement]
-  - operations: [copy, layout_transform]
-  - traits: [aligned_transfer, quantization]
+  - operations: [copy]
+  - traits: [quantization, rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
-    kind: related
-    condition: "unit_flag_mode与计算指令配合"
+    kind: constrained_by
+    condition: "unit_flag_mode需与MMAD类指令的UnitFlag设置配合"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md
     kind: requires
-    condition: "开启Nz2DN转换时"
+    condition: "Nz2DN转换前配置非0的源矩阵步长"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
     kind: requires
-    condition: "随路tensor量化模式"
+    condition: "随路tensor量化时设置量化tensor起始地址"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md
     kind: requires
-    condition: "随路激活模式"
+    condition: "随路Leaky ReLU激活时配置激活参数"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md
     kind: requires
-    condition: "开启Nz2ND或Nz2DN格式转换时"
+    condition: "Nz2ND或Nz2DN格式转换前配置格式转换参数"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_prequant.md
     kind: requires
-    condition: "随路scalar量化模式"
+    condition: "随路scalar量化时设置量化参数"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md
     kind: requires
-    condition: "随路激活模式"
+    condition: "随路ReLU激活时配置激活参数"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md
     kind: related
-    condition: "开启enable_channel_split时"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
-    kind: related
-    condition: "开启enable_nz2dn时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
     kind: related
-    condition: "开启enable_nz2nd时"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
-    kind: related
-    condition: "不开启格式转换时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
     kind: related
-    condition: "随路量化模式选择、系数准备及限制"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
-    kind: related
-    condition: "量化与ReLU组合使用场景"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
-    kind: related
-    condition: "随路ReLU模式与配置"
-  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
-    kind: constrained_by
-    condition: "本指令与其他指令存在目的地址重叠时"
 version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "补充强类型枚举原型：l2_cache_mode、unit_flag_mode、quant_pre_mode、relu_pre_mode分别改用asc_store_l2_cache_mode、asc_unit_flag_mode、asc_quant_mode、asc_relu_pre_mode，并新增enable_nz2dn与enable_clip_relu_pre参数，共14个重载，覆盖int4b_t、fp8_e4m3fn_t、hifloat8_t目的类型；9.1.0的整数参数原型（含l2_cache_ctl、clip_relu_pre、unit_flag_ctl、quant_post、eltwise_op等21个参数）同版本标记废弃并迁往废弃接口文档，未移除。"
 ---
 # asc_copy_l0c2gm_arch_3510
 

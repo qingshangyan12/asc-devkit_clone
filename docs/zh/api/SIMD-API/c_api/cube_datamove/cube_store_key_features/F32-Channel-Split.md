@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "矩阵计算搬出过程中对目标类型f32开启Channel Split后，硬件将16×16分形矩阵转换为16×8小z分形矩阵，每个16×16分形矩阵拆分为2个独立的16×8分形矩阵，开启时n_size须为8的倍数。"
+description: "说明L0C搬出时目标类型为f32并开启通道拆分后，16×16分形矩阵被拆分为两个16×8小z分形矩阵；Atlas A3/A2用channel_split、Ascend 950PR&950DT用enable_channel_split开启，并要求输入输出均为float、Nz输出到GM且关闭相关转换与unitFlag。"
 ---
 # F32 Channel Split
 

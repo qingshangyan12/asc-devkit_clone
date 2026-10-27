@@ -1,15 +1,19 @@
 ---
 okftype: reference.api
-description: "将数据从L1 Buffer搬运到Global Memory，以连续传输数据块组织搬运，块长度及目的间隔以32字节为单位，支持源与目的迭代间隔控制。"
+description: "将 L1 Buffer 中的数据按连续传输数据块个数、块长度和源/目间隔搬运到 Global Memory，支持非连续搬运，仅 Atlas A3 与 Atlas A2 系列产品可用。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [store]
   - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "存储单元空间大小和对齐要求"
-version: ">=9.0.0"
+    condition: "存储单元空间大小与对齐要求"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    kind: requires
+    condition: "与其它指令存在数据依赖时需插入同步指令串行化"
+version: ">=9.1.0"
+version_changes: []
 ---
 # asc_copy_l12gm
 

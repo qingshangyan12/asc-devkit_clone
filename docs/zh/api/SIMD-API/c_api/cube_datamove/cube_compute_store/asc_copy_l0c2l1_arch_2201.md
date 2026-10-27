@@ -1,48 +1,40 @@
 ---
 okftype: reference.api
-description: "对矩阵计算结果执行随路量化后从L0C Buffer搬运到L1 Buffer，支持9种量化模式、int4b_t量化、NZ2ND布局转换和通道拆分。"
+description: "在Atlas A3与Atlas A2系列产品上把L0C Buffer矩阵结果量化激活后搬入L1 Buffer，覆盖9种随路量化模式，可选随路ReLU、F32通道拆分与NZ2ND格式转换，并提供void指针通用重载。"
 tag:
   - roles: [data_movement]
-  - operations: [copy, layout_transform]
+  - operations: [copy]
   - traits: [quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
-    kind: related
-    condition: "unit_flag_mode与计算指令配合"
+    kind: constrained_by
+    condition: "unit_flag_mode取值需与MMAD类指令的unit_flag设置配合"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12fb_arch_2201.md
     kind: requires
-    condition: "Vector量化参数搬入"
+    condition: "随路矢量量化时把量化参数搬入Fixpipe Buffer，仅Atlas A3系列产品和Atlas A2系列产品"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md
     kind: requires
-    condition: "Vector量化参数搬入后配置起始地址索引"
+    condition: "矢量量化时配置量化参数起始地址索引"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_params.md
     kind: requires
-    condition: "开启Nz2ND功能时"
+    condition: "开启NZ2ND时配置矩阵数量与矩阵间隔"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_prequant.md
     kind: requires
-    condition: "设置Scalar量化参数"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md
-    kind: related
-    condition: "开启channel_split时"
+    condition: "随路scalar量化时设置量化参数"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
     kind: related
-    condition: "开启enable_nz2nd时"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
-    kind: related
-    condition: "不开启格式转换时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
     kind: related
-    condition: "随路量化模式选择、系数准备及限制"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
-    kind: related
-    condition: "量化与ReLU组合使用场景"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
-    kind: related
-    condition: "随路ReLU模式与配置"
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "存储单元空间大小和对齐要求"
+    condition: "存储单元空间与对齐、通用地址重叠约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "CANN_9_1_0.md新增特性：新增asc_copy_l0c2l1_sync，并新增int16_t目的与int32_t源、bfloat16_t目的与float源两种组合，以及目的为__cbuf__ void*、源分别为__cc__ float*与__cc__ int32_t*的通用重载（后者走int4b_t量化通路）。"
 ---
 # asc_copy_l0c2l1
 

@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "矩阵计算搬出过程中将Nz格式矩阵转换为DN格式矩阵的特性，通过asc_copy_l0c2gm的enable_nz2dn启用，与Channel Split/Channel Merge或L0C到UB双目标模式互斥。"
+description: "说明Nz2DN格式转换：将Nz格式矩阵转换为DN格式，给出逐块地址换算伪代码及matrix_num、src_stride、dst_stride、src_nz_fractal_stride等可配置参数，仅Ascend 950PR&950DT系列产品通过搬出接口的enable_nz2dn开启。"
 ---
 # NZ2DN
 

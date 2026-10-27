@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍L0C Buffer的Bank与Bank Group内存结构、不同产品下的容量与地址编码格式，并说明C API寻址时64B对齐步长及UnitFlag标志块与结果分形的区别。"
+description: "说明L0C Buffer按Bank与Bank Group组织的等容量存储结构，给出2201架构128KB与3510架构256KB两种规格下的地址编码位域含义，并指出结果分形对齐、搬出步长单位与UnitFlag块在C API寻址中的区别。"
 ---
 # L0C Buffer内存结构介绍
 

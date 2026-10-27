@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍矩阵计算的搬出接口，主要实现从L0C Buffer到Global Memory和L1 Buffer的数据传输，支持随路量化、随路ReLU、随路格式转换、通道拆分与合并等场景。"
+description: "矩阵计算搬出总体说明，介绍 L0C Buffer 到 Global Memory、L1 Buffer 与 UB 的搬出流程、随路量化、随路 ReLU、随路格式转换与通道拆分合并能力，并给出 Fixpipe Buffer 量化模式排布图。"
 ---
 # 矩阵搬出总体说明
 

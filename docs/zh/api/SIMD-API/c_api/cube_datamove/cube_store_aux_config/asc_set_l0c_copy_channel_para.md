@@ -1,28 +1,30 @@
 ---
 okftype: reference.api
-description: "在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移，配置由后续开启Nz2DN功能的矩阵搬出接口使用，仅在AIC上生效。"
+description: "在 L0C Buffer 搬出并执行 Nz2DN 格式转换时，配置源 Nz 矩阵中相邻行的地址偏移，供开启 Nz2DN 的 L0C 搬出接口取用，仅在 AIC 上生效。"
 tag:
   - roles: [data_movement_configuration]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
-    kind: constrained_by
-    condition: "开启Nz2DN功能且src_nz_fractal_stride不等于1时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md
     kind: configures
-    condition: "搬出接口开启Nz2DN功能时"
+    condition: "仅当该搬出接口 enable_nz2dn 为 true 时取用本配置"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md
     kind: configures
-    condition: "搬出接口开启Nz2DN功能时"
+    condition: "仅当该搬出接口 enable_nz2dn 为 true 时取用本配置"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md
     kind: configures
-    condition: "搬出接口开启Nz2DN功能时"
+    condition: "仅当该搬出接口 enable_nz2dn 为 true 时取用本配置"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md
     kind: related
-    condition: "配置矩阵数量及矩阵间隔时"
+    condition: "矩阵数量与矩阵间隔由该接口配置"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
     kind: related
-    condition: "了解src_nz_fractal_stride与源矩阵排布的对应关系时"
-version: ">=9.0.0"
+version: ">=9.2.0"
+version_changes:
+  - since: "9.2.0"
+    kind: renamed
+    scope: "page"
+    scope_basis: kind_default
+    note: "由 asc_set_l0c2gm_channel_para（9.1.0 提供，参数为 uint64_t config）更名为 asc_set_l0c_copy_channel_para，参数改为逐项传入 uint16_t src_nz_fractal_stride；Release Notes CANN_9_2_0 重命名表记为「函数名变化；uint64_t config 参数改为逐项传入」，旧名保留为 deprecated_interface 页面。"
 ---
 # asc_set_l0c_copy_channel_para
 

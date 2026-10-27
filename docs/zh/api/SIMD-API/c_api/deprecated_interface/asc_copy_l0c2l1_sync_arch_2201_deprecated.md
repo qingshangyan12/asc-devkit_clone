@@ -1,18 +1,27 @@
 ---
 okftype: reference.api
-description: "将矩阵计算结果量化处理后从L0C Buffer搬运到L1 Buffer，支持int4b_t量化，该同步接口已废弃，请使用asc_copy_l0c2l1非同步接口和asc_sync接口替代。"
+description: "废弃接口页：2201 架构下 asc_copy_l0c2l1_sync 在矩阵计算后按量化模式处理结果并同步搬到 L1 Buffer，支持 9 种量化以及 int4b_t 量化组合，建议改用非同步 asc_copy_l0c2l1 加 asc_sync。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [conversion, store]
   - traits: [quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_2201.md
     kind: replaced_by
-    condition: "替代废弃同步接口的非同步接口"
+    condition: "建议改用对应的非同步接口并显式调用 asc_sync"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "各存储单元的空间大小与对齐要求按其存储单元说明"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "与替代接口配合使用的同步接口"
-version: ">=9.0.0"
+    kind: related
+    condition: "替代方案中承担同步等待"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include 头以 ASC_DEPRECATED(9.2.0) 标记该 2201 同步接口，替代路径是非同步 asc_copy_l0c2l1 加 asc_sync；接口未移除。"
 ---
 # asc_copy_l0c2l1_sync_arch_2201（废弃）
 

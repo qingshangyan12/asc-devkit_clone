@@ -1,3 +1,6 @@
+---
+okftype: reference.index
+---
 # 标量计算
 
 - **[位运算](scalar_bit/scalar_bit.md)**
