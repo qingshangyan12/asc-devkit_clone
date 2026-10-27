@@ -27,7 +27,7 @@
 namespace asc {
 namespace te {
 
-__aicore__ inline int64_t get_vf_len() { return asc_get_vf_len(); }
+__aicore__ inline constexpr int64_t get_vf_len() { return asc_get_vf_len(); }
 
 } // namespace te
 } // namespace asc

@@ -15,6 +15,7 @@
 
 TEST(TensorApiUtils, GetVfLenReturnsVectorRegisterLength)
 {
-    const int64_t vfLen = asc::te::get_vf_len();
+    constexpr int64_t vfLen = asc::te::get_vf_len();
+    static_assert(vfLen == 256);
     EXPECT_EQ(vfLen, 256);
 }
