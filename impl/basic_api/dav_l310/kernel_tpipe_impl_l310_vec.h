@@ -14,12 +14,12 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic_api/dav_l300/kernel_tpipe_impl_l300_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/dav_l310/kernel_tpipe_impl_l310_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L310_VEC_H__
 #endif
-#ifndef ASCENDC_MODULE_TPIPE_IMPL_L300_H
-#define ASCENDC_MODULE_TPIPE_IMPL_L300_H
+#ifndef ASCENDC_MODULE_TPIPE_IMPL_L310_H
+#define ASCENDC_MODULE_TPIPE_IMPL_L310_H
 #include "../../../include/basic_api/kernel_tpipe.h"
 #include "../../../include/basic_api/kernel_prof_trace_intf.h"
 
@@ -2317,8 +2317,8 @@ __aicore__ inline uint64_t GetTQueHeadAddr(const T& que)
     }
 }
 } // namespace AscendC
-#endif // ASCENDC_MODULE_TPIPE_IMPL_L300_H
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H__)
+#endif // ASCENDC_MODULE_TPIPE_IMPL_L310_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L310_VEC_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L310_VEC_H__
 #endif

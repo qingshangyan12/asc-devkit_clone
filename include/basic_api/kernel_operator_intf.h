@@ -98,7 +98,7 @@
 #include "include/adv_api/activation/softmaxflashv2.h"
 #include "include/adv_api/activation/softmaxgrad.h"
 #endif
-#if (__NPU_ARCH__ <= 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ <= 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113)
 #include "include/adv_api/index/arithprogression.h"
 #include "include/adv_api/normalization/layernormgrad.h"
