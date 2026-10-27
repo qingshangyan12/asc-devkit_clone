@@ -69,7 +69,9 @@ from .ascendc_compile_v220 import (
     get_code_channel_v220_by_first_tiling_key,
     set_dynamic_sub_func_names_of_super_kernel_with_kernel_type_group,
     gen_compile_cmd_for_meta_info,
+    generate_param_section,
 )
+from .kernel_param_metadata import prepare_kernel_param_metadata
 from .ascendc_compile_v200 import call_bisheng_v200_static, call_bisheng_v200_dynamic
 from .ascendc_compile_gen_code import (
     get_code_for_l2_cache,
@@ -169,7 +171,11 @@ def _gen_kernel_func_declare_head_with_workspace(tiling_info: TilingInfo, super_
 
 
 def _gen_kernel_func_declare_head(
-    is_mix: bool, is_single_and_using_hard_sync: bool, opinfo: OpInfo, tiling_info: TilingInfo
+    is_mix: bool,
+    is_single_and_using_hard_sync: bool,
+    opinfo: OpInfo,
+    tiling_info: TilingInfo,
+    compile_info: CompileInfo = None,
 ):
     # generate kernel function
     source = ""
@@ -226,6 +232,9 @@ def _gen_kernel_func_declare_head(
 
     super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
         tiling_info, super_kernel_params, func_params
+    )
+    prepare_kernel_param_metadata(
+        compile_info, None if global_var_storage.get_variable("ascendc_enable_super_kernel") is True else func_params
     )
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         global_var_storage.set_variable("ascendc_sub_super_kernel_params", super_kernel_params)
@@ -436,7 +445,7 @@ def gen_kernel_fun(
     )
 
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = _gen_kernel_func_declare_head(
-        is_mix, is_single_and_using_hard_sync, opinfo, tiling_info
+        is_mix, is_single_and_using_hard_sync, opinfo, tiling_info, compile_info
     )
     source += kernel_func_dec_pub
     source += source_declare_pub
@@ -1551,7 +1560,12 @@ def _get_sub_kernel_name(compile_info: CompileInfo, core_type: int):
 
 
 def _generate_section_content(
-    kernel_name: str, tiling_key: str, kernel_type: KernelMetaType, tiling_info: TilingInfo, compile_info: CompileInfo
+    kernel_name: str,
+    tiling_key: str,
+    kernel_type: KernelMetaType,
+    tiling_info: TilingInfo,
+    compile_info: CompileInfo,
+    sub_arch: str = None,
 ):
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         return ""
@@ -1571,6 +1585,7 @@ def _generate_section_content(
                 )
     section_content += "#endif\n"
     section_content += DFXSectionGenerator().generate_dfx_section(tiling_key, tiling_info, kernel_name, compile_info)
+    section_content += generate_param_section(compile_info, tiling_key, kernel_name, sub_arch)
     return section_content
 
 
@@ -1634,7 +1649,9 @@ def _get_compile_cmd_and_section_content(
         ]
     else:
         compile_cmd += [f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"]
-    section_content = _generate_section_content(current_kernel_name, tiling_key, kernel_type, tiling_info, compile_info)
+    section_content = _generate_section_content(
+        current_kernel_name, tiling_key, kernel_type, tiling_info, compile_info, arch
+    )
     if global_var_storage.get_variable("ascendc_sk_double_compile") is True:
         compile_info.global_kernel_symbols.append(current_kernel_name)
     compile_info.last_compiled_symbol = current_kernel_name

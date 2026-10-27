@@ -1,0 +1,266 @@
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+
+"""Regression tests for metadata generation during the existing CCE compilation."""
+
+from contextlib import ExitStack
+import importlib
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+import unittest
+from unittest import mock
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools/build"))
+from asc_op_compile_base.asc_op_compiler import kernel_param_metadata as metadata
+from asc_op_compile_base.asc_op_compiler import ascendc_compile_v220 as v220
+from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
+    CommonUtility,
+    CompileInfo,
+    CompileCommandMode,
+    CompileCommandSession,
+)
+from asc_op_compile_base.asc_op_compiler.ascendc_constants import CORE_TYPE_CUBE, KernelMetaType
+from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator
+from asc_op_compile_base.asc_op_compiler.get_op_tiling import TilingInfo
+from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
+
+compile_op = importlib.import_module("asc_op_compile_base.asc_op_compiler.compile_op")
+
+
+class TestKernelParamMetadata(unittest.TestCase):
+    def test_pointer_layout_is_emitted_without_a_second_compile_switch(self):
+        info = CompileInfo()
+        metadata.prepare_kernel_param_metadata(info, ("GM_ADDR x", "GM_ADDR tiling"))
+        source = metadata.generate_param_metadata("add", info.kernel_param_metadata)
+        self.assertIn(".ascend.meta.add", source)
+        self.assertIn("{16, 12}, 2, 16", source)
+        self.assertIn("{17, 36}, 0, 1, 8, 8, 8, 2, 0, 0, 0, 0", source)
+        self.assertNotIn("#ifdef ASCENDC_EMIT", source)
+        self.assertNotIn("static_assert", source)
+
+    def test_zero_parameters_does_not_emit_a_zero_length_array(self):
+        info = CompileInfo()
+        metadata.prepare_kernel_param_metadata(info, ())
+        source = metadata.generate_param_metadata("empty", info.kernel_param_metadata)
+        self.assertIn("{16, 12}, 0, 0", source)
+        self.assertNotIn("parameters[0]", source)
+        self.assertNotIn("{17, 36}", source)
+
+    def test_unsupported_description_leaves_original_source_usable(self):
+        for entry, parameters in (('bad"entry', ()), ("add", ("int value",)), ("add", None)):
+            with self.subTest(entry=entry, parameters=parameters):
+                info = CompileInfo()
+                metadata.prepare_kernel_param_metadata(info, parameters)
+                self.assertEqual(metadata.generate_param_metadata(entry, info.kernel_param_metadata), "")
+
+    def test_prepared_description_is_independent_of_the_formal_list(self):
+        parameters = ["GM_ADDR x", "GM_ADDR tiling"]
+        info = CompileInfo()
+        metadata.prepare_kernel_param_metadata(info, parameters)
+        description = info.kernel_param_metadata
+        parameters.clear()
+        self.assertEqual(description.count, 2)
+        self.assertEqual(description.total_size, 16)
+        self.assertEqual(description.infos, ((0, 0, 0, 8, 8, 2, 0, 0, 0, 0), (0, 1, 8, 8, 8, 2, 0, 0, 0, 0)))
+        with self.assertRaises(AttributeError):
+            description.count = 3
+        first = metadata.generate_param_metadata("first", description)
+        second = metadata.generate_param_metadata("second", description)
+        self.assertEqual(first.replace("first", "second"), second)
+        self.assertNotIn("GM_ADDR", first)
+
+    def test_failed_preparation_clears_previous_description_even_if_logging_fails(self):
+        info = CompileInfo()
+        metadata.prepare_kernel_param_metadata(info, ("GM_ADDR x",))
+        self.assertIsNotNone(info.kernel_param_metadata)
+        with mock.patch.object(metadata.logging.Logger, "warning", side_effect=RuntimeError("log failure")):
+            metadata.prepare_kernel_param_metadata(info, ("int value",))
+        self.assertIsNone(info.kernel_param_metadata)
+
+
+class TestCompileParamSections(unittest.TestCase):
+    def setUp(self):
+        self.info = CompileInfo()
+        self.info.kernel_name = "add"
+        self.info.origin_func_name = "add"
+        self.info.gen_kernel_func_file = "/tmp/metadata_wrapper.cpp"
+        self.info.dst_file = "/tmp/metadata.o"
+        self.info.code_channel = CORE_TYPE_CUBE
+        metadata.prepare_kernel_param_metadata(self.info, ("GM_ADDR x", "GM_ADDR tiling"))
+        self.info.tiling_key_list = ["7"]
+        self.info.no_set_kernel_type = True
+        self.tiling = TilingInfo()
+        self.tiling.static_shape_flag = False
+        self.stack = ExitStack()
+        self.addCleanup(self.stack.close)
+        for name, value in (("ascendc_enable_super_kernel", False), ("ascendc_meta_info", "")):
+            old = global_var_storage.get_variable(name)
+            global_var_storage.set_variable(name, value)
+            self.addCleanup(global_var_storage.set_variable, name, old)
+        self.stack.enter_context(mock.patch.object(CommonUtility, "is_v220", return_value=True))
+        self.stack.enter_context(mock.patch.object(CommonUtility, "is_c310", return_value=False))
+        self.stack.enter_context(mock.patch.object(DFXSectionGenerator(), "generate_dfx_section", return_value=""))
+
+    def run_default_compile(self, mode):
+        self.info.compile_command_session = CompileCommandSession(mode)
+        command = ["bisheng", "-c", "wrapper.cpp", "-o", "/tmp/metadata_7.o"]
+        self.stack.enter_context(
+            mock.patch.object(CommonUtility, "ascendc_read_file", return_value=["#if 1\n", "#endif\n"])
+        )
+        self.write = self.stack.enter_context(mock.patch.object(CommonUtility, "ascendc_write_file"))
+        self.stack.enter_context(mock.patch.object(v220, "compile_single_tiling_v220", return_value=(command, "add_7")))
+        self.batch = self.stack.enter_context(mock.patch.object(v220, "compile_multi_tilingkey"))
+        self.fatbin = self.stack.enter_context(mock.patch.object(v220, "fatbin_objs"))
+        return command
+
+    def test_record_only_keeps_original_argv_and_return_with_metadata_source(self):
+        command = self.run_default_compile(CompileCommandMode.RECORD_ONLY)
+        result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        self.assertEqual(result, ["7"])
+        self.assertEqual(self.info.compile_command_session.records[0].argv, tuple(command))
+        source = "".join(self.write.call_args.args[1])
+        self.assertIn(".ascend.meta.add_7", source)
+        self.assertIn("#if TILING_KEY_VAR == 7UL", source)
+        self.batch.assert_not_called()
+        self.fatbin.assert_not_called()
+
+    def test_success_uses_original_batch_and_return(self):
+        command = self.run_default_compile(CompileCommandMode.EXECUTE_AND_RECORD)
+        result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        self.assertEqual(result, ["7"])
+        self.assertEqual(self.info.compile_command_session.records[0].argv, tuple(command))
+        self.batch.assert_called_once()
+        self.assertEqual(self.batch.call_args.args[1], [command])
+        self.fatbin.assert_called_once()
+
+    def test_new_generation_failure_keeps_original_compile_and_source(self):
+        self.run_default_compile(CompileCommandMode.EXECUTE_AND_RECORD)
+        metadata.prepare_kernel_param_metadata(self.info, ("unsupported scalar",))
+        result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        self.assertEqual(result, ["7"])
+        self.assertEqual("".join(self.write.call_args.args[1]), "#if 1\n#endif\n")
+        self.batch.assert_called_once()
+        self.fatbin.assert_called_once()
+
+    def test_final_declaration_is_the_parameter_source_and_sk_clears_it(self):
+        op = SimpleNamespace(
+            mc2_ctx=["ctx"],
+            inputs=[None, {"param_name": "x"}],
+            outputs=[{"param_name": "y"}],
+            output_shape_depend_on_compute=[0],
+            param_type_list=None,
+        )
+        DFXSectionGenerator().dfx_info_reset(op)
+        source, _, _, _ = compile_op._gen_kernel_func_declare_head(True, False, op, self.tiling, self.info)
+        expected = (
+            "GM_ADDR ffts_addr",
+            "GM_ADDR ctx",
+            "GM_ADDR x",
+            "GM_ADDR y",
+            "GM_ADDR __ascendc_output_shape",
+            "GM_ADDR workspace",
+            "GM_ADDR tiling",
+        )
+        description = self.info.kernel_param_metadata
+        self.assertIsNotNone(description)
+        self.assertEqual((description.count, description.total_size), (7, 56))
+        self.assertEqual(description.infos, tuple((0, i, i * 8, 8, 8, 2, 0, 0, 0, 0) for i in range(7)))
+        self.assertTrue(source.startswith(", ".join(expected) + ") {"))
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        with mock.patch.object(compile_op, "get_context", return_value=None):
+            source, _, _, _ = compile_op._gen_kernel_func_declare_head(True, False, op, self.tiling, self.info)
+        self.assertTrue(source.startswith("uint64_t args_offset) {"))
+        self.assertIsNone(self.info.kernel_param_metadata)
+
+    def test_existing_compile_exception_and_preexecution_record_are_preserved(self):
+        command = self.run_default_compile(CompileCommandMode.EXECUTE_AND_RECORD)
+        failure = RuntimeError("original compiler failure")
+        self.batch.side_effect = failure
+        with self.assertRaises(RuntimeError) as raised:
+            v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        self.assertIs(raised.exception, failure)
+        self.assertEqual(self.info.compile_command_session.records[0].argv, tuple(command))
+        self.batch.assert_called_once()
+        self.fatbin.assert_not_called()
+
+    def test_typed_mix_sections_follow_key_and_physical_core(self):
+        self.info.tiling_key_group_map = {"7": ["8"]}
+        self.info.tiling_key_kernel_type = {
+            "7": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
+            "8": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
+        }
+        source = compile_op._generate_section_content(
+            "add_7_mix_aiv", "7", KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, self.tiling, self.info
+        )
+        self.assertIn(".ascend.meta.add_7_mix_aiv", source)
+        self.assertIn(".ascend.meta.add_8_mix_aiv", source)
+        self.assertIn("defined(__DAV_VEC__)", source)
+        self.assertIn("#if TILING_KEY_VAR == 7UL", source)
+        self.assertNotIn('.ascend.meta.add_8_mix_aic"), aligned', source)
+
+    def test_user_name_substrings_do_not_select_the_metadata_core(self):
+        for name, arch in (("test_mix_aic_vector_7", "dav-c220-vec"), ("test_mix_aiv_cube_7", "dav-c220-cube")):
+            with self.subTest(name=name):
+                source = v220.generate_param_section(self.info, "7", name, arch)
+                core = "VEC" if arch.endswith("vec") else "CUBE"
+                opposite = "CUBE" if core == "VEC" else "VEC"
+                self.assertIn(f"defined(__DAV_{core}__)", source)
+                self.assertNotIn(f"defined(__DAV_{opposite}__)", source)
+
+    def test_static_compile_keeps_original_command_and_return(self):
+        self.run_default_compile(CompileCommandMode.EXECUTE)
+        self.tiling.static_shape_flag = True
+        self.tiling.tiling_key = 7
+        command = ["bisheng", "-o", "/tmp/metadata.o"]
+        with ExitStack() as stack:
+            stack.enter_context(mock.patch.object(v220, "gen_compile_cmd_v220", return_value=list(command)))
+            stack.enter_context(mock.patch.object(v220, "gen_current_kernel_name", return_value="add_static"))
+            stack.enter_context(mock.patch.object(v220, "get_compile_cmd_for_kernel_name", return_value=[]))
+            compile_once = stack.enter_context(mock.patch.object(CommonUtility, "run_cmd_inner"))
+            result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        self.assertEqual(result, ["7"])
+        compile_once.assert_called_once()
+        self.assertEqual(compile_once.call_args.args[0], command + ["-DTILING_KEY_VAR=7UL"])
+        self.assertIn(".ascend.meta.add_static", "".join(self.write.call_args.args[1]))
+        self.batch.assert_not_called()
+        self.fatbin.assert_not_called()
+
+    def test_integer_static_key_finds_string_slave_group(self):
+        self.info.tiling_key_group_map = {"7": ["8"]}
+        self.info.tiling_key_kernel_type = {"8": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2}
+        source = v220.generate_param_section(self.info, 7, "add_7_mix_aiv", "dav-c220-vec")
+        self.assertIn(".ascend.meta.add_8_mix_aiv", source)
+
+    def test_generation_exception_discards_entire_group_even_if_logging_fails(self):
+        self.info.tiling_key_group_map = {"7": ["8"]}
+        self.info.tiling_key_kernel_type = {"8": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2}
+        original = metadata._generate_param_metadata
+
+        def fail_slave(entry, parameters):
+            if entry.endswith("_8_mix_aic"):
+                raise RuntimeError("new supplement failure")
+            return original(entry, parameters)
+
+        with ExitStack() as stack:
+            stack.enter_context(mock.patch.object(metadata, "_generate_param_metadata", side_effect=fail_slave))
+            stack.enter_context(
+                mock.patch.object(metadata.logging.Logger, "warning", side_effect=RuntimeError("log failure"))
+            )
+            self.assertEqual(v220.generate_param_section(self.info, "7", "add_7_mix_aic"), "")
+
+    def test_sk_entry_does_not_use_stale_ordinary_parameters(self):
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        result = compile_op._generate_section_content(
+            "sub_kernel", "7", KernelMetaType.KERNEL_TYPE_AIC_ONLY, self.tiling, self.info
+        )
+        self.assertEqual(result, "")
+
+
+if __name__ == "__main__":
+    unittest.main()

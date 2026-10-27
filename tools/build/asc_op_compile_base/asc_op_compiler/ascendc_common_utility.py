@@ -162,6 +162,8 @@ class CompileInfo:
         # Dynamic compilation owns command production; Manifest generation consumes it.
         self.compile_command_session = CompileCommandSession()
         self.last_compiled_symbol: str = ""
+        # None denotes an ABI not handled by the ordinary GM_ADDR wrapper.
+        self.kernel_param_metadata = None
 
     def __str__(self):
         return ",".join("{}={}".format(key, getattr(self, key)) for key in self.__dict__.keys())

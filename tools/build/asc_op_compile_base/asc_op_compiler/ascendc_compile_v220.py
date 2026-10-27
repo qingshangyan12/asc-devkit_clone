@@ -41,6 +41,7 @@ from .ascendc_constants import (
 from .ascendc_compile_base import fatbin_objs, compile_multi_tilingkey, SingleTilingKeyCompileParams
 from .ascendc_compile_dfx import DFXSectionGenerator
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
+from .kernel_param_metadata import generate_param_metadata, log_param_metadata_failure
 
 
 def _gen_compile_cmd_c310(
@@ -526,6 +527,47 @@ def get_compile_cmd_for_kernel_name(
     return compile_cmd
 
 
+def generate_param_section(compile_info, tiling_key, kernel_name, sub_arch=None):
+    """Generate TLVs under the same key/core conditions as the ordinary entry."""
+    try:
+        if (
+            compile_info.kernel_param_metadata is None
+            or global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+            or not (CommonUtility.is_v220() or CommonUtility.is_c310())
+        ):
+            return ""
+        if not str(tiling_key).isdigit():
+            raise ValueError("invalid parameter metadata tiling key")
+        entries = [kernel_name]
+        group_map = compile_info.tiling_key_group_map or {}
+        for slave_key in group_map.get(tiling_key, group_map.get(str(tiling_key), [])):
+            slave_name = get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info, slave_key)
+            # Slave declarations use a vector suffix for the vector half of MIX.
+            if kernel_name.endswith("_mix_aiv") or (sub_arch is not None and "vec" in sub_arch):
+                slave_name = slave_name[:-1] + "v"
+            entries.append(slave_name)
+        sections = []
+        for entry in dict.fromkeys(entries):
+            declaration = generate_param_metadata(entry, compile_info.kernel_param_metadata)
+            if not declaration:
+                return ""
+            # Operator names may themselves contain "mix_aic"/"mix_aiv".
+            # Use the physical command target or the exact generated suffix.
+            core = sub_arch.rsplit("-", 1)[-1] if sub_arch is not None else None
+            if core not in ("cube", "vec"):
+                core = (
+                    "cube"
+                    if kernel_name.endswith("_mix_aic")
+                    else ("vec" if kernel_name.endswith("_mix_aiv") else None)
+                )
+            core_guard = get_ktype_section_head("mix_aic" if core == "cube" else "mix_aiv") if core else ""
+            sections.append(core_guard + declaration + ("#endif\n" if core_guard else ""))
+        return f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL\n" + "".join(sections) + "#endif\n"
+    except Exception as error:
+        log_param_metadata_failure(error)
+        return ""
+
+
 def call_bisheng_v220(
     compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo, sub_arch: str, code_channel: int
 ):
@@ -555,6 +597,7 @@ def call_bisheng_v220(
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key), tiling_info, current_kernel_name, compile_info, True
         )
+        new_sources += generate_param_section(compile_info, tiling_info.tiling_key, current_kernel_name, sub_arch)
         if compile_info.code_channel == CORE_TYPE_MIX:
             if "vec" in sub_arch:
                 new_sources += global_var_storage.get_variable("ascendc_meta_info")
@@ -598,6 +641,7 @@ def call_bisheng_v220(
             new_sources += DFXSectionGenerator().generate_dfx_section(
                 tiling_key, tiling_info, kernel_name, compile_info, True
             )
+            new_sources += generate_param_section(compile_info, tiling_key, kernel_name, sub_arch)
             cmds_list.append(compile_cmd)
         if compile_info.code_channel == CORE_TYPE_MIX:
             if "vec" in sub_arch:
