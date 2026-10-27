@@ -1272,3 +1272,19 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
     }
 }
 } // extern "C"
+
+// C++ overloads. Acquire drops the size output. Launch supplies sizeof(OpResCtx), which is the only
+// length the size check compares and the length both acquire paths publish.
+uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
+{
+    uint32_t ccResCtxSize = 0U;
+    const uint32_t ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, ccResCtx, &ccResCtxSize);
+    (void)ccResCtxSize;
+    return ret;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
+{
+    return Mc2CcKernelLaunch(stream, ccResCtx, static_cast<uint32_t>(sizeof(OpResCtx)));
+}

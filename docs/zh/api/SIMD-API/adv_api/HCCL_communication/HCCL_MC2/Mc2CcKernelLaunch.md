@@ -27,12 +27,18 @@
 
 使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的通信资源上下文启动通信服务端。AI CPU路径下，本接口在指定AI CPU任务流上启动AI CPU Server；CCU路径下，本接口启动CCU服务端。后续AI Core侧调用HCCL高阶API时，会作为客户端向服务端下发实际通信任务。
 
+不带ccResCtxSize的重载与带大小参数的重载走同一条启动路径。前者内部以sizeof(OpResCtx)作为上下文长度。
+
 ## 函数原型
 
 ```cpp
+extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
+
 extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
     void* stream, void* ccResCtx, uint32_t ccResCtxSize)
 ```
+
+不带ccResCtxSize的重载使用C++链接，避免与extern "C"版本的符号冲突。带ccResCtxSize的重载保持C链接。
 
 ## 参数说明
 
@@ -42,7 +48,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 | --- | --- | --- |
 | stream | 输入 | aclrtStream指针。AI CPU路径为必填，用于启动AI CPU Server；CCU路径不使用该参数，可传入nullptr。 |
 | ccResCtx | 输入 | [Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的设备侧通信资源上下文。 |
-| ccResCtxSize | 输入 | [Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的通信资源上下文大小，单位为字节。 |
+| ccResCtxSize | 输入 | 仅带大小参数的重载需要该值，单位为字节，且不小于sizeof(OpResCtx)。不带该参数的重载内部使用sizeof(OpResCtx)。 |
 
 ## 返回值说明
 
@@ -54,7 +60,8 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 -   AI CPU路径的stream必须与AI Core任务所在stream不同。AI CPU Server会阻塞等待AI Core客户端消息，若共用stream会导致任务无法完成。
 -   AI CPU路径建议先同步AI Core任务流、再同步AI CPU任务流。
 -   CCU路径的启动stream由通信资源上下文内部携带，stream参数不参与CCU服务端启动。
--   本接口必须与[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx和ccResCtxSize配合使用。
+-   本接口必须使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx。带ccResCtxSize的重载还需要传入同一次申请返回的大小。
+-   ccResCtxSize在启动路径中只参与下限检查。后续按sizeof(OpResCtx)读取OpResCtx，AI CPU启动参数只传递上下文地址。申请接口在AI CPU和CCU路径上写出的长度都是sizeof(OpResCtx)，因此不带大小参数的重载与传入该长度的带大小重载行为一致。
 -   AI Core侧调用Finalize后，AI CPU Server才能正常退出。
 
 ## 调用示例
@@ -62,7 +69,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 CCU示例：
 
 ```cpp
-Mc2Result ret = Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
+Mc2Result ret = Mc2CcKernelLaunch(nullptr, ccResCtx);
 if (ret != HCCL_SUCCESS) {
     // 错误处理
 }
@@ -71,8 +78,14 @@ if (ret != HCCL_SUCCESS) {
 AI CPU示例：
 
 ```cpp
-Mc2Result ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx, ccResCtxSize);
+Mc2Result ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx);
 if (ret != HCCL_SUCCESS) {
     // 错误处理
 }
+```
+
+带上下文大小的调用：
+
+```cpp
+Mc2Result ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx, ccResCtxSize);
 ```

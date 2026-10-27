@@ -171,7 +171,7 @@ protected:
     // resource acquiring path has to run on every rank at the same time.
     void AcquireOnAllRanks(
         uint32_t rankSize, uint8_t ccType, uint8_t commEngine, uint8_t reduceType, const char* algConfig,
-        bool acquireTwice, std::vector<RankAcquireOutcome>& outcomes)
+        bool acquireTwice, std::vector<RankAcquireOutcome>& outcomes, bool omitCtxSize = false)
     {
         DestroyComm();
         SimWorld::Global()->Deinit();
@@ -181,7 +181,8 @@ protected:
 
         std::vector<std::thread> workers;
         for (uint32_t rank = 0U; rank < rankSize; ++rank) {
-            workers.emplace_back([this, rank, ccType, commEngine, reduceType, algConfig, acquireTwice, &outcomes]() {
+            workers.emplace_back([this, rank, ccType, commEngine, reduceType, algConfig, acquireTwice, omitCtxSize,
+                                  &outcomes]() {
                 auto& outcome = outcomes[rank];
                 if (aclrtSetDevice(static_cast<int32_t>(rank)) != ACL_SUCCESS) {
                     return;
@@ -195,8 +196,13 @@ protected:
                 if (ccArgs != nullptr) {
                     (void)Mc2SetCcReduceType(ccArgs, reduceType);
                     void* ccResCtx = nullptr;
-                    outcome.acquireRet = static_cast<HcclResult>(
-                        Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &outcome.ccResCtxSize));
+                    if (omitCtxSize) {
+                        outcome.acquireRet =
+                            static_cast<HcclResult>(Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx));
+                    } else {
+                        outcome.acquireRet = static_cast<HcclResult>(
+                            Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &outcome.ccResCtxSize));
+                    }
                     if (outcome.acquireRet == HCCL_SUCCESS && ccResCtx != nullptr) {
                         outcome.opResCtx = *static_cast<const OpResCtx*>(ccResCtx);
                         if (outcome.opResCtx.algInfo[0].opParam != 0U) {
@@ -204,10 +210,16 @@ protected:
                         }
                         if (acquireTwice) {
                             void* secondCtx = nullptr;
-                            uint32_t secondSize = 0U;
-                            outcome.secondAcquireRet = static_cast<HcclResult>(
-                                Mc2AcquireCcResCtx(comm, ccType, ccArgs, &secondCtx, &secondSize));
-                            outcome.reusedCtx = (secondCtx == ccResCtx) && (secondSize == outcome.ccResCtxSize);
+                            if (omitCtxSize) {
+                                outcome.secondAcquireRet =
+                                    static_cast<HcclResult>(Mc2AcquireCcResCtx(comm, ccType, ccArgs, &secondCtx));
+                                outcome.reusedCtx = (secondCtx == ccResCtx);
+                            } else {
+                                uint32_t secondSize = 0U;
+                                outcome.secondAcquireRet = static_cast<HcclResult>(
+                                    Mc2AcquireCcResCtx(comm, ccType, ccArgs, &secondCtx, &secondSize));
+                                outcome.reusedCtx = (secondCtx == ccResCtx) && (secondSize == outcome.ccResCtxSize);
+                            }
                         }
                     }
                     (void)Mc2FreeCcArgs(ccArgs);
@@ -536,6 +548,279 @@ TEST_F(AicpuMc2Test, LaunchRejectsInvalidContext)
     OpResCtx opResCtx{};
     BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
     EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx, sizeof(opResCtx) - 1U), HCCL_E_PARA);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
+// Overloads without ccResCtxSize. Launch supplies sizeof(OpResCtx) internally, so the old
+// "ccResCtxSize < sizeof(OpResCtx) -> HCCL_E_PARA" case is outside this contract.
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsNullParameters)
+{
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = reinterpret_cast<void*>(0x1);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(nullptr, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), nullptr, &ccResCtx),
+        HCCL_E_PTR);
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, nullptr), HCCL_E_PTR);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsUnsupportedCcType)
+{
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(Mc2AcquireCcResCtx(comm_, 0xFFU, ccArgs, &ccResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsSingleRank)
+{
+    ReinitWorld(DevType::DEV_TYPE_950, SINGLE_RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeRejectsUnsupportedDevice)
+{
+    ReinitWorld(DevType::DEV_TYPE_910_93, RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    void* ccArgs = MakeCcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    void* ccResCtx = nullptr;
+    EXPECT_EQ(
+        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx),
+        HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeAicpuTsBuildsContextDecoupledOpParam)
+{
+    std::vector<RankAcquireOutcome> outcomes;
+    constexpr bool kOmitCtxSize = true;
+    AcquireOnAllRanks(
+        PAIR_RANK_SIZE, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
+        static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), HCCL_REDUCE_SUM, DEFAULT_ALG_CONFIG, false, outcomes,
+        kOmitCtxSize);
+    ASSERT_EQ(outcomes.size(), PAIR_RANK_SIZE);
+
+    for (const auto& outcome : outcomes) {
+        ASSERT_EQ(outcome.initRet, HCCL_SUCCESS);
+        ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
+        EXPECT_EQ(outcome.opResCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+        EXPECT_EQ(outcome.opResCtx.rankSize, PAIR_RANK_SIZE);
+        EXPECT_NE(outcome.opResCtx.workSpace, 0U);
+        EXPECT_NE(outcome.opResCtx.workSpaceSize, 0U);
+        EXPECT_EQ(outcome.opResCtx.opParamSize[0], sizeof(OpParam));
+        EXPECT_NE(outcome.opResCtx.algInfo[0].opParam, 0U);
+
+        EXPECT_NE(outcome.opParam.hcclComm, nullptr);
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
+        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
+        EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
+        EXPECT_EQ(outcome.opParam.stream, nullptr);
+        EXPECT_EQ(outcome.opParam.opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+        EXPECT_EQ(outcome.opParam.DataDes.dataType, HCCL_DATA_TYPE_FP16);
+        EXPECT_NE(outcome.opParam.algName[0], '\0');
+        EXPECT_NE(outcome.opParam.resCtx, nullptr);
+        EXPECT_NE(outcome.opParam.ctxSize, 0U);
+    }
+    EXPECT_EQ(outcomes[RANK_ID].opResCtx.rankId, RANK_ID);
+    EXPECT_EQ(outcomes[1].opResCtx.rankId, 1U);
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeAcceptsPlainAicpuCommEngine)
+{
+    std::vector<RankAcquireOutcome> outcomes;
+    constexpr bool kOmitCtxSize = true;
+    AcquireOnAllRanks(
+        PAIR_RANK_SIZE, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
+        static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), HCCL_REDUCE_SUM, DEFAULT_ALG_CONFIG, false, outcomes,
+        kOmitCtxSize);
+    ASSERT_EQ(outcomes.size(), PAIR_RANK_SIZE);
+
+    for (const auto& outcome : outcomes) {
+        ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
+        EXPECT_EQ(outcome.opResCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+        EXPECT_EQ(outcome.opResCtx.commEngine, static_cast<uint64_t>(COMM_ENGINE_AICPU));
+        EXPECT_EQ(outcome.opParam.engine, COMM_ENGINE_AICPU_TS);
+        EXPECT_EQ(outcome.opParam.opExecuteConfig, OpExecuteConfig::AICPU_TS);
+        EXPECT_EQ(outcome.opParam.commOpExpansionMode, HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU);
+    }
+}
+
+TEST_F(AicpuMc2Test, AcquireNoSizeReusesContextForTheSameTag)
+{
+    std::vector<RankAcquireOutcome> outcomes;
+    constexpr bool kOmitCtxSize = true;
+    AcquireOnAllRanks(
+        PAIR_RANK_SIZE, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
+        static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), HCCL_REDUCE_SUM, DEFAULT_ALG_CONFIG, true, outcomes,
+        kOmitCtxSize);
+    ASSERT_EQ(outcomes.size(), PAIR_RANK_SIZE);
+
+    for (const auto& outcome : outcomes) {
+        ASSERT_EQ(outcome.acquireRet, HCCL_SUCCESS);
+        ASSERT_EQ(outcome.secondAcquireRet, HCCL_SUCCESS);
+        EXPECT_TRUE(outcome.reusedCtx);
+    }
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeUsesSimpleCtxProtocol)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    const auto& state = GetMc2AicpuLaunchStubState();
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.kernelType, static_cast<uint32_t>(KERNEL_TYPE_AICPU_KFC));
+    EXPECT_EQ(state.opName, SERVER_KERNEL_NAME);
+    EXPECT_EQ(state.numBlocks, 1U);
+    EXPECT_EQ(state.flags, static_cast<uint32_t>(RT_KERNEL_USE_SPECIAL_TIMEOUT));
+    EXPECT_EQ(state.stream, stream_);
+    EXPECT_EQ(state.argsSize, HOST_ARGS_SIZE);
+    EXPECT_EQ(state.soNameAddrOffset, SO_NAME_OFFSET);
+    EXPECT_EQ(state.kernelNameAddrOffset, KERNEL_NAME_OFFSET);
+    EXPECT_FALSE(state.isNoNeedH2DCopy);
+    EXPECT_EQ(state.ctxArgs[0], HcclApi::MC2_AICPU_SIMPLE_CTX_PROTOCOL);
+    EXPECT_EQ(state.ctxArgs[1], reinterpret_cast<uint64_t>(&opResCtx));
+    EXPECT_EQ(ArgsFieldAt(state, SO_NAME_OFFSET), SERVER_SO_NAME);
+    EXPECT_EQ(ArgsFieldAt(state, KERNEL_NAME_OFFSET), SERVER_KERNEL_NAME);
+    EXPECT_EQ(ArgsFieldAt(state, OP_NAME_OFFSET), SERVER_KERNEL_NAME);
+    EXPECT_EQ(state.timeout, DEFAULT_HCCL_TIMEOUT_S);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsAicpuTsEngine)
+{
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU_TS);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeTimeoutAddsOpExecuteTimeout)
+{
+    auto& state = GetMc2AicpuLaunchStubState();
+    state.opExecuteTimeoutMs = 30000U;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.opExecuteTimeoutCalls, 1U);
+    EXPECT_EQ(state.timeout, DEFAULT_HCCL_TIMEOUT_S + 30U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeTimeoutHonoursExternalExecTimeout)
+{
+    ASSERT_EQ(setenv(EXEC_TIMEOUT_ENV, "100", 1), 0);
+    ResetAlgEnvConfigInitState();
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    const auto& state = GetMc2AicpuLaunchStubState();
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.timeout, 100U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeTimeoutClampsToMaxUint16)
+{
+    ASSERT_EQ(setenv(EXEC_TIMEOUT_ENV, "100000", 1), 0);
+    ResetAlgEnvConfigInitState();
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    ASSERT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+
+    const auto& state = GetMc2AicpuLaunchStubState();
+    ASSERT_EQ(state.launchCalls, 1U);
+    EXPECT_EQ(state.timeout, MAX_LAUNCH_TIMEOUT);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeSkippedWhenTimeoutQueryFails)
+{
+    auto& state = GetMc2AicpuLaunchStubState();
+    state.opExecuteTimeoutFail = true;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_RUNTIME);
+    EXPECT_EQ(state.launchCalls, 0U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizePropagatesRuntimeFailure)
+{
+    auto& state = GetMc2AicpuLaunchStubState();
+    state.launchRet = RT_LAUNCH_FAILURE;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_RUNTIME);
+    EXPECT_EQ(state.launchCalls, 1U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeSurvivesDirectMemcpyRejection)
+{
+    g_rejectDirectAclrtMemcpy = true;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_SUCCESS);
+    EXPECT_EQ(g_aclrtMemcpyCallCount, 1U);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 1U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsUnsupportedDevice)
+{
+    ReinitWorld(DevType::DEV_TYPE_910_93, RANK_SIZE);
+    ASSERT_NE(comm_, nullptr);
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
+}
+
+TEST_F(AicpuMc2Test, LaunchNoSizeRejectsNullContext)
+{
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, nullptr), HCCL_E_PTR);
     EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 0U);
 }
 

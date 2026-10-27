@@ -21,7 +21,7 @@ HCCL MC2接口由Host侧参数配置、资源上下文申请和通信服务端�
     -   [Mc2SetCcReduceType](Mc2SetCcReduceType.md)：设置Reduce操作类型，仅AllReduce、ReduceScatter等归约类任务需要配置。
     -   [Mc2SetCcAlgConfig](Mc2SetCcAlgConfig.md)：设置通信算法。
 
-3.  调用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)申请通信资源上下文，获得设备侧资源上下文地址和大小。
+3.  调用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)申请通信资源上下文，获得设备侧资源上下文地址。上下文长度由接口内部处理，调用方不需要保存ccResCtxSize。
 
 4.  调用[Mc2CcKernelLaunch](Mc2CcKernelLaunch.md)启动通信服务端。AI CPU路径传入独立于AI Core任务的AI CPU任务流；CCU路径可传入nullptr。
 
@@ -30,6 +30,8 @@ HCCL MC2接口由Host侧参数配置、资源上下文申请和通信服务端�
 6.  参数对象不再使用后，调用[Mc2FreeCcArgs](Mc2FreeCcArgs.md)释放。
 
 上述流程中的第3步与第5步必须使用同一个资源上下文。ccResCtx是[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的设备侧通信资源上下文地址，包含通信算法和通信资源相关信息；该资源由通信域生命周期管理，用户不需要调用单独的接口释放。
+
+不带ccResCtxSize的重载与带大小参数的重载行为一致。申请接口在AI CPU和CCU路径上写出的上下文长度都是sizeof(OpResCtx)，启动接口内部也使用这个长度。需要拿到字节长度时，使用带ccResCtxSize参数的重载。
 
 [Mc2GetCcArgs](Mc2GetCcArgs.md)创建的参数对象默认通信引擎为`AICPU_TS`，即AI CPU通信服务端。若使用CCU路径，必须调用[Mc2SetCcCommEngine](Mc2SetCcCommEngine.md)显式设置通信引擎，推荐设置为`CCU_SCHED`。
 
@@ -49,7 +51,6 @@ AI CPU与CCU路径的主要差异如下：
 ```cpp
 void* ccArgs = nullptr;
 void* ccResCtx = nullptr;
-uint32_t ccResCtxSize = 0U;
 constexpr uint8_t kCcuSchedEngine = 6U; // CCU_SCHED
 const uint8_t ccType = static_cast<uint8_t>(AscendC::HcclCMDType::HCCL_CMD_ALLTOALL);
 char algConfig[] = "sole[mesh]";
@@ -60,10 +61,10 @@ ret = Mc2SetCcSrcDataType(ccArgs, HCCL_DATA_TYPE_FP32);
 ret = Mc2SetCcDstDataType(ccArgs, HCCL_DATA_TYPE_FP32);
 ret = Mc2SetCcAlgConfig(ccArgs, algConfig);
 
-ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &ccResCtxSize);
+ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx);
 (void)Mc2FreeCcArgs(ccArgs);
 
-ret = Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
+ret = Mc2CcKernelLaunch(nullptr, ccResCtx);
 
 // 将ccResCtx传入AI Core核函数，并在核函数内调用InitV2和AlltoAll接口。
 all_to_all_kernel<<<1, nullptr, streamAiv>>>(sendBuf, recvBuf, ccResCtx, dataCount);
@@ -74,7 +75,6 @@ all_to_all_kernel<<<1, nullptr, streamAiv>>>(sendBuf, recvBuf, ccResCtx, dataCou
 ```cpp
 void* ccArgs = nullptr;
 void* ccResCtx = nullptr;
-uint32_t ccResCtxSize = 0U;
 constexpr uint8_t kAicpuTsEngine = 2U; // AICPU_TS
 const uint8_t ccType = static_cast<uint8_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER);
 
@@ -83,10 +83,10 @@ ret = Mc2SetCcCommEngine(ccArgs, kAicpuTsEngine);
 ret = Mc2SetCcSrcDataType(ccArgs, HCCL_DATA_TYPE_FP32);
 ret = Mc2SetCcDstDataType(ccArgs, HCCL_DATA_TYPE_FP32);
 
-ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &ccResCtxSize);
+ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx);
 (void)Mc2FreeCcArgs(ccArgs);
 
-ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx, ccResCtxSize);
+ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx);
 
 all_gather_kernel<<<1, nullptr, streamAiv>>>(sendBuf, recvBuf, ccResCtx, sendCount);
 ```
