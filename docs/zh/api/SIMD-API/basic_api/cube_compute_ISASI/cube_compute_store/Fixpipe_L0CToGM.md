@@ -29,6 +29,9 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id31 -->
+- Kirin 9020处理器系列产品：支持
+<!-- end id31 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>

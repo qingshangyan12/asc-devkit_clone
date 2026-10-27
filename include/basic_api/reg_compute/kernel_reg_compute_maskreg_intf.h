@@ -33,9 +33,21 @@ namespace AscendC {
 namespace Reg {
 #if !defined(__NPU_ARCH__) ||                                                                                     \
     (defined(__NPU_ARCH__) &&                                                                                     \
+<<<<<<< HEAD
+<<<<<<< HEAD
+         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+          (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
+          (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 3103)) || \
+=======
          ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
           (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
           (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
+>>>>>>> 8ddfd83bcf8372e308f464f570ff43d1c5129a23
+=======
+         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+          (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+          (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
+>>>>>>> 65be2b130eead27fab6f46827d327e701403daef
      defined(__ASC_NPU_HOST__))
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue);
@@ -85,9 +97,15 @@ __simd_callee__ inline MaskReg MoveMask();
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__) &&                                                                                     \
+<<<<<<< HEAD
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+         (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
+         (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 3103)) || \
+=======
         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
          (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
          (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
+>>>>>>> 65be2b130eead27fab6f46827d327e701403daef
     defined(__ASC_NPU_HOST__)
 #include "../../../impl/basic_api/reg_compute/kernel_reg_compute_maskreg_intf_impl.h"
 #endif

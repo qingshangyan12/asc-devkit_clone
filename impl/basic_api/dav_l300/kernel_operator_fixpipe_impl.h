@@ -28,14 +28,25 @@ namespace AscendC {
 
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
 {
-    (void)(config);
-    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeClipRelu");
+    set_fix_clip_relu(config);
 }
 
 template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeAddr");
+    static_assert(
+        SupportType<T, half>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half");
+    const Hardware eleWiseHWPos = GetPhyType((TPosition)eleWiseTensor.GetPosition());
+    if (eleWiseHWPos != Hardware::L1) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "eleWise", "L1 Buffer(A1/B1/C1)", "SetFixPipeAddr",
+            GetPositionDisplay(static_cast<TPosition>(eleWiseTensor.GetPosition())));
+    }
+    
+    uint64_t config = 0;
+    config = config | c0ChStride; // ELT_SRC_PARA[15:0], C0 channel stride Size.
+    config = config | ((static_cast<uint64_t>(eleWiseTensor.GetPhyAddr()) >> 5) << 16); // L1 address, ELT_SRC_PARA[31:16], align with 32bit.
+    set_elt_src_para(config);
 }
 
 /* **************************************************************************************************
@@ -252,6 +263,40 @@ __aicore__ inline void FixpipeL0cToL1(
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false);
 }
 
+// contains loop info and cal n size for each loop
+// move data L0C->UB
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0cToUB(
+    __ubuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL300<config.format>& intriParams,
+    const FixpipeTiling& fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex = 0)
+{
+    static_assert(
+        SupportType<
+            Tuple<SrcT, DstT>, Tuple<float, half>, Tuple<float, int8_t>, Tuple<float, uint8_t>, Tuple<float, float>,
+            Tuple<int32_t, half>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>, Tuple<int32_t, int32_t>>(),
+        "Failed to check dtype in Fixpipe");
+    uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
+    // Loop1_src_stride in unit of C0_size
+    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
+    uint32_t dstOffset = 0;
+    // If NZ2ND/NZ2DN is enabled, it is the dst_D value in unit of element. Loop2_dst_stride
+    // If NZ2ND/NZ2DN is disabled, it is in unit of element, Loop1_dst_stride
+    bool nz2ndEn = false;
+    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
+        dstOffset = nIterIndex * fixpipeTiling.nSize;
+        nz2ndEn = true;
+    } else {
+        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
+    }
+    // LOC -> UB only n direction need fixpipeTiling, m no need fixpipeTiling
+    return copy_matrix_cc_to_ub(
+        (__ubuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
+        intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
+        static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+        intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
+        false, false, false, false);
+}
+
 template <const FixpipeConfig& config>
 __aicore__ inline uint64_t GetGMLen(
     const FixpipeParamsL300<config.format>& intriParams, const uint16_t calNSize, const uint16_t dstEleSize)
@@ -338,6 +383,19 @@ __aicore__ inline void FixpipeL0C2L1ImplN(
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImplN(
+    __ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsL300<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
+    uint16_t nIterIndex)
+{
+    // mov deq tensor from L1 to FB
+    CopyDeqTensorToFbuf(cbufWorkspace, fixpipeTiling, calNSize, nIterIndex);
+    PipeBarrier<PIPE_FIX>();
+    // L0C->UB
+    FixpipeL0cToUB<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, calNSize, nIterIndex);
+}
+
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2GMImplN(
     __gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
     const FixpipeParamsL300<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t calNSize,
@@ -411,6 +469,72 @@ __aicore__ inline void FixpipeL0C2L1Impl(
         }
         return;
     }
+}
+
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImpl(
+    __ubuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL300<config.format>& intriParams)
+{
+    // nz2nd/nz2dn need set LOOP3_PARA
+    SetLoop3Para<config>(intriParams);
+
+    // nz2dn mode need set CHANNEL_PARA extra
+    if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
+        // Loop0_dst_stride in uint of CO_SIZE
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
+        set_channel_para(channelPara);
+    }
+    /*
+    make code for scalar quant mode:
+    1. copy deq scalar u64 immediate
+    2. code gen: move data from l0c to ub
+    */
+    if (IsScalarQuantMode(intriParams.quantPre)) {
+        // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32,
+        set_quant_pre(intriParams.deqScalar);
+    }
+    PipeBarrier<PIPE_FIX>();
+    FixpipeTiling fixpipeTiling;
+    // LOC -> UB
+    FixpipeL0cToUB<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
+}
+
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImpl(
+    __ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsL300<config.format>& intriParams)
+{
+    // nz2nd/nz2dn need set LOOP3_PARA
+    SetLoop3Para<config>(intriParams);
+
+    // nz2dn mode need set CHANNEL_PARA extra
+    if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
+        // Loop0_dst_stride in uint of CO_SIZE
+        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride) << 48; // CHANNEL_PARA[63:48]
+        set_channel_para(channelPara);
+    }
+    /*
+    make code for vector quant mode:
+    1. generate fixpipeTiling
+    2. copy deq tensor from l1 to fb1 (l1 -> fb1)
+    3. code gen: move data from l0c to ub
+    */
+    if (IsVectorQuantMode(intriParams.quantPre)) {
+        FixpipeTiling fixpipeTiling = GenFixpipeTiling(intriParams.nSize);
+        for (uint16_t i = 0; i < fixpipeTiling.nIterNum; ++i) {
+            FixpipeL0C2UBImplN<DstT, SrcT, config>(
+                dst, src, cbufWorkspace, intriParams, fixpipeTiling, fixpipeTiling.nSize, i);
+        }
+        // deal with the tail, it also need copy deq/relu tensor from L1 to fb1
+        if (fixpipeTiling.tailNSize > 0) {
+            FixpipeL0C2UBImplN<DstT, SrcT, config>(
+                dst, src, cbufWorkspace, intriParams, fixpipeTiling, fixpipeTiling.tailNSize, fixpipeTiling.nIterNum);
+        }
+        return;
+    }
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe with cbufWorkspace only supports vector quant mode");
+    });
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
@@ -529,17 +653,21 @@ __aicore__ inline void FixpipeL0C2GMImpl(
     FixpipeL0C2GMImpl<DstT, SrcT, config>(dst, src, cbufWorkspace, params);
 }
 
-template <typename T, typename U, const FixpipeConfig& config>
-__aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsV220& intriParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe doesn't support L0C to UB on current device\n"); });
+    FixpipeParamsL300<config.format> params;
+    TransFixpipeParamsV220ToFixpipeParamsL300(intriParams, params);
+    FixpipeL0C2UBImpl<DstT, SrcT, config>(dst, src, params);
 }
 
-template <typename T, typename U, const FixpipeConfig& config>
+template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0C2UBImpl(
-    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams)
+    __ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe doesn't support L0C to UB on current device\n"); });
+    FixpipeParamsL300<config.format> params;
+    TransFixpipeParamsV220ToFixpipeParamsL300(intriParams, params);
+    FixpipeL0C2UBImpl<DstT, SrcT, config>(dst, src, cbufWorkspace, params);
 }
 
 } // namespace AscendC
