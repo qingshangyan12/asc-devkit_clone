@@ -1,13 +1,19 @@
 ---
 okftype: reference.api
-description: "在单次迭代内对32个元素按score降序排列，并将score与索引index以8字节结果结构写入dst，repeat控制的各次迭代相互独立排序。"
+description: "在一次迭代内对32个元素按score降序排列，score取float或half、index固定uint32_t，排序结果以8字节的(score,index)结构写入dst，repeat参数控制多个互不排序的迭代，每次迭代跳过32元素与256字节。"
 tag:
   - roles: [compute]
   - operations: [sort]
+  - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: ">=9.1.0"
+    condition: "需遵循通用地址重叠约束"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: related
+    condition: "排序结果通常作为该接口的输入队列"
+version: ">=9.0.0"
+version_changes: []
 ---
 # asc_bitsort
 

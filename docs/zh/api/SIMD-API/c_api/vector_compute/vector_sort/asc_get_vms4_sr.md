@@ -1,13 +1,14 @@
 ---
 okftype: reference.api
-description: "获取asc_mrgsort4归并后4个队列各自已处理的Region Proposal个数，需与if_exhausted_suspension配置为true的asc_mrgsort4配合并在其执行完成后调用。"
+description: "获取asc_mrgsort4操作后4个队列各自已处理的Region Proposal个数，输出数组长度由ASC_C_API_MRGSORT_ELEMENT_LEN定义为4，需将mrgsort4的if_exhausted_suspension配置为true并同步后再调用。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
     kind: requires
-    condition: "asc_mrgsort4的if_exhausted_suspension参数需配置为true，并通过同步操作确保asc_mrgsort4执行完成后再调用本接口"
-version: ">=9.0.0"
+    condition: "需与该归并接口配合使用且其if_exhausted_suspension需为true"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_vms4_sr
 

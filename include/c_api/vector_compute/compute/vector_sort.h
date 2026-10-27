@@ -28,55 +28,55 @@
 #endif
 /**
  * @ingroup simd_c_api.vector_compute.vector_sort
- * @brief Output-parameter interface: writes into sorted_num how many Region Proposals each of the 4 queues already processed after asc_mrgsort4; returns nothing.
+ * @brief Retrieves, for each of the four merge queues, how many Region Proposals asc_mrgsort4 has already processed.
  *
  * @override_id asc_get_vms4_sr__Amrgu16
  * @archs 2201
- * @param [out] sorted_num 每个队列已经理过的Region Proposal个数。队列数量ASC_C_API_MRGSORT_ELEMENT_LEN值为4。
+ * @param [out] sorted_num Array of four uint16_t values (ASC_C_API_MRGSORT_ELEMENT_LEN = 4) that receives the number of processed Region Proposals per queue.
  */
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4]);
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_sort
- * @brief Sorts 32 half score elements in descending order per iteration and writes (score, index) 8-byte structures into dst; iterations are sorted independently; src1 is the uint32 index.
+ * @brief Sorts 32 half score values per iteration in descending order and writes each score together with its uint32 index into 8-byte records in dst.
  *
  * @override_id asc_bitsort__PUf16_PUf16_PUu32_i32
  * @archs 2201 3510
- * @param [out] dst 目的操作数在UB中的起始地址。
- * @param [in] src0 score在UB中的起始地址。
- * @param [in] src1 index在UB中的起始地址。
- * @param [in] repeat 迭代次数，取值范围为[0, 255]。每次迭代处理32个元素；下次迭代时，`src0`和`src1`各跳过32个元素，`dst`跳过256字节。不同迭代之间不进行排序。
+ * @param [out] dst Destination start address in UB for the sorted (score, index) records; must be 32-byte aligned.
+ * @param [in] src0 Start address of the half score values in UB; must be 32-byte aligned.
+ * @param [in] src1 Start address of the uint32 index values in UB; must be 32-byte aligned.
+ * @param [in] repeat Iteration count in the range [0, 255]; each iteration sorts 32 elements, after which src0/src1 skip 32 elements and dst skips 256 bytes.
  */
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_sort
- * @brief Sorts 32 float score elements in descending order per iteration and writes (score, index) 8-byte structures into dst; iterations are sorted independently; src1 is the uint32 index.
+ * @brief Sorts 32 float score values per iteration in descending order and writes each score together with its uint32 index into 8-byte records in dst.
  *
  * @override_id asc_bitsort__PUf32_PUf32_PUu32_i32
  * @archs 2201 3510
- * @param [out] dst 目的操作数在UB中的起始地址。
- * @param [in] src0 score在UB中的起始地址。
- * @param [in] src1 index在UB中的起始地址。
- * @param [in] repeat 迭代次数，取值范围为[0, 255]。每次迭代处理32个元素；下次迭代时，`src0`和`src1`各跳过32个元素，`dst`跳过256字节。不同迭代之间不进行排序。
+ * @param [out] dst Destination start address in UB for the sorted (score, index) records; must be 32-byte aligned.
+ * @param [in] src0 Start address of the float score values in UB; must be 32-byte aligned.
+ * @param [in] src1 Start address of the uint32 index values in UB; must be 32-byte aligned.
+ * @param [in] repeat Iteration count in the range [0, 255]; each iteration sorts 32 elements, after which src0/src1 skip 32 elements and dst skips 256 bytes.
  */
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_sort
- * @brief Merges 2, 3 or 4 descending score-sorted half queues (typically asc_bitsort output) into one ordered queue in dst; valid_bit selects active queues, iterations are not merged.
+ * @brief Merges 2, 3 or 4 descending-score-sorted half queues per iteration into one ordered queue in dst, keeping the records sorted by score.
  *
  * @override_id asc_mrgsort4__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8
  * @archs 2201 3510
- * @param [out] dst UB中的目的队列起始地址，要求32字节对齐。
- * @param [in] src 包含4条源队列起始地址的指针数组，`ASC_C_API_MRGSORT_ELEMENT_LEN`为`4`。每个队列起始地址要求8字节对齐，数组下标0～3分别对应4条队列。4个数组项均须初始化，无效队列可复用合法UB地址。
- * @param [in] repeat 迭代次数，执行归并时取值为[1, 255]。取值大于1时须满足[约束说明](#约束说明)中的多次迭代约束。多次迭代产生多条分别有序的结果队列，不会自动将它们合为一条。
- * @param [in] element_length_0 起始地址为`src[0]`的队列的长度，即队列中数据单元的个数，每个数据单元占8字节，因此单位为8字节。 对于有效队列，取值范围为[1, 4095]；对于无效队列，取值为0。
- * @param [in] element_length_1 起始地址为`src[1]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] element_length_2 起始地址为`src[2]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] element_length_3 起始地址为`src[3]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] if_exhausted_suspension 某个队列耗尽时，控制指令是否停止执行，类型为bool，取值说明如下： &nbsp;&nbsp;&bull; `false`：归并排序过程中某条有效队列耗尽后继续处理其余队列，输出所有有效队列的值，单次迭代的输出长度为有效队列长度之和。 &nbsp;&nbsp;&bull; `true`：归并排序过程中任意一有效队列耗尽时停止排序，只输出已经完成排序的有序前缀，不能将有效队列长度之和作为单次迭代的实际输出长度。
- * @param [in] valid_bit 有效队列位掩码，有效取值为`3`、`7`、`15`，含义如下： &nbsp;&nbsp;&bull; `3`（`0b0011`）：有效队列为起始地址为`src[0]`和`src[1]`的队列。 &nbsp;&nbsp;&bull; `7`（`0b0111`）：有效队列为起始地址为`src[0]`、`src[1]`和`src[2]`的队列。 &nbsp;&nbsp;&bull; `15`（`0b1111`）：全部4条队列均有效。
+ * @param [out] dst Destination queue start address in UB; must be 32-byte aligned.
+ * @param [in] src Array of four source queue start addresses (ASC_C_API_MRGSORT_ELEMENT_LEN is 4), each 8-byte aligned; all four entries must be initialized even for queues not selected by valid_bit.
+ * @param [in] repeat Iteration count in [1, 255]; values above 1 must satisfy the multi-iteration constraints in constraints section.
+ * @param [in] element_length_0 Length of the queue at src[0] counted in 8-byte data units; [1, 4095] for a valid queue and 0 for an invalid one.
+ * @param [in] element_length_1 Length of the queue at src[1] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] element_length_2 Length of the queue at src[2] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] element_length_3 Length of the queue at src[3] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] if_exhausted_suspension false keeps merging the remaining queues after one is exhausted (output length is the sum of valid queue lengths); true stops at the first exhausted queue and outputs only the sorted prefix.
+ * @param [in] valid_bit Valid-queue mask: 3 (0b0011) uses src[0]/src[1], 7 (0b0111) uses src[0..2], and 15 (0b1111) uses all four queues.
  */
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
@@ -85,19 +85,19 @@ __aicore__ inline void asc_mrgsort4(
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_sort
- * @brief Merges 2, 3 or 4 descending score-sorted float queues (typically asc_bitsort output) into one ordered queue in dst; valid_bit selects active queues, iterations are not merged.
+ * @brief Merges 2, 3 or 4 descending-score-sorted float queues per iteration into one ordered queue in dst, keeping the records sorted by score.
  *
  * @override_id asc_mrgsort4__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8
  * @archs 2201 3510
- * @param [out] dst UB中的目的队列起始地址，要求32字节对齐。
- * @param [in] src 包含4条源队列起始地址的指针数组，`ASC_C_API_MRGSORT_ELEMENT_LEN`为`4`。每个队列起始地址要求8字节对齐，数组下标0～3分别对应4条队列。4个数组项均须初始化，无效队列可复用合法UB地址。
- * @param [in] repeat 迭代次数，执行归并时取值为[1, 255]。取值大于1时须满足[约束说明](#约束说明)中的多次迭代约束。多次迭代产生多条分别有序的结果队列，不会自动将它们合为一条。
- * @param [in] element_length_0 起始地址为`src[0]`的队列的长度，即队列中数据单元的个数，每个数据单元占8字节，因此单位为8字节。 对于有效队列，取值范围为[1, 4095]；对于无效队列，取值为0。
- * @param [in] element_length_1 起始地址为`src[1]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] element_length_2 起始地址为`src[2]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] element_length_3 起始地址为`src[3]`的队列的长度，单位及范围同`element_length_0`。
- * @param [in] if_exhausted_suspension 某个队列耗尽时，控制指令是否停止执行，类型为bool，取值说明如下： &nbsp;&nbsp;&bull; `false`：归并排序过程中某条有效队列耗尽后继续处理其余队列，输出所有有效队列的值，单次迭代的输出长度为有效队列长度之和。 &nbsp;&nbsp;&bull; `true`：归并排序过程中任意一有效队列耗尽时停止排序，只输出已经完成排序的有序前缀，不能将有效队列长度之和作为单次迭代的实际输出长度。
- * @param [in] valid_bit 有效队列位掩码，有效取值为`3`、`7`、`15`，含义如下： &nbsp;&nbsp;&bull; `3`（`0b0011`）：有效队列为起始地址为`src[0]`和`src[1]`的队列。 &nbsp;&nbsp;&bull; `7`（`0b0111`）：有效队列为起始地址为`src[0]`、`src[1]`和`src[2]`的队列。 &nbsp;&nbsp;&bull; `15`（`0b1111`）：全部4条队列均有效。
+ * @param [out] dst Destination queue start address in UB; must be 32-byte aligned.
+ * @param [in] src Array of four source queue start addresses (ASC_C_API_MRGSORT_ELEMENT_LEN is 4), each 8-byte aligned; all four entries must be initialized even for queues not selected by valid_bit.
+ * @param [in] repeat Iteration count in [1, 255]; values above 1 must satisfy the multi-iteration constraints in constraints section.
+ * @param [in] element_length_0 Length of the queue at src[0] counted in 8-byte data units; [1, 4095] for a valid queue and 0 for an invalid one.
+ * @param [in] element_length_1 Length of the queue at src[1] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] element_length_2 Length of the queue at src[2] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] element_length_3 Length of the queue at src[3] counted in 8-byte data units, with the same range and meaning as element_length_0.
+ * @param [in] if_exhausted_suspension false keeps merging the remaining queues after one is exhausted (output length is the sum of valid queue lengths); true stops at the first exhausted queue and outputs only the sorted prefix.
+ * @param [in] valid_bit Valid-queue mask: 3 (0b0011) uses src[0]/src[1], 7 (0b0111) uses src[0..2], and 15 (0b1111) uses all four queues.
  */
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
