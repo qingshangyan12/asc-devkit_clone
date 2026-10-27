@@ -1,3 +1,16 @@
+---
+okftype: reference.api
+description: "为连续搬运数据块设置左右填充值的配置接口，与asc_copy_gm2ub_align配合使用，仅在enable_constant_pad为true时生效，支持int8_t到float共9种dtype，950上FP8与FP4等类型需转换为int8_t后调用。"
+tag:
+  - roles: [configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+    condition: "设置的填充值供该搬运接口在enable_constant_pad为true时取用"
+version: ">=9.1.0"
+version_changes: []
+---
 # asc_set_copy_pad_val
 
 ## 产品支持情况

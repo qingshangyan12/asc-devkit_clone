@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "对矢量输入按元素取绝对值并写入目的矢量，支持前n个数据计算与高维切分计算两种形式，要求起始地址32字节对齐。"
+description: "对half或float矢量按元素取绝对值，支持前n个数据计算的count形式与按repeat和DataBlock步长的高维切分形式两种原型，结果写入目的矢量，需要32字节地址对齐。"
 tag:
   - roles: [compute]
   - operations: [absolute]
@@ -8,7 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵循通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 
 # asc_abs

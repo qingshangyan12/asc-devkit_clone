@@ -1,18 +1,22 @@
 ---
 okftype: reference.api
-description: "执行矢量与标量的乘法运算，逐元素将源矢量src与标量value相乘后写入目的矢量dst；该接口已废弃，请使用对应的非同步接口asc_mul_scalar和同步接口asc_sync替代。"
+description: "已废弃的矢量标量乘法同步接口，按源元素乘标量 value 的公式逐元素计算，提供 int16_t、half、int32_t、float 四种同类型形式，替代方案为 asc_mul_scalar 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [multiply]
-  - traits: [aligned_transfer, scalar_operand]
+  - operations: [multiply, synchronization]
+  - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md
     kind: replaced_by
-    condition: "非同步乘法场景改用asc_mul_scalar实现"
-version: ">=9.0.0"
+version: ">=8.5.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_mul_scalar 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的 4 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_mul_scalar_sync（废弃）
 

@@ -1,18 +1,26 @@
 ---
 okftype: reference.api
-description: "按元素计算自然对数并将结果写入目的操作数，dst与src起始地址需32字节对齐。该接口已废弃，请使用对应的非同步接口asc_log和同步接口asc_sync替代。"
+description: "已废弃的同步数学接口，按元素取自然对数并按PIPE_V流水计算，提供half与float两种源类型的重载，替代方案为asc_log配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [natural_log]
-  - traits: [elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景配合asc_sync实现"
+    kind: related
+    condition: "与非同步接口配合完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_log.md
     kind: replaced_by
-    condition: "非同步计算采用asc_log实现"
+    condition: "替代本同步接口的非同步接口"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "两个源类型重载均带 ASC_DEPRECATED(9.2.0, 2027/09/07, asc_log and asc_sync) 标记（include/c_api/composite/vector_compute_composite.h 中对应 @override_id 之前的宏行），替代方案为非同步接口 asc_log 加 asc_sync；本页全部原型均属废弃范围，属整页废弃，不封可用上限。"
 ---
 # asc_log_sync（废弃）
 

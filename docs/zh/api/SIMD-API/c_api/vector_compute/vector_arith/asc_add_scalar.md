@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "执行矢量加法运算，将源矢量的每个元素与标量相加并写入目的矢量，支持连续数据计算与高维切分计算。"
+description: "对int16_t、half、int32_t或float矢量逐元素加上同类型标量value，支持连续数据计算与按repeat和DataBlock步长的高维切分两种原型，需32字节地址对齐。"
 tag:
   - roles: [compute]
   - operations: [add]
@@ -8,7 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: ">=9.0.0"
+    condition: "需遵循通用地址重叠约束"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_add_scalar
 

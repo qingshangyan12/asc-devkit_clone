@@ -1,21 +1,27 @@
 ---
 okftype: reference.api
-description: "根据掩码对两个源矢量及输入进位逐元素求差，输出减法结果与进位标志，硬件按32位无符号数补码加法处理。"
+description: "按掩码对两个矢量数据寄存器及输入借位标志逐元素求差，把补码加法和的低 32 位写入目的寄存器、进位标志写入目的掩码寄存器，支持 int32_t 与 uint32_t。"
 tag:
   - roles: [compute]
   - operations: [subtract]
   - traits: [carry_input, elementwise, supports_carry_output]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
+    kind: requires
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md
-    kind: related
+    condition: "Reg 矢量计算 C API 通用约束"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-    condition: "运算输出完整计算结果（包含借位标志）时"
+    condition: "本接口输出完整计算结果，不受该控制接口影响"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: header_reorganized
+    scope: "page"
+    scope_basis: kind_default
+    note: "声明位置由 include/c_api/reg_compute/reg_vector.h（9.1.0 及更早）统一到 include/c_api/reg_compute/compute/reg_arith.h（9.2.0 起）；本页只有 2 条引用输出声明，9.2.0 未增加函数返回值形式，故不登记 overload_added。"
 ---
 # asc_subc
 

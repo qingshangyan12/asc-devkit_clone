@@ -1,18 +1,21 @@
 ---
 okftype: reference.api
-description: "按元素对源矢量开方后取倒数，结果写入目的操作数，该接口已废弃，请改用对应的非同步接口asc_rsqrt和同步接口asc_sync替代。"
+description: "已废弃的矢量平方根倒数同步接口，按目标元素等于源元素开方后取倒数的公式逐元素计算，支持 half 与 float，仅在 Atlas A2、A3 支持，替代方案为 asc_rsqrt 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [reciprocal_sqrt]
-  - traits: [elementwise]
+  - operations: [reciprocal_sqrt, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md
     kind: replaced_by
-    condition: "同步接口拆分为对应的非同步接口与asc_sync同步接口组合"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_rsqrt 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_rsqrt_sync（废弃）
 

@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "按元素对源矢量开方后取倒数，将结果写入目的矢量，支持前n个数据计算与高维切分计算。"
+description: "对half或float矢量按元素先开方再取倒数，支持前n个数据计算与按repeat和DataBlock步长的高维切分两种原型，结果写入目的矢量并需32字节地址对齐。"
 tag:
   - roles: [compute]
   - operations: [reciprocal_sqrt]
@@ -8,8 +8,14 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址重叠"
+    condition: "需遵循通用地址重叠约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: behavior_fixed
+    scope: "page"
+    scope_basis: kind_default
+    note: "修复2201架构下asc_rsqrt同步重载误调用非同步实现的问题（CANN_9_2_0 Release Notes原文条目）；本页记录的是非同步原型，该修复保证其在同步包装路径下的行为正确。"
 ---
 # asc_rsqrt
 

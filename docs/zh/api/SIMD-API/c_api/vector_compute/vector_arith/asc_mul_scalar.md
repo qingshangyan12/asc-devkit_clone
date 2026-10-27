@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "执行矢量与标量的乘法运算，每个源元素乘以标量值后写入目的矢量，支持前n个数据与高维切分计算。"
+description: "对int16_t、half、int32_t或float矢量逐元素乘以同类型标量value，支持前n个数据计算与按repeat和DataBlock步长的高维切分两种原型，结果写入目的矢量。"
 tag:
   - roles: [compute]
   - operations: [multiply]
@@ -8,8 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址重叠"
-version: ">=9.0.0"
+    condition: "需遵循通用地址重叠约束"
+version: ">=8.5.0"
+version_changes: []
 ---
 
 # asc_mul_scalar

@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将源矢量逐元素与标量比较并取较小值写入目的矢量，支持前n个数据计算与高维切分计算。"
+description: "对half、float、int16_t或int32_t矢量逐元素与同类型标量value取最小值，支持前n个数据计算与按repeat和DataBlock步长的高维切分两种原型，结果写入目的矢量。"
 tag:
   - roles: [compute]
   - operations: [minimum]
@@ -8,8 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址重叠"
+    condition: "需遵循通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_min_scalar
 

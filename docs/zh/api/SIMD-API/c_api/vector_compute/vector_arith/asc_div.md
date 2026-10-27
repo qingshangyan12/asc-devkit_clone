@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "执行矢量除法运算，对两个源矢量的对应元素逐元素相除并写入目的矢量，使用时需注意除0错误。"
+description: "对half或float矢量按元素执行src0除以src1，支持前n个数据计算与高维切分两种原型，结果写入目的矢量；需32字节地址对齐并注意除0错误。"
 tag:
   - roles: [compute]
   - operations: [divide]
@@ -8,7 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: ">=9.0.0"
+    condition: "需遵循通用地址重叠约束"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_div
 

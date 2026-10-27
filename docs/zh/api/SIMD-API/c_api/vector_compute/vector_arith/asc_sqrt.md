@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "按元素对输入矢量执行开方运算，结果写入目的矢量。计算要求src只支持设置为正数，且dst、src的起始地址需要32字节对齐。"
+description: "对half或float矢量按元素开平方，支持前n个数据计算与按repeat和DataBlock步长的高维切分两种原型，结果写入目的矢量并需32字节地址对齐。"
 tag:
   - roles: [compute]
   - operations: [sqrt]
@@ -8,7 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵循通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_sqrt
 

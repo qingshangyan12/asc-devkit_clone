@@ -1,18 +1,22 @@
 ---
 okftype: reference.api
-description: "执行矢量与标量的逐元素加法运算，接口已废弃，请使用asc_add_scalar与asc_sync替代。"
+description: "已废弃的矢量标量加法同步接口，将标量 value 与源矢量逐元素相加写入目的矢量，提供 int16_t、half、int32_t、float 四种同类型形式，替代方案为 asc_add_scalar 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [add]
+  - operations: [add, synchronization]
   - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md
     kind: replaced_by
-    condition: "标量与矢量相加场景改用asc_add_scalar实现"
-version: ">=9.0.0"
+version: ">=8.5.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "复合同步接口族废弃，改用 asc_add_scalar 与 asc_sync；include/c_api/composite/vector_compute_composite.h:87-129 的 4 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_add_scalar_sync（废弃）
 

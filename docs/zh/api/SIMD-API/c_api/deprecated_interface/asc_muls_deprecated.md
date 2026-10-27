@@ -1,15 +1,20 @@
 ---
 okftype: reference.api
-description: "对源矢量src与标量value进行乘法运算并按ROUND舍入模式转换为half类型，再按mask将结果写入dst；该接口已废弃，请使用asc_mul_scalar_float2half_rn替代。"
+description: "已废弃的 Reg 乘标量接口，把 float 源矢量与标量 value 相乘后按 ROUND 舍入转为 half 写入目的寄存器，含无后缀与 _v2 两个隐式位置重载，替代方案为 asc_mul_scalar_float2half_rn。"
 tag:
   - roles: [compute]
-  - operations: [multiply]
+  - operations: [conversion, multiply]
   - traits: [rounding_mode, scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
     kind: replaced_by
-    condition: "改用asc_mul_scalar_float2half_rn实现乘法与舍入转换"
-version: ">=9.0.0,<=9.2.0"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "asc_muls 与 asc_muls_v2 废弃，改用 asc_mul_scalar_float2half_rn；include/c_api/reg_compute/compute/reg_fused.h:581 起的两个声明均带 ASC_DEPRECATED(9.2.0)，CANN_9_2_0 废弃表第 126 行列有该条目。"
 ---
 # asc_muls (废弃)
 
