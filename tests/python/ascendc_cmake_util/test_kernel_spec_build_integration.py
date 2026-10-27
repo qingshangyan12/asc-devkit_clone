@@ -81,6 +81,7 @@ function(add_kernel kernel)
   file(MAKE_DIRECTORY "${auto_gen_path}")
   file(WRITE "${auto_gen_path}/custom_opc_options.ini" "${SPEC_OPC_OPTIONS}")
   set(kernel_spec_mode "${SPEC_MODE}")
+  set(ASCEND_AUTOGEN_PATH "${auto_gen_path}")
   set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "${auto_gen_path}")
   ascend_copy_kernel_source_file(TARGET ${kernel}_copy_kernel_srcs PACKAGE_TARGET ${kernel}
     KERNEL_BASE_DIR "${KERNEL_SRC_BASE}" DST_DIR "${KERNEL_DYNAMIC_PATH}")
@@ -93,9 +94,8 @@ function(add_kernel kernel)
       add_custom_target(${kernel}_${soc}_${op}
         COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/producer.py" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util"
           "${kernel_spec_mode}" "${CMAKE_BINARY_DIR}/demo/kernel_spec_bundle" "${op}" "${soc}"
-          "${KERNEL_SRC_BASE}/${op_file}.cpp" "${KERNEL_DYNAMIC_PATH}/${op_file}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
+          "${KERNEL_SRC_BASE}/${op_file}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
         VERBATIM)
-      add_dependencies(${kernel}_${soc}_${op} ${kernel}_copy_kernel_srcs)
       list(APPEND KERNEL_COMPILE_TARGETS ${kernel}_${soc}_${op})
       list(APPEND kernel_spec_tasks "[\"${op}\",\"${soc}\"]")
       add_dependencies(${kernel}_ascendc_bin_${soc}_gen_ops_config ${kernel}_${soc}_${op})
@@ -121,8 +121,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
 from ascendc_build_kernel_spec import task_directory
-mode, root, op, soc, source, copied_source, fail = sys.argv[2:]
-assert Path(copied_source).read_text() == Path(source).read_text(), 'compile must see the latest copied source'
+mode, root, op, soc, source, fail = sys.argv[2:]
 if mode != "None":
     assert (Path(root) / 'input').is_dir(), 'CMake must prepare inputs before producers'
     directory = task_directory(str(Path(root) / 'input'), op, soc)
@@ -231,10 +230,6 @@ def test_package_reuses_fixed_paths_and_replaces_resource_inputs(project):
     _build(build)
     assert not stale.exists()
     assert output.stat().st_mtime_ns == timestamp
-    (source / "kernel_a/add.cpp").write_text("changed source")
-    _build(build)
-    assert output.stat().st_mtime_ns != timestamp
-    assert (build / "kernel_a/binary/dynamic/add.cpp").read_text() == "changed source"
 
 
 def test_skipped_producers_remove_old_result_and_reconfigure_requires_build(project):

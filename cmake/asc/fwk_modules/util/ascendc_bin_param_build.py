@@ -436,6 +436,11 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             check_result += "fi\n"
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".json")
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".o")
+            directory = getattr(self, "kernel_spec_directory", None)
+            if directory is not None:
+                skipped = shlex.quote(str(directory / bin_file / ".manifest-skipped"))
+                check_result += f"if [ -f {skipped} ]; then\n"
+                check_result += f'    echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}filtered"\n    exit 0\nfi\n'
             check_result += f'echo "{const_var.KERNEL_SPEC_RESULT_PREFIX}completed"\n'
             return check_result
         if enable_tiling_keys is False:
