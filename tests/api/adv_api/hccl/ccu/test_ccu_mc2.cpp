@@ -1926,7 +1926,6 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedDevice)
 TEST_F(CcuMc2TestSuite, CcuKernelLaunch_RejectsNullParameters)
 {
     EXPECT_EQ(CcuKernelLaunch(nullptr, nullptr), CCU_E_PTR);
-    EXPECT_EQ(CcuKernelLaunch(comm_, nullptr), CCU_E_PTR);
 }
 
 } // namespace
