@@ -31,6 +31,8 @@ namespace Std = AscendC::Std;
 
 enum class unit_flag_mode : uint8_t { disable = 0, enable_keep = 2, enable_update = 3 };
 
+__aicore__ inline int64_t get_vf_len();
+
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
 using _2 = Std::Int<2>;
