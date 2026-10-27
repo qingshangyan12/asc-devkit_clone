@@ -82,7 +82,7 @@ class TestKernelParamMetadata(unittest.TestCase):
         self.assertEqual(struct.unpack_from("<IQ", second_bytes, 4), (1, 8))
 
     def test_unsupported_description_leaves_original_source_usable(self):
-        for entry, parameters in (('bad"entry', ()), ("add", ("int value",)), ("add", None)):
+        for entry, parameters in (('bad"entry', ()), ("add", None)):
             with self.subTest(entry=entry, parameters=parameters):
                 info = CompileInfo()
                 metadata.prepare_kernel_param_metadata(info, parameters)
@@ -108,8 +108,10 @@ class TestKernelParamMetadata(unittest.TestCase):
         info = CompileInfo()
         metadata.prepare_kernel_param_metadata(info, ("GM_ADDR x",))
         self.assertIsNotNone(info.kernel_param_metadata)
+        parameters = mock.MagicMock()
+        parameters.__len__.return_value = 0x20000000
         with mock.patch.object(metadata.logging.Logger, "warning", side_effect=RuntimeError("log failure")):
-            metadata.prepare_kernel_param_metadata(info, ("int value",))
+            metadata.prepare_kernel_param_metadata(info, parameters)
         self.assertIsNone(info.kernel_param_metadata)
 
 
@@ -170,8 +172,8 @@ class TestCompileParamSections(unittest.TestCase):
 
     def test_new_generation_failure_keeps_original_compile_and_source(self):
         self.run_default_compile(CompileCommandMode.EXECUTE_AND_RECORD)
-        metadata.prepare_kernel_param_metadata(self.info, ("unsupported scalar",))
-        result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
+        with mock.patch.object(metadata, "_serialize_param_metadata", side_effect=RuntimeError("encoding failure")):
+            result = v220.call_bisheng_v220(self.info, None, self.tiling, "dav-c220-cube", CORE_TYPE_CUBE)
         self.assertEqual(result, ["7"])
         self.assertEqual("".join(self.write.call_args.args[1]), "#if 1\n#endif\n")
         self.batch.assert_called_once()
@@ -206,6 +208,28 @@ class TestCompileParamSections(unittest.TestCase):
             source, _, _, _ = compile_op._gen_kernel_func_declare_head(True, False, op, self.tiling, self.info)
         self.assertTrue(source.startswith("uint64_t args_offset) {"))
         self.assertIsNone(self.info.kernel_param_metadata)
+
+    def test_qualified_tiling_pointer_keeps_all_parameter_records(self):
+        op = SimpleNamespace(
+            mc2_ctx=[],
+            inputs=[{"param_name": "x"}],
+            outputs=[{"param_name": "y"}],
+            output_shape_depend_on_compute=[],
+            param_type_list=None,
+        )
+        DFXSectionGenerator().dfx_info_reset(op)
+        with mock.patch.object(CommonUtility, "is_920r1", return_value=True):
+            source, _, _, _ = compile_op._gen_kernel_func_declare_head(False, False, op, self.tiling, self.info)
+        self.assertIn("GM_ADDR __early_read_before_pre_task_done__ tiling", source)
+        self.assertIsNotNone(self.info.kernel_param_metadata)
+        encoded = decode_declaration(metadata.generate_param_metadata("add", self.info.kernel_param_metadata))
+        self.assertEqual(struct.unpack_from("<IQ", encoded, 4), (4, 32))
+        self.assertEqual(len(encoded), 16 + 4 * 40)
+        for ordinal in range(4):
+            self.assertEqual(
+                struct.unpack_from("<IIIIHHIIII", encoded, 16 + ordinal * 40 + 4),
+                (0, ordinal, ordinal * 8, 8, 8, 2, 0, 0, 0, 0),
+            )
 
     def test_existing_compile_exception_and_preexecution_record_are_preserved(self):
         command = self.run_default_compile(CompileCommandMode.EXECUTE_AND_RECORD)

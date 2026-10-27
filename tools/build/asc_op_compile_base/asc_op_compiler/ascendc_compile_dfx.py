@@ -105,7 +105,7 @@ def log_param_metadata_failure(error):
 
 
 def prepare_kernel_param_metadata(compile_info, parameters):
-    """Validate final GM_ADDR formals and save their immutable numeric layout."""
+    """Save the immutable pointer layout of final formals from the ordinary wrapper generator."""
     if compile_info is None:
         return
     compile_info.kernel_param_metadata = None
@@ -115,8 +115,7 @@ def prepare_kernel_param_metadata(compile_info, parameters):
         count = len(parameters)
         if count > 0xFFFFFFFF // 8:
             raise ValueError("parameter block exceeds the Runtime offset range")
-        if any(not re.fullmatch(r"GM_ADDR [A-Za-z_][A-Za-z_0-9]*", parameter) for parameter in parameters):
-            raise ValueError("parameter metadata requires the ordinary GM_ADDR wrapper ABI")
+        # The caller generates GM_ADDR formals; additional qualifiers do not change their pointer layout.
         infos = tuple((0, ordinal, ordinal * 8, 8, 8, 2, 0, 0, 0, 0) for ordinal in range(count))
         compile_info.kernel_param_metadata = KernelParamMetadata(count, count * 8, infos)
     except Exception as error:
