@@ -35,8 +35,6 @@ public:
     // 设计常数：每板 8 卡 × 2 流集合（一套做前半 rank 空间，一套做后半），全链路口径一致
     static constexpr u32 RANK_NUM_PER_BOARD = 8;
     static constexpr u32 THREAD_SET_NUM = 2;
-    // pod 内板数硬件常数（topoInfo 无 pod 层数据，按 128P=2 pod 实测硬编码）
-    static constexpr u32 BOARDS_PER_POD = 8;
 
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& tempAlgParams,
