@@ -1,11 +1,13 @@
 ---
 okftype: reference.enum
-description: "定义L0C Buffer数据搬出时的类型转换或量化模式枚举，作为矩阵搬出接口quant_pre_mode参数类型，不同产品型号支持的量化模式不同。"
+description: "L0C Buffer数据搬出时的类型转换或量化模式别名，等价于编译器提供的QuantMode_t，作为矩阵搬出接口quant_pre_mode参数的类型，可用取值随产品型号和具体接口而不同。"
 tag:
-  - roles: [configuration]
+  - roles: [data_movement_configuration]
+  - operations: [conversion]
   - traits: [quantization]
 dependencies: []
-version: ">=9.0.0"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_quant_mode
 

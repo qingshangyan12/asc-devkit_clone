@@ -1,10 +1,12 @@
 ---
 okftype: reference.enum
-description: "定义L0C Buffer数据搬出时的随路ReLU模式枚举，作为矩阵搬出接口relu_pre_mode参数类型，支持不执行、普通、Scalar和Vector四种取值。"
+description: "L0C Buffer数据搬出时的随路ReLU模式枚举，作为矩阵搬出接口relu_pre_mode参数的类型，区分不执行、普通ReLU以及使用Scalar或Vector参数执行随路ReLU。"
 tag:
-  - roles: [configuration]
+  - roles: [data_movement_configuration]
+  - operations: [relu]
 dependencies: []
-version: ">=9.0.0"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_relu_pre_mode
 

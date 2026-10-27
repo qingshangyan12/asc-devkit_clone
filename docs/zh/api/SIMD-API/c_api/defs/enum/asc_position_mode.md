@@ -1,10 +1,11 @@
 ---
 okftype: reference.enum
-description: "定义源或目的操作数在寄存器中的奇偶位置枚举，供Reg类型转换和融合计算接口选择数据位置，配套ASC_POSITION_EVEN与ASC_POSITION_ODD常量。"
+description: "表示源或目的操作数在寄存器中奇偶位置的枚举，供Reg类型转换和融合计算接口选择数据位置，EVEN和ODD可分别通过ASC_POSITION_EVEN与ASC_POSITION_ODD常量直接传入。"
 tag:
   - roles: [configuration]
 dependencies: []
-version: ">=9.0.0"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_position_mode
 

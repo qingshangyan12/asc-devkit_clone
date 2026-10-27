@@ -1,25 +1,35 @@
 ---
 okftype: reference.enum
-description: "定义asc_load_l2_cache_mode枚举，表示数据从GM搬运到Unified Buffer时的L2 Cache管理策略，用于向量搬运接口以及标量访存load策略配置与查询。"
+description: "数据从GM搬运到Unified Buffer或L1 Buffer时的L2 Cache管理策略枚举，供向量搬运、支持L2配置的矩阵搬入以及标量访存路径的配置与查询接口使用，区分NORMAL启用与NOTALLOC不启用两类策略。"
 tag:
   - roles: [data_movement_configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md
-    kind: configures
-    condition: "标量访存load策略查询"
-  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
-    kind: configures
-    condition: "标量访存load策略配置"
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
-    kind: configures
-    condition: "作为该向量搬运接口的L2 Cache管理策略"
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
-    kind: configures
-    condition: "作为该向量搬运接口的L2 Cache管理策略"
-  - path: examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode/README.md
     kind: related
-    condition: "L2 Cache模式最佳实践说明"
-version: ">=9.0.0"
+    condition: "该接口返回本枚举表示的当前load策略"
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: related
+    condition: "该接口以本枚举设置标量访存路径的load策略"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_2d_arch_3510.md
+    kind: related
+    condition: "该3510矩阵搬入接口使用本枚举配置L2 Cache"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
+    kind: related
+    condition: "该矩阵搬入接口的重载使用本枚举配置L2 Cache"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md
+    kind: related
+    condition: "该矩阵搬入接口使用本枚举配置L2 Cache"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_3510.md
+    kind: related
+    condition: "该3510矩阵搬入接口使用本枚举配置L2 Cache"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: related
+    condition: "该向量搬运接口以本枚举配置L2 Cache策略"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+    condition: "该向量搬运接口以本枚举配置L2 Cache策略"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_load_l2_cache_mode
 

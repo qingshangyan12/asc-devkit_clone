@@ -1,14 +1,14 @@
 ---
 okftype: reference.union
-description: "包含原子操作启用位atomic_type与原子操作类型atomic_op的参数结构体，用于asc_get_store_atomic_config接口获取原子配置，atomic_type用于指定参与原子操作的数据类型，atomic_op当前仅支持求和操作。"
+description: "保存数据搬出原子操作启用位与操作类型的联合体，atomic_type 取 0 至 6 分别表示不开启或 float、half、int16_t、int32_t、int8_t、bfloat16_t 类型，atomic_op 为 0 表示求和，供 asc_get_store_atomic_config 读取。"
 tag:
-  - roles: [configuration]
+  - roles: [data_movement_configuration]
   - traits: [atomic]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
     kind: related
-    condition: "作为查询接口的输出参数类型"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_store_atomic_config
 
