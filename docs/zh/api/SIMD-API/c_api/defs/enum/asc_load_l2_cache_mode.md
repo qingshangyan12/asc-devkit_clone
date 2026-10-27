@@ -29,9 +29,14 @@ enum class asc_load_l2_cache_mode : uint8_t {
 
 |枚举值|L2 Cache管理策略|
 |------|-----------|
-| NORMAL_FIRST_VICTIM | 启用L2 Cache，并且将分配的Cache Line标记为高替换优先级。 |
-| NORMAL_LAST_VICTIM | 启用L2 Cache，并且将分配的Cache Line标记为低替换优先级。 |
+| NORMAL_FIRST_VICTIM | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级（FIRST_VICTIM），即在发生替换时优先被淘汰。 |
+| NORMAL_LAST_VICTIM | 启用L2 Cache，并将分配的Cache Line标记为低替换优先级（LAST_VICTIM），即在发生替换时优先保留。 |
 | NORMAL_PERSISTENT | 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。 |
 | NOTALLOC_KEEP | 不启用L2 Cache，每次都直接从GM中读取，并且保持已有Cache Line的状态不变。 |
 | NOTALLOC_CLEAN | 不启用L2 Cache，若L2 Cache中已有同地址缓存会被保留并标记为Clean，标记为Clean的Cache Line被移出L2 Cache时会被直接丢弃。 |
 | NOTALLOC_DROP | 不启用L2 Cache，若L2 Cache中已有同地址缓存，会被直接丢弃。 |
+
+Clean和Dirty用于表示Cache Line是否需要回写GM：
+
+- Clean（干净）：该Cache Line未被标记为需要回写，被替换时可直接丢弃，无需回写GM。
+- Dirty（脏）：该Cache Line包含尚未回写GM的修改数据，被替换时需要先将修改数据回写GM。
