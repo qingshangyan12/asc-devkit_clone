@@ -94,7 +94,9 @@ def _copy_static_files(common_root, out_dir, md_files):
     for entry in sorted(common_root.rglob("*")):
         if not entry.is_file():
             continue
-        if entry.suffix.lower() not in _STATIC_EXTS:
+        suffix = entry.suffix.lower()
+        compound_suffix = "".join(entry.suffixes[-2:]).lower()
+        if suffix not in _STATIC_EXTS and compound_suffix not in _STATIC_EXTS:
             continue
         rel = entry.relative_to(common_root)
         if rel in md_set:
