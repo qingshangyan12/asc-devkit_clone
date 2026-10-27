@@ -1849,7 +1849,7 @@ __aicore__ inline void ExpSub(
     ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()), {
         KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3103)
     static_assert(
         SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<float, half>, Tuple<float, float>>(),
         "Failed to check dtype in "
