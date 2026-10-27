@@ -395,6 +395,14 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             maxTmpMemSize_, rankSize_, dataTypeSize_),
         HCCL_E_INTERNAL);
     u64 loopTimes = dataCount_ / maxCountPerLoop + static_cast<u64>(dataCount_ % maxCountPerLoop != 0);
+    HCCL_INFO(
+        "[AG_PERF_DIAG][Runtime] rank[%u] algTag[%s] rankSize[%u] levelRanks[%u,%u,%u] "
+        "count[%llu] typeBytes[%llu] scratchBytes[%llu] maxCountPerLoop[%llu] loops[%llu] symmetric[%u]",
+        myRank_, param.algTag, rankSize_, rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1],
+        rankSizeLevel_[OMNIPIPE_LEVEL2], static_cast<unsigned long long>(dataCount_),
+        static_cast<unsigned long long>(dataTypeSize_), static_cast<unsigned long long>(maxTmpMemSize_),
+        static_cast<unsigned long long>(maxCountPerLoop), static_cast<unsigned long long>(loopTimes),
+        static_cast<u32>(param.supportSymmetricMemory));
 
     u64 perLoopSize = maxCountPerLoop * dataTypeSize_;
     std::vector<u64> dataSizePerLoop(rankSize_, perLoopSize);

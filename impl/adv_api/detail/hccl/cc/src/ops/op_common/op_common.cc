@@ -1351,6 +1351,14 @@ HcclResult HcclGetChannelImpl(
             comm, resCtxHost->topoInfo.userRank, &localEndpoint, ENDPOINT_ATTR_BW_COEFF, portSizeTypeSize,
             static_cast<void*>(&portSize)));
         channel.portGroupSize = portSize;
+        if (param.opType == HCCL_CMD_ALLGATHER) {
+            HCCL_INFO(
+                "[AG_PERF_DIAG][Channel] rank[%u] algTag[%s] level[%u] index[%u] peer[%u] "
+                "protocol[%u] localPort[%u] remotePort[%u] portGroupSize[%u] notifyNum[%u]",
+                resCtxHost->topoInfo.userRank, param.algTag, level, idx, channel.remoteRank,
+                static_cast<u32>(channel.protocol), static_cast<u32>(channelDescNew.localEndpoint.commAddr.eid[5]),
+                static_cast<u32>(channelDescNew.remoteEndpoint.commAddr.eid[5]), portSize, channel.notifyNum);
+        }
         CHK_PRT_RET(
             portSize == 0,
             HCCL_ERROR(
