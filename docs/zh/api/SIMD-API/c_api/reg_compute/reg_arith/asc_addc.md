@@ -38,7 +38,7 @@ $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\} + \{32'b0, carry\_src_i\}
 $$
 
-![](../../figures/asc_addc_1.png)
+![](../../../../figures/asc_addc_1.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -97,7 +97,7 @@ __simd_callee__ inline void asc_addc(vector_bool& carry,
 
 以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF + 0x00000000 00000008 = 0x00000000 00000007为例，asc_add/asc_addc接口的适用场景如下图：
 
-![](../../figures/asc_addc_2.png)
+![](../../../../figures/asc_addc_2.png)
 
 ## 调用示例
 

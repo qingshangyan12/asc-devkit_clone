@@ -30,7 +30,7 @@
 
 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
 
-![](../../figures/asc_gather_datablock.png)
+![](../../../../figures/asc_gather_datablock.png)
 
 其中，index中仅前8个元素有效，每个元素对应一个DataBlock。例如，第一个元素为96（3 * 32），表示选取DataBlock3写入dst中对应的位置。
 

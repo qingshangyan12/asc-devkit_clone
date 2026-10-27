@@ -117,17 +117,17 @@ PIPE_MTE1
 
 - 对应的feature map格式如下图：
 
-![ ](../../figures/load3d_01.png)
+![ ](../../../../figures/load3d_01.png)
 
 - 对应的filter的格式如下图：
 
-![ ](../../figures/load3d_02.png)
+![ ](../../../../figures/load3d_02.png)
 
 其中n为filter的个数，可以看出维度排布为(Hk,Wk,Ci,n)，但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
-![ ](../../figures/load3d_03.png)
+![ ](../../../../figures/load3d_03.png)
 
 对于L0B Buffer中的feature map来说有两种方案，水平分块和垂直分块。分别对应参数中repeatMode的0和1。
 
@@ -135,11 +135,11 @@ PIPE_MTE1
 
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
-![ ](../../figures/load3d_04.png)
+![ ](../../../../figures/load3d_04.png)
 
 repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
-![ ](../../figures/load3d_05.png)
+![ ](../../../../figures/load3d_05.png)
 
 ## 调用示例
 

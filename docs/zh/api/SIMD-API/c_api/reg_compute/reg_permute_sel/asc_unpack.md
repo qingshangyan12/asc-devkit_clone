@@ -43,13 +43,13 @@
 
 **图1** 矢量数据寄存器unpack流程
 
-![矢量数据寄存器unpack流程](../../figures/capi_unpack_reg.png)
+![矢量数据寄存器unpack流程](../../../../figures/capi_unpack_reg.png)
 
 掩码数据寄存器unpack流程如图2所示：
 
 **图2** 掩码数据寄存器unpack流程
 
-![掩码数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
+![掩码数据寄存器unpack流程](../../../../figures/capi_unpack_mask.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

@@ -146,11 +146,11 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 
 **图1** 矢量寄存器复制到掩码寄存器（uint16_t）<a id="fig-maskgen-b16"></a>
 
-![矢量寄存器复制到掩码寄存器（uint16_t）](../../figures/capi_copy_reg2mask_b16.png)
+![矢量寄存器复制到掩码寄存器（uint16_t）](../../../../figures/capi_copy_reg2mask_b16.png)
 
 **图2** 矢量寄存器复制到掩码寄存器（uint32_t）<a id="fig-maskgen-b32"></a>
 
-![矢量寄存器复制到掩码寄存器（uint32_t）](../../figures/capi_copy_reg2mask_b32.png)
+![矢量寄存器复制到掩码寄存器（uint32_t）](../../../../figures/capi_copy_reg2mask_b32.png)
 
 ## 调用示例
 

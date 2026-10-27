@@ -35,10 +35,10 @@
 有效长度非32字节对齐时，硬件会补齐读取UB至32字节边界，但仅把有效数据写入GM。连续搬运仅在整体末尾补齐读取；高维切分搬运中，`src_stride`等于`burst_len`时仅在所有数据块的整体末尾补齐读取，否则每个数据块分别补齐读取。源UB必须为实际读取范围预留合法空间。
 
 **图1**  连续搬运示意图
-![](../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
 
 **图2**  高维切分搬运示意图
-![](../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 

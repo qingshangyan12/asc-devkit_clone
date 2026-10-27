@@ -56,11 +56,11 @@
 
     **图1**  Compact模式32字节补齐示意图
 
-    ![](../../figures/asc_copy_gm2ub_align_compact_padding.png "Compact模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_gm2ub_align_compact_padding.png "Compact模式32字节补齐示意图")
 
     **图2**  Normal模式32字节补齐示意图
 
-    ![](../../figures/asc_copy_gm2ub_align_normal_padding.png "Normal模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_gm2ub_align_normal_padding.png "Normal模式32字节补齐示意图")
 
     当只搬运1个数据块，或`burst_len`已经32字节对齐且无左右Padding时，两种模式的搬运结果相同。
 
