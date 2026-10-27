@@ -21,24 +21,24 @@ using namespace hcomm;
 using namespace std;
 
 static_assert(
-    KFC_CONCURRENT_AG_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM,
+    KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U,
     "Concurrent AllGather parameters exceed the KFC server load width");
 static_assert(
-    KFC_AG_SOLE_NHR_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM,
+    KFC_AG_SOLE_NHR_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U,
     "SoleNHR AllGather parameters exceed the KFC server load width");
 static_assert(
-    KFC_CONCURRENT_A2A_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM,
+    KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U,
     "Concurrent AllToAll parameters exceed the KFC server load width");
 static_assert(
-    KFC_A2A_MJ_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM, "AllToAll MultiJetty parameters exceed the KFC server load width");
+    KFC_A2A_MJ_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U, "AllToAll MultiJetty parameters exceed the KFC server load width");
 static_assert(
-    KFC_CONCURRENT_RS_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM,
+    KFC_CONCURRENT_RS_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U,
     "Concurrent ReduceScatter parameters exceed the KFC server load width");
 static_assert(
-    KFC_RS_SOLE_NHR_2DIE_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM,
+    KFC_RS_SOLE_NHR_2DIE_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U,
     "SoleNHR 2Die ReduceScatter parameters overlap server Func arguments");
 static_assert(
-    KFC_PARALLEL_AG_PARAM_NUM <= KFC_FUNC_QUEUE_ARG_NUM, "Parallel AllGather parameters overlap server Func arguments");
+    KFC_PARALLEL_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE - 2U, "Parallel AllGather parameters overlap server Func arguments");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -152,7 +152,7 @@ static CcuResult CallKfcSubKernel(
         args.emplace_back(param[i]);
     }
     args.emplace_back(ctx.token);
-    for (uint32_t i = KFC_FUNC_TOKEN_ARG_INDEX; i < KFC_FUNC_QUEUE_ARG_NUM; ++i) {
+    for (uint32_t i = KFC_FUNC_TOKEN_ARG_INDEX; i < CCU_PARAM_NUM_PER_DIE - 2U; ++i) {
         args.emplace_back(param[i]);
     }
     args.emplace_back(turnEndAddr);

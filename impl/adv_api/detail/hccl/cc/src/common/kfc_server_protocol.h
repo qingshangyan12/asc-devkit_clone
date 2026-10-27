@@ -32,9 +32,8 @@ constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = KFC_MAX_MISSION_NUM;
 constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
 
 // Queue slots [0..2] keep their indices; token occupies [3], queue [3..29] maps to [4..30].
-constexpr uint32_t KFC_FUNC_QUEUE_ARG_NUM = 30U;
 constexpr uint32_t KFC_FUNC_TOKEN_ARG_INDEX = 3U;
-constexpr uint32_t KFC_FUNC_TURN_END_ARG_INDEX = KFC_FUNC_QUEUE_ARG_NUM + 1U;
+constexpr uint32_t KFC_FUNC_TURN_END_ARG_INDEX = 31U;
 
 constexpr uint32_t KfcFuncArgIndex(uint32_t queueIndex)
 {
