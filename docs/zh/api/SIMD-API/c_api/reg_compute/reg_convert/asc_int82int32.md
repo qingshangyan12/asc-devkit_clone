@@ -1,16 +1,16 @@
 ---
 okftype: reference.api
-description: "根据mask将src中参与计算的int8_t元素转换为int32_t类型并写入dst，因位宽比为1:4，需通过src_quarter_pos离散选取每隔4个元素的索引位置读取数据。"
+description: "按掩码将矢量数据寄存器中的int8_t元素按1:4 读（src 每4个元素取一组）规则进行转换，转换为int32_t，支持引用参数与函数返回值两种输出形式。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [elementwise, widening_result]
+  - traits: [elementwise, split_high_low]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int82int32
 

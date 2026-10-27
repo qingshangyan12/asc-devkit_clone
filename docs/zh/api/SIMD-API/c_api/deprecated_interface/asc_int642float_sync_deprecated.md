@@ -1,17 +1,27 @@
 ---
 okftype: reference.api
-description: "将int64_t类型数据同步转换为float类型，包含rd、rn、rna、ru、rz五种变体，接口已废弃，请使用对应的非同步接口asc_int642float和同步接口asc_sync替代。"
+description: "已废弃的同步类型转换接口族，按RINT、ROUND、FLOOR、CEIL或TRUNC五种舍入模式将int64_t数据转换为float并按PIPE_V流水计算，替代方案为对应非同步接口配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [conversion]
+  - traits: [rounding_mode]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
+    kind: related
+    condition: "与非同步接口配合完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md
     kind: replaced_by
-    condition: "非同步转换场景改用asc_int642float实现"
+    condition: "替代本组同步接口的非同步接口"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "五个同步原型在 include/c_api/composite/vector_compute_composite.h 中各带 ASC_DEPRECATED(9.2.0, 2027/09/07, asc_int642float_<模式> and asc_sync) 标记（_rd/_rn/_rna/_ru/_rz 分别对应各自舍入模式），替代方案为对应非同步接口加 asc_sync；本页全部原型均属废弃范围，属整页废弃，不封可用上限。"
 ---
 # asc_int642float_sync（废弃）
 

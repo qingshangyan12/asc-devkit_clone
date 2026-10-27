@@ -1,17 +1,27 @@
 ---
 okftype: reference.api
-description: "将uint8_t类型数据同步转换为half类型，要求dst与src起始地址32字节对齐。该接口已废弃，请使用对应的非同步接口asc_uint82half和同步接口asc_sync替代。"
+description: "废弃接口页：2201 架构下 asc_uint82half_sync 同步把 uint8_t 矢量扩宽为 half 并写入 dst，dst 与 src 需 32 字节对齐，建议改用非同步 asc_uint82half 加 asc_sync。"
 tag:
   - roles: [compute]
   - operations: [conversion]
+  - traits: [elementwise, widening_result]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "地址重叠约束按其通用地址重叠约束"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
+    kind: related
+    condition: "替代方案中承担同步等待"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
     kind: replaced_by
-    condition: "非同步转换场景改用asc_uint82half实现"
+    condition: "建议改用对应的非同步接口并显式调用 asc_sync"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include 头在 asc_uint82half_sync 声明前标注 ASC_DEPRECATED(9.2.0)，Release Notes 9.2.0 把 _sync 复合接口整体列为废弃；接口未移除。"
 ---
 # asc_uint82half_sync（废弃）
 

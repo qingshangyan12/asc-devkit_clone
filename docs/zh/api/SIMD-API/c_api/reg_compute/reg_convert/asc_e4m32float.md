@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "依据掩码将源矢量寄存器中的 fp8_e4m3fn_t 元素转换为 float，并按四分之一位置标签离散选取每隔4个元素的索引位置读取数据。"
+description: "把fp8_e4m3fn_t矢量按src_quarter_pos标签从索引0、4、8或1、5、9等离散四分之一位置读取并转换为float，结果写入目的寄存器或作为返回值，其他读取位置不参与，仅在AIV生效。"
 tag:
   - roles: [compute]
   - operations: [conversion]
@@ -8,11 +8,22 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
+    condition: "矢量数据寄存器与掩码寄存器定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "需遵循Reg矢量计算C API通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增通过函数返回值返回结果的重载（返回vector_float）；引用参数形式自9.0.0起可用，9.2.0两形式合计8条声明（四个离散位置×2种结果形式）。"
+  - since: "9.3.0-beta.1"
+    kind: parameter_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "读取位置改为显式编译期标签src_quarter_pos（std::integral_constant<asc_position_quarter_mode,...>四个离散位置）；原_v2/_v3/_v4位置后缀原型自9.2.0起废弃，见deprecated_interface对应页。"
 ---
 # asc_e4m32float
 

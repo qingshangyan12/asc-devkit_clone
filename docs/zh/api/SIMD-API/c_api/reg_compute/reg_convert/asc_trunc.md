@@ -1,21 +1,16 @@
 ---
 okftype: reference.api
-description: "将源寄存器中的浮点元素按TRUNC（向零方向截断）截断到整数值，结果保持原浮点类型，未通过掩码筛选的元素置零。"
+description: "按掩码对矢量数据寄存器中的half/bfloat16_t/float（同类型）元素执行TRUNC（向零截断），1:1（类型与元素数量不变），支持引用参数与函数返回值两种输出形式。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise, rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入模式规则"
+    kind: related
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_trunc
 

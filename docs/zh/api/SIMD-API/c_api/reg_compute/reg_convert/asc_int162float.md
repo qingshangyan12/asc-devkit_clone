@@ -1,18 +1,16 @@
 ---
 okftype: reference.api
-description: "将源寄存器中int16_t元素转换为float并写入目的寄存器，因源与目的位宽比为1:2，需按src_pos编译期标签选择读取src的偶数或奇数索引位置，掩码未选中元素置零。"
+description: "按掩码将矢量数据寄存器中的int16_t元素转换为float元素，VL 数据分两部分，按 src_pos 选择偶数或奇数索引读取。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int162float
 

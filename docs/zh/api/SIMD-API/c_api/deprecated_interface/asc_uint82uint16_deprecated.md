@@ -1,15 +1,33 @@
 ---
 okftype: reference.api
-description: "将uint8_t类型数据转换为uint16_t类型，根据mask控制元素是否参与计算，因源与目的位宽比1:2需按奇或偶索引读取输入，该通过接口后缀控制读取位置的原型已废弃，请使用asc_uint82uint16的显式位置参数重载替代。"
+description: "已废弃的uint8_t到uint16_t矢量转换原型说明，旧位置后缀形式由带显式位置参数标签的同名重载替代，源目位宽比1比2按偶数或奇数索引读取。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [widening_result]
+  - traits: [elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md
     kind: replaced_by
-    condition: "通过接口后缀控制源操作数读取位置的原型改用显式位置参数重载实现"
+    condition: "迁移到显式位置参数重载"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "overload:asc_uint82uint16__Rvu16_vu8_vb_icposeven"
+    scope_basis: resolved
+    note: "新增显式位置参数重载（第四参数 asc_position_mode::EVEN），取代无位置后缀原型。"
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "overload:asc_uint82uint16__Rvu16_vu8_vb_icposodd"
+    scope_basis: resolved
+    note: "新增显式位置参数重载（asc_position_mode::ODD），取代 _v2 位置后缀原型。"
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "头文件以 ASC_DEPRECATED(9.2.0) 标记无位置后缀与 _v2 原型；替代方式为移除位置后缀并把位置常量作为第四参数传入。仅废弃、未移除，不设可用上限。"
 ---
 # asc_uint82uint16（废弃）
 

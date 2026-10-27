@@ -1,21 +1,16 @@
 ---
 okftype: reference.api
-description: "根据掩码将源寄存器中int32_t元素转换为float，支持FLOOR、RINT、ROUND、CEIL、TRUNC多种舍入模式并由函数后缀指定，未选中元素置零。"
+description: "按掩码将矢量数据寄存器中的int32_t元素转换为float元素，伪代码展示 rn（RINT）舍入与 mask 未选中置零。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise, rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入与饱和模式规则"
+    kind: related
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int322float
 

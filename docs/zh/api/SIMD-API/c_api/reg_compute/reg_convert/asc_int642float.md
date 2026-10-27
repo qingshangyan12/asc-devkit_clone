@@ -1,19 +1,16 @@
 ---
 okftype: reference.api
-description: "将int64_t类型数据转换为float并支持rd、rn、rna、ru、rz多种舍入模式，因源与目的位宽比为2:1，需按dst_pos将结果写入目的寄存器偶数或奇数索引位置，其余位置清零。"
+description: "按掩码将矢量数据寄存器中的int64_t元素按2:1 写（EVEN/ODD 两组）规则进行转换，转换为float，支持引用参数与函数返回值两种输出形式。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise, rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入模式规则"
+    kind: related
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int642float
 

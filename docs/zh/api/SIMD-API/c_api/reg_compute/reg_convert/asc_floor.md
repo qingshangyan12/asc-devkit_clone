@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将源矢量中的half、bfloat16_t或float元素按FLOOR模式向负无穷方向舍入到整数值，结果保持原浮点类型，未参与计算元素置零。"
+description: "把half、bfloat16_t或float矢量按向负无穷方向舍入取整并保持原浮点类型，结果写入目的寄存器或作为返回值，half与bfloat16_t支持饱和模式、float仅支持不饱和，未参与计算的元素置零。"
 tag:
   - roles: [compute]
   - operations: [conversion]
@@ -8,13 +8,17 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入模式规则"
+    condition: "需遵循Reg矢量计算C API通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增通过函数返回值返回结果的重载（返回vector_half、vector_bfloat16_t或vector_float）；引用参数形式自9.0.0起可用，9.2.0两形式合计6条声明（3种dtype×2种结果形式）。"
 ---
 # asc_floor
 

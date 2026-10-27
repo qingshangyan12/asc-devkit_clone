@@ -1,18 +1,16 @@
 ---
 okftype: reference.api
-description: "根据掩码将源矢量中的int32元素转换为int16类型，支持饱和与非饱和模式，并按偶数和奇数索引将结果分散写入目的矢量寄存器。"
+description: "按掩码将矢量数据寄存器中的int32_t元素转换为int16_t元素，支持饱和/非饱和模式，按 dst_pos 选择写入位置。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [elementwise, rounding_mode, saturation_mode]
+  - traits: [elementwise, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int322int16
 

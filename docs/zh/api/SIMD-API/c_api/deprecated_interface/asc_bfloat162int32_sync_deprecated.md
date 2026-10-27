@@ -1,16 +1,22 @@
 ---
 okftype: reference.api
-description: "将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式。该同步系列接口已废弃，请使用对应的非同步接口asc_bfloat162int32和asc_sync同步接口替代。"
+description: "已废弃的同步转换接口，将 Unified Buffer 中 bfloat16_t 元素转为 int32_t 并支持 rn、rna、rd、ru、rz 五种舍入，仅在 Atlas A2、A3 支持，替代方案为 asc_bfloat162int32 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [conversion]
-  - traits: [rounding_mode]
+  - operations: [conversion, synchronization]
+  - traits: [rounding_mode, widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md
     kind: replaced_by
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "五个带舍入后缀的同步复合接口废弃，改用 asc_bfloat162int32 与 asc_sync；include/c_api/composite/vector_compute_composite.h:667-719 的 5 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_bfloat162int32_sync（废弃）
 

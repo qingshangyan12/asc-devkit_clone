@@ -1,22 +1,27 @@
 ---
 okftype: reference.api
-description: "根据掩码将源寄存器中每个参与计算的bfloat16_t元素转换为half类型并写入目的寄存器，支持五种舍入模式以及饱和与非饱和模式。"
+description: "把参与mask筛选的bfloat16_t矢量元素按rd、rn、rna、ru、rz舍入与饱和或非饱和模式转换为half，结果写入目的寄存器或作为返回值，使用饱和模式前需配置ctrl寄存器，仅在AIV生效。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [elementwise, rounding_mode]
+  - traits: [elementwise, rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
+    condition: "需遵循Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入与饱和模式规则"
+    kind: related
+    condition: "舍入与饱和模式说明"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: requires
-    condition: "使用饱和或非饱和模式时"
+    condition: "使用饱和或非饱和模式前需配置ctrl寄存器"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增通过函数返回值返回结果的重载（返回vector_half）；引用参数形式自9.0.0起可用，9.2.0两形式合计20条声明（5种舍入×饱和与非饱和×2种结果形式）。"
 ---
 # asc_bfloat162half
 

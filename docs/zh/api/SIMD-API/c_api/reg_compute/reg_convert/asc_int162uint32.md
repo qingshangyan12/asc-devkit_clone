@@ -1,18 +1,16 @@
 ---
 okftype: reference.api
-description: "将源寄存器中int16_t元素转换为uint32_t并写入目的寄存器，实现16位有符号整数到32位无符号整数的转换，按src_pos选择src偶数或奇数索引。"
+description: "按掩码将矢量数据寄存器中的int16_t元素转换为uint32_t元素，16位有符号转32位无符号，按 src_pos 奇偶索引读取。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int162uint32
 

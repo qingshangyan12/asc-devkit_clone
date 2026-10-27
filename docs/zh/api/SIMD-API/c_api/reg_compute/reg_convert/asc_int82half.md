@@ -1,16 +1,16 @@
 ---
 okftype: reference.api
-description: "将int8_t类型数据转换为half类型，因源与目的位宽比为1:2，需通过src_pos选择读取源操作数索引为偶数或奇数的位置，未参与计算元素置零。"
+description: "按掩码将矢量数据寄存器中的int8_t元素按1:2 读（EVEN/ODD 两组）规则进行转换，转换为half，支持引用参数与函数返回值两种输出形式。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [elementwise, widening_result]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_int82half
 

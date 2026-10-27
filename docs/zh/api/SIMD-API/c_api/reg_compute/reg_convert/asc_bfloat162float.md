@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "根据掩码将源寄存器中每个参与计算的bfloat16_t元素转换为float类型并写入目的寄存器，按位置标签选择读取源寄存器中的偶数或奇数索引。"
+description: "把参与mask筛选的bfloat16_t矢量元素转换为float，按src_pos标签读取源索引为偶数或奇数的位置，结果写入目的寄存器或作为返回值，仅在AIV生效。"
 tag:
   - roles: [compute]
   - operations: [conversion]
@@ -8,9 +8,22 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
+    condition: "需遵循Reg矢量计算C API通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: parameter_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增显式编译期位置标签src_pos（std::integral_constant<asc_position_mode, EVEN/ODD>），用于在1:2位宽比下选择读取源索引偶数或奇数位置；1:2位宽比下必须显式选择读取位置。"
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增通过函数返回值返回结果的重载（返回vector_float），9.2.0两形式共4条声明（偶数与奇数位置各两条）。"
 ---
 # asc_bfloat162float
 

@@ -1,21 +1,16 @@
 ---
 okftype: reference.api
-description: "将源寄存器中的浮点元素按ROUND（四舍五入）舍入模式舍入到整数值，结果保持原浮点类型，恰在中间时向远离0方向舍入。"
+description: "按掩码对矢量数据寄存器中的half/bfloat16_t/float（同类型）元素执行ROUND（四舍五入，半值远离0），1:1（类型与元素数量不变），支持引用参数与函数返回值两种输出形式。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise, rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: constrained_by
-    condition: "舍入模式规则"
+    kind: related
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_round
 

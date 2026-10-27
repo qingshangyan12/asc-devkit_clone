@@ -1,16 +1,16 @@
 ---
 okftype: reference.api
-description: "将hifloat8元素转换为half并写入目的寄存器，按src_pos读取源寄存器的偶数或奇数索引，掩码未筛选的元素在输出中置零。"
+description: "按掩码将矢量数据寄存器中的hifloat8_t元素转换为half元素，伪代码给出 mask 未选中位置写0、按奇偶索引读取源元素。"
 tag:
   - roles: [compute]
   - operations: [conversion]
   - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
+    condition: "舍入与饱和模式说明"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_hif82half
 

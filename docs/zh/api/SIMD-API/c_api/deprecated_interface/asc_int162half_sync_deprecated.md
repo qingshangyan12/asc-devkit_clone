@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "asc_int162half_sync（废弃）将int16_t类型数据同步转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC等多种舍入模式，dst与src起始地址需32字节对齐。该接口已废弃，替代为非同步接口asc_int162half和同步接口asc_sync。"
+description: "已废弃的同步类型转换接口，把 int16_t 数据在无舍入或 RINT、ROUND、FLOOR、CEIL、TRUNC 舍入下转换为 half 写入 dst，仅 2201 架构支持，需改用 asc_int162half 配合 asc_sync。"
 tag:
   - roles: [compute]
   - operations: [conversion]
@@ -8,11 +8,17 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "asc_int162half_sync等接口已废弃，由同步接口替代"
+    condition: "替代本接口原有的同步等待语义"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md
     kind: replaced_by
-    condition: "asc_int162half_sync等接口已废弃，由非同步接口替代"
+    condition: "替代本接口按舍入模式转换到 half 的能力，需另行插入同步"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include/c_api/composite/vector_compute_composite.h 中 asc_int162half_sync、asc_int162half_rna_sync、asc_int162half_ru_sync、asc_int162half_rd_sync、asc_int162half_rn_sync、asc_int162half_rz_sync（第3771-3834行起）标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_int162half* and asc_sync)，正文改用非同步接口加 asc_sync；9.3.0-beta.1 声明仍保留，属废弃而非移除。"
 ---
 # asc_int162half_sync（废弃）
 
