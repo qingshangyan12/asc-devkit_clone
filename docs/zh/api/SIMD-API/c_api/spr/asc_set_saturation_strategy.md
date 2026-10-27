@@ -1,17 +1,3 @@
----
-okftype: reference.api
-description: "设置饱和控制策略：按单指令或API路径配置饱和，或使用全局饱和配置，决定CAST类全局饱和是否生效。"
-tag:
-  - roles: [configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
-    kind: related
-    condition: "CAST 全局饱和需与本策略配合"
-version: ">=9.2.0"
-version_changes: []
----
 # asc_set_saturation_strategy
 
 ## 产品支持情况

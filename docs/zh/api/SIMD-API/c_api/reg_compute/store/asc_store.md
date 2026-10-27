@@ -1,37 +1,3 @@
----
-okftype: reference.api
-description: "把矢量数据寄存器搬出到UB的非对齐搬出接口，目的地址按dtype对齐，支持整体VL连续搬出与只搬出前count个元素的两种模式。"
-tag:
-  - roles: [data_movement]
-  - operations: [store]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "正文据此说明矢量数据寄存器/掩码寄存器"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: related
-    condition: "正文据此引用 Reg 矢量计算通用约束"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: related
-    condition: "与其他指令存在数据依赖时插入同步指令串行化"
-version: ">=9.0.0"
-version_changes:
-  - since: "9.1.0"
-    kind: capability_extended
-    scope: "page"
-    scope_basis: kind_default
-    note: "新增 int4b_t、vector_int4x2_t 数据重载：CANN 9.1.0 Release Notes 明确列出 asc_store 新增上述低精度重载，对应正文 dtype 列表中的 int4b_t（对应 vector_int4x2_t）。"
-  - since: "9.2.0"
-    kind: behavior_fixed
-    scope: "page"
-    scope_basis: kind_default
-    note: "修复非对齐搬出的地址后处理：CANN 9.2.0 Release Notes 记载修复3510架构下 asc_store 非对齐搬出时未执行地址 Post Update 后处理而导致搬运结果错误的问题。"
-  - since: "9.2.0"
-    kind: overload_added
-    scope: "section:函数原型"
-    scope_basis: resolved
-    note: "补充 half 且带 count 参数的公共重载：CANN 9.2.0 Release Notes 记载 asc_store 补充 half 数据类型且带 count 参数的公共重载，对应正文带搬出数量模式的 __ubuf__ <dtype>* dst + vector_<dtype> src + uint32_t count 形态。"
----
 # asc_store
 
 ## 产品支持情况
@@ -100,7 +66,7 @@ __simd_callee__ inline void asc_store(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`half`、`int16_t`、`uint16_t`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int16_t`、`uint16_t`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 #### 函数原型典型示例
 

@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 排序计算
 
 - **[asc_bitsort](asc_bitsort.md)**
