@@ -61,11 +61,17 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
 
 ## 返回值说明
 
-返回按元素计算以2为底对数的结果，类型为reg_tensor&lt;T&gt;。返回值mask与src.mask相同；src.mask对应位置为0时，返回值的对应元素置零。该行为适用于half和float类型。
+返回按元素计算以2为底对数的结果，类型为reg_tensor&lt;T&gt;。返回值mask与src.mask相同；src.mask对应位置为0时，返回值的对应元素置零。
 
 ## 约束说明
 
 src.mask需通过[with_mask](../reg_tensor/reg_tensor.md)接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+
+## 关键特性说明
+
+### 精度提升
+
+当源操作数数据类型为half时，将half提升精度到float后进行计算，再将结果转为half后输出。
 
 ## 调用示例
 
