@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 寄存器类型
 
 - **[寄存器类型总览](reg_data_types.md)**

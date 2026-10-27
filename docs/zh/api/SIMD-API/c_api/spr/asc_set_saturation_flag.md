@@ -1,17 +1,3 @@
----
-okftype: reference.api
-description: "按饱和模式类型设置对应饱和开关，FLOAT、FLOAT8、INT、CAST 四种模式下布尔参数分别表示饱和/非饱和或饱和/截断。"
-tag:
-  - roles: [configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
-    kind: requires
-    condition: "FLOAT/CAST 模式需配合全局饱和策略使用"
-version: ">=9.2.0"
-version_changes: []
----
 # asc_set_saturation_flag
 
 ## 产品支持情况

@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 工具接口
 
 - **[系统初始化](sys_init/sys_init.md)**
