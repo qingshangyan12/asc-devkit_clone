@@ -50,6 +50,9 @@
 #elif (__NPU_ARCH__ == 5162)
 #include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "dav_5162/kernel_operator_vec_duplicate_impl.h"
+#elif (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
+#include "dav_5161/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3113
