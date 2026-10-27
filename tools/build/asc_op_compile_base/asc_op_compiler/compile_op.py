@@ -63,6 +63,7 @@ from .ascendc_compile_dfx import (
     DFXArgInfo,
     DFXSectionGenerator,
     prepare_kernel_param_metadata,
+    generate_param_metadata,
 )
 from .ascendc_compile_v220 import (
     _get_compile_cmd_and_section_content,
@@ -584,6 +585,7 @@ def gen_kernel_fun(
     source += called_func_params_type + ") {\n"
     source += "    " + source_declare_pub_fun + "\n"
     source += "}\n\n"
+    source += generate_param_metadata(auto_gen_kernel_func, compile_info.kernel_param_metadata)
 
     for tiling_key in compile_info.tiling_key_list:
         if compile_info.tiling_key_group_map is not None:
@@ -640,6 +642,7 @@ def gen_kernel_fun_with_tiling_key_slave(
                             source += source_declare
                         source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
+                        source += generate_param_metadata(kernel_name_of_tk, compile_info.kernel_param_metadata)
                         source += "#endif\n"
                         source += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL && defined({vec_core_type})\n"
                         kernel_name_of_tk = get_kernel_fun_name_with_tiling_key_and_kernel_type(
@@ -654,6 +657,7 @@ def gen_kernel_fun_with_tiling_key_slave(
                             source += source_declare
                         source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
+                        source += generate_param_metadata(kernel_name_of_tk, compile_info.kernel_param_metadata)
                         source += "#endif\n"
                     else:
                         raise Exception(f"unsupported kernel type {kernel_type} for tiling key {tiling_key}")

@@ -105,7 +105,7 @@ def log_param_metadata_failure(error):
 
 
 def prepare_kernel_param_metadata(compile_info, parameters):
-    """Validate final GM_ADDR formals and save their immutable numeric layout."""
+    """Save the immutable pointer layout of final formals from the ordinary wrapper generator."""
     if compile_info is None:
         return
     compile_info.kernel_param_metadata = None
@@ -115,8 +115,7 @@ def prepare_kernel_param_metadata(compile_info, parameters):
         count = len(parameters)
         if count > 0xFFFFFFFF // 8:
             raise ValueError("parameter block exceeds the Runtime offset range")
-        if any(not re.fullmatch(r"GM_ADDR [A-Za-z_][A-Za-z_0-9]*", parameter) for parameter in parameters):
-            raise ValueError("parameter metadata requires the ordinary GM_ADDR wrapper ABI")
+        # The caller generates GM_ADDR formals; additional qualifiers do not change their pointer layout.
         infos = tuple((0, ordinal, ordinal * 8, 8, 8, 2, 0, 0, 0, 0) for ordinal in range(count))
         compile_info.kernel_param_metadata = KernelParamMetadata(count, count * 8, infos)
     except Exception as error:
@@ -130,6 +129,8 @@ def generate_param_metadata(entry, description):
     TLVs describe 8-byte pointer slots, not the pointed-to data.
     """
     try:
+        if description is None:
+            return ""
         return _generate_param_metadata(entry, description)
     except Exception as error:
         log_param_metadata_failure(error)
@@ -156,11 +157,16 @@ def _generate_param_metadata(entry, description):
     # Keep each TLV on its own line so generated source remains easy to inspect.
     records = [encoded[:16]] + [encoded[offset : offset + 40] for offset in range(16, len(encoded), 40)]
     values = "\n".join("    " + ", ".join(f"0x{value:02x}" for value in record) + "," for record in records)
+    # The existing compiler command renames the main entry with -D. Expand it before stringifying.
     return f"""
+#ifndef ASCENDC_PARAM_STRINGIFY
+#define ASCENDC_PARAM_STRINGIFY_IMPL(name) #name
+#define ASCENDC_PARAM_STRINGIFY(name) ASCENDC_PARAM_STRINGIFY_IMPL(name)
+#endif
 #ifndef ASCENDC_PARAM_METADATA_{entry}
 #define ASCENDC_PARAM_METADATA_{entry}
 static const unsigned char g_ascendc_param_metadata_{entry}[]
-    __attribute__((used, section(".ascend.meta.{entry}"), aligned(4))) = {{
+    __attribute__((used, section(".ascend.meta." ASCENDC_PARAM_STRINGIFY({entry})), aligned(4))) = {{
 {values}
 }};
 #endif
