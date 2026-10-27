@@ -79,7 +79,7 @@ __aicore__ inline void SetFixpipePreQuantFlagImpl(const FixPipePreQuantParams<T>
         config |= (((uint64_t)params.shiftScale & 0x1F) << 16);
         config |= ((params.mulScale) * 0x7FF << 21);
     } else {
-        config |= ((((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13);
+        config |= ((uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFFE000);
     }
     config |= (((uint64_t)params.offset0 & 0x1FF) |
                (((uint64_t)params.offset1 & 0xF) | ((((uint64_t)params.offset1 >> 7) & 0x1) << 4)) |
@@ -136,7 +136,7 @@ __aicore__ inline void SetFixpipePostQuantImpl(const FixPipePostQuantParams& par
     config |= (((uint64_t)params.offset0 & 0xF) | (((uint64_t)params.offset0 & 0x80) >> 3));
     config |= (((uint64_t)params.offset1 & 0xFF) | (((uint64_t)params.offset1 & 0x8000) >> 7));
     config |= ((uint64_t)params.offset2 & 0x1FF);
-    config |= (((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13;
+    config |= ((uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFFE000);
     config |= ((((uint64_t)params.offset2 >> 9) & 0x7F) | ((((uint64_t)params.offset2 >> 31) & 0x1) << 7)) << 32;
     config |= ((uint64_t)params.shiftScale & 0x1F) << 40;
     set_m_quant_post(config);

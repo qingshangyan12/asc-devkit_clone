@@ -242,7 +242,7 @@ struct FixPipeReluAlphaBitModeConfig0 {
     __aicore__ inline void Init(const FixPipeReluAlphaParams& params)
     {
         lut = static_cast<uint8_t>(params.lut);
-        preValue = params.preValue;
+        preValue = params.preValue >> 13;
     }
 
     __aicore__ inline void SetLut(lut_mode_t lut_) { lut = static_cast<uint8_t>(lut_); };
