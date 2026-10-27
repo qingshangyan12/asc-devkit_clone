@@ -53,22 +53,43 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
     uint32_t count =
         VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
-    newRepeatTimes = VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
+    newRepeatTimes = VecLogicalGetRepeatTimes<T, isNormalMode>(count, repeatTime);
+    constexpr uint32_t BLK_NUM_PER_MICRO = GetVecLen() / GetDataBlockSizeInBytes();
+    constexpr uint16_t MICRO_NUM_PER_ITER = DEFAULT_BLK_NUM / BLK_NUM_PER_MICRO;
+    static_assert(DEFAULT_BLK_NUM % BLK_NUM_PER_MICRO == 0, "logical iteration must cover integral micro iters");
     Reg::MaskReg maskReg;
     Reg::MaskReg maskFull = Reg::CreateMask<T, Reg::MaskPattern::ALL>();
     Reg::RegTensor<T> dstVreg;
-    if constexpr (isNormalMode) {
-        maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+    if constexpr (isNormalMode && !isSetMask) {
+        maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
     }
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
 
     Reg::Duplicate(dstVreg, scalarValue, maskFull);
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
-        if constexpr (!isNormalMode) {
-            maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+        if constexpr (isNormalMode) {
+            count = countPerLogicalIter;
         }
-        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dst + index * dstRepeatStride * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+        if constexpr (isNormalMode && isMaskBitMode && isSetMask) {
+            {
+                maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+                constexpor uint32_t blkBaseOfMicro = 0;
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+            }
+            if constexpr (MICRO_NUM_PER_ITER > 1) {
+                maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+                constexpor uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+            }
+        } else {
+            for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
+                if constexpr ((!isNormalMode) || isSetMask) {
+                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+                }
+                constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+            }
+        }
     }
 }
 
@@ -90,7 +111,7 @@ __aicore__ inline void VecDupLevel0Template(
     }
     if (Internal::IsCounterMode()) {
         if constexpr (!isSetMask) {
-            maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2); // maskReg 256bit PK-> 128bit
+            maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
         }
         VecDupLevel0VFImpl<isSetMask, isMaskBitMode, false, T>(
             dst, scalarValue, maskArrayStruct, maskCount, repeatTime, dstBlockStride, dstRepeatStride, maskBuf);
@@ -101,25 +122,16 @@ __aicore__ inline void VecDupLevel0Template(
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
-                auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
-                SetFlag<HardEvent::V_S>(eventIDV2S);
-                WaitFlag<HardEvent::V_S>(eventIDV2S);
-                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 4);
-                maskBuf[0] = maskArray[0];
-                maskBuf[1] = maskArray[1];
-                maskBuf[2] = maskArray[2];
-                maskBuf[3] = maskArray[3];
-                auto eventIDS2V = GetTPipePtr()->FetchEventID(HardEvent::S_V);
-                SetFlag<HardEvent::S_V>(eventIDS2V);
-                WaitFlag<HardEvent::S_V>(eventIDS2V);
-            } else if constexpr (isSetMask) {
-                SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
+            }
+            if constexpr (isMaskBitMode) {
+                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 8);
+                ExpandBitMaskToUB<T>(maskArrayStruct.maskArray, maskBuf);
             }
         }
         // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
         VecDupLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
             dst, scalarValue, maskArrayStruct, maskCount, repeatTime, dstBlockStride, dstRepeatStride, maskBuf);
-        if constexpr (isMaskBitMode && SupportBytes<T, 1>()) {
+        if constexpr (isMaskBitMode && isSetMask) {
             AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
         }
     }
