@@ -783,7 +783,8 @@ HcclResult RunMc2BoundReplay(
     addressPlan.addrs = {{param.inputPtr, param.outputPtr}};
     ReplayImage* image = nullptr;
     const bool regular = param.opType != HCCL_CMD_ALLTOALL && param.opType != HCCL_CMD_ALLTOALLV;
-    if (regular && scope.repeatReady_) {
+    const bool reusableRepeat = regular || param.opType == HCCL_CMD_ALLTOALL;
+    if (reusableRepeat && scope.repeatReady_) {
         addressPlan.sizes = scope.repeatSizes_;
         image = static_cast<ReplayImage*>(scope.repeatEntry_);
     } else {
@@ -819,7 +820,7 @@ HcclResult RunMc2BoundReplay(
     }
     if (image) {
         Mc2ServerStageTiming::Cache(true);
-        scope.repeatReady_ = regular;
+        scope.repeatReady_ = reusableRepeat;
         scope.repeatSizes_ = addressPlan.sizes;
         scope.repeatEntry_ = image;
         domain.recent = image;
@@ -874,7 +875,7 @@ HcclResult RunMc2BoundReplay(
     auto tableKey = captured->key;
     domain.entries.emplace(std::move(tableKey), std::move(captured));
     domain.recent = image;
-    scope.repeatReady_ = regular;
+    scope.repeatReady_ = reusableRepeat;
     scope.repeatEntry_ = image;
     scope.repeatSizes_ = addressPlan.sizes;
     return HCCL_SUCCESS;

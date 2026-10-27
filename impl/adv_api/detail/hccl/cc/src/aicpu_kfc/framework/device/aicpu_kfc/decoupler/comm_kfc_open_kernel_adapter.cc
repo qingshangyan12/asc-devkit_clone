@@ -221,7 +221,14 @@ HcclResult FormatOpenOpParamDataFromMsg(
             HCCL_ERROR("Run op param is empty at repeat %u.", repeatIdx);
             return HCCL_E_PARA;
         }
-        if (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLTOALL) {
+        if (param->opType == HCCL_CMD_ALLTOALL) {
+            // Equal-count A2A repeats translate each peer by the same byte offset.
+            // Keep displacements stable; move the two bases, exactly once.
+            const u64 sendBytes = extMsg.sendCounts[0] * GetDataTypeSize(param->all2AllVDataDes.sendType);
+            const u64 recvBytes = extMsg.recvCounts[0] * GetDataTypeSize(param->all2AllVDataDes.recvType);
+            param->inputPtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(param->inputPtr) + sendBytes);
+            param->outputPtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(param->outputPtr) + recvBytes);
+        } else if (param->opType == HCCL_CMD_ALLTOALLV) {
             for (u32 i = 0U; i < rankNum; ++i) {
                 extMsg.sendOffset[i] += extMsg.sendCounts[i];
                 extMsg.recvOffset[i] += extMsg.recvCounts[i];

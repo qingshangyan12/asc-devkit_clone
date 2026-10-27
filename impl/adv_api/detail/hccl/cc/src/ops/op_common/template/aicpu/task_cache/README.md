@@ -18,3 +18,9 @@ An entry is published only after successful capture finalization. Replay errors 
 ## Validation boundary
 
 Only compilation is authorized for this change. Compilation does not prove output correctness, queue progress or performance. Before deployment, validate exact task semantics, clear/rebuild, alternating shapes, repeat 1/2/8/32, repeated Prepare, memory boundaries, registration changes and capacity fallback. Compare policy, execute and total sq_expand, including binding cost in init.
+
+## Stage 2
+
+Equal-count A2A repeats translate input/output bases while preserving per-peer displacements; ordinary and A2A repeats reuse message-level selection. A2AV remains exact-shape. Variable-array packing is deferred to the actual executor callback. HCOMM binds each WQE array directly to its token vector, fuses patch and submission, and removes destination zero fills that were immediately overwritten by full-length copies.
+
+Token values still resolve on each replay because no registration-generation invalidation contract is available. Per-WQE publication barriers remain unchanged. Cross-WQE barrier removal and persistent registration-range bindings are deliberately not enabled without a visibility/lifetime proof. These are remaining design subitems, not completed optimizations.
