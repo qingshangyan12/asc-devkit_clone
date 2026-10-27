@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "L1到Fixpipe Buffer数据搬运，说明随路Vector量化与ReLU参数使用独立地址空间，通过asc_copy_l12fb在PIPE_FIX上从L1装载，支持连续与高维切分模式，并给出对齐、容量与同步要求。"
+description: "说明3510上L1到Fixpipe Buffer的参数装载：asc_copy_l12fb的连续与高维切分原型，量化与ReLU参数各自独立的地址空间选择、对齐与容量上限，以及参数必须在L0C搬出前完成的PIPE_FIX同步要求。"
 ---
 # L1到Fixpipe Buffer数据搬运
 

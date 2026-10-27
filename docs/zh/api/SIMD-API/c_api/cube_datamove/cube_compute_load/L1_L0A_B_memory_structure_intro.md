@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "说明Cube侧L1 Buffer与L0A/L0B Buffer的Bank结构、容量、地址编码格式及读写并发限制，用于理解矩阵计算输入搬运的内存约束。"
+description: "介绍Cube侧L1 Buffer、L0A Buffer与L0B Buffer的Bank与Bank Group内存结构，给出各Buffer容量、Bank数量、行宽以及地址编码位域划分，并说明同一Bank与同一Bank Group内的读写并发限制。"
 ---
 # L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
 

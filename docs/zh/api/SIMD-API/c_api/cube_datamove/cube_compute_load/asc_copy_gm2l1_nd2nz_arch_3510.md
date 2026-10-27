@@ -1,24 +1,18 @@
 ---
 okftype: reference.api
-description: "将数据从Global Memory搬运到L1 Buffer，将源端N维连续的ND格式转换为Nz分形排布，搬运前需先配置Nz矩阵stride与ND矩阵个数。"
+description: "在AIC上将Global Memory的ND数据搬入L1 Buffer并转换为Nz分形排布，支持12种数据类型、L2 Cache策略枚举与SmallC0模式，d_value未按32字节对齐时目的端自动补零。"
 tag:
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - traits: [aligned_transfer, padding]
+  - traits: [aligned_transfer, datablock_granularity, padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
     kind: constrained_by
-    condition: "地址对齐与搬运粒度要求"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_nz_para.md
     kind: requires
-    condition: "进行ND2Nz格式搬运前"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "与其他指令存在目的地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在目的地址重叠时"
-version: ">=9.1.0"
+    condition: "调用前必须先配置Nz目的矩阵步长与ND矩阵搬运个数"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_copy_gm2l1_nd2nz_arch_3510
 

@@ -1,17 +1,26 @@
 ---
 okftype: reference.api
-description: "接口asc_copy_gm2l1_nd2nz_sync已废弃，请使用对应的非同步接口asc_copy_gm2l1_nd2nz_arch_2201和同步接口asc_sync替代，该接口将数据从Global Memory (GM)搬运到Level 1 cache (L1)，并在数据搬运时支持ND格式到NZ格式的转换。"
+description: "废弃接口页：2201 架构下 asc_copy_gm2l1_nd2nz_sync 在 GM 到 L1 的同步搬运中完成 ND 到 NZ 格式转换，用 nd_num、行列数与各 stride 参数描述多个 ND 矩阵的搬运布局，官方建议改用同架构非同步 asc_copy_gm2l1_nd2nz 加 asc_sync。"
 tag:
   - roles: [data_movement]
   - operations: [copy, layout_transform]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_2201.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
+    condition: "建议改用对应的非同步接口并显式调用 asc_sync"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "各存储单元的空间大小与对齐要求按其存储单元说明"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景"
-version: ">=9.1.0"
+    kind: related
+    condition: "替代方案中承担同步等待"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include 头以 ASC_DEPRECATED(9.2.0) 标记该同步接口，Release Notes 9.2.0 给出的替代路径为非同步 asc_copy_gm2l1_nd2nz 加 asc_sync；接口未移除。"
 ---
 # asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）
 

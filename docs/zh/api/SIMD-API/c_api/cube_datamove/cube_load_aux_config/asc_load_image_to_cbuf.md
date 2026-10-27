@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将图像数据从Global Memory搬运到L1 Buffer，加载时可指定水平与垂直的尺寸及起始位置，并支持对目的图片上、下、左、右四边填充像素。"
+description: "将 Global Memory 中的图像数据按水平垂直起始位置与加载尺寸搬运到 L1 Buffer 的 dst 起始地址，并可在目的图像的上、下、左、右四侧填充指定像素数。"
 tag:
   - roles: [data_movement]
   - operations: [load]
@@ -8,17 +8,17 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
     kind: related
-    condition: "了解图像搬入在卷积计算流程中的位置时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_arch_2201.md
     kind: related
-    condition: "后续进行L1到L0的3D搬运时"
+    condition: "仅 Atlas A3 与 Atlas A2 系列产品上存在后续 L1 到 L0 的 3D 搬运衔接"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_arch_2201.md
     kind: related
-    condition: "后续进行L1到L0的3D搬运时"
+    condition: "仅 Atlas A3 与 Atlas A2 系列产品上存在后续 L1 到 L0 的 3D 搬运衔接"
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "各存储单元的空间大小和对齐要求"
+    condition: "存储单元空间与对齐要求、通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_load_image_to_cbuf
 

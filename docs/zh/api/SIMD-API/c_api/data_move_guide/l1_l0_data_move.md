@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍L1到L0A/L0B的二维分形、转置、三维img2col和MX量化系数搬运，以及L0C到L1随路处理搬出，说明由PIPE_MTE1装载、PIPE_FIX搬出的方向性通路与容量对齐约束。"
+description: "说明3510上L1与L0的定向搬运：L1到L0A/L0B的二维分形与伴转置、三维img2col、Repeat转置及MX量化系数装载，以及L0C到L1的随路处理搬出，并给出分形形状、对齐与容量约束。"
 ---
 # L1与L0数据搬运
 

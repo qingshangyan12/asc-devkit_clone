@@ -1,16 +1,25 @@
 ---
 okftype: reference.api
-description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式转换，满足矩阵计算对分形列连续性的要求。旧常规重载与asc_copy_gm2l1_dn2nz_sync已废弃，请使用带asc_load_l2_cache_mode参数的asc_copy_gm2l1_dn2nz接口，同步场景调用asc_sync。"
+description: "已废弃的 DN 到 Nz 格式搬运旧重载，把 GM 数据按 DN 矩阵行列数与步长搬入 L1 Buffer 并完成格式转换，含 uint8 的 l2_cache_ctl 参数，替代方案改用 asc_load_l2_cache_mode 枚举重载。"
 tag:
   - roles: [data_movement]
-  - operations: [layout_transform]
+  - operations: [copy, layout_transform]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md
     kind: replaced_by
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景"
-version: ">=9.1.0,<=9.2.0"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_nz_para.md
+    kind: requires
+    condition: "搬运前须配置目的 Nz 矩阵步长与 DN 矩阵搬运个数"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "使用 uint8_t l2_cache_ctl 的旧重载及对应 _sync 重载废弃，改用带 asc_load_l2_cache_mode l2_cache_mode 的 asc_copy_gm2l1_dn2nz；include/c_api/cube_datamove/cube_datamove.h 的 24 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_copy_gm2l1_dn2nz（废弃）
 

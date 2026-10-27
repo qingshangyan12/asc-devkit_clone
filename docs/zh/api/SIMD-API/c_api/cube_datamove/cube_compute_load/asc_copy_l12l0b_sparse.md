@@ -1,27 +1,16 @@
 ---
 okftype: reference.api
-description: "用于将L1 Buffer里的512B大小稠密权重矩阵搬运到L0B Buffer，同时读取128B索引矩阵用于稠密矩阵的稀疏化，不支持转置。"
+description: "将L1 Buffer中512字节分形的稠密权重矩阵搬入L0B Buffer，同时读取128字节索引矩阵完成稀疏化，供稀疏矩阵乘加使用。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [sparse_input]
+  - traits: [datablock_granularity, sparse_input]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
-    kind: related
-    condition: "了解压缩权重与索引矩阵的配合方式"
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
-    kind: related
-    condition: "了解搬入前的数据排布时"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_sparse.md
     kind: related
-    condition: "后续稀疏矩阵乘加时"
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
-    kind: constrained_by
-    condition: "地址对齐与搬运粒度要求"
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "各存储单元的空间大小和对齐要求"
+    condition: "压缩权重与索引矩阵供稀疏矩阵乘加读取"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_copy_l12l0b_sparse
 

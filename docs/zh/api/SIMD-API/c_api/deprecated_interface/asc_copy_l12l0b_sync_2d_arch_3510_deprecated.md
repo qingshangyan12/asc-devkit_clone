@@ -1,18 +1,27 @@
 ---
 okftype: reference.api
-description: "接口asc_copy_l12l0b_sync和asc_copy_l12l0b_transpose_sync已废弃，原用于按512字节数据分形将矩阵计算所需2D格式数据从L1 Buffer搬入L0B Buffer，支持非转置与转置，替代方案为非同步接口asc_copy_l12l0b_2d_arch_3510配合同步接口asc_sync。"
+description: "废弃接口页：3510 架构下 asc_copy_l12l0b_sync 与 asc_copy_l12l0b_transpose_sync 以 512 字节分形为单位把 L1 Buffer 的 2D 矩阵搬入 L0B Buffer，支持转置与非转置以及 b4、b8、b16、b32，建议改用非同步接口加 asc_sync。"
 tag:
   - roles: [data_movement]
-  - operations: [copy, layout_transform]
+  - operations: [load, transpose]
   - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_2d_arch_3510.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景"
-version: ">=9.0.0"
+    condition: "建议改用对应的非同步 2D 接口并显式调用 asc_sync"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "目的地址与其他指令重叠时需插入同步指令串行化"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "目的地址与其他指令重叠时需插入同步指令串行化"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include 头在 asc_copy_l12l0b_sync 声明前标注 ASC_DEPRECATED(9.2.0)，替代路径是非同步 2D 接口加 asc_sync；接口未移除。"
 ---
 # asc_copy_l12l0b_sync_2d_arch_3510（废弃）
 

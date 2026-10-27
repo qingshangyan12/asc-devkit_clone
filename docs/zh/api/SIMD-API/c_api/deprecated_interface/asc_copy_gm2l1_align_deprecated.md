@@ -1,16 +1,25 @@
 ---
 okftype: reference.api
-description: "将数据从Global Memory搬运到L1 Buffer，提供非32字节对齐搬运与padding能力，支持Normal与Compact填充模式。旧常规重载及asc_copy_gm2l1_align_sync已废弃，请使用带asc_load_l2_cache_mode参数的asc_copy_gm2l1_align接口，同步场景调用asc_sync。"
+description: "已废弃的非对齐搬运旧重载，提供非 32 字节对齐搬运并在搬运中按 Normal、Compact 或左右模式填充数据，含 uint8 的 l2_cache_ctl 参数，替代方案改用 asc_load_l2_cache_mode 枚举重载。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
+  - traits: [padding, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md
     kind: replaced_by
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景"
-version: ">=9.1.0,<=9.2.0"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md
+    kind: constrained_by
+    condition: "data_select_bit 为 true 或使用左右填充模式时须先配置填充值"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "使用 uint8_t l2_cache_ctl 的旧常规重载及其 _sync 重载废弃，改用带 asc_load_l2_cache_mode l2_cache_mode 的 asc_copy_gm2l1_align，同步场景额外调用 asc_sync；include/c_api/cube_datamove/cube_datamove.h 的 20 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_copy_gm2l1_align（废弃）
 

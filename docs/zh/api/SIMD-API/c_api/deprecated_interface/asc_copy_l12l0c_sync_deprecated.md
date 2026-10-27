@@ -1,17 +1,26 @@
 ---
 okftype: reference.api
-description: "已废弃的同步接口，将矩阵由L1 Buffer搬运到L0C Buffer，支持bfloat16_t、half、float、int32_t、uint32_t等数据类型间的转换搬运，替代为对应非同步接口asc_copy_l12l0c和asc_sync。"
+description: "已废弃的同步版 L1 Buffer 到 L0C Buffer 矩阵搬运接口，支持 bfloat16_t、half、float 与 32 位整型组合，替代方案为 asc_copy_l12l0c 加 asc_sync。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [load]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0c.md
     kind: replaced_by
-    condition: "接口已废弃，使用对应的非同步接口替代"
+    condition: "正文声明的替代非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "存储单元空间大小与对齐要求"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "接口已废弃，使用同步接口asc_sync替代"
-version: ">=9.0.0"
+    condition: "替代方案中的同步部分"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.2.0 起标记废弃，正文与 include 给出的替代方案均为 asc_copy_l12l0c 加 asc_sync；声明保留，属 deprecated 而非 removed。"
 ---
 # asc_copy_l12l0c_sync（废弃）
 

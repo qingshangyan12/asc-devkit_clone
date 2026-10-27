@@ -1,27 +1,35 @@
 ---
 okftype: reference.api
-description: "将GM数据以512字节分形为单位、按行列起始位置与步长切分提取多个分形矩阵搬入L1 Buffer，不进行格式转换，用于矩阵计算2D数据加载。"
+description: "在Ascend 950PR与950DT系列产品上以512字节分形为单位，从Global Memory按行列起始位置与步长切分多个分形矩阵搬运到L1 Buffer，支持2D矩阵搬运模式且搬运中不做分形格式转换，仅AIC执行时有效。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [load]
   - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
-    kind: related
-    condition: "了解搬入前的数据排布时"
+    kind: requires
+    condition: "搬入前源数据需按分形格式排布"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
     kind: constrained_by
     condition: "地址对齐与搬运粒度要求"
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
-    kind: related
-    condition: "l2_cache_mode参数取值"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: "与其他指令存在目的地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    condition: "l2_cache_mode参数取值与语义"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
     kind: requires
-    condition: "与其他指令存在目的地址重叠时"
-version: ">=9.0.0"
+    condition: "与其他指令存在数据依赖时需插入同步指令"
+version: ">=9.2.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "overload:asc_copy_gm2l1__PL1bf16_PGbf16_u32_u32_u16_u16_u16_u8_u8"
+    scope_basis: resolved
+    note: "旧参数2D重载（uint8_t decomp_mode、uint8_t l2_cache_ctl）及对应 _sync 形式自9.2.0起被标记废弃（头文件 ASC_DEPRECATED(9.2.0)）但实现保留、仍可调用；替代方式为本页强类型重载配合 asc_sync。"
+  - since: "9.2.0"
+    kind: behavior_fixed
+    scope: "page"
+    scope_basis: fallback
+    note: "CANN 9.2.0 Release Notes 记录修复 asc_copy_gm2l1 部分3510实现调用底层CCE指令时缺少参数的问题；原文只说“部分3510实现”未指明具体重载，故暂记页级待细化。"
 ---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
 

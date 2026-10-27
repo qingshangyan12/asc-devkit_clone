@@ -1,20 +1,32 @@
 ---
 okftype: reference.api
-description: "将value的二进制值赋值给目的地址，对L0B Buffer的Local Memory进行初始化，用于准备矩阵输入缓冲区，填充参数通过asc_fill_value_config配置。"
+description: "将标量填充值 value 的二进制值写入 L0B Buffer 中 dst 起始的矩阵区域，按 asc_fill_value_config 的 repeat、blk_num 与 dst_gap 重复填充，用于右矩阵输入缓冲区的初始化。"
 tag:
   - roles: [data_initialization]
   - operations: [fill]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
     kind: related
-    condition: "了解填充后的矩阵计算衔接时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/L1_L0A_B_memory_structure_intro.md
     kind: related
-    condition: "了解输入缓冲区布局时"
   - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
     kind: requires
-    condition: "使用config参数配置填充行为时"
+    condition: "所有重载均需传入 config 指定迭代次数、单次数据块数与块间隔"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "L0B 存储单元容量、对齐要求与通用地址重叠约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "overload:asc_fill_l0b__PCBbf16_f16_RCfillcfg"
+    scope_basis: resolved
+    note: "9.1.0 起 include 与 impl 同步新增 bfloat16_t* dst 配 half 填充值的重载，9.0.0 及更早没有该签名；当前 include 该重载的 @override_id 即 asc_fill_l0b__PCBbf16_f16_RCfillcfg，@archs 2201。"
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "overload:asc_fill_l0b__PCBbf16_u32_RCfillcfg"
+    scope_basis: resolved
+    note: "9.1.0 起 include 与 impl 同步新增 bfloat16_t* dst 配 uint32_t 填充值的重载，9.0.0 及更早没有该签名；当前 include 该重载的 @override_id 即 asc_fill_l0b__PCBbf16_u32_RCfillcfg，@archs 2201。"
 ---
 # asc_fill_l0b
 

@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍GM到L1与L0C到GM两类直达通路，涵盖连续、高维切分、二维分形、ND2Nz、DN2Nz、非对齐搬运及L0C搬出量化激活等接口，并给出GM到L0A/L0B经L1的两段搬运流程。"
+description: "说明3510的GM与L1/L0通路：GM到L1的连续、高维切分、二维分形、ND2Nz、DN2Nz与非对齐搬运，以及L0C到GM的组合量化激活格式转换搬出，并给出各原型的参数单位、对齐与L1空间要求。"
 ---
 # GM与L1/L0数据搬运
 

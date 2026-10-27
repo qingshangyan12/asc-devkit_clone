@@ -1,24 +1,15 @@
 ---
 okftype: reference.api
-description: "负责完成矩阵计算所需的2D格式数据从L1 Buffer到L0A Buffer的搬运，搬运粒度为512字节的数据分形，支持非转置与转置两种模式，仅在AIC上执行有效。"
+description: "在AIC上以512字节分形为单位将L1 Buffer中的2D矩阵搬入L0A Buffer，支持非转置与转置两种模式，覆盖b4至b32多档数据类型。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
-  - traits: [aligned_transfer]
+  - operations: [copy, transpose]
+  - traits: [datablock_granularity]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
-    kind: related
-    condition: "查看搬入前的数据排布"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
     kind: constrained_by
-    condition: "地址对齐与搬运粒度要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "本指令与其他指令存在目的地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "本指令与其他指令存在目的地址重叠时"
-version: ">=9.0.0"
+version: ">=9.1.0"
+version_changes: []
 ---
 # asc_copy_l12l0a_arch_3510（2D矩阵搬运）
 

@@ -1,17 +1,16 @@
 ---
 okftype: reference.api
-description: "将L1 Buffer中的Bias数据搬运到BiasTable Buffer，支持前n个数据搬运与高维切分搬运，前n个方式要求搬运数据大小32字节对齐。"
+description: "将L1 Buffer中的Bias数据搬运到BiasTable Buffer，供矩阵计算单元作为Bias读取，提供按size连续搬运与按块个数、块长和源目间隔高维切分两种参数列表。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+  - traits: [aligned_transfer, datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "存储单元空间大小与对齐要求"
-version: ">=9.1.0"
+    condition: "Bias作为C矩阵初始值时由Mmad读取"
+version: ">=9.0.0"
+version_changes: []
 ---
 # asc_copy_l12bt
 

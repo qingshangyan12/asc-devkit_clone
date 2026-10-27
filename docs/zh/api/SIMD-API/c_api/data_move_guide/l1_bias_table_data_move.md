@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "L1到BiasTable数据搬运，BiasTable保存Mmad使用的bias，通过asc_copy_l12bt在PIPE_MTE1上从L1装载偏置，支持连续与高维切分模式及half到float的随路转换，并给出容量与同步要求。"
+description: "说明3510上L1到BiasTable的bias搬运：asc_copy_l12bt的连续与高维切分原型、half与bfloat16_t等源类型的写入转换规则、conv_control约束，以及L1容量上限512KB与BiasTable容量上限4KB的同步要求。"
 ---
 # L1到BiasTable数据搬运
 

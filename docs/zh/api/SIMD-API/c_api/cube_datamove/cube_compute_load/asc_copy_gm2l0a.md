@@ -1,20 +1,22 @@
 ---
 okftype: reference.api
-description: "将数据从GM搬运到L0A Buffer，按分形矩阵ID指定起始位置，每次迭代处理512B，可配置相邻迭代的源步长与目的间隔。"
+description: "将Global Memory中的分形矩阵数据搬运到L0A Buffer，以base_idx指定起始分形、repeat指定迭代次数，src_stride与dst_gap按512字节单位控制相邻迭代地址间隔，仅Atlas A2与A3系列产品可用。"
 tag:
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [load]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
-    kind: related
-    condition: "了解搬入前的数据排布时"
+    kind: requires
+    condition: "搬入前源数据需按分形格式排布"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/cube_compute_input_move_constraint.md
     kind: constrained_by
     condition: "地址对齐与搬运粒度要求"
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "各存储单元的空间大小和对齐要求"
-version: ">=9.0.0"
+    condition: "存储单元空间大小与对齐要求、通用地址重叠约束"
+version: ">=9.1.0"
+version_changes: []
 ---
 # asc_copy_gm2l0a
 

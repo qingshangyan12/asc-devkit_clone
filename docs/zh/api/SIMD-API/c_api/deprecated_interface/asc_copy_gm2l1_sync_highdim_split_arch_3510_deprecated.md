@@ -1,18 +1,30 @@
 ---
 okftype: reference.api
-description: "接口asc_copy_gm2l1_sync已废弃，请使用对应的非同步接口asc_copy_gm2l1_highdim_split_arch_3510和同步接口asc_sync替代，该接口将数据从Global Memory搬运到L1 Buffer且格式内容不变，通过配置数据块个数和长度实现非连续高维切分搬运，支持按通道插入或移除padding。"
+description: "废弃接口页：3510 架构下 asc_copy_gm2l1_sync 高维切分重载按数据块个数、块长与地址偏移实现非连续 GM 到 L1 搬运，并可用 pad_func_mode 在 32 字节粒度插入或移除通道填充，填充值由 asc_set_gm2l1_padding 配置，建议改用非同步接口加 asc_sync。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [aligned_transfer, high_dimensional]
+  - traits: [datablock_granularity, padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_highdim_split_arch_3510.md
     kind: replaced_by
-    condition: "使用对应的非同步接口"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景"
-version: ">=9.0.0"
+    condition: "建议改用对应的非同步高维切分接口并显式调用 asc_sync"
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_padding.md
+    kind: requires
+    condition: "pad_func_mode 取 1 至 5 的填充模式时需先设置 padding 值"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "目的地址与其他指令重叠时需插入同步指令串行化"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "目的地址与其他指令重叠时需插入同步指令串行化"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include 头以 ASC_DEPRECATED(9.2.0) 标记该 3510 高维切分同步重载，替代路径是非同步高维切分接口加 asc_sync；接口未移除。"
 ---
 # asc_copy_gm2l1_sync_highdim_split_arch_3510（废弃）
 
