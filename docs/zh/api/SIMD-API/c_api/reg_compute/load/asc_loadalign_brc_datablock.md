@@ -1,18 +1,16 @@
 ---
 okftype: reference.api
-description: "从32字节对齐的UB起始地址读取一个DataBlock（32字节）并广播到整个矢量数据寄存器，支持对齐、立即数偏移及地址寄存器偏移三种搬入模式。"
+description: "将UB中一个DataBlock（32字节）广播到整个矢量数据寄存器，提供对齐、立即数偏移与地址寄存器偏移三种模式。"
 tag:
   - roles: [data_movement]
-  - operations: [broadcast, load]
+  - operations: [load]
   - traits: [aligned_transfer, datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: "地址寄存器偏移搬入模式"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-version: ">=9.0.0"
+    condition: "地址寄存器偏移模式需配合 asc_update_addr_reg"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_loadalign_brc_datablock
 

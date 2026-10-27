@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "从16字节对齐的UB起始地址读取VL/16长度数据，将每个bit重复两次得到VL/8掩码数据并通过函数返回值返回。"
+description: "从UB的16字节对齐地址读取VL/16长度数据，将每个bit重复两次得到VL/8长度的2倍上采样结果，并通过函数返回值返回掩码寄存器。"
 tag:
   - roles: [data_movement]
   - operations: [load]
@@ -8,11 +8,15 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md
     kind: related
-    condition: "对齐搬入模式中目的操作数为掩码寄存器"
+    condition: "对齐搬入模式中目的为掩码寄存器的原型，本接口为其返回值形式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-version: ">=9.0.0"
+    condition: "与其他指令存在数据依赖时需插入该同步指令"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_loadalign_mask_upsample
 

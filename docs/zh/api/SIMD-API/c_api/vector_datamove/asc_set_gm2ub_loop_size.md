@@ -1,19 +1,17 @@
 ---
 okftype: reference.api
-description: "设置asc_copy_gm2ub_align循环搬运模式下内层loop1与外层loop2的循环迭代次数，完成后需复位为1，否则可能影响下一次搬运。"
+description: "设置asc_copy_gm2ub_align循环搬运模式两层循环次数的配置接口，loop1_size与loop2_size分别控制内层与外层迭代次数，任一项为0时后续搬运不搬数据，任务结束需复位为1。"
 tag:
-  - roles: [data_movement_configuration]
+  - roles: [configuration]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
-    kind: configures
-    condition: "使用循环搬运模式时"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
-    kind: related
-    condition: "使用循环搬运模式时"
+    kind: requires
+    condition: "循环搬运需同时配置内层步长"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
-    kind: related
-    condition: "使用循环搬运模式时"
+    kind: requires
+    condition: "循环搬运需同时配置外层步长"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_set_gm2ub_loop_size
 

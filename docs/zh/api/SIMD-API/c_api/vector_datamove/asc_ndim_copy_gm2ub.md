@@ -1,33 +1,25 @@
 ---
 okftype: reference.api
-description: "将多维数据从Global Memory搬运到Unified Buffer，最多支持5维且各维可单独配置Stride，并支持随路Padding及转置、切片、广播等场景。"
+description: "把GM中的多维数据搬运到UB，最多支持5个维度，各维可单独配置步长并通过配套接口设置Padding，支持常数填充或最近值填充两种方式，需保证总地址范围不超过40位。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
   - traits: [high_dimensional, padding]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "存储单元空间大小与对齐要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
     kind: requires
-    condition: "多核场景下多个AI Core可能读取同一块GM地址且该数据可能被其他核更新时"
+    condition: "多核可能读取同一GM地址时需先刷新NDDMA DataCache"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
     kind: requires
-    condition: "调用本接口前需预先配置各维源/目步长"
+    condition: "各维源/目的步长需预先配置"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
     kind: requires
-    condition: "调用本接口前需预先配置1至4维左右填充元素数"
+    condition: "loop1至loop4维的左右填充元素数需预先配置"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
     kind: requires
-    condition: "padding_mode为true时填充固定值"
+    condition: "常数填充需预先设置填充值"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_ndim_copy_gm2ub
 

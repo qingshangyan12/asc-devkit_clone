@@ -1,21 +1,18 @@
 ---
 okftype: reference.api
-description: "将数据从Global Memory (GM)搬运到Unified Buffer（UB），支持前n个数据搬运与高维切分搬运，前n个数据搬运方式要求搬运数据大小32字节对齐。"
+description: "在2201架构上把数据从GM搬运到UB，提供按size的连续搬运与按burst_count/burst_len及源目的间隔的高维切分搬运两种形式。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [aligned_transfer, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "存储单元空间与对齐要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-version: ">=9.1.0"
+    kind: related
+    condition: "正文据此引用存储单元说明"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    kind: related
+    condition: "有数据依赖时按该页插入同步指令"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_copy_gm2ub
 

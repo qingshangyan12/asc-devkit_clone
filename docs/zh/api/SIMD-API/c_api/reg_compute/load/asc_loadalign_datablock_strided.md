@@ -1,17 +1,25 @@
 ---
 okftype: reference.api
-description: "从Unified Buffer中32字节对齐地址非连续搬入8个DataBlock，通过函数返回值返回矢量数据寄存器，支持配置相邻数据块之间的地址步长与起始读取位置。"
+description: "从UB的32字节对齐地址按block_stride指定的32字节步长非连续搬入8个DataBlock，由mask按DataBlock粒度决定是否搬入，结果通过函数返回值返回矢量数据寄存器，仅在AIV上生效。"
 tag:
   - roles: [data_movement]
   - operations: [load]
   - traits: [aligned_transfer, datablock_granularity]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: related
+    condition: "非连续对齐搬入模式的目的寄存器形式，本接口为其返回值形式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+    condition: "Reg矢量计算C API通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: requires
-    condition: "本指令与其他指令存在UB地址重叠时"
-version: ">=9.0.0"
+    condition: "与其他指令存在数据依赖时需插入该同步指令"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_loadalign_datablock_strided
 

@@ -1,15 +1,16 @@
 ---
 okftype: reference.api
-description: "从Unified Buffer中按dtype对齐的地址读取一个元素并广播到整个矢量数据寄存器，采用Post Update模式，搬运完成后自动更新源地址指针。"
+description: "将UB中一个元素广播到整个矢量数据寄存器，并在搬运后自动更新源地址指针。"
 tag:
   - roles: [data_movement]
-  - operations: [broadcast, load]
-  - traits: [aligned_transfer, post_update]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: "本指令与其他指令存在UB地址重叠时"
-version: ">=9.0.0"
+    condition: "地址寄存器偏移模式需配合 asc_update_addr_reg"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_loadalign_brc_elem_postupdate
 

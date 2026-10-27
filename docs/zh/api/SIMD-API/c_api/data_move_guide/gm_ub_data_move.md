@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "GM与UB数据搬运是Vector侧加载与回写的主要通路，GM到UB由PIPE_MTE2执行、UB到GM由PIPE_MTE3执行，涵盖连续、高维切分、非对齐与NDDMA多维搬运及对齐补齐和同步约束。"
+description: "说明GM与UB双向通路：连续、高维切分、非对齐原型与GM到UB五维NDDMA的参数单位和补齐行为，并给出PIPE_MTE2/MTE3同步、UB源目的地址对齐以及访问范围计算要求。"
 ---
 # GM与UB数据搬运
 

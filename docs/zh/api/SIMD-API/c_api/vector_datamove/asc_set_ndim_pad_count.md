@@ -1,19 +1,18 @@
 ---
 okftype: reference.api
-description: "本接口用于配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，仅在AIV上生效。"
+description: "配置asc_ndim_copy_gm2ub中loop1至loop4各维左右两侧填充元素数的接口，接收asc_ndim_pad_count_config引用；loop0的填充数由搬运接口自身参数配置，常数填充时还需设置填充值。"
 tag:
-  - roles: [data_movement_configuration]
+  - roles: [configuration]
   - traits: [high_dimensional, padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
-    kind: configures
-    condition: "调用asc_ndim_copy_gm2ub前"
+    kind: requires
+    condition: "配置字段定义见该结构体页"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
-    kind: related
-    condition: "使用常数填充模式时"
+    kind: requires
+    condition: "常数填充模式需与填充值配置配合使用"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_set_ndim_pad_count
 

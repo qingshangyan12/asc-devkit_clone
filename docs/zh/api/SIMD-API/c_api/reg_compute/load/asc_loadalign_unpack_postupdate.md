@@ -1,15 +1,24 @@
 ---
 okftype: reference.api
-description: "从Unified Buffer中32字节对齐的起始地址读取VL/2长度连续数据，在每个源元素后补1个值为0的元素并解包写入矢量数据寄存器，采用Post Update模式在搬运完成后自动更新源地址指针。"
+description: "从UB中32字节对齐地址读取VL/2长度数据并在每个源元素后补1个0解包为VL长度，搬入矢量寄存器后按offset自动更新源指针。"
 tag:
   - roles: [data_movement]
   - operations: [load]
-  - traits: [aligned_transfer, post_update]
+  - traits: [post_update]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "正文据此说明矢量数据寄存器"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    kind: related
+    condition: "与其他指令存在数据依赖时插入同步指令串行化"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: behavior_fixed
+    scope: "page"
+    scope_basis: kind_default
+    note: "UB 源指针参数改为引用传递：CANN 9.1.0 Release Notes 记载 asc_loadalign_unpack_postupdate 等 Post Update 接口中需要自动更新的 UB 源指针参数修正为指针引用，确保调用后地址变化对调用方可见（对应正文 __ubuf__ <dtype>*& src 形式）。"
 ---
 # asc_loadalign_unpack_postupdate
 

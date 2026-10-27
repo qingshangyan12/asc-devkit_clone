@@ -1,33 +1,36 @@
 ---
 okftype: reference.api
-description: "提供GM到UB的非对齐搬运，支持前n个与高维切分两种方式，非32字节对齐的数据会补齐，填充值可手动配置或由硬件自动生成。"
+description: "在2201架构上把GM数据按非32字节整数倍长度搬入UB并补齐到32字节，支持前n个数据与Normal模式高维切分，可手动或自动填充。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
-  - traits: [high_dimensional, padding, unaligned_transfer]
+  - traits: [padding, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "存储单元空间与对齐要求"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "与其他指令存在UB地址重叠时"
+    kind: related
+    condition: "正文据此引用存储单元说明"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    kind: related
+    condition: "有数据依赖时按该页插入同步指令"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
-    kind: requires
-    condition: "采用手动填充方式时"
+    kind: related
+    condition: "手动填充时先调用它配置填充值"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
-    kind: requires
-    condition: "采用循环搬运模式时"
+    kind: related
+    condition: "循环搬运模式内层步长配置"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
-    kind: requires
-    condition: "采用循环搬运模式时"
+    kind: related
+    condition: "循环搬运模式外层步长配置"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
-    kind: requires
-    condition: "采用循环搬运模式时"
+    kind: related
+    condition: "循环搬运模式的迭代次数配置"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "新增仅传入 dst、src、size 的简化重载：CANN 9.1.0 Release Notes 记载 asc_copy_gm2ub_align（含 _sync）新增简化重载，对应正文前n个数据搬运的 (dst、src、uint32_t size) 形式。"
 ---
 # asc_copy_gm2ub_align
 

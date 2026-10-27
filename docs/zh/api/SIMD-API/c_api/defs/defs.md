@@ -1,3 +1,6 @@
+---
+okftype: reference.index
+---
 # 基础定义
 
 - **[联合体](union/union.md)**
