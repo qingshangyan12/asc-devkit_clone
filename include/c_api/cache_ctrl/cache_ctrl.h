@@ -29,40 +29,40 @@
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Manually preloads instructions from the current Global Memory address (PC via asc_get_program_counter masked to 48 bits) into ICache to avoid later fetch misses; prefetch_len is in 2 KB units.
+ * @brief Preloads instruction data starting at a Global Memory address into the ICache in units of 2 KByte to avoid later instruction-cache misses.
  *
  * @override_id asc_icache_preload__PCv_i64
  * @archs 2201 3510
- * @param [in] addr 预取指令的Global Memory起始地址。
- * @param [in] prefetch_len 预加载数据的长度，单位为2K Byte。
+ * @param [in] addr Global Memory start address of the instructions to preload; hardware uses the 128-byte-aligned effective bits of this address.
+ * @param [in] prefetch_len Length of the instruction data to preload, counted in 2-KByte instruction units; documented range [0, 15] on AIC (32 KB ICache) and [0, 7] on AIV (16 KB ICache).
  */
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
 
 namespace __asc_aicore {
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans and invalidates the single Cache Line containing the given GM address dst, writing dirty data back to GM (void return, PIPE_S).
+ * @brief Cleans and invalidates the single DCache line that contains the GM address dst, so the next scalar access to that address reads fresh GM data.
  *
  * @override_id asc_dcci_single__PGv
  * @archs 2201 3510
- * @param [in] dst 待清理与失效的Cache Line所在地址。 硬件按Cache Line边界对齐定位目标行，传入地址无需满足Cache Line对齐。
+ * @param [in] dst Address of the cache line to clean and invalidate, passed as __gm__ void*; the doc states the address need not be Cache Line aligned because hardware aligns to the line boundary.
  */
 __aicore__ inline void asc_dcci_single(__gm__ void* dst);
 }
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans and invalidates the single Cache Line containing the given UB address dst (AIV only, void return, PIPE_S).
+ * @brief Cleans and invalidates the single DCache line that contains the Unified Buffer address dst (AIV only).
  *
  * @override_id asc_ub_dcci_single__PUv
  * @archs 2201 3510
- * @param [in] dst 待清理与失效的Cache Line所在地址。 硬件按Cache Line边界对齐定位目标行，传入地址无需满足Cache Line对齐。
+ * @param [in] dst Address of the cache line to clean and invalidate, passed as __ubuf__ void*; the doc states the address need not be Cache Line aligned because hardware aligns to the line boundary.
  */
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst);
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans and invalidates all valid Cache Lines containing UB addresses in the entire DCache (AIV only, void return, PIPE_S).
+ * @brief Cleans and invalidates every valid DCache line whose address belongs to the Unified Buffer address range.
  *
  * @override_id asc_dcci_entire_ub__z
  * @archs 2201 3510
@@ -71,7 +71,7 @@ __aicore__ inline void asc_dcci_entire_ub();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans and invalidates all valid Cache Lines containing GM addresses in the entire DCache, writing dirty data back to GM (void return, PIPE_S).
+ * @brief Cleans and invalidates every valid DCache line whose address belongs to GM, writing dirty data back to GM.
  *
  * @override_id asc_dcci_entire_out__z
  * @archs 2201 3510
@@ -80,7 +80,7 @@ __aicore__ inline void asc_dcci_entire_out();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans (writes dirty data back to GM) and invalidates all valid Cache Lines in the entire DCache (void return, PIPE_S).
+ * @brief Cleans and invalidates every valid DCache line of the current AI Core, covering both Unified Buffer and GM addresses.
  *
  * @override_id asc_dcci_entire_all__z
  * @archs 2201 3510
@@ -89,7 +89,7 @@ __aicore__ inline void asc_dcci_entire_all();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Cleans and invalidates all valid Cache Lines containing GM addresses related to scalar atomic operations in the entire DCache (void return, PIPE_S).
+ * @brief Cleans and invalidates every valid DCache line associated with GM addresses used by scalar atomic operations.
  *
  * @override_id asc_dcci_entire_atomic__z
  * @archs 2201 3510
@@ -98,7 +98,7 @@ __aicore__ inline void asc_dcci_entire_atomic();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Debug query called after asc_icache_preload that returns the ICache preload status: 0 means the previous preload is idle/completed, 1 means it is still in progress.
+ * @brief Returns the ICache preload status: 0 when the previous preload has finished and 1 while a preload is still running.
  *
  * @override_id asc_get_icache_preload_status__z
  * @archs 2201 3510
@@ -107,18 +107,18 @@ __aicore__ inline int64_t asc_get_icache_preload_status();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Preloads one 64-byte Cache Line from the Global Memory address plus byte offset into DCache ahead of a later Scalar read, reducing first-access latency.
+ * @brief Preloads the 64-byte cache line containing address plus offset from Global Memory into the DCache for later scalar reads.
  *
  * @override_id asc_datacache_preload__PGu64_i64
  * @archs 2201 3510
- * @param [in] address 源操作数在Global Memory中地址，单位为字节。
- * @param [in] offset 相对`address`的有符号字节偏移，预取起始地址 = `address` + `offset`，单位为字节。
+ * @param [in] address Source address in Global Memory, expressed in bytes; the prefetch base.
+ * @param [in] offset Signed byte offset added to address; the prefetch starts at address + offset.
  */
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset);
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Invalidates all Cache Lines of the whole DCache, discarding dirty data without write-back so later accesses reload from Global Memory; call asc_sync_data_barrier(DSB_ALL) first.
+ * @brief Invalidates the whole DCache by marking every cache line invalid without writing back dirty data, so later accesses reload from Global Memory.
  *
  * @override_id asc_dci__z
  * @archs 3510
@@ -127,27 +127,27 @@ __aicore__ inline void asc_dci();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Sets the L2 Cache management policy for scalar load accesses to Global Memory via the asc_load_l2_cache_mode overload; later scalar GM reads follow it until changed.
+ * @brief Sets the L2 cache management policy applied by subsequent scalar GM load operations until the mode is changed again.
  *
  * @override_id asc_set_scalar_cache_mode__loadl2
  * @archs 3510
- * @param [in] l2_cache_mode L2 Cache管理策略： &bull; 配置标量load接口的L2 Cache管理策略重载传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。 &bull; 配置标量store接口的L2 Cache管理策略重载传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。
+ * @param [in] l2_cache_mode asc_load_l2_cache_mode enumerator selecting the L2 policy for the scalar load path; values NORMAL_FIRST_VICTIM=0, NORMAL_LAST_VICTIM=1, NORMAL_PERSISTENT=2, NOTALLOC_KEEP=4, NOTALLOC_CLEAN=5, NOTALLOC_DROP=6.
  */
 __aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode);
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Sets the L2 Cache management policy for scalar store accesses to Global Memory via the asc_store_l2_cache_mode overload; later scalar GM writes follow it until changed.
+ * @brief Sets the L2 cache management policy applied by subsequent scalar GM store operations until the mode is changed again.
  *
  * @override_id asc_set_scalar_cache_mode__storel2
  * @archs 3510
- * @param [in] l2_cache_mode L2 Cache管理策略： &bull; 配置标量load接口的L2 Cache管理策略重载传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。 &bull; 配置标量store接口的L2 Cache管理策略重载传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。
+ * @param [in] l2_cache_mode asc_store_l2_cache_mode enumerator selecting the L2 policy for the scalar store path; values NORMAL_FIRST_VICTIM=0, NORMAL_LAST_VICTIM=1, NORMAL_PERSISTENT=2, NOTALLOC_CLEAN=4.
  */
 __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode);
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Returns the current L2 Cache management policy of the scalar load path as an asc_load_l2_cache_mode value, e.g. to save the old setting or verify after setting it.
+ * @brief Returns the current L2 Cache management policy of the scalar load path as an asc_load_l2_cache_mode value.
  *
  * @override_id asc_get_scalar_load_cache_mode__z
  * @archs 3510
@@ -156,7 +156,7 @@ __aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode();
 
 /**
  * @ingroup simd_c_api.cache_ctrl
- * @brief Returns the current L2 Cache management policy of the scalar store path as an asc_store_l2_cache_mode value, e.g. to save the old setting or verify after setting it.
+ * @brief Returns the current L2 Cache management policy of the scalar store path as an asc_store_l2_cache_mode value.
  *
  * @override_id asc_get_scalar_store_cache_mode__z
  * @archs 3510

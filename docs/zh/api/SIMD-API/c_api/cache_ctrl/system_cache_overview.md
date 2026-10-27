@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍AI Core中L2 Cache、DCache、ICache等缓存类型的层次与功能，说明Prefetch、Preload、Invalid、Clean四种缓存操作、延迟写回与直写策略、多核缓存一致性问题及缓存控制接口汇总。"
+description: "介绍AI Core中L2 Cache、DCache、ICache、SIMT DCache和NDDMA Cache的功能，归纳Prefetch、Preload、Invalid、Clean四种操作，说明延迟写回与直写引发的多核一致性问题，并按Cache类型汇总缓存控制接口；3510支持五类缓存，2201仅支持L2 Cache、DCache与ICache三类。"
 ---
 # 系统缓存概述
 
