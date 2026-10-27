@@ -8,33 +8,26 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#pragma message("misc.h is deprecated.Please use c_api/utils/sys_init.h and c_api/utils/sys_misc.h.")
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MISC_MISC_H
+#endif
+
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "misc.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
-#endif
-
 #ifndef INCLUDE_C_API_MISC_H
 #define INCLUDE_C_API_MISC_H
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/instr_impl/npu_arch_2201/misc_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-// A6(9201) reuses the arch-common misc implementations provided for A5(3510).
-#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
-#endif
-
-__aicore__ inline void asc_init();
+#include "c_api/utils/sys_init.h"
+#include "c_api/utils/sys_misc.h"
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MISC_MISC_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MISC_MISC_H
 #endif
