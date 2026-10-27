@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 废弃接口
 
 ## 矩阵数据搬运

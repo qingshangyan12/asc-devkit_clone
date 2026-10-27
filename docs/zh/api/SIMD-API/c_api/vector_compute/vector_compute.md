@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # Memory矢量计算
 
 - **[基础算术](vector_arith/vector_arith.md)**

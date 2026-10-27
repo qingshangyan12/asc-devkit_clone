@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 矩阵搬出关键特性说明
 
 - **[NZ2NZ](NZ2NZ.md)**

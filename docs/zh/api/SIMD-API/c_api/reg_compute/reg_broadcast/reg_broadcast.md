@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 广播操作
 
 - **[asc_duplicate](asc_duplicate.md)**
