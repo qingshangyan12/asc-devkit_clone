@@ -1,14 +1,21 @@
 ---
 okftype: reference.api
-description: "已废弃的原子操作关闭接口，与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min配合使用，在完成原子操作后关闭原子操作以避免影响后续搬运，请使用asc_disable_dma_atomic替代。"
+description: "已废弃的原子操作关闭接口，在完成 asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min 配置的原子搬运后关闭原子状态，替代方案为 asc_disable_dma_atomic。"
 tag:
   - roles: [data_movement_configuration]
   - traits: [atomic]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: replaced_by
-    condition: "改用asc_disable_dma_atomic关闭原子操作"
-version: ">=9.0.0,<=9.2.0"
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: related
+version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "接口废弃，改用语义明确的 asc_disable_dma_atomic；include/c_api/atomic/datamove_atomic.h:184 起的声明带 ASC_DEPRECATED(9.2.0, asc_disable_dma_atomic)，CANN_9_2_0 废弃表同源。"
 ---
 # asc_set_atomic_none（废弃）
 

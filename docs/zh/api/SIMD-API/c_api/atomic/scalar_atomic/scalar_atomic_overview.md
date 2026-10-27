@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍标量原子操作在GM指定地址上完成单元素原子读-改-写的能力与适用场景，并汇总各接口功能及其支持的数据类型。"
+description: "汇总标量原子操作接口：在Global Memory指定地址完成单个元素的原子读改写并返回旧值，说明适用场景、各接口计算公式与数据类型，并区分Ascend 950PR&950DT与Atlas A2、A3在原子计算和配置类接口上的支持差异。"
 ---
 # 标量原子操作概述
 

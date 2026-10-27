@@ -31,501 +31,501 @@
 namespace __asc_aicore {
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically adds the int32_t val to the element at the Global Memory address and returns the pre-update old value; read, add and write-back are one atomic operation.
+ * @brief Atomically adds val to the 32-bit signed integer (int32_t) element at the Global Memory address and returns the element's previous value.
  *
  * @override_id asc_atomic_add__PGi32_i32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value added to the addressed element. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically adds the uint32_t val to the element at the Global Memory address and returns the pre-update old value; read, add and write-back are one atomic operation.
+ * @brief Atomically adds val to the 32-bit unsigned integer (uint32_t) element at the Global Memory address and returns the element's previous value.
  *
  * @override_id asc_atomic_add__PGu32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value added to the addressed element. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_add(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically adds the float val to the element at the Global Memory address and returns the pre-update old value; read, add and write-back are one atomic operation.
+ * @brief Atomically adds val to the float (fp32) element at the Global Memory address and returns the element's previous value.
  *
  * @override_id asc_atomic_add__PGf32_f32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value added to the addressed element. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_add(__gm__ float* address, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically adds the int64_t val to the element at the Global Memory address and returns the pre-update old value; read, add and write-back are one atomic operation.
+ * @brief Atomically adds val to the 64-bit signed integer (int64_t) element at the Global Memory address and returns the element's previous value.
  *
  * @override_id asc_atomic_add__PGi64_i64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value added to the addressed element. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_add(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically adds the uint64_t val to the element at the Global Memory address and returns the pre-update old value; read, add and write-back are one atomic operation.
+ * @brief Atomically adds val to the 64-bit unsigned integer (uint64_t) element at the Global Memory address and returns the element's previous value.
  *
  * @override_id asc_atomic_add__PGu64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value added to the addressed element. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_add(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores old_value minus val into the int32_t element at the Global Memory address and returns the pre-update old value; the operation is atomic.
+ * @brief Atomically subtracts val from the 32-bit signed integer (int32_t) element at the Global Memory address and returns its previous value.
  *
  * @override_id asc_atomic_sub__PGi32_i32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value subtracted from the addressed element. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_sub(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores old_value minus val into the uint32_t element at the Global Memory address and returns the pre-update old value; the operation is atomic.
+ * @brief Atomically subtracts val from the 32-bit unsigned integer (uint32_t) element at the Global Memory address and returns its previous value.
  *
  * @override_id asc_atomic_sub__PGu32_u32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value subtracted from the addressed element. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_sub(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores old_value minus val into the float element at the Global Memory address and returns the pre-update old value; the operation is atomic.
+ * @brief Atomically subtracts val from the float (fp32) element at the Global Memory address and returns its previous value.
  *
  * @override_id asc_atomic_sub__PGf32_f32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value subtracted from the addressed element. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_sub(__gm__ float* address, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores old_value minus val into the int64_t element at the Global Memory address and returns the pre-update old value; the operation is atomic.
+ * @brief Atomically subtracts val from the 64-bit signed integer (int64_t) element at the Global Memory address and returns its previous value.
  *
  * @override_id asc_atomic_sub__PGi64_i64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value subtracted from the addressed element. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_sub(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores old_value minus val into the uint64_t element at the Global Memory address and returns the pre-update old value; the operation is atomic.
+ * @brief Atomically subtracts val from the 64-bit unsigned integer (uint64_t) element at the Global Memory address and returns its previous value.
  *
  * @override_id asc_atomic_sub__PGu64_u64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value subtracted from the addressed element. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_sub(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically replaces the int32_t element at the Global Memory address with val and returns the pre-update old value; the read and write-back are atomic.
+ * @brief Atomically stores val into the 32-bit signed integer (int32_t) element at the Global Memory address and returns the previous value.
  *
  * @override_id asc_atomic_exch__PGi32_i32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value stored into the addressed element, replacing its old value. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_exch(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically replaces the uint32_t element at the Global Memory address with val and returns the pre-update old value; the read and write-back are atomic.
+ * @brief Atomically stores val into the 32-bit unsigned integer (uint32_t) element at the Global Memory address and returns the previous value.
  *
  * @override_id asc_atomic_exch__PGu32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value stored into the addressed element, replacing its old value. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_exch(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically replaces the float element at the Global Memory address with val and returns the pre-update old value; the read and write-back are atomic.
+ * @brief Atomically stores val into the float (fp32) element at the Global Memory address and returns the previous value.
  *
  * @override_id asc_atomic_exch__PGf32_f32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value stored into the addressed element, replacing its old value. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_exch(__gm__ float* address, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically replaces the int64_t element at the Global Memory address with val and returns the pre-update old value; the read and write-back are atomic.
+ * @brief Atomically stores val into the 64-bit signed integer (int64_t) element at the Global Memory address and returns the previous value.
  *
  * @override_id asc_atomic_exch__PGi64_i64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value stored into the addressed element, replacing its old value. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_exch(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically replaces the uint64_t element at the Global Memory address with val and returns the pre-update old value; the read and write-back are atomic.
+ * @brief Atomically stores val into the 64-bit unsigned integer (uint64_t) element at the Global Memory address and returns the previous value.
  *
  * @override_id asc_atomic_exch__PGu64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value stored into the addressed element, replacing its old value. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_exch(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores max(old_value, val) into the int32_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the larger of val and the 32-bit signed integer (int32_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_max__PGi32_i32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the larger of the two is written back. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_max(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores max(old_value, val) into the uint32_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the larger of val and the 32-bit unsigned integer (uint32_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_max__PGu32_u32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the larger of the two is written back. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_max(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores max(old_value, val) into the float element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the larger of val and the float (fp32) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_max__PGf32_f32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the larger of the two is written back. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_max(__gm__ float* address, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores max(old_value, val) into the int64_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the larger of val and the 64-bit signed integer (int64_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_max__PGi64_i64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the larger of the two is written back. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_max(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores max(old_value, val) into the uint64_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the larger of val and the 64-bit unsigned integer (uint64_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_max__PGu64_u64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the larger of the two is written back. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_max(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores min(old_value, val) into the int32_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the smaller of val and the 32-bit signed integer (int32_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_min__PGi32_i32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the smaller of the two is written back. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_min(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores min(old_value, val) into the uint32_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the smaller of val and the 32-bit unsigned integer (uint32_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_min__PGu32_u32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the smaller of the two is written back. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_min(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores min(old_value, val) into the float element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the smaller of val and the float (fp32) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_min__PGf32_f32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the smaller of the two is written back. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_min(__gm__ float* address, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores min(old_value, val) into the int64_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the smaller of val and the 64-bit signed integer (int64_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_min__PGi64_i64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the smaller of the two is written back. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_min(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically stores min(old_value, val) into the uint64_t element at the Global Memory address and returns the pre-update old value read from that address.
+ * @brief Atomically writes the smaller of val and the 64-bit unsigned integer (uint64_t) element at the Global Memory address back into that element and returns the old value.
  *
  * @override_id asc_atomic_min__PGu64_u64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Value compared with the addressed element; the smaller of the two is written back. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_min(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically compares the int32_t element at the Global Memory address with compare and stores val only when equal, returning the pre-update old value.
+ * @brief Atomically writes val into the 32-bit signed integer (int32_t) element at the Global Memory address only when its old value equals compare, and returns the old value.
  *
  * @override_id asc_atomic_cas__PGi32_i32_i32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] compare 源操作数，做比较的值。
- * @param [in] val 源操作数，用于赋值的值。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] compare Value the addressed element must equal for the new value to be stored; typed 32-bit signed integer (int32_t) like the addressed element.
+ * @param [in] val Value written into the addressed element when the comparison succeeds. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address, int32_t compare, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically compares the uint32_t element at the Global Memory address with compare and stores val only when equal, returning the pre-update old value.
+ * @brief Atomically writes val into the 32-bit unsigned integer (uint32_t) element at the Global Memory address only when its old value equals compare, and returns the old value.
  *
  * @override_id asc_atomic_cas__PGu32_u32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] compare 源操作数，做比较的值。
- * @param [in] val 源操作数，用于赋值的值。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] compare Value the addressed element must equal for the new value to be stored; typed 32-bit unsigned integer (uint32_t) like the addressed element.
+ * @param [in] val Value written into the addressed element when the comparison succeeds. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_cas(__gm__ uint32_t* address, uint32_t compare, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically compares the float element at the Global Memory address with compare and stores val only when equal, returning the pre-update old value.
+ * @brief Atomically writes val into the float (fp32) element at the Global Memory address only when its old value equals compare, and returns the old value.
  *
  * @override_id asc_atomic_cas__PGf32_f32_f32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] compare 源操作数，做比较的值。
- * @param [in] val 源操作数，用于赋值的值。
+ * @param [in,out] address Address of the single float (fp32) element in Global Memory that is read and updated atomically.
+ * @param [in] compare Value the addressed element must equal for the new value to be stored; typed float (fp32) like the addressed element.
+ * @param [in] val Value written into the addressed element when the comparison succeeds. Typed float (fp32), matching the addressed element.
  */
 __aicore__ inline float asc_atomic_cas(__gm__ float* address, float compare, float val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically compares the int64_t element at the Global Memory address with compare and stores val only when equal, returning the pre-update old value.
+ * @brief Atomically writes val into the 64-bit signed integer (int64_t) element at the Global Memory address only when its old value equals compare, and returns the old value.
  *
  * @override_id asc_atomic_cas__PGi64_i64_i64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] compare 源操作数，做比较的值。
- * @param [in] val 源操作数，用于赋值的值。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] compare Value the addressed element must equal for the new value to be stored; typed 64-bit signed integer (int64_t) like the addressed element.
+ * @param [in] val Value written into the addressed element when the comparison succeeds. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_cas(__gm__ int64_t* address, int64_t compare, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically compares the uint64_t element at the Global Memory address with compare and stores val only when equal, returning the pre-update old value.
+ * @brief Atomically writes val into the 64-bit unsigned integer (uint64_t) element at the Global Memory address only when its old value equals compare, and returns the old value.
  *
  * @override_id asc_atomic_cas__PGu64_u64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] compare 源操作数，做比较的值。
- * @param [in] val 源操作数，用于赋值的值。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] compare Value the addressed element must equal for the new value to be stored; typed 64-bit unsigned integer (uint64_t) like the addressed element.
+ * @param [in] val Value written into the addressed element when the comparison succeeds. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_cas(__gm__ uint64_t* address, uint64_t compare, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ANDs the int32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit signed integer (int32_t) element at the Global Memory address with the bitwise AND of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_and__PGi32_i32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise AND operand combined with the addressed element. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_and(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ANDs the uint32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit unsigned integer (uint32_t) element at the Global Memory address with the bitwise AND of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_and__PGu32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise AND operand combined with the addressed element. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_and(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ANDs the int64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit signed integer (int64_t) element at the Global Memory address with the bitwise AND of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_and__PGi64_i64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise AND operand combined with the addressed element. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_and(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ANDs the uint64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit unsigned integer (uint64_t) element at the Global Memory address with the bitwise AND of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_and__PGu64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise AND operand combined with the addressed element. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_and(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ORs the int32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit signed integer (int32_t) element at the Global Memory address with the bitwise OR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_or__PGi32_i32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise OR operand combined with the addressed element. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_or(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ORs the uint32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit unsigned integer (uint32_t) element at the Global Memory address with the bitwise OR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_or__PGu32_u32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise OR operand combined with the addressed element. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_or(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ORs the int64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit signed integer (int64_t) element at the Global Memory address with the bitwise OR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_or__PGi64_i64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise OR operand combined with the addressed element. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_or(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically ORs the uint64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit unsigned integer (uint64_t) element at the Global Memory address with the bitwise OR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_or__PGu64_u64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise OR operand combined with the addressed element. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_or(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically XORs the int32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit signed integer (int32_t) element at the Global Memory address with the bitwise XOR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_xor__PGi32_i32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit signed integer (int32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise XOR operand combined with the addressed element. Typed 32-bit signed integer (int32_t), matching the addressed element.
  */
 __aicore__ inline int32_t asc_atomic_xor(__gm__ int32_t* address, int32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically XORs the uint32_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 32-bit unsigned integer (uint32_t) element at the Global Memory address with the bitwise XOR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_xor__PGu32_u32
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 32-bit unsigned integer (uint32_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise XOR operand combined with the addressed element. Typed 32-bit unsigned integer (uint32_t), matching the addressed element.
  */
 __aicore__ inline uint32_t asc_atomic_xor(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically XORs the int64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit signed integer (int64_t) element at the Global Memory address with the bitwise XOR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_xor__PGi64_i64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit signed integer (int64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise XOR operand combined with the addressed element. Typed 64-bit signed integer (int64_t), matching the addressed element.
  */
 __aicore__ inline int64_t asc_atomic_xor(__gm__ int64_t* address, int64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically XORs the uint64_t element at the Global Memory address with val, writes the result back to that address, and returns the pre-update old value.
+ * @brief Atomically replaces the 64-bit unsigned integer (uint64_t) element at the Global Memory address with the bitwise XOR of its old value and val and returns the old value.
  *
  * @override_id asc_atomic_xor__PGu64_u64
  * @archs 3510
- * @param [in,out] address Global Memory的地址。
- * @param [in] val 标量值，数据类型与`address`指向元素类型一致。
+ * @param [in,out] address Address of the single 64-bit unsigned integer (uint64_t) element in Global Memory that is read and updated atomically.
+ * @param [in] val Bitwise XOR operand combined with the addressed element. Typed 64-bit unsigned integer (uint64_t), matching the addressed element.
  */
 __aicore__ inline uint64_t asc_atomic_xor(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically increments the uint32_t element at the Global Memory address (0 if old_value is at least val, otherwise old_value+1) and returns the old value.
+ * @brief Atomically increments the uint32_t element at address in Global Memory and returns its previous value (new_value = (old_value >= val) ? 0 : (old_value + 1)).
  *
  * @override_id asc_atomic_inc__PGu32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the uint32_t element in Global Memory that is read, updated and written back atomically.
+ * @param [in] val uint32_t scalar used by the update rule; the value written back depends on the comparison with the old element.
  */
 __aicore__ inline uint32_t asc_atomic_inc(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically increments the uint64_t element at the Global Memory address (0 if old_value is at least val, otherwise old_value+1) and returns the old value.
+ * @brief Atomically increments the uint64_t element at address in Global Memory and returns its previous value (new_value = (old_value >= val) ? 0 : (old_value + 1)).
  *
  * @override_id asc_atomic_inc__PGu64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the uint64_t element in Global Memory that is read, updated and written back atomically.
+ * @param [in] val uint64_t scalar used by the update rule; the value written back depends on the comparison with the old element.
  */
 __aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t* address, uint64_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically decrements the uint32_t element at the Global Memory address (val if old_value is 0 or greater than val, otherwise old_value-1) and returns the old value.
+ * @brief Atomically decrements the uint32_t element at address in Global Memory and returns its previous value (new_value = (old_value == 0 or old_value > val) ? val : (old_value - 1)).
  *
  * @override_id asc_atomic_dec__PGu32_u32
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the uint32_t element in Global Memory that is read, updated and written back atomically.
+ * @param [in] val uint32_t scalar used by the update rule; the value written back depends on the comparison with the old element.
  */
 __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val);
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Atomically decrements the uint64_t element at the Global Memory address (val if old_value is 0 or greater than val, otherwise old_value-1) and returns the old value.
+ * @brief Atomically decrements the uint64_t element at address in Global Memory and returns its previous value (new_value = (old_value == 0 or old_value > val) ? val : (old_value - 1)).
  *
  * @override_id asc_atomic_dec__PGu64_u64
  * @archs 3510
- * @param [in] address Global Memory的地址。
- * @param [in] val 源操作数。
+ * @param [in,out] address Address of the uint64_t element in Global Memory that is read, updated and written back atomically.
+ * @param [in] val uint64_t scalar used by the update rule; the value written back depends on the comparison with the old element.
  */
 __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val);
 } // namespace __asc_aicore
 
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Sets the atomic-operation enable bits (type, selecting the data type) and atomic operation type (op, 0 = sum) for later stores.
+ * @brief Sets the atomic-operation enable bit and the atomic-operation type for subsequent store atomics on A2/A3 generation products.
  *
  * @override_id asc_set_store_atomic_config_v1__u16_u16
  * @archs 2201
- * @param [in] type 原子操作启用位。 0：无原子操作。 1：开启原子操作，进行原子操作的数据类型为float。 2：开启原子操作，进行原子操作的数据类型为half。 3：开启原子操作，进行原子操作的数据类型为int16_t。 4：开启原子操作，进行原子操作的数据类型为int32_t。 5：开启原子操作，进行原子操作的数据类型为int8_t。 6：开启原子操作，进行原子操作的数据类型为bfloat16_t。
- * @param [in] op 原子操作类型。 0：求和操作。
+ * @param [in] type Atomic-operation enable and data type: 0 none, 1 float, 2 half, 3 int16_t, 4 int32_t, 5 int8_t, 6 bfloat16_t.
+ * @param [in] op Atomic-operation kind; 0 selects the sum operation.
  */
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
 
 /**
  * @ingroup simd_c_api.atomic.scalar_atomic
- * @brief Reads the atomic-operation enable bits and atomic operation type into the output reference config for verification (void return).
+ * @brief Reads back the currently configured atomic-operation enable bits and atomic-operation type into an asc_store_atomic_config value.
  *
  * @override_id asc_get_store_atomic_config__Ratomiccfg
  * @archs 2201 3510
- * @param [out] config 用于获取原子操作启用位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../../defs/union/asc_store_atomic_config.md)。
+ * @param [out] config Reference receiving the current atomic type/op configuration; its config field packs a 3-bit atomic_type and a 2-bit atomic_op.
  */
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
 ASC_DEPRECATED(9.1.0, "2027/09/07", asc_atomic_add)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: sets the atomic-operation enable bits and type; op 2 selects sum, but atomic add should use asc_atomic_add instead.
+ * @brief Deprecated setter of the atomic-operation enable bits and atomic operation type.
  *
  * @override_id asc_set_store_atomic_config_v2__u16_u16
  * @archs 3510
- * @param [in] type 原子操作启用位。 1：开启原子操作，进行原子操作的数据类型为int32_t。 4：开启原子操作，进行原子操作的数据类型为half。 5：开启原子操作，进行原子操作的数据类型为float。 7：开启原子操作，进行原子操作的数据类型为bfloat16_t。 9：开启原子操作，进行原子操作的数据类型为int16_t。 10：开启原子操作，进行原子操作的数据类型为int8_t。 其余值无具体含义。
- * @param [in] op 原子操作类型。 2：求和操作。 其余值无具体含义。
+ * @param [in] type Atomic operation enable selector, where 1 enables int32_t, 4 half, 5 float, 7 bfloat16_t, 9 int16_t and 10 int8_t atomic operations; all other values have no defined meaning.
+ * @param [in] op Atomic operation type, where 2 selects the summation operation; all other values have no defined meaning.
  */
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 
