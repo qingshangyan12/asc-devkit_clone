@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 同步控制
 
 - **[系统同步能力概述](system_sync_overview.md)**
