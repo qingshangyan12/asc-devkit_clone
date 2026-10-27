@@ -1,19 +1,25 @@
 ---
 okftype: reference.api
-description: "设置Mmad计算关闭HF32模式，关闭后L0A Buffer与L0B Buffer中的float数据参与计算前不做舍入处理，需在矩阵乘加指令执行前调用。"
+description: "关闭Mmad计算的HF32模式，使L0A Buffer与L0B Buffer中的float数据在参与矩阵乘加前不做舍入处理，恢复FP32直算；须在asc_mmad执行前调用，与asc_enable_hf32互斥，仅AIC生效。"
 tag:
   - roles: [configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
-    kind: configures
-    condition: "执行矩阵乘加计算前"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hf32.md
     kind: related
-    condition: "与asc_enable_hf32不同时生效"
+    condition: "作用相反，二者不同时生效，开启HF32需改用对方接口"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
     kind: related
-    condition: "了解HF32格式、舍入模式及对计算精度的影响时"
+    condition: "HF32格式、舍入模式与精度影响说明"
 version: ">=9.2.0"
+version_changes:
+  - since: "9.2.0"
+    kind: renamed
+    scope: "page"
+    scope_basis: kind_default
+    note: "以 asc_disable_hf32 取代 9.2.0 废弃的 asc_set_fp32_mode：两者实现同为清除控制寄存器第46位（HF32_MODE_BIT），签名均为无参无返回，语义不变；依据为 impl 对比与 ASC_DEPRECATED(9.2.0, ..., asc_disable_hf32)。"
 ---
 # asc_disable_hf32
 

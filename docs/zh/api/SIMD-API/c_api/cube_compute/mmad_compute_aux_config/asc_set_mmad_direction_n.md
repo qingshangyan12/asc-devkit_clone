@@ -1,31 +1,37 @@
 ---
 okftype: reference.api
-description: "设置矩阵乘加计算时逐行生成矩阵结果分形，仅改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，需在矩阵乘加指令执行前调用。"
+description: "设置Mmad计算逐行生成L0C Buffer上的结果分形，适用于Nz2ND随路格式转换或开启B8/B4量化触发Channel Merge的搬出场景；不改变计算结果与输出格式，须在asc_mmad前调用。"
 tag:
   - roles: [configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
-    kind: configures
-    condition: "需在矩阵乘加指令执行前调用"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md
-    kind: configures
-    condition: "需在矩阵乘加指令执行前调用"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_m.md
     kind: related
-    condition: "切换为逐列生成矩阵计算结果分形时"
+    condition: "切换为逐列生成需调用对方接口"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
     kind: related
-    condition: "结果分形生成方向与搬出顺序配合时"
+    condition: "计算方向与结果搬出顺序的配合说明"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
     kind: related
-    condition: "了解不同结果生成方向对应的输出布局差异时"
+    condition: "搬出布局区别参照"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
     kind: related
-    condition: "了解不同结果生成方向对应的输出布局差异时"
+    condition: "搬出布局区别参照"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
     kind: related
-    condition: "了解不同结果生成方向对应的输出布局差异时"
-version: ">=9.1.0"
+    condition: "搬出布局区别参照"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: arch_support_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.0.0 仅在 2201 分支声明与实现；9.1.0 起同签名在 include 的 3510 分支与 impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h 中出现，Ascend 950PR&950DT 自 9.1.0 起可用，逐行生成的语义未变。"
 ---
 # asc_set_mmad_direction_n
 

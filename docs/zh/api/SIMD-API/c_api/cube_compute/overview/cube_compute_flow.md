@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "梳理普通矩阵、MX矩阵、4选2稀疏矩阵与Conv2D前向四类Cube计算流程，说明每类流程中数据搬入、矩阵计算与结果搬出的接口步骤。"
+description: "梳理Cube核矩阵计算的四类流程：普通矩阵乘加从GM搬入L1、分形转换、搬入L0A与L0B、asc_mmad计算到L0C再随路搬出；并说明仅950系列支持的Mx量化矩阵流程、A2与A3上的4选2稀疏矩阵流程，以及用3D重载在线img2col的Conv2D前向流程。"
 ---
 # 普通矩阵计算流程
 

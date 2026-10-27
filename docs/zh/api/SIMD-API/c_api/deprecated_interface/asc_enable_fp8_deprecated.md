@@ -1,13 +1,22 @@
 ---
 okftype: reference.api
-description: "用于设置Mmad计算开启FP8模式并关闭HiF8模式，开启后L0A Buffer与L0B Buffer中的FP8数据在参与Mmad计算之前不转换为hifloat8_t类型数据，该接口已废弃，请使用asc_disable_hif8替代。"
+description: "已废弃的Mmad模式切换接口，调用后开启FP8模式并关闭HiF8模式，使L0A与L0B中的FP8数据在参与矩阵乘加前不再转换为hifloat8_t，替代方案为asc_disable_hif8。"
 tag:
   - roles: [configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hif8.md
     kind: replaced_by
-    condition: "接口已废弃"
-version: ">=9.1.0,<=9.2.0"
+    condition: "以语义明确的无参数接口关闭HiF8模式"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hif8.md
+    kind: constrained_by
+    condition: "两者作用相反，不同时生效"
+version: ">=9.1.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include头标注ASC_DEPRECATED(9.2.0, 2027/09/07, asc_disable_hif8)；CANN_9_2_0 Release Notes废弃表同条说明改用asc_disable_hif8；接口仍保留在3510，未移除。"
 ---
 # asc_enable_fp8（废弃）
 

@@ -1,22 +1,29 @@
 ---
 okftype: reference.api
-description: "设置Mmad计算开启HF32模式以提升FP32数据计算性能，但会带来精度损失，启用后数据在参与计算前舍入为HF32格式，需在矩阵乘加指令前调用。"
+description: "开启Mmad计算的HF32模式，L0A Buffer与L0B Buffer中的FP32数据在参与矩阵乘加前舍入为HF32，以提升FP32计算性能，结果仍以FP32输出；须在asc_mmad前调用，舍入方式由asc_set_hf32_round_mode配置。"
 tag:
   - roles: [configuration]
+  - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
-    kind: configures
-    condition: "执行矩阵乘加计算前"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hf32.md
     kind: related
-    condition: "需要关闭HF32模式时"
+    condition: "关闭HF32模式需调用对方接口"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md
-    kind: requires
-    condition: "启用HF32模式后需配置舍入模式时"
+    kind: related
+    condition: "须在本接口之后调用以配置舍入模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md
     kind: related
-    condition: "了解HF32格式、舍入模式及对计算精度的影响时"
-version: ">=9.1.0"
+    condition: "HF32格式、舍入模式与精度影响说明"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: arch_support_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.0.0 仅在 2201 分支声明与实现；9.1.0 在 include 的 __NPU_ARCH__==3510 分支与 impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h 新增同签名声明与实现，Ascend 950PR&950DT（dav-3510）自 9.1.0 起可用，接口语义与签名未变。"
 ---
 # asc_enable_hf32
 

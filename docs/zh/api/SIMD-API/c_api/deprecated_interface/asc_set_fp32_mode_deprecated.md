@@ -1,13 +1,28 @@
 ---
 okftype: reference.api
-description: "已废弃的Mmad模式配置接口，用于关闭HF32模式，使L0A与L0B Buffer中的float数据在参与Mmad计算前不做舍入处理。需在矩阵乘加指令执行前调用，替代接口为asc_disable_hf32。"
+description: "已废弃的矩阵乘加模式配置接口，用于关闭 HF32 模式使 L0A、L0B 中的 float 数据参与 Mmad 计算前不做舍入，替代方案为 asc_disable_hf32。"
 tag:
   - roles: [configuration]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    kind: constrained_by
+    condition: "需在 asc_mmad 执行前调用以生效"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hf32.md
     kind: replaced_by
-    condition: "关闭HF32模式使float数据不做舍入处理的场景改用asc_disable_hf32"
-version: ">=9.1.0,<=9.2.0"
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_enable_hf32.md
+    kind: related
+version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: arch_support_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "新增 3510（Ascend 950PR&950DT）实现：history_probe 显示 npu_arch_3510/cube_compute_impl.h 中的 asc_set_fp32_mode 自 9.1.0 起出现，CANN_9_1_0 新增特性列出该接口；9.0.0 时仅 2201（Atlas A2/A3）可用。"
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "接口废弃，改用语义明确的 asc_disable_hf32；include/c_api/cube_compute/cube_compute.h:1135 起的声明带 ASC_DEPRECATED(9.2.0, asc_disable_hf32)，CANN_9_2_0 废弃表同源。"
 ---
 # asc_set_fp32_mode（废弃）
 

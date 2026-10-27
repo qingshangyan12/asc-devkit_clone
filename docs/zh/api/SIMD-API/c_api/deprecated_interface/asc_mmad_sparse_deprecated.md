@@ -1,18 +1,24 @@
 ---
 okftype: reference.api
-description: "完成稀疏矩阵乘加操作，左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵，矩阵A在计算时稠密化，仅在AIC上生效。该接口已废弃，请使用新asc_mmad_sparse接口替代，原同步功能由asc_sync实现。"
+description: "已废弃的稀疏矩阵乘加旧原型，unit_flag 为 uint8_t，左稀疏矩阵 A 计算时稠密化、右矩阵 B 需预先稠密化，并含对应的 asc_mmad_sparse_sync 同步形式，替代方案为强类型 unit_flag_mode 原型。"
 tag:
   - roles: [compute]
-  - operations: [matrix_multiply_accumulate]
+  - operations: [matrix_multiply_accumulate, synchronization]
   - traits: [sparse_input]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_sparse.md
     kind: replaced_by
-    condition: "unit_flag为uint8_t的旧asc_mmad_sparse形态改用新asc_mmad_sparse接口"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "asc_mmad_sparse_sync的同步功能改由asc_sync实现"
-version: ">=9.0.0,<=9.2.0"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "unit_flag 为 uint8_t 的 asc_mmad_sparse 旧原型及 asc_mmad_sparse_sync 废弃，改用 unit_flag_mode 为 asc_unit_flag_mode 的当前同名接口并配合 asc_sync；include/c_api/cube_compute/cube_compute.h 与 include/c_api/composite/cube_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_mmad_sparse（废弃）
 

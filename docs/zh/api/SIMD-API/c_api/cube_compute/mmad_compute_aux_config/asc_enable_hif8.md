@@ -1,19 +1,20 @@
 ---
 okftype: reference.api
-description: "启用矩阵乘加计算的HiF8模式，启用后左右矩阵均为fp8_e4m3fn_t时数据在计算前转换为hifloat8_t类型，需在矩阵乘加指令前调用。"
+description: "开启Mmad计算的HiF8模式，当左矩阵A与右矩阵B均为fp8_e4m3fn_t时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法前转换为hifloat8_t；须在asc_mmad或asc_mmad_mx前调用，仅950PR/950DT支持。"
 tag:
   - roles: [configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
-    kind: configures
-    condition: "执行矩阵乘加计算前"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md
-    kind: configures
-    condition: "执行矩阵乘加计算前"
+    kind: constrained_by
+    condition: "须在矩阵乘加指令执行前调用"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_aux_config/asc_disable_hif8.md
     kind: related
-    condition: "需要切换为FP8模式时"
+    condition: "切换回FP8模式需调用对方接口"
 version: ">=9.1.0"
+version_changes: []
 ---
 # asc_enable_hif8
 

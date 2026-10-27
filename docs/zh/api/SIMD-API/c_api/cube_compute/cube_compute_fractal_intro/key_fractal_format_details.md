@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "详解矩阵分形格式：不同产品形态对A、B、C矩阵格式组合要求不同，并说明ND、DN、Zz、Zn、Nz、NC1HWC0等格式的定义、物理位置与转换过程。"
+description: "详述矩阵分形存储格式如何适配不同产品形态的读取路径：Atlas A2/A3 上矩阵乘按 Zz 乘 Zn 得 Nz，Ascend 950PR&950DT 上按 Nz 乘 Zn 得 Nz；并逐节给出 ND、DN、Zz、Zn、Nz 与 NC1HWC0 的定义、物理位置、转换公式、分形大小约束及 ND 转 Nz 的伪代码示例。"
 ---
 # 关键分形格式详解
 

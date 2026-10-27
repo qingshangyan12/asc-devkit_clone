@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "GEMV 特性在矩阵 A 的 M 维取值为 1 时自动启用，运算退化为 1×K 行向量与 K×N 矩阵的乘法，适用于 M 方向非对齐场景，可减少数据搬运开销。Ascend 950PR&950DT 系列可通过 asc_mmad 的 disable_gemv 参数关闭该功能。"
+description: "介绍矩阵乘加在M等于1时自动启用的GEMV特性：把1乘K行向量与K乘N矩阵的乘法退化为向量化运算，相比非对齐处理减少搬运开销；说明1乘K矩阵A需512字节地址对齐且K个数据连续、C矩阵按1乘16子向量各占1024字节而有效数据仅64字节的约束，并给出Ascend 950PR&950DT系列产品用asc_mmad的disable_gemv参数关闭该特性的方式。"
 ---
 # GEMV
 
