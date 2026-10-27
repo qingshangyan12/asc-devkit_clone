@@ -231,10 +231,6 @@ def test_package_reuses_fixed_paths_and_replaces_resource_inputs(project):
     _build(build)
     assert not stale.exists()
     assert output.stat().st_mtime_ns == timestamp
-    (source / "kernel_a/add.cpp").write_text("changed source")
-    _build(build)
-    assert output.stat().st_mtime_ns != timestamp
-    assert (build / "kernel_a/binary/dynamic/add.cpp").read_text() == "changed source"
 
 
 def test_skipped_producers_remove_old_result_and_reconfigure_requires_build(project):

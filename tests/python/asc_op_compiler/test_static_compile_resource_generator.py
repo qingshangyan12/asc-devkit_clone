@@ -343,6 +343,33 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertTrue(reference.startswith(prefix))
         return reference[len(prefix) :]
 
+    def test_include_paths_are_relative_to_installed_source(self):
+        marker = "${source_file_path}"
+        cases = (
+            ("dynamic/add.cpp", "dynamic/add.py", "../ascendc/common"),
+            ("dynamic/op_kernel/add.cpp", "dynamic/add.py", "../../ascendc/common"),
+            ("dynamic/add/nested/add.cpp", "dynamic/add.py", "../../../ascendc/common"),
+            ("src/fa/op_kernel/fa.cpp", "src/fa/FA.py", "../../common"),
+            ("src/ascendc/fa/op_kernel/fa.cpp", "src/fa/FA.py", "../../common"),
+            ("impl/ascendc/a/op_kernel/dynamic/a.cpp", "impl/dynamic/a.py", "../../../common"),
+        )
+        for source, script, common_relative in cases:
+            with self.subTest(source=source):
+                source, script = Path(self.root, source), Path(self.root, script)
+                paths = generator.ManifestSourcePaths(source)
+                common = script.parent.parent / "ascendc/common"
+                argv = [f"-I{source.parent}", "-I", str(common), f"-include{common}/header.h"]
+                expected = [
+                    f"-I{marker}",
+                    "-I",
+                    f"{marker}/{common_relative}",
+                    f"-include{marker}/{common_relative}/header.h",
+                ]
+                self.assertEqual(paths.rewrite(argv), expected)
+                self.assertFalse(paths.warned)
+        paths = generator.ManifestSourcePaths(Path(self.root, "external/add.cpp"))
+        self.assertEqual(paths.rewrite(["-I" + str(Path(self.root, "external"))]), ["-I${source_file_path}"])
+
     def test_normalize_source_include_options(self):
         replacement = "${source_file_path}"
         source_argument = self.wrapper_path
@@ -466,8 +493,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     index for index, value in enumerate(expanded_cmd) if value.startswith("${resource}/resources/src/")
                 ),
             )
-            self.assertIn("-I" + os.path.join(self.input_root, "missing_joined"), expanded_cmd)
-            self.assertIn(os.path.join(self.input_root, "missing_split"), expanded_cmd)
+            self.assertIn("-I${source_file_path}/missing_joined", expanded_cmd)
+            self.assertIn("${source_file_path}/missing_split", expanded_cmd)
             include_index = expanded_cmd.index("-include")
             self.assertEqual(expanded_cmd[include_index + 1], constant_info["file"])
 
@@ -855,8 +882,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertNotIn("${source_file_path}", bind_compile)
         self.assertNotIn(self.input_root, bind_compile)
         self.assertNotIn("-I" + self.input_root, bind_compile)
-        self.assertIn("-I" + os.path.join(self.input_root, "missing_joined"), bind_compile)
-        self.assertIn(os.path.join(self.input_root, "missing_split"), bind_compile)
+        self.assertIn("-I${source_file_path}/missing_joined", bind_compile)
+        self.assertIn("${source_file_path}/missing_split", bind_compile)
         bind_reference = next(
             value for value in sk_object["commands"][1]["cmd"] if value.startswith("${resource}/resources/src/sk_bind_")
         )
