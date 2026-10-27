@@ -4,13 +4,14 @@
 
 This sample uses the Cube-programmed `QuantMatmulHifp8` computation as context. It uses `DumpTensor` to print
 the HiFloat8 matrix A, bias, and scale from L1 Buffer, Bias Table Buffer, and Fixpipe Buffer, demonstrating
-Cube Buffer data printing on dav-3510.
+Cube Buffer data printing on dav-3510 or dav-9201
 
 ## Supported Products and CANN Software Versions
 
 | Product | CANN Software Version | HDK Version |
 |---------|-----------------------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 | >= 25.7.RC1.6 |
+| Ascend 960DT products | >= CANN 9.3.0 | >= 25.7.RC1.6 |
 
 ## Directory Structure
 
@@ -108,7 +109,10 @@ Run the following commands in the sample root directory:
 ```bash
 source ${install_path}/cann/set_env.sh
 mkdir -p build && cd build
+# Ascend950DT/Ascend950PR (dav-3510)
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
+# or Ascend960DT (dav-9201)
+# cmake -DCMAKE_ASC_ARCHITECTURES=dav-9201 .. && make -j
 python3 ../scripts/gen_data.py
 ./demo 2>&1 | tee run.log
 python3 ../scripts/verify_result.py output/output.bin output/golden.bin run.log \

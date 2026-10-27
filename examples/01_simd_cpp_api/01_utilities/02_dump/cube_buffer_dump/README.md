@@ -3,13 +3,14 @@
 ## 概述
 
 本样例以Cube编程模式的`QuantMatmulHifp8`计算为背景，通过`DumpTensor`打印HiFloat8矩阵A、Bias和
-scale在L1 Buffer、Bias Table Buffer和Fixpipe Buffer中的数据，展示dav-3510 Cube Buffer的数据打印方法。
+scale在L1 Buffer、Bias Table Buffer和Fixpipe Buffer中的数据，展示 dav-3510 或 dav-9201 Cube Buffer的数据打印方法。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 | HDK版本 |
 |------|-------------|---------|
 | Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 | >= 25.7.RC1.6 |
+| Ascend 960DT系列产品 | >= CANN 9.3.0 | >= 25.7.RC1.6 |
 
 ## 目录结构介绍
 
@@ -105,7 +106,10 @@ fixpipe_value = l1_value & 0x00007fe0ffffe0ff
 ```bash
 source ${install_path}/cann/set_env.sh
 mkdir -p build && cd build
+# Ascend950DT/Ascend950PR (dav-3510)
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
+# or Ascend960DT (dav-9201)
+# cmake -DCMAKE_ASC_ARCHITECTURES=dav-9201 .. && make -j
 python3 ../scripts/gen_data.py
 ./demo 2>&1 | tee run.log
 python3 ../scripts/verify_result.py output/output.bin output/golden.bin run.log \
