@@ -573,7 +573,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hdivx2(const bfloat16x2_t x
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __habsx2(const bfloat16x2_t x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hfmax2(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hfmax2(
+    const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hnegx2(const bfloat16x2_t x);
 
@@ -591,7 +592,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hmax_nan(const bfloat16_t x, 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hmin_nan(const bfloat16_t x, const bfloat16_t y);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hfma_relu(const bfloat16_t x, const bfloat16_t y, const bfloat16_t z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __hfma_relu(
+    const bfloat16_t x, const bfloat16_t y, const bfloat16_t z);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hmaxx2(const bfloat16x2_t x, const bfloat16x2_t y);
 
@@ -601,10 +603,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hmaxx2_nan(const bfloat16x2
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hminx2_nan(const bfloat16x2_t x, const bfloat16x2_t y);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t
-__hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hfmax2_relu(
+    const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __hcmadd(
+    const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16x2_t z);
 
 #include "impl/simt_api/asc_bf16_impl.h"
 

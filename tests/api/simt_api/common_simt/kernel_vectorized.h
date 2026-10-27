@@ -111,32 +111,49 @@ using float8_e4m3x2_t = Vectorized::VectorizedType2<fp8_e4m3fn_t>;
 using float8_e5m2x2_t = Vectorized::VectorizedType2<fp8_e5m2_t>;
 using float8_e6m2x2_t = Vectorized::VectorizedType2<fp8_e6m2_t>;
 
-template<typename T>
-Vectorized::VectorizedType2<T> operator+(const Vectorized::VectorizedType2<T> &lhs, const Vectorized::VectorizedType2<T> &rhs) {
+template <typename T>
+Vectorized::VectorizedType2<T> operator+(
+    const Vectorized::VectorizedType2<T>& lhs, const Vectorized::VectorizedType2<T>& rhs)
+{
     Vectorized::VectorizedType2<T> output = {};
     output.x = lhs.x + rhs.x;
     output.y = lhs.y + rhs.y;
     return output;
 }
 
-template<typename T>
-Vectorized::VectorizedType2<T> operator-(const Vectorized::VectorizedType2<T> &lhs, const Vectorized::VectorizedType2<T> &rhs) {
+template <typename T>
+Vectorized::VectorizedType2<T> operator-(
+    const Vectorized::VectorizedType2<T>& lhs, const Vectorized::VectorizedType2<T>& rhs)
+{
     Vectorized::VectorizedType2<T> output = {};
     output.x = lhs.x - rhs.x;
     output.y = lhs.y - rhs.y;
     return output;
 }
 
-template<typename T>
-Vectorized::VectorizedType2<T> operator*(const Vectorized::VectorizedType2<T> &lhs, const Vectorized::VectorizedType2<T> &rhs) {
+template <typename T>
+Vectorized::VectorizedType2<T> operator-(const Vectorized::VectorizedType2<T>& rhs)
+{
+    Vectorized::VectorizedType2<T> output = {};
+    output.x = T{0} - rhs.x;
+    output.y = T{0} - rhs.y;
+    return output;
+}
+
+template <typename T>
+Vectorized::VectorizedType2<T> operator*(
+    const Vectorized::VectorizedType2<T>& lhs, const Vectorized::VectorizedType2<T>& rhs)
+{
     Vectorized::VectorizedType2<T> output = {};
     output.x = lhs.x * rhs.x;
     output.y = lhs.y * rhs.y;
     return output;
 }
 
-template<typename T>
-Vectorized::VectorizedType2<T> operator/(const Vectorized::VectorizedType2<T> &lhs, const Vectorized::VectorizedType2<T> &rhs) {
+template <typename T>
+Vectorized::VectorizedType2<T> operator/(
+    const Vectorized::VectorizedType2<T>& lhs, const Vectorized::VectorizedType2<T>& rhs)
+{
     Vectorized::VectorizedType2<T> output = {};
     output.x = lhs.x / rhs.x;
     output.y = lhs.y / rhs.y;
