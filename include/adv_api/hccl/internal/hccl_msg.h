@@ -224,8 +224,6 @@ struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
 };
-// Named reservation: res[0..2] are used by CCU. Keep the ABI layout unchanged.
-constexpr uint32_t MC2_DEBUG_MODE_RES_INDEX = 3U;
 struct OpResCtx {
     uint64_t version;
     uint64_t workspace;

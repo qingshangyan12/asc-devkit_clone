@@ -1,6 +1,6 @@
 # A5 Server 三段 mean 计时
 
-通过 Mc2CcTilingConfig::SetDebugMode(4) 开启，默认关闭。GetTiling 将 debugMode 写入 init tiling；Host 在 HcclAllocOpResCtx 中写入 OpResCtx.res[MC2_DEBUG_MODE_RES_INDEX]（索引3），保留结构布局及 version 语义。res[0..2] 保持原有 CCU 用途。无 tiling 的资源入口保持0，不开启测量。
+通过 Mc2CcTilingConfig::SetDebugMode(4) 开启，默认关闭。GetTiling 将 debugMode 写入 init tiling；Host 在 HcclAllocOpResCtx 中写入 OpResCtx.res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX]（索引3），保留结构布局及 version 语义。res[0..2] 保持原有 CCU 用途。无 tiling 的资源入口保持0，不开启测量。
 
 当前支持单context、每kernel一次通信的统计。多context入口不启用；多消息、重复展开、计时异常或通信错误通过批次status标记为无效。开关关闭时各打点入口不读取时间戳。
 
