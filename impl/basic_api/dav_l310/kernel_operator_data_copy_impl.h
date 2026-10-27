@@ -553,11 +553,61 @@ __aicore__ inline void VecCopyLevel0Template(
             AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
         }
     } else {
-        if constexpr (isMaskBitMode && isSetMask) {
-            SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
+        if constexpr (isMaskBitMode) {
+            if constexpr (isSetMask) {
+                if constexpr (GetVecLen() == 128) {
+                    constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
+                    for(uint8_t r = 0; r < repeatTime; r++){
+                         __ubuf__ T* rSrc = src + r * repeatParams.srcStride * blockElm;
+                         __ubuf__ T* rDst = dst + r * repeatParams.dstStride * blockElm;
+                    SetVectorMask<T>(0, maskArray[0]);
+                    VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                       rSrc, rDst, maskArrayStruct, maskCount, 1, repeatParams, maskBuf);
+                    if constexpr (sizeof(T) == 2) {
+                        SetVectorMask<T>(0, maskArray[1]);
+                    } else {
+                        SetVectorMask<T>(0, maskArray[0] >> 32);
+                    }
+                    VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                        dst + 4 * repeatParams.dstStride * blockElm, src + 4 * repeatParams.srcStride * blockElm,
+                        maskArrayStruct, maskCount, 1, repeatParams, maskBuf);
+                    }
+                } else {
+                    SetVectorMask<T>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
+                    VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                        dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+                }
+            } else {
+            VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+            }
+        } else {
+            if constexpr (isSetMask) {
+                if constexpr (GetVecLen() == 128) {
+                    constexpr uint32_t maxLanePerPass = GetVecLen() / sizeof(T);
+                    constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
+                    uint32_t countA = (maskCount < maxLanePerPass) ? maskCount : maxLanePerPass;
+                    uint32_t countB = (maskCount < maxLanePerPass) ? (maskCount - maxLanePerPass) : 0;
+                    for(uint8_t r = 0; r < repeatTime; r++){
+                         __ubuf__ T* rSrc = src + r * repeatParams.srcStride * blockElm;
+                         __ubuf__ T* rDst = dst + r * repeatParams.dstStride * blockElm;
+                        VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                        rSrc, rDst, maskArrayStruct, maskCount, 1, repeatParams, maskBuf);
+                        if(countB > 0){
+                            VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                                dst + 4 * repeatParams.dstStride * blockElm, src + 4 * repeatParams.srcStride * blockElm,
+                                maskArrayStruct, maskCount, 1, repeatParams, maskBuf);
+                        }
+                    }
+                } else {
+                    VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                        dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+                }
+            } else {
+                VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
+                    dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+            }
         }
-        VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
-            dst, src, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
     }
 }
 
