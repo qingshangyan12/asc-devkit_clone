@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 逻辑计算
 
 - **[asc_and](asc_and.md)**
