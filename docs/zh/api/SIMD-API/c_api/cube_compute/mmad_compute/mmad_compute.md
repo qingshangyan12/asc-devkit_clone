@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # Mmad计算
 
 - **[asc_mmad](asc_mmad.md)**

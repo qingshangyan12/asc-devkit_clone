@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 矩阵计算关键特性说明
 
 - **[GEMV](GEMV.md)**

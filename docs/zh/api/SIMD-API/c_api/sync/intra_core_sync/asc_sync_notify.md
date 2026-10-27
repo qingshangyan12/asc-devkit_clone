@@ -1,17 +1,3 @@
----
-okftype: reference.api
-description: "与asc_sync_wait配对，在源流水前序读写完成后置位硬件标志位以通知目标流水，自身不阻塞源流水。"
-tag:
-  - roles: [control]
-  - operations: [synchronization]
-  - traits: [inter_core_synchronization]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: requires
-    condition: "必须与 asc_sync_wait 成对使用"
-version: ">=8.5.0"
-version_changes: []
----
 # asc_sync_notify
 
 ## 产品支持情况

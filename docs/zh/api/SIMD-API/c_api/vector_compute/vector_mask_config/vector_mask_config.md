@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 掩码操作
 
 - **[asc_set_mask_count](asc_set_mask_count.md)**

@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # Reg数据搬入
 
 - **[Reg数据搬入概述](reg_load_overview.md)**
