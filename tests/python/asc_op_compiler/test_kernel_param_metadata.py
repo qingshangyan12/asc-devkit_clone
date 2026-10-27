@@ -10,6 +10,8 @@
 
 from contextlib import ExitStack
 import importlib
+import re
+import struct
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -17,7 +19,7 @@ import unittest
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools/build"))
-from asc_op_compile_base.asc_op_compiler import kernel_param_metadata as metadata
+from asc_op_compile_base.asc_op_compiler import ascendc_compile_dfx as metadata
 from asc_op_compile_base.asc_op_compiler import ascendc_compile_v220 as v220
 from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
     CommonUtility,
@@ -33,14 +35,29 @@ from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storag
 compile_op = importlib.import_module("asc_op_compile_base.asc_op_compiler.compile_op")
 
 
+def decode_declaration(source):
+    # Read the emitted initializer, independently of the encoder's internal helper.
+    initializer = source.split("= {", 1)[1].split("};", 1)[0]
+    return bytes(int(value, 16) for value in re.findall(r"0x[0-9a-f]{2}", initializer))
+
+
 class TestKernelParamMetadata(unittest.TestCase):
     def test_pointer_layout_is_emitted_without_a_second_compile_switch(self):
         info = CompileInfo()
         metadata.prepare_kernel_param_metadata(info, ("GM_ADDR x", "GM_ADDR tiling"))
         source = metadata.generate_param_metadata("add", info.kernel_param_metadata)
         self.assertIn(".ascend.meta.add", source)
-        self.assertIn("{16, 12}, 2, 16", source)
-        self.assertIn("{17, 36}, 0, 1, 8, 8, 8, 2, 0, 0, 0, 0", source)
+        encoded = decode_declaration(source)
+        # Protocol bytes also observed in the native <<<>>> two-pointer ELF.
+        expected = bytes.fromhex(
+            "10000c00 02000000 1000000000000000 "
+            "11002400 00000000 00000000 00000000 08000000 08000200 00000000 00000000 00000000 00000000 "
+            "11002400 00000000 01000000 08000000 08000000 08000200 00000000 00000000 00000000 00000000"
+        )
+        self.assertEqual(encoded, expected)
+        self.assertIn("static const unsigned char", source)
+        self.assertIn("aligned(4)", source)
+        self.assertNotIn("struct AscendCParam", source)
         self.assertNotIn("#ifdef ASCENDC_EMIT", source)
         self.assertNotIn("static_assert", source)
 
@@ -48,9 +65,21 @@ class TestKernelParamMetadata(unittest.TestCase):
         info = CompileInfo()
         metadata.prepare_kernel_param_metadata(info, ())
         source = metadata.generate_param_metadata("empty", info.kernel_param_metadata)
-        self.assertIn("{16, 12}, 0, 0", source)
+        self.assertEqual(decode_declaration(source), bytes.fromhex("10000c00 00000000 0000000000000000"))
         self.assertNotIn("parameters[0]", source)
-        self.assertNotIn("{17, 36}", source)
+
+    def test_compilation_descriptions_are_independent_and_large_offsets_are_not_truncated(self):
+        first, second = CompileInfo(), CompileInfo()
+        metadata.prepare_kernel_param_metadata(first, tuple(f"GM_ADDR p{i}" for i in range(64)))
+        metadata.prepare_kernel_param_metadata(second, ("GM_ADDR x",))
+        first_bytes = decode_declaration(metadata.generate_param_metadata("first", first.kernel_param_metadata))
+        second_bytes = decode_declaration(metadata.generate_param_metadata("second", second.kernel_param_metadata))
+        self.assertEqual(len(first_bytes), 16 + 64 * 40)
+        self.assertEqual(struct.unpack_from("<IQ", first_bytes, 4), (64, 512))
+        self.assertEqual(
+            struct.unpack_from("<IIIIHHIIII", first_bytes, 16 + 63 * 40 + 4), (0, 63, 504, 8, 8, 2, 0, 0, 0, 0)
+        )
+        self.assertEqual(struct.unpack_from("<IQ", second_bytes, 4), (1, 8))
 
     def test_unsupported_description_leaves_original_source_usable(self):
         for entry, parameters in (('bad"entry', ()), ("add", ("int value",)), ("add", None)):

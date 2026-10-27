@@ -46,9 +46,8 @@ from .ascendc_compile_base import (
     get_compile_core_types,
     add_op_system_run_cfg_option,
 )
-from .ascendc_compile_dfx import DFXSectionGenerator
+from .ascendc_compile_dfx import DFXSectionGenerator, generate_param_metadata, log_param_metadata_failure
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
-from .kernel_param_metadata import generate_param_metadata, log_param_metadata_failure
 
 
 def _gen_compile_cmd_920r1(

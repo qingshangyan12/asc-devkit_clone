@@ -14,6 +14,10 @@ ascendc compile dfx
 """
 
 import enum
+import logging
+import re
+import struct
+from typing import NamedTuple
 from functools import reduce
 from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type
 from .get_op_tiling import OpInfo, TilingInfo
@@ -79,7 +83,88 @@ class FuncMetaType(enum.Enum):
     F_TYPE_L0_EXCEPTION_DFX = 4  # DFX tlv for header
     F_TYPE_L0_EXCEPTION_DFX_ARGSINFO = 5  # DFX tlv for args info
     F_TYPE_L0_EXCEPTION_DFX_IS_TIK = 6  # DFX tlv mark for TIK
+    F_TYPE_PARAM_SUMMARY = 16  # Runtime parameter summary
+    F_TYPE_PARAM_INFO = 17  # Runtime parameter layout
     F_TYPE_MAX = -1
+
+
+class KernelParamMetadata(NamedTuple):
+    """Entry-independent summary and parameter records, prepared once."""
+
+    count: int
+    total_size: int
+    infos: tuple
+
+
+def log_param_metadata_failure(error):
+    """A supplement failure must not change the existing compiler failure path."""
+    try:
+        logging.getLogger(__name__).warning("Parameter metadata was not generated: %s", error)
+    except Exception:
+        pass
+
+
+def prepare_kernel_param_metadata(compile_info, parameters):
+    """Validate final GM_ADDR formals and save their immutable numeric layout."""
+    if compile_info is None:
+        return
+    compile_info.kernel_param_metadata = None
+    try:
+        if parameters is None:
+            return
+        count = len(parameters)
+        if count > 0xFFFFFFFF // 8:
+            raise ValueError("parameter block exceeds the Runtime offset range")
+        if any(not re.fullmatch(r"GM_ADDR [A-Za-z_][A-Za-z_0-9]*", parameter) for parameter in parameters):
+            raise ValueError("parameter metadata requires the ordinary GM_ADDR wrapper ABI")
+        infos = tuple((0, ordinal, ordinal * 8, 8, 8, 2, 0, 0, 0, 0) for ordinal in range(count))
+        compile_info.kernel_param_metadata = KernelParamMetadata(count, count * 8, infos)
+    except Exception as error:
+        log_param_metadata_failure(error)
+
+
+def generate_param_metadata(entry, description):
+    """Return a complete declaration, or no supplement if generation fails.
+
+    The caller supplies the numeric layout prepared from the final formals.
+    TLVs describe 8-byte pointer slots, not the pointed-to data.
+    """
+    try:
+        return _generate_param_metadata(entry, description)
+    except Exception as error:
+        log_param_metadata_failure(error)
+        return ""
+
+
+def _serialize_param_metadata(description):
+    # Payload lengths exclude the four-byte TLV header: SUMMARY=12, INFO=36.
+    # Explicit little-endian encoding avoids C++ structure padding and host byte order.
+    records = [
+        struct.pack("<HHIQ", FuncMetaType.F_TYPE_PARAM_SUMMARY.value, 12, description.count, description.total_size)
+    ]
+    records.extend(
+        struct.pack("<HHIIIIHHIIII", FuncMetaType.F_TYPE_PARAM_INFO.value, 36, *parameter)
+        for parameter in description.infos
+    )
+    return b"".join(records)
+
+
+def _generate_param_metadata(entry, description):
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", entry):
+        raise ValueError("invalid parameter metadata entry name")
+    encoded = _serialize_param_metadata(description)
+    # Keep each TLV on its own line so generated source remains easy to inspect.
+    records = [encoded[:16]] + [encoded[offset : offset + 40] for offset in range(16, len(encoded), 40)]
+    values = "\n".join("    " + ", ".join(f"0x{value:02x}" for value in record) + "," for record in records)
+    return f"""
+#ifndef ASCENDC_PARAM_METADATA_{entry}
+#define ASCENDC_PARAM_METADATA_{entry}
+static const unsigned char g_ascendc_param_metadata_{entry}[]
+    __attribute__((used, section(".ascend.meta.{entry}"), aligned(4))) = {{
+{values}
+}};
+#endif
+"""
 
 
 class DFXArgInfo:

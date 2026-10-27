@@ -57,7 +57,13 @@ from .ascendc_common_utility import (
     convert_customized_config_to_inferchannel,
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
-from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
+from .ascendc_compile_dfx import (
+    DFXParamType,
+    DFXPointType,
+    DFXArgInfo,
+    DFXSectionGenerator,
+    prepare_kernel_param_metadata,
+)
 from .ascendc_compile_v220 import (
     _get_compile_cmd_and_section_content,
     get_v220_kernel_type_mix_flag,
@@ -65,7 +71,6 @@ from .ascendc_compile_v220 import (
     get_code_channel_v220_by_first_tiling_key,
     gen_compile_cmd_for_meta_info,
 )
-from .kernel_param_metadata import prepare_kernel_param_metadata
 from .ascendc_compile_v200 import call_bisheng_v200_static, call_bisheng_v200_dynamic
 from .ascendc_compile_gen_code import (
     get_code_for_l2_cache,
