@@ -350,6 +350,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_PTR_NULL(opResCtxPtr);
     OpResCtx resCtx{};
     const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
+    resCtx.res[HcclApi::MC2_DEBUG_MODE_RES_INDEX] = initTiling->debugMode;
     const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
 
     for (uint32_t i = 0U; i < opParamVec.size(); ++i) {

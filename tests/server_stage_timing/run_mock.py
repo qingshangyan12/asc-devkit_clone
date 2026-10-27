@@ -20,20 +20,19 @@ inline std::vector<std::string>& Logs() { static std::vector<std::string> v; ret
 #include <cassert>
 int main() {
     using namespace Mc2ServerStageTiming;
-    Start();
+    Start(false); PollBegin(); Receive(0); Parsed(); Cache(false); Submitted(0); Finish(0);
     assert(Logs().empty());
-    auto& s=Get(); s.entry=100; s.poll=200; s.parsed=500; s.submitted=900;
-    s.messages=1; s.valid=15; Cache(false); Finish(0);
-    assert(Logs().size()==1);
-    assert(Logs()[0].find("init_ns=100 msg_parse_ns=300 sq_expand_ns=400 cache=0 status=0")!=std::string::npos);
-    Start(); Finish(1);
+    for (int i=0; i<30; ++i) {
+        Start(true, 1);
+        auto& s=Get(); s.entry=100; s.poll=200; s.parsed=500; s.submitted=900;
+        s.messages=1; s.valid=15; Cache(false); Finish(0);
+        assert(Logs().size()==(i==29 ? 1U : 0U));
+    }
+    assert(Logs()[0].find("count=30 init_mean_ns=100.000000 msg_parse_mean_ns=300.000000 sq_expand_mean_ns=400.000000 cache=0 status=0")!=std::string::npos);
+    for (int i=0; i<30; ++i) { Start(true, 1); Finish(1); }
     assert(Logs().size()==2 && Logs()[1].find("status=-3")!=std::string::npos);
-    Start(); Receive(0); Receive(1); s.valid=15; s.entry=100; s.poll=200; s.parsed=300; s.submitted=400; Finish(0);
-    assert(Logs().size()==3 && Logs()[2].find("status=-3")!=std::string::npos);
-    Start(); s.messages=1; s.valid=15; s.entry=400; s.poll=200; Finish(0);
-    assert(Logs().size()==4 && Logs()[3].find("status=-4")!=std::string::npos);
-    Start(); Cache(true); Cache(false); assert(Get().cache==2);
-    Start(); Parsed(); Parsed(); assert(Get().status!=0);
+    Start(true, 1); Finish(1); Start(false); assert(Totals().count==0);
+    Start(true, 1); Finish(1); Start(true, 2); assert(Totals().count==0);
 }
 ''')
     subprocess.run(['c++','-std=c++14','-O2','-Wall','-Wextra','-Werror',str(root/'test.cc'),'-o',str(root/'test')],check=True)

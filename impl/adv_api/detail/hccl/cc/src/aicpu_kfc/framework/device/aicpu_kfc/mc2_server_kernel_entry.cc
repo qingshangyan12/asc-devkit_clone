@@ -40,7 +40,13 @@ static uint32_t Mc2ServerKernelBody(void* args[])
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
-    Mc2ServerStageTiming::Start();
+    // Enable only a single-context launch; multi-context attribution is unsupported.
+    uint64_t descriptor = args ? reinterpret_cast<uint64_t>(args[0]) : 0;
+    const auto* desc = reinterpret_cast<const CommKfcParamDesc*>(&descriptor);
+    const bool single = descriptor == MC2_AICPU_SIMPLE_CTX_PROTOCOL || desc->itemNum == 1;
+    const auto* ctx = args && single ? static_cast<const OpResCtx*>(args[1]) : nullptr;
+    Mc2ServerStageTiming::Start(ctx && ctx->res[MC2_DEBUG_MODE_RES_INDEX] == 4,
+                              reinterpret_cast<uintptr_t>(ctx));
     const uint32_t status = Mc2ServerKernelBody(args);
     // Both protocol paths return from CommKfcDispatcher::Run before reporting.
     // The message loop and all three measured intervals have ended here.
