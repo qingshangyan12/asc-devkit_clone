@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 系统资源和变量
 
 - **[asc_get_arch_ver](asc_get_arch_ver.md)**

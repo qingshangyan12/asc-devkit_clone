@@ -1,30 +1,3 @@
----
-okftype: reference.api
-description: "把half矢量按src_pos标签读取偶数或奇数索引位置的元素并转换为float，结果写入目的寄存器或作为返回值，未参与计算的元素置零，仅在AIV生效且无舍入模式参数。"
-tag:
-  - roles: [compute]
-  - operations: [conversion]
-  - traits: [elementwise]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "矢量数据寄存器与掩码寄存器定义"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "需遵循Reg矢量计算C API通用约束"
-version: ">=9.0.0"
-version_changes:
-  - since: "9.2.0"
-    kind: parameter_added
-    scope: "section:函数原型"
-    scope_basis: resolved
-    note: "新增显式编译期位置标签src_pos（std::integral_constant<asc_position_mode, EVEN/ODD>），1:2位宽比下选择读取源索引偶数或奇数位置；原位置后缀原型自9.2.0起废弃，见deprecated_interface对应页。"
-  - since: "9.2.0"
-    kind: overload_added
-    scope: "section:函数原型"
-    scope_basis: resolved
-    note: "新增通过函数返回值返回结果的重载（返回vector_float），9.2.0两形式合计4条声明（EVEN与ODD两个位置×2种结果形式）。"
----
 # asc_half2float
 
 ## 产品支持情况
