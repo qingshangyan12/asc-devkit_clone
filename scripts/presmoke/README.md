@@ -4,7 +4,7 @@
 
 如需直接调试 Python CLI，可以使用 `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`。
 
-执行全量看护前，编排脚本会清理当前 CANN `opp/vendors` 目录下的所有内容，保证自定义算子包安装状态可复现。带 `--filter` 或 `--dry-run` 的运行不会清理 `opp/vendors`。
+执行全量看护前，编排脚本会清理当前 CANN `opp/vendors` 目录下的所有内容，保证自定义算子包安装状态可复现。带 `--filter`、`--exact-filter`、`--exclude` 或 `--dry-run` 的运行不会清理 `opp/vendors`。
 
 ## 快速开始
 

@@ -281,6 +281,27 @@ EOF
             self.assertTrue(stale.exists())
             self.assertIn("vendors_clean_skip reason=non_full_run", result.stdout)
 
+    def test_excluded_run_does_not_clean_cann_vendors(self) -> None:
+        for args in (["--exclude", "x"], ["--exclude=x"]):
+            with self.subTest(args=args), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                script = self.copy_orchestrate_fixture(root)
+                stale = root / "opp/vendors/stale_vendor"
+                stale.mkdir(parents=True)
+                (stale / "old.txt").write_text("old", encoding="utf-8")
+                env = self.base_env(
+                    root,
+                    PROJECT_ROOT=str(root),
+                    OUT_ROOT=str(root / "out"),
+                    ASCEND_OPP_PATH=str(root / "opp"),
+                    NPU_CARDS="0",
+                )
+                result = subprocess.run(
+                    ["bash", str(script), *args], text=True, capture_output=True, env=env, check=False
+                )
+                self.assertEqual((stale / "old.txt").read_text(encoding="utf-8"), "old")
+                self.assertIn("vendors_clean_skip reason=non_full_run", result.stdout)
+
     def test_dry_run_does_not_clean_cann_vendors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
