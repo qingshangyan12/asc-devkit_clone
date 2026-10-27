@@ -197,6 +197,31 @@ __aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
 #endif
 }
 
+// 探测扩展段位置：扩展段写在atomicIndex之后（exceptionDump未开时紧跟旧OOM区）。
+// 先检查probePtr处是否为扩展段magic；若非，跳过8B（可能为atomicIndex）再检查。
+// 都不匹配返回probePtr原址（老host布局下该处为hostInputInfo，后续header校验自然失败退legacy）
+__aicore__ static inline __gm__ uint8_t* OOMFindStorageShapeExt(__gm__ uint8_t* probePtr)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    if (probePtr[0] == Internal::g_oomStorageShapeMagic) {
+        const uint8_t version = probePtr[1] & Internal::g_oomNibbleMask;
+        if (version == Internal::g_oomStorageShapeVersion) {
+            return probePtr;
+        }
+    }
+    if (probePtr[8] == Internal::g_oomStorageShapeMagic) {
+        const uint8_t version = probePtr[9] & Internal::g_oomNibbleMask;
+        if (version == Internal::g_oomStorageShapeVersion) {
+            return probePtr + 8;
+        }
+    }
+    return probePtr;
+#else
+    (void)probePtr;
+    return nullptr;
+#endif
+}
+
 template <typename T>
 __aicore__ static inline T OOMReadPackedValue(__gm__ uint8_t* address)
 {

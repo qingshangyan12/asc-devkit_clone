@@ -35,8 +35,10 @@ from .ascendc_compile_dfx import DFXSectionGenerator
 
 
 OOM_STORAGE_SHAPE_INIT_PATTERN = (
-    "    __gm__ uint8_t *oomStorageShapeCursor = (__gm__ uint8_t *)tiling + "
+    "    __gm__ uint8_t *oomProbePtr = (__gm__ uint8_t *)tiling + "
     "tmpTilingSizeForOOM + {legacy_len_offset};\n"
+    "    // 扩展段在atomicIndex之后：先探测旧OOM区后，若非扩展段再跳过8B(atomicIndex)探测\n"
+    "    __gm__ uint8_t *oomStorageShapeCursor = AscendC::OOMFindStorageShapeExt(oomProbePtr);\n"
     "    bool hasOomStorageShape = "
     "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
     "    if (hasOomStorageShape) {{\n"
