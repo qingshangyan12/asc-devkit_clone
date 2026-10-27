@@ -51,10 +51,6 @@ __aicore__ inline T* GetUnderlyingPtr(T* val)
 }
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
-// __gm__ 重载仅在编译器将 __gm__（cce_global）视为独立地址空间类型时启用。
-// 现有 ccec（clang 15.0.5，CANN 9.1.0 / 9.2.0-beta.2）在重载决议中将其塌缩为 T*，
-// 与上方 T* 重载构成重复定义；其透传语义已由 T* 重载覆盖，行为等价。
-// 待编译器支持地址空间指针类型后，由构建系统定义 ASCENDC_ADDRESS_SPACE_TYPES=1 启用。
 #if defined(ASCENDC_ADDRESS_SPACE_TYPES)
 template <typename T>
 __aicore__ inline __gm__ T* GetUnderlyingPtr(__gm__ T* val)

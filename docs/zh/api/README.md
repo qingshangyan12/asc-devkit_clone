@@ -44,6 +44,7 @@
                 -   [GetShapeInfo](SIMD-API/basic_api/data_structures/GlobalTensor/GetShapeInfo.md)
                 -   [SetL2CacheHint](SIMD-API/basic_api/data_structures/GlobalTensor/SetL2CacheHint.md)
                 -   [ReinterpretCast](SIMD-API/basic_api/data_structures/GlobalTensor/ReinterpretCast.md)
+            -   [GetUnderlyingPtr](SIMD-API/basic_api/data_structures/GetUnderlyingPtr.md)
         -   [辅助数据结构](SIMD-API/basic_api/aux_data_structures/aux_data_structures.md)
             -   [Coordinate](SIMD-API/basic_api/aux_data_structures/Coordinate/Coordinate.md)
                 -   [Coordinate简介](SIMD-API/basic_api/aux_data_structures/Coordinate/Coordinate_intro.md)

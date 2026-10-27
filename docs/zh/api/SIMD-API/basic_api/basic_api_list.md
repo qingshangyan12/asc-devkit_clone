@@ -6,6 +6,7 @@
 | --- | --- |
 | [LocalTensor](data_structures/LocalTensor/LocalTensor.md) | LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。 |
 | [GlobalTensor](data_structures/GlobalTensor/GlobalTensor.md) | GlobalTensor用来存放Global Memory（外部存储）的全局数据。 |
+| [GetUnderlyingPtr](data_structures/GetUnderlyingPtr.md) | 从 Tensor 或硬件指针取出底层地址。指针原样返回，Tensor 返回 GetPhyAddr() 的结果。 |
 | [Coordinate](aux_data_structures/Coordinate/Coordinate.md) | Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。 |
 | [Layout](aux_data_structures/Layout/Layout.md) | Layout数据结构是描述多维张量内存布局的基础模板类，通过编译时的形状（Shape）和步长（Stride）信息，实现逻辑坐标空间到一维内存地址空间的映射。 |
 | [TensorTrait](aux_data_structures/TensorTrait/TensorTrait.md) | TensorTrait数据结构是描述Tensor相关信息的基础模板类，包含Tensor的数据类型、逻辑位置和Layout内存布局。 |
