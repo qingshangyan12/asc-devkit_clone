@@ -1498,6 +1498,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | int64_t/int32_t | MIN | 0 | -2147483648 |
 | int64_t/float | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 |
 | int64_t/float | MIN | -9223372036854775808.00（MIN） | -9223372036854775808.00（MIN） |
+| int16_t/uint8_t | MAX | 255 | 255 |
+| int16_t/uint8_t | MIN | 0 | 0 |
 
 注：float->float转换，-0会被转为+0，与IEEE754不一致。
 
