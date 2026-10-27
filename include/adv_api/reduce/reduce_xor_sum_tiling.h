@@ -25,8 +25,8 @@ namespace AscendC {
  * @param [in] srcShape: src tensor shape.
  * @param [in] typeSize: src and dst tensor dtype size.
  * @param [in] isReuseSource: whether temporary variables can reuse the input memory.
- * @param [out] maxValue: ReduceXorSum api calculate need max temporary local space size.
- * @param [out] minValue: ReduceXorSum api calculate need min temporary local space size.
+ * @param [out] maxValue: ReduceXorSum api calculate need max temporary local space size, in bytes.
+ * @param [out] minValue: ReduceXorSum api calculate need min temporary local space size, in bytes.
  */
 void GetReduceXorSumMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
