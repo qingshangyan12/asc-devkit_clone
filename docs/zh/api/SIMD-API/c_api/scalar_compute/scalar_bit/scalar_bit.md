@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 位运算
 
 - **[asc_clear_nthbit](asc_clear_nthbit.md)**

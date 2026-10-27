@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 原子操作
 
 - **[原子操作概述](atomic_operations_overview.md)**

@@ -1,20 +1,3 @@
----
-okftype: reference.api
-description: "在3510架构上把数据从GM搬运到UB，连续搬运按size字节、高维切分按burst_count/burst_len与字节单位的src_stride/dst_stride搬运，有效长度非32字节对齐时在UB侧补齐。"
-tag:
-  - roles: [data_movement]
-  - operations: [copy]
-  - traits: [aligned_transfer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: related
-    condition: "正文据此引用存储单元说明"
-  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
-    kind: related
-    condition: "有数据依赖时按该页插入同步指令"
-version: ">=9.1.0"
-version_changes: []
----
 # asc_copy_gm2ub
 
 ## 产品支持情况
