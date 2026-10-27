@@ -65,6 +65,7 @@ from .ascendc_compile_v220 import (
     get_code_channel_v220_by_first_tiling_key,
     gen_compile_cmd_for_meta_info,
 )
+from .kernel_param_metadata import prepare_kernel_param_metadata
 from .ascendc_compile_v200 import call_bisheng_v200_static, call_bisheng_v200_dynamic
 from .ascendc_compile_gen_code import (
     get_code_for_l2_cache,
@@ -165,7 +166,11 @@ def _gen_kernel_func_declare_head_with_workspace(tiling_info: TilingInfo, super_
 
 
 def _gen_kernel_func_declare_head(
-    is_mix: bool, is_single_and_using_hard_sync: bool, opinfo: OpInfo, tiling_info: TilingInfo
+    is_mix: bool,
+    is_single_and_using_hard_sync: bool,
+    opinfo: OpInfo,
+    tiling_info: TilingInfo,
+    compile_info: CompileInfo = None,
 ):
     # generate kernel function
     source = ""
@@ -228,6 +233,9 @@ def _gen_kernel_func_declare_head(
 
     super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
         tiling_info, super_kernel_params, func_params
+    )
+    prepare_kernel_param_metadata(
+        compile_info, None if global_var_storage.get_variable("ascendc_enable_super_kernel") is True else func_params
     )
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         global_var_storage.set_variable("ascendc_sub_super_kernel_params", super_kernel_params)
@@ -442,7 +450,7 @@ def gen_kernel_fun(
     )
 
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = _gen_kernel_func_declare_head(
-        is_mix, is_single_and_using_hard_sync, opinfo, tiling_info
+        is_mix, is_single_and_using_hard_sync, opinfo, tiling_info, compile_info
     )
     source += kernel_func_dec_pub
     source += source_declare_pub
