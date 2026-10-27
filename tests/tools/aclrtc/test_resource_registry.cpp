@@ -1550,7 +1550,7 @@ namespace ascendc {
 namespace specialization_compile {
 namespace {
 
-TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
+TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndSourceDirectory)
 {
     for (const std::string& relativeLibrary :
          {std::string("vendors/custom/op_spec/libcust_compile_resource.so"),
@@ -1566,7 +1566,7 @@ TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
         EXPECT_EQ(
             ResourceRegistry::LocateSourceFile(spec, "resource", "op_impl/first/source.cpp", located),
             ResourceStatus::Success);
-        EXPECT_EQ(located, fs::canonical(root).string());
+        EXPECT_EQ(located, fs::canonical(root / "op_impl/first").string());
         EXPECT_EQ(
             ResourceRegistry::LocateSourceFile(spec, "resource", "op_impl/missing/source.cpp", located),
             ResourceStatus::InvalidResource);
@@ -1578,7 +1578,9 @@ TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
         StageState stage;
         EXPECT_EQ(ResourceRegistry::LoadManifest(unit, spec, 0U, stage), ResourceStatus::Success);
         ASSERT_EQ(stage.external.resources.size(), 1U);
-        EXPECT_EQ(stage.external.resources.at("installed")->data.sourceFilePath, fs::canonical(root).string());
+        EXPECT_EQ(
+            stage.external.resources.at("installed")->data.sourceFilePath,
+            fs::canonical(root / "op_impl/first").string());
     }
 }
 

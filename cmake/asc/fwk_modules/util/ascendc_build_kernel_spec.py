@@ -9,10 +9,9 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-"""Collect and relocate Kernel Spec resources for RUN package delivery."""
+"""Collect Kernel Spec resources and bind source installation paths for RUN delivery."""
 
 import argparse
-import copy
 from dataclasses import dataclass, field
 import fcntl
 import hashlib
@@ -23,9 +22,6 @@ from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import tempfile
-
-SOURCE_MARKER = "${source_file_path}"
-INCLUDE_FLAGS = ("-isystem", "-iquote", "-idirafter", "-include", "-I")
 
 
 class BundleError(RuntimeError):
@@ -134,7 +130,7 @@ def _atomic_write(output, write):
 
 
 class KernelSpecSourceMapper:
-    """Own source candidates and their installed paths for manifest relocation."""
+    """Resolve source candidates to their installed paths."""
 
     def __init__(self, source_map, source_file=()):
         self.source_files = source_file
@@ -186,58 +182,6 @@ class KernelSpecSourceMapper:
             raise BundleError(f"source file has no source-map: {source}")
         return source, installed
 
-    def _rewrite_include(self, path, source_parent):
-        if path == SOURCE_MARKER or path.startswith(SOURCE_MARKER + "/"):
-            suffix = path[len(SOURCE_MARKER) :].lstrip("/")
-            if suffix:
-                _relative(suffix)
-            return SOURCE_MARKER + "/" + str(PurePosixPath(source_parent) / suffix)
-        if not os.path.isabs(path):
-            return path
-        mapped = self.map_path(Path(os.path.abspath(path)))
-        if mapped is None:
-            # External dependencies are supplied by the consumer and keep their original paths.
-            return path
-        _checked_path(path)
-        return SOURCE_MARKER + "/" + mapped
-
-    def _rewrite_tokens(self, tokens, source_parent):
-        result = []
-        index = 0
-        while index < len(tokens):
-            token = tokens[index]
-            if not isinstance(token, str):
-                raise BundleError("compile/link options must contain string argv tokens")
-            flag = next((flag for flag in INCLUDE_FLAGS if token.startswith(flag)), None)
-            if flag and token == flag:
-                if index + 1 == len(tokens) or not isinstance(tokens[index + 1], str):
-                    raise BundleError(f"missing include path after {flag}")
-                result.extend([flag, self._rewrite_include(tokens[index + 1], source_parent)])
-                index += 2
-            elif flag:
-                suffix = token[len(flag) :]
-                separator = "=" if suffix.startswith("=") else ""
-                result.append(flag + separator + self._rewrite_include(suffix.lstrip("="), source_parent))
-                index += 1
-            else:
-                result.append(token)
-                index += 1
-        return result
-
-    def relocate(self, manifest, package_source):
-        result = copy.deepcopy(manifest)
-        result["source_file"] = package_source
-        parent = str(PurePosixPath(package_source).parent)
-        for key, tokens in result.get("options", {}).items():
-            result["options"][key] = self._rewrite_tokens(tokens, parent)
-        for kernel in result["kernels"]:
-            if "link_options" in kernel:
-                kernel["link_options"] = self._rewrite_tokens(kernel["link_options"], parent)
-            for obj in kernel.get("objects", []):
-                for command in obj.get("commands", []):
-                    command["cmd"] = self._rewrite_tokens(command["cmd"], parent)
-        return result
-
 
 @dataclass
 class ResourceUnit:
@@ -280,8 +224,8 @@ class KernelSpecBundleBuilder:
                     manifest.get("source_file"), bindings.get(str(_checked_path(directory)))
                 )
                 resource_root = _checked_path(path.parent / _relative(manifest.get("resource_path")))
-                relocated = mapper.relocate(manifest, package_source)
-                encoded = json.dumps(relocated, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+                manifest["source_file"] = package_source
+                encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
                 if source not in source_hashes:
                     source_hashes[source] = _hash_file(source)
                 unit = ResourceUnit(path, encoded, resource_root, package_source, source_hashes[source])

@@ -284,7 +284,9 @@ def main():
             kernel_builder.ascendc_put_tiling()
             kernel_builder.ascendc_build()
             status = getattr(kernel_builder, "kernel_spec_status", "completed")
-            kernel_builder.record_kernel_spec_result(status, "all tiling keys filtered" if status == "filtered" else "")
+            kernel_builder.record_kernel_spec_result(
+                status, "no variants produced Kernel Spec resources" if status == "filtered" else ""
+            )
         kernel_builder.clean()
     except Exception as error:
         if kernel_builder is not None:

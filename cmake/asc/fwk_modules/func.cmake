@@ -441,39 +441,14 @@ function(ascend_copy_kernel_source_file)
   if("${auto_gen_path}" STREQUAL "")
     message(FATAL_ERROR "auto_gen_path has not be set which should set in npu_op_code_gen api.")
   endif()
-  get_filename_component(copy_binary_dir "${COPY_KERNEL_DST_DIR}/../../.." ABSOLUTE)
-  set(copy_inputs)
-  set(source_directories "${COPY_KERNEL_KERNEL_BASE_DIR}")
-  # Exclude build trees before registering directory contents with CONFIGURE_DEPENDS.
-  while(source_directories)
-    list(POP_BACK source_directories source_directory)
-    file(GLOB kernel_entries CONFIGURE_DEPENDS LIST_DIRECTORIES TRUE "${source_directory}/*")
-    foreach(entry IN LISTS kernel_entries)
-      get_filename_component(entry "${entry}" ABSOLUTE)
-      if("${entry}" STREQUAL "${copy_binary_dir}" OR "${entry}" STREQUAL "${CMAKE_BINARY_DIR}")
-        continue()
-      endif()
-      if(IS_DIRECTORY "${entry}" AND NOT IS_SYMLINK "${entry}")
-        list(APPEND source_directories "${entry}")
-      else()
-        list(APPEND copy_inputs "${entry}")
-      endif()
-    endforeach()
-  endwhile()
-  file(GLOB source_config CONFIGURE_DEPENDS "${auto_gen_path}/${COPY_KERNEL_PACKAGE_TARGET}_custom_source_files.ini")
-  list(APPEND copy_inputs ${source_config})
-  set(copy_stamp "${auto_gen_path}/${COPY_KERNEL_TARGET}.timestamp")
-  # A changed file list also invalidates the copy when an input was added or removed.
-  file(GENERATE OUTPUT "${copy_stamp}.inputs" CONTENT "${copy_inputs}\n")
-  set(copy_script "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_copy_kernel_src.py")
-  add_custom_command(OUTPUT "${copy_stamp}"
-    COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${copy_script}"
-      "--auto-gen-path=${auto_gen_path}" "--target-name=${COPY_KERNEL_PACKAGE_TARGET}"
-      "--kernel-base-dir=${COPY_KERNEL_KERNEL_BASE_DIR}" "--copy-dst-dir=${COPY_KERNEL_DST_DIR}"
-    COMMAND "${CMAKE_COMMAND}" -E touch "${copy_stamp}"
-    DEPENDS ${copy_inputs} "${copy_stamp}.inputs" "${copy_script}"
-    VERBATIM)
-  add_custom_target(${COPY_KERNEL_TARGET} DEPENDS "${copy_stamp}")
+  add_custom_command(OUTPUT ${ASCEND_AUTOGEN_PATH}/copy_kernel_src.timestamp
+    COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_copy_kernel_src.py --auto-gen-path=${auto_gen_path} --target-name=${COPY_KERNEL_PACKAGE_TARGET}
+    --kernel-base-dir=${COPY_KERNEL_KERNEL_BASE_DIR} --copy-dst-dir=${COPY_KERNEL_DST_DIR}
+    COMMAND echo "copy kernel src" > ${ASCEND_AUTOGEN_PATH}/copy_kernel_src.timestamp
+  )
+  add_custom_target(${COPY_KERNEL_TARGET}
+    DEPENDS ${ASCEND_AUTOGEN_PATH}/copy_kernel_src.timestamp
+  )
 endfunction()
 
 function(npu_op_kernel_library target_name)
@@ -534,17 +509,12 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   find_program(_ASC_KERNEL_SPEC_EXPORTER asc_compile_exporter
     HINTS "${ASCEND_CANN_PACKAGE_PATH}/tools/asc_compile_exporter" "${ASCEND_CANN_PACKAGE_PATH}/bin"
     NO_CMAKE_FIND_ROOT_PATH)
-  if(CMAKE_CXX_COMPILER)
-    set(_ASC_KERNEL_SPEC_CXX "${CMAKE_CXX_COMPILER}")
-  else()
-    find_program(_ASC_KERNEL_SPEC_CXX NAMES c++ g++ clang++ NO_CMAKE_FIND_ROOT_PATH)
-  endif()
-  find_program(_ASC_KERNEL_SPEC_MAKE NAMES make gmake NO_CMAKE_FIND_ROOT_PATH)
+  find_program(_ASC_KERNEL_SPEC_MAKE NAMES make NO_CMAKE_FIND_ROOT_PATH)
 
   add_custom_target(${spec_target}
     COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}"
       --build-config "${spec_build_config}" --work-dir "${spec_work}"
-      --exporter "${_ASC_KERNEL_SPEC_EXPORTER}" --cxx "${_ASC_KERNEL_SPEC_CXX}" --make "${_ASC_KERNEL_SPEC_MAKE}"
+      --exporter "${_ASC_KERNEL_SPEC_EXPORTER}" --cxx "${CMAKE_CXX_COMPILER}" --make "${_ASC_KERNEL_SPEC_MAKE}"
     BYPRODUCTS "${spec_install_script}"
     VERBATIM)
   add_dependencies(binary ${spec_target})

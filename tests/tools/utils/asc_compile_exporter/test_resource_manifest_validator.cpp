@@ -202,6 +202,7 @@ TEST_F(ResourceManifestValidatorTest, AcceptsPackageRelativeSourceFile)
 {
     Json manifest = MakeValidManifest();
     manifest["source_file"] = "op_impl/ai_core/tbe/impl/add/kernel.cpp";
+    manifest["options"]["common_compile"].push_back("-I${source_file_path}/../../common");
     EXPECT_TRUE(Validate(manifest));
 }
 
