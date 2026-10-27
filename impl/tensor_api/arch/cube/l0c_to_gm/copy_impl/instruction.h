@@ -51,10 +51,10 @@ public:
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_gm instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unit_flag, "copy_l0c_to_gm instruction");
 
-        asc_copy_l0c2gm(dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
-                        static_cast<uint16_t>(src_stride), cache_mode, 0, unit_flag, static_cast<uint64_t>(quant_pre),
-                        static_cast<uint8_t>(relu_en), is_channel_split, nz2nd_en,
-                        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, nz2dn_en);
+        asc_copy_l0c2gm(
+            dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+            static_cast<uint16_t>(src_stride), cache_mode, unit_flag, quant_pre,
+            relu_en ? asc_relu_pre_mode::NORMAL : asc_relu_pre_mode::NONE, is_channel_split, nz2nd_en, nz2dn_en, false);
     }
 };
 
