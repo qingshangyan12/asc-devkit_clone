@@ -210,7 +210,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 ## 参数说明
 
 <!-- npu="950" id14 -->
-**表** 参数说明（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_param_table"></a>
+**表1** 参数说明（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -229,7 +229,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
-**表** 参数说明（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**表2** 参数说明（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
