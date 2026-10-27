@@ -27,7 +27,18 @@
 
 使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的通信资源上下文启动通信服务端。AI CPU路径下，本接口在指定AI CPU任务流上启动AI CPU Server；CCU路径下，本接口启动CCU服务端。后续AI Core侧调用HCCL高阶API时，会作为客户端向服务端下发实际通信任务。
 
+本接口提供两个重载：不带`ccResCtxSize`的重载内部按资源上下文固定大小启动；带`ccResCtxSize`的重载由调用方传入上下文大小。二者启动逻辑相同。
+
 ## 函数原型
+
+推荐使用不带`ccResCtxSize`的重载（C++链接）：
+
+```cpp
+extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
+    void* stream, void* ccResCtx)
+```
+
+需要显式传入上下文大小时，使用带`ccResCtxSize`的重载（C链接）：
 
 ```cpp
 extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
@@ -42,7 +53,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 | --- | --- | --- |
 | stream | 输入 | aclrtStream指针。AI CPU路径为必填，用于启动AI CPU Server；CCU路径不使用该参数，可传入nullptr。 |
 | ccResCtx | 输入 | [Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的设备侧通信资源上下文。 |
-| ccResCtxSize | 输入 | [Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的通信资源上下文大小，单位为字节。 |
+| ccResCtxSize | 输入 | 通信资源上下文大小，单位为字节。仅带`ccResCtxSize`的重载提供该参数；通常传入[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的大小。 |
 
 ## 返回值说明
 
@@ -54,24 +65,35 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 -   AI CPU路径的stream必须与AI Core任务所在stream不同。AI CPU Server会阻塞等待AI Core客户端消息，若共用stream会导致任务无法完成。
 -   AI CPU路径建议先同步AI Core任务流、再同步AI CPU任务流。
 -   CCU路径的启动stream由通信资源上下文内部携带，stream参数不参与CCU服务端启动。
--   本接口必须与[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx和ccResCtxSize配合使用。
+-   本接口必须与[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx配合使用。
+-   不带`ccResCtxSize`的重载为C++链接，仅可在C++代码中调用；内部使用`sizeof(OpResCtx)`作为上下文大小，并调用带`ccResCtxSize`的实现。
+-   带`ccResCtxSize`的重载为C链接，C/C++均可调用；若传入大小小于资源上下文实际大小，将返回参数错误。
 -   AI Core侧调用Finalize后，AI CPU Server才能正常退出。
 
 ## 调用示例
 
-CCU示例：
+CCU示例（推荐写法）：
 
 ```cpp
-Mc2Result ret = Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
+Mc2Result ret = Mc2CcKernelLaunch(nullptr, ccResCtx);
 if (ret != HCCL_SUCCESS) {
     // 错误处理
 }
 ```
 
-AI CPU示例：
+AI CPU示例（推荐写法）：
 
 ```cpp
-Mc2Result ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx, ccResCtxSize);
+Mc2Result ret = Mc2CcKernelLaunch(aicpuStream, ccResCtx);
+if (ret != HCCL_SUCCESS) {
+    // 错误处理
+}
+```
+
+显式传入上下文大小时：
+
+```cpp
+Mc2Result ret = Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
 if (ret != HCCL_SUCCESS) {
     // 错误处理
 }

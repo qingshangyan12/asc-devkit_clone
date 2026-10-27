@@ -813,12 +813,11 @@ namespace {
 CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
-    HcclResult hcclRet =
-        haclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        hcclRet != HCCL_SUCCESS,
+        aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] haclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", hcclRet, opResCtx,
+            "[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
             sizeof(OpResCtx)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -837,12 +836,12 @@ CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
     void* opParamDev = reinterpret_cast<void*>(opResHost.algInfo[0].opParam);
-    HcclResult hcclRet =
-        haclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclError aclRet =
+        aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        hcclRet != HCCL_SUCCESS,
+        aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] haclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", hcclRet, opParamDev,
+            "[CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", aclRet, opParamDev,
             sizeof(OpParam)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -857,13 +856,13 @@ CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable
     HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
     auto* resCtx = static_cast<char*>(opParamHost.resCtx);
     std::vector<char> seq(opParamHost.ctxSize);
-    HCCL_INFO("[CcuKernelLaunch]Start haclrtMemcpy D2H.");
-    HcclResult hcclRet =
-        haclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
+    aclError aclRet =
+        aclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        hcclRet != HCCL_SUCCESS,
+        aclRet != ACL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] haclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", hcclRet, seq.data(),
+            "[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, seq.data(),
             resCtx, opParamHost.ctxSize),
         CCU_E_INTERNAL);
     HCCL_INFO("[CcuKernelLaunch]Start resourceCtx DeSerialize.");
@@ -1272,3 +1271,15 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
     }
 }
 } // extern "C"
+
+Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
+{
+    uint32_t ccResCtxSize = 0U;
+    return Mc2AcquireCcResCtx(comm, ccType, ccArgs, ccResCtx, &ccResCtxSize);
+}
+
+Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
+{
+    return Mc2CcKernelLaunch(stream, ccResCtx, static_cast<uint32_t>(sizeof(OpResCtx)));
+}
