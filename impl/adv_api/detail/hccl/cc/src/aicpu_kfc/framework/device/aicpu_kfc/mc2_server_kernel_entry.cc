@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstdint>
-#include "../../../../common/mc2_server_stage_timing.h"
-#include "../../../../common/mc2_server_debug_config.h"
+#include "mc2_server_stage_timing.h"
+#include "mc2_server_debug_config.h"
 
 #include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
 #include "common/aicpu_kfc_def.h"
@@ -46,8 +46,8 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     const auto* desc = reinterpret_cast<const CommKfcParamDesc*>(&descriptor);
     const bool single = descriptor == MC2_AICPU_SIMPLE_CTX_PROTOCOL || desc->itemNum == 1;
     const auto* ctx = args && single ? static_cast<const OpResCtx*>(args[1]) : nullptr;
-    Mc2ServerStageTiming::Start(ctx && ctx->res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] == 4,
-                              reinterpret_cast<uintptr_t>(ctx));
+    Mc2ServerStageTiming::Start(
+        ctx && ctx->res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] == 4, reinterpret_cast<uintptr_t>(ctx));
     const uint32_t status = Mc2ServerKernelBody(args);
     // Both protocol paths return from CommKfcDispatcher::Run before reporting.
     // The message loop and all three measured intervals have ended here.

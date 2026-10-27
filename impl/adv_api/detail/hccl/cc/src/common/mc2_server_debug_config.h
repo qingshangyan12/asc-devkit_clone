@@ -13,5 +13,5 @@
 namespace Mc2ServerDebugConfig {
 // Shared by the Host and Device OpResCtx definitions; res[0..2] belong to CCU.
 constexpr uint32_t DEBUG_MODE_RES_INDEX = 3U;
-}
+} // namespace Mc2ServerDebugConfig
 #endif
