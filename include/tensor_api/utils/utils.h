@@ -78,4 +78,6 @@ struct ssbuf {};
 } // namespace te
 } // namespace asc
 
+#include "impl/tensor_api/utils/sys_var_impl.h"
+
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
