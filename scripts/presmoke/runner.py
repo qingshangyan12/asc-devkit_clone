@@ -806,7 +806,10 @@ def _kill_process_group(proc: subprocess.Popen) -> None:
     except OSError:
         return
     time.sleep(1)
-    if proc.poll() is None:
+    # The leader can exit on SIGTERM while a child still holds the output pipe.
+    # Do not reap the leader before signaling its group again: its PID must not
+    # be reused as a different process group during the grace period.
+    if (hasattr(os, "killpg") and proc.pid) or proc.poll() is None:
         try:
             if hasattr(os, "killpg") and proc.pid:
                 os.killpg(proc.pid, signal.SIGKILL)
