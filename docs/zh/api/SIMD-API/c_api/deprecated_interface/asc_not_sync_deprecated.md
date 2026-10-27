@@ -1,16 +1,21 @@
 ---
 okftype: reference.api
-description: "对源矢量按元素执行按位取反并写入目的矢量，该同步复合接口已废弃，请改用对应的非同步接口 asc_not 和同步接口 asc_sync 替代。"
+description: "已废弃的矢量按位取反同步接口，对 int16_t 与 uint16_t 两种源矢量逐元素取反并写入目的矢量，仅在 Atlas A2、A3 支持，替代方案为 asc_not 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [bitwise_not]
-  - traits: [aligned_transfer]
+  - operations: [bitwise_not, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
     kind: replaced_by
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_not 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_not_sync（废弃）
 

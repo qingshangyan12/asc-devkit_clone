@@ -1,18 +1,22 @@
 ---
 okftype: reference.api
-description: "根据掩码对两个矢量数据寄存器或掩码寄存器逐元素执行按位与，结果写入目的操作数，未通过掩码筛选的元素在输出中置零。"
+description: "按掩码对两个矢量数据寄存器或两个掩码寄存器执行按位与，结果可经函数返回值或目的参数输出，矢量形式支持 int8_t 至 uint32_t 六种整型，掩码位为 0 的输出位写 0。"
 tag:
   - roles: [compute]
   - operations: [bitwise_and]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "需遵守 Reg 矢量计算 C API 通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "补充函数返回值形式的重载（返回 vector_<dtype> 或 vector_bool），引用参数输出形式保留；history_probe 显示 vector_int32_t asc_and(vector_int32_t src0, vector_int32_t src1, vector_bool mask) 最早出现于 9.2.0 的 impl/c_api/reg_base_impl/reg_logic_intf_impl.h:699，CANN_9_2_0 增强节列出该批返回值形式重载。"
 ---
 # asc_and
 

@@ -1,14 +1,16 @@
 ---
 okftype: reference.api
-description: "对源矢量各元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，并提供带舍入处理的asc_shiftright_round变体。"
+description: "对矢量元素执行算术或逻辑右移的C API接口，含带舍入的asc_shiftright_round，提供前n个数据计算与高维切分计算两种形式，支持16位与32位有符号及无符号整数，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
   - operations: [bitwise_shift]
-  - traits: [elementwise, rounding_mode, scalar_operand]
+  - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
 version: ">=9.0.0"
+version_changes: []
 ---
 
 # asc_shiftright

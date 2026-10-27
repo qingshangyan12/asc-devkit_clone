@@ -1,17 +1,21 @@
 ---
 okftype: reference.api
-description: "执行矢量按位与运算，接口已废弃，请使用asc_and与asc_sync替代。"
+description: "已废弃的矢量按位与同步接口，对 int16_t 与 uint16_t 两种源矢量逐元素执行按位与并写入目的矢量，仅在 Atlas A2、A3 支持，替代方案为 asc_and 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [bitwise_and]
+  - operations: [bitwise_and, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
     kind: replaced_by
-    condition: "矢量按位与场景改用asc_and实现"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "复合同步接口族废弃，改用 asc_and 与 asc_sync；include/c_api/composite/vector_compute_composite.h:3018,3033 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_and_sync（废弃）
 

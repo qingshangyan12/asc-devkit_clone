@@ -1,14 +1,19 @@
 ---
 okftype: reference.api
-description: "根据掩码对源操作数src0、src1执行按位与操作并将结果写入目的操作数dst，该接口的浮点类型重载已废弃，请使用等位宽的asc_and整数重载替代。"
+description: "已废弃的 Reg 位与浮点重载，在掩码 mask 控制下对两个矢量数据寄存器逐位与并将结果写入目的寄存器，支持 fp8_e4m3fn_t、fp8_e5m2_t、half、bfloat16_t、float，仅在 AIV 生效。"
 tag:
   - roles: [compute]
   - operations: [bitwise_and]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md
     kind: replaced_by
-    condition: "浮点类型重载废弃后改用等位宽整数重载"
-version: ">=9.0.0,<=9.2.0"
+version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "浮点类型重载废弃，改用相同位宽的整数重载；include/c_api/reg_compute/compute/reg_logic.h 中 fp8_e4m3fn_t、fp8_e5m2_t、half、bfloat16_t、float 五个声明均带 ASC_DEPRECATED(9.2.0)，CANN_9_2_0 废弃表第 128 行同源。"
 ---
 # asc_and（废弃）
 

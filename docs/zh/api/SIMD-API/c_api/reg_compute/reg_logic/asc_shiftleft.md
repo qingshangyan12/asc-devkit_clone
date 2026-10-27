@@ -1,18 +1,22 @@
 ---
 okftype: reference.api
-description: "根据掩码将源矢量各元素左移，移位数由矢量移位操作数对应元素指定，无符号做逻辑左移、有符号做算术左移，未筛选元素输出置零。"
+description: "按掩码把源矢量数据寄存器的元素左移，移位数由 shift 矢量逐元素给出，无符号类型执行逻辑左移、有符号类型执行算术左移，覆盖 6 组 dtype0 与 dtype1 组合。"
 tag:
   - roles: [compute]
   - operations: [bitwise_shift]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
-    condition: "矢量数据寄存器和掩码寄存器说明"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "需遵守 Reg 矢量计算 C API 通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "补充函数返回值形式的重载（返回 vector_<dtype0>），引用参数输出形式保留；history_probe 显示 vector_uint16_t asc_shiftleft(vector_uint16_t src, vector_int16_t shift, vector_bool mask) 最早出现于 9.2.0 的 impl/c_api/reg_base_impl/reg_logic_intf_impl.h:316。"
 ---
 # asc_shiftleft
 
