@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/arch/vector/type_conversion.h"`。
+头文件路径：`"tensor_api/experimental/utils/reg_enum.h"`。
 
 `cast_round_mode`用于指定[cast](../type_conversion/cast.md)转换时的舍入方式。
 
@@ -21,7 +21,9 @@ enum class cast_round_mode {
 };
 ```
 
-| 参数名 | 描述 |
+## 枚举值说明
+
+| 枚举值 | 说明 |
 | :-- | :-- |
 | unknown | 未指定舍入方式，预留值。 |
 | rint | 舍入到最近值，正好位于中间值时舍入到偶数。 |

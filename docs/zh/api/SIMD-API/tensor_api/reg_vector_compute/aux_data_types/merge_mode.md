@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/arch/vector/data_padding.h"`。
+头文件路径：`"tensor_api/experimental/utils/reg_enum.h"`。
 
 `merge_mode`用于指定带Mask的寄存器写入操作中，目的寄存器未被Mask选中的元素如何处理。
 
@@ -17,7 +17,7 @@ enum class merge_mode {
 
 ## 枚举值说明
 
-| 参数名 | 描述 |
+| 枚举值 | 说明 |
 | :-- | :-- |
 | zeroing | Mask未选择的元素在目的寄存器中置0。 |
 | merging | Mask未选择的元素在目的寄存器中保留原值。 |

@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/arch/vector/type_conversion.h"`。
+头文件路径：`"tensor_api/experimental/utils/reg_enum.h"`。
 
 `cast_layout`用于指定[cast](../type_conversion/cast.md)执行位宽变化时，较小位宽元素在每组数据中的位置。
 
@@ -18,7 +18,9 @@ enum class cast_layout {
 };
 ```
 
-| 参数名 | 描述 |
+## 枚举值说明
+
+| 枚举值 | 说明 |
 | :-- | :-- |
 | unknown | 未指定数据排布，预留值，不用于当前`cast`接口。 |
 | zero | 大转小时，转换结果位于目的操作数组内第0个小位宽位置；小转大时，选取源操作数组内第0个小位宽元素。 |

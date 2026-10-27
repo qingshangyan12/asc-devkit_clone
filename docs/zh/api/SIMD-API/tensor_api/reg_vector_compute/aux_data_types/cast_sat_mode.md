@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/arch/vector/type_conversion.h"`。
+头文件路径：`"tensor_api/experimental/utils/reg_enum.h"`。
 
 `cast_sat_mode`用于指定[cast](../type_conversion/cast.md)转换时是否采用饱和模式。
 
@@ -16,7 +16,9 @@ enum class cast_sat_mode {
 };
 ```
 
-| 参数名 | 描述 |
+## 枚举值说明
+
+| 枚举值 | 说明 |
 | :-- | :-- |
 | unknown | 当转换类型不支持饱和模式配置时使用的预留值。 |
 | not_sat | 不饱和模式。超出范围时按目的格式截断，或保留浮点格式支持的特殊值。 |
