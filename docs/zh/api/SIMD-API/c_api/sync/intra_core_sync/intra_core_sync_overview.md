@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "说明核内同步的必要性，列出硬件流水类型与pipe_t枚举，并按多流水同步、单流水同步与数据屏障等方式介绍同步接口。"
+description: "概述AI Core核内同步的必要性、并行流水执行时序，并给出硬件流水类型与pipe_t枚举的取值对照。"
 ---
 # 核内同步能力概述
 

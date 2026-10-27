@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "系统同步能力概述，将AI Core同步分为核内同步与核间同步两类，汇总各类同步接口并介绍四种核间同步控制模式。"
+description: "概述AI Core同步的两大类（核内同步与核间同步），并用表格汇总各类同步接口的同步范围、对应模式与功能。"
 ---
 # 系统同步能力概述
 

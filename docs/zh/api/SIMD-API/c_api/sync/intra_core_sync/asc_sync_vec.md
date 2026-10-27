@@ -1,20 +1,16 @@
 ---
 okftype: reference.api
-description: "针对PIPE_V执行流水同步，保证该流水中前序指令（如矢量计算）全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S的后续指令才能开始执行。无入参函数原型已废弃，请改用asc_sync。"
+description: "针对PIPE_V执行同步的易用性接口，保证PIPE_V前序指令完成后其他流水的后续指令才能开始；无入参原型已废弃。"
 tag:
   - roles: [control]
   - operations: [synchronization]
+  - traits: [inter_core_synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "无入参函数原型已废弃，改用 asc_sync"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: related
-    condition: "id 参数语义与 event_t 枚举定义"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: related
-    condition: "示例中手工精准同步的替代写法"
-version: ">=9.0.0"
+    condition: "页面声明无入参原型 asc_sync_vec() 改用 asc_sync"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_sync_vec
 

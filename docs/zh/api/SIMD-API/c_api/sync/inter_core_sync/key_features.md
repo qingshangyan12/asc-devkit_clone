@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "配合时序图说明模式0、模式1、模式2与模式4四种核间同步控制模式的实现原理，并给出场景代码片段与计数器变化过程。"
+description: "核间同步关键特性：按模式0、模式1、模式2和模式4分别说明AI Core核间、AIV核间、AIC与AIV之间、AIC与单个AIV之间同步的计数器加减与阻塞解除原理，给出arrive与wait配对约束，并说明2201、3510架构上pipe参数生效范围及模式4的架构限制。"
 ---
 # 关键特性说明<a id="inter_core_sync_key_features"></a>
 

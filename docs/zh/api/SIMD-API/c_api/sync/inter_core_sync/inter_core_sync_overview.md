@@ -1,6 +1,6 @@
 ---
 okftype: reference.concept
-description: "介绍核间同步的业务场景、AIC/AIV的block与subblock结构，并以表格汇总四对核间同步接口及其对应的同步模式与同步范围。"
+description: "核间同步能力概述：以AIC等待多个AIV完成原子累加结果为例说明核间同步的使用场景，给出AIC与AIV按group划分的block与subblock结构，列出Cube、Vector、Mix三类算子的group配置，并汇总四对核间同步接口的同步范围与模式。"
 ---
 # 核间同步能力概述
 

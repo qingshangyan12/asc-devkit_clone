@@ -1,17 +1,13 @@
 ---
 okftype: reference.api
-description: "针对PIPE_MTE3执行流水同步，保证该流水中前序指令（如UB到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V的后续指令才能开始执行，属于简化手工同步的易用性接口。"
+description: "针对PIPE_MTE3执行同步的易用性接口，保证其前序指令全部完成后PIPE_MTE2 与 PIPE_V的后续指令才能开始执行。"
 tag:
   - roles: [control]
   - operations: [synchronization]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: related
-    condition: "id 参数语义与 event_t 枚举定义"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: related
-    condition: "示例中手工精准同步的替代写法"
-version: ">=9.0.0"
+  - traits: [inter_core_synchronization]
+dependencies: []
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_sync_mte3
 

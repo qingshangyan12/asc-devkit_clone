@@ -1,17 +1,16 @@
 ---
 okftype: reference.api
-description: "完成同一流水内的同步控制，传入指定流水值时仅阻塞该流水的后续指令直至其前序指令全部完成，传入PIPE_ALL时等待所有流水前序指令完成后才解除阻塞。"
+description: "完成同一流水内的同步控制，传入PIPE_ALL时等价于asc_sync，传入其他合法流水时仅阻塞该流水后续指令。"
 tag:
   - roles: [control]
   - operations: [synchronization]
+  - traits: [inter_core_synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: "PIPE_ALL 全流水同步的等价行为"
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md
-    kind: related
-    condition: "pipe_t 枚举取值含义"
+    condition: "PIPE_ALL 时功能等价"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_sync_pipe
 

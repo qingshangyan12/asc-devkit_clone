@@ -1,14 +1,16 @@
 ---
 okftype: reference.api
-description: "与asc_lock配对使用，指定流水的前序指令执行完成后，根据mutex_id释放对应Mutex，实现核内异步流水指令之间的同步。"
+description: "与asc_lock配对，在指定流水前序指令完成后按mutex_id释放对应Mutex，解除其他流水的锁定等待。"
 tag:
   - roles: [control]
   - operations: [synchronization]
+  - traits: [inter_core_synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
     kind: requires
-    condition: "必须严格成对使用，相同的pipe、mutex_id、mode，且asc_unlock写在asc_lock之后"
+    condition: "必须与 asc_lock 严格成对使用"
 version: ">=9.1.0"
+version_changes: []
 ---
 # asc_unlock
 

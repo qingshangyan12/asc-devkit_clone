@@ -29,71 +29,71 @@
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Sets a synchronization event after preceding source-pipeline accesses complete without blocking subsequent source instructions.
+ * @brief Sets the hardware event flag of a source pipeline so that a paired asc_sync_wait on a destination pipeline can proceed.
  *
  * @override_id asc_sync_notify__pipe_pipe_event
  * @archs 2201 3510
- * @param [in] pipe 源流水类型，即“等待哪条流水的前序指令完成”。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] tpipe 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。
- * @param [in] id 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。
+ * @param [in] pipe Source pipeline type whose preceding instructions must finish before the flag is set, of type pipe_t; PIPE_ALL is not allowed.
+ * @param [in] tpipe Destination pipeline type whose paired asc_sync_wait is to be released, of type pipe_t with the same value set as pipe; PIPE_ALL is not allowed.
+ * @param [in] id Synchronization event ID of type event_t; each (pipe, tpipe) combination owns eight independent event IDs EVENT_ID0 through EVENT_ID7.
  */
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Waits for a matching synchronization event and clears it before allowing subsequent destination-pipeline instructions.
+ * @brief Blocks a destination pipeline until the paired asc_sync_notify on the source pipeline has set the event flag.
  *
  * @override_id asc_sync_wait__pipe_pipe_event
  * @archs 2201 3510
- * @param [in] pipe 源流水类型，即“等待哪条流水的前序指令完成”。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] tpipe 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。
- * @param [in] id 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。
+ * @param [in] pipe Source pipeline type whose preceding instructions are awaited, of type pipe_t; PIPE_ALL is not allowed.
+ * @param [in] tpipe Destination pipeline type whose subsequent instructions are blocked, of type pipe_t with the same value set as pipe; PIPE_ALL is not allowed.
+ * @param [in] id Synchronization event ID of type event_t; each (pipe, tpipe) combination owns eight independent event IDs EVENT_ID0 through EVENT_ID7.
  */
 __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Synchronizes within a single pipe: PIPE_ALL waits for all pipes and equals asc_sync, while any other pipe value blocks only that pipe's later instructions.
+ * @brief Blocks the subsequent instructions of one pipeline (or of all pipelines with PIPE_ALL) until that pipeline's prior instructions complete.
  *
  * @override_id asc_sync_pipe__pipe
  * @archs 2201 3510
- * @param [in] pipe 阻塞的流水类别。支持的取值有`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`、`PIPE_ALL`，不支持`PIPE_S`。如果不关注流水类别，希望阻塞所有流水，可以传入`PIPE_ALL`。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] pipe Pipeline category to block, of type pipe_t: PIPE_V, PIPE_M, PIPE_MTE1, PIPE_MTE2, PIPE_MTE3, PIPE_FIX or PIPE_ALL; PIPE_S is not supported.
  */
 __aicore__ inline void asc_sync_pipe(pipe_t pipe);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Synchronizes PIPE_V: after all prior PIPE_V instructions (such as vector compute) finish, later PIPE_MTE2, PIPE_MTE3 and PIPE_S instructions may start; id in [0,7] selects the sync event.
+ * @brief Synchronizes the PIPE_V pipeline so that all its preceding instructions complete before later PIPE_MTE2, PIPE_MTE3 and PIPE_S instructions start, using the given sync ID.
  *
  * @override_id asc_sync_vec__i
  * @archs 2201 3510
- * @param [in] id 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\_t枚举定义](asc_sync_notify.md#event_t_enum)。
+ * @param [in] id Intra-core multi-pipeline sync ID in the range [0, 7]; it has the same meaning as the event_t enum values used by asc_sync_notify.
  */
 __aicore__ inline void asc_sync_vec(int id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Ease-of-use PIPE_MTE3 synchronization (AIV only): makes subsequent PIPE_MTE2 and PIPE_V instructions start only after all prior MTE3 instructions such as UB-to-GM copies finish.
+ * @brief Synchronizes the MTE3 pipeline so that later MTE2 and vector instructions wait for its prior transfers.
  *
  * @override_id asc_sync_mte3__i
  * @archs 2201 3510
- * @param [in] id 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\_t枚举定义](asc_sync_notify.md#event_t_enum)。
+ * @param [in] id In-core multi-pipeline synchronization ID in the range [0, 7], with the same meaning as the event_t enumerator used by asc_sync_notify (EVENT_ID0 to EVENT_ID7).
  */
 __aicore__ inline void asc_sync_mte3(int id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Ease-of-use PIPE_MTE2 synchronization (AIV only): makes subsequent PIPE_MTE3 and PIPE_V instructions start only after all prior MTE2 instructions such as GM-to-UB copies finish.
+ * @brief Synchronizes the MTE2 pipeline so that later MTE3 and vector instructions wait for its prior transfers.
  *
  * @override_id asc_sync_mte2__i
  * @archs 2201 3510
- * @param [in] id 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\_t枚举定义](asc_sync_notify.md#event_t_enum)。
+ * @param [in] id In-core multi-pipeline synchronization ID in the range [0, 7], with the same meaning as the event_t enumerator used by asc_sync_notify (EVENT_ID0 to EVENT_ID7).
  */
 __aicore__ inline void asc_sync_mte2(int id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Synchronizes all hardware pipelines inside one core, equivalent to asc_sync_pipe(PIPE_ALL); it blocks later instructions until all prior instructions on every pipeline complete.
+ * @brief Synchronizes all hardware pipelines of the current core by blocking subsequent instructions until prior work in every pipeline completes.
  *
  * @override_id asc_sync__z
  * @archs 2201 3510
@@ -102,152 +102,152 @@ __aicore__ inline void asc_sync();
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_block_wait to sync the AIC with all AIVs in one AI Core: after prior instructions on pipe finish it notifies the scheduler and does not block later instructions.
+ * @brief Notifies the scheduler that the AIC side of a single AI Core has reached the sync point, pairing with asc_sync_block_wait for AIC-to-all-AIV synchronization.
  *
  * @override_id asc_sync_block_arrive__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose preceding instructions must complete before the notification is sent to the scheduler, of type pipe_t; the value takes effect on every supported NPU architecture for this interface.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_subblock_wait to sync all AIVs (subblocks) within one AI Core: after prior instructions on pipe finish it notifies the scheduler without blocking later instructions.
+ * @brief Notifies the scheduler that this AIV reached the sync point, pairing with asc_sync_subblock_wait for synchronization among all AIVs of one AI Core.
  *
  * @override_id asc_sync_subblock_arrive__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口仅支持AIV调用，AIV支持的`pipe`取值请参考[约束说明](#约束说明)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose preceding instructions must complete before notifying the scheduler, of type pipe_t; the interface is callable on AIV only and the accepted values follow the AIV table in the constraints.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_inter_wait to sync all AICs or all AIVs across AI Cores: after prior instructions on pipe finish it notifies the scheduler without blocking later instructions.
+ * @brief Notifies the scheduler that this core reached the sync point for cross-AI-Core synchronization of all AICs or all AIVs.
  *
  * @override_id asc_sync_inter_arrive__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose preceding instructions must complete before notifying the scheduler, of type pipe_t; the value takes effect on every supported NPU architecture for this interface.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Blocks subsequent instructions until all previously issued but unfinished memory accesses complete; mem_dsb_t selects the waited scope such as DSB_ALL, DSB_DDR or DSB_UB.
+ * @brief Blocks subsequent instructions until all previously issued memory accesses within a selected memory scope have completed.
  *
  * @override_id asc_sync_data_barrier__memdsb
  * @archs 2201 3510
- * @param [in] arg 表示需要等待的内存位置，类型为mem_dsb_t，可取值为：  &bull; DSB_ALL：等待所有内存访问指令。  &bull; DSB_DDR：等待GM访问指令。 &bull; DSB_UB：等待UB访问指令。 &bull; DSB_SEQ：预留参数，暂未启动，为后续的功能扩展做保留。
+ * @param [in] arg Memory scope to wait on, of type mem_dsb_t: DSB_ALL waits for all memory accesses (in practice GM and UB only), DSB_DDR waits for GM accesses, DSB_UB waits for UB accesses, and DSB_SEQ is a reserved value not yet enabled.
  */
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_intra_wait to sync the AIC with a single AIV in one AI Core: after prior instructions on pipe finish it notifies the scheduler without blocking later instructions.
+ * @brief Notifies the scheduler from one core of a single AI Core for AIC-to-single-AIV synchronization.
  *
  * @override_id asc_sync_intra_arrive__pipe_u64
  * @archs 3510
- * @param [in] pipe 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。
- * @param [in] sync_id 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。 同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。
+ * @param [in] pipe Pipeline whose preceding instructions must complete before the notification is sent, of type pipe_t; this argument takes effect for the arrive side and the supported values are tabulated per core type.
+ * @param [in] sync_id Synchronization tag identifying one signal group, where an AI Core's AIC owns 32 sync_id values (0 to 31) and each AIV owns 16 (0 to 15), with an independent 4-bit counter per value.
  */
 __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_intra_arrive to sync the AIC with a single AIV in one AI Core: it blocks later instructions on pipe until the matching sync_id counter is non-zero.
+ * @brief Blocks a pipeline until the paired asc_sync_intra_arrive side has signalled, completing AIC-to-single-AIV synchronization.
  *
  * @override_id asc_sync_intra_wait__pipe_u64
  * @archs 3510
- * @param [in] pipe 标识阻塞哪条流水的后续指令，直到对应`sync_id`的计数器非0。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。
- * @param [in] sync_id 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。 同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked until the sync_id counter becomes non-zero, of type pipe_t, with supported values tabulated per core type.
+ * @param [in] sync_id Synchronization tag identifying one signal group, where the AIC owns 32 sync_id values (0 to 31) and each AIV owns 16 (0 to 15), each with an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_subblock_arrive to sync all AIVs (subblocks) within one AI Core: it blocks later instructions on pipe until the matching flag_id counter is non-zero.
+ * @brief Blocks a pipeline until all AIVs of the AI Core have arrived, completing synchronization among all subblocks.
  *
  * @override_id asc_sync_subblock_wait__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked once the flag_id counter becomes non-zero, of type pipe_t; the argument takes effect on 3510, where exactly this pipeline is blocked, while on 2201 it does not take effect and the wait blocks regardless of the value passed.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_inter_arrive to sync all AICs or all AIVs across AI Cores: it blocks later instructions on pipe until the matching flag_id counter is non-zero.
+ * @brief Blocks a pipeline until all participating AI Cores have arrived, completing cross-core synchronization of all AICs or all AIVs.
  *
  * @override_id asc_sync_inter_wait__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked once the flag_id counter becomes non-zero, of type pipe_t; the argument takes effect on 3510, where exactly this pipeline is blocked, while on 2201 it does not take effect and the wait blocks regardless of the value passed.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.inter_core_sync
- * @brief Pairs with asc_sync_block_arrive to sync the AIC with all AIVs in one AI Core: it blocks later instructions on pipe until the matching flag_id counter is non-zero.
+ * @brief Blocks a pipeline until the paired asc_sync_block_arrive side has signalled, completing AIC-to-all-AIV synchronization in one AI Core.
  *
  * @override_id asc_sync_block_wait__pipe_i64
  * @archs 2201 3510
- * @param [in] pipe 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。 本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。
- * @param [in] flag_id 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked once the flag_id counter becomes non-zero, of type pipe_t; the argument takes effect on 3510, where exactly this pipeline is blocked, while on 2201 it does not take effect and the wait blocks regardless of the value passed.
+ * @param [in] flag_id Synchronization tag identifying one signal group, range [0, 15], where each flag_id owns an independent 4-bit counter.
  */
 __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Acquires the Mutex for mutex_id; if already locked, blocks subsequent instructions on the pipe until all Mutexes with the same mutex_id are released by asc_unlock.
+ * @brief Acquires the mutex identified by mutex_id and blocks later instructions of the given pipe until every unlock with the same mutex_id has been released.
  *
  * @override_id asc_lock__pipe_u8
  * @archs 3510
- * @param [in] pipe 标识阻塞哪条流水上后续指令，直到所有流水中具有相同`mutex_id`的Mutex都已经被[asc_unlock](asc_unlock.md)释放。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] mutex_id mutex标号，取值范围为[0, 31]。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked; a pipe_t enum value limited to the pipes supported by the current core type.
+ * @param [in] mutex_id Mutex identifier in the range [0, 31] that groups matching asc_lock and asc_unlock calls.
  */
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Acquires the Mutex for mutex_id with an explicit asc_mutex_execute_mode: ASC_LOCK_BLOCK blocks the pipe until matching unlocks complete, ASC_LOCK_NON_BLOCK does not block it.
+ * @brief Acquires the mutex identified by mutex_id with an explicit execute mode, optionally blocking later instructions of the given pipe.
  *
  * @override_id asc_lock__pipe_u8_mutexmode
  * @archs 3510
- * @param [in] pipe 标识阻塞哪条流水上后续指令，直到所有流水中具有相同`mutex_id`的Mutex都已经被[asc_unlock](asc_unlock.md)释放。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] mutex_id mutex标号，取值范围为[0, 31]。
- * @param [in] mode 可选参数，用于指定是否阻塞流水，默认值为`ASC_LOCK_BLOCK`。 &bull; `ASC_LOCK_BLOCK`：阻塞`pipe`对应流水的执行，直到代码中位于当前`asc_lock`之前且`mutex_id`相同的所有`asc_unlock`调用均已执行完成。 &bull; `ASC_LOCK_NON_BLOCK`：不阻塞`pipe`对应流水的执行。
+ * @param [in] pipe Pipeline whose subsequent instructions are blocked when the blocking mode is selected; a pipe_t enum value.
+ * @param [in] mutex_id Mutex identifier in the range [0, 31] that groups matching asc_lock and asc_unlock calls.
+ * @param [in] mode Optional asc_mutex_execute_mode value defaulting to ASC_LOCK_BLOCK; ASC_LOCK_NON_BLOCK (1) does not block the pipe's execution.
  */
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Releases the Mutex for mutex_id once prior instructions on the pipe have completed; must be paired with asc_lock using the same pipe, mutex_id and mode.
+ * @brief Releases the mutex identified by mutex_id after the preceding instructions of the given pipe finish executing.
  *
  * @override_id asc_unlock__pipe_u8
  * @archs 3510
- * @param [in] pipe 指令的执行流水线。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] mutex_id mutex标号。取值范围[0, 31]。
+ * @param [in] pipe Execution pipeline whose preceding instructions must complete before the mutex is released; a pipe_t enum value.
+ * @param [in] mutex_id Mutex identifier in the range [0, 31] shared with the matching asc_lock call.
  */
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
 
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Releases the Mutex for mutex_id with an explicit asc_mutex_execute_mode; ASC_LOCK_BLOCK waits only for prior pipe instructions, ASC_LOCK_NON_BLOCK also waits for matching unlocks.
+ * @brief Releases the mutex identified by mutex_id with an explicit execute mode after the relevant instructions of the given pipe complete.
  *
  * @override_id asc_unlock__pipe_u8_mutexmode
  * @archs 3510
- * @param [in] pipe 指令的执行流水线。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
- * @param [in] mutex_id mutex标号。取值范围[0, 31]。
- * @param [in] mode 可选参数，用于指定是否阻塞流水，默认值为`ASC_LOCK_BLOCK`。 &bull; `ASC_LOCK_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成后执行。 &bull; `ASC_LOCK_NON_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成且相同`mutex_id`的所有`asc_unlock`指令执行完成后执行。
+ * @param [in] pipe Execution pipeline whose preceding instructions gate the release, or whose prior instructions plus same-mutex unlocks are awaited in non-blocking mode.
+ * @param [in] mutex_id Mutex identifier in the range [0, 31] shared with the matching asc_lock call.
+ * @param [in] mode Optional asc_mutex_execute_mode value defaulting to ASC_LOCK_BLOCK; ASC_LOCK_NON_BLOCK waits also for all unlocks with the same mutex_id.
  */
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sync)
 /**
  * @ingroup simd_c_api.sync.intra_core_sync
- * @brief Deprecated no-argument variant that synchronizes PIPE_V so later PIPE_MTE2, PIPE_MTE3 and PIPE_S instructions wait for prior vector compute; use asc_sync instead.
+ * @brief Synchronizes all pipelines by issuing a PIPE_ALL barrier with no sync ID; the documented PIPE_V description applies to the overload that takes an id, and this parameterless form is deprecated in favour of asc_sync.
  *
  * @override_id asc_sync_vec__z
  * @archs 2201 3510

@@ -1,15 +1,19 @@
 ---
 okftype: reference.api
-description: "不同AI Core之间全部AIC或全部AIV的核间同步等待接口，阻塞流水后续指令直到对应flag_id计数器非0，需与asc_sync_inter_arrive配对使用。"
+description: "跨AI Core核间同步的等待侧接口，与asc_sync_inter_arrive配对实现全部AIC或全部AIV之间的模式0同步：阻塞流水后续指令直到flag_id计数器非0并减1，2201架构上pipe不生效而阻塞全部流水。"
 tag:
   - roles: [control]
   - operations: [synchronization]
   - traits: [inter_core_synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
+    kind: requires
+    condition: "必须与该到达侧成对使用且flag_id完全一致，否则出现未定义行为"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
     kind: related
-    condition: "配对使用，flag_id必须完全一致"
+    condition: "四种核间同步模式与模式0的总体说明"
 version: ">=9.1.0"
+version_changes: []
 ---
 # asc_sync_inter_wait
 

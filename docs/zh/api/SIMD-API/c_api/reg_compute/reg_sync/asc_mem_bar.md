@@ -1,14 +1,26 @@
 ---
 okftype: reference.api
-description: "Reg矢量计算内不同流水线间的同步指令，指定源与目的流水线，使目的流水线等待源流水线上所有指令完成后才执行，用于读写保序。"
+description: "在SIMD_VF函数内按源、目的流水线插入同步，使目的流水线等待源流水线全部指令完成，通过MEM_TYPE取值区分矢量与标量、读写与写写等十二种流水线组合。"
 tag:
   - roles: [control]
   - operations: [synchronization]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+    condition: "作为 VEC_LOAD 流水的典型指令在流水线说明与调用示例中出现"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    kind: related
+    condition: "正文据此引用 Reg 矢量计算通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+    kind: related
+    condition: "作为 VEC_STORE 流水的典型指令在流水线说明与调用示例中出现"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: header_reorganized
+    scope: "page"
+    scope_basis: kind_default
+    note: "宏别名所在公共头由 c_api/reg_compute/reg_vector.h 迁至 c_api/reg_compute/reg_sync.h（第24行），与 CANN 9.2.0 Release Notes 公共头文件按模块拆分、API 资料同步使用最细粒度头文件路径的说明一致；接口名与语义不变。"
 ---
 # asc_mem_bar
 
