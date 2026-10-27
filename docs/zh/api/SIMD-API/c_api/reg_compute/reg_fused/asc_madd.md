@@ -1,17 +1,26 @@
 ---
 okftype: reference.api
-description: "根据掩码将目的矢量数据寄存器与第一个源寄存器按元素相乘后与第二个源寄存器相加，目的寄存器既参与输入又存储最终结果。"
+description: "以目的矢量数据寄存器为累加器的Reg融合乘加接口，按掩码计算dst乘src0加src1并写回dst，支持half、bfloat16_t与float，仅在AIV上生效。"
 tag:
   - roles: [compute]
   - operations: [fused_multiply_add]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg矢量计算C API通用约束见该页通用约束节"
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: related
+    condition: "产品型号与NPU架构映射说明"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "overload:asc_madd__Rvbf16_vbf16_vbf16_vb"
+    scope_basis: resolved
+    note: "新增 bfloat16_t 数据的重载 asc_madd(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)；依据 CANN_9_2_0 Release Notes 第 58 行（asc_madd 新增 bfloat16_t 重载）与 upstream/9.2.0 首次出现的该声明（9.1.0 的 reg_vector.h 仅有 half/float 两种）。"
 ---
 # asc_madd
 

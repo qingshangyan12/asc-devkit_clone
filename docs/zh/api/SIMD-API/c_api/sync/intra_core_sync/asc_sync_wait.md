@@ -1,3 +1,17 @@
+---
+okftype: reference.api
+description: "与asc_sync_notify配对，在目标流水上阻塞后续指令直到对应硬件标志位被通知置位，随后清零并放行。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "必须与 asc_sync_notify 成对使用"
+version: ">=8.5.0"
+version_changes: []
+---
 # asc_sync_wait
 
 ## 产品支持情况

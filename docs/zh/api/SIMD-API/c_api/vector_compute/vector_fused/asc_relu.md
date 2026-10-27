@@ -1,14 +1,15 @@
 ---
 okftype: reference.api
-description: "对输入矢量按元素执行线性整流Relu，按dst_i = relu(src_i)计算并写回目的操作数，支持half、int32_t和float数据类型，提供前n个数据计算和高维切分计算两种形式。"
+description: "按元素执行线性整流 ReLU 并将结果写入目的矢量的基础接口，支持 half、int32_t、float，提供前 n 个元素与高维切分两种计算形式。"
 tag:
   - roles: [compute]
   - operations: [relu]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵守通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_relu
 

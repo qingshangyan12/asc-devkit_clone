@@ -1,18 +1,21 @@
 ---
 okftype: reference.api
-description: "按元素将src0与dst相乘后加上src1，再进行Relu计算（结果和0对比取较大值）并存入dst。该同步接口已废弃，请使用asc_mul_add_relu与asc_sync替代。"
+description: "已废弃的融合乘加 ReLU 同步接口，按 src0 乘 dst 加 src1 后再与 0 取较大值的公式逐元素计算，支持 half 与 float，替代方案为 asc_mul_add_relu 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [fused_multiply_add, relu]
-  - traits: [aligned_transfer]
+  - operations: [fused_multiply_add, relu, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md
     kind: replaced_by
-    condition: "乘加与Relu融合计算场景改用asc_mul_add_relu实现"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_mul_add_relu 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_mul_add_relu_sync（废弃）
 

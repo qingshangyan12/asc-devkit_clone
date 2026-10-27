@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "将int16_t数据量化转换为int8_t或uint8_t，存放在每个DataBlock的上半块或下半块，使用前需调用asc_set_deq_scale设置量化参数。"
+description: "把 int16_t 源矢量按逐元素量化参数反量化后转为 int8_t 或 uint8_t，并写入每个 DataBlock 的上半块或下半块，使用前需调用 asc_set_deq_scale 设置量化参数。"
 tag:
   - roles: [compute]
   - operations: [conversion]
@@ -8,11 +8,12 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
+    condition: "需遵守通用地址重叠约束"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
     kind: requires
-    condition: "使用asc_vdeq_int162b8系列接口前"
+    condition: "使用前须先用数组形式设置逐元素量化参数"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_vdeq_int162b8
 

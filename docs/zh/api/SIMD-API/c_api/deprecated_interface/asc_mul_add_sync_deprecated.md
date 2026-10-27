@@ -1,18 +1,21 @@
 ---
 okftype: reference.api
-description: "执行矢量的乘加运算，将src0与dst相乘再加上src1并将结果写回dst。该同步接口已废弃，请使用asc_mul_add与asc_sync替代。"
+description: "已废弃的矢量乘加同步接口，按 src0 乘 dst 加 src1 的公式逐元素计算并写回 dst，支持 half 与 float，替代方案为 asc_mul_add 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [fused_multiply_add]
-  - traits: [aligned_transfer]
+  - operations: [fused_multiply_add, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md
     kind: replaced_by
-    condition: "矢量乘加计算场景改用asc_mul_add实现"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_mul_add 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的两个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_mul_add_sync（废弃）
 

@@ -1,17 +1,22 @@
 ---
 okftype: reference.api
-description: "根据掩码将float源寄存器的元素与标量value按元素相乘，并按ROUND舍入模式转换为half写入偶数或奇数索引位置，其余位置置零。"
+description: "将float矢量元素与标量相乘后转换为half并按dst_pos写入偶数或奇数索引位置的Reg融合接口，未写入位置置0，支持返回值与dst引用两种形式，仅在AIV上生效。"
 tag:
   - roles: [compute]
   - operations: [conversion, multiply]
-  - traits: [elementwise, rounding_mode, scalar_operand]
+  - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg矢量计算C API通用约束见该页通用约束节"
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: related
+    condition: "产品型号与NPU架构映射说明"
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_mul_scalar_float2half_rn
 

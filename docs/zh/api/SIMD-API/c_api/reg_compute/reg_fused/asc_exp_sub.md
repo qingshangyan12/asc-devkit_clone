@@ -1,17 +1,31 @@
 ---
 okftype: reference.api
-description: "根据掩码将两个源矢量数据寄存器按元素相减，并以差值为指数计算自然指数函数，结果可由返回值返回或写入目的寄存器，half输入变体支持提取偶数或奇数索引元素转为float后计算。"
+description: "对两个源矢量逐元素相减并计算以差值为指数的自然指数函数的Reg融合计算接口，float输入走asc_exp_sub，half输入走asc_exp_sub_half2float并可选奇偶索引，仅在AIV上生效。"
 tag:
   - roles: [compute]
   - operations: [exponential, subtract]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg矢量计算C API通用约束见该页通用约束节"
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: related
+    condition: "产品型号与NPU架构映射说明"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: capability_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "新增 asc_exp_sub_half2float 接口：half 源操作数转换为 float 后计算以差值为指数的自然指数函数，并支持通过 asc_position_mode 常量显式选择读取偶数或奇数索引元素（CANN_9_2_0 Release Notes 第 43 行）；该接口的返回值与 dst 引用两种形式均随本次新增。"
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "overload:asc_exp_sub__vf32_vf32_vb"
+    scope_basis: resolved
+    note: "新增 float 输入的函数返回值形式重载 asc_exp_sub(vector_float, vector_float, vector_bool)，原 dst 引用形式保留（CANN_9_2_0 Release Notes 第 54 行的函数返回值形式补充批次）。"
 ---
 # asc_exp_sub
 

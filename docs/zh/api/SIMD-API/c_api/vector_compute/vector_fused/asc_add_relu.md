@@ -1,14 +1,15 @@
 ---
 okftype: reference.api
-description: "按元素对矢量src0与src1求和，再与0比较取较大值完成Relu，并可转换最终结果数据类型，支持s162s8、f322f16、f162s8。"
+description: "按元素对两个源矢量求和再与 0 取较大值，支持 s162s8、f322f16、f162s8 等目的类型转换，提供前 n 个元素与高维切分两种计算形式，覆盖 half、float、int16_t、int8_t。"
 tag:
   - roles: [compute]
   - operations: [add, relu]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵守通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_add_relu
 

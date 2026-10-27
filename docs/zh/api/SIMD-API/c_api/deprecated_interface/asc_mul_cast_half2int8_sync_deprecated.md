@@ -1,18 +1,22 @@
 ---
 okftype: reference.api
-description: "按元素求积并将结果转换为int8_t类型，转换采用RINT舍入模式（四舍六入五成双），溢出做饱和处理。该同步接口已废弃，请使用asc_mul_cast_half2int8与asc_sync替代。"
+description: "已废弃的同步求积转换接口，将两个 half 源矢量逐元素相乘后按 RINT 舍入并饱和转换为 int8_t，仅在 Atlas A2、A3 支持，替代方案为 asc_mul_cast_half2int8 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [conversion, multiply]
-  - traits: [aligned_transfer, rounding_mode, saturation_mode]
+  - operations: [conversion, multiply, synchronization]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md
     kind: replaced_by
-    condition: "half求积并转int8_t场景改用asc_mul_cast_half2int8实现"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步复合接口废弃，改用 asc_mul_cast_half2int8 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的声明带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_mul_cast_half2int8_sync（废弃）
 

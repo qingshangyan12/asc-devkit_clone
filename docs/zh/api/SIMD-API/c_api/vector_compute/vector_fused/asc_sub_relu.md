@@ -1,15 +1,15 @@
 ---
 okftype: reference.api
-description: "对两个矢量按元素求差后与0取较大值完成Relu计算，并可转换最终结果的数据类型输出。"
+description: "按元素对两个源矢量求差再与 0 取较大值，并支持 s162s8、f322f16、f162s8 等目的类型转换，提供前 n 个元素与高维切分两种计算形式。"
 tag:
   - roles: [compute]
   - operations: [relu, subtract]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
+    condition: "需遵守通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_sub_relu
 

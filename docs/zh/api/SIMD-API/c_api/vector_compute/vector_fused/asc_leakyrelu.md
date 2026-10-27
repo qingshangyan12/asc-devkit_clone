@@ -1,6 +1,6 @@
 ---
 okftype: reference.api
-description: "执行矢量Leaky Relu运算，对正元素保持原值、非正元素乘以标量alpha，支持前n个数据计算与高维切分计算，起始地址需32字节对齐。"
+description: "按元素执行 Leaky ReLU，正数保持源值、非正数乘以标量 alpha 后写入目的矢量，支持 half 与 float，提供前 n 个元素与高维切分两种计算形式。"
 tag:
   - roles: [compute]
   - operations: [leaky_relu]
@@ -8,7 +8,9 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
+    condition: "需遵守通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_leakyrelu
 

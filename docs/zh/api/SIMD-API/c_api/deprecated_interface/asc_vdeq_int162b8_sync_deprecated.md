@@ -1,18 +1,24 @@
 ---
 okftype: reference.api
-description: "将int16_t类型数据量化转换为int8_t或uint8_t并存放在每个DataBlock的上半块或下半块，使用前需调用asc_set_deq_scale设置量化参数。该接口已废弃，替代方案为对应的非同步接口asc_vdeq_int162b8与同步接口asc_sync。"
+description: "已废弃的int16_t到int8_t或uint8_t同步量化转换接口说明，结果写入DataBlock上半块或下半块，替代方式为非同步接口配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [conversion]
-  - traits: [quantization]
+  - traits: [datablock_granularity, elementwise, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
+    condition: "同步语义改用 asc_sync 显式表达"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
     kind: replaced_by
-    condition: "非同步计算场景改用asc_vdeq_int162b8实现"
+    condition: "改用非同步接口 asc_vdeq_int162b8"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "vector_compute_composite.h 对 _h_sync/_l_sync 四条重载加 ASC_DEPRECATED(9.2.0)，替代为非同步 asc_vdeq_int162b8_h/_l 加 asc_sync；仅废弃、未移除，不设可用上限。"
 ---
 # asc_vdeq_int162b8_sync（废弃）
 
