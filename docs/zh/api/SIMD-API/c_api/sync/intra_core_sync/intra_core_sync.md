@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 核内同步
 
 - **[核内同步能力概述](intra_core_sync_overview.md)**

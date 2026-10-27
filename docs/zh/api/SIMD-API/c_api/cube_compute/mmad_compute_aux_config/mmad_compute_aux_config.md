@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # Mmad计算辅助配置接口
 
 - **[asc_disable_hf32](asc_disable_hf32.md)**
