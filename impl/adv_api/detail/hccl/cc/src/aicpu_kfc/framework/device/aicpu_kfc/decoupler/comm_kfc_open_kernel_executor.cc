@@ -191,13 +191,13 @@ HcclResult LaunchOpenOpParamDataImpl(
         return HCCL_SUCCESS;
     }
 
-    auto executor =
-        mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
-    CHK_SMART_PTR_NULL(executor);
-
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
-    HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(
-        *param, resCtx, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
+    HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
+        auto executor =
+            mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
+        CHK_SMART_PTR_NULL(executor);
+        return executor->Orchestrate(*param, resCtx);
+    });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

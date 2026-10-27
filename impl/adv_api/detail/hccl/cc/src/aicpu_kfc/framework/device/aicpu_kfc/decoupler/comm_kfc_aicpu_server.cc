@@ -29,6 +29,7 @@
 #include "stream_lite.h"
 #include "thread.h"
 #include "hcomm_res_defs.h"
+#include "task_cache/mc2_aicpu_task_cache.h"
 
 using namespace HcclApi;
 namespace {
@@ -393,6 +394,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
         execCtx.commName = commName;
         execCtx.baseOpParam = std::move(baseOpParam);
         execCtx.resCtxHolder = std::move(resCtxHolder);
+        execCtx.replayDomain = mc2_ops_hccl::BindMc2ReplayDomain(*baseParam, execCtx.resCtxHolder);
 
         bool isDevice950 = false;
         CHK_RET(IsDevice950(isDevice950));
@@ -698,6 +700,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     bool dfxRegistered = false;
     HcclResult executionRet = HCCL_SUCCESS;
     HcclResult profilingRet = HCCL_SUCCESS;
+    mc2_ops_hccl::Mc2ReplayScope replayScope(execCtx->replayDomain);
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;

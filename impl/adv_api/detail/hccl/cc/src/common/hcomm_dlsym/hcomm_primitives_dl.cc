@@ -20,6 +20,15 @@ using HcommAicpuTsTaskCacheEndFunc = int32_t (*)(const char*);
 using HcommAicpuTsTaskCacheExecuteFunc = int32_t (*)(const char*, void**, uint64_t*, uint64_t);
 using HcommAicpuTsTaskCacheClearFunc = int32_t (*)(const char*);
 
+using Mc2ReplayV1Func = int32_t (*)(uint32_t, void**, void**, uint64_t*, uint32_t, uint64_t*);
+static Mc2ReplayV1Func g_Mc2ReplayV1 = nullptr;
+extern "C" bool Mc2HcommHasReplayV1(void) { return g_Mc2ReplayV1 != nullptr; }
+extern "C" int32_t Mc2HcommReplayV1(
+    uint32_t action, void** handle, void** addrs, uint64_t* sizes, uint32_t count, uint64_t* bytes)
+{
+    return g_Mc2ReplayV1 == nullptr ? HCCL_E_NOT_SUPPORT : g_Mc2ReplayV1(action, handle, addrs, sizes, count, bytes);
+}
+
 static bool g_HcommBatchTransferOnThreadSupported = false;
 static HcclHcommBatchTransferOnThreadFunc g_HcommBatchTransferOnThread = nullptr;
 static HcommAicpuTsTaskCacheLookupFunc g_HcommAicpuTsTaskCacheLookup = nullptr;
@@ -153,6 +162,7 @@ extern "C" int32_t Mc2HcommAicpuTsTaskCacheClear(const char* tag)
 
 extern "C" void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle)
 {
+    g_Mc2ReplayV1 = reinterpret_cast<Mc2ReplayV1Func>(dlsym(libHcommHandle, "HcommMc2ReplayV1"));
     g_HcommAicpuTsTaskCacheLookup =
         reinterpret_cast<HcommAicpuTsTaskCacheLookupFunc>(dlsym(libHcommHandle, "HcommAicpuTsTaskCacheLookup"));
     g_HcommAicpuTsTaskCacheStart =

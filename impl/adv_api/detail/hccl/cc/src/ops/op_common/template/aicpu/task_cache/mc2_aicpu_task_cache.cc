@@ -10,6 +10,7 @@
 #include "mc2_aicpu_task_cache.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstring>
 #include <iomanip>
 #include <limits>
@@ -18,6 +19,9 @@
 #include "alg_env_config.h"
 #include "hcomm_primitives_dl.h"
 #include "log.h"
+#include "mc2_server_stage_timing.h"
+#include <memory>
+#include <vector>
 
 namespace mc2_ops_hccl {
 namespace {
@@ -175,8 +179,9 @@ void SetBypass(Mc2AicpuTaskCachePlan& plan, const char* reason)
     HCCL_DEBUG("[MC2_TASK_CACHE][Bypass] reason[%s].", reason);
 }
 
+template <typename Builder>
 bool GetAllToAllVSpans(
-    const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan, Digest128Builder& shape)
+    const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan, Builder& shape)
 {
     const auto* sendCounts = static_cast<const uint64_t*>(param.all2AllVDataDes.sendCounts);
     const auto* recvCounts = static_cast<const uint64_t*>(param.all2AllVDataDes.recvCounts);
@@ -219,8 +224,8 @@ bool GetAllToAllVSpans(
     return true;
 }
 
-bool GetRegularSpans(
-    const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan, Digest128Builder& shape)
+template <typename Builder>
+bool GetRegularSpans(const OpParam& param, uint32_t rankSize, uint64_t& inputSpan, uint64_t& outputSpan, Builder& shape)
 {
     const uint64_t dataTypeSize = GetDataTypeSize(param.DataDes.dataType);
     const HcclDataType outputType =
@@ -273,7 +278,8 @@ bool IsOverlapping(const Mc2AicpuTaskCachePlan& plan)
     return input < outputEnd && output < inputEnd;
 }
 
-void AddAlgType(Digest128Builder& digest, const AlgType& algType)
+template <typename Builder>
+void AddAlgType(Builder& digest, const AlgType& algType)
 {
     digest.AddU32(static_cast<uint32_t>(algType.algoLevel0));
     digest.AddU32(static_cast<uint32_t>(algType.algoLevel1));
@@ -334,7 +340,8 @@ void AddPhysicalLevel(Digest128Builder& digest, const PhysicalLevelInfo& level)
     }
 }
 
-void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpan, Digest128Builder& shape)
+template <typename Builder>
+void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpan, Builder& shape)
 {
     shape.AddU32(static_cast<uint32_t>(param.opType));
     shape.AddString(param.algName, OP_ALG_LENGTH);
@@ -619,6 +626,260 @@ HcclResult BuildMc2AicpuTaskCachePlan(
     return HCCL_SUCCESS;
 }
 
+namespace {
+struct ShapeWords {
+    std::vector<uint64_t> words;
+    void AddU8(uint8_t v) { words.push_back(v); }
+    void AddU32(uint32_t v) { words.push_back(v); }
+    void AddU64(uint64_t v) { words.push_back(v); }
+    void AddBool(bool v) { words.push_back(v ? 1U : 0U); }
+    void AddDouble(double v)
+    {
+        uint64_t bits;
+        std::memcpy(&bits, &v, sizeof(bits));
+        words.push_back(bits);
+    }
+    void AddString(const char* v, size_t maxLen)
+    {
+        const size_t n = v == nullptr ? 0U : strnlen(v, maxLen);
+        words.push_back(n);
+        for (size_t i = 0; i < n; ++i) {
+            words.push_back(static_cast<unsigned char>(v[i]));
+        }
+    }
+};
+struct ShapeHash {
+    size_t operator()(const std::vector<uint64_t>& key) const
+    {
+        uint64_t h = 0x9e3779b97f4a7c15ULL;
+        for (auto v : key) {
+            h ^= v + 0x9e3779b97f4a7c15ULL + (h << 6U) + (h >> 2U);
+        }
+        return static_cast<size_t>(h);
+    }
+};
+std::atomic<uint64_t> replayBytes{0};
+constexpr uint64_t TOTAL_REPLAY_BUDGET = 64U * 1024U * 1024U;
+struct ReplayImage {
+    void* handle = nullptr;
+    uint64_t bytes = 0;
+    std::vector<uint64_t> key;
+    bool accounted = false;
+    ~ReplayImage()
+    {
+        if (accounted) {
+            replayBytes.fetch_sub(bytes);
+        }
+        if (handle != nullptr) {
+            (void)Mc2HcommReplayV1(4, &handle, nullptr, nullptr, 0, nullptr);
+        }
+    }
+};
+std::mutex domainRegistryMutex;
+thread_local Mc2ReplayScope* currentReplayScope = nullptr;
+} // namespace
+
+class Mc2ReplayDomain {
+public:
+    std::mutex mutex;
+    void* comm = nullptr;
+    std::shared_ptr<const AlgResourceCtxSerializable> resources;
+    std::unordered_map<std::vector<uint64_t>, std::unique_ptr<ReplayImage>, ShapeHash> entries;
+    ReplayImage* recent = nullptr;
+    ShapeWords shape;
+    uint64_t bytes = 0;
+    bool supported = false;
+    void Clear()
+    {
+        recent = nullptr;
+        entries.clear();
+        bytes = 0;
+    }
+};
+namespace {
+std::unordered_map<const AlgResourceCtxSerializable*, std::shared_ptr<Mc2ReplayDomain>> replayDomains;
+constexpr uint64_t DOMAIN_BUDGET = 10U * 1024U * 1024U;
+constexpr size_t MAX_DOMAINS = 256U;
+void ClearReplayDomains(void* comm)
+{
+    std::lock_guard<std::mutex> registryLock(domainRegistryMutex);
+    for (auto it = replayDomains.begin(); it != replayDomains.end();) {
+        if (it->second->comm != comm) {
+            ++it;
+            continue;
+        }
+        {
+            std::lock_guard<std::mutex> domainLock(it->second->mutex);
+            it->second->Clear();
+        }
+        it = replayDomains.erase(it);
+    }
+}
+} // namespace
+
+std::shared_ptr<Mc2ReplayDomain> BindMc2ReplayDomain(
+    const OpParam& param, std::shared_ptr<const AlgResourceCtxSerializable> resources)
+{
+    if (!resources || !Mc2HcommHasReplayV1()) {
+        return {};
+    }
+    std::lock_guard<std::mutex> registryLock(domainRegistryMutex);
+    const auto found = replayDomains.find(resources.get());
+    if (found != replayDomains.end()) {
+        return found->second;
+    }
+    // Only unused domains may be removed. An active scope owns another reference.
+    if (replayDomains.size() >= MAX_DOMAINS) {
+        for (auto it = replayDomains.begin(); it != replayDomains.end();) {
+            if (it->second.use_count() == 1) {
+                it = replayDomains.erase(it);
+                break;
+            }
+            ++it;
+        }
+        if (replayDomains.size() >= MAX_DOMAINS) {
+            return {};
+        }
+    }
+    auto domain = std::make_shared<Mc2ReplayDomain>();
+    domain->comm = param.hcclComm;
+    domain->resources = resources;
+    Digest128Builder resource("mc2-bound-resource-v1");
+    domain->supported = AddResourceFields(param, *resources, resource);
+    domain->shape.words.reserve(1024);
+    replayDomains.emplace(resources.get(), domain);
+    return domain;
+}
+
+Mc2ReplayScope::Mc2ReplayScope(std::shared_ptr<Mc2ReplayDomain> domain)
+    : domain_(std::move(domain)), previous_(currentReplayScope)
+{
+    if (domain_) {
+        lock_ = std::unique_lock<std::mutex>(domain_->mutex);
+    }
+    currentReplayScope = this;
+}
+Mc2ReplayScope::~Mc2ReplayScope() { currentReplayScope = previous_; }
+bool Mc2ReplayScope::Active() { return currentReplayScope != nullptr && currentReplayScope->domain_ != nullptr; }
+
+HcclResult RunMc2BoundReplay(
+    const OpParam& param, const AlgResourceCtxSerializable& resources, const std::function<HcclResult()>& execute)
+{
+    auto& scope = *currentReplayScope;
+    auto& domain = *scope.domain_;
+    CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    auto finish = [&](HcclResult result) {
+        const auto end = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        return result == HCCL_SUCCESS ? end : result;
+    };
+    if (!domain.supported || GetExternalInputHcclAicpuCacheEnable() == 0U || !IsSupportedOp(param.opType) ||
+        param.opMode == OpMode::OFFLOAD || RequiresAicpuReduction(param) || param.supportSymmetricMemory ||
+        param.hcclComm != domain.comm || param.inputPtr == nullptr || param.outputPtr == nullptr ||
+        resources.topoInfo.userRankSize <= 1U || resources.threads.empty() ||
+        (param.engine != CommEngine::COMM_ENGINE_AICPU_TS && param.engine != CommEngine::COMM_ENGINE_CCU)) {
+        return finish(execute());
+    }
+    Mc2AicpuTaskCachePlan addressPlan;
+    addressPlan.addrs = {{param.inputPtr, param.outputPtr}};
+    ReplayImage* image = nullptr;
+    const bool regular = param.opType != HCCL_CMD_ALLTOALL && param.opType != HCCL_CMD_ALLTOALLV;
+    if (regular && scope.repeatReady_) {
+        addressPlan.sizes = scope.repeatSizes_;
+        image = static_cast<ReplayImage*>(scope.repeatEntry_);
+    } else {
+        domain.shape.words.clear();
+        uint64_t inputSpan = 0, outputSpan = 0;
+        const bool valid =
+            regular ? GetRegularSpans(param, resources.topoInfo.userRankSize, inputSpan, outputSpan, domain.shape) :
+                      GetAllToAllVSpans(param, resources.topoInfo.userRankSize, inputSpan, outputSpan, domain.shape);
+        if (!valid || (inputSpan == 0 && outputSpan == 0)) {
+            return finish(execute());
+        }
+        addressPlan.sizes = {{inputSpan, outputSpan}};
+        AddShapeFields(param, inputSpan, outputSpan, domain.shape);
+        // OpParam fields are not owned by the immutable resource object.
+        domain.shape.AddString(param.algTag, ALG_TAG_LENGTH);
+        domain.shape.AddString(param.commName, COMM_INDENTIFIER_MAX_LENGTH);
+        domain.shape.AddU64(static_cast<uint64_t>(param.opThread));
+        domain.shape.AddU64(reinterpret_cast<uintptr_t>(param.hcclBuff.addr));
+        domain.shape.AddU64(param.hcclBuff.size);
+        domain.shape.AddU64(reinterpret_cast<uintptr_t>(param.inputSymWindow));
+        domain.shape.AddU64(reinterpret_cast<uintptr_t>(param.outputSymWindow));
+        if (domain.recent && domain.recent->key == domain.shape.words) {
+            image = domain.recent;
+        } else {
+            const auto found = domain.entries.find(domain.shape.words);
+            if (found != domain.entries.end()) {
+                image = found->second.get();
+            }
+        }
+    }
+    if (IsOverlapping(addressPlan)) {
+        return finish(execute());
+    }
+    if (image) {
+        Mc2ServerStageTiming::Cache(true);
+        scope.repeatReady_ = regular;
+        scope.repeatSizes_ = addressPlan.sizes;
+        scope.repeatEntry_ = image;
+        domain.recent = image;
+        const auto result = finish(
+            static_cast<HcclResult>(
+                Mc2HcommReplayV1(3, &image->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr)));
+        if (result != HCCL_SUCCESS) {
+            scope.repeatReady_ = false;
+            domain.Clear();
+        }
+        return result;
+    }
+    if (domain.bytes >= DOMAIN_BUDGET || replayBytes.load() >= TOTAL_REPLAY_BUDGET) {
+        return finish(execute());
+    }
+    std::unique_ptr<ReplayImage> captured(new ReplayImage);
+    auto ret = static_cast<HcclResult>(Mc2HcommReplayV1(0, &captured->handle, nullptr, nullptr, 0, nullptr));
+    if (ret != HCCL_SUCCESS) {
+        return finish(execute());
+    }
+    ret = static_cast<HcclResult>(
+        Mc2HcommReplayV1(1, &captured->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr));
+    if (ret != HCCL_SUCCESS) {
+        return finish(execute());
+    }
+    Mc2ServerStageTiming::Cache(false);
+    ret = execute();
+    const auto flush = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    if (ret != HCCL_SUCCESS || flush != HCCL_SUCCESS) {
+        return ret != HCCL_SUCCESS ? ret : flush;
+    }
+    CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    ret = static_cast<HcclResult>(Mc2HcommReplayV1(2, &captured->handle, nullptr, nullptr, 0, &captured->bytes));
+    ret = finish(ret);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    captured->bytes += domain.shape.words.size() * sizeof(uint64_t) * 2U + sizeof(ReplayImage);
+    if (captured->bytes > DOMAIN_BUDGET - domain.bytes) {
+        return HCCL_SUCCESS;
+    }
+    uint64_t total = replayBytes.load();
+    do {
+        if (captured->bytes > TOTAL_REPLAY_BUDGET - total) {
+            return HCCL_SUCCESS;
+        }
+    } while (!replayBytes.compare_exchange_weak(total, total + captured->bytes));
+    captured->accounted = true;
+    captured->key = domain.shape.words;
+    domain.bytes += captured->bytes;
+    image = captured.get();
+    auto tableKey = captured->key;
+    domain.entries.emplace(std::move(tableKey), std::move(captured));
+    domain.recent = image;
+    scope.repeatReady_ = regular;
+    scope.repeatEntry_ = image;
+    scope.repeatSizes_ = addressPlan.sizes;
+    return HCCL_SUCCESS;
+}
+
 HcclResult Mc2AicpuTaskCacheLookup(const Mc2AicpuTaskCachePlan& plan, bool& isHit)
 {
     isHit = false;
@@ -718,6 +979,7 @@ void Mc2AicpuTaskCacheManager::Unregister(void* comm, const std::string& tag)
 
 HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
 {
+    ClearReplayDomains(comm);
     std::unordered_set<std::string> tags;
     {
         std::lock_guard<std::mutex> lock(mutex_);
