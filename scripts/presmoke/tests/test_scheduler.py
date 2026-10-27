@@ -400,6 +400,47 @@ class SchedulerTest(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual([item["example"] for item in payload["results"]], ["b", "a", "c"])
 
+    def test_cli_strict_fixed_schedule_allows_exact_filter(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [{"case": name, "supported_archs": ["dav-2201"], "supported_modes": ["npu"]} for name in ["a", "b"]]
+                ),
+                encoding="utf-8",
+            )
+            schedule_file = root / "scripts" / "presmoke" / "schedules" / "dav-2201_npu.txt"
+            schedule_file.parent.mkdir(parents=True, exist_ok=True)
+            schedule_file.write_text("a\nb\n", encoding="utf-8")
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "fixed",
+                        "--strict-schedule",
+                        "--exact-filter",
+                        "a",
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(root / "out"),
+                    ]
+                )
+            self.assertEqual(rc, 0)
+            payload = json.loads((root / "out" / "report.json").read_text(encoding="utf-8"))
+            self.assertEqual([item["example"] for item in payload["results"]], ["a"])
+
     def test_cli_strict_fixed_schedule_rejects_schedule_only_cases(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
