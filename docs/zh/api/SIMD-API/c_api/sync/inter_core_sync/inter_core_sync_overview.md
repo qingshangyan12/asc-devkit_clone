@@ -1,7 +1,3 @@
----
-okftype: reference.concept
-description: "核间同步能力概述：以AIC等待多个AIV完成原子累加结果为例说明核间同步的使用场景，给出AIC与AIV按group划分的block与subblock结构，列出Cube、Vector、Mix三类算子的group配置，并汇总四对核间同步接口的同步范围与模式。"
----
 # 核间同步能力概述
 
 核间同步的使用场景通常是：一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能获取。  

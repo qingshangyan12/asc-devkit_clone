@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 矩阵计算分形介绍
 
 - **[背景与核心概念](background_and_core_concepts.md)**
