@@ -61,8 +61,8 @@ const int32_t CUBE_MAX_SIZE = 256;
  * \param [in] srcShape input shape
  * \param [in] typeSize data type size: sizeof(TYPE)
  * \param [in] transposeTypeIn transpose type.
- * \param [out] maxValue max size of tmp buffer
- * \param [out] minValue min size of tmp buffer
+ * \param [out] maxValue max size of tmp buffer, in bytes
+ * \param [out] minValue min size of tmp buffer, in bytes
  */
 void GetConfusionTransposeMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const uint32_t transposeTypeIn, uint32_t& maxValue,
