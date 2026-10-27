@@ -30,6 +30,29 @@
 | 扩展friend声明 | [N1791](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1791.pdf) | 是 | 支持模板友元不写`<>`的扩展形式。 |
 | 扩展sizeof | [N2253](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2253.html)、[DR850](https://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#850) | 是 | 支持类成员sizeof且无需实例，以及`sizeof...`参数包。 |
 | 定义移动特殊成员函数 | [N3053](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3053.html) | 是 | 支持移动构造与移动赋值的定义、使用。 |
+| 右值引用 | [N2118](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2118.html) | 是 | 支持右值引用形参、移动构造与移动赋值。 |
+| 非静态数据成员初始化器 | [N2756](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2756.pdf) | 是 | 类内成员默认初始化器可用，构造对象时未显式初始化的成员取默认值。 |
+| 扩展变参模板模板参数 | [N2555](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2555.pdf) | 是 | 模板模板形参可接受变参模板实参。 |
+| 移除auto存储类说明符 | [N2546](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2546.pdf) | 是 | auto不再作为存储类说明符，仅保留类型推导语义。 |
+| 新函数声明符语法 | [N2541](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2541.pdf) | 是 | 支持尾置返回类型`auto f(...) -> T`，与decltype配合推导返回类型。 |
+| 不完整返回类型 | [N3276](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3276.pdf) | 是 | 允许函数声明返回不完整类型，定义时类型须完整。 |
+| 函数模板默认模板实参 | [DR226](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/dr226.html) | 是 | 函数模板形参可带默认模板实参。 |
+| 表达式SFINAE | [DR339](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/dr339.html) | 是 | 替换失败发生在表达式与类型推导中时按SFINAE处理，不报硬错误。 |
+| 外部模板 | [N1987](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1987.pdf) | 是 | 支持`extern template`显式实例化声明，抑制隐式实例化。 |
+| 枚举前向声明 | [N2764](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2764.pdf) | 是 | `enum class E : 底层类型;`可先声明后定义，底层类型须显式指定。 |
+| 标准化属性语法 | [N2761](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2761.pdf) | 是 | 支持`[[...]]`标准属性语法，如`[[noreturn]]`。 |
+| 广义常量表达式 | [N2235](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2235.pdf) | 是 | constexpr变量可作数组尺寸与模板实参，constexpr函数可在编译期求值。 |
+| 未定义行为转为可诊断错误 | [N1727](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1727.pdf) | 是 | 标准要求可诊断的未定义行为按编译错误或告警处理。 |
+| 继承构造函数 | [N2540](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2540.pdf) | 是 | 派生类可经`using Base::Base;`继承基类构造函数。 |
+| Unicode字符串字面量 | [N2442](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2442.pdf) | 是 | u8/u/U前缀字符串字面量可编译。 |
+| 原始字符串字面量 | [N2442](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2442.pdf) | 是 | R"(...)"内转义序列不生效，按字面字符处理。 |
+| 用户自定义字面量 | [N2765](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2765.pdf) | 是 | 支持operator""后缀字面量运算符，Device侧可定义并调用。 |
+| 内联命名空间 | [N2535](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2535.pdf) | 是 | inline namespace成员对外直接可见，可用于版本管理。 |
+| 非受限联合体 | [N2544](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2544.pdf) | 是 | 联合体成员可含非平凡成员与非静态数据成员初始化器。 |
+| 局部与无名类型作为模板实参 | [N2657](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2657.pdf) | 是 | 块作用域内定义的类型可作模板实参。 |
+| 基于范围的for循环 | [N2930](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2930.pdf) | 是 | 数组与定义了begin/end的类型可用范围for遍历；Device侧数组遍历可用。 |
+| 显式虚函数重载 | [N2928](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2927.pdf) | 是 | 支持override与final标识虚函数重载与终态。 |
+| 允许移动构造抛出异常（noexcept） | [N3050](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3050.pdf) | 是 | 支持noexcept说明符与noexcept运算符，`static_assert(noexcept(f))`可用。 |
 
 下表汇总了Device侧对C++11收录的C99特性的支持情况
 
@@ -42,3 +65,20 @@
 | long long | [N1811](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1811.pdf) | 是 | 至少64位，支持LL、ULL后缀与宽位数算术。 |
 | 扩展整型 | [N1988](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1988.pdf) | 是 | `<stdint.h>`与`<cinttypes>`的intmax\_t、uintmax\_t、INT64\_C等在Device侧可用。 |
 
+下表汇总了Device侧对C++11并发相关特性的支持情况。Device侧不支持动态内存分配与异常，并发特性中依赖该能力的部分均不可用，线程级同步经SIMT API（如`asc_syncthreads`）与原子API（如`asc_atomic_add`）实现，详见SIMT API参考。
+
+**表3**  C++11并发特性列表
+
+| C++11特性 | C++11 Proposal | 是否支持 | 说明 |
+| --- | --- | --- | --- |
+| 顺序点 | [N2239](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2239.pdf) | 否 | Device侧无标准顺序点模型，执行顺序以指令流为准。 |
+| 原子操作 | [N2427](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2427.pdf) | 部分 | `std::atomic`不可用；原子能力经SIMT原子API提供，如`asc_atomic_add`、`asc_atomic_cas`。 |
+| 强比较与交换 | [N2748](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2748.pdf) | 部分 | CAS能力经`asc_atomic_cas`提供，非`std::atomic`接口。 |
+| 双向栅栏 | [N2752](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2752.pdf) | 部分 | 内存栅栏经SIMT同步API提供，如`asc_threadfence`。 |
+| 内存模型 | [N2429](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2429.pdf) | 否 | Device侧不实现C++标准内存模型，一致性约束见SIMT API文档。 |
+| 数据依赖顺序：原子与内存模型 | [N2664](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2664.pdf) | 否 | 同上，以硬件一致性语义为准。 |
+| 异常传播 | [N2179](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2179.pdf) | 否 | Device侧不支持异常。 |
+| 信号处理器中使用原子 | [N2547](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2547.pdf) | 否 | Device侧无信号处理模型。 |
+| 线程局部存储 | [N2659](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2659.pdf) | 部分 | `threadIdx.x`映射的线程私有变量承担线程局部存储职责；`thread_local`关键字不可用。 |
+| 并发动态初始化与析构 | [N2660](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2660.pdf) | 否 | Device侧不支持动态初始化与析构的并发语义。 |
+| 最小GC与泄漏检测支持 | [N2670](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2670.pdf) | 否 | 不适用。 |

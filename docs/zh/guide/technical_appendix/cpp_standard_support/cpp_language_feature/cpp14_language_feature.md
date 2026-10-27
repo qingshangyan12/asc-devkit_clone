@@ -13,4 +13,9 @@
 | 成员初始化器与聚合 | [N3653](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3653.html) | 是 | 含默认成员初始化器的类可作为聚合用花括号初始化。 |
 | \[\[deprecated\]\]属性 | [N3760](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3760.html) | 是 | - |
 | 单引号数字分隔符 | [N3781](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3781.pdf) | 是 | `1'000'000`形式可用。 |
+| 上下文转换调整 | [N3323](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3323.pdf) | 是 | if等上下文中explicit bool转换可直接使用。 |
+| 返回类型推导函数 | [N3638](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3638.pdf) | 是 | 无尾置返回类型的函数可用auto推导返回类型。 |
+| 变量模板 | [N3651](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3651.pdf) | 是 | 支持`template <typename T> constexpr T var = ...;`变量模板。 |
+| 内存分配澄清 | [N3664](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3664.pdf) | 否 | Device侧不支持动态内存分配。 |
+| 带尺寸的释放 | [N3778](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3778.pdf) | 否 | Device侧不支持动态内存释放。 |
 

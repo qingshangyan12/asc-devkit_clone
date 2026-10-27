@@ -21,3 +21,28 @@
 | enum class构造规则 | [P0138R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0138r2.pdf) | 是 | 整型可直接列表初始化enum class。 |
 | 十六进制浮点字面量 | [P0245R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0245r1.html) | 是 | `0x1.8p3`形式可用。 |
 | `__has_include` | [P0061R1](https://wg21.link/p0061) | 是 | — |
+| 折叠表达式 | [N4295](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4295.pdf) | 是 | 支持一元与二元折叠，如`(args + ... + 0)`。 |
+| 扩展static_assert | [N3928](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3928.pdf) | 是 | static_assert可省略消息串。 |
+| 花括号初始化列表的auto推导新规则 | [N3922](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3922.pdf) | 是 | `auto x{1};`推导为int而非initializer_list。 |
+| 聚合初始化扩展 | [P0017R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0017r1.html) | 是 | 含基类的聚合可直接花括号初始化。 |
+| 泛化基于范围的for循环 | [P0184R0](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0184r0.pdf) | 是 | begin/end可返回不同类型。 |
+| 超对齐数据的动态内存分配 | [P0035R4](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0035r4.html) | 否 | Device侧不支持动态内存分配。 |
+| 保证拷贝消除 | [P0135R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0135r1.html) | 是 | 纯右值初始化对象时保证不产生拷贝。 |
+| 表达式求值顺序细化 | [P0145R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0145r3.html) | 是 | 求值顺序规则由编译器实现。 |
+| constexpr if | [P0292R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0292r2.pdf) | 是 | if constexpr按条件裁剪实例化分支。 |
+| 带初始化器的选择语句 | [P0305R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0305r1.pdf) | 是 | 支持`if (init; cond)`与`switch (init; cond)`。 |
+| 类模板的模板实参推导 | [P0091R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0091r3.html) | 是 | 构造函数实参可推导类模板实参，如`Box b(7);`。 |
+| auto声明非类型模板参数 | [P0127R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r2.html) | 是 | 支持`template <auto V>`形式。 |
+| 属性命名空间免重复 | [P0028R4](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0028r4.html) | 是 | using属性声明后可省略命名空间限定。 |
+| 忽略不支持的非标准属性 | [P0283R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0283r2.pdf) | 是 | 未知属性仅告警不报错。 |
+| 结构化绑定 | [P0217R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0217r3.pdf) | 是 | 支持`auto [a, b] = expr;`绑定结构体成员。 |
+| 移除register关键字弃用用法 | [P0001R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0001r1.html) | 是 | register不再是合法存储类说明符。 |
+| 移除operator++(bool)弃用用法 | [P0002R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0002r1.html) | 是 | bool不再支持自增自减。 |
+| 异常规格成为类型系统一部分 | [P0012R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0012r1.html) | 是 | noexcept参与函数类型；Device侧不支持异常抛出。 |
+| 继承构造函数措辞重写 | [P0136R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0136r1.html) | 是 | 继承构造函数按基类构造等价实现。 |
+| 内联变量 | [P0386R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0386r2.pdf) | 是 | 支持`inline constexpr`变量定义。 |
+| 模板模板实参匹配DR150 | [P0522R0](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0522r0.html) | 是 | 模板模板实参匹配规则放宽。 |
+| 移除动态异常规格 | [P0003R5](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0003r5.html) | 是 | 动态异常规格语法移除。 |
+| using声明中的包展开 | [P0195R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0195r2.html) | 是 | 支持`using Bs::operator()...;`包展开。 |
+| 字节类型定义 | [P0298R0](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0298r0.pdf) | 是 | `std::byte`可用，`<cstddef>`可在Device侧包含。 |
+| 类内显式实例化DR727 | [CWG727](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/cwg727.html) | 是 | 类内显式实例化按缺陷报告决议实现。 |
