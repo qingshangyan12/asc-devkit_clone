@@ -10,6 +10,8 @@
 
 #include "ins_temp_all_to_all_v_pairwise.h"
 #include <algorithm>
+#include <map>
+#include <set>
 
 namespace mc2_ops_hccl {
 constexpr u32 RING_IN_THREAD_OFFSET = 1;
@@ -23,6 +25,38 @@ constexpr u64 RING_SMALL_DATA_THRESHOLD = 2 * 1024 * 1024;
 //   scratch 区 [0, PAIRWISE_SLOT_NUM × stride)
 //   cclBuff  区 [PAIRWISE_SLOT_NUM × stride, scratchMultiple_ × stride)
 constexpr u32 CCL_BUFF_BASE_SLOT = PAIRWISE_SLOT_NUM;
+
+namespace {
+#ifndef AICPU_COMPILE
+void FilterPairwiseChannelsByDie(HcclComm comm, u32 myRank, std::vector<HcclChannelDesc>& channels)
+{
+    std::map<u32, std::set<EndpointAttrDieId>> seenDiesByPeer;
+    std::vector<HcclChannelDesc> selectedChannels;
+    selectedChannels.reserve(channels.size());
+    for (const auto& channel : channels) {
+        EndpointDesc localEndpoint = channel.localEndpoint;
+        EndpointAttrDieId dieId = 0;
+        const HcclResult ret = HcclRankGraphGetEndpointInfo(
+            comm, myRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
+        // Match HCCL: keep the link when the endpoint does not expose a die id.
+        if (ret != HCCL_SUCCESS || seenDiesByPeer[channel.remoteRank].insert(dieId).second) {
+            selectedChannels.push_back(channel);
+        }
+    }
+    channels.swap(selectedChannels);
+}
+#endif
+} // namespace
+
+bool InsTempAllToAllVPairwise::IsSupportedTopology(const TopoInfoWithNetLayerDetails* topoInfo)
+{
+    constexpr u32 MAX_RANK_SIZE = 128U;
+    constexpr u32 UNIT_RANK_SIZE = THREAD_SET_NUM * RANK_NUM_PER_BOARD;
+    return topoInfo != nullptr && topoInfo->topoLevelNums > 1U && topoInfo->level0Topo == Level0Shape::MESH_1D &&
+           topoInfo->deviceNumPerModule == RANK_NUM_PER_BOARD &&
+           topoInfo->level0Symmetric && topoInfo->userRankSize >= UNIT_RANK_SIZE &&
+           topoInfo->userRankSize <= MAX_RANK_SIZE && topoInfo->userRankSize % UNIT_RANK_SIZE == 0;
+}
 
 InsTempAllToAllVPairwise::InsTempAllToAllVPairwise(
     const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
@@ -68,12 +102,23 @@ HcclResult InsTempAllToAllVPairwise::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(
+        !IsSupportedTopology(topoInfo),
+        HCCL_WARNING(
+            "[InsTempAllToAllVPairwise][CalcRes] unsupported topology, rankSize[%u], "
+            "level0Topo[%u], levels[%u], deviceNumPerModule[%u], symmetric[%u].",
+            topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo), topoInfo->topoLevelNums,
+            topoInfo->deviceNumPerModule, static_cast<u32>(topoInfo->level0Symmetric)),
+        HCCL_E_NOT_SUPPORT);
     // 拓扑校验与参数推导（与 InitParam 共用入口）
     CHK_RET(CheckAndDeriveTopology());
 
-    // 一次申请全 rank channel，每 link 1 条，自适应 1ch/多 ch
+    // Request all peers, then retain the first link per peer/die as in HCCL.
     std::vector<HcclChannelDesc> myChannelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, myChannelDescs));
+#ifndef AICPU_COMPILE
+    FilterPairwiseChannelsByDie(comm, topoInfo->userRank, myChannelDescs);
+#endif
     resourceRequest.channels.push_back(myChannelDescs);
 
     // 1 主 + 组内 ring + 组间 ring（fullMesh 复用组内前 RANK_NUM_PER_BOARD 条）

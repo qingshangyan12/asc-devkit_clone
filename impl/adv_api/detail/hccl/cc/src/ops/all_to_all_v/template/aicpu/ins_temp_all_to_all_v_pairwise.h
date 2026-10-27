@@ -36,6 +36,8 @@ public:
     static constexpr u32 RANK_NUM_PER_BOARD = 8;
     static constexpr u32 THREAD_SET_NUM = 2;
 
+    static bool IsSupportedTopology(const TopoInfoWithNetLayerDetails* topoInfo);
+
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& tempAlgParams,
         const TemplateResource& templateResource) override;

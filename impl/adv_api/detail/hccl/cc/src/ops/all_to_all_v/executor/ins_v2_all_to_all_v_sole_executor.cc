@@ -329,8 +329,8 @@ REGISTER_ALG_META(
 // 对齐 hccl ins_v2_all_to_all_v_sole_executor.cc:611-620：AicpuAllToAllVSolePairwise（跨框 MESH_1D
 // pairwise 配对模板，TopoMatchOneLevel 单层扁平化 hierarchy）；topo 约束
 // （MESH_1D 多级 + 每框 8 卡 + rankSize%16==0 + level0Symmetric + <=128P）由
-// alltoallv_auto_selector 的 IsPairwiseCapable 分支守卫（devkit 无 hccl 注册框架的
-// REGISTER_ALG_ATTRS topoCustomCheck 注入链）
+// selector 与模板 CalcRes 共用 IsSupportedTopology 守卫，包括 forced-alg 资源预检
+// （devkit 无 hccl 注册框架的 REGISTER_ALG_ATTRS topoCustomCheck 注入链）。
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSolePairwise, InsV2AlltoAllVSoleExecutor, TopoMatchOneLevel,
     InsTempAllToAllVPairwise);

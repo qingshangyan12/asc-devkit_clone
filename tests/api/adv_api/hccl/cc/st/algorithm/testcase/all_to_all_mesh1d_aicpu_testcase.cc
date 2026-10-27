@@ -21,6 +21,7 @@
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
+#include "ins_temp_all_to_all_v_pairwise.h"
 
 using namespace mc2_ops_hccl;
 
@@ -163,7 +164,7 @@ TopoInfoWithNetLayerDetails MakePairwiseTopo(u32 rankSize = 32U)
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoallv_pairwise_selector_hits_and_guards)
 {
     AlltoAllVAutoSelector selector;
-    OpParam param = MakeAicpuParam(HCclCMDType::HCCL_CMD_ALLTOALLV);
+    OpParam param = MakeAicpuParam(HcclCMDType::HCCL_CMD_ALLTOALLV);
     std::string algName;
 
     // 命中：pairwise-capable 拓扑优先于 SoleMesh（对齐 hccl selector 顺序）
@@ -198,6 +199,55 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoallv_pairwise_selector_hits_and_gua
     topo.deviceNumPerModule = 4U;
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoallv_pairwise_supported_topology_boundaries)
+{
+    AlltoAllVAutoSelector selector;
+    OpParam param = MakeAicpuParam(HcclCMDType::HCCL_CMD_ALLTOALLV);
+    EXPECT_FALSE(InsTempAllToAllVPairwise::IsSupportedTopology(nullptr));
+    for (u32 rankSize : {16U, 32U, 48U, 64U, 128U}) {
+        TopoInfoWithNetLayerDetails topo = MakePairwiseTopo(rankSize);
+        EXPECT_TRUE(InsTempAllToAllVPairwise::IsSupportedTopology(&topo));
+        std::string algName;
+        EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+        EXPECT_EQ(algName, "AicpuAllToAllVSolePairwise");
+    }
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoallv_pairwise_resource_precheck_rejects_unsupported_topology)
+{
+    OpParam param = MakeAicpuParam(HcclCMDType::HCCL_CMD_ALLTOALLV);
+    std::vector<TopoInfoWithNetLayerDetails> unsupportedTopos;
+    for (u32 rankSize : {0U, 8U, 24U, 144U, 256U}) {
+        unsupportedTopos.push_back(MakePairwiseTopo(rankSize));
+    }
+    TopoInfoWithNetLayerDetails topo = MakePairwiseTopo();
+    topo.deviceNumPerModule = 4U;
+    unsupportedTopos.push_back(topo);
+    topo = MakePairwiseTopo();
+    topo.level0Symmetric = false;
+    unsupportedTopos.push_back(topo);
+    topo = MakePairwiseTopo();
+    topo.topoLevelNums = 1U;
+    unsupportedTopos.push_back(topo);
+    topo = MakePairwiseTopo();
+    topo.level0Topo = Level0Shape::CLOS;
+    unsupportedTopos.push_back(topo);
+
+    // Exercise CalcRes directly, as forced-alg preflight does, without the auto selector guard.
+    for (const auto& unsupported : unsupportedTopos) {
+        EXPECT_FALSE(InsTempAllToAllVPairwise::IsSupportedTopology(&unsupported));
+        std::vector<u32> ranks;
+        for (u32 rank = 0; rank < unsupported.userRankSize; ++rank) {
+            ranks.push_back(rank);
+        }
+        InsTempAllToAllVPairwise algTemplate(param, 0U, {ranks});
+        AlgResourceRequest request;
+        EXPECT_EQ(algTemplate.CalcRes(nullptr, param, &unsupported, request), HCCL_E_NOT_SUPPORT);
+        EXPECT_TRUE(request.channels.empty());
+        EXPECT_TRUE(request.notifyNumPerThread.empty());
+    }
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_template_uses_all_channels_per_rank)
