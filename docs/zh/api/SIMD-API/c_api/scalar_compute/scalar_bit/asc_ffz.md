@@ -1,11 +1,13 @@
 ---
 okftype: reference.api
-description: "在64位无符号整数的二进制表示中从最低位向最高位查找第一个值为0的比特并返回其位索引，未找到0时返回-1。"
+description: "查找 64 位无符号整数二进制表示中从最低有效位开始的第一个 0 的位置，未找到 0 时返回 -1，返回值需先判断 -1 再当位索引使用，运行在标量流水上。"
 tag:
   - roles: [compute]
   - operations: [bit_manipulation]
+  - traits: [count_limited]
 dependencies: []
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_ffz
 

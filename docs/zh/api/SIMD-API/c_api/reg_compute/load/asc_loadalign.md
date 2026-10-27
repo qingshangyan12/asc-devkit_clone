@@ -1,3 +1,23 @@
+---
+okftype: reference.api
+description: "从Unified Buffer 32字节对齐地址搬入数据到矢量或掩码寄存器，提供连续、立即数偏移、地址寄存器偏移与非连续DataBlock四种搬入模式。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer, datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md
+    kind: related
+    condition: "非连续模式返回矢量寄存器时使用"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
+    kind: related
+    condition: "连续模式返回掩码寄存器时使用"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移模式需先用 asc_update_addr_reg 更新偏移"
+version: ">=9.0.0"
+version_changes: []
+---
 # asc_loadalign
 
 ## 产品支持情况

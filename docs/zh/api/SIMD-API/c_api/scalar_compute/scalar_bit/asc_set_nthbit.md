@@ -1,11 +1,12 @@
 ---
 okftype: reference.api
-description: "将64位无符号整数的指定二进制位置为1，其余位保持不变，并返回修改后的无符号整数，越界索引按取模计算。"
+description: "把 64 位无符号整数的指定位置为 1 并返回修改后的整数，其余位保持不变，idx 超出 0 到 63 时按 idx 对 64 取模再取绝对值计算，输入数据本身不被修改。"
 tag:
   - roles: [compute]
   - operations: [bit_manipulation]
 dependencies: []
-version: ">=9.1.0"
+version: ">=9.0.0"
+version_changes: []
 ---
 # asc_set_nthbit
 

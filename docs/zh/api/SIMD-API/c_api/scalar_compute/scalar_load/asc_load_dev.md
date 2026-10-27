@@ -1,11 +1,16 @@
 ---
 okftype: reference.api
-description: "不经过DCache直接从GM地址读取整型数据，用于避免多核操作无法对齐到Cache Line时的数据覆盖问题。"
+description: "不经过DCache直接从Global Memory读取整型标量数据，用于多核访问无法按Cache Line对齐的GM地址、避免Cache Line粒度覆盖的场景。"
 tag:
   - roles: [data_movement]
   - operations: [load]
-dependencies: []
+  - traits: [scalar_operand, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: related
+    condition: "与其他通路共用GM地址时需清理/失效Cache Line"
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_load_dev
 
