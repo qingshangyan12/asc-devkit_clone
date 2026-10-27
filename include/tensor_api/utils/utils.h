@@ -31,8 +31,6 @@ namespace Std = AscendC::Std;
 
 enum class unit_flag_mode : uint8_t { disable = 0, enable_keep = 2, enable_update = 3 };
 
-__aicore__ inline constexpr int64_t get_vf_len();
-
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
 using _2 = Std::Int<2>;
@@ -77,7 +75,5 @@ struct ssbuf {};
 
 } // namespace te
 } // namespace asc
-
-#include "impl/tensor_api/utils/sys_var_impl.h"
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H

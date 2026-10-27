@@ -46,10 +46,6 @@ file(GLOB ASCENDC_UT_BASIC_STRUCT_CASE_SRC
     basic_struct/tensor/*.cpp
 )
 
-file(GLOB ASCENDC_UT_UTILS_CASE_SRC
-    utils/*.cpp
-)
-
 file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIC_CASE_SRC
     npu_arch_3510/aic/*.cpp
 )
@@ -63,7 +59,6 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         ${ASCENDC_DIR}/tests/main.cpp
         ${ASCENDC_UT_COMMON_SRC}
         ${ASCENDC_UT_BASIC_STRUCT_CASE_SRC}
-        ${ASCENDC_UT_UTILS_CASE_SRC}
         ${ASCENDC_UT_${product_type}_CASE_SRC}
     )
 
