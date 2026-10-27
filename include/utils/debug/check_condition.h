@@ -17,13 +17,13 @@
 
 namespace AscendC {
 
-inline void check_condition(bool condition, const char* message, const char* file, int line);
+inline void check_condition(bool condition, const char* violation_message, const char* file, int line);
 
 } // namespace AscendC
 
 #include "impl/utils/debug/check_condition_impl.h"
 
-#define ASC_HOST_CHECK_CONDITION(condition, message) \
-    AscendC::check_condition((condition), (message), __FILE__, __LINE__)
+#define ASC_HOST_CHECK_CONDITION(condition, violation_message) \
+    AscendC::check_condition((condition), (violation_message), __FILE__, __LINE__)
 
 #endif // INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H

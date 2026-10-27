@@ -39,7 +39,7 @@
 ## 函数原型
 
 ```cpp
-ASC_HOST_CHECK_CONDITION(condition, message)
+ASC_HOST_CHECK_CONDITION(condition, violation_message)
 ```
 
 ## 参数说明
@@ -49,7 +49,7 @@ ASC_HOST_CHECK_CONDITION(condition, message)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过，条件为`false`时终止当前进程。 |
-| message | 输入 | 条件不成立时输出的自定义错误信息。 |
+| violation_message | 输入 | 条件不成立时输出的自定义错误信息。 |
 
 ## 返回值说明
 
@@ -147,6 +147,6 @@ ASC_HOST_CHECK_CONDITION failed: error src0_device is nullptr, file=example.asc,
 
 输出中的信息来源如下：
 
-- `error src0_device is nullptr`：由宏参数`message`得到，即调用方传入的自定义错误信息。
+- `error src0_device is nullptr`：由宏参数`violation_message`得到，即调用方传入的自定义错误信息。
 - `example.asc`：由预定义宏`__FILE__`得到，即包含`ASC_HOST_CHECK_CONDITION`调用的源文件名。实际输出可能是文件名、相对路径或绝对路径，取决于编译命令。
 - `46`：由预定义宏`__LINE__`得到，即`ASC_HOST_CHECK_CONDITION`在源文件中的调用行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。
