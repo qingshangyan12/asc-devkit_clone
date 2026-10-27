@@ -1,24 +1,11 @@
 ---
 okftype: reference.api
-description: "按mask对矢量寄存器中的元素逐元素取绝对值，结果写入目的寄存器或由函数返回值返回，支持int8、int16、half、int32与float。"
+description: "根据mask对源操作数矢量数据寄存器按元素取绝对值，结果写入目的操作数或通过函数返回值返回；输入为有符号整数类型最小负值时结果保留原值不变。"
 tag:
   - roles: [compute]
   - operations: [absolute]
-  - traits: [elementwise]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-    condition: "正文据此说明矢量数据寄存器与掩码寄存器"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: related
-    condition: "正文据此引用 Reg 矢量计算通用约束"
-version: ">=9.0.0"
-version_changes:
-  - since: "9.2.0"
-    kind: overload_added
-    scope: "section:函数原型"
-    scope_basis: resolved
-    note: "新增函数返回值形式重载：CANN 9.2.0 Release Notes 记载为 Reg 算术等接口补充函数返回值形式的重载并明确列出 asc_abs；探测 inline vector_* asc_abs 首次出现在 9.2.0 的 reg_base_impl/reg_arith_intf_impl.h:995，对应正文 vector_<dtype> asc_abs(vector_<dtype> src, vector_bool mask) 一条。"
+dependencies: []
+version: ">=9.2.0"
 ---
 # asc_abs
 
