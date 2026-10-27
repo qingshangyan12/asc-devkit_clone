@@ -1,17 +1,24 @@
 ---
 okftype: reference.api
-description: "按元素判断src与value是否相等，成立时输出结果对应比特位为1，否则为0，该接口已废弃，请使用对应的非同步接口asc_eq_scalar和同步接口asc_sync替代。"
+description: "已废弃的标量相等比较同步接口，对half、int32_t或float矢量按元素与标量value比较，成立的比特位置1并按小端顺序写入dst，替代方案为asc_eq_scalar配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [comparison]
+  - traits: [datablock_granularity, scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "接口已废弃，配合同步接口asc_sync替代"
+    kind: requires
+    condition: "改用非同步接口后需自行调用asc_sync完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md
     kind: replaced_by
-    condition: "接口已废弃，使用对应非同步接口替代"
+    condition: "非同步比较接口替代本页同步接口"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include头对half、int32_t、float三个重载统一标注ASC_DEPRECATED(9.2.0, 2027/09/07, asc_eq_scalar and asc_sync)；CANN_9_2_0 Release Notes废弃表覆盖该类*_sync复合接口；仅2201可用，接口保留。"
 ---
 # asc_eq_scalar_sync（废弃）
 

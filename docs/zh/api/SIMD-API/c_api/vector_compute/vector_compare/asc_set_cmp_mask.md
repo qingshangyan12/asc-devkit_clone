@@ -1,13 +1,14 @@
 ---
 okftype: reference.api
-description: "为asc_select操作设置作用于选择的Mask掩码，掩码起始地址由sel_mask参数指定，需与asc_select配合使用。"
+description: "为asc_select操作设置作用于选择的Mask掩码，从UB地址读取掩码内容，需与asc_select配合使用，仅在2201架构支持。"
 tag:
   - roles: [configuration]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
-    kind: configures
-    condition: "需和asc_select操作配合使用"
-version: ">=9.0.0"
+    kind: related
+    condition: "正文说明该掩码用于 asc_select 操作"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_set_cmp_mask
 

@@ -1,20 +1,21 @@
 ---
 okftype: reference.api
-description: "按元素判断src0与src1是否不相等，成立时输出对应比特位为1，否则为0，结果可存入寄存器或目标地址，寄存器形式需配合asc_get_cmp_mask获取结果。"
+description: "逐元素比较 src0 是否不等于 src1，结果可按每元素1bit写入目的地址或留在比较寄存器中，仅在2201架构支持。"
 tag:
   - roles: [compute]
   - operations: [comparison]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
+    kind: related
+    condition: "正文据此引用通用地址重叠约束"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
-    kind: requires
-    condition: "使用寄存器形式的接口时"
+    kind: related
+    condition: "寄存器形式需配合它读取比较结果"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: "需要初始化结果寄存器时"
+    condition: "寄存器残留时用它初始化比较掩码"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_ne
 

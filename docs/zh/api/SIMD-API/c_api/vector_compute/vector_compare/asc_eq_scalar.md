@@ -1,14 +1,16 @@
 ---
 okftype: reference.api
-description: "按元素判断矢量src是否等于标量value，成立则输出结果的对应比特位为1，否则为0，dst按小端顺序排列为二进制结果。"
+description: "把矢量元素与标量逐元素比较是否相等，结果按每元素1bit写入目的地址，覆盖half、int32与float，仅在2201架构支持。"
 tag:
   - roles: [compute]
   - operations: [comparison]
-  - traits: [elementwise, scalar_operand]
+  - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
+    kind: related
+    condition: "正文据此引用通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 
 # asc_eq_scalar

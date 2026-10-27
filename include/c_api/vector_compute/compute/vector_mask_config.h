@@ -28,7 +28,7 @@
 #endif
 /**
  * @ingroup simd_c_api.vector_compute.vector_mask_config
- * @brief Sets the Mask mode to Counter mode so callers pass the element count and the vector unit infers iterations; use together with asc_set_vector_mask.
+ * @brief Switches the Mask working mode to Counter mode so that element counts can be passed directly.
  *
  * @override_id asc_set_mask_count__z
  * @archs 2201
@@ -37,7 +37,7 @@ __aicore__ inline void asc_set_mask_count();
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_mask_config
- * @brief Sets the Mask mode to the system default Normal mode, where the Mask parameter controls which elements participate in each iteration; use with asc_set_vector_mask.
+ * @brief Restores the Mask working mode to the default Normal mode.
  *
  * @override_id asc_set_mask_norm__z
  * @archs 2201
@@ -46,12 +46,12 @@ __aicore__ inline void asc_set_mask_norm();
 
 /**
  * @ingroup simd_c_api.vector_compute.vector_mask_config
- * @brief Sets the vector mask value indicating which elements participate; supports Normal and Counter modes and requires the Mask mode to be set beforehand.
+ * @brief Sets the mask value, interpreted as a 128-bit participation mask or as an element count depending on the Mask mode.
  *
  * @override_id asc_set_vector_mask__u64_u64
  * @archs 2201 3510
- * @param [in] mask_high 高64位Mask值。
- * @param [in] mask_low 低64位Mask值。
+ * @param [in] mask_high High 64 bits of the mask value. On 2201 products it is the high-order mask in Normal mode and must be 0 in Counter mode, where it has no effect.
+ * @param [in] mask_low Low 64 bits of the mask value. On 2201 products it is the low-order mask in Normal mode, while in Counter mode it carries the number of elements participating in the whole vector computation.
  */
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low);
 

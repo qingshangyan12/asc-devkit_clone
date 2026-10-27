@@ -1,13 +1,22 @@
 ---
 okftype: reference.api
-description: "从SPR中读取mask值并按数据类型格式化后返回，b16模式将每个bit扩展为2bit、b32模式扩展为4bit，拼成256bit掩码寄存器。"
+description: "从特殊用途寄存器读取掩码值并按数据类型格式化，b16 模式把每个 bit 扩展为 2bit、b32 模式扩展为 4bit，拼成 256bit 掩码寄存器返回。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg 矢量计算 C API 通用约束"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: related
+    condition: "在 VF 场景外由该接口设置掩码寄存器，再配合本接口在 Reg 场景获取"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: header_reorganized
+    scope: "page"
+    scope_basis: kind_default
+    note: "声明位置由 include/c_api/reg_compute/reg_load.h（9.1.0 及更早）迁移到 include/c_api/reg_compute/compute/reg_mask.h（9.2.0 起），与正文头文件路径一致；签名始终保持无参返回 vector_bool。"
 ---
 # asc_get_mask_spr
 

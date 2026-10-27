@@ -1,18 +1,25 @@
 ---
 okftype: reference.api
-description: "按元素判断src0与src1是否不等，每个元素的比较结果占1个bit并可输出到寄存器或目标地址；该接口已废弃，请使用对应的非同步接口asc_ne和同步接口asc_sync替代。"
+description: "已废弃的矢量不等比较同步接口，逐元素判断两个源矢量是否不等，结果可按位写入目的地址或输出到比较掩码寄存器，支持 half 与 float，替代方案为 asc_ne 配合 asc_sync。"
 tag:
   - roles: [compute]
-  - operations: [comparison]
-  - traits: [aligned_transfer, elementwise]
+  - operations: [comparison, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步等待场景配合asc_sync实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md
     kind: replaced_by
-    condition: "非同步比较场景改用asc_ne实现"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "同步比较复合接口废弃，改用 asc_ne 与 asc_sync；include/c_api/composite/vector_compute_composite.h 的 4 个声明均带 ASC_DEPRECATED(9.2.0)。"
 ---
 # asc_ne_sync（废弃）
 

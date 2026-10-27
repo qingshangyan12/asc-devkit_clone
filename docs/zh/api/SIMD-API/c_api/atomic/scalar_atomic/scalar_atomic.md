@@ -1,3 +1,6 @@
+---
+okftype: reference.index
+---
 # 标量原子操作
 
 - **[标量原子操作概述](scalar_atomic_overview.md)**

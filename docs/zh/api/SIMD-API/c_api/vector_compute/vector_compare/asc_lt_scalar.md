@@ -1,14 +1,16 @@
 ---
 okftype: reference.api
-description: "将源矢量中每个元素与标量value比较，小于标量值时输出结果对应比特位为1，否则为0，结果按小端序排列到dst，支持高维切分计算。"
+description: "把矢量元素与标量逐元素比较是否小于，结果按每元素1bit写入目的地址，覆盖half与float，仅在2201架构支持。"
 tag:
   - roles: [compute]
   - operations: [comparison]
-  - traits: [elementwise, scalar_operand]
+  - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
+    kind: related
+    condition: "正文据此引用通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_lt_scalar
 

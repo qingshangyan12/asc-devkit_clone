@@ -1,18 +1,32 @@
 ---
 okftype: reference.api
-description: "按元素判断src0 < src1是否成立，成立则目的操作数对应比特位为1否则为0，支持结果存入寄存器或输出到目标地址，起始地址需32字节对齐。该接口已废弃，替代为asc_lt与asc_sync。"
+description: "已废弃的同步比较接口，按元素判断src0是否小于src1，结果可写入比较寄存器或按小端序打包写入目的地址，提供half与float两组共四个原型，替代方案为asc_lt配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [comparison]
-  - traits: [elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景配合asc_sync实现"
+    kind: related
+    condition: "与非同步接口配合完成同步"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: related
+    condition: "结果写入寄存器后需用该接口读取比较结果"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
     kind: replaced_by
-    condition: "非同步计算采用asc_lt实现"
+    condition: "替代本同步比较接口的非同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: "结果写入寄存器时可用该接口初始化比较掩码"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "四个原型均带 ASC_DEPRECATED(9.2.0, 2027/09/07, asc_lt and asc_sync) 标记（include/c_api/composite/vector_compute_composite.h 中对应 @override_id 之前的宏行），替代方案为非同步比较接口 asc_lt 加 asc_sync；本页全部原型均属废弃范围，属整页废弃，不封可用上限。"
 ---
 # asc_lt_sync（废弃）
 

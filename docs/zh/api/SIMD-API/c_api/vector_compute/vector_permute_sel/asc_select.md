@@ -1,18 +1,18 @@
 ---
 okftype: reference.api
-description: "执行矢量选择操作，按sel_mask比特位从src0和src1中选择元素写入dst，比特位为1取src0、为0取src1，需配合asc_set_cmp_mask使用且操作数起始地址32字节对齐。"
+description: "根据比较掩码从两个源矢量中逐元素选择数据的C API接口：掩码位为1取src0、为0取src1，需配合asc_set_cmp_mask使用，提供前n个数据与高维切分两种形式，支持half与float，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
   - operations: [selection]
-  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
-    kind: requires
-    condition: "使用asc_select前需先设置选择掩码"
-version: ">=9.0.0"
+    kind: related
+    condition: "选择规则由该接口设置的比较掩码决定"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_select
 

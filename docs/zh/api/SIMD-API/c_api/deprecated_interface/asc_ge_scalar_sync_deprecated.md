@@ -1,17 +1,24 @@
 ---
 okftype: reference.api
-description: "按元素判断src >= value是否成立，成立输出1否则输出0，每个元素的比较结果占1个bit。该接口已废弃，请使用非同步接口asc_ge_scalar和同步接口asc_sync替代。"
+description: "已废弃的同步比较接口，逐元素判断 src 是否大于等于标量 value，每个元素的比较结果占1个bit并写入 dst，仅在 2201 架构支持，需改用 asc_ge_scalar 配合 asc_sync。"
 tag:
   - roles: [compute]
   - operations: [comparison]
+  - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: replaced_by
-    condition: "同步场景配合asc_sync替代"
+    condition: "替代本接口原有的同步等待语义"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md
     kind: replaced_by
-    condition: "非同步计算场景使用asc_ge_scalar替代"
+    condition: "替代本接口的矢量与标量比较能力，需另行插入同步"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include/c_api/composite/vector_compute_composite.h 中两个重载标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_ge_scalar and asc_sync)，正文改用 asc_ge_scalar 加 asc_sync；声明在 9.3.0-beta.1 仍保留，属废弃而非移除，不设版本上限。"
 ---
 # asc_ge_scalar_sync（废弃）
 

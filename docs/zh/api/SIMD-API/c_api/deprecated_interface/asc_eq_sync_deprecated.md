@@ -1,17 +1,30 @@
 ---
 okftype: reference.api
-description: "比较src0与src1在对应索引位置的元素大小，比较结果为真时输出结果对应比特位设为1，否则设为0，该接口已废弃，请使用对应的非同步接口asc_eq和同步接口asc_sync替代。"
+description: "已废弃的矢量相等比较同步接口，比较两路half、float或int32_t矢量对应元素并把结果比特位写入寄存器或dst，寄存器形式固定处理256B需配asc_get_cmp_mask读取，替代方案为asc_eq配合asc_sync。"
 tag:
   - roles: [compute]
   - operations: [comparison]
+  - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "接口已废弃，配合同步接口asc_sync替代"
+    kind: requires
+    condition: "改用非同步接口后需自行调用asc_sync完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
     kind: replaced_by
-    condition: "接口已废弃，使用对应非同步接口替代"
+    condition: "非同步比较接口替代本页同步接口"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+    condition: "结果存入寄存器的形式需用该接口读取比较结果"
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: "需要初始化比较结果寄存器时使用"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include头对5个重载统一标注ASC_DEPRECATED(9.2.0, 2027/09/07, asc_eq and asc_sync)；CANN_9_2_0 Release Notes废弃表覆盖该类*_sync复合接口；接口保留且仅2201可用。"
 ---
 # asc_eq_sync（废弃）
 

@@ -1,19 +1,25 @@
 ---
 okftype: reference.api
-description: "已废弃接口，用于获取当前运行核（逻辑核）的索引，建议改用内置变量block_idx结合asc_get_sub_block_num与asc_get_sub_block_id接口替代。"
+description: "已废弃的核索引查询接口，返回当前逻辑核索引；迁移时纯Vector或Cube场景直接用内置变量 block_idx，Mix场景需按 block_idx 乘子块数再加子块ID计算，头文件为 c_api/utils/sys_var.h。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
-    kind: replaced_by
-    condition: "替代时结合内置变量block_idx计算逻辑核索引"
+    kind: related
+    condition: "Mix场景按逻辑位置计算索引时提供当前Vector Core的ID"
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
-    kind: replaced_by
-    condition: "替代时结合内置变量block_idx计算逻辑核索引"
+    kind: related
+    condition: "Mix场景按逻辑位置计算索引时提供子块数量"
   - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
     kind: replaced_by
-    condition: "非Mix场景可直接使用内置变量block_idx，Mix场景需结合子块信息计算"
-version: ">=9.1.0,<=9.2.0"
+    condition: "非Mix场景可直接使用内置变量 block_idx 取得与原接口相同的返回值"
+version: ">=8.5.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include/c_api/utils/sys_var.h 中声明标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)，CANN 9.2.0 Release Notes 接口废弃表亦列出该接口；9.3.0-beta.1 声明仍保留，属废弃而非移除，不设版本上限。"
 ---
 # asc_get_block_idx（废弃）
 

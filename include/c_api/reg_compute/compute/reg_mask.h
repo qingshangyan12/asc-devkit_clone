@@ -27,37 +27,37 @@
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_mask
- * @brief Returns a mask for 8-bit elements and reduces value by the processed element count.
+ * @brief Generates a b8 mask from the element count value and subtracts the 256-element vector processing granularity from value in place.
  *
  * @override_id asc_update_mask_b8__Ru32
  * @archs 3510
- * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。 执行完一次该接口后，value = (value < VL_T) ? 0 : (value - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 例如，有320个b16数据类型的元素，每次处理128个元素： 第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。 第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。 第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ * @param [in,out] value Number of remaining elements; after the call it becomes value = (value < 256) ? 0 : (value - 256), so the count is consumed by one b8 vector processing unit.
  */
 __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_mask
- * @brief Returns a mask for 16-bit elements and reduces value by the processed element count.
+ * @brief Generates a b16 mask from the element count value and subtracts the 128-element vector processing granularity from value in place.
  *
  * @override_id asc_update_mask_b16__Ru32
  * @archs 3510
- * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。 执行完一次该接口后，value = (value < VL_T) ? 0 : (value - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 例如，有320个b16数据类型的元素，每次处理128个元素： 第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。 第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。 第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ * @param [in,out] value Number of remaining elements; after the call it becomes value = (value < 128) ? 0 : (value - 128), so the count is consumed by one b16 vector processing unit.
  */
 __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_mask
- * @brief Returns a mask for 32-bit elements and reduces value by the processed element count.
+ * @brief Generates a b32 mask from the element count value and subtracts the 64-element vector processing granularity from value in place.
  *
  * @override_id asc_update_mask_b32__Ru32
  * @archs 3510
- * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。 执行完一次该接口后，value = (value < VL_T) ? 0 : (value - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 例如，有320个b16数据类型的元素，每次处理128个元素： 第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。 第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。 第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ * @param [in,out] value Number of remaining elements; after the call it becomes value = (value < 64) ? 0 : (value - 64), so the count is consumed by one b32 vector processing unit.
  */
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_mask
- * @brief Reads a 128-bit mask from the SPR, expands each bit into 2 bits, and returns the resulting 256-bit b16 mask register for 16-bit vector computation.
+ * @brief Reads the b16 mask value from the SPR and returns it as a 256-bit mask register with every SPR bit expanded to two bits.
  *
  * @override_id asc_get_mask_spr_b16__z
  * @archs 3510
@@ -66,7 +66,7 @@ __simd_callee__ inline vector_bool asc_get_mask_spr_b16();
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_mask
- * @brief Reads a 64-bit mask from the SPR, expands each bit into 4 bits, and returns the resulting 256-bit b32 mask register for 32-bit vector computation.
+ * @brief Reads the b32 mask value from the SPR and returns it as a 256-bit mask register with every SPR bit expanded to four bits.
  *
  * @override_id asc_get_mask_spr_b32__z
  * @archs 3510
