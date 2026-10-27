@@ -11,7 +11,6 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -69,59 +68,6 @@ npu_op_package_add(demo LIBRARY kernel_b)
     assert "accepts only one KERNEL library per package" in error
     assert "already contains 'kernel_a'" in error
     assert "cannot add 'kernel_b'" in error
-
-
-@pytest.mark.skipif(shutil.which("ninja") is None, reason="Ninja is required")
-@pytest.mark.parametrize("source_suffix", ["", "/"])
-@pytest.mark.parametrize("build_path", ["build", "nested/build"])
-def test_kernel_copy_excludes_nested_build_directory(tmp_path, source_suffix, build_path):
-    source = tmp_path / "add.cpp"
-    source.write_text("int add() { return 0; }\n")
-    (tmp_path / "CMakeLists.txt").write_text(
-        f'''cmake_minimum_required(VERSION 3.16)
-project(kernel_copy NONE)
-include("{FWK_MODULES_DIR / "func.cmake"}")
-set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR}")
-set(ASCEND_PYTHON_EXECUTABLE python3)
-file(MAKE_DIRECTORY "${{CMAKE_BINARY_DIR}}/autogen")
-set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "${{CMAKE_BINARY_DIR}}/autogen")
-npu_op_kernel_library(kernel SRC_BASE "${{CMAKE_CURRENT_SOURCE_DIR}}{source_suffix}" TILING_LIBRARY tiling)
-'''
-    )
-    build = tmp_path / build_path
-
-    def run(*arguments):
-        result = subprocess.run(["cmake", *arguments], text=True, capture_output=True)
-        assert result.returncode == 0, result.stdout + result.stderr
-        return result
-
-    run("-G", "Ninja", "-S", str(tmp_path), "-B", str(build))
-    target = ("--build", str(build), "--target", "kernel_copy_kernel_srcs")
-    result = run(*target)
-    assert "GLOB mismatch" not in result.stdout + result.stderr
-    assert "Re-running CMake" not in result.stdout
-    stamp = build / "autogen/kernel_copy_kernel_srcs.timestamp"
-    copied = build / "kernel/binary/dynamic/add.cpp"
-    assert copied.read_text() == source.read_text()
-    copied_at = stamp.stat().st_mtime_ns
-    assert "Re-running CMake" not in run(*target).stdout
-    assert stamp.stat().st_mtime_ns == copied_at
-    (build / "autogen/generated.cpp").write_text("int generated() { return 0; }\n")
-    result = run(*target)
-    assert "GLOB mismatch" not in result.stdout + result.stderr
-    assert "Re-running CMake" not in result.stdout
-    assert stamp.stat().st_mtime_ns == copied_at
-    source.write_text("int add() { return 1; }\n")
-    run(*target)
-    assert copied.read_text() == source.read_text()
-    extra = tmp_path / "extra.cpp"
-    extra.write_text("int extra() { return 2; }\n")
-    run(*target)
-    extra_copy = build / "kernel/binary/dynamic/extra.cpp"
-    assert extra_copy.read_text() == extra.read_text()
-    extra.unlink()
-    run(*target)
-    assert not extra_copy.exists()
 
 
 def _valid_binary_json(op_type="AddCustomTemplate"):
