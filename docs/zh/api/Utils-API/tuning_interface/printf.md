@@ -101,15 +101,29 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
     AscendC::printf("fmt string %d\n", 0x123);
     ```
 
--   由于在simd vf中不能直接访问gm地址，因此使用simd vf中的printf时，需要先定义一个ubuf的字符串，该字符串即为原来的fmt变量。
+-   SIMD VF 的普通字符串入口使用 UB 格式字符串，可显式声明如下。GM 引用入口见下文：VF 仅传递字符串引用，由 AICore 消费端读取 GM 字符串正文。
 
     ```cpp
     __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
     ```
 
+-   Ascend 950PR/950DT 的调测扩展还提供 `__asc_simd_vf::GmDebugString`，用于把不可变 GM 字符串作为 SIMD VF printf 的引用传入。该句柄只保存 GM 地址的高低 32 位和包含 NUL 的长度，VF 不读取 GM；AICore 在调测记录发布到 GM FIFO 时复制字符串正文。源字符串必须在本次 `asc_vf_call` 完成前保持有效且不可修改。
+
+    ```cpp
+    __aicore__ void kernel(__gm__ const char* gmText)
+    {
+        auto fmt = __asc_simd_vf::make_gm_debug_string("value=%s\n", sizeof("value=%s\n"));
+        auto text = __asc_simd_vf::make_gm_debug_string(gmText, textLengthIncludingNul);
+        // 将句柄表放入 UB 后，在 VF 中使用 __asc_simd_vf::load_gm_debug_string。
+        asc_vf_call<PrintGm>(handleTable);
+    }
+    ```
+
+    该扩展使用独立的 UB 内部引用记录；Host 仍收到原有自包含的 `DUMP_SCALAR` / `DUMP_ASSERT` 记录。显式 `__ubuf__ const char*` 调用继续走兼容路径。上述 `__asc_simd_vf::GmDebugString` 路径要求已知长度，消费者按声明长度复制。新增的 `__asc_simd_vf::GmCStringRef` 路径只传地址，由 AICore 有界扫描 NUL，见文末。两者均要求源字符串有效且不可变，不能把 `%p` 参数当作字符串引用。
+
 <!-- npu="950" id15 -->
--   SIMD VF场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留Unified Buffer（UB）空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条调测数据必须能完整保存在该空间中，否则该条数据不会打印。
--   每次调用`simd_vf`的`printf`时，除格式字符串和参数外，还会固定占用32字节；整条打印数据需要按8字节对齐。
+-   SIMD VF场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留Unified Buffer（UB）空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条 UB 调测记录必须能完整保存在该空间中。GM 路径在此保存引用和参数，GM 字符串正文不必装入该 UB；展开后的完整 TLV 另受 GM FIFO 容量限制。
+-   普通 UB printf 的最终 TLV 除格式字符串和参数外，固定开销为32字节，并按8字节对齐。GM 路径的内部 UB 引用记录为48字节头部加每个参数16字节，再加内联 UB 字符串及对齐；最终 FIFO 中仍使用原有 TLV 布局。
 -   SIMD VF场景下，"simd\_printf\_fifo\_size\_per\_core"建议配置为3KB以上。配置过小且打印数据量较大时，部分调测数据不会被打印。
 <!-- end id15 -->
 
@@ -234,3 +248,33 @@ simt vf: d: (0, 1, 0), f: 3.140000, s: pass
 simt vf: d: (1, 1, 0), f: 3.140000, s: pass
 ......
 ```
+
+### SIMD VF 仅地址 GM 字符串入口（编译器适配前）
+
+3510 设备路径新增 `__asc_simd_vf::printf_gm(__asc_simd_vf::GmCStringRef fmt, Args&&... args)`。
+`__asc_simd_vf::GmCStringRef` 仅含 GM 地址的低、高32位，不要求调用者提供长度。
+AICore 侧用 `__asc_simd_vf::make_gm_cstring_ref(__gm__ const char*)` 构造引用，将其放入用户 UB 后，
+VF 用 `__asc_simd_vf::load_gm_cstring_ref` 读取。GM `%s` 参数同样使用该类型；数值、普通指针和 UB 字符串沿用各自参数编码。
+
+```cpp
+// AICore: source 已位于GM，且以NUL结束。
+auto ref = __asc_simd_vf::make_gm_cstring_ref(source);
+// 将ref的两个地址字段写入UB引用表，再启动VF。
+// VF:
+__asc_simd_vf::printf_gm(__asc_simd_vf::load_gm_cstring_ref(refs), 10);
+```
+
+VF 只提交引用，不读取 GM。AICore 根据每核 FIFO 容量进行有界 NUL 扫描，
+测得长度后复制正文、生成原有自包含 TLV。所有字符串共用一条记录的容量预算。
+消费端在 UB 记录尚未确认期间缓存测得的长度，FIFO 暂时空间不足时复用它们重试。
+无效描述或容量范围内未找到 NUL 会置停止标志，不发布该记录。
+源内存必须可读，并在 VF 消费完成前保持有效、不变；容量上限不等于地址有效性检查。
+
+现有 `__asc_simd_vf::GmDebugString` 带长度入口继续可用。当前 SDK **不支持自动将 VF 内的
+`printf_gm("literal")` 字面量迁移到 GM**；这需要编译器生成真正的 GM 常量及地址。
+使用 `__asc_simd_vf::printf_gm` 显式命名空间入口可避免依赖未适配的执行域名称映射。
+CPU debug 将引用解包后调用 `std::printf`；`ASCENDC_DUMP=0` 时关闭输出。
+
+完整样例：`examples/01_simd_cpp_api/01_utilities/00_printf/simd_vf_printf_gm/`。
+
+GM 引用类型、构造函数、加载函数及打印重载统一位于 `__asc_simd_vf` 命名空间。构造函数仍为 `__aicore__`，加载函数和打印入口为 `__simd_callee__`；命名空间不改变执行域。

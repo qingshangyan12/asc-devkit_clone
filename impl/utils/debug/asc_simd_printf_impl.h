@@ -289,4 +289,6 @@ __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 
 #endif // ASCENDC_CPU_DEBUG
 
+#include "impl/utils/debug/asc_simd_gm_printf_impl.h"
+
 #endif // IMPL_UTILS_DEBUG_ASC_SIMD_PRINTF_IMPL_H
