@@ -1,6 +1,3 @@
----
-okftype: reference.index
----
 # 搬运原子操作
 
 - **[asc_set_atomic_add](asc_set_atomic_add.md)**
