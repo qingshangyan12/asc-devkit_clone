@@ -1,28 +1,3 @@
----
-okftype: reference.api
-description: "按元素个数 value 生成掩码寄存器并自动扣除当前向量处理单元的元素数，支持 b8、b16、b32 三种位宽，用于循环处理超长矢量时逐次更新掩码。"
-tag:
-  - roles: [configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: requires
-    condition: "矢量数据寄存器与掩码寄存器的类型定义"
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-    condition: "Reg 矢量计算 C API 通用约束"
-version: ">=9.0.0"
-version_changes:
-  - since: "9.1.0"
-    kind: parameter_changed
-    scope: "param:value"
-    scope_basis: resolved
-    note: "参数名由 scalar 统一为 value（类型仍为 uint32_t& 输入/输出）：Release Notes CANN_9_1_0 明确记录 asc_update_mask_b8/b16/b32 参数名由 scalar 统一为 value，upstream/9.0.0 的声明为 (uint32_t& scalar)、9.1.0 起为 (uint32_t& value)。"
-  - since: "9.2.0"
-    kind: header_reorganized
-    scope: "page"
-    scope_basis: kind_default
-    note: "声明位置在 9.2.0 起统一到 include/c_api/reg_compute/compute/reg_mask.h，与正文头文件路径一致。"
----
 # asc_update_mask
 
 ## 产品支持情况
