@@ -49,7 +49,7 @@ dst[128] = min(src[0:64])
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 layout 构造 GM、UB Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将输入从 GM 搬运到 UB。
+    2. 使用 `asc::te::mutex` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将输入从 GM 搬运到 UB。
     3. 使用 `all_mask<float>` 和 `load` 将64个 `float` 数据加载为 Reg Tensor。
     4. 调用 `reduce_sum<reduce_scope::element, float>`、`reduce_max` 和 `reduce_min` 完成 element scope归约。
     5. 使用 `store` 写入三个 UB 结果区，再通过 `make_copy(copy_ub_to_gm{})` 和 `copy` 写回 GM。
