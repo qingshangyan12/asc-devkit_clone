@@ -19,14 +19,15 @@
 namespace __asc_aicore {
 
 __aicore__ inline void get_matrix_copy_param(
-    uint32_t dumpSize, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
+    uint32_t dumpBytes, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
 {
     constexpr int32_t blockCube = 16;
-    constexpr int32_t defaultOneBlockSize = 256;
+    // The caller supplies bytes; each 16x16 float matrix occupies 1024 bytes.
+    constexpr int32_t defaultOneBlockSize = blockCube * blockCube * sizeof(float);
     constexpr int32_t srcBurstLenSizeEle = 16;
 
-    uint16_t align = (dumpSize % defaultOneBlockSize == 0) ? 0 : 1;
-    uint16_t countBlks = align + dumpSize / defaultOneBlockSize;
+    uint16_t align = (dumpBytes % defaultOneBlockSize == 0) ? 0 : 1;
+    uint16_t countBlks = align + dumpBytes / defaultOneBlockSize;
     uint16_t burstLen =
         static_cast<uint16_t>(srcBurstLenSizeEle * srcBurstLenSizeEle * sizeof(float) / ASC_ONE_DATABLOCK_SIZE);
     n = countBlks * blockCube;
@@ -37,11 +38,11 @@ __aicore__ inline void get_matrix_copy_param(
 }
 
 template <typename T>
-__aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& len)
+__aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& alignDumpBytes)
 {
 #if defined(__DAV_CUBE__)
     uint16_t nSize, mSize, dstStrideDstD, srcStride;
-    get_matrix_copy_param(len, nSize, mSize, dstStrideDstD, srcStride);
+    get_matrix_copy_param(alignDumpBytes, nSize, mSize, dstStrideDstD, srcStride);
     copy_matrix_cc_to_gm(
         (__gm__ float*)dst, (__cc__ float*)src, 0, nSize, mSize, dstStrideDstD, srcStride, 0, QuantMode_t::NoQuant,
         static_cast<uint8_t>(false), false, false);
@@ -52,10 +53,13 @@ __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src
 }
 
 template <typename T>
-__aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
+__aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* src, const uint32_t& alignDumpBytes)
 {
 #if defined(__DAV_CUBE__)
-    copy_cbuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1, len, 0, 0);
+    // copy_cbuf_to_gm takes the burst length in 32-byte blocks.
+    copy_cbuf_to_gm(
+        reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1,
+        alignDumpBytes / ASC_ONE_DATABLOCK_SIZE, 0, 0);
     return 0;
 #else
     return 1;
