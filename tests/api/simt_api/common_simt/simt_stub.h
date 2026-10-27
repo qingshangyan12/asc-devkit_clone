@@ -75,6 +75,11 @@ static inline int __popc(unsigned int x)
     return count;
 }
 
+static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
+{
+    return 0;
+}
+
 template <typename T, typename U>
 constexpr uint32_t GetRoundBitNum()
 {
