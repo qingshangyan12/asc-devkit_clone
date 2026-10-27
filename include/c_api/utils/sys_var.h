@@ -32,7 +32,7 @@
 
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns SMMU version information as int64_t; the low 28 bits encode year, month, day and same-day sub-version for runtime version checks.
+ * @brief Returns the SMMU tag version, encoding the release date of the system memory management unit.
  *
  * @override_id asc_get_smmu_tag_version__z
  * @archs 2201 3510
@@ -40,7 +40,7 @@
 __aicore__ inline int64_t asc_get_smmu_tag_version();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the physical stack base address (int64_t) of the current core, typically used for debugging to locate the stack in physical memory.
+ * @brief Returns the physical base address of the current core's stack.
  *
  * @override_id asc_get_phy_stack_base__z
  * @archs 2201 3510
@@ -48,7 +48,7 @@ __aicore__ inline int64_t asc_get_smmu_tag_version();
 __aicore__ inline int64_t asc_get_phy_stack_base();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Reads the full 64-bit STATUS special register value as int64_t, reporting warning events; bits stay set until reset or cleared by reading, read-only.
+ * @brief Reads the 64-bit STATUS register value that records warning events during kernel execution.
  *
  * @override_id asc_get_status__z
  * @archs 2201 3510
@@ -56,7 +56,7 @@ __aicore__ inline int64_t asc_get_phy_stack_base();
 __aicore__ inline int64_t asc_get_status();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Reads the read-only system virtual base address register as int64_t, used to convert relative offsets into system virtual addresses for address derivation.
+ * @brief Returns the system virtual base address of the current core context.
  *
  * @override_id asc_get_sys_virtual_base__z
  * @archs 2201 3510
@@ -64,7 +64,7 @@ __aicore__ inline int64_t asc_get_status();
 __aicore__ inline int64_t asc_get_sys_virtual_base();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the number (int64_t) of AICs or AIVs on the current AI Core in split mode; a read-only value configured by the system before kernel launch.
+ * @brief Reads the number of Cube or Vector cores configured on the current AI Core.
  *
  * @override_id asc_get_sub_block_num__z
  * @archs 2201 3510
@@ -72,7 +72,7 @@ __aicore__ inline int64_t asc_get_sys_virtual_base();
 __aicore__ inline int64_t asc_get_sub_block_num();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the logical index (int64_t) of the AIC or AIV on the logical AI Core in split mode; the value lies in [0, SubBlockNum).
+ * @brief Returns the logical index of the AIC or AIV within the current logical AI Core in separation mode.
  *
  * @override_id asc_get_sub_block_id__z
  * @archs 2201 3510
@@ -80,7 +80,7 @@ __aicore__ inline int64_t asc_get_sub_block_num();
 __aicore__ inline int64_t asc_get_sub_block_id();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the raw 64-bit system cycle counter value as int64_t, monotonically increasing since hardware start, for performance and timing measurements.
+ * @brief Returns the raw 64-bit system cycle counter value.
  *
  * @override_id asc_get_system_cycle__z
  * @archs 2201 3510
@@ -88,7 +88,7 @@ __aicore__ inline int64_t asc_get_sub_block_id();
 __aicore__ inline int64_t asc_get_system_cycle();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the current system time in microseconds as int64_t, computed internally by dividing the system cycle counter by the chip clock factor.
+ * @brief Returns the current system time in microseconds, converted internally from the cycle counter.
  *
  * @override_id asc_get_system_clock__z
  * @archs 2201 3510
@@ -96,7 +96,7 @@ __aicore__ inline int64_t asc_get_system_cycle();
 __aicore__ inline int64_t asc_get_system_clock();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the base address of the inter-core synchronization registers as int64_t; read-only, it must first be configured with asc_set_ffts_base_addr.
+ * @brief Reads the base address of the inter-core synchronization register.
  *
  * @override_id asc_get_ffts_base_addr__z
  * @archs 2201
@@ -104,7 +104,7 @@ __aicore__ inline int64_t asc_get_system_clock();
 __aicore__ inline int64_t asc_get_ffts_base_addr();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns as int64_t the number identifying the current AI Core relative to the other AI Cores, useful for splitting work across cores.
+ * @brief Returns the index of the current AI Core among the cores of the task.
  *
  * @override_id asc_get_core_id__z
  * @archs 2201 3510
@@ -113,16 +113,16 @@ __aicore__ inline int64_t asc_get_core_id();
 __aicore__ inline uint64_t asc_get_overflow_status();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the on-chip physical address (uint64_t) computed from the given offset, for debugging, address derivation or tiling address calculation.
+ * @brief Converts an on-chip memory offset into the physical address used directly by hardware.
  *
  * @override_id asc_get_phy_buf_addr__u64
  * @archs 2201 3510
- * @param [in] offset 片上内存的地址偏移量，范围是0~物理内存大小。
+ * @param [in] offset Address offset within on-chip memory, ranging from 0 to the physical memory size.
  */
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the program counter pointer (int64_t); only the low 48 bits are a valid GM address and the upper 16 bits must be masked off.
+ * @brief Returns the program counter value pointing at the current instruction.
  *
  * @override_id asc_get_program_counter__z
  * @archs 2201 3510
@@ -130,25 +130,25 @@ __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 __aicore__ inline int64_t asc_get_program_counter();
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Output-parameter interface: writes the current AI processor architecture version into core_version (uint32_t) by reference; returns nothing.
+ * @brief Reads the AI processor architecture version into an output parameter.
  *
  * @override_id asc_get_arch_ver__Ru32
  * @archs 2201 3510
- * @param [out] core_version AI处理器架构版本，数据类型uint32_t。接收当前核的核心版本字段值，接口返回时该参数被覆写为ARCH_VER寄存器中的核心版本字段值，调用前无需初始化。
+ * @param [out] core_version Receives the core version field of the ARCH_VER register as uint32_t; the parameter is overwritten by the call, needs no initialization beforehand, and the documented values are 3510 for Ascend 950PR&950DT and 2201 for Atlas A3 and Atlas A2 products.
  */
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Writes the inter-core synchronization register base address obtained from aclrtGetHardwareSyncAddr before using asc_sync_block_wait/arrive; returns nothing.
+ * @brief Sets the base address of the inter-core synchronization register before paired block arrive/wait calls.
  *
  * @override_id asc_set_ffts_base_addr__u64
  * @archs 2201
- * @param [in] config 核间同步的基地址。取值范围[0, 2^48-1]。
+ * @param [in] config Base address for inter-core synchronization; range [0, 2^48 - 1], to be obtained on the host side via aclrtGetHardwareSyncAddr and passed in.
  */
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 /**
  * @ingroup simd_c_api.utils.sys_var
- * @brief Returns the vector register length VL as a constexpr int64_t, the number of elements processed per Repeat, used to derive masks and loop counts.
+ * @brief Returns the chip's vector register length VL in bytes as a compile-time constant.
  *
  * @override_id asc_get_vf_len__z
  * @archs 3510
@@ -158,7 +158,7 @@ __aicore__ inline constexpr int64_t asc_get_vf_len();
 ASC_DEPRECATED(9.2.0, "2027/09/07", block_num)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: returns the number of cores configured for the current task for multi-core logic control; use the built-in block_num variable, whose value matches.
+ * @brief Deprecated getter returning the number of cores configured for the current task.
  *
  * @override_id asc_get_block_num__z
  * @archs 2201 3510
@@ -174,7 +174,7 @@ on Vector cores instead.
 ASC_DEPRECATED(9.2.0, "2027/09/07", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: returns the index of the current running logical core; use built-in block_idx combined with asc_get_sub_block_num and asc_get_sub_block_id instead.
+ * @brief Deprecated getter returning the index of the current logical core.
  *
  * @override_id asc_get_block_idx__z
  * @archs 2201 3510

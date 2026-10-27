@@ -1,19 +1,14 @@
 ---
 okftype: reference.api
-description: "获取核间同步寄存器的基地址；本接口仅支持只读查询，基地址需先通过asc_set_ffts_base_addr预先配置后方可用于核间同步。"
+description: "获取核间同步寄存器的基地址，需先在Host侧取得硬件同步地址并经设置接口写入。"
 tag:
   - roles: [query]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
-    kind: related
-    condition: "核间同步寄存器基地址配置完成后"
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
-    kind: related
-    condition: "核间同步寄存器基地址配置完成后"
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md
-    kind: constrained_by
-    condition: "基地址用于核间同步时"
+    kind: requires
+    condition: "Host 侧经 aclrtGetHardwareSyncAddr 取基址后需先设置"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_get_ffts_base_addr
 

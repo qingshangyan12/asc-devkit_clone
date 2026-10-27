@@ -1,14 +1,28 @@
 ---
 okftype: reference.api
-description: "该接口已废弃，请改用asc_update_addr_reg实现，它用于初始化地址寄存器以在循环中存储地址偏移量，支持1-4个offset参数与b8、b16、b32位宽，适配1-4维Tensor并自动计算多维循环地址偏移。"
+description: "已废弃的地址寄存器初始化接口族，按 b8、b16、b32 位宽创建可存放 1 至 4 个偏移量的地址寄存器，供循环内多维迭代寻址，替代方案为 asc_update_addr_reg。"
 tag:
   - roles: [configuration]
   - traits: [high_dimensional]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+    condition: "地址寄存器的类型定义与调用示例所在页面"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: replaced_by
-    condition: "使用asc_update_addr_reg实现此功能"
+    condition: "正文声明的替代接口，按 b8/b16/b32 分别对应"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.1.0"
+    kind: capability_extended
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.1.0 起三个位宽版本的地址寄存器初始化接口由单个 offset 扩展为支持 1 至 4 个 offset 参数（Release Notes CANN_9_1_0 记录该扩展），用于适配 1 至 4 维 Tensor 的循环寻址；9.0.0 只有单参数形式。"
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "9.2.0 起 include 对三个位宽的重载逐条标记 ASC_DEPRECATED(9.2.0, \"2027/09/07\", asc_update_addr_reg_b32/b16/b8)，Release Notes CANN_9_2_0 的替代关系表说明地址寄存器类型与初始化接口统一更名为 addr_reg 与 asc_update_addr_reg_b8/b16/b32；声明保留，属 deprecated 而非 removed。"
 ---
 # asc_create_iter_reg (废弃)
 

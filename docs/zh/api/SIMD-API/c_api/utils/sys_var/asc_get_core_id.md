@@ -1,13 +1,11 @@
 ---
 okftype: reference.api
-description: "获取当前AI Core的编号，返回的是该AI Core相对其余AI Core的索引，常用于按核编号划分任务，实现多核并行处理不同数据分片。"
+description: "获取当前AI Core的编号，用于区分同一AI Core内的AIC与若干AIV执行单元。"
 tag:
   - roles: [query]
-dependencies:
-  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
-    kind: related
-    condition: "区分AI Core内部AIC/AIV索引与核间索引时"
-version: ">=9.1.0"
+dependencies: []
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_core_id
 

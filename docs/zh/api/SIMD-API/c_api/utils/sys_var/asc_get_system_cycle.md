@@ -1,12 +1,14 @@
 ---
 okftype: reference.api
-description: "读取只读系统cycle计数器，返回硬件运行以来的累计cycle数，常用于性能统计、耗时测量与执行序时序判断"
+description: "无参查询接口，读取64位只读系统cycle计数器返回int64_t原始计数值，随系统时钟持续递增；若换算为时间需按架构自行计算，950按除以1000、A3与A2按除以50得到微秒。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md
     kind: related
-version: ">=9.0.0"
+    condition: "需要接口内部完成频率换算时改用该接口"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_system_cycle
 

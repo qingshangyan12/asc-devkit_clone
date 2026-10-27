@@ -29,7 +29,7 @@
 
 /**
  * @ingroup simd_c_api.spr
- * @brief Returns the value of specified bits of the CTRL control register as int64_t; see asc_set_ctrl for the bit field meanings.
+ * @brief Reads the value of the CTRL control register.
  *
  * @override_id asc_get_ctrl__z
  * @archs 2201 3510
@@ -38,17 +38,17 @@ __aicore__ inline int64_t asc_get_ctrl();
 
 /**
  * @ingroup simd_c_api.spr
- * @brief Writes the given 64-bit config to specific bits of the CTRL control register (float saturation, mask mode, scalar UB DCache access, etc.); returns nothing.
+ * @brief Sets specific bits of the CTRL control register.
  *
  * @override_id asc_set_ctrl__u64
  * @archs 2201 3510
- * @param [in] config 待设置的寄存器值。常用CTRL寄存器比特位说明参考表2。
+ * @param [in] config Register value to write; the page documents the commonly used bits: CTRL[48] floating-point saturation mode (0 saturates INF to +/-MAX and NAN to 0, 1 keeps them), CTRL[49] whether scalar UB access goes through DCache, CTRL[50] saturation for fp8_e8m0_t/fp8_e5m2_t/fp8_e4m3fn_t scenarios, CTRL[53] integer saturation versus truncation, CTRL[56] MASK mode (0 per-element mask register, 1 MASK[31:0] element count) and CTRL[59]/CTRL[60] for float-to-integer and integer-to-integer precision-conversion saturation.
  */
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
 /**
  * @ingroup simd_c_api.spr
- * @brief Returns from the AR special register the valid data length (int64_t) packed by squeeze, used with asc_squeeze_and_storeunalign to learn how much data was moved out.
+ * @brief Reads the valid data length that squeeze operations accumulated in the AR special register.
  *
  * @override_id asc_get_squeeze_status__z
  * @archs 3510
@@ -57,35 +57,35 @@ __aicore__ inline int64_t asc_get_squeeze_status();
 
 /**
  * @ingroup simd_c_api.spr
- * @brief Enables or disables saturation for the selected saturation mode without changing other modes.
+ * @brief Enables or disables saturation for a given saturation mode.
  *
  * @override_id asc_set_saturation_flag__saturation_b
  * @archs 3510
- * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
- * @param [in] enable_sat 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。
+ * @param [in] saturation_mode Saturation mode to configure, of type asc_saturation_mode (FLOAT = 48 for floating-point computation and part of the precision conversions, FLOAT8 = 50 for fp8 scenarios, INT = 53 for integer computation, CAST = 59 for float-to-integer and integer-to-integer conversions).
+ * @param [in] enable_sat Whether to enable saturation: true enables it, false disables it, which means truncation for INT and non-saturation or truncation for FLOAT/FLOAT8/CAST as detailed in the mode table.
  */
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
 /**
  * @ingroup simd_c_api.spr
- * @brief Returns a bool indicating whether saturation is enabled for the given saturation mode; CAST also requires the USE_GLOBAL saturation strategy.
+ * @brief Reads whether saturation is enabled for a given saturation mode.
  *
  * @override_id asc_get_saturation_flag__saturation
  * @archs 3510
- * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ * @param [in] saturation_mode Saturation mode whose enabled state is queried, of type asc_saturation_mode (header enum values FLOAT = 48, FLOAT8 = 50, INT = 53, CAST = 59).
  */
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
 /**
  * @ingroup simd_c_api.spr
- * @brief Selects per-API or global saturation control without changing the saturation flags.
+ * @brief Sets the saturation control strategy that decides between per-API and global saturation configuration.
  *
  * @override_id asc_set_saturation_strategy__strategy
  * @archs 3510
- * @param [in] strategy 饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。
+ * @param [in] strategy Saturation control strategy of type asc_override_strategy: USE_API configures saturation per instruction or API path, USE_GLOBAL uses the global saturation configuration, which is the default.
  */
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
 /**
  * @ingroup simd_c_api.spr
- * @brief Returns the current saturation control strategy as asc_override_strategy, either USE_API or USE_GLOBAL; commonly used to save or verify the configuration.
+ * @brief Reads the current saturation control strategy.
  *
  * @override_id asc_get_saturation_strategy__z
  * @archs 3510
@@ -95,7 +95,7 @@ __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_get_squeeze_status)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: reads the value of the specified special register and returns it as an int64_t; use asc_get_squeeze_status to achieve this functionality instead.
+ * @brief Deprecated getter that reads the value of a special register.
  *
  * @override_id asc_get_ar_spr__z
  * @archs 3510

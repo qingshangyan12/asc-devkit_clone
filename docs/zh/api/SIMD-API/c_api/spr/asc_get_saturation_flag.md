@@ -1,20 +1,16 @@
 ---
 okftype: reference.api
-description: "按饱和模式类型查询当前是否开启饱和并返回布尔结果，对CAST模式还须饱和策略为USE_GLOBAL才会在精度转换中生效。"
+description: "按饱和模式类型查询当前是否开启饱和并返回布尔结果，CAST 模式还需结合饱和策略判断是否真正生效。"
 tag:
   - roles: [query]
-  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
     kind: related
-    condition: "saturation_mode参数取值"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
     kind: related
-    condition: "了解各饱和模式语义差异时"
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
-    kind: constrained_by
-    condition: "CAST模式下饱和配置生效时"
+    condition: "与设置接口配合回读"
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_get_saturation_flag
 

@@ -1,13 +1,11 @@
 ---
 okftype: reference.api
-description: "基于偏移量offset获取片上实际物理地址，用于调试、地址推导或tiling数据地址计算，不能与以数组方式申请内存的方法混用。"
+description: "基于偏移量获取片上实际物理地址，用于调试、地址推导或tiling地址计算场景。"
 tag:
   - roles: [query]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-    condition: "手工规划片上内存布局时"
-version: ">=9.1.0"
+dependencies: []
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_phy_buf_addr
 

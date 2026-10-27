@@ -1,16 +1,17 @@
 ---
 okftype: reference.api
-description: "在分离模式下获取逻辑AI Core上Cube Core（AIC）或Vector Core（AIV）的逻辑索引；返回的SubBlockIdx取值不小于0且小于子块总数。"
+description: "无参查询接口，在分离模式下返回当前逻辑AI Core上Cube Core或Vector Core的逻辑索引，取值落在0到SubBlockNum之间，只读且不修改任何寄存器或存储状态。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
     kind: related
-    condition: "解释SubBlockIdx取值范围上界时"
+    condition: "索引上界需通过该接口获取的SubBlockNum确定"
   - path: docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md
-    kind: constrained_by
-    condition: "分离模式下"
-version: ">=9.1.0"
+    kind: related
+    condition: "分离模式与逻辑AI Core架构说明"
+version: ">=8.5.0"
+version_changes: []
 ---
 # asc_get_sub_block_id
 

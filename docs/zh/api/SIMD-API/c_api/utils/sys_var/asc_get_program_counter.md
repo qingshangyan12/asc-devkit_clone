@@ -1,13 +1,14 @@
 ---
 okftype: reference.api
-description: "获取程序计数器的指针以定位当前程序执行位置，也可将其作为指令预取起始地址；返回值高16位为无效位，需用掩码取低48位有效地址。"
+description: "获取程序计数器指针以定位当前执行位置，也可作为指令预取的起始地址配合缓存预取接口使用。"
 tag:
   - roles: [query]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
     kind: related
-    condition: "将PC作为指令预取起始地址时"
+    condition: "可将当前指令地址作为预取起始地址"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_get_program_counter
 
