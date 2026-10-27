@@ -762,6 +762,7 @@ def _run_command(command: Command, cwd: Path, log, timeout: Optional[int]) -> in
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            errors="replace",
             preexec_fn=os.setsid if hasattr(os, "setsid") else None,
         )
         try:
