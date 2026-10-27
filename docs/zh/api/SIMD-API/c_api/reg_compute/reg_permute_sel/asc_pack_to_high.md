@@ -1,16 +1,18 @@
 ---
 okftype: reference.api
-description: "将源操作数元素选取低位后压缩写入目的操作数高半部分，支持矢量数据寄存器与掩码寄存器两种输入。"
+description: "把源寄存器元素截取低位后压缩写入目的寄存器的高半部分，掩码源则每 2bit 取低位 bit 压缩，支持引用输出与返回值两种形式。"
 tag:
   - roles: [compute]
   - operations: [compression]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
+    kind: requires
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg 矢量计算 C API 通用约束"
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_pack_to_high
 

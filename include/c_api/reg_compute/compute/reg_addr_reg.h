@@ -27,141 +27,141 @@
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b32 (4-byte unit) address register with 1 offset argument(s) in elements, for 1-D iterative addressing.
+ * @brief Returns an address register seeded with a single innermost-dimension element offset in b32 mode so that subsequent load/store operations auto-increment the Unified Buffer address.
  *
  * @override_id asc_update_addr_reg_b32__u32
  * @archs 3510
- * @param [in] offset 第1维的偏移量（最内层），单位为元素个数。 数据类型为uint32_t。 例如b32模式下offset=64表示64个float元素（一个VL即256B）。
+ * @param [in] offset Offset of the first (innermost) dimension in elements; in b32 mode one element advances the UB address by 4 byte(s), e.g. b32 offset=64 addresses 64 float elements, one 256-byte VL.
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b16 (2-byte unit) address register with 1 offset argument(s) in elements, for 1-D iterative addressing.
+ * @brief Returns an address register seeded with a single innermost-dimension element offset in b16 mode so that subsequent load/store operations auto-increment the Unified Buffer address.
  *
  * @override_id asc_update_addr_reg_b16__u32
  * @archs 3510
- * @param [in] offset 第1维的偏移量（最内层），单位为元素个数。 数据类型为uint32_t。 例如b32模式下offset=64表示64个float元素（一个VL即256B）。
+ * @param [in] offset Offset of the first (innermost) dimension in elements; in b16 mode one element advances the UB address by 2 byte(s) for any 2-byte element type.
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b8 (1-byte unit) address register with 1 offset argument(s) in elements, for 1-D iterative addressing.
+ * @brief Returns an address register seeded with a single innermost-dimension element offset in b8 mode so that subsequent load/store operations auto-increment the Unified Buffer address.
  *
  * @override_id asc_update_addr_reg_b8__u32
  * @archs 3510
- * @param [in] offset 第1维的偏移量（最内层），单位为元素个数。 数据类型为uint32_t。 例如b32模式下offset=64表示64个float元素（一个VL即256B）。
+ * @param [in] offset Offset of the first (innermost) dimension in elements; in b8 mode one element advances the UB address by 1 byte(s) for any 1-byte element type.
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b32 (4-byte unit) address register with 2 offset argument(s) in elements, for 2-D iterative addressing.
+ * @brief Returns an address register seeded with 2 element offsets covering 2 tensor dimensions in b32 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b32__u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b16 (2-byte unit) address register with 2 offset argument(s) in elements, for 2-D iterative addressing.
+ * @brief Returns an address register seeded with 2 element offsets covering 2 tensor dimensions in b16 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b16__u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b8 (1-byte unit) address register with 2 offset argument(s) in elements, for 2-D iterative addressing.
+ * @brief Returns an address register seeded with 2 element offsets covering 2 tensor dimensions in b8 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b8__u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b32 (4-byte unit) address register with 3 offset argument(s) in elements, for 3-D iterative addressing.
+ * @brief Returns an address register seeded with 3 element offsets covering 3 tensor dimensions in b32 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b32__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b16 (2-byte unit) address register with 3 offset argument(s) in elements, for 3-D iterative addressing.
+ * @brief Returns an address register seeded with 3 element offsets covering 3 tensor dimensions in b16 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b16__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b8 (1-byte unit) address register with 3 offset argument(s) in elements, for 3-D iterative addressing.
+ * @brief Returns an address register seeded with 3 element offsets covering 3 tensor dimensions in b8 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b8__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b32 (4-byte unit) address register with 4 offset argument(s) in elements, for 4-D iterative addressing.
+ * @brief Returns an address register seeded with 4 element offsets covering 4 tensor dimensions in b32 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b32__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset3 第4维的偏移量（最外层，如N×C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b16 (2-byte unit) address register with 4 offset argument(s) in elements, for 4-D iterative addressing.
+ * @brief Returns an address register seeded with 4 element offsets covering 4 tensor dimensions in b16 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b16__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset3 第4维的偏移量（最外层，如N×C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_addr_reg
- * @brief Updates and returns an addr_reg b8 (1-byte unit) address register with 4 offset argument(s) in elements, for 4-D iterative addressing.
+ * @brief Returns an address register seeded with 4 element offsets covering 4 tensor dimensions in b8 mode, so that asc_loadalign/asc_storealign auto-increment the Unified Buffer address during iteration.
  *
  * @override_id asc_update_addr_reg_b8__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 第1维的偏移量（最内层，如W维），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset1 第2维的偏移量（如H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset2 第3维的偏移量（如C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
- * @param [in] offset3 第4维的偏移量（最外层，如N×C×H×W维的总步长），单位为元素个数。 数据类型为uint32_t。
+ * @param [in] offset0 Offset of the first (innermost, e.g. W) dimension in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements, i.e. the cumulative stride of that dimension; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
@@ -169,122 +169,122 @@ __simd_callee__ inline addr_reg asc_update_addr_reg_b8(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b32)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b32 (4-byte unit) address register with 1 offset argument(s) for 1-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 1 element offset(s) (offset) in b32 mode, and is the equivalent of asc_update_addr_reg_b32.
  *
  * @override_id asc_create_iter_reg_b32__u32
  * @archs 3510
- * @param [in] offset 地址偏移量。
+ * @param [in] offset Offset of the single innermost dimension in elements; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b16)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b16 (2-byte unit) address register with 1 offset argument(s) for 1-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 1 element offset(s) (offset) in b16 mode, and is the equivalent of asc_update_addr_reg_b16.
  *
  * @override_id asc_create_iter_reg_b16__u32
  * @archs 3510
- * @param [in] offset 地址偏移量。
+ * @param [in] offset Offset of the single innermost dimension in elements; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b8)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b8 (1-byte unit) address register with 1 offset argument(s) for 1-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 1 element offset(s) (offset) in b8 mode, and is the equivalent of asc_update_addr_reg_b8.
  *
  * @override_id asc_create_iter_reg_b8__u32
  * @archs 3510
- * @param [in] offset 地址偏移量。
+ * @param [in] offset Offset of the single innermost dimension in elements; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b32)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b32 (4-byte unit) address register with 2 offset argument(s) for 2-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 2 element offset(s) (offset0, offset1) in b32 mode, and is the equivalent of asc_update_addr_reg_b32.
  *
  * @override_id asc_create_iter_reg_b32__u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b16)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b16 (2-byte unit) address register with 2 offset argument(s) for 2-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 2 element offset(s) (offset0, offset1) in b16 mode, and is the equivalent of asc_update_addr_reg_b16.
  *
  * @override_id asc_create_iter_reg_b16__u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b8)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b8 (1-byte unit) address register with 2 offset argument(s) for 2-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 2 element offset(s) (offset0, offset1) in b8 mode, and is the equivalent of asc_update_addr_reg_b8.
  *
  * @override_id asc_create_iter_reg_b8__u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b32)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b32 (4-byte unit) address register with 3 offset argument(s) for 3-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 3 element offset(s) (offset0, offset1, offset2) in b32 mode, and is the equivalent of asc_update_addr_reg_b32.
  *
  * @override_id asc_create_iter_reg_b32__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b16)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b16 (2-byte unit) address register with 3 offset argument(s) for 3-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 3 element offset(s) (offset0, offset1, offset2) in b16 mode, and is the equivalent of asc_update_addr_reg_b16.
  *
  * @override_id asc_create_iter_reg_b16__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b8)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b8 (1-byte unit) address register with 3 offset argument(s) for 3-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 3 element offset(s) (offset0, offset1, offset2) in b8 mode, and is the equivalent of asc_update_addr_reg_b8.
  *
  * @override_id asc_create_iter_reg_b8__u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b32)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b32 (4-byte unit) address register with 4 offset argument(s) for 4-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 4 element offset(s) (offset0, offset1, offset2, offset3) in b32 mode, and is the equivalent of asc_update_addr_reg_b32.
  *
  * @override_id asc_create_iter_reg_b32__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
- * @param [in] offset3 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements; in b32 mode one element advances the UB address by 4 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b32(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
@@ -292,14 +292,14 @@ __simd_callee__ inline addr_reg asc_create_iter_reg_b32(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b16)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b16 (2-byte unit) address register with 4 offset argument(s) for 4-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 4 element offset(s) (offset0, offset1, offset2, offset3) in b16 mode, and is the equivalent of asc_update_addr_reg_b16.
  *
  * @override_id asc_create_iter_reg_b16__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
- * @param [in] offset3 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements; in b16 mode one element advances the UB address by 2 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b16(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
@@ -307,14 +307,14 @@ __simd_callee__ inline addr_reg asc_create_iter_reg_b16(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_update_addr_reg_b8)
 /**
  * @ingroup simd_c_api.deprecated_interface
- * @brief Deprecated: initializes and returns an iter_reg b8 (1-byte unit) address register with 4 offset argument(s) for 4-D iterative addressing; replaced by asc_update_addr_reg.
+ * @brief Deprecated initializer that returns an address register seeded with 4 element offset(s) (offset0, offset1, offset2, offset3) in b8 mode, and is the equivalent of asc_update_addr_reg_b8.
  *
  * @override_id asc_create_iter_reg_b8__u32_u32_u32_u32
  * @archs 3510
- * @param [in] offset0 地址偏移量。
- * @param [in] offset1 地址偏移量。
- * @param [in] offset2 地址偏移量。
- * @param [in] offset3 地址偏移量。
+ * @param [in] offset0 Offset of the first dimension (innermost, e.g. W) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset1 Offset of the second dimension (cumulative stride, e.g. H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset2 Offset of the third dimension (cumulative stride, e.g. C*H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
+ * @param [in] offset3 Offset of the fourth dimension (outermost, cumulative stride, e.g. N*C*H*W in an N,C,H,W layout) in elements; in b8 mode one element advances the UB address by 1 byte(s).
  */
 __simd_callee__ inline addr_reg asc_create_iter_reg_b8(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);

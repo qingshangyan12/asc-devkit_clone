@@ -1,18 +1,24 @@
 ---
 okftype: reference.api
-description: "根据地址偏移矢量按DataBlock粒度将输入矢量收集到目的矢量中。该接口已废弃，请使用非同步接口asc_gather_datablock和同步接口asc_sync替代。"
+description: "已废弃的DataBlock粒度收集同步接口，按src_offset给出的地址偏移把uint16_t或uint32_t输入矢量按32字节块收集到目的矢量并等待PIPE_V，替代方案为asc_gather_datablock配合asc_sync。"
 tag:
-  - roles: [compute]
+  - roles: [data_movement]
   - operations: [gather]
   - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景配合asc_sync替代"
+    kind: requires
+    condition: "改用非同步接口后需自行调用asc_sync完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
     kind: replaced_by
-    condition: "非同步计算场景使用asc_gather_datablock替代"
+    condition: "非同步收集接口替代本页同步接口"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include头对uint16_t与uint32_t两个重载统一标注ASC_DEPRECATED(9.2.0, 2027/09/07, asc_gather_datablock and asc_sync)；CANN_9_2_0 Release Notes废弃表覆盖该类*_sync复合接口；接口保留且仅2201可用。"
 ---
 # asc_gather_datablock_sync（废弃）
 

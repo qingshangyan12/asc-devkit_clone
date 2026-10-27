@@ -1,15 +1,16 @@
 ---
 okftype: reference.api
-description: "根据地址偏移矢量按DataBlock粒度将输入矢量收集到目的矢量，偏移取值须保证元素类型位宽对齐。"
+description: "按 src_offset 给出的 DataBlock 粒度地址偏移，把源矢量中的数据块收集到目的矢量，支持 uint16_t 与 uint32_t，仅提供高维切分计算形式。"
 tag:
-  - roles: [compute]
+  - roles: [data_movement]
   - operations: [gather]
   - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
+    condition: "需遵守通用地址重叠约束"
 version: ">=9.0.0"
+version_changes: []
 ---
 # asc_gather_datablock
 

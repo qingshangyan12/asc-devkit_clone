@@ -1,17 +1,21 @@
 ---
 okftype: reference.api
-description: "将src中被掩码筛选的有效元素或bit复制到函数返回值对应位置，支持矢量数据寄存器间和掩码寄存器间两种复制模式，仅在AIV上生效。"
+description: "通过函数返回值完成掩码复制的接口，支持矢量数据寄存器到矢量数据寄存器以及掩码寄存器到掩码寄存器两种模式，未被掩码筛选的位置未定义或置零，仅在AIV上生效。"
 tag:
   - roles: [data_movement]
   - operations: [copy]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
     kind: related
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
+    condition: "Reg矢量计算C API通用约束见该页通用约束节"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
     kind: related
+    condition: "同功能的dst引用形式接口见该页掩码到掩码模式"
 version: ">=9.2.0"
+version_changes: []
 ---
 # asc_mask
 

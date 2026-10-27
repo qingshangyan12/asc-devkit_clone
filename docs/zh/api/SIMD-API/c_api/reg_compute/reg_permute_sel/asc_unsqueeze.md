@@ -1,16 +1,29 @@
 ---
 okftype: reference.api
-description: "根据掩码对矢量数据寄存器执行解压缩，dst第0个元素置0，第i个元素等于mask前i位中1的数量，最高位不参与统计，结果可写出或返回。"
+description: "按掩码对压缩索引做解压缩：目的寄存器第 0 个元素为 0，第 i 个元素等于掩码第 0 至 i-1 位中 1 的数量，掩码最高位不参与统计。"
 tag:
   - roles: [compute]
-  - operations: [compression]
+  - operations: [conversion]
+  - traits: [count_limited]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
+    kind: requires
+    condition: "矢量数据寄存器与掩码寄存器的类型定义"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg 矢量计算 C API 通用约束"
 version: ">=9.0.0"
+version_changes:
+  - since: "9.2.0"
+    kind: overload_added
+    scope: "section:函数原型"
+    scope_basis: resolved
+    note: "9.2.0 新增按函数名后缀区分数据类型的返回值形式 asc_unsqueeze_u8/s8/u16/s16/u32/s32（__simd_callee__ inline vector_T asc_unsqueeze_<suffix>(vector_bool mask)），9.0.0/9.1.0 只有引用输出形式；Release Notes CANN_9_2_0 明确记录这六个接口支持通过函数返回值获取掩码前缀计数结果。"
+  - since: "9.2.0"
+    kind: header_reorganized
+    scope: "page"
+    scope_basis: kind_default
+    note: "声明位置由 include/c_api/reg_compute/reg_vector.h（9.1.0 及更早）统一到 include/c_api/reg_compute/compute/reg_permute_sel.h（9.2.0 起）。"
 ---
 # asc_unsqueeze
 

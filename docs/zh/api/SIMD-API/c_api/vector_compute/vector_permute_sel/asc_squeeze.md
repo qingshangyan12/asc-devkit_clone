@@ -1,14 +1,15 @@
 ---
 okftype: reference.api
-description: "通过比较掩码src1将源矢量src0压缩成更短的向量并存储到dst，支持uint16_t与uint32_t类型，操作数起始地址需32字节对齐。"
+description: "按比较掩码把源矢量压缩成更短矢量并写入目的地址的C API接口，提供uint16_t与uint32_t两种重载，通过repeat与6个stride参数控制高维切分计算，流水类型为PIPE_V。"
 tag:
   - roles: [compute]
-  - operations: [compression]
+  - operations: [compact]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
-version: ">=9.0.0"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
+version: ">=9.1.0"
+version_changes: []
 ---
 # asc_squeeze
 

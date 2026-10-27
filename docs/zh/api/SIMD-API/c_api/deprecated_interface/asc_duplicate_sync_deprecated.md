@@ -1,17 +1,24 @@
 ---
 okftype: reference.api
-description: "执行矢量复制操作，将标量值复制填充到矢量中，要求目的地址32字节对齐，接口已废弃，替代方案为asc_duplicate与asc_sync。"
+description: "已废弃的矢量复制同步接口，把half、int16_t、uint16_t、bfloat16_t、float、int32_t或uint32_t标量复制填充到目的矢量的count个连续元素并等待流水，替代方案为asc_duplicate配合asc_sync。"
 tag:
-  - roles: [data_initialization]
-  - operations: [fill]
+  - roles: [compute]
+  - operations: [broadcast]
+  - traits: [scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: replaced_by
-    condition: "同步场景配合asc_sync实现"
+    kind: requires
+    condition: "改用非同步接口后需自行调用asc_sync完成同步"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
     kind: replaced_by
-    condition: "非同步计算场景改用asc_duplicate实现"
-version: ">=9.0.0"
+    condition: "非同步复制接口替代本页同步接口"
+version: ">=8.5.0"
+version_changes:
+  - since: "9.2.0"
+    kind: deprecated
+    scope: "page"
+    scope_basis: kind_default
+    note: "include头对7个标量类型重载统一标注ASC_DEPRECATED(9.2.0, 2027/09/07, asc_duplicate and asc_sync)；CANN_9_2_0 Release Notes废弃表列出该类*_sync复合接口；接口保留，未移除。"
 ---
 # asc_duplicate_sync（废弃）
 

@@ -1,20 +1,20 @@
 ---
 okftype: reference.api
-description: "对AR特殊寄存器执行清零，用于配合asc_squeeze_and_storeunalign及收尾接口使用，每组连续搬出操作开始前需调用一次，首次调用主接口前须先清零。"
+description: "把用于连续非对齐搬出的 AR 特殊寄存器清零，作为一组 asc_squeeze_and_storeunalign 搬出操作的起始步骤，仅在 AIV 上生效。"
 tag:
-  - roles: [compute]
-  - operations: [store]
+  - roles: [control]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: "Reg矢量计算C API通用约束"
+    condition: "Reg 矢量计算 C API 通用约束"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: related
-    condition: "配合主接口使用"
+    condition: "清零后由该接口在搬出过程中累加 AR 字节偏移"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
     kind: related
-    condition: "开始新一组操作前"
-version: ">=9.0.0"
+    condition: "同一搬出序列的收尾接口，开始新一组前需先调用"
+version: ">=9.2.0"
+version_changes: []
 ---
 # asc_squeeze_and_storeunalign_init
 

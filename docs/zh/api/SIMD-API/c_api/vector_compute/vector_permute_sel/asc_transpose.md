@@ -1,14 +1,18 @@
 ---
 okftype: reference.api
-description: "用于实现16*16的二维矩阵数据块转置，支持int16_t和uint16_t两种数据类型，要求dst与src的起始地址32字节对齐。"
+description: "实现16乘16二维矩阵数据块转置的C API接口，支持int16_t与uint16_t两种数据类型，dst与src起始地址需按32字节对齐，流水类型为PIPE_V。"
 tag:
-  - roles: [compute]
+  - roles: [data_movement]
   - operations: [transpose]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: "操作数地址存在重叠时"
-version: ">=9.1.0"
+    condition: "操作数地址重叠约束见该页通用地址重叠约束节"
+  - path: docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md
+    kind: related
+    condition: "产品型号与NPU架构映射说明"
+version: ">=9.0.0"
+version_changes: []
 ---
 # asc_transpose
 
