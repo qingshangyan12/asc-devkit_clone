@@ -23,6 +23,7 @@
 #define IMPL_MATMUL_SCHEDULER_BATCH_BATCH_SCHEDULER_SINGLE_H
 
 #include "batch_scheduler_intf.h"
+#include "../base/runtime_iterate_order.h"
 
 namespace AscendC {
 namespace Impl {
@@ -78,7 +79,7 @@ public:
             MATMUL_MODULE(BiasScheduler)->End();
             MATMUL_MODULE(CubeOutBuffer)->Destroy();
             if constexpr (
-                ((IsSameTypeV<SrcT, int8_t> || IsSameTypeV<SrcT, int4b_t>)&&IsSameTypeV<DstT, half>) ||
+                ((IsSameTypeV<SrcT, int8_t> || IsSameTypeV<SrcT, int4b_t>) && IsSameTypeV<DstT, half>) ||
                 (IsSameTypeV<SrcT, int8_t> && (IsSameTypeV<DstT, int8_t> || IsSameTypeV<DstT, uint8_t>))) {
                 MATMUL_MODULE(MatmulQuantProcessor)->Destroy();
             }
@@ -142,19 +143,9 @@ private:
             return MoveOnFirstIterate();
         } else {
             if constexpr (ToMatmulConfig(MM_CFG).iterateOrder == IterateOrder::UNDEF) {
-                if (likely(
-                        MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
-                        static_cast<int>(IterateOrder::ORDER_M))) {
+                if (IsRuntimeMatmulOrderM(MATMUL_MODULE(MatmulShapeTiling))) {
                     return MoveOnIterateOrderM();
                 } else {
-                    ASCENDC_ASSERT(
-                        (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
-                         static_cast<int>(IterateOrder::ORDER_N)),
-                        {
-                            KERNEL_LOG(
-                                KERNEL_ERROR, "iterateOrder is %d , which should be ORDER_N",
-                                MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder());
-                        });
                     return MoveOnIterateOrderN();
                 }
             } else if constexpr (ToMatmulConfig(MM_CFG).iterateOrder == IterateOrder::ORDER_M) {

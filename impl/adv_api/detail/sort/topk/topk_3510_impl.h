@@ -211,11 +211,10 @@ __aicore__ inline constexpr bool NeedPreProcess()
     return NeedReverse<isLargest>() || Internal::IsNeedTwiddleType<T>();
 }
 
-template <typename T, bool isReuseSrc, bool isLargest>
-__aicore__ inline void InitializeTempBuffer(
+template <typename T>
+__aicore__ inline void InitializeTempBufferAddresses(
     const LocalTensor<T>& tempBuffer, const uint32_t alignCount, __ubuf__ T*& tmpSrcData,
-    __ubuf__ int32_t*& tmpSrcIndex, __ubuf__ uint16_t*& tmpHistData, __ubuf__ T*& realWorkData,
-    __ubuf__ T*& sortTmpBuffer)
+    __ubuf__ int32_t*& tmpSrcIndex, __ubuf__ uint16_t*& tmpHistData)
 {
     __ubuf__ uint8_t* tmp = (__ubuf__ uint8_t*)tempBuffer.GetPhyAddr();
     tmpSrcData = (__ubuf__ T*)tmp;
@@ -234,6 +233,15 @@ __aicore__ inline void InitializeTempBuffer(
     }
 
     tmpHistData = (__ubuf__ uint16_t*)(tmpSrcIndex);
+}
+
+template <typename T, bool isReuseSrc, bool isLargest>
+__aicore__ inline void InitializeTempBuffer(
+    const LocalTensor<T>& tempBuffer, const uint32_t alignCount, __ubuf__ T*& tmpSrcData,
+    __ubuf__ int32_t*& tmpSrcIndex, __ubuf__ uint16_t*& tmpHistData, __ubuf__ T*& realWorkData,
+    __ubuf__ T*& sortTmpBuffer)
+{
+    InitializeTempBufferAddresses(tempBuffer, alignCount, tmpSrcData, tmpSrcIndex, tmpHistData);
 
     if constexpr (NeedPreProcess<T, isLargest>()) {
         if constexpr (!isReuseSrc) {
@@ -257,22 +265,7 @@ __aicore__ inline void InitializeTempBuffer(
     __ubuf__ int32_t*& tmpSrcIndex, __ubuf__ uint16_t*& tmpHistData, __ubuf__ T*& realWorkData,
     __ubuf__ T*& sortTmpBuffer)
 {
-    __ubuf__ uint8_t* tmp = (__ubuf__ uint8_t*)tempBuffer.GetPhyAddr();
-    tmpSrcData = (__ubuf__ T*)tmp;
-
-    if constexpr (sizeof(T) == 8) {
-        uint32_t srcOffset = 0;
-        if (alignCount < LOAD_NUMS_PER_ROUND) {
-            srcOffset += sizeof(T) * LOAD_NUMS_PER_ROUND;
-        } else {
-            srcOffset += sizeof(T) * alignCount;
-        }
-        tmpSrcIndex = (__ubuf__ int32_t*)((__ubuf__ uint8_t*)tmpSrcData + srcOffset);
-    } else {
-        tmpSrcIndex = (__ubuf__ int32_t*)((__ubuf__ uint8_t*)tmpSrcData + sizeof(T) * alignCount);
-    }
-
-    tmpHistData = (__ubuf__ uint16_t*)(tmpSrcIndex);
+    InitializeTempBufferAddresses(tempBuffer, alignCount, tmpSrcData, tmpSrcIndex, tmpHistData);
 
     if (NeedPreProcess<T>(isLargest)) {
         if constexpr (!isReuseSrc) {

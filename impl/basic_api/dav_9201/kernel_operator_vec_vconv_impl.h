@@ -2459,6 +2459,35 @@ __aicore__ inline void CastDeqImpl(__ubuf__ U* dst, __ubuf__ T* src, const uint3
     }
 }
 
+template <typename U, typename T, bool isCounterMode, bool isBitMap, bool isSetMask>
+__simd_callee__ inline void PrepareCastDeqMask(
+    Reg::MaskReg& maskReg0, Reg::MaskReg& fullMask, uint32_t& sreg, uint8_t& repeatTime, const int32_t mask,
+    __ubuf__ uint64_t* tempBuf)
+{
+    constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    if constexpr (isCounterMode) {
+        if constexpr (!isSetMask) {
+            maskReg0 = Reg::MoveMask<uint16_t>();
+            Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg0);
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
+            sreg = static_cast<uint32_t>(tempBuf[0]);
+        }
+        repeatTime = CeilDivision(sreg, oneRepSize);
+    } else {
+        if constexpr (isBitMap) {
+            maskReg0 = Reg::MoveMask<T>();
+        } else {
+            if constexpr (isSetMask) {
+                uint32_t maskCount = static_cast<uint32_t>(mask);
+                maskReg0 = Reg::UpdateMask<T>(maskCount);
+            } else {
+                maskReg0 = Reg::MoveMask<T>();
+            }
+        }
+    }
+    fullMask = Reg::CreateMask<U, Reg::MaskPattern::ALL>();
+}
+
 template <typename U, typename T, bool isCounterMode, bool isBitMap, bool isSetMask, bool halfBlock>
 __simd_vf__ inline void CastVecDeqLevel0ImplVF(
     __ubuf__ U* dst, __ubuf__ T* src, const int32_t mask, __ubuf__ uint64_t* tempBuf, uint8_t repeatTime,
@@ -2485,27 +2514,7 @@ __simd_vf__ inline void CastVecDeqLevel0ImplVF(
     uint32_t sreg = static_cast<uint32_t>(mask);
     GenVecCastDeqParam(deqScaleAddr, scaleReg, offsetReg, signMask, unSignMask, tmpReg, fullMask);
     GenGatherIndex((Reg::RegTensor<int8_t>&)mrg2ChnIndexReg);
-    if constexpr (isCounterMode) {
-        if constexpr (!isSetMask) {
-            maskReg0 = Reg::MoveMask<uint16_t>();
-            Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg0);
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
-            sreg = static_cast<uint32_t>(tempBuf[0]);
-        }
-        repeatTime = CeilDivision(sreg, oneRepSize);
-    } else {
-        if constexpr (isBitMap) {
-            maskReg0 = Reg::MoveMask<T>();
-        } else {
-            if constexpr (isSetMask) {
-                uint32_t sreg = static_cast<uint32_t>(mask);
-                maskReg0 = Reg::UpdateMask<T>(sreg);
-            } else {
-                maskReg0 = Reg::MoveMask<T>();
-            }
-        }
-    }
-    fullMask = Reg::CreateMask<U, Reg::MaskPattern::ALL>();
+    PrepareCastDeqMask<U, T, isCounterMode, isBitMap, isSetMask>(maskReg0, fullMask, sreg, repeatTime, mask, tempBuf);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         if constexpr (isCounterMode) {
             maskReg0 = Reg::UpdateMask<T>(sreg);
@@ -2560,27 +2569,7 @@ __simd_vf__ inline void CastDeqLevel0ImplVF(
     constexpr int8_t zero = 0;
     uint32_t halfRepStride = halfRepBlkSize * blockElm * repeatParams.srcBlkStride;
     uint32_t sreg = static_cast<uint32_t>(mask);
-    if constexpr (isCounterMode) {
-        if constexpr (!isSetMask) {
-            maskReg0 = Reg::MoveMask<uint16_t>();
-            Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg0);
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
-            sreg = static_cast<uint32_t>(tempBuf[0]);
-        }
-        repeatTime = CeilDivision(sreg, oneRepSize);
-    } else {
-        if constexpr (isBitMap) {
-            maskReg0 = Reg::MoveMask<T>();
-        } else {
-            if constexpr (isSetMask) {
-                uint32_t sreg = static_cast<uint32_t>(mask);
-                maskReg0 = Reg::UpdateMask<T>(sreg);
-            } else {
-                maskReg0 = Reg::MoveMask<T>();
-            }
-        }
-    }
-    fullMask = Reg::CreateMask<U, Reg::MaskPattern::ALL>();
+    PrepareCastDeqMask<U, T, isCounterMode, isBitMap, isSetMask>(maskReg0, fullMask, sreg, repeatTime, mask, tempBuf);
     GenGatherIndex((Reg::RegTensor<int8_t>&)mrg2ChnIndexReg);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         if constexpr (isCounterMode) {

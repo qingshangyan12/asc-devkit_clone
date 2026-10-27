@@ -19,6 +19,7 @@
 #include "../kernel_utils.h"
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_vec_template_impl.h"
+#include "kernel_operator_mask_prepare_impl.h"
 #include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace AscendC {
@@ -89,15 +90,7 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     BasicAPIMaskStruct maskArrayStruct;
-    if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(
-            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
-        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
-    } else {
-        ASCENDC_ASSERT(maskArray == nullptr, {
-            KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false.");
-        });
-    }
+    PrepareLevel0MaskArray<isMaskBitMode>(maskArrayStruct, maskArray, maskCount);
     __ubuf__ uint64_t* maskBuf = nullptr;
 
     if (Internal::IsCounterMode()) {
@@ -186,15 +179,7 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     BasicAPIMaskStruct maskArrayStruct;
-    if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(
-            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
-        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
-    } else {
-        ASCENDC_ASSERT(maskArray == nullptr, {
-            KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false.");
-        });
-    }
+    PrepareLevel0MaskArray<isMaskBitMode>(maskArrayStruct, maskArray, maskCount);
     __ubuf__ uint64_t* maskBuf = nullptr;
 
     if (Internal::IsCounterMode()) {

@@ -23,6 +23,7 @@
 #define IMPL_MATMUL_SCHEDULER_MDL_BASE_MX_H
 
 #include "scheduler_intf.h"
+#include "runtime_iterate_order.h"
 #include "scheduler_mdl_mx_base.h"
 
 namespace AscendC {
@@ -84,19 +85,9 @@ public:
                 MATMUL_MODULE(KLoop)->InnerStart();
             }
             if constexpr (ToMatmulConfig(MM_CFG).iterateOrder == IterateOrder::UNDEF) {
-                if (likely(
-                        MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
-                        static_cast<int>(IterateOrder::ORDER_M))) {
+                if (IsRuntimeMatmulOrderM(MATMUL_MODULE(MatmulShapeTiling))) {
                     return MoveOnIterateOrderM();
                 } else {
-                    ASCENDC_ASSERT(
-                        (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
-                         static_cast<int>(IterateOrder::ORDER_N)),
-                        {
-                            KERNEL_LOG(
-                                KERNEL_ERROR, "iterateOrder is %d , which should be ORDER_N",
-                                MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder());
-                        });
                     return MoveOnIterateOrderN();
                 }
             } else if constexpr (ToMatmulConfig(MM_CFG).iterateOrder == IterateOrder::ORDER_N) {

@@ -501,6 +501,25 @@ __aicore__ inline void AscendQuantPerGroupForKRow(
     }
 }
 
+template <typename dstT, typename srcT, typename scaleT, const AscendQuantPolicy& policy>
+__aicore__ inline void CheckAscendQuantParams(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const AscendQuantParam& para)
+{
+    static_assert(SupportType<srcT, half, float>(), "AscendQuant only support half/float input dtype");
+    static_assert(SupportType<scaleT, half, float>(), "AscendQuant only support half/float scale dtype");
+    static_assert(
+        (policy == AscendQuantPolicy::PER_TOKEN || policy == AscendQuantPolicy::PER_GROUP),
+        "unsupported policy for AscendQuant in current device!");
+    ASCENDC_ASSERT(
+        (para.calCount <= srcTensor.GetSize() && para.calCount <= dstTensor.GetSize() && para.calCount >= 0), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "calCount is %u, which should be in [0, min(%u, %u)]", para.calCount, srcTensor.GetSize(),
+                dstTensor.GetSize());
+        });
+    ASCENDC_ASSERT(
+        (para.calCount % para.n == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount must be an integer multiple of n!"); });
+}
+
 template <
     typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
     const AscendQuantPolicy& policy>
@@ -515,19 +534,7 @@ __aicore__ inline void AscendQuantImpl(
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN/VECOUT/VECCALC");
-    static_assert(SupportType<srcT, half, float>(), "AscendQuant only support half/float input dtype");
-    static_assert(SupportType<scaleT, half, float>(), "AscendQuant only support half/float scale dtype");
-    static_assert(
-        (policy == AscendQuantPolicy::PER_TOKEN || policy == AscendQuantPolicy::PER_GROUP),
-        "unsupported policy for AscendQuant in current device!");
-    ASCENDC_ASSERT(
-        (para.calCount <= srcTensor.GetSize() && para.calCount <= dstTensor.GetSize() && para.calCount >= 0), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "calCount is %u, which should be in [0, min(%u, %u)]", para.calCount, srcTensor.GetSize(),
-                dstTensor.GetSize());
-        });
-    ASCENDC_ASSERT(
-        (para.calCount % para.n == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount must be an integer multiple of n!"); });
+    CheckAscendQuantParams<dstT, srcT, scaleT, policy>(dstTensor, srcTensor, para);
     if constexpr (policy == AscendQuantPolicy::PER_TOKEN) {
         static_assert(SupportType<dstT, int8_t>(), "AscendQuant PerToken only support int8_t output dtype");
         AscendQuantPerToken<dstT, srcT, scaleT, config>(
@@ -562,19 +569,7 @@ __aicore__ inline void AscendQuantImpl(
     CheckTensorPosition(dstTensor, "dstTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
-    static_assert(SupportType<srcT, half, float>(), "AscendQuant only support half/float input dtype");
-    static_assert(SupportType<scaleT, half, float>(), "AscendQuant only support half/float scale dtype");
-    static_assert(
-        (policy == AscendQuantPolicy::PER_TOKEN || policy == AscendQuantPolicy::PER_GROUP),
-        "unsupported policy for AscendQuant in current device!");
-    ASCENDC_ASSERT(
-        (para.calCount <= srcTensor.GetSize() && para.calCount <= dstTensor.GetSize() && para.calCount >= 0), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "calCount is %u, which should be in [0, min(%u, %u)]", para.calCount, srcTensor.GetSize(),
-                dstTensor.GetSize());
-        });
-    ASCENDC_ASSERT(
-        (para.calCount % para.n == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount must be an integer multiple of n!"); });
+    CheckAscendQuantParams<dstT, srcT, scaleT, policy>(dstTensor, srcTensor, para);
     if constexpr (policy == AscendQuantPolicy::PER_TOKEN) {
         static_assert(SupportType<dstT, int8_t>(), "AscendQuant PerToken only support int8_t output dtype");
         AscendQuantPerToken<dstT, srcT, scaleT, config>(

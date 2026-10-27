@@ -1057,7 +1057,8 @@ __aicore__ inline void ReduceMaxIntrinsicsImpl(
     }
 }
 
-__aicore__ inline void ReduceMaxIntrinsicsImpl(
+template <bool isMax>
+__aicore__ inline void ReduceFloatArrayMaskImpl(
     __ubuf__ float* sharedTmpBuffer, __ubuf__ float* srcLocal, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride)
 {
@@ -1081,12 +1082,23 @@ __aicore__ inline void ReduceMaxIntrinsicsImpl(
         uint32_t strideConfig1 = ((static_cast<uint32_t>(0)) << 16);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             vsldb(vreg0, srcLocal + i * srcRepStride * 8, strideConfig0, preg1);
-            vcmax(vreg1, vreg0, preg1, MODE_ZEROING);
+            if constexpr (isMax) {
+                vcmax(vreg1, vreg0, preg1, MODE_ZEROING);
+            } else {
+                vcmin(vreg1, vreg0, preg1, MODE_ZEROING);
+            }
             vstus(ureg, 2, vreg1, sharedTmpBuffer, POST_UPDATE);
         }
         vstas(ureg, sharedTmpBuffer, 0, POST_UPDATE);
     }
     AscendCUtils::FreeTemporaryBuffer<uint8_t>(tempBuf);
+}
+
+__aicore__ inline void ReduceMaxIntrinsicsImpl(
+    __ubuf__ float* sharedTmpBuffer, __ubuf__ float* srcLocal, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride)
+{
+    ReduceFloatArrayMaskImpl<true>(sharedTmpBuffer, srcLocal, mask, repeatTime, srcRepStride);
 }
 
 template <typename T>
@@ -1183,32 +1195,7 @@ __aicore__ inline void ReduceMinIntrinsicsImpl(
     __ubuf__ float* sharedTmpBuffer, __ubuf__ float* srcLocal, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride)
 {
-    __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
-    *((__ubuf__ uint64_t*)tempBuf) = mask[0];
-    *((__ubuf__ uint64_t*)tempBuf + 1) = mask[1];
-
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
-    SetFlag<HardEvent::S_V>(eventIdSToV);
-    WaitFlag<HardEvent::S_V>(eventIdSToV);
-    __VEC_SCOPE__
-    {
-        vector_f32 vreg0;
-        vector_f32 vreg1;
-        vector_align ureg;
-        vector_bool preg;
-        vector_bool preg1;
-        plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);
-        punpack(preg1, preg, LOWER);
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(1)) << 16);
-        uint32_t strideConfig1 = ((static_cast<uint32_t>(0)) << 16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            vsldb(vreg0, srcLocal + i * srcRepStride * 8, strideConfig0, preg1);
-            vcmin(vreg1, vreg0, preg1, MODE_ZEROING);
-            vstus(ureg, 2, vreg1, sharedTmpBuffer, POST_UPDATE);
-        }
-        vstas(ureg, sharedTmpBuffer, 0, POST_UPDATE);
-    }
-    AscendCUtils::FreeTemporaryBuffer<uint8_t>(tempBuf);
+    ReduceFloatArrayMaskImpl<false>(sharedTmpBuffer, srcLocal, mask, repeatTime, srcRepStride);
 }
 
 template <typename T>

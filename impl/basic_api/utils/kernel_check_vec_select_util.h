@@ -158,26 +158,11 @@ struct VecGatherApiParams {
         uint16_t dstBlockStrideIn, uint16_t dstRepeatStrideIn, uint32_t dstDtypeBytesIn, uint32_t srcDtypeBytesIn,
         uint32_t offsetDtypeBytesIn, uint64_t dstSizeIn, uint64_t srcSizeIn, uint64_t offsetSizeIn, uint8_t dstPosIn,
         uint8_t srcPosIn, uint8_t offsetPosIn)
+        : VecGatherApiParams(
+              dstAddrIn, srcAddrIn, offsetAddrIn, repeatIn, dstBlockStrideIn, dstRepeatStrideIn, dstDtypeBytesIn,
+              srcDtypeBytesIn, offsetDtypeBytesIn, dstSizeIn, srcSizeIn, offsetSizeIn, dstPosIn, srcPosIn, offsetPosIn)
     {
-        dstAddr = dstAddrIn;
-        srcAddr = srcAddrIn;
-        offsetAddr = offsetAddrIn;
         srcBaseOffset = srcBaseOffsetIn;
-        repeatTimes = repeatIn;
-        dstBlockStride = dstBlockStrideIn;
-        dstRepeatStride = dstRepeatStrideIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        offsetDtypeBytes = offsetDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        offsetSize = offsetSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        offsetLogicPos = offsetPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
-        offsetPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(offsetPosIn)));
     }
 
     VecGatherApiParams(

@@ -26,6 +26,7 @@
 #include "../../basic_check/reuse_source_check.h"
 #include "../../basic_check/single_tensor_check.h"
 #include "../../basic_check/multiple_tensor_check.h"
+#include "../../basic_check/binary_elementwise_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {
@@ -46,18 +47,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
     {
-        ReuseSourceCheckFuncBasicClass::IsReuseSourceVerifyingParameters<false>(ARG_AND_STRING(isReuseSource));
-
-        CalCountCheckFuncBasicClass::CalCountVerifyingParameters(
-            ARG_AND_STRING(count), VA_ARGS_TO_MAKE_TUPLE(dst, src0, src1));
-
-        SingleTensorCheckFuncBasicClass::TensorVerifyingParameters(
-            VA_ARGS_TO_MAKE_TUPLE(dst, src0, src1),
-            MakeParameters2Tuple(TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC), "UB(VECIN/VECOUT/VECCALC)");
-
-        MultipleTensorCheckFuncBasicClass::TensorReuseVerifyingParameters(VA_ARGS_TO_MAKE_TUPLE(dst, src0));
-
-        MultipleTensorCheckFuncBasicClass::TensorReuseVerifyingParameters(VA_ARGS_TO_MAKE_TUPLE(dst, src1));
+        VerifyBinaryElementwiseParameters<isReuseSource>(*this, *this, *this, *this, dst, src0, src1, count);
     };
 };
 } // namespace HighLevelApiCheck

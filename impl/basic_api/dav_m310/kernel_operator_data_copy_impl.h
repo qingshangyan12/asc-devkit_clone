@@ -317,16 +317,16 @@ __aicore__ inline void CopyImpl(
 }
 
 // Copy::Level 0 - mask count mode
-template <typename T = int16_t, bool isSetMask = true>
-__aicore__ inline void CopyImpl(
-    __ubuf__ int16_t* dst, __ubuf__ int16_t* src, const uint64_t mask, const uint8_t repeatTime,
+template <typename T, typename VecT, bool isSetMask>
+__aicore__ inline void CopyB16Impl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
     if constexpr (isSetMask) {
         uint32_t sreg = mask;
         __VEC_SCOPE__
         {
-            vector_s16 vreg;
+            VecT vreg;
             uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
             uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
             vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -345,7 +345,7 @@ __aicore__ inline void CopyImpl(
     uint16_t tailRepeat = (tail == 0) ? 0 : 1;
     __VEC_SCOPE__
     {
-        vector_s16 vreg;
+        VecT vreg;
         uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
         uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
         vector_bool preg = pset_b16(PAT_ALL);
@@ -360,6 +360,14 @@ __aicore__ inline void CopyImpl(
             vsstb(vreg, dst + loop * repeatParams.dstRepeatSize * 16, dstStride, tailPreg);
         }
     }
+}
+
+template <typename T = int16_t, bool isSetMask = true>
+__aicore__ inline void CopyImpl(
+    __ubuf__ int16_t* dst, __ubuf__ int16_t* src, const uint64_t mask, const uint8_t repeatTime,
+    const CopyRepeatParams& repeatParams)
+{
+    CopyB16Impl<int16_t, vector_s16, isSetMask>(dst, src, mask, repeatTime, repeatParams);
 }
 
 template <typename T = uint16_t, bool isSetMask = true>
@@ -367,44 +375,7 @@ __aicore__ inline void CopyImpl(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
-    if constexpr (isSetMask) {
-        uint32_t sreg = mask;
-        __VEC_SCOPE__
-        {
-            vector_u16 vreg;
-            uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
-            uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
-            vector_bool preg = plt_b16(sreg, POST_UPDATE);
-            for (uint16_t i = 0; i < (static_cast<uint16_t>(repeatTime)); ++i) {
-                mem_bar(VST_VLD);
-                vsldb(vreg, src + i * repeatParams.srcRepeatSize * 16, srcStride, preg);
-                vsstb(vreg, dst + i * repeatParams.dstRepeatSize * 16, dstStride, preg);
-            }
-        }
-        return;
-    }
-    uint64_t count = g_maskCount;
-    uint32_t sreg = static_cast<uint32_t>(count);
-    uint16_t loop = static_cast<uint16_t>(sreg / 128);
-    uint32_t tail = static_cast<uint32_t>(sreg % 128);
-    uint16_t tailRepeat = (tail == 0) ? 0 : 1;
-    __VEC_SCOPE__
-    {
-        vector_u16 vreg;
-        uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
-        uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
-        vector_bool preg = pset_b16(PAT_ALL);
-        for (uint16_t i = 0; i < loop; ++i) {
-            mem_bar(VST_VLD);
-            vsldb(vreg, src + i * repeatParams.srcRepeatSize * 16, srcStride, preg);
-            vsstb(vreg, dst + i * repeatParams.dstRepeatSize * 16, dstStride, preg);
-        }
-        for (uint16_t i = 0; i < tailRepeat; ++i) {
-            vector_bool tailPreg = plt_b16(tail, POST_UPDATE);
-            vsldb(vreg, src + loop * repeatParams.srcRepeatSize * 16, srcStride, tailPreg);
-            vsstb(vreg, dst + loop * repeatParams.dstRepeatSize * 16, dstStride, tailPreg);
-        }
-    }
+    CopyB16Impl<uint16_t, vector_u16, isSetMask>(dst, src, mask, repeatTime, repeatParams);
 }
 
 template <typename T = half, bool isSetMask = true>
@@ -412,44 +383,7 @@ __aicore__ inline void CopyImpl(
     __ubuf__ half* dst, __ubuf__ half* src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
-    if constexpr (isSetMask) {
-        uint32_t sreg = mask;
-        __VEC_SCOPE__
-        {
-            vector_f16 vreg;
-            uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
-            uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
-            vector_bool preg = plt_b16(sreg, POST_UPDATE);
-            for (uint16_t i = 0; i < (static_cast<uint16_t>(repeatTime)); ++i) {
-                mem_bar(VST_VLD);
-                vsldb(vreg, src + i * repeatParams.srcRepeatSize * 16, srcStride, preg);
-                vsstb(vreg, dst + i * repeatParams.dstRepeatSize * 16, dstStride, preg);
-            }
-        }
-        return;
-    }
-    uint64_t count = g_maskCount;
-    uint32_t sreg = static_cast<uint32_t>(count);
-    uint16_t loop = static_cast<uint16_t>(sreg / 128);
-    uint32_t tail = static_cast<uint32_t>(sreg % 128);
-    uint16_t tailRepeat = (tail == 0) ? 0 : 1;
-    __VEC_SCOPE__
-    {
-        vector_f16 vreg;
-        uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
-        uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
-        vector_bool preg = pset_b16(PAT_ALL);
-        for (uint16_t i = 0; i < loop; ++i) {
-            mem_bar(VST_VLD);
-            vsldb(vreg, src + i * repeatParams.srcRepeatSize * 16, srcStride, preg);
-            vsstb(vreg, dst + i * repeatParams.dstRepeatSize * 16, dstStride, preg);
-        }
-        for (uint16_t i = 0; i < tailRepeat; ++i) {
-            vector_bool tailPreg = plt_b16(tail, POST_UPDATE);
-            vsldb(vreg, src + loop * repeatParams.srcRepeatSize * 16, srcStride, tailPreg);
-            vsstb(vreg, dst + loop * repeatParams.dstRepeatSize * 16, dstStride, tailPreg);
-        }
-    }
+    CopyB16Impl<half, vector_f16, isSetMask>(dst, src, mask, repeatTime, repeatParams);
 }
 
 template <typename T = int32_t, bool isSetMask = true>

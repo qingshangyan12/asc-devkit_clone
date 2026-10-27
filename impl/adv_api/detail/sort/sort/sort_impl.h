@@ -486,15 +486,15 @@ __simd_vf__ inline void UpdateValueAndIndexByLocalIndex(
                 (__ubuf__ uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset1, maskHighP0, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + 2 * i * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
             GatherAndStoreB64Elements(
                 localOffset2, maskLowP1, (__ubuf__ uint32_t*)prevSortedIndex,
                 (__ubuf__ uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset3, maskHighP1, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + (2 * i + 1) * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
         } else {
             RegTensor<uint32_t> vecIndex0;
             RegTensor<uint32_t> vecIndex1;
@@ -546,8 +546,8 @@ __simd_vf__ inline void UpdateValueAndIndexByLocalIndex(
                 (__ubuf__ uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t)));
             GatherAndStoreB64Elements(
                 localOffset1, maskHigh, (__ubuf__ uint32_t*)prevSortedIndex,
-                (__ubuf__
-                     uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t) + GetVecLen() / sizeof(uint32_t)));
+                (__ubuf__ uint32_t*)(currSortedIndex + i * GetVecLen() / sizeof(uint16_t) +
+                                     GetVecLen() / sizeof(uint32_t)));
         } else {
             RegTensor<uint32_t> indexU32P0;
             RegTensor<uint32_t> indexU32P1;
@@ -784,6 +784,23 @@ __simd_vf__ inline void DescendProcess(__ubuf__ T* dst, uint32_t count)
     }
 }
 
+template <typename T, bool isDescend>
+__aicore__ inline int32_t PrepareMergeSort(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t count)
+{
+    ASCENDC_ASSERT((count % singleSortElementCount == 0), {
+        KERNEL_LOG(KERNEL_ERROR, "calCount should be align to 32 in MERGE_MODE!");
+    });
+    ASCENDC_ASSERT((dstLocal.GetSize() * sizeof(T) >= count * 8), {
+        KERNEL_LOG(KERNEL_ERROR, "dstLocal size should be greater equal to 8 * count!");
+    });
+    const int32_t repeatTime = static_cast<int32_t>(count / singleSortElementCount);
+    if constexpr (!isDescend) {
+        DescendProcess<T>((__ubuf__ T*)srcLocal.GetPhyAddr(), count);
+    }
+    return repeatTime;
+}
+
 template <typename T, bool isReuseSource, const SortConfig& config>
 __aicore__ inline void SortImpl(
     LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
@@ -806,16 +823,7 @@ __aicore__ inline void SortImpl(
         static_assert(
             SupportType<T, half, float>(),
             "Advanced Sort API MERGE_MODE only supports data value with half/float types.");
-        ASCENDC_ASSERT((count % singleSortElementCount == 0), {
-            KERNEL_LOG(KERNEL_ERROR, "calCount should be align to 32 in MERGE_MODE!");
-        });
-        ASCENDC_ASSERT((dstLocal.GetSize() * sizeof(T) >= count * 8), {
-            KERNEL_LOG(KERNEL_ERROR, "dstLocal size should be greater equal to 8 * count!");
-        });
-        const int32_t repeatTime = static_cast<int32_t>(count / singleSortElementCount);
-        if constexpr (!isDescend) {
-            DescendProcess<T>((__ubuf__ T*)srcLocal.GetPhyAddr(), count);
-        }
+        const int32_t repeatTime = PrepareMergeSort<T, isDescend>(dstLocal, srcLocal, count);
         Sort32(dstLocal, srcLocal, (const LocalTensor<uint32_t>&)srcLocal, repeatTime);
         DoFullSort(
             dstLocal, (const LocalTensor<T>&)sharedTmpBuffer, (const LocalTensor<uint32_t>&)sharedTmpBuffer,
@@ -973,16 +981,7 @@ __aicore__ inline void SortImpl(
         static_assert(
             SupportType<T, half, float>(),
             "Advanced Sort API MERGE_MODE only supports data value with half/float types.");
-        ASCENDC_ASSERT((count % singleSortElementCount == 0), {
-            KERNEL_LOG(KERNEL_ERROR, "calCount should be align to 32 in MERGE_MODE!");
-        });
-        ASCENDC_ASSERT((dstLocal.GetSize() * sizeof(T) >= count * 8), {
-            KERNEL_LOG(KERNEL_ERROR, "dstLocal size should be greater equal to 8 * count!");
-        });
-        const int32_t repeatTime = static_cast<int32_t>(count / singleSortElementCount);
-        if constexpr (!isDescend) {
-            DescendProcess<T>((__ubuf__ T*)srcLocal.GetPhyAddr(), count);
-        }
+        const int32_t repeatTime = PrepareMergeSort<T, isDescend>(dstLocal, srcLocal, count);
         GenSrcIndex((__ubuf__ uint32_t*)sharedTmpBuffer.GetPhyAddr(), count);
         Sort32(dstLocal, srcLocal, (const LocalTensor<uint32_t>&)sharedTmpBuffer, repeatTime);
         DoFullSort(
@@ -1150,16 +1149,7 @@ __aicore__ inline void SortImpl(
             "Advanced Sort API MERGE_MODE only supports data value with half/float types.");
         static_assert(
             SupportType<U, uint32_t>(), "Advanced Sort API MERGE_MODE only supports src index with uint32_t types.");
-        ASCENDC_ASSERT((count % singleSortElementCount == 0), {
-            KERNEL_LOG(KERNEL_ERROR, "calCount should be align to 32 in MERGE_MODE!");
-        });
-        ASCENDC_ASSERT((dstLocal.GetSize() * sizeof(T) >= count * 8), {
-            KERNEL_LOG(KERNEL_ERROR, "dstLocal size should be greater equal to 8 * count!");
-        });
-        const int32_t repeatTime = static_cast<int32_t>(count / singleSortElementCount);
-        if constexpr (!isDescend) {
-            DescendProcess<T>((__ubuf__ T*)srcLocal.GetPhyAddr(), count);
-        }
+        const int32_t repeatTime = PrepareMergeSort<T, isDescend>(dstLocal, srcLocal, count);
         Sort32(dstLocal, srcLocal, srcIndexLocal, repeatTime);
         DoFullSort(
             dstLocal, (const LocalTensor<T>&)sharedTmpBuffer, (const LocalTensor<uint32_t>&)sharedTmpBuffer,
@@ -1357,7 +1347,7 @@ __aicore__ inline void SortImpl(
 }
 } // namespace internal
 } // namespace Reg
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_SORT_SORT_SORT_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_SORT_SORT_IMPL_H__)

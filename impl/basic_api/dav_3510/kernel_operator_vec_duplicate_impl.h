@@ -18,6 +18,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_IMPL_H
 #include <type_traits>
 #include "kernel_operator_vec_template_impl.h"
+#include "kernel_operator_mask_prepare_impl.h"
 #include "../reg_compute/kernel_reg_compute_intf_impl.h"
 
 namespace AscendC {
@@ -77,15 +78,7 @@ __aicore__ inline void VecDupLevel0Template(
     const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
     BasicAPIMaskStruct maskArrayStruct;
-    if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(
-            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
-        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
-    } else {
-        ASCENDC_ASSERT(maskArray == nullptr, {
-            KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false.");
-        });
-    }
+    PrepareLevel0MaskArray<isMaskBitMode>(maskArrayStruct, maskArray, maskCount);
     __ubuf__ uint64_t* maskBuf = nullptr;
 
     if (Internal::IsCounterMode()) {

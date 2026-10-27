@@ -39,20 +39,16 @@ __aicore__ inline void AddImpl(
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
-template <typename T = half, bool isSetMask = true>
-__aicore__ inline void AddImpl(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const uint64_t mask[], const uint8_t repeatTime,
+template <typename T, typename VecT>
+__aicore__ inline void AddB16ArrayMaskImpl(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    if constexpr (isSetMask) {
-        SetVectorMask<T>(mask[1], mask[0]);
-    }
-
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        VecT vreg0;
+        VecT vreg1;
+        VecT vreg2;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -68,6 +64,18 @@ __aicore__ inline void AddImpl(
     }
 }
 
+template <typename T = half, bool isSetMask = true>
+__aicore__ inline void AddImpl(
+    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    if constexpr (isSetMask) {
+        SetVectorMask<T>(mask[1], mask[0]);
+    }
+
+    AddB16ArrayMaskImpl<half, vector_f16>(dst, src0, src1, repeatTime, repeatParams);
+}
+
 template <typename T = int16_t, bool isSetMask = true>
 __aicore__ inline void AddImpl(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, const uint64_t mask[],
@@ -77,24 +85,7 @@ __aicore__ inline void AddImpl(
         SetVectorMask<T>(mask[1], mask[0]);
     }
 
-    __VEC_SCOPE__
-    {
-        vector_s16 vreg0;
-        vector_s16 vreg1;
-        vector_s16 vreg2;
-        vector_bool preg;
-        preg = movp_b16();
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
-        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.src1BlkStride)) << 16);
-        uint32_t strideConfig2 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            mem_bar(VST_VLD);
-            vsldb(vreg0, src0 + i * repeatParams.src0RepStride * 16, strideConfig0, preg);
-            vsldb(vreg1, src1 + i * repeatParams.src1RepStride * 16, strideConfig1, preg);
-            vadd(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
-            vsstb(vreg2, dst + i * repeatParams.dstRepStride * 16, strideConfig2, preg);
-        }
-    }
+    AddB16ArrayMaskImpl<int16_t, vector_s16>(dst, src0, src1, repeatTime, repeatParams);
 }
 
 template <typename T = int32_t, bool isSetMask = true>

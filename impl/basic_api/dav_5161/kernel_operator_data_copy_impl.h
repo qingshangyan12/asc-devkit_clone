@@ -907,8 +907,8 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     ASSERT(false && "unsupported data copy UB to L1 on current device");
 }
 
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+template <typename T, PaddingMode mode, typename Params>
+__aicore__ inline void DataCopyPadL12GMCore(__gm__ T* dst, __cbuf__ T* src, const Params& intriParams)
 {
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
@@ -963,57 +963,15 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 }
 
 template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+{
+    DataCopyPadL12GMCore<T, mode>(dst, src, intriParams);
+}
+
+template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t) true, intriParams);
-    }
-
-    uint32_t srcStride = 0;
-    if constexpr (mode == PaddingMode::Normal) {
-        srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
-    } else {
-        srcStride = intriParams.blockLen;
-    }
-    uint64_t dstStride = intriParams.blockLen + intriParams.dstStride;
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
-    copy_cbuf_to_gm_align_v2(
-        dst, src, (uint8_t)intriParams.sid, (uint32_t)intriParams.blockCount, (uint32_t)intriParams.blockLen, dstStride,
-        srcStride);
-#endif
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    if constexpr (SupportBytes<T, 1, 2>()) {
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = 1;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.blockLen / sizeof(T);
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.blockCount;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)
-        uint64_t loop3SrcStride = DivCeil(srcStride, BYTE_32_ALIGN);
-        // ISA: unit of C0_size(32B)
-        uint64_t loop4SrcStride = 0;
-        // ISA: unit of byte
-        uint64_t loop2DstStride = dstStride;
-        // ISA: unit of byte
-        uint64_t loop4DstStride = 0;
-
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
-
-        fix_cbuf_to_gm(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride,
-            fixp_trans_mode_t::NORMAL_DMA, intriParams.sid);
-    } else {
-        ASSERT(false && "fix copy only support type b8/b16 on current device");
-    }
-#endif
+    DataCopyPadL12GMCore<T, mode>(dst, src, intriParams);
 }
 
 #pragma begin_pipe(V)
