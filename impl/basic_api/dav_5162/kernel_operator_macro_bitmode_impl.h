@@ -249,10 +249,10 @@ struct FixPipeReluAlphaBitModeConfig0 {
     /* PreValue is (1, 8, 10) for computation that is 1 sign bit, 8 exponent bits and 10 mantissa bits,
      * use for f32 static_cast to u32 to set Value
      */
-    __aicore__ inline void SetPreValue(uint32_t preValue_) { preValue = preValue_ >> 13; };
+    __aicore__ inline void SetPreValue(uint32_t preValue_) { preValue = preValue_; };
 
     __aicore__ inline lut_mode_t GetLut() const { return static_cast<lut_mode_t>(lut); };
-    __aicore__ inline uint32_t GetPreValue() const { return preValue << 13; };
+    __aicore__ inline uint32_t GetPreValue() const { return preValue; };
 };
 
 struct FixPipeAddrBitModeConfig0 {
