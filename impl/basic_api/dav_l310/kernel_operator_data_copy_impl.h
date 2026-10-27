@@ -569,7 +569,7 @@ __aicore__ inline void VecCopyLevel0Template(
                             SetVectorMask<T>(0, maskArray[0] >> 32);
                         }
                         VecCopyLevel0VFImpl<isSetMask, isMaskBitMode, true, T>(
-                            rDst + 4 * repeatParams.dstStride * blockElm, src + 4 * repeatParams.srcStride * blockElm,
+                            rDst + 4 * repeatParams.dstStride * blockElm, rSrc + 4 * repeatParams.srcStride * blockElm,
                             maskArrayStruct, maskCount, 1, repeatParams, maskBuf);
                     }
                 } else {
