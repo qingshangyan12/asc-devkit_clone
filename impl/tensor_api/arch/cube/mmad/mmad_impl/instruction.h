@@ -55,7 +55,7 @@ public:
 private:
     template <typename CType, typename AType, typename BType>
     __aicore__ inline static void mmad_impl(__cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint16_t m,
-                                            uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
+                                            uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag, bool disable_gemv,
                                             bool init_with_btbuf, bool init_with_zero)
     {
         if constexpr (Std::is_same_v<AType, hifloat8_t> && Std::is_same_v<BType, hifloat8_t>) {
@@ -82,7 +82,7 @@ public:
 private:
     template <typename CType, typename AType, typename BType>
     __aicore__ inline static void mmad_impl(__cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint64_t bias,
-                                            uint16_t m, uint16_t k, uint16_t n, int8_t unit_flag, bool disable_gemv,
+                                            uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag, bool disable_gemv,
                                             bool init_with_btbuf, bool init_with_zero)
     {
         uint64_t xd = reinterpret_cast<uint64_t>(dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
@@ -111,7 +111,7 @@ public:
 private:
     template <typename CType, typename AType, typename BType>
     __aicore__ inline static void mmad_impl(__cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint16_t m,
-                                            uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
+                                            uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag, bool disable_gemv,
                                             bool init_with_btbuf, bool init_with_zero)
     {
         if constexpr (current_arch_version == arch_version::v9201) {
@@ -141,7 +141,7 @@ public:
 private:
     template <typename CType, typename AType, typename BType>
     __aicore__ inline static void mmad_impl(__cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint64_t bias,
-                                            uint16_t m, uint16_t k, uint16_t n, int8_t unit_flag, bool disable_gemv,
+                                            uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag, bool disable_gemv,
                                             bool init_with_btbuf, bool init_with_zero)
     {
         if constexpr (current_arch_version == arch_version::v9201) {
