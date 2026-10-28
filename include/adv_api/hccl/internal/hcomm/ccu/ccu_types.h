@@ -73,6 +73,8 @@ typedef struct {
     uint32_t eventOffset;
 } CcuLoopGroupConfig;
 
+#define CCU_FUNC_TASK_ARG_MAX 32u
+
 typedef uint64_t CcuInsHandle;
 
 typedef uint64_t CcuKernelHandle;

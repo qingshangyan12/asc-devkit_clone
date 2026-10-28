@@ -16,7 +16,9 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
+#include "../template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
 #endif
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
@@ -111,6 +113,13 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
         CHK_PRT_RET(
             request0.ccuKernelNum.empty() || request1.ccuKernelNum.empty(),
             HCCL_ERROR("[InsV2AllToAllConcurrentExecutor][CalcRes] CCU kernel num is empty."), HCCL_E_INTERNAL);
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+        CHK_PRT_RET(
+            request1.ccuKernelInfos.size() != 1U,
+            HCCL_ERROR("[InsV2AllToAllConcurrentExecutor][CalcRes] expected one CLOS kernel."), HCCL_E_INTERNAL);
+        request1.ccuKernelInfos[0].kernelFunc = reinterpret_cast<void*>(CcuKfcAllToAllClos1DMultiJettyKernel);
+        request1.ccuKernelInfos[0].subKernelName = KFC_FUNC_KFC_ALL_TO_ALL_CLOS1D_MULTI_JETTY_NAME;
+#endif
         resourceRequest.slaveThreadNum = request0.slaveThreadNum + request1.slaveThreadNum + 1U;
         resourceRequest.notifyNumOnMainThread = request0.notifyNumOnMainThread + 1U;
         resourceRequest.notifyNumPerThread = request0.notifyNumPerThread;

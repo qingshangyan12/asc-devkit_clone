@@ -9,6 +9,9 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
+#include "../ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -131,36 +134,35 @@ static CcuResult DoPeerOnlyReduceScatter(KfcReduceScatterMesh1DMem2MemPeerOnlyCo
     return CCU_SUCCESS;
 }
 
-CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable skipLocalRankCopy, ccu::Variable tailSize,
-    ccu::Variable chunkLoopNum, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, const HcclDataType& dataType, const HcclReduceOp& reduceType)
+CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterMesh1DMem2Mem*>(arg);
     KfcReduceScatterMesh1DMem2MemPeerOnlyContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.dataType = dataType;
-    ctx.reduceOp = reduceType;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.dataType = kernelArg->opParam.DataDes.dataType;
+    ctx.reduceOp = kernelArg->opParam.reduceType;
     ctx.resourceAllocated = false;
     ctx.moConfig.msInterleave = 0;
     ctx.moConfig.loopCount = 0;
     ctx.moConfig.memSlice = 0;
     ctx.moRes.eventCount = 0;
     ctx.moRes.bufCount = 0;
-
     HCCL_INFO(
         "[CcuSchedReduceScatterSoleMeshPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
         ctx.rankId, ctx.rankSize, ctx.dataType, ctx.reduceOp);
     CCU_CHK_RET(InitPeerOnlyResource(ctx));
-    CCU_CHK_RET(LoadPeerOnlyArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, currentRankSliceInputOffset, skipLocalRankCopy, tailSize, chunkLoopNum));
-    CCU_CHK_RET(PeerOnlyPreSync(ctx));
-    CCU_CHK_RET(DoPeerOnlyReduceScatter(ctx));
-    CCU_CHK_RET(PeerOnlyPostSync(ctx));
-    HCCL_INFO("[CcuSchedReduceScatterSoleMeshPeerOnly] end.");
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadPeerOnlyArgs(ctx, args[1], args[2], args[KFC_FUNC_TOKEN_ARG_INDEX], args[5], args[6], args[8], args[9]);
+            PeerOnlyPreSync(ctx);
+            DoPeerOnlyReduceScatter(ctx);
+            PeerOnlyPostSync(ctx);
+            HCCL_INFO("[CcuSchedReduceScatterSoleMeshPeerOnly] end.");
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME);
     return CCU_SUCCESS;
 }
 

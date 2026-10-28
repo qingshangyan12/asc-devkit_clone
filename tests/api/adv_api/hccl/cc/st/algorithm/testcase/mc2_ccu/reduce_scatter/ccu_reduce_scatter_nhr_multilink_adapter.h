@@ -22,9 +22,8 @@
 namespace HcclSim {
 namespace CcuSt {
 
-// 与 CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel 的 10 个 ccu::Variable 形参一一对应
-// （token 亦占一槽，KFC 直调模式下由 taskArgs 提供）。
-constexpr uint32_t REDUCE_SCATTER_NHR_ML_TASK_ARG_COUNT = 10;
+// Func ABI: queue [0..2], token [3], queue [3..29], turn-end address [31].
+constexpr uint32_t REDUCE_SCATTER_NHR_ML_TASK_ARG_COUNT = 32;
 
 struct ReduceScatterNhrMultiLinkKernelConfig {
     uint32_t rankId{0}; // mySubCommRank

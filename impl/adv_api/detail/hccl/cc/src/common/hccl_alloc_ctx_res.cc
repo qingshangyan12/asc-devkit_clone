@@ -876,7 +876,8 @@ static HcclResult AcquireAlgResources(
         resCtxHost->kfcServerArgs.reserve(missionNum * KFC_SERVER_ARG_NUM);
         for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
             resCtxHost->kfcServerArgs.insert(
-                resCtxHost->kfcServerArgs.end(), {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U});
+                resCtxHost->kfcServerArgs.end(),
+                {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U, 0U});
         }
         resCtxHost->kfcServerArgSize = KFC_SERVER_ARG_NUM;
         HCCL_INFO(
