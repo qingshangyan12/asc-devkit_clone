@@ -91,3 +91,10 @@ inline short int __half2short_rd(const half x)
         dst[idx] = __half2short_rd(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -32768, -2048, -1.5, 0.5, 1.5, 2048, inf, nan
+result: -32768, -2048, -2, 0, 1, 2048, 32767, 0
+```

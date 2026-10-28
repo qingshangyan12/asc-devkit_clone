@@ -85,11 +85,12 @@ $$
 ## 约束说明
 
 - 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 输出结果为不饱和模式。
 
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void mul_example(InputTensor input, OutputTensor output)

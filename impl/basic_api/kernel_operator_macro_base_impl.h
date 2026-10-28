@@ -22,14 +22,16 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_npu_debug.h"
 
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "dav_5161/kernel_operator_macro_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+#include "dav_5162/kernel_operator_macro_impl.h"
 #endif
 #include "kernel_operator_macro_check.h"
 #include "../../include/basic_api/kernel_struct_macro.h"
@@ -239,6 +241,19 @@ __aicore__ inline void MmadMxFixImpl(
     MmadMxFixCal<T, U, S, V>(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProcImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params)
+{
+    PostProcCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProcImpl(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params)
+{
+    PostProcCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
 }
 } // namespace AscendC
 

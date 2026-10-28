@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-**`asc_enable_hf32_trans`接口已废弃。请使用[asc_set_hf32_round_mode](../cube_compute/asc_set_hf32_round_mode.md)接口替代。**
+**`asc_enable_hf32_trans`接口已废弃。请使用[asc_set_hf32_round_mode](../cube_compute/mmad_compute_aux_config/asc_set_hf32_round_mode.md)接口替代。**
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。
+本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/mmad_compute_aux_config/asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
 
@@ -56,7 +56,7 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+- 本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/mmad_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 - 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
 - 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
 
@@ -65,14 +65,14 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-以下调用示例代码仅Ascend 950PR&950DT系列产品产品支持。
+以下调用示例代码仅Ascend 950PR&950DT系列产品支持。
 
 ```cpp
 #include <cstdint>
@@ -111,7 +111,7 @@ __global__ __cube__ void asc_enable_hf32_trans_kernel(
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* label, const std::vector<float>& data)

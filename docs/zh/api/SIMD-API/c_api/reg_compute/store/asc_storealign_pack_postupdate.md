@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ <dtype>*& ds
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -79,7 +79,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ <dtype>*& ds
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`取值为：`uint8_t`、`uint16_t`、`uint32_t`。
 
 #### 函数原型典型示例
 
@@ -88,7 +88,6 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
                                                            vector_bool src,
                                                            int32_t offset)
 ```
-
 
 ## 参数说明
 
@@ -126,7 +125,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 源操作数为矢量数据寄存器或掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
 - UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。目的操作数的写出范围和Post Update后的地址不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 矢量数据寄存器压缩搬出场景
 
@@ -145,72 +144,92 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 constexpr uint32_t MASK_BYTES = 32;
 constexpr uint32_t PACKED_BYTES = 16;
-constexpr uint32_t REPEAT_TIMES = 2;
+// 每个分区的有效打包字节数，可调整为其他长度；19用于覆盖非整块尾部。
+constexpr uint32_t TOTAL_LENGTH = 19;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
+// 掩码压缩每次固定写出16字节，向上取整分配完整写出块。
+constexpr uint32_t REPEAT_TIME = AscendC::Std::ceil_div(TOTAL_LENGTH, PACKED_BYTES);
+// 每次写出16字节，保留16字节哨兵区；所有起始地址均为16字节对齐。
 constexpr uint32_t STEP_BYTES = 32;
-constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
+// 额外预留一个步长，使最后一次Post Update后的地址仍处于本分区内。
+constexpr uint32_t SECTION_BYTES = (REPEAT_TIME + 1) * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
-__simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
-                                           __ubuf__ uint32_t* mask_input)
+// 此掩码寄存器重载不支持尾块掩码：末轮仍写满16字节，尾部填充在预留UB空间内校验。
+__simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* dst,
+                                           __ubuf__ uint32_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool src;
-    asc_loadalign(src, mask_input);
+    vector_bool src_reg;
+    asc_loadalign(src_reg, src);
 
-    __ubuf__ uint8_t* dst8 = output;
-    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(output + SECTION_BYTES);
-    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(output + 2 * SECTION_BYTES);
-    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
-        asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
-        asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
-        asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
+    __ubuf__ uint8_t* dst8 = dst;
+    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(dst + SECTION_BYTES);
+    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(dst + 2 * SECTION_BYTES);
+    const int32_t step_bytes = static_cast<int32_t>(one_repeat_size + PACKED_BYTES);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_storealign_pack_postupdate(dst8, src_reg, step_bytes);
+        asc_storealign_pack_postupdate(dst16, src_reg, step_bytes);
+        asc_storealign_pack_postupdate(dst32, src_reg, step_bytes);
     }
 }
 
 __global__ __vector__ void asc_storealign_pack_postupdate_kernel(
-    __gm__ uint8_t* output, __gm__ uint32_t* mask_input)
+    __gm__ uint8_t* dst, __gm__ uint32_t* src)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    __ubuf__ uint32_t mask_local[MASK_BYTES / sizeof(uint32_t)];
-    asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
-    asc_copy_gm2ub(mask_local, mask_input, MASK_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    pack_postupdate_vf(output_local, mask_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    __ubuf__ uint8_t dst_local[OUTPUT_BYTES];
+    __ubuf__ uint32_t src_local[MASK_BYTES / sizeof(uint32_t)];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub(dst_local, dst, OUTPUT_BYTES);
+    asc_copy_gm2ub(src_local, src, MASK_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    // 源掩码寄存器共32字节，隔位压缩后每轮输出16字节。
+    uint32_t one_repeat_size = PACKED_BYTES;
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<pack_postupdate_vf>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm(dst, dst_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint32_t> mask_input(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
+    std::vector<uint32_t> src(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
-    std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
+    std::vector<uint8_t> golden(OUTPUT_BYTES, SENTINEL);
+    // 每次固定写满PACKED_BYTES：同时校验有效数据与末轮填充，块间和分区末尾的哨兵保持不变。
     for (uint32_t base = 0; base < OUTPUT_BYTES; base += SECTION_BYTES) {
-        for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        for (uint32_t repeat = 0; repeat < REPEAT_TIME; ++repeat) {
             for (uint32_t i = 0; i < PACKED_BYTES; ++i) {
-                expected[base + repeat * STEP_BYTES + i] = 0xff;
+                golden[base + repeat * STEP_BYTES + i] = 0xff;
             }
         }
     }
@@ -221,13 +240,13 @@ int main()
     uint8_t* output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&mask_device), MASK_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(mask_device, MASK_BYTES, mask_input.data(), MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(mask_device, MASK_BYTES, src.data(), MASK_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_storealign_pack_postupdate_kernel<<<1, 0>>>(output_device, mask_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == expected;
+    const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_storealign_pack_postupdate passed."
                          : "[Failed] asc_storealign_pack_postupdate output mismatch.")
               << std::endl;

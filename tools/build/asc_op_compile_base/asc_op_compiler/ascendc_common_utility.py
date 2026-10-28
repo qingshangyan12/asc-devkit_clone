@@ -498,7 +498,7 @@ class CommonUtility:
             res: True means soc version support workspace offset way
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend950", "Ascend350", "MC62", "MC32DM11A"]:
+        if short_soc_version in ["Ascend950", "Ascend350", "MC62", "MC32DM11A", "Ascend5162A"]:
             return True
         return False
 
@@ -613,6 +613,18 @@ class CommonUtility:
         return False
 
     @staticmethod
+    def is_516r2():
+        """return if current soc version is v516
+
+        Returns:
+            res: True means v516
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Ascend5162A"]:
+            return True
+        return False
+
+    @staticmethod
     def is_l300():
         """return if current soc version is l300
 
@@ -621,6 +633,18 @@ class CommonUtility:
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
         if short_soc_version in ["KirinX90"]:
+            return True
+        return False
+
+    @staticmethod
+    def is_l310():
+        """return if current soc version is l310
+
+        Returns:
+            res: True means l310
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Kirin9020"]:
             return True
         return False
 
@@ -644,7 +668,7 @@ class CommonUtility:
             res: True means l311
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["KirinDev0000"]:
+        if short_soc_version in ["Kirin9050"]:
             return True
         return False
 
@@ -662,7 +686,7 @@ class CommonUtility:
 
     @staticmethod
     def get_chip_version():
-        """get chip version for (c220/c310/920r1/920r2/510r2)
+        """get chip version for (c220/c310/920r1/920r2/510r2/516r2)
 
         Returns:
             chip_version: chip version
@@ -676,6 +700,8 @@ class CommonUtility:
             chip_version = "920r2"
         elif CommonUtility.is_m510():
             chip_version = "510r2"
+        elif CommonUtility.is_516r2():
+            chip_version = "516r2"
         return chip_version
 
     @staticmethod

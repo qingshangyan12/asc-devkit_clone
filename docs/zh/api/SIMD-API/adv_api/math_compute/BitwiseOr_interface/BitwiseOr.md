@@ -27,7 +27,7 @@
 
 逐比特对两个输入进行或操作。
 
-![](../../../../figures/zh-cn_formulaimage_0000002442050326.png)
+![](../../../../figures/formulaimage_0000002442050326.png)
 
 ## 函数原型
 

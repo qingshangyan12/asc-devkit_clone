@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/reduction_compute.h"`。
 
 该接口根据输入[reg_tensor](../reg_tensor/reg_tensor.md)携带的mask，对源操作数执行归约求和操作，并返回计算结果。通过模板参数`scope`选择归约范围，支持对所有有效元素求和、对每个`DataBlock`（32B）内的有效元素求和，以及对相邻两个有效元素求和。
 
@@ -108,7 +108,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void reduce_sum_example(InputTensor input, OutputTensor output)
@@ -117,15 +117,18 @@ __simd_vf__ inline void reduce_sum_example(InputTensor input, OutputTensor outpu
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
 
     auto elemSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::element, float>(src);
-    elemSum.with_mask(asc::te::experimental::update_mask<float>(1));
+    elemSum.with_mask(
+        asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl1, float>());
     asc::te::experimental::store(output, asc::te::make_coord(0), elemSum);
 
     auto blockSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::datablock, float>(src);
-    blockSum.with_mask(asc::te::experimental::update_mask<float>(8));
+    blockSum.with_mask(
+        asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl8, float>());
     asc::te::experimental::store(output, asc::te::make_coord(8), blockSum);
 
     auto pairSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::pair, float>(src);
-    pairSum.with_mask(asc::te::experimental::update_mask<float>(32));
+    pairSum.with_mask(
+        asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl32, float>());
     asc::te::experimental::store(output, asc::te::make_coord(16), pairSum);
 }
 ```

@@ -52,7 +52,7 @@ __aicore__ inline void asc_set_gm2ub_loop1_stride(uint64_t loop1_src_stride,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | loop1_src_stride | 输入 | 内层循环中相邻迭代源操作数的数据块间隔，单位为字节，取值范围为[0, $2^{40}−1$]。 |
-| loop1_dst_stride | 输入 | 内层循环中相邻迭代目的操作数的数据块间隔，单位为字节，取值范围为[0, $2^{24}−1$]，且必须32字节对齐。 |
+| loop1_dst_stride | 输入 | 内层循环中相邻迭代目的操作数的数据块间隔，单位为字节，取值范围为[0, $2^{21}−1$]，且必须32字节对齐。 |
 
 ## 返回值说明
 
@@ -75,7 +75,7 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -103,10 +103,13 @@ __global__ __vector__ void asc_set_gm2ub_loop1_stride_kernel(__gm__ uint8_t* out
     asc_set_gm2ub_loop2_stride(128, 64);
     asc_copy_gm2ub_align(local, input, 1, 32, 0, 0, false,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+    // 搬运完成后恢复默认循环次数，避免该寄存器配置影响后续搬运。
     asc_set_gm2ub_loop_size(1, 1);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

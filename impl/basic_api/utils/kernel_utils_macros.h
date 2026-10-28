@@ -94,7 +94,8 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
     B_TYPE_SK_INFO = 5,
-    B_TYPE_SPECIALIZATION_RESOURCE_ID = 6
+    B_TYPE_SPECIALIZATION_RESOURCE_ID = 6,
+    B_TYPE_ICACHE_PRELOAD_FLAG = 7
 };
 
 struct BaseTlv { // definition of TLV head
@@ -133,6 +134,12 @@ struct BinaryMetaOptionalParam {
 struct BinaryMetaAscFeature {
     BaseTlv head;
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
+};
+
+struct BinaryMetaIcachePreloadFlag {
+    BaseTlv head;
+    uint16_t icachePreloadFlag; // 0: no preload, 1: preload
+    uint16_t reserved;
 };
 
 enum FuncMetaType {                       // function level TLV type
@@ -216,9 +223,10 @@ enum class CacheMode { CACHE_MODE_DISABLE = 0, CACHE_MODE_NORMAL = 1, CACHE_MODE
 
 enum class CacheRwMode { READ = 1, WRITE = 2, RW = 3 };
 
-#if defined(__NPU_ARCH__) &&                                                                              \
-        (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3113 ||  \
-         __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163) || \
+#if defined(__NPU_ARCH__) &&                                                                             \
+        (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162 || \
+         __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) ||                                                \
     defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
@@ -436,6 +444,7 @@ struct OomAddrRange {
     uintptr_t addr[g_oomAddrRangeMaxSize];
     uint64_t len[g_oomAddrRangeMaxSize];
     uint8_t isLevelOnePointer[g_oomAddrRangeMaxSize];
+    __gm__ uint8_t* tensorListStorageShape[g_oomAddrRangeMaxSize];
     uint64_t count;
 };
 __BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange;

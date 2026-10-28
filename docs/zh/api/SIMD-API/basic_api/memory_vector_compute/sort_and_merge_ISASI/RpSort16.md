@@ -52,7 +52,7 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
 </td>
 <td class="cellrowborder" valign="top" width="86.42%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001429830437_p168351657155818"><a name="zh-cn_topic_0000001429830437_p168351657155818"></a><a name="zh-cn_topic_0000001429830437_p168351657155818"></a>操作数数据类型。</p>
 <p id="p489919112302"><a name="p489919112302"></a><a name="p489919112302"></a><span id="ph389915183019"><a name="ph389915183019"></a><a name="ph389915183019"></a><term id="zh-cn_topic_0000001312391781_term71949488213_1"><a name="zh-cn_topic_0000001312391781_term71949488213_1"></a><a name="zh-cn_topic_0000001312391781_term71949488213_1"></a>Atlas训练系列产品</term></span>，支持的数据类型为：half</p>
-<p id="p690016111305"><a name="p690016111305"></a><a name="p690016111305"></a><span id="ph199001173011"><a name="ph199001173011"></a><a name="ph199001173011"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span>，支持的数据类型为：half/float</p>
+<p id="p690016111305"><a name="p690016111305"></a><a name="p690016111305"></a><span id="ph199001173011"><a name="ph199001173011"></a><a name="ph199001173011"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas推理系列产品</term>AI Core</span>，支持的数据类型为：half/float</p>
 </td>
 </tr>
 </tbody>
@@ -102,6 +102,7 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
 -   用户需保证src和dst中存储的Region Proposal数目大于实际所需数据，否则会存在tensor越界错误。
 -   当存在proposal\[i\]与proposal\[j\]的score值相同时，如果i\>j，则proposal\[j\]将首先被选出来，排在前面。
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/RpSort16_res.md#id2 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

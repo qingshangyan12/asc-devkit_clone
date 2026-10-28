@@ -21,6 +21,9 @@ namespace mc2_ops_hccl {
 struct CcuKernelArgKfcAllGatherNHR1DMem2Mem : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
+    // D4 双 die：die 维编号/总数（双 die 时每 die 一份 kernelInfo，axisId 区分实例）
+    uint32_t axisId = 0;
+    uint32_t axisSize = 1;
     OpParam opParam;
     std::vector<KfcNhrStepInfo> stepInfoVector;
     std::map<uint32_t, uint32_t> rank2ChannelIdx;
@@ -50,12 +53,17 @@ public:
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
 private:
-    HcclResult CalcNhrInfo(std::vector<KfcNhrStepInfo>& stepInfoVector) const;
+    // 按 step 序列逐个选 from/to 的 channel（单 die 用 enableDieId 的链路；双 die 加两个 die
+    // 的链路，供跨框 die0 连 die1 场景两条链路并存）——RS 2die ProcessNHRStepInfo 同构。
+    HcclResult ProcessNHRStepInfo(
+        const HcclComm comm, std::vector<KfcNhrStepInfo>& stepInfoVector, std::map<u32, u32>& rank2ChannelIdx,
+        u32 enableDieNum, u32 enableDieId, std::vector<std::vector<HcclChannelDesc>>& channelsPerDie) const;
     HcclResult GetStepInfo(u32 step, u32 stepNum, KfcNhrStepInfo& stepInfo) const;
-    uint32_t RemoteRankIdToSubRank(uint32_t remoteRankId) const;
 
     uint32_t mySubCommRank_ = 0;
     uint32_t tempRankSize_ = 0;
+    // 对端 rank -> 通道描述列表（RestoreChannelMap 填充，ProcessNHRStepInfo 消费；与 hccl/RS 2die 模板同构）
+    std::map<u32, std::vector<HcclChannelDesc>> rankIdToChannelDesc_;
 };
 
 } // namespace mc2_ops_hccl

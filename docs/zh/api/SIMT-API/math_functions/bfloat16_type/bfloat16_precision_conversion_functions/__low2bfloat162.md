@@ -73,7 +73,7 @@ inline bfloat16x2_t __low2bfloat162(const bfloat16x2_t x)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __low2bfloat162(input[idx]);
@@ -94,7 +94,7 @@ inline bfloat16x2_t __low2bfloat162(const bfloat16x2_t x)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __low2bfloat162(input[idx]);
@@ -104,3 +104,10 @@ inline bfloat16x2_t __low2bfloat162(const bfloat16x2_t x)
         asc_vf_call<simt_low2bfloat162>(dim3(1024), (__gm__ bfloat16x2_t*)input, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (0.5, -1.0), (1.0, 2.0), (3.0, 4.0), (0.0, 3.0), (nan, 1.0), (1.0, 2.0), (inf, -inf), (nan, nan)
+result: (0.5, 0.5), (1.0, 1.0), (3.0, 3.0), (0.0, 0.0), (nan, nan), (1.0, 1.0), (inf, inf), (nan, nan)
+```

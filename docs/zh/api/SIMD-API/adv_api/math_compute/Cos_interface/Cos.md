@@ -33,11 +33,11 @@
 
 按元素做三角函数余弦运算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218333665.png)
+![](../../../../figures/formulaimage_0000002218333665.png)
 
 Cos\(x\)的泰勒展开式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002376868752.png)
+![](../../../../figures/formulaimage_0000002376868752.png)
 
 ## 函数原型
 

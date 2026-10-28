@@ -52,10 +52,17 @@ public:
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, m_size, nz2nd_en, "copy_l0c_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unit_flag, "copy_l0c_to_ub instruction");
-        asc_copy_l0c2ub(
-            dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
-            static_cast<uint16_t>(src_stride), sub_block_id, dual_dst_ctl, unit_flag, quant_pre, relu_pre,
-            is_channel_split, nz2nd_en, nz2dn_en, false);
+        if constexpr (current_arch_version == arch_version::v9201) {
+            asc_copy_l0c2ub(
+                dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+                static_cast<uint16_t>(src_stride), 0, unit_flag, quant_pre, relu_pre, is_channel_split, nz2nd_en,
+                nz2dn_en, false);
+        } else {
+            asc_copy_l0c2ub(
+                dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+                static_cast<uint16_t>(src_stride), sub_block_id, dual_dst_ctl, unit_flag, quant_pre, relu_pre,
+                is_channel_split, nz2nd_en, nz2dn_en, false);
+        }
     }
 };
 

@@ -1,8 +1,27 @@
 # 系统同步能力概述<a name="ZH-CN_TOPIC_0000002586323695"></a>
 
-在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。
+在Ascend C编程中，同步用于约束AI Core内外不同执行单元的执行先后关系，确保后续指令在依赖的数据、状态或同步信号就绪后再继续执行。由于数据搬运、计算、不同核函数（Kernel）或不同AI Core之间可以并行，如果缺少必要的同步，后续执行单元可能读取到尚未写入完成的数据，或在前序任务未完成时提前执行，导致计算结果错误或执行行为不符合预期。
 
-AI Core的同步，总共分成3类：核内同步、核间同步、任务间同步。各类同步对应的接口如下。
+AI Core的同步，总共分成3类：核内同步、核间同步、任务间同步。
+
+以下内容展示三类同步的使用场景。
+
+- 核内同步用于约束同一核内不同硬件流水或同一硬件流水内指令的执行时序。
+
+    例如在AIV中，MTE2单元通过`PIPE_MTE2`将数据搬入片上存储后，Vector单元才可以通过`PIPE_V`读取该数据进行计算，此时需要插入`PIPE_MTE2`到`PIPE_V`的同步，使`PIPE_V`等待`PIPE_MTE2`的前序搬入完成。
+- 核间同步用于约束不同核之间的执行进度，参与同步的对象可以是多个AI Core，也可以是同一AI Core内的AIC和AIV。
+    <!-- npu="950" id1 -->
+    如图1所示，针对[NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，同一个AI Core内AIV通过`PIPE_MTE3`将数据从UB搬运到L1 Buffer后，AIC侧`PIPE_MTE1`才能将L1 Buffer中的数据搬入L0A Buffer和L0B Buffer并继续执行矩阵计算，此时需要让AIC等待AIV的数据搬运完成通知。
+
+    核内同步和核间同步的区别在于：核内同步解决同一核内部硬件流水之间的数据依赖，关注`PIPE_MTE2`、`PIPE_V`等流水的先后关系；核间同步解决不同核或不同逻辑核之间的进度依赖，关注AIC、AIV或多个AI Core之间的先后关系。
+
+    **图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图
+    ![](../../../figures/npu_3510_hw_arch_sync.png)
+    <!-- end id1 -->
+
+- 任务间同步用于SuperKernel场景下多个子核函数（Kernel）之间的调度与并行控制。SuperKernel将多个子核函数（Kernel）融合为一个超级核函数（Kernel）执行，通过任务间同步接口可以让相邻子核函数（Kernel）的部分指令并行，减少Task调度等待时间。更多原理和适配说明请参考[SuperKernel](../../../../guide/programming_guide/advanced_programming/super_kernel/principles.md)。
+
+各类同步对应的接口如下。
 
 **表1**  核内同步接口
 

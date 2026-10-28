@@ -207,39 +207,35 @@ Matmul的计算公式为：C = A \* B + Bias，其示意图如下。
 
 <a name="table98851538118"></a>
 CubeFormat::NZ格式的矩阵对齐要求为：
+
 - A矩阵/B矩阵：外轴为16的倍数，内轴为C0_size的倍数。
-<!-- npu="310p,310b" id103 -->
-对于如下产品型号：
+- C矩阵：
+  <!-- npu="310p,310b" id103 -->
+  - 对于如下产品型号：
+    <!-- npu="310p" id105 -->
+    - Atlas推理系列产品AI Core
+    <!-- end id105 -->
+    <!-- npu="310b" id106 -->
+    - Atlas 200I/500 A2推理产品
+    <!-- end id106 -->
+    外轴为16的倍数，内轴为16的倍数。
+  <!-- end id103 -->
+  <!-- npu="950,A3,910b" id104 -->
+  - 对于如下产品型号：
+    <!-- npu="950" id107 -->
+    - Ascend 950PR&950DT系列产品
+    <!-- end id107 -->
+    <!-- npu="A3" id108 -->
+    - Atlas A3系列产品
+    <!-- end id108 -->
+    <!-- npu="910b" id109 -->
+    - Atlas A2系列产品
+    <!-- end id109 -->
+    开启channel_split功能：外轴为16的倍数，内轴为C0_size的倍数。
 
-<!-- npu="310p" id105 -->
-Atlas推理系列产品AI Core
-<!-- end id105 -->
-
-<!-- npu="310b" id106 -->
-Atlas 200I/500 A2推理产品
-<!-- end id106 -->
-
-- C矩阵：外轴为16的倍数，内轴为16的倍数。
-<!-- end id103 -->
-<!-- npu="950,A3,910b" id104 -->
-对于如下产品型号：
-
-<!-- npu="950" id107 -->
-Ascend 950PR&950DT系列产品
-<!-- end id107 -->
-
-<!-- npu="A3" id108 -->
-Atlas A3系列产品
-<!-- end id108 -->
-
-<!-- npu="910b" id109 -->
-Atlas A2系列产品
-<!-- end id109 -->
-
-- C矩阵（开启channel_split功能）：外轴为16的倍数，内轴为C0_size的倍数。
-- C矩阵（不开启channel_split功能）：外轴为16的倍数，对于float/int32_t类型内轴为16的倍数，对于half/bfloat16_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t类型内轴为C0_size的倍数。
-<!-- end id104 -->
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_usage_res.md#id8 -->
+    不开启channel_split功能：外轴为16的倍数，对于float/int32_t类型内轴为16的倍数，对于half/bfloat16_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t类型内轴为C0_size的倍数。
+  <!-- end id104 -->
+  <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_usage_res.md#id8 -->
 
 上述参数和概念的补充说明如下：
 

@@ -4,7 +4,7 @@
 
 >[!NOTE]说明
 >CPU调测过程中，配置日志相关环境变量，可以记录程序的运行过程及异常信息，有助于开发者进行功能调测。
->关于环境变量的使用约束以及详细说明，可参见[《环境变量参考》](https://www.hiascend.com/document/redirect/CannCommunityEnvRef)中“辅助功能 \> 日志”章节。
+>关于环境变量的使用约束以及详细说明，可参见[日志相关环境变量](https://gitcode.com/cann/docs/blob/master/docs/zh/env-vars/_dump_log.md)。
 
 ## CPU侧验证核函数（Kernel）<a name="section1227643165914"></a>
 

@@ -93,3 +93,10 @@ inline long long int __half2ll_rn(const half x)
         dst[idx] = __half2ll_rn(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
+result: -2, -2, 0, 2, 2, 9223372036854775807, -9223372036854775808, 0
+```

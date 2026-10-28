@@ -31,41 +31,41 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
 -   不带尾块/不带counts参数场景：
 
-    ![](../../../figures/zh-cn_formulaimage_0000002047308822.png)
+    ![](../../../figures/formulaimage_0000002047308822.png)
 
     <!-- npu="950" id7 -->
     对于Ascend 950PR&950DT系列产品，方差计算公式如下。
 
     -   方差系数未修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002188346134.png)
+        ![](../../../figures/formulaimage_0000002188346134.png)
 
     -   方差系数修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002223917377.png)
+        ![](../../../figures/formulaimage_0000002223917377.png)
     <!-- end id7 -->
 
     其中，Mean为均值输出，Var为方差输出。
 
-    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/zh-cn_formulaimage_0000002235200305.png)代表<!-- npu="950" id14 -->未修正的<!-- end id14 -->方差系数rRec<!-- npu="950" id15 -->，![](../../../figures/zh-cn_image_0000002200279866.png)代表修正方差系数rRecWithCorrection<!-- end id15 -->。
+    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/formulaimage_0000002235200305.png)代表<!-- npu="950" id14 -->未修正的<!-- end id14 -->方差系数rRec<!-- npu="950" id15 -->，![](../../../figures/image_0000002200279866.png)代表修正方差系数rRecWithCorrection<!-- end id15 -->。
 
 -   带尾块/带counts参数场景：
 
-    ![](../../../figures/zh-cn_formulaimage_0000002047309002.png)
+    ![](../../../figures/formulaimage_0000002047309002.png)
 
     <!-- npu="950" id8 -->
     对于Ascend 950PR&950DT系列产品，方差计算公式如下。
 
     -   方差系数未修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002223802977.png)
+        ![](../../../figures/formulaimage_0000002223802977.png)
 
     -   方差系数修正场景：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002223917381.png)
+        ![](../../../figures/formulaimage_0000002223917381.png)
     <!-- end id8 -->
 
-    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/zh-cn_formulaimage_0000002200133484.png)代表<!-- npu="950" id16 -->未修正的<!-- end id16 -->方差系数rRec<!-- npu="950" id17 -->，![](../../../figures/zh-cn_image_0000002200279878.png)代表修正系数rRecWithCorrection<!-- end id17 -->。
+    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/formulaimage_0000002200133484.png)代表<!-- npu="950" id16 -->未修正的<!-- end id16 -->方差系数rRec<!-- npu="950" id17 -->，![](../../../figures/image_0000002200279878.png)代表修正系数rRecWithCorrection<!-- end id17 -->。
 
 ## 函数原型
 

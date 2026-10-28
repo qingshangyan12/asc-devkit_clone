@@ -26,8 +26,8 @@ namespace AscendC {
  * @param [in] dstShape : dst tensor shape
  * @param [in] typeSize : src and dst tensor dtype size
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return max temporary local space size
- * @return min temporary local space size
+ * @param [out] maxValue : maximum temporary local space size, in bytes
+ * @param [out] minValue : minimum temporary local space size, in bytes
  */
 void GetBroadCastMaxMinTmpSize(
     const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,

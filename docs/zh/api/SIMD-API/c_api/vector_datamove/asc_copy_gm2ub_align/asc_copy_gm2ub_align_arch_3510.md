@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
 
-提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。
+将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持搬运长度不是32字节整数倍的数据，并在搬运过程中进行32字节对齐补齐。该接口支持8位/16位/32位数据类型搬运，搬运数据长度仍需满足对应数据类型的字节对齐要求；源、目的起始地址的对齐要求请参见[参数说明](#参数说明)。
 
 本接口支持以下两种数据搬运方式：
 
@@ -171,7 +171,7 @@ PIPE_MTE2
 
 - 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 连续数据搬运约束
 
@@ -212,12 +212,13 @@ __global__ __vector__ void asc_copy_gm2ub_align_arch3510_kernel(__gm__ uint8_t* 
 {
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
-    // Copy INPUT_BYTES from GM to UB, then wait only for PIPE_MTE2.
+    // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对对齐搬运结果。
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

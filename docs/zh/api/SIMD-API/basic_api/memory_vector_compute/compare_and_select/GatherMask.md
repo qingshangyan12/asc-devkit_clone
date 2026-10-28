@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -240,6 +240,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | float | uint32_t | float |
 
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask_res.md#id2 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -267,6 +268,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
   - 内置固定模式占用8KB UB临时空间。
   - 用户自定义模式不涉及8KB UB临时空间的占用。
 <!-- end id26 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

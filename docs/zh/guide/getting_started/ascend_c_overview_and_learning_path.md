@@ -39,7 +39,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 > - Atlas 200I/500 A2推理产品
 > <!-- end id5 -->
 > <!-- npu="310p" id6 -->
-> - Atlas 推理系列产品
+> - Atlas推理系列产品
 > <!-- end id6 -->
 > <!-- npu="910" id7 -->
 > - Atlas训练系列产品
@@ -153,7 +153,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style="flex: 1; min-width: 200px;">
 <a href="../../api/api_list.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>
-<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口</a>
+<a href="https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/README.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口</a>
 </div>
 </div>
 </div>

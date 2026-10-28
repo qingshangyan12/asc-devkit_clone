@@ -1616,9 +1616,10 @@ public:
     }
 
 #if defined(USE_SSBUF)
-    using ScaleT = fp8_e8m0_t;
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
 
-    __aicore__ inline void SetTensorScaleA(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const GlobalTensor<SrcScaleAT>& gm, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -1630,7 +1631,7 @@ public:
         kfcMsg_.body.quantAddr = reinterpret_cast<uint64_t>(gm.address_);
     }
 
-    __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const LocalTensor<SrcScaleAT>& leftMatrix, bool isTransposeScaleA = false)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -1641,7 +1642,7 @@ public:
         kfcMsg_.body.quantMode = (kfcMsg_.body.quantMode & 0b10) | (static_cast<uint32_t>(isTransposeScaleA) & 0b01);
         if constexpr (PhyMxScalePosIsL1<A_TYPE>()) {
             kfcMsg_.body.quantAddr = GetTscmAddr(leftMatrix);
-            sizeScaleAmatrix_ = leftMatrix.GetSize() * sizeof(ScaleT);
+            sizeScaleAmatrix_ = leftMatrix.GetSize() * sizeof(SrcScaleAT);
             auto intraId = (reinterpret_cast<TBufType*>(leftMatrix.GetBufferHandle()))->enQueEvtID;
             // 8 bit for intraID, 32 bit for addr
             kfcMsg_.body.quantAddr = (((uint64_t)intraId) << VALID_ADDR_BITS_NUM) + kfcMsg_.body.quantAddr;
@@ -1651,12 +1652,12 @@ public:
             while (!(matmulL1AddrMsg->valid)) {
             }
             kfcMsg_.body.quantAddr = matmulL1AddrMsg->l1aScaleAddr;
-            sizeScaleAmatrix_ = leftMatrix.GetSize() * sizeof(ScaleT);
+            sizeScaleAmatrix_ = leftMatrix.GetSize() * sizeof(SrcScaleAT);
             aScaleAddr_ = (uint64_t)leftMatrix.GetPhyAddr();
         }
     }
 
-    __aicore__ inline void SetTensorScaleB(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const GlobalTensor<SrcScaleBT>& gm, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -1669,7 +1670,7 @@ public:
         kfcMsg_.body.quantScalar = reinterpret_cast<uint64_t>(gm.address_);
     }
 
-    __aicore__ inline void SetTensorScaleB(const LocalTensor<ScaleT>& rightMatrix, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const LocalTensor<SrcScaleBT>& rightMatrix, bool isTransposeScaleB = true)
     {
         static_assert(
             !ToMatmulConfig(MM_CFG).enableMixDualMaster,
@@ -1681,7 +1682,7 @@ public:
             (kfcMsg_.body.quantMode & 0b01) | ((static_cast<uint32_t>(isTransposeScaleB) & 0b01) << 1);
         if constexpr (PhyMxScalePosIsL1<B_TYPE>()) {
             kfcMsg_.body.quantScalar = GetTscmAddr(rightMatrix);
-            sizeScaleBmatrix_ = rightMatrix.GetSize() * sizeof(ScaleT);
+            sizeScaleBmatrix_ = rightMatrix.GetSize() * sizeof(SrcScaleBT);
             auto intraId = (reinterpret_cast<TBufType*>(rightMatrix.GetBufferHandle()))->enQueEvtID;
             // 8 bit for intraID, 32 bit for addr
             kfcMsg_.body.quantScalar = (((uint64_t)intraId) << VALID_ADDR_BITS_NUM) + kfcMsg_.body.quantScalar;
@@ -1691,7 +1692,7 @@ public:
             while (!(matmulL1AddrMsg->valid)) {
             }
             kfcMsg_.body.quantScalar = matmulL1AddrMsg->l1bScaleAddr;
-            sizeScaleBmatrix_ = rightMatrix.GetSize() * sizeof(ScaleT);
+            sizeScaleBmatrix_ = rightMatrix.GetSize() * sizeof(SrcScaleBT);
             bScaleAddr_ = (uint64_t)rightMatrix.GetPhyAddr();
         }
     }
@@ -1842,6 +1843,7 @@ private:
             *((uint32_t*)&kfcMsg_.body) = 0;
             return;
         }
+#if __NPU_ARCH__ != 9201
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             if (GetSubBlockIdxImpl() == 1) {
                 client->PostSameABFakeMsg<isAck>(funID, this->instIdx);
@@ -1849,6 +1851,7 @@ private:
                 return;
             }
         }
+#endif
         auto msg = client->AllocMessage();
         ASSERT(msg != nullptr && "msg cannot be nullptr when matmul client post msg");
         auto msgDst = reinterpret_cast<__ssbuf__ uint64_t*>(&(msg->body));
@@ -1880,6 +1883,7 @@ private:
     template <KFC_Enum funID, bool isAck>
     __aicore__ inline void PostMessage()
     {
+#if __NPU_ARCH__ != 9201
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             ASSERT(DoMatmulNorm(MM_CFG) && "MM_CFG should use norm config when sameab is enabled");
             if (GetSubBlockIdxImpl() == 1) {     // Do not send v1's message to cube
@@ -1888,6 +1892,7 @@ private:
                 return;
             }
         }
+#endif
         kfcMsg_.head = KfcMsgMakeFlag(funID, this->instIdx);
 
         auto msg = client->AllocMessage();
@@ -1941,6 +1946,7 @@ private:
         const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         // If the cache is not configured, the output is stored in the L0C buffer.
+#if __NPU_ARCH__ != 9201
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             if (GetSubBlockIdxImpl() == 1) {
                 CrossCoreSetFlag<INTRA_MODE, PIPE_V>(
@@ -1949,6 +1955,7 @@ private:
                 return;
             }
         }
+#endif
         CrossCoreSetFlag<INTRA_MODE, PIPE_V>(static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP) + this->instIdx);
         if constexpr (!ToMatmulConfig(MM_CFG).enableMixDualMaster) {
             auto msg = client->AllocMessage();
@@ -2837,7 +2844,7 @@ private:
     __aicore__ inline void CopyScaleUbAToL1(bool isTrans)
     {
         int32_t scaleK = Ceil(singleCoreK_, AscendC::Impl::MX_BASEK_FACTOR) * 2;
-        c0Size_ = AscendCUtils::GetC0Count(sizeof(ScaleT));
+        c0Size_ = AscendCUtils::GetC0Count(sizeof(SrcScaleAT));
         TBuffAddr tbufOutTmp;
         tbufOutTmp.logicPos = (uint8_t)(TPosition::A1);
         if constexpr (A_TYPE::scaleFormat == CubeFormat::ND) {
@@ -2850,19 +2857,20 @@ private:
                 orgHeightAlign = Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE;
                 orgWidthAlign = Ceil(scaleK, c0Size_) * c0Size_;
             }
-            tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * sizeof(ScaleT);
+            tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * sizeof(SrcScaleAT);
         } else {
             tbufOutTmp.dataLen = Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE * Ceil(singleCoreK_, BLOCK_CUBE) *
-                                 BLOCK_CUBE * sizeof(ScaleT);
+                                 BLOCK_CUBE * sizeof(SrcScaleAT);
         }
 
         tbufOutTmp.bufferAddr = kfcMsg_.body.quantAddr;
 #if ASCENDC_CPU_DEBUG
         tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + tbufOutTmp.bufferAddr;
 #endif
-        LocalTensor<ScaleT> leftMatrix;
+        LocalTensor<SrcScaleAT> leftMatrix;
         leftMatrix.SetAddr(tbufOutTmp);
-        LocalTensor<ScaleT> srcTensor = GetVecTensor<ScaleT>(aScaleAddr_, sizeScaleAmatrix_ / sizeof(ScaleT));
+        LocalTensor<SrcScaleAT> srcTensor =
+            GetVecTensor<SrcScaleAT>(aScaleAddr_, sizeScaleAmatrix_ / sizeof(SrcScaleAT));
         if constexpr (PhyMxScalePosIsUB<A_TYPE>()) {
             if constexpr (A_TYPE::scaleFormat == CubeFormat::NZ) {
                 if (isTrans) {
@@ -2875,13 +2883,13 @@ private:
                     leftMatrix, srcTensor,
                     {1, static_cast<uint16_t>(Ceil(singleCoreK_ / NUM_THIRTYTWO, c0Size_)), 0, 0});
             } else if constexpr (A_TYPE::scaleFormat == CubeFormat::ND) {
-                if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                if constexpr (SupportType<SrcScaleAT, fp8_e8m0_t>()) {
                     ScaleAUbSizeCheck(reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK);
                 } else {
                     ScaleAUbSizeCheck(srcTensor, scaleK);
                 }
                 if (isTrans) {
-                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    if constexpr (SupportType<SrcScaleAT, fp8_e8m0_t>()) {
                         CopyUbNZ2NZForScale(
                             reinterpret_cast<LocalTensor<uint8_t>&>(leftMatrix),
                             reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK,
@@ -2892,7 +2900,7 @@ private:
                             scaleTmpBufSize_);
                     }
                 } else {
-                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    if constexpr (SupportType<SrcScaleAT, fp8_e8m0_t>()) {
                         ND2ScaleZZ(
                             reinterpret_cast<LocalTensor<uint8_t>&>(leftMatrix),
                             reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), singleCoreM_,
@@ -2912,7 +2920,7 @@ private:
     __aicore__ inline void CopyScaleUbBToL1(bool isBTrans)
     {
         int32_t scaleK = Ceil(singleCoreK_, AscendC::Impl::MX_BASEK_FACTOR) * 2;
-        c0Size_ = AscendCUtils::GetC0Count(sizeof(ScaleT));
+        c0Size_ = AscendCUtils::GetC0Count(sizeof(SrcScaleBT));
         TBuffAddr tbufOutTmp;
         tbufOutTmp.logicPos = (uint8_t)(TPosition::B1);
         if constexpr (B_TYPE::scaleFormat == CubeFormat::ND) {
@@ -2925,18 +2933,19 @@ private:
                 orgHeightAlign = Ceil(scaleK, BLOCK_CUBE) * BLOCK_CUBE;
                 orgWidthAlign = Ceil(singleCoreN_, c0Size_) * c0Size_;
             }
-            tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * sizeof(ScaleT);
+            tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * sizeof(SrcScaleBT);
         } else {
             tbufOutTmp.dataLen = Ceil(singleCoreK_ / NUM_THIRTYTWO, BLOCK_CUBE) * BLOCK_CUBE *
-                                 Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE * sizeof(ScaleT);
+                                 Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE * sizeof(SrcScaleBT);
         }
         tbufOutTmp.bufferAddr = kfcMsg_.body.quantScalar;
 #if ASCENDC_CPU_DEBUG
         tbufOutTmp.absAddr = GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::B1)) + tbufOutTmp.bufferAddr;
 #endif
-        LocalTensor<ScaleT> rightMatrix;
+        LocalTensor<SrcScaleBT> rightMatrix;
         rightMatrix.SetAddr(tbufOutTmp);
-        LocalTensor<ScaleT> srcTensor = GetVecTensor<ScaleT>(bScaleAddr_, sizeScaleBmatrix_ / sizeof(ScaleT));
+        LocalTensor<SrcScaleBT> srcTensor =
+            GetVecTensor<SrcScaleBT>(bScaleAddr_, sizeScaleBmatrix_ / sizeof(SrcScaleBT));
         if constexpr (PhyMxScalePosIsUB<B_TYPE>()) {
             if constexpr (B_TYPE::scaleFormat == CubeFormat::NZ) {
                 if (isBTrans) {
@@ -2945,13 +2954,13 @@ private:
                     CopyUB2L1NZ2NZ(rightMatrix, srcTensor, singleCoreK_ / NUM_THIRTYTWO, singleCoreN_);
                 }
             } else if constexpr (B_TYPE::scaleFormat == CubeFormat::ND) {
-                if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                if constexpr (SupportType<SrcScaleBT, fp8_e8m0_t>()) {
                     ScaleBUbSizeCheck(reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK);
                 } else {
                     ScaleBUbSizeCheck(srcTensor, scaleK);
                 }
                 if (isBTrans) {
-                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    if constexpr (SupportType<SrcScaleBT, fp8_e8m0_t>()) {
                         ND2ScaleZZ(
                             reinterpret_cast<LocalTensor<uint8_t>&>(rightMatrix),
                             reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), singleCoreN_,
@@ -2962,7 +2971,7 @@ private:
                             scaleTmpBufSize_);
                     }
                 } else {
-                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    if constexpr (SupportType<SrcScaleBT, fp8_e8m0_t>()) {
                         CopyUbNZ2NZForScale(
                             reinterpret_cast<LocalTensor<uint8_t>&>(rightMatrix),
                             reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK,

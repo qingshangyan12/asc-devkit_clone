@@ -100,7 +100,7 @@ PIPE_V
 - Ascend 950PR&950DT系列产品的`PIPE_V`内部同步由硬件自动保证，多条本接口指令之间无需额外插入同步。
 <!-- end id9 -->
 <!-- npu="A3,910b" id10 -->
-- Atlas A2系列产品和Atlas A3系列产品执行多条本接口指令且目的地址存在重叠时，使用`asc_sync_pipe(PIPE_V)`保证多个指令串行化。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 <!-- end id10 -->
 
 ### 连续搬运模式约束
@@ -136,13 +136,15 @@ __global__ __vector__ void asc_copy_ub2ub_kernel(__gm__ uint8_t* output, __gm__ 
     asc_init();
     __ubuf__ uint8_t source[INPUT_BYTES], copied[INPUT_BYTES];
     asc_copy_gm2ub_align(source, input, INPUT_BYTES);
-    asc_sync_mte2(0);
-    // Copy INPUT_BYTES within UB on PIPE_V before the MTE3 consumer starts.
+    // UB内搬运使用PIPE_V，需等待PIPE_MTE2搬入完成。
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    // 先在UB内生成独立副本，再搬出该副本，以验证源数据和目的数据没有发生混淆。
     asc_copy_ub2ub(copied, source, INPUT_BYTES);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, copied, INPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

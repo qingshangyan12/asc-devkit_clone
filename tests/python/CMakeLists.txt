@@ -90,6 +90,14 @@ add_dependencies(asc_opc_unittest
     asc_platform_test
 )
 
+run_python_llt_test(
+    TARGET ascendc_pyut_kernel_spec_package
+    SRC_FILES_DIR ${ASCENDC_DIR}/cmake/asc/fwk_modules/util/
+    TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/ascendc_cmake_util/
+    PRE_TEST_COMMAND
+    COVERAGERC_DIR
+)
+
 # clear generated files
 add_custom_target(run_all_tests_and_clean ALL
     # dependency asc_platform_test
@@ -102,7 +110,7 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMAND rm -rf ${ASCENDC_DIR}/out/
     # created by run_python_llt_test
     COMMAND rm -f ${ASCENDC_DIR}/null
-    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel
+    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel ascendc_pyut_kernel_spec_package
     COMMENT "clean generated test files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )

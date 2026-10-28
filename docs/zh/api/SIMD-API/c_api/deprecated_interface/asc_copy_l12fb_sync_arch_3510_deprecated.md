@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/composite/cube_datamove_composite.h"`。
 
-**`asc_copy_l12fb_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
+**`asc_copy_l12fb_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/cube_compute_load/asc_copy_l12fb_arch_3510.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。
 
@@ -66,11 +66,9 @@ PIPE_FIX
 ## 调用示例
 
 ```cpp
-constexpr uint16_t n_burst = 1;
-constexpr uint16_t len_burst = 1;
-constexpr uint16_t src_gap = 0;
-constexpr uint16_t dst_gap = 1;
+// 同步接口按字节数连续搬运，此处搬运一个32字节数据块。
+constexpr uint32_t copy_size = 32;
 __cbuf__ half src[256];
 __fbuf__ half dst[256];
-asc_copy_l12fb_sync(dst, src, n_burst, len_burst, src_gap, dst_gap);
+asc_copy_l12fb_sync(dst, src, copy_size);
 ```

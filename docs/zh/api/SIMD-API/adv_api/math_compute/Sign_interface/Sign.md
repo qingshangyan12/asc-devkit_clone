@@ -33,9 +33,9 @@
 
 按元素执行Sign操作，Sign是指返回输入数据的符号，如果为0则返回0，如果为正数则返回1，如果为负数则返回-1。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002386224424.png)
+![](../../../../figures/formulaimage_0000002386224424.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002227274457.png)
+![](../../../../figures/formulaimage_0000002227274457.png)
 
 ## 函数原型
 

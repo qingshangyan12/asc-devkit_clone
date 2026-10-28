@@ -25,8 +25,8 @@ namespace AscendC {
  * \param [in] srcShape: input shape
  * \param [in] typeSize: data type size
  * \param [in] isReuseSource: indicate whether to reuse source tensor. Reserved parameter.
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  */
 void GetLayerNormMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
@@ -59,8 +59,8 @@ void GetLayerNormNDTilingInfo(
  * \param [in] typeSizeT: data type size: sizeof(T)
  * \param [in] isReuseSource: indicate whether to reuse source tensor. Reserved parameter.
  * \param [in] isInplace: indicate whether outputs that are not calculated are multiplexed inputs.
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  */
 void GetWelfordUpdateMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource,
@@ -73,8 +73,8 @@ void GetWelfordUpdateMaxMinTmpSize(
  * \param [in] isReuseSource: indicate whether to reuse source tensor. Reserved parameter.
  * \param [in] isComputeRstd: indicate whether to calculate rstd. Only support true now.
  * \param [in] isOnlyOutput: indicate whether to only output normalized result y. Only support false now.
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  */
 void GetLayerNormMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,

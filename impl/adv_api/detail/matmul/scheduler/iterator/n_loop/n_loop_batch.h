@@ -33,9 +33,9 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     NLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, class INPUT_TYPE, const auto& MM_CFG>
+template <typename IMPL, class INPUT_TYPE, class B_TYPE, const auto& MM_CFG>
 class NLoop<
-    IMPL, INPUT_TYPE, MM_CFG,
+    IMPL, INPUT_TYPE, B_TYPE, MM_CFG,
     enable_if_t<
         IsBmmEnableScheduler<INPUT_TYPE, MM_CFG> &&
         (ToMatmulConfig(MM_CFG).scheduleType != ScheduleType::OUTER_PRODUCT)>> {

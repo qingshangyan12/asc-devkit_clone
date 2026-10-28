@@ -12,6 +12,7 @@
 | [Coord](layout/coord.md) | 描述Tensor在各维度上的逻辑坐标。 |
 | [global_tensor和local_tensor](tensor/tensor.md) | 分别描述Global Memory和片上Local Memory中的Tensor对象。 |
 | [Pointer](tensor/pointer.md) | 描述Tensor的访问地址及其对应的存储位置。 |
+| [view_engine](tensor/view_engine.md) | 持有Tensor视图的内存指针，并提供视图起始位置和缓存模式管理能力。 |
 | [make_layout](layout/make_layout.md) | 根据Shape和Stride构造普通Layout。 |
 | [make_pattern_layout](layout/make_pattern_layout.md) | 根据Layout Pattern、Shape和Stride构造带有排布类型信息的Layout。 |
 | [make_frame_layout](layout/make_frame_layout.md) | 根据卷积特征图或矩阵分形的Layout Pattern和形状参数构造Layout。 |
@@ -100,6 +101,10 @@
 
 | 接口或类型名 | 功能描述 |
 | --- | --- |
+| [cast_layout](reg_vector_compute/aux_data_types/cast_layout.md) | 指定寄存器类型转换中的数据排布位置。 |
+| [cast_round_mode](reg_vector_compute/aux_data_types/cast_round_mode.md) | 指定寄存器类型转换的舍入方式。 |
+| [cast_sat_mode](reg_vector_compute/aux_data_types/cast_sat_mode.md) | 指定寄存器类型转换是否采用饱和模式。 |
+| [merge_mode](reg_vector_compute/aux_data_types/merge_mode.md) | 指定带Mask的寄存器写入操作中，目的寄存器未被选中元素的处理方式。 |
 | [reg_tensor](reg_vector_compute/reg_tensor/reg_tensor.md) | 封装矢量数据寄存器及其掩码寄存器，用于寄存器数据计算。 |
 | [reg_pair](reg_vector_compute/reg_tensor/reg_pair.md) | 保存两个元素类型相同的`reg_tensor`，用于具有双结果的寄存器接口。 |
 | [all_mask](reg_vector_compute/mask_reg_compute/all_mask.md) | 创建与指定元素类型位宽匹配的全有效Mask寄存器。 |
@@ -108,21 +113,29 @@
 | [update_mask](reg_vector_compute/mask_reg_compute/update_mask.md) | 根据剩余待处理元素数生成有效位Mask，并更新剩余元素数量。 |
 | [interleave（掩码寄存器交织）](reg_vector_compute/mask_reg_compute/interleave.md) | 将两个Mask寄存器按指定元素宽度交织，返回低半部分和高半部分结果。 |
 | [deinterleave（掩码寄存器解交织）](reg_vector_compute/mask_reg_compute/deinterleave.md) | 将两个Mask寄存器按指定元素宽度解交织，返回偶数组和奇数组结果。 |
+| [move](reg_vector_compute/reg_data_copy/move.md) | 将源寄存器中Mask选中的有效元素复制到目的寄存器的对应位置。 |
+| [move_mask](reg_vector_compute/reg_data_copy/move_mask.md) | 从源矢量数据寄存器的指定数据块中提取并扩展比特，生成Mask寄存器。 |
 | [load](reg_vector_compute/reg_data_load/load.md) | 将UB中的数据搬入`reg_tensor`，支持多种数据排列方式。 |
 | [load_broadcast](reg_vector_compute/reg_data_load/load_broadcast.md) | 从UB搬入数据，并按指定模式广播到`reg_tensor`。 |
+| [load_gather](reg_vector_compute/reg_data_load/load_gather.md) | 根据索引从UB Tensor的离散位置收集数据到`reg_tensor`。 |
+| [unalign_load](reg_vector_compute/reg_data_load/unalign_load.md) | 将非32字节对齐的UB数据搬入`reg_tensor`，支持连续搬入。 |
 | [store](reg_vector_compute/reg_data_store/store.md) | 将`reg_tensor`中的数据搬出到UB，支持多种数据排列方式。 |
+| [store_scatter](reg_vector_compute/reg_data_store/store_scatter.md) | 根据索引将`reg_tensor`中的有效元素分散写入UB Tensor。 |
+| [unalign_store](reg_vector_compute/reg_data_store/unalign_store.md) | 将`reg_tensor`中的指定数量元素连续搬出到非32字节对齐的UB地址，并提供收尾操作。 |
 | [cast](reg_vector_compute/type_conversion/cast.md) | 转换寄存器数据类型，支持配置数据排布、舍入和饱和模式。 |
 | [trunc](reg_vector_compute/type_conversion/trunc.md) | 将Mask选中的浮点元素向零取整，并保留原数据类型。 |
 | [abs](reg_vector_compute/basic_arithmetic/abs.md) | 对源操作数逐元素计算绝对值。 |
-| [addc](reg_vector_compute/basic_arithmetic/addc.md) | 对源操作数逐元素执行带进位加法。 |
+| [add_carry](reg_vector_compute/basic_arithmetic/add_carry.md) | 对源操作数逐元素执行带进位加法。 |
 | [exp](reg_vector_compute/basic_arithmetic/exp.md) | 对源操作数中的有效元素逐元素计算指数。 |
 | [leaky_relu](reg_vector_compute/basic_arithmetic/leaky_relu.md) | 对源操作数逐元素执行Leaky ReLU计算。 |
 | [log](reg_vector_compute/basic_arithmetic/log.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
+| [ln](reg_vector_compute/basic_arithmetic/ln.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
 | [log10](reg_vector_compute/basic_arithmetic/log10.md) | 对源操作数中的有效元素逐元素计算以10为底的对数。 |
 | [log2](reg_vector_compute/basic_arithmetic/log2.md) | 对源操作数中的有效元素逐元素计算以2为底的对数。 |
 | [max](reg_vector_compute/basic_arithmetic/max.md) | 对两个源操作数逐元素计算最大值。 |
 | [min](reg_vector_compute/basic_arithmetic/min.md) | 对两个源操作数逐元素计算最小值。 |
 | [mull](reg_vector_compute/basic_arithmetic/mull.md) | 对两个源操作数逐元素执行高低位乘法计算。 |
+| [neg](reg_vector_compute/basic_arithmetic/neg.md) | 对源操作数逐元素取相反数。 |
 | [+](reg_vector_compute/basic_arithmetic/operator_add.md) | 对两个源操作数逐元素执行加法计算。 |
 | [-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对两个源操作数逐元素执行减法计算。 |
 | [*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
@@ -130,7 +143,14 @@
 | [prelu](reg_vector_compute/basic_arithmetic/prelu.md) | 对源操作数逐元素执行PReLU计算。 |
 | [relu](reg_vector_compute/basic_arithmetic/relu.md) | 对源操作数逐元素执行ReLU计算。 |
 | [sqrt](reg_vector_compute/basic_arithmetic/sqrt.md) | 对源操作数逐元素计算平方根。 |
-| [subc](reg_vector_compute/basic_arithmetic/subc.md) | 对源操作数逐元素执行带借位减法。 |
+| [sub_carry](reg_vector_compute/basic_arithmetic/sub_carry.md) | 对源操作数逐元素执行带借位减法。 |
+| [axpy](reg_vector_compute/composite_compute/axpy.md) | 将源寄存器与标量逐元素相乘，再与目的寄存器原值相加。 |
+| [abs_diff](reg_vector_compute/composite_compute/abs_diff.md) | 对两个源寄存器逐元素计算差值的绝对值。 |
+| [exp_diff](reg_vector_compute/composite_compute/exp_diff.md) | 对两个源寄存器逐元素求差，并计算以差值为指数的指数函数。 |
+| [madd](reg_vector_compute/composite_compute/madd.md) | 将目的寄存器与第一个源寄存器逐元素相乘，再与第二个源寄存器相加。 |
+| [mula](reg_vector_compute/composite_compute/mula.md) | 将两个源寄存器逐元素相乘，再与目的寄存器原值相加。 |
+| [fma](reg_vector_compute/composite_compute/fma.md) | 对三个源寄存器逐元素执行融合乘加计算。 |
+| [muls_cast](reg_vector_compute/composite_compute/muls_cast.md) | 将源寄存器与标量逐元素相乘，并将结果转换为目的数据类型。 |
 | [not](reg_vector_compute/logical_compute/not.md) | 对源操作数逐元素执行逻辑非计算。 |
 | [&](reg_vector_compute/logical_compute/and.md) | 对两个源操作数逐元素执行按位与计算。 |
 | [\|](reg_vector_compute/logical_compute/or.md) | 对两个源操作数逐元素执行按位或计算。 |
@@ -147,9 +167,21 @@
 | [select](reg_vector_compute/compare_and_select/select.md) | 根据条件Mask从两个源寄存器中逐元素选择数据。 |
 | [数据填充](reg_vector_compute/data_padding/data_padding.md) | 根据mask将源操作数src的最低位元素或者一个scalar操作数填充到目的操作数。 |
 | [fill](reg_vector_compute/data_padding/fill.md) | 将标量或源寄存器最低位元素广播并填充到目的寄存器。 |
-| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 给定源操作数src0和src1，将src0和src1中的元素交织或解交织存入结果操作数。 |
+| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 对寄存器数据执行交织、解交织、按索引收集、位宽压缩与扩展、按掩码筛选及前缀计数。 |
 | [interleave（数据寄存器交织）](reg_vector_compute/data_reorder/interleave.md) | 将两个源寄存器中的元素交织到两个结果寄存器。 |
 | [deinterleave（数据寄存器解交织）](reg_vector_compute/data_reorder/deinterleave.md) | 将两个源寄存器中的元素解交织到两个结果寄存器。 |
+| [gather](reg_vector_compute/data_reorder/gather.md) | 根据索引寄存器逐元素收集源寄存器中的数据。 |
+| [pack](reg_vector_compute/data_reorder/pack.md) | 提取源元素的低半位宽数据，压缩后写入结果寄存器的低半部分或高半部分。 |
+| [unpack](reg_vector_compute/data_reorder/unpack.md) | 选取源寄存器的低半部分或高半部分，将元素位宽扩展为原来的两倍。 |
+| [compress](reg_vector_compute/data_reorder/compress.md) | 根据筛选掩码将选中的源元素按原顺序连续排列在结果寄存器的低位。 |
+| [expand](reg_vector_compute/data_reorder/expand.md) | 根据掩码生成排除当前位置的前缀计数索引。 |
+| [索引生成](reg_vector_compute/reg_index/reg_index.md) | 以标量为基值生成寄存器索引序列。 |
+| [iota](reg_vector_compute/reg_index/iota.md) | 以标量为基值生成步长为1的递增或递减序列。 |
+| [histograms](reg_vector_compute/histogram_compute/histograms.md) | 统计输入值的频率分布或累计分布，并在目的寄存器原值上累加统计结果。 |
+| [reduce_sum](reg_vector_compute/reduction_compute/reduce_sum.md) | 按指定归约范围对源寄存器中的有效元素求和。 |
+| [reduce_max](reg_vector_compute/reduction_compute/reduce_max.md) | 按指定归约范围计算源寄存器中有效元素的最大值。 |
+| [reduce_min](reg_vector_compute/reduction_compute/reduce_min.md) | 按指定归约范围计算源寄存器中有效元素的最小值。 |
+| [mem_bar](reg_vector_compute/reg_sync_control/mem_bar.md) | 同步Reg矢量计算函数内不同流水线之间的UB访问。 |
 
 ## 工具接口
 

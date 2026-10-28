@@ -81,6 +81,7 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend950": "ascend950",
     "ascend350_354f": "ascend350",
     "ascend350_355e": "ascend350",
+    "ascend5162a": "ascend5162a",
     "ascend960dt_969b5": "ascend960DT",
     "ascend960dt_969b6": "ascend960DT",
     "ascend960dt_968b7": "ascend960DT",
@@ -89,9 +90,9 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend960dt_966b8z": "ascend960DT",
     "ascend960dt_961by": "ascend960DT",
     "ascend960dt_961bz": "ascend960DT",
-    "ascend960_9689": "ascend960PR",
-    "ascend960PR_969A1": "ascend960PR",
-    "ascend960PR_964A1": "ascend960PR",
+    "ascend960pr_963a1": "ascend960PR",
+    "ascend960pr_969a1": "ascend960PR",
+    "ascend960pr_964a1": "ascend960PR",
 }
 CONFLICT_KEYWORDS = {
     "and",

@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -62,6 +62,7 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。U支持的数据类型为：int8_t、int16_t、int32_t、int64_t。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_shift_amount_tensor_res.md#id2 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -73,6 +74,7 @@ Ascend 950PR&950DT系列产品，T支持的数据类型为：int8_t、uint8_t、
 
 -   对于逻辑位移（无符号数据类型），如果位移量大于数据类型位宽，则输出为0。
 -   对于算数位移（有符号数据类型），如果src0小于0，src1小于0，并且位移量大于数据类型位宽，则输出-1；如果src0大于0，并且位移量大于数据类型位宽，则输出0。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_shift_amount_tensor_res.md#id3 -->
 
 ## 调用示例<a name="section132384819392"></a>
 

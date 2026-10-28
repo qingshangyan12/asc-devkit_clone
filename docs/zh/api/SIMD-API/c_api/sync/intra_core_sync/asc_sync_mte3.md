@@ -66,7 +66,7 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -108,7 +108,7 @@ __global__ __vector__ void asc_sync_mte3_kernel(__gm__ float* dst0, __gm__ float
         asc_copy_gm2ub_align(y, src1 + iter * ELEMENTS, BYTES);
         asc_copy_gm2ub_align(w, src2 + iter * ELEMENTS, BYTES);
 
-        // PIPE_MTE2到PIPE_V的同步，需分别分别编写notify与wait。
+        // PIPE_MTE2到PIPE_V的同步，需分别编写notify与wait。
         asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 

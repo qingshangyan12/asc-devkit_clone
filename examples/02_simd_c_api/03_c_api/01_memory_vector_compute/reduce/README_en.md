@@ -15,8 +15,8 @@ This example supports two sum-reduction scenarios, selected with the CMake build
 
 | Product | CANN Version |
 |---------|-------------|
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A3 products | >= CANN 9.2.0 |
+| Atlas A2 products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -57,7 +57,7 @@ This example performs reduction on the input vector. The details are as follows:
 
 **Scenario 2: DataBlock Reduction**
 
-- Example functionality: Separately sums the eight float values in each of eight 32-byte DataBlocks.
+- Example functionality: Separately sums the eight float values in each of eight 32byte DataBlocks.
 - Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="3" align="center">AIV Example</td></tr>
@@ -69,9 +69,9 @@ This example performs reduction on the input vector. The details are as follows:
   </table>
 
 - Example implementation:
-  The `reduce_kernel` function calls `asc_datablock_reduce_sum` to separately sum the eight float values in each of eight 32-byte DataBlocks. The process is as follows:
+  The `reduce_kernel` function calls `asc_datablock_reduce_sum` to separately sum the eight float values in each of eight 32byte DataBlocks. The process is as follows:
   - Load: Calls `asc_copy_gm2ub_align` to load 64 float values from GM to UB.
-  - Compute: Calls `asc_datablock_reduce_sum` to sum the eight float values in each 32-byte DataBlock.
+  - Compute: Calls `asc_datablock_reduce_sum` to sum the eight float values in each 32byte DataBlock.
   - Store: Calls `asc_copy_ub2gm_align` to store the result from UB to GM.
   - Invocation implementation: Uses the kernel invocation syntax `<<<>>>` to call the kernel function.
 
@@ -106,7 +106,7 @@ Run the following steps in the root directory of this example to build and run i
   | Option | Values | Description |
   | --- | --- | --- |
   | `SCENARIO_NUM` | `1` (default), `2` | Example execution scenario: Scenario 1: Repeat reduction, Scenario 2: DataBlock reduction |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default) | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default) | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products |
 
 - Execution result
 

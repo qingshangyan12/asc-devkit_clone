@@ -73,7 +73,7 @@ inline half2 __halves2half2(const half x, const half y)
     __aicore__ void simt_halves2half2(half* input1, half* input2, half2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __halves2half2(input1[idx], input2[idx]);
@@ -93,7 +93,7 @@ inline half2 __halves2half2(const half x, const half y)
     __simt_vf__ __launch_bounds__(1024) inline void simt_halves2half2(__gm__ half* input1, __gm__ half* input2, __gm__ half2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __halves2half2(input1[idx], input2[idx]);
@@ -103,3 +103,11 @@ inline half2 __halves2half2(const half x, const half y)
         asc_vf_call<simt_halves2half2>(dim3(1024), input1, input2, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+y: -0.5, 0.5, 1.25, 2.0
+result: (-1.25, -0.5), (0.5, 0.5), (2.5, 1.25), (-3.75, 2.0)
+```

@@ -5,8 +5,10 @@
 Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自动启用Gemv功能，该操作退化为1×K维度的行向量与K×N维度矩阵之间的乘法运算。
 
 <!-- npu="950" id1 -->
-针对Ascend 950PR&950DT系列产品产品，可以通过设置asc_mmad的disable_gemv参数为true，将该功能关闭。
+针对Ascend 950PR&950DT系列产品，可以通过设置asc_mmad的disable_gemv参数为true，将该功能关闭。
 <!-- end id1 -->
+
+计算参数参见[asc_mmad](../mmad_compute/asc_mmad.md)；输入向量的搬入接口参见[asc_copy_l12l0a](../../cube_datamove/cube_compute_load/asc_copy_l12l0a.md)，结果存储空间的组织参见[L0C Buffer内存结构介绍](../../cube_datamove/cube_compute_store/L0C_memory_structure_intro.md)。
 
 **特性约束：**
 
@@ -61,7 +63,7 @@ asc_mmad(c, a, b, 1, k, n, asc_unit_flag_mode::DISABLE,
 ```
 
 <!-- npu="950" id3 -->
-针对Ascend 950PR&950DT系列产品产品，可以通过设置asc_mmad的disable_gemv参数为true，将该功能关闭，示例如下：
+针对Ascend 950PR&950DT系列产品，可以通过设置asc_mmad的disable_gemv参数为true，将该功能关闭，示例如下：
 
 ```cpp
 asc_mmad(c, a, b, 1, k, n, asc_unit_flag_mode::DISABLE,

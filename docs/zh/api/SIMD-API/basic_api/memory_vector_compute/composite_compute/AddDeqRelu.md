@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -122,6 +122,7 @@ $$
 | src0、src1数据类型 | dst数据类型 |
 | :----------------- | :---------- |
 | int32_t            | half        |
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddDeqRelu_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -160,6 +161,7 @@ $$
     8K, & \text{if } count \gt 2K
   \end{cases}
   $$
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddDeqRelu_res.md#id3 -->
 
 ## 关键特性
 

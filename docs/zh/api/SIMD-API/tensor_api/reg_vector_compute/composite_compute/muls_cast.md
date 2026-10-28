@@ -34,7 +34,7 @@ $$
 dst_i = cast\_round\_to\_f16(src_i \times scalar)
 $$
 
-默认布局为`cast_layout::zero`，转换结果写入返回寄存器中每组两个`half`元素的第0个位置（偶数索引），第1个位置置零。
+默认布局为[cast_layout](../aux_data_types/cast_layout.md)::zero，转换结果写入返回寄存器中每组两个`half`元素的第0个位置（偶数索引），第1个位置置零。
 
 ## 函数原型
 
@@ -45,15 +45,15 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 
 ## 参数说明
 
-**表1**模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| Layout | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
+| Layout | [cast_layout](../aux_data_types/cast_layout.md)枚举类型，结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
 | T | 返回值元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | U | 源操作数和标量类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-**表2**参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 
 ## 数据类型
 
-**表3**数据类型组合
+**表3** 数据类型组合
 
 | src | scalar | dst |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void muls_cast_vf(

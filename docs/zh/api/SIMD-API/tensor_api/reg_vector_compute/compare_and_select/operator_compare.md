@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -170,20 +170,20 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 ## 返回值说明
 
-返回类型为`reg_tensor<bool>`。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。当src0和src1都为reg_tensor类型时，返回值的mask和src0的mask值相同，当src0和src1分别为reg_tensor和标量形式时，，返回值的mask和reg_tensor操作数的mask相同。
+返回类型为`reg_tensor<bool>`。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。当src0和src1都为reg_tensor类型时，返回值的mask和src0的mask值相同，当src0和src1分别为reg_tensor和标量形式时，返回值的mask和reg_tensor操作数的mask相同。
 
 ## 约束说明
 
-- 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 用于控制计算的`reg_tensor`操作数的mask需通过`with_mask`接口预先设置：当`src0`为`reg_tensor`时，使用`src0.mask`；当`src0`为标量、`src1`为`reg_tensor`时，使用`src1.mask`。未设置时，mask的内容不确定，会导致参与计算的元素位置错误；标量操作数不需要设置mask。
 - 本接口应在Vector Function（`__simd_vf__`标记的函数）内调用。
 - 输入mask比特位为0时，计算结果对应比特位写0。
 - 浮点比较时，+0.0与-0.0视为相等。
-- 浮点比较输入含nan时，计算结果对应比特位写0。
+- 浮点比较输入含nan时，`operator==`、`operator<`、`operator<=`、`operator>`和`operator>=`的计算结果对应比特位写0，`operator!=`的计算结果对应比特位写1。
 
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void compare_example(InputTensor input, OutputTensor output)

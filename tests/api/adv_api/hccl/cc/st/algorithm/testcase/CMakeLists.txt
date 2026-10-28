@@ -13,6 +13,7 @@ set(src_list
     all_gather_nhr_testcase.cc
     all_gather_aicpu_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
+    all_to_all_ccu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
 )
 
@@ -155,6 +156,8 @@ add_custom_command(
 )
 
 add_subdirectory(mc2_ccu)
+
+add_subdirectory(mc2_aicpu)
 
 # Isolate primitive interception from the existing simulator and production libraries.
 set(MESHCHUNK_TEST_TARGET ascendc_ut_adv_api_hccl_cc_meshchunk)

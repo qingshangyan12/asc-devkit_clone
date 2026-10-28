@@ -29,7 +29,7 @@
 
 获取输入x乘以2的exp次幂的结果。
 
-![](../../../figures/zh-cn_formulaimage_0000002484776400.png)
+![](../../../figures/formulaimage_0000002484776400.png)
 
 ## 函数原型
 
@@ -98,7 +98,7 @@ inline float ldexpf(float x, int exp)
 输入输出示例如下：
 
 ```
-n：1, 2, 3, 1
-x：0.25, 0.75, 1.25, 1.75
-result: 0.5 3 10 3.5
+n: 1, 2, 3, 1
+x: 0.25, 0.75, 1.25, 1.75
+result: 0.5, 3, 10, 3.5
 ```

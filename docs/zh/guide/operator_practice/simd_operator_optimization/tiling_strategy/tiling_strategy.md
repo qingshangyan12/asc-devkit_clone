@@ -1,3 +1,3 @@
 # Tiling策略
 
-本文件为文档发布时所需的索引文件。
+- [核间负载均衡](./inter_core_load_balance.md)

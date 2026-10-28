@@ -29,7 +29,7 @@
 
 获取输入数据x各元素的平方根的倒数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002576421069.png)
+![](../../../../figures/formulaimage_0000002576421069.png)
 
 ## 函数原型
 
@@ -89,3 +89,10 @@ inline bfloat16x2_t h2rsqrt(bfloat16x2_t x)
         dst[idx] = h2rsqrt(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (-2, 1.25), (0.75, -0.25)
+result: (nan, 1.41406), (0.632813, nan), (nan, 0.894531), (1.15625, nan)
+```

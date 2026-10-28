@@ -29,15 +29,15 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
 1.  对输入特征x，在batch维度上计算均值μ和方差σ：
 
-    ![](../../../figures/zh-cn_formulaimage_0000001819896105.png)
+    ![](../../../figures/formulaimage_0000001819896105.png)
 
 2.  对于每个特征i，对输入特征x进行归一化：
 
-    ![](../../../figures/zh-cn_formulaimage_0000001819898557.png)
+    ![](../../../figures/formulaimage_0000001819898557.png)
 
 3.  对归一化后的特征进行缩放和平移：
 
-    ![](../../../figures/zh-cn_formulaimage_0000001773144218.png)
+    ![](../../../figures/formulaimage_0000001773144218.png)
 
 ## 函数原型
 

@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_scatter(__ubuf__ int8_t* dst,
 - 源操作数和索引为矢量数据寄存器，目的操作数为UB地址。
 - `dst`起始地址需32字节对齐。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD与SIMT混合编程时再划分32KB～128KB作为Data Cache，可用容量进一步减少）。`index`索引后的实际写入地址不可超过实际可用容量。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 分散搬出约束
 
@@ -112,7 +112,7 @@ __simd_callee__ inline void asc_scatter(__ubuf__ int8_t* dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -124,27 +124,42 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint8_t MUTEX_ID = 0;
+
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t ELEMENT_COUNT = 133;
 constexpr uint32_t REPEAT_TIMES = 3;
 constexpr uint32_t OUTPUT_COUNT = REPEAT_TIMES * ELEMENT_COUNT;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
+constexpr uint32_t DATA_BYTES = INPUT_BYTES;
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
 __simd_vf__ inline void scatter_vf(__ubuf__ uint16_t* output,
                                     __ubuf__ uint16_t* input,
-                                    __ubuf__ uint16_t* indices)
+                                    __ubuf__ uint16_t* indices, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src;
     vector_uint16_t index;
     asc_loadalign(src, input);
     asc_loadalign(index, indices);
-    vector_bool mask = asc_create_mask_b16(PAT_M4);
     for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
-        asc_scatter(output + repeat * ELEMENT_COUNT, src, index, mask);
+        // 每次重新遍历输入时重置计数，内层循环由asc_update_mask_b16自动更新。
+        uint32_t remaining_length = ELEMENT_COUNT;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            const uint32_t offset = i * one_repeat_size;
+            vector_bool mask = asc_update_mask_b16(remaining_length);
+            asc_loadalign(src, input + offset);
+            asc_loadalign(index, indices + offset);
+            asc_scatter(output + repeat * ELEMENT_COUNT + offset, src, index, mask);
+        }
     }
 }
 
@@ -156,15 +171,21 @@ __global__ __vector__ void asc_scatter_kernel(__gm__ uint16_t* output,
     __ubuf__ uint16_t output_local[OUTPUT_COUNT];
     __ubuf__ uint16_t input_local[ELEMENT_COUNT];
     __ubuf__ uint16_t index_local[ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_copy_gm2ub_align(index_local, indices, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    scatter_vf(output_local, input_local, index_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<scatter_vf>(output_local, input_local, index_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
@@ -176,7 +197,8 @@ int main()
     std::vector<uint16_t> output(OUTPUT_COUNT, SENTINEL);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
         input[i] = static_cast<uint16_t>(i + 1);
-        indices[i] = static_cast<uint16_t>((i * 3) % ELEMENT_COUNT);
+        const uint32_t block_count = (i < ELEMENTS_PER_REGISTER) ? ELEMENTS_PER_REGISTER : ELEMENT_COUNT - ELEMENTS_PER_REGISTER;
+        indices[i] = static_cast<uint16_t>((i * 3) % block_count);
     }
 
     if (aclInit(nullptr) != ACL_SUCCESS || aclrtSetDevice(0) != ACL_SUCCESS) return 1;
@@ -203,8 +225,9 @@ int main()
     bool passed = true;
     for (uint32_t repeat = 0; repeat < REPEAT_TIMES && passed; ++repeat) {
         for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-            const uint16_t expected = (i % 4 == 0) ? input[i] : SENTINEL;
-            const uint32_t position = repeat * ELEMENT_COUNT + indices[i];
+            const uint16_t expected = input[i];
+            const uint32_t block_offset = (i / ELEMENTS_PER_REGISTER) * ELEMENTS_PER_REGISTER;
+            const uint32_t position = repeat * ELEMENT_COUNT + block_offset + indices[i];
             if (output[position] != expected) {
                 std::cerr << "Mismatch at output[" << position << "]: expected " << expected
                           << ", actual " << output[position] << std::endl;

@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -57,6 +57,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 ## 数据类型
 
 支持数据类型为：b8、b16、b32。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GetCmpMask_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -65,6 +66,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 dst的空间大小不能少于128字节。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GetCmpMask_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

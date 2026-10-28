@@ -1006,6 +1006,8 @@ const bool& GetExternalInputHcclAicpuUnfold()
 
 const uint8_t& GetExternalInputHcclAicpuCacheEnable() { return g_algEnvConfig.aicpuCacheEnable; }
 
+const u8& GetExternalInputHcclDeterministic() { return g_algEnvConfig.hcclDeterministic; }
+
 const bool& GetExternalInputHcclAivMode() { return g_algEnvConfig.aivMode; }
 
 const bool& GetExternalInputHcclAivOnlyMode() { return g_algEnvConfig.aivOnlyMode; }
@@ -1041,7 +1043,7 @@ bool RunIndependentOpExpansion(DevType deviceType)
     }
 
 #ifdef MACRO_DEV_TYPE_NEW
-    if (deviceType == DevType::DEV_TYPE_950) {
+    if (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960) {
 #else
     if (deviceType == DevType::DEV_TYPE_910_95) {
 #endif

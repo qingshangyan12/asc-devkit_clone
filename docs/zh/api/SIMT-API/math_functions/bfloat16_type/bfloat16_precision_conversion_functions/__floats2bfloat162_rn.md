@@ -73,7 +73,7 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
     __aicore__ void simt_floats2bfloat162_rn(float* input1, float* input2, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __floats2bfloat162_rn(input1[idx], input2[idx]);
@@ -93,7 +93,7 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
     __simt_vf__ __launch_bounds__(1024) inline void simt_floats2bfloat162_rn(__gm__ float* input1, __gm__ float* input2, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __floats2bfloat162_rn(input1[idx], input2[idx]);
@@ -103,3 +103,11 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
         asc_vf_call<simt_floats2bfloat162_rn>(dim3(1024), input1, input2, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 128.25, 128.5, 128.75, -128.5, 0.0, -0.0, inf, nan
+y: nan, inf, -0.0, 0.0, -128.5, 128.75, 128.5, 128.25
+result: (128.0, nan), (128.0, inf), (129.0, -0.0), (-128.0, 0.0), (0.0, -128.0), (-0.0, 129.0), (inf, 128.0), (nan, 128.0)
+```

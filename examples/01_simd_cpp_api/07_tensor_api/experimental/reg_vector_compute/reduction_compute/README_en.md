@@ -16,7 +16,7 @@ Only the first element of each result region is valid. The remaining elements ar
 
 ## Supported Products
 
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT products
 
 ## Directory Structure
 
@@ -88,7 +88,7 @@ This sample has been verified with CANN 9.2.0, `dav-3510`, and NPU simulation mo
 
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   python3 ../scripts/gen_data.py
   ./demo
@@ -102,7 +102,6 @@ This sample has been verified with CANN 9.2.0, `dav-3510`, and NPU simulation mo
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode: `npu` or `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU architecture. This sample supports only `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Experimental ASC API switch. This sample requires `ON`. |
 
 - Expected result
 

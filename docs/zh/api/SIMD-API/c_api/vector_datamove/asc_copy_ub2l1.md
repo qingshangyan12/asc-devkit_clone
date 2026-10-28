@@ -107,8 +107,9 @@ PIPE_MTE3
 ### 通用约束
 
 - 本接口在非AIV上调用直接返回。
+- 本接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为1：2的配置。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 连续搬运模式约束
 
@@ -119,7 +120,7 @@ PIPE_MTE3
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -177,7 +178,7 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
             asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
         asc_sync_pipe(PIPE_FIX);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* name, const std::vector<float>& data)

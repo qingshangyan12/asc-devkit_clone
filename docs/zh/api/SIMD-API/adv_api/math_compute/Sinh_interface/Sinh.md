@@ -33,9 +33,9 @@
 
 按元素做双曲正弦函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002182888644.png)
+![](../../../../figures/formulaimage_0000002182888644.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000001678718948.png)
+![](../../../../figures/formulaimage_0000001678718948.png)
 
 ## 函数原型
 

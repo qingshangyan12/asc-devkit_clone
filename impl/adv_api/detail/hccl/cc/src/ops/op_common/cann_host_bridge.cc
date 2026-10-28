@@ -141,8 +141,9 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
-    return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+    (void)param;
+    // ALLTOALL/ALLTOALLV/ALLREDUCE 已切回本地路径(选路/执行器/资源), 当前无 op 走 CANN 桥接。
+    return false;
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)

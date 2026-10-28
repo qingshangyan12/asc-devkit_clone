@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-**`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)接口替代。**
+**`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md)接口替代。**
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
+本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/cube_compute_store/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
@@ -63,21 +63,21 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
-- 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+- 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/cube_compute_store/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/cube_compute_store/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-以下调用示例代码仅Ascend 950PR&950DT系列产品产品支持。
+以下调用示例代码仅Ascend 950PR&950DT系列产品支持。
 
 ```cpp
 #include <cstdint>
@@ -115,7 +115,7 @@ __global__ __cube__ void asc_set_l0c2gm_nz2nd_kernel(
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* label, const std::vector<float>& data)

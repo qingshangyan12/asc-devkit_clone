@@ -29,7 +29,7 @@
 
 获取int32类型数据`x`和`y`的向上取整平均值，避免中间求和溢出。
 
-![](../../../figures/zh-cn_formulaimage_0000002585583711.png)
+![](../../../figures/formulaimage_0000002585583711.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ int __rhadd(int x, int y)
         dst[idx] = __rhadd(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -7, 0, 23, -13
+y: 6, 0, 15, -8
+result: 0, 0, 19, -10
+```

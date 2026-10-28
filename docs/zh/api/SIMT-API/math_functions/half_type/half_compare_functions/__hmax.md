@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533455019.png)
+![](../../../../figures/formulaimage_0000002533455019.png)
 
 ## 函数原型
 
@@ -93,3 +93,11 @@ inline half __hmax(half x, half y)
         dst[idx] = __hmax(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: nan, 0.5, 2.5, nan
+y: -1.25, -0.25, 3.25, nan
+result: -1.25, 0.5, 3.25, nan
+```

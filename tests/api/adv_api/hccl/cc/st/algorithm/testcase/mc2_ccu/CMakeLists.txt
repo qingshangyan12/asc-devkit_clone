@@ -119,6 +119,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mj_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
+    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/peer_only_local_copy_testcase.cpp
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_multilink_adapter.cc
@@ -126,6 +127,8 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/all_reduce_testcase.cpp
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_mesh1d_mem2mem_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce.cc
+    ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_selector_testcase.cc
+    ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/aicpu_all_reduce_selector_testcase.cc
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/all_gather_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/parallel_migration_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather_kfc_server_adapter.cc

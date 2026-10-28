@@ -9,7 +9,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -50,7 +50,7 @@
 
 - 调用实现
 
-  在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数完成dump打印，随后通过`AscendC::Adds`执行计算并将结果写回GM。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
+  在`__global__ __vector__`核函数内使用`asc_vf_call`打印原始UB和寄存器数据，通过`AscendC::Adds`执行计算后，再打印修改后的UB，最后将结果写回GM。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
 
 ## 编译运行
 
@@ -79,7 +79,7 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：dav-3510对应Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：dav-3510对应Ascend 950PR&950DT系列产品 |
 
 - 执行结果
   最终执行结果如下，说明精度对比成功。

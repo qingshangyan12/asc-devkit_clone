@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -48,6 +48,7 @@ __aicore__ inline void ResetMask()
 ## 约束说明<a name="section633mcpsimp"></a>
 
 调用SetVectorMask接口之后，如需恢复mask的值为默认值（全1），可调用本接口实现。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/ResetMask_res.md#id2 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

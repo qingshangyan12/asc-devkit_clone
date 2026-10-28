@@ -29,9 +29,9 @@
 
 按元素计算x的gamma函数的绝对值并求自然对数，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218495125.png)
+![](../../../../figures/formulaimage_0000002218495125.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002188278974.png)
+![](../../../../figures/formulaimage_0000002188278974.png)
 
 ## 函数原型
 

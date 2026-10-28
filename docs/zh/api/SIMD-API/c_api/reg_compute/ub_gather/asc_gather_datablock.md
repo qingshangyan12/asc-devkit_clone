@@ -91,15 +91,15 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
                                                           vector_bool mask)
 ```
 
-### 无掩码控制（占位符形式）
+### 无掩码控制
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
                                                  __ubuf__ <src_dtype>* src,
                                                  vector_uint32_t index)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
                                                                vector_uint32_t index)
 ```
@@ -185,7 +185,7 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -197,9 +197,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 void PrintData(const char* label, const std::vector<T>& values)
 {
@@ -211,44 +215,68 @@ void PrintData(const char* label, const std::vector<T>& values)
 }
 
 constexpr uint32_t DATA_BLOCK_SIZE = 32;
-constexpr uint32_t DATA_BLOCK_COUNT = 8;
+constexpr uint32_t DATA_BLOCKS_PER_REGISTER = 8;
+constexpr uint32_t DATA_BLOCK_COUNT = 9;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (DATA_BLOCK_COUNT + DATA_BLOCKS_PER_REGISTER - 1) / DATA_BLOCKS_PER_REGISTER;
+constexpr uint32_t PADDED_DATA_BLOCK_COUNT = REPEAT_COUNT * DATA_BLOCKS_PER_REGISTER;
 constexpr uint32_t BUFFER_BYTES = DATA_BLOCK_SIZE * DATA_BLOCK_COUNT;
+constexpr uint32_t PADDED_BUFFER_BYTES = DATA_BLOCK_SIZE * PADDED_DATA_BLOCK_COUNT;
 constexpr uint32_t INDEX_WORDS = 64;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BLOCK_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATA_BLOCK_SIZE;
 __simd_vf__ inline void gather_datablock_vf(
-    __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index)
+    __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool gather_mask = asc_create_mask_b32(PAT_ALL);
-    vector_uint32_t index_reg;
-    asc_loadalign(index_reg, index);
-    vector_uint8_t dst;
-    asc_gather_datablock(dst, data, index_reg, gather_mask);
-    vector_bool store_mask = asc_create_mask_b8(PAT_ALL);
-    asc_storealign(output, dst, store_mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = BUFFER_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t block_offset = i * one_repeat_size;
+        uint32_t valid_count = DATA_BLOCK_COUNT - block_offset;
+        if (valid_count > DATA_BLOCKS_PER_REGISTER) {
+            valid_count = DATA_BLOCKS_PER_REGISTER;
+        }
+        uint32_t remaining_length_gather = valid_count;
+        vector_bool gather_mask = asc_update_mask_b32(remaining_length_gather);
+        vector_bool store_mask = asc_update_mask_b8(remaining_length);
+        vector_uint32_t index_reg;
+        asc_loadalign(index_reg, index + block_offset);
+        vector_uint8_t dst;
+        asc_gather_datablock(dst, data, index_reg, gather_mask);
+        asc_storealign(output + block_offset * DATA_BLOCK_SIZE, dst, store_mask);
+    }
 }
 
 __global__ __vector__ void asc_gather_datablock_kernel(
     __gm__ uint8_t* output, __gm__ uint8_t* data, __gm__ uint32_t* index)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_BYTES];
-    __ubuf__ uint8_t data_local[BUFFER_BYTES];
+    __ubuf__ uint8_t output_local[PADDED_BUFFER_BYTES];
+    __ubuf__ uint8_t data_local[PADDED_BUFFER_BYTES];
     __ubuf__ uint32_t index_local[INDEX_WORDS];
-    asc_copy_gm2ub_align(data_local, data, BUFFER_BYTES);
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(data_local, data, PADDED_BUFFER_BYTES);
     asc_copy_gm2ub_align(index_local, index, INDEX_WORDS * sizeof(uint32_t));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    gather_datablock_vf(output_local, data_local, index_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = asc_get_vf_len() / DATA_BLOCK_SIZE;
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<gather_datablock_vf>(output_local, data_local, index_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> data(BUFFER_BYTES);
+    std::vector<uint8_t> data(PADDED_BUFFER_BYTES, 0);
     std::vector<uint32_t> index(INDEX_WORDS);
     std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
     std::vector<uint8_t> golden(BUFFER_BYTES);
@@ -267,7 +295,7 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* data_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&data_device), BUFFER_BYTES,
+    aclrtMalloc(reinterpret_cast<void**>(&data_device), PADDED_BUFFER_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint32_t* index_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&index_device), INDEX_WORDS * sizeof(uint32_t),

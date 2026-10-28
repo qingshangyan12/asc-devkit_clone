@@ -77,3 +77,11 @@ int __mul24(int x, int y)
         dst[idx] = __mul24(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+y: 6, 15, 3, 4
+result: -72, 0, 69, -28
+```

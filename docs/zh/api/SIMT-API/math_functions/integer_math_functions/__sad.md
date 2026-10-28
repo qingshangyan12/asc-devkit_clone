@@ -78,3 +78,12 @@ unsigned int __sad(int x, int y, unsigned int z)
         dst[idx] = __sad(x[idx], y[idx], z[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, 7
+y: 0, 15, 7, -13
+z: 0, 5, 9, 3
+result: 12, 20, 25, 23
+```

@@ -42,13 +42,13 @@
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id11 -->
-**图1** L0C2GM流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**图 2** L0C2GM流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>  
+**图 2** L0C2GM流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id13 -->
@@ -273,8 +273,8 @@
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+        // 设置CTRL[48]为0，开启浮点数饱和模式。
+        AscendC::SetCtrlSpr<48, 48>(0);
         ```
 
     对于整数类型只有饱和模式。
@@ -282,7 +282,7 @@
 <!-- npu="950" id29 -->
 - Ascend 950PR&950DT系列产品特殊值/边界值约束说明：
 
-    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式，该模式由CTRL\[48\]直接决定，不受CTRL\[60\]限制；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
@@ -290,13 +290,14 @@
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+        // 该模式由CTRL[48]直接决定，不受CTRL[60]限制。
+        AscendC::SetCtrlSpr<48, 48>(0);
         ```
 
     对于整数类型只有饱和模式。
     L0C Buffer到GM搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id29 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id3 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
@@ -308,7 +309,7 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../example
     ```cpp
         AscendC::GlobalTensor<outputType> cGM;
         cGM.SetGlobalBuffer((__gm__ outputType *)c);
-    
+
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         AscendC::FixpipeParamsV220 fixpipeParams;
         fixpipeParams.ndNum = 1;
@@ -324,3 +325,6 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../example
         AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
     ```
 <!-- end id30 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id4 -->
+

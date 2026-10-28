@@ -25,11 +25,11 @@
 
 ## 功能说明
 
-按元素计算x的gamma函数的对数导数，计算公式如下，![](../../../../figures/zh-cn_formulaimage_0000001945339324.png)为伽玛函数。
+按元素计算x的gamma函数的对数导数，计算公式如下，![](../../../../figures/formulaimage_0000001945339324.png)为伽玛函数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002182895154.png)
+![](../../../../figures/formulaimage_0000002182895154.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002218495557.png)
+![](../../../../figures/formulaimage_0000002218495557.png)
 
 ## 函数原型
 

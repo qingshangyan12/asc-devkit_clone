@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -96,7 +96,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -106,7 +106,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
                                                         addr_reg offset,
                                                         vector_bool mask)
 ```
-
 
 ## 参数说明
 
@@ -156,7 +155,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
 - `dst`起始地址需32字节对齐，否则会报错。
 - `mask`必须为`vector_bool`类型掩码寄存器，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。`dst`偏移与写出区域对应的UB范围不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### int32_t偏移压缩搬出场景
 
@@ -174,7 +173,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -186,35 +185,46 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t INPUT_BYTES = 256;
+constexpr uint8_t MUTEX_ID = 0;
+
+
+constexpr uint32_t ELEMENT_COUNT = 67;
 constexpr uint32_t PACKED_BYTES = 64;
 constexpr uint32_t REPEAT_TIMES = 2;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_TIMES * PACKED_BYTES;
+constexpr uint32_t INPUT_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint32_t);
 constexpr uint32_t STEP_BYTES = 128;
 constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
 __simd_vf__ inline void pack_quarter_vf(__ubuf__ uint8_t* output,
-                                        __ubuf__ uint32_t* input)
+                                        __ubuf__ uint32_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
     vector_int32_t src_i32;
     vector_uint32_t src_u32;
     vector_float src_f32;
-    asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_loadalign(src_u32, input);
-    asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input));
-    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input) + i * PACKED_BYTES);
+        asc_loadalign(src_u32, input + i * PACKED_BYTES);
+        asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input) + i * PACKED_BYTES);
+        vector_bool tail_mask = asc_update_mask_b32(remaining_length);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ int32_t*>(
-            output + repeat * STEP_BYTES), src_i32, mask);
+            output + i * STEP_BYTES), src_i32, tail_mask);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ uint32_t*>(
-            output + SECTION_BYTES + repeat * STEP_BYTES), src_u32, mask);
+            output + SECTION_BYTES + i * STEP_BYTES), src_u32, tail_mask);
         asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ float*>(
-            output + 2 * SECTION_BYTES + repeat * STEP_BYTES), src_f32, mask);
+            output + 2 * SECTION_BYTES + i * STEP_BYTES), src_f32, tail_mask);
     }
 }
 
@@ -223,32 +233,42 @@ __global__ __vector__ void asc_storealign_pack_quarter_kernel(
 {
     asc_init();
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    __ubuf__ uint32_t input_local[ELEMENT_COUNT];
+    __ubuf__ uint32_t input_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
     asc_copy_gm2ub(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    pack_quarter_vf(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<pack_quarter_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint32_t> input(ELEMENT_COUNT);
+    std::vector<uint32_t> input(PADDED_ELEMENT_COUNT, 0);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        input[i] = 0x5a000000u | i;
-        const uint8_t value = static_cast<uint8_t>(input[i]);
-        for (uint32_t section = 0; section < 3; ++section) {
-            for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = 0x5a000000u | i;
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        const uint32_t valid_count = remaining_length > PACKED_BYTES ? PACKED_BYTES : remaining_length;
+        for (uint32_t i = 0; i < valid_count; ++i) {
+            const uint8_t value = static_cast<uint8_t>(input[repeat * PACKED_BYTES + i]);
+            for (uint32_t section = 0; section < 3; ++section) {
                 expected[section * SECTION_BYTES + repeat * STEP_BYTES + i] = value;
             }
         }
+        remaining_length -= valid_count;
     }
 
     aclInit(nullptr);

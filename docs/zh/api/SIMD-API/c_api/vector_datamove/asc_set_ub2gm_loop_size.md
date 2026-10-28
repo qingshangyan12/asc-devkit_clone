@@ -52,7 +52,7 @@ __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | loop1_size | 输入 | 内层循环`loop1`的迭代次数。取值范围为[0, $2^{21}−1$]。 |
-| loop2_size | 输入 | 外层循环`loop2`的迭代次数。取值范围为[0, $2^{21}−1$]。 |
+| loop2_size | 输入 | 外层循环`loop2`的迭代次数。取值范围为[0, $2^{22}−1$]。 |
 
 ## 返回值说明
 
@@ -75,7 +75,7 @@ PIPE_S
 将以下代码保存为`example.asc`后，执行对应的编译运行命令。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

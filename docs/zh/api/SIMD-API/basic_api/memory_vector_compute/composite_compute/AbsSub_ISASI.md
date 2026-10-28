@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -63,6 +63,7 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，T支持的数据类型为：half、float。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AbsSub_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -77,6 +78,7 @@ Ascend 950PR&950DT系列产品，T支持的数据类型为：half、float。
 <!-- npu="950" id9 -->
 - 该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AbsSub_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

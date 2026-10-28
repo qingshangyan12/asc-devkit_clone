@@ -61,7 +61,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| event | 输入 | 模板参数。同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。<br>HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。<br>流水类型的取值及含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。HardEvent的取值范围请参考[核内同步分类小节中表2和表3](intra_core_sync_overview.md#核内同步分类)。 |
+| event | 输入 | 模板参数。同步事件，数据类型为HardEvent。同一核内的不同流水之间，在存在数据访问依赖时，需要根据数据访问的先后顺序，插入对应的同步事件。HardEvent用来表示对应的同步事件。<br>HardEvent命名规则为<源流水\_目标流水\>，其中源流水的指令先执行、目标流水中的指令后执行。例如MTE2\_V，代表PIPE\_MTE2为源流水，PIPE\_V为目标流水，标识从PIPE\_MTE2到PIPE\_V的同步，PIPE\_V等待PIPE\_MTE2。<br>流水类型的取值及含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。由于硬件架构版本代际间的差异，不同硬件架构上的事件存在差异。[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)下HardEvent的取值范围请参考[核内同步组合](intra_core_sync_overview.md#npu_arch_2201_intra_core_sync_combinations)。 |
 | eventID | 输入 | 事件ID。数据类型为int32_t类型。eventID的取值范围与产品型号有关，具体请参考[约束说明](#section633mcpsimp)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>

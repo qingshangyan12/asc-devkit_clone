@@ -14,6 +14,7 @@
 import copy
 import fcntl
 import json
+import logging
 import os
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -85,7 +86,6 @@ class ManifestInputSnapshot:
     tiling_info: object
     workspace_idx: int
     sk_compile_info: Optional[object] = None
-    sk_cap_bitmap: Optional[int] = None
     constant_infos: Optional[Tuple[ConstantInfoRecord, ...]] = None
     constant_info_size_by_tiling_key: Optional[dict] = None
 
@@ -225,16 +225,32 @@ class _KernelCompileRecordBuilder:
         recorded_commands = compile_info.compile_command_session.records
         if not recorded_commands:
             raise ManifestCommandError(f"{object_type} Manifest generation requires recorded dynamic compile commands")
-        return tuple(
-            replace(
-                spec,
-                compile_tiling_key=str(spec.tiling_key),
-                compile_symbol=spec.compiled_symbol,
-                object_type=object_type,
-                constant_info_files=self._constant_info_files,
+        # Import lazily because compile command generation also imports this module.
+        from .ascendc_compile_base import add_op_system_run_cfg_option
+
+        commands = []
+        for spec in recorded_commands:
+            argv = list(spec.argv)
+            if object_type == "basic":
+                add_op_system_run_cfg_option(
+                    argv,
+                    compile_info,
+                    self._snapshot.tiling_info,
+                    spec.tiling_key,
+                    spec.core_type,
+                    definition_key=spec.tiling_key,
+                )
+            commands.append(
+                replace(
+                    spec,
+                    argv=tuple(argv),
+                    compile_tiling_key=str(spec.tiling_key),
+                    compile_symbol=spec.compiled_symbol,
+                    object_type=object_type,
+                    constant_info_files=self._constant_info_files,
+                )
             )
-            for spec in recorded_commands
-        )
+        return tuple(commands)
 
 
 def static_tiling_template_text(dynamic_header):
@@ -365,9 +381,6 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
                 source_include_added = True
             index += option_size
             continue
-        if os.path.isabs(include_path) and not os.path.exists(include_path):
-            index += option_size
-            continue
         normalized.extend(argv[index : index + option_size])
         index += option_size
     if replacement is not None and not source_include_added:
@@ -383,8 +396,32 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
     return normalized
 
 
-def _static_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
-    lines = ['#include "kernel_operator.h"']
+def gen_sk_bind_source(pairs, basic_attribute, sk_attribute):
+    """Keep DCCI capability selectable when recorded sources are specialized.
+    Capability bits are assembled by compile-time macros, cap_bitmap:
+    * bit 0 (value 1): enable wait-pre-task-end capability.
+    * bit 1 (value 2): enable set-next-task-start capability.
+    * bit 2 (value 4): disable DCCI when the DCCI disable macro is defined.
+    """
+    lines = [
+        '#include "kernel_operator.h"',
+        "#ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END",
+        "#define __ASCENDC_SK_CAP_WAIT_FLAG__ 0b1ULL",
+        "#else",
+        "#define __ASCENDC_SK_CAP_WAIT_FLAG__ 0b0ULL",
+        "#endif",
+        "#ifdef __ASCENDC_ENABLE_SET_NEXT_TASK_START",
+        "#define __ASCENDC_SK_CAP_SET_FLAG__ 0b10ULL",
+        "#else",
+        "#define __ASCENDC_SK_CAP_SET_FLAG__ 0b0ULL",
+        "#endif",
+        "#ifdef __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__",
+        "#define __ASCENDC_SK_CAP_DISABLE_DCCI__ 0b100ULL",
+        "#else",
+        "#define __ASCENDC_SK_CAP_DISABLE_DCCI__ 0b0ULL",
+        "#endif",
+    ]
+    cap_bitmap = "(__ASCENDC_SK_CAP_WAIT_FLAG__ | __ASCENDC_SK_CAP_SET_FLAG__ | __ASCENDC_SK_CAP_DISABLE_DCCI__)"
     for basic_symbol, sk_symbol in pairs:
         lines.extend(
             [
@@ -472,6 +509,70 @@ def _publish_directory(stage_dir, target_dir):
         shutil.rmtree(backup_dir)
 
 
+class ManifestSourcePaths:
+    """Resolve recorded include paths without changing the commands used for compilation."""
+
+    _FLAGS = ("-isystem", "-iquote", "-idirafter", "-include", "-I")
+    _MARKER = "${source_file_path}"
+
+    def __init__(self, source_file):
+        source = Path(os.path.abspath(source_file))
+        self._source_dir = source.parent
+        self.warned = set()
+        self.maps = [(source.parent, self._MARKER)]
+
+    def _mapped(self, path):
+        for parent in (path, *path.parents):
+            if parent.name == "common" and parent.parent.name == "ascendc":
+                relative = Path(os.path.relpath(parent, self._source_dir)).as_posix()
+                if "src" in self._source_dir.parts:
+                    relative = relative.replace("/ascendc/common", "/common")
+                marker = self._MARKER if relative == "." else self._MARKER + "/" + relative
+                entry = (parent, marker)
+                if entry not in self.maps:
+                    self.maps.append(entry)
+                break
+        for root, marker in self.maps:
+            try:
+                tail = path.relative_to(root)
+            except ValueError:
+                continue
+            return marker if not tail.parts else marker + "/" + tail.as_posix()
+        return None
+
+    def _path(self, value, forced_include=False):
+        if not os.path.isabs(value):
+            return value
+        path = Path(os.path.abspath(value))
+        mapped = self._mapped(path)
+        if mapped is not None:
+            return mapped
+        directory = path.parent if forced_include else path
+        if directory not in self.warned:
+            logging.warning(
+                "Kernel Spec: external include directory '%s' has no installation mapping. "
+                "Skipping manifest generation; place the dependency under the source directory or its "
+                "ascendc/common directory.",
+                directory,
+            )
+            self.warned.add(directory)
+        return value
+
+    def rewrite(self, argv):
+        result = []
+        tokens = iter(argv)
+        for token in tokens:
+            flag = next((flag for flag in self._FLAGS if token.startswith(flag)), None)
+            if token == flag:
+                result.append(token)
+                path = next(tokens, None)
+                if path is not None:
+                    result.append(self._path(path, flag == "-include"))
+            else:
+                result.append(flag + self._path(token[len(flag) :], flag == "-include") if flag else token)
+        return result
+
+
 class ManifestPackageWriter:
     """Collect packaged Manifest resources and publish the Manifest."""
 
@@ -508,6 +609,7 @@ class ManifestPackageWriter:
         self._wrapper_paths = {}
         self._constant_info_logicals = {}
         self._wrapper_commands = []
+        self._source_paths = ManifestSourcePaths(self._source_file_path)
 
     @staticmethod
     def _append_sk_objcopy_commands(commands, rename_specs, split_specs):
@@ -547,7 +649,7 @@ class ManifestPackageWriter:
             specs.append((static_symbol, final_output, split_index, split_name))
         return tuple(specs)
 
-    def write(self) -> str:
+    def write(self) -> Optional[str]:
         os.makedirs(self._parent_dir, exist_ok=True)
         lock_path = os.path.join(self._parent_dir, f".{self._kernel_name}.manifest.lock")
         with open(lock_path, "a+", encoding="utf-8") as lock_file:
@@ -557,16 +659,22 @@ class ManifestPackageWriter:
                 self._stage_dir = tempfile.mkdtemp(prefix=f".{self._kernel_name}.stage.", dir=self._parent_dir)
                 self._collect_resources()
                 manifest = self._build_manifest()
-                _write_resources(self._stage_dir, self._resource_path, self._resources)
-                manifest_path = os.path.join(self._stage_dir, self._manifest_name)
-                with open(manifest_path, "w", encoding="utf-8") as file_obj:
-                    json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
-                    file_obj.write("\n")
+                if self._source_paths.warned:
+                    # Replace any previous package so a skipped variant cannot reuse stale resources.
+                    Path(self._stage_dir, ".manifest-skipped").write_text(
+                        "Unmapped external include directories\n", encoding="utf-8"
+                    )
+                else:
+                    _write_resources(self._stage_dir, self._resource_path, self._resources)
+                    manifest_path = os.path.join(self._stage_dir, self._manifest_name)
+                    with open(manifest_path, "w", encoding="utf-8") as file_obj:
+                        json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
+                        file_obj.write("\n")
                 # Persist the package before exposing it through the final rename.
                 _fsync_tree(self._stage_dir)
                 _publish_directory(self._stage_dir, self._target_dir)
                 self._stage_dir = ""
-                return os.path.join(self._target_dir, self._manifest_name)
+                return None if self._source_paths.warned else os.path.join(self._target_dir, self._manifest_name)
             finally:
                 if self._stage_dir and os.path.isdir(self._stage_dir):
                     shutil.rmtree(self._stage_dir)
@@ -737,9 +845,7 @@ class ManifestPackageWriter:
         bind_logical = _add_resource(
             self._resources,
             "src/" + bind_name,
-            content=_static_bind_source(
-                bind_pairs, basic_attribute or sk_attribute, sk_attribute, self._snapshot.sk_cap_bitmap
-            ),
+            content=gen_sk_bind_source(bind_pairs, basic_attribute or sk_attribute, sk_attribute),
         )
         output_name = f"{kernel.kernel_name}.sk_bind.o"
         commands.append({"type": "compile", "cmd": self._build_bind_command(bind_logical, output_name)})
@@ -791,7 +897,7 @@ class ManifestPackageWriter:
                 normalized[index] = source_reference
             if value.startswith("-include") and record.source_path in value:
                 normalized[index] = value.replace(record.source_path, source_reference)
-        return normalized
+        return self._source_paths.rewrite(normalized)
 
     def _rewrite_static_sk_symbols(self, argv, target_symbol, tiling_key):
         if target_symbol is None:
@@ -831,7 +937,7 @@ class ManifestPackageWriter:
             if cann_root and cann_root in value:
                 value = value.replace(cann_root, "${env:ASCEND_HOME_PATH}")
             normalized.append(value)
-        return normalized
+        return self._source_paths.rewrite(normalized)
 
 
 class KernelSpecCompilation:
@@ -850,7 +956,6 @@ class KernelSpecCompilation:
         self.basic_compile_info = compile_info
         self.kernel_spec_dir = context.get_addition("kernel_spec_dir")
         self.resource_id = None
-        self.sk_cap_bitmap = None
         self._cleaned = False
         # Save process-global SK state before the record-only replay changes it.
         self._global_state = {name: global_var_storage.get_variable(name) for name in self._GLOBAL_STATE_NAMES}
@@ -870,16 +975,21 @@ class KernelSpecCompilation:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if not self.record_sk_commands:
-            return False
-        global_var_storage = storage_module.global_var_storage
-        try:
-            self.cleanup()
-        finally:
-            # Restore the entry state even when replay or cleanup fails.
-            for name, value in self._global_state.items():
-                global_var_storage.set_variable(name, value)
+        if self.record_sk_commands:
+            try:
+                self.cleanup()
+            finally:
+                # Restore the entry state even when publication or cleanup fails.
+                for name, value in self._global_state.items():
+                    storage_module.global_var_storage.set_variable(name, value)
         return False
+
+    def _manifest_error(self, reason):
+        utility_module.CommonUtility.ascendc_raise_python_err(
+            error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+            f"Kernel Spec manifest generation failed: kernel={self.compile_info.kernel_name}, "
+            f"mode={self._kernel_spec_mode}, output_dir={self.kernel_spec_dir}; {reason}",
+        )
 
     @classmethod
     def create(cls, compile_info, compile_option_tuple, tiling_info):
@@ -920,13 +1030,10 @@ class KernelSpecCompilation:
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
         return True
 
-    def finish_sk_recording(self, sk_cap_bitmap):
-        self.sk_cap_bitmap = sk_cap_bitmap
-
     def publish_manifest(self, tiling_info, workspace_idx):
         if not self.enabled:
             return
-        # Publish after the Resource ID and all requested commands are available.
+        # The writer validates and publishes the complete package atomically.
         try:
             ManifestPackageWriter(
                 ManifestInputSnapshot(
@@ -938,13 +1045,10 @@ class KernelSpecCompilation:
                     tiling_info=tiling_info,
                     workspace_idx=workspace_idx,
                     sk_compile_info=self.sk_compile_info,
-                    sk_cap_bitmap=self.sk_cap_bitmap,
                 )
             ).write()
-        except ManifestGenerationError as error:
-            utility_module.CommonUtility.ascendc_raise_python_err(
-                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE, f"generate Manifest failed, reason is: {error}"
-            )
+        except (ManifestGenerationError, OSError) as error:
+            self._manifest_error(str(error))
 
     def cleanup(self):
         if self._cleaned:

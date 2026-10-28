@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。
 
-![](../../../figures/zh-cn_formulaimage_0000002521590972.png)
+![](../../../figures/formulaimage_0000002521590972.png)
 
 ## 函数原型
 
@@ -85,3 +85,11 @@ inline long long int llmax(const long long int x, const long long int y)
         dst[idx] = llmax(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+y: -20, 0, 15, 7
+result: -12, 0, 23, 7
+```

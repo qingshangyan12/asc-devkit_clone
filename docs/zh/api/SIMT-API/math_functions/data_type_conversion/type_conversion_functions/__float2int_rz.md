@@ -96,3 +96,10 @@ inline int __float2int_rz(const float x)
         asc_vf_call<kernel__float2int_rz>(dim3(256), dst, x, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -6.5, -1.75, 1.75, 6.5, inf, -inf, nan
+result: -6, -1, 1, 6, 2147483647, -2147483648, 0
+```

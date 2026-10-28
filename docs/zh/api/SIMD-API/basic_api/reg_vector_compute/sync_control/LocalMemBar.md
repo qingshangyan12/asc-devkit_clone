@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar_res.md#id1 -->
 
 
@@ -93,7 +105,7 @@ __simd_callee__ inline void LocalMemBar()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-如下示例中dstPtr和src0Ptr为同一个Unified Buffer（UB）地址，for循环的第二次迭代中读UB矢量搬运和第一次迭代中写UB矢量搬运操作了同一块UB地址空间，因此第二次循环中读UB矢量搬运需要等待第一次循环中写UB矢量搬运执行完成后才能执行，需要插入VEC_LOAD等待VEC_STORE的同步。
+如下示例中`dstAddr`和`src0Addr`为同一个Unified Buffer（UB）地址，for循环的第二次迭代中读UB矢量搬运和第一次迭代中写UB矢量搬运操作了同一块UB地址空间，因此第二次循环中读UB矢量搬运需要等待第一次循环中写UB矢量搬运执行完成后才能执行，需要插入VEC_LOAD等待VEC_STORE的同步。
 
 ```cpp
 template<typename T>

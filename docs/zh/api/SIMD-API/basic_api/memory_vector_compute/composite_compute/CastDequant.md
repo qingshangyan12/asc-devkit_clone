@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -150,6 +150,7 @@
 | int16_t     | uint8_t     |
 
 <!-- end id11 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/CastDequant_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -191,6 +192,7 @@
   |输入类型为int16_t，关闭向量量化模式|<br>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)|
   |输入类型为int16_t，开启向量量化模式|<br>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)|
   |输入类型为int32_t，输出数据类型为half类型|<br>\_\_aicore\_\_ inline void SetDeqScale(half scale)|
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/CastDequant_res.md#id3 -->
 
 ## 关键特性
 

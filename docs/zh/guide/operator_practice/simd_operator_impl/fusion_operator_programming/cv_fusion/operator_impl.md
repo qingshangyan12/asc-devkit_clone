@@ -29,9 +29,8 @@
 -   算子类型（OpType）：MATMUL\_LEAKYRELU
 -   算子输入输出：
 
-    **表1**  MATMUL\_LEAKYRELU算子输入输出规格
+    **表1**  MATMUL\_LEAKYRELU算子输入输出规格<a name="table4934296305"></a>
 
-    <a name="table4934296305"></a>
     <table><thead align="left"><tr id="row59358913304"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p5503181819300"><a name="p5503181819300"></a><a name="p5503181819300"></a><strong id="b1850331853010"><a name="b1850331853010"></a><a name="b1850331853010"></a>name</strong></p>
     </th>
     <th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.2"><p id="p1550381833017"><a name="p1550381833017"></a><a name="p1550381833017"></a><strong id="b7503171811309"><a name="b7503171811309"></a><a name="b7503171811309"></a>shape</strong></p>
@@ -102,9 +101,9 @@
 
     Leaky ReLU（带泄露线性整流函数）激活函数，是人工神经网络中一种常用的激活函数，其数学表达式和函数图像如下所示：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002501251774.png)
+    ![](../../../../figures/formulaimage_0000002501251774.png)
 
-    ![](../../../../figures/zh-cn_image_0000002501411624.png)
+    ![](../../../../figures/image_0000002501411624.png)
 
 5.  将输出结果搬运到Global Memory。
 

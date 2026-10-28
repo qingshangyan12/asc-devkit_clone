@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -173,6 +173,7 @@
     - T支持的数据类型为：half（所有CMPMODE都支持）、float（所有CMPMODE都支持）、int32_t（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
 <!-- end id23 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares_res.md#id2 -->
 
 ## 返回值说明<a name="section128671456102513"></a>
 
@@ -185,6 +186,7 @@
 - dst按照小端顺序排序成二进制结果，对应src0中相应位置的数据比较结果。
 
 - **使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

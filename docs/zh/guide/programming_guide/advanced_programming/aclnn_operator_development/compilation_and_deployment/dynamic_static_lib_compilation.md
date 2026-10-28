@@ -19,10 +19,10 @@
 - Ascend 950PR&950DT系列产品
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3训练系列产品 / Atlas A3推理系列产品
+- Atlas A3系列产品
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2训练系列产品 / Atlas A2推理系列产品
+- Atlas A2系列产品
 <!-- end id3 -->
 
 开始前需完成以下准备：
@@ -190,7 +190,7 @@ export ASCEND_CUSTOM_OPP_PATH=${CMAKE_INSTALL_PREFIX}/lib/:${ASCEND_CUSTOM_OPP_P
 ASCEND_CUSTOM_OPP_PATH=<path1>/vendors/vendor_name1:<path2>/lib/:<path3>/vendors/vendor_name3:<path4>/lib/
 ```
 
-如果开发者通过Ascend Graph进行图开发，除了配置环境变量的方式，也可以采用直接在应用程序的编译文件中链接动态库libcust_opapi.so的方式。Ascend Graph图开发的相关信息请参考[《图引擎开发指南》](https://www.hiascend.com/document/redirect/CannCommunityGraphguide)。动态库链接方式的so加载优先级高于环境变量配置方式。
+如果开发者通过Ascend Graph进行图开发，除了配置环境变量的方式，也可以采用直接在应用程序的编译文件中链接动态库libcust_opapi.so的方式。Ascend Graph图开发的相关信息请参考[《图开发》](https://gitcode.com/cann/ge/blob/master/docs/zh/user_guides/graph_dev/README.md)。动态库链接方式的so加载优先级高于环境变量配置方式。
 
 ## 多厂商和同名动态库处理
 

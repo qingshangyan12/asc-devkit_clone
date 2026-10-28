@@ -10,7 +10,7 @@ dst[i] = src[i] << shift[i]
 
 ## 支持的产品
 
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT系列产品
 
 ## 目录结构介绍
 
@@ -65,7 +65,7 @@ dst[i] = src[i] << shift[i]
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
   ./demo
   ```

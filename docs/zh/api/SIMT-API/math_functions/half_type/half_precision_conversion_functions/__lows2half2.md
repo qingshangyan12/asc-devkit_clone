@@ -75,7 +75,7 @@ inline half2 __lows2half2(const half2 x, const half2 y)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __lows2half2(input1[idx], input2[idx]);
@@ -96,7 +96,7 @@ inline half2 __lows2half2(const half2 x, const half2 y)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __lows2half2(input1[idx], input2[idx]);
@@ -106,3 +106,11 @@ inline half2 __lows2half2(const half2 x, const half2 y)
         asc_vf_call<simt_lows2half2>(dim3(1024), (__gm__ half2*)input1, (__gm__ half2*)input2, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (-2, 1.25), (0.75, -0.25)
+y: (0.5, -2), (1.25, 3), (1.5, -1), (-0.5, 2.25)
+result: (-1.25, 0.5), (2.5, 1.25), (-2, 1.5), (0.75, -0.5)
+```

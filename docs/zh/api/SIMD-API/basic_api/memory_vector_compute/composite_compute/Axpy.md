@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
@@ -191,6 +191,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 
 <!-- end id17 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/Axpy_res.md#id2 -->
 
 ## 返回值说明<a name="section17124037164714"></a>
 
@@ -222,6 +223,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id23 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/Axpy_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

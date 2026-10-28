@@ -23,16 +23,28 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Prelu_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`。
 
-该接口用于实现PReLU（Parametric ReLU）激活函数：当源操作数srcReg0中对应元素大于0时，直接将该元素写入目的操作数dstReg；否则将srcReg0与srcReg1对应元素相乘的结果写入dstReg，计算公式如下：
+该接口用于实现PReLU（Parametric ReLU）激活函数：当源操作数srcReg0中对应元素大于等于0时，直接将该元素写入目的操作数dstReg，否则将srcReg0与srcReg1对应元素相乘的结果写入dstReg。注：源操作数srcReg0中数据为浮点数正零（+0）时按正数处理并直接输出；为浮点数负零（-0）时按负数处理并与srcReg1相乘。计算公式如下：
 
 $$
-dstReg_i = \begin{cases} srcReg0_i & srcReg0_i > 0 \\ srcReg0_i \times srcReg1_i & srcReg0_i \leq 0 \end{cases}
+dstReg_i = \begin{cases} srcReg0_i & srcReg0_i >= 0 \\ srcReg0_i \times srcReg1_i & srcReg0_i < 0 \end{cases}
 $$
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -71,7 +83,7 @@ __simd_callee__ inline void Prelu(U &dstReg, U &srcReg0, U &srcReg1, MaskReg &ma
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 源操作数`srcReg0`中数据为浮点数正零（+0）时按正数处理并直接输出；为浮点数负零（-0）时按负数处理并与`srcReg1`相乘，乘法满足IEEE 754浮点乘法规则。
 
 ## 调用示例<a name="section232816306478"></a>
 

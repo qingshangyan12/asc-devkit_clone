@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/reduction_compute.h"`。
 
 该接口根据输入[reg_tensor](../reg_tensor/reg_tensor.md)携带的mask，对源操作数执行归约最大值操作，并返回计算结果。通过模板参数`scope`选择归约范围，支持对所有有效元素求最大值，以及对每个`DataBlock`（32B）内的有效元素求最大值。
 
@@ -94,7 +94,7 @@ __simd_callee__ inline reg_tensor<DataType> reduce_max(const reg_tensor<DataType
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void reduce_max_example(InputTensor input, OutputTensor output)
@@ -103,11 +103,13 @@ __simd_vf__ inline void reduce_max_example(InputTensor input, OutputTensor outpu
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
 
     auto elemMax = asc::te::experimental::reduce_max(src);
-    elemMax.with_mask(asc::te::experimental::update_mask<float>(2));
+    elemMax.with_mask(
+        asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl2, float>());
     asc::te::experimental::store(output, asc::te::make_coord(0), elemMax);
 
     auto blockMax = asc::te::experimental::reduce_max<asc::te::experimental::reduce_scope::datablock>(src);
-    blockMax.with_mask(asc::te::experimental::update_mask<float>(8));
+    blockMax.with_mask(
+        asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl8, float>());
     asc::te::experimental::store(output, asc::te::make_coord(8), blockMax);
 }
 ```

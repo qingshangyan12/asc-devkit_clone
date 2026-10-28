@@ -29,7 +29,7 @@
 
 获取输入数据的双曲正切值。
 
-![](../../../../figures/zh-cn_formulaimage_0000002501372254.png)
+![](../../../../figures/formulaimage_0000002501372254.png)
 
 ## 函数原型
 
@@ -85,3 +85,10 @@ inline half htanh(half x)
         dst[idx] = htanh(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: -0.848145, 0.462158, 0.986816, -0.999023
+```

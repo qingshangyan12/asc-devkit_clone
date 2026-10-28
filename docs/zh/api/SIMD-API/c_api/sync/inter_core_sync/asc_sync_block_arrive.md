@@ -73,7 +73,7 @@ PIPE_S
     <!-- npu="950" id9 -->
     - 针对[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
-        **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
+        **表2** NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |
@@ -84,7 +84,7 @@ PIPE_S
     <!-- npu="A3,910b" id10 -->
     - 针对[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表3](#aic_aiv_supported_pipe_2201)所示。
 
-        **表3**  NPU架构2201中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_2201"></a>
+        **表3** NPU架构2201中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_2201"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |
@@ -103,7 +103,7 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -167,7 +167,7 @@ __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ half* input, __gm__ f
                         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
                         asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

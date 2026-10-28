@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
@@ -92,6 +92,7 @@
 <!-- npu="910b,A3" id10 -->
 - 针对Atlas A3系列产品、Atlas A2系列产品，mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）。
 <!-- end id10 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask_res.md#id2 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

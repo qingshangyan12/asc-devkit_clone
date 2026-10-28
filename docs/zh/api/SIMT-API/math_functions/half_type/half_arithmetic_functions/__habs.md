@@ -29,7 +29,7 @@
 
 获取输入数据的绝对值。
 
-![](../../../../figures/zh-cn_formulaimage_0000002533455017.png)
+![](../../../../figures/formulaimage_0000002533455017.png)
 
 ## 函数原型
 
@@ -85,3 +85,10 @@ inline half __habs(half x)
         dst[idx] = __habs(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: 1.25, 0.5, 2.5, 3.75
+```

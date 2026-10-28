@@ -84,3 +84,10 @@ inline float __float2float_ru(const float x)
         dst[idx] = __float2float_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -5.5, -0.25, 2.25, 5.5, inf, -inf, nan
+result: -5.0, 0.0, 3.0, 6.0, inf, -inf, nan
+```

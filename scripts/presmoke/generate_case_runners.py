@@ -66,7 +66,6 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
     "02_simd_c_api/00_introduction/00_quickstart/hello_world_npu",
     "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
-    "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
 }
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
@@ -285,9 +284,9 @@ def parse_scenario_values_from_cmake(cmake_file: Path) -> List[int]:
 
     values: set[int] = set()
     for match in re.finditer(r"set\s*\(\s*SCENARIO_NUM\s+[^)]*CACHE\s+STRING\s+\"([^\"]*)\"", text):
-        values.update(parse_scenario_values_from_text(match.group(1)))
+        values.update(parse_scenario_values_from_description(match.group(1)))
     for match in re.finditer(r"set\s*\(\s*SCENARIO\s+[^)]*CACHE\s+STRING\s+\"([^\"]*)\"", text):
-        values.update(parse_scenario_values_from_text(match.group(1)))
+        values.update(parse_scenario_values_from_description(match.group(1)))
     for match in re.finditer(r"SCENARIO_NUM[^\n\r\"]*\"([^\"]*)\"", text):
         values.update(parse_scenario_values_from_text(match.group(1)))
     for match in re.finditer(r"set\s*\(\s*VALID_SCENARIOS\s+([^)]+)\)", text):
@@ -295,6 +294,13 @@ def parse_scenario_values_from_cmake(cmake_file: Path) -> List[int]:
     for match in re.finditer(r"SCENARIO_NUM[^\n\r]*(?:must be|Valid values are|specify)[^\n\r]*", text):
         values.update(parse_scenario_values_from_text(match.group(0)))
     return sorted(value for value in values if 0 <= value <= 32)
+
+
+def parse_scenario_values_from_description(text: str) -> List[int]:
+    mapping_keys = re.findall(r"(?:^|[(:,;]\s*)(\d+)\s*=", text)
+    if mapping_keys:
+        return sorted({int(value) for value in mapping_keys})
+    return parse_scenario_values_from_text(text)
 
 
 def parse_scenario_values_from_readme(readme_file: Path) -> List[int]:

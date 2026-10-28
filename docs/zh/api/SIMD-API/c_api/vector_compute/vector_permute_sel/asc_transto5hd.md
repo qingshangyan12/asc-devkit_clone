@@ -72,11 +72,11 @@ __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst,
 | ------------ | ------------ | ------------ |
 |dst|输出|目的地址寄存器。|
 |src|输入|源地址寄存器。|
-|repeat|输入|重复迭代次数， repeat∈[0,255]。<br>注意事项：<br>&bull;当repeat为1时，目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置加上dst_stride/src_stride。如果要让目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，需要将dst_stride/src_stride置为0。<br>&bull;当repeat大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，第二次会加上dst_stride/src_stride。以此类推。|
+|repeat|输入|重复迭代次数，repeat∈[0,255]。<br>注意事项：<br>&bull;当repeat为1时，目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置加上dst_stride/src_stride。如果要让目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，需要将dst_stride/src_stride置为0。<br>&bull;当repeat大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，第二次会加上dst_stride/src_stride。以此类推。|
 |dst_stride|输入|相邻迭代间，目的操作数相同DataBlock地址Stride，单位：DataBlock。<br>相邻迭代间相同DataBlock的地址步长参数的详细说明请参考[repeatStride](../../general_description_and_constraints.md#repeatStride)。|
 |src_stride|输入|相邻迭代间，源操作数相同DataBlock地址Stride，单位：DataBlock。<br>相邻迭代间相同DataBlock的地址步长参数的详细说明请参考[repeatStride](../../general_description_and_constraints.md#repeatStride)。|
-|dst_high_half|输入|指定每个dst地址中的数据存储到DataBlock的高半部还是低半部，该配置只配置int8_t/uint8_t的数据类型。<br>支持的数据类型为bool，有以下两种取值：<br>&bull; true:表示存储于DataBlock的高半部。<br>&bull; false:表示存储于DataBlock的低半部。|
-|src_high_half|输入|指定每个src地址中的数据存储到DataBlock的高半部还是低半部，该配置只配置int8_t/uint8_t的数据类型。<br>支持的数据类型为bool，有以下两种取值：<br>&bull; true:表示存储于DataBlock的高半部。<br>&bull;false:表示存储于DataBlock的低半部。|
+|dst_high_half|输入|指定每个dst地址中的数据存储到DataBlock的高半部还是低半部，该配置仅在操作数数据类型为int8_t/uint8_t时支持。<br>该参数为bool类型，有以下两种取值：<br>&bull; true：表示存储于DataBlock的高半部。<br>&bull; false：表示存储于DataBlock的低半部。|
+|src_high_half|输入|指定每个src地址中的数据存储到DataBlock的高半部还是低半部，该配置仅在操作数数据类型为int8_t/uint8_t时支持。<br>该参数为bool类型，有以下两种取值：<br>&bull; true：表示存储于DataBlock的高半部。<br>&bull; false：表示存储于DataBlock的低半部。|
 
 ## 返回值说明
 
@@ -129,9 +129,9 @@ constexpr uint32_t TOTAL_ELEMENTS = 2 * 32 * 16 * 16;
 constexpr uint32_t OFFSET = 16 * 16 * 16;
 
 __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
-                                              __gm__ uint16_t* matrix_in,
-                                              __gm__ uint16_t* layout_out,
-                                              __gm__ uint16_t* layout_in)
+                                             __gm__ uint16_t* matrix_in,
+                                             __gm__ uint16_t* layout_out,
+                                             __gm__ uint16_t* layout_in)
 {
     asc_init();
     __ubuf__ uint16_t src[TOTAL_ELEMENTS];
@@ -141,7 +141,9 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
 
     // 场景一：一次repeat完成16x16矩阵转置，stride为0时从地址列表起点读取。
     asc_copy_gm2ub_align(src, matrix_in, MATRIX_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte2(0);
+    // 转置前等待矩阵数据搬入完成。
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     for (int i = 0; i < 16; ++i) {
         src_list[i] = reinterpret_cast<__ubuf__ half*>(src + i * 16);
         dst_list[i] = reinterpret_cast<__ubuf__ half*>(dst + i * 16);
@@ -153,13 +155,21 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
     asc_set_va_reg(VA2, src_list);
     asc_set_va_reg(VA3, src_list + 8);
     asc_transto5hd_b16(VA0, VA2, 1, 0, 0);
-    asc_sync_vec(0);
+    // 搬出矩阵前等待转置完成。
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(matrix_out, dst, MATRIX_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte3(0);
 
     // 场景二：N=2、C=32、H=W=16，四组C0=16通道分别处理。
+    // 等待前一次转置完成，再复用src和地址列表。
+    asc_sync_notify(PIPE_V, PIPE_S, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_S, EVENT_ID0);
     asc_copy_gm2ub_align(src, layout_in, TOTAL_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte2(0);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    // 重新写入dst前，等待前一次矩阵搬出读取dst完成。
+    asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
     for (int j = 0; j < 4; ++j) {
         for (int i = 0; i < 16; ++i) {
             src_list[i] = reinterpret_cast<__ubuf__ half*>(src + OFFSET * j + i * 16 * 16);
@@ -173,10 +183,16 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
         asc_set_va_reg(VA3, src_list + 8);
         // 16次repeat沿HW方向推进，src_stride=1、dst_stride=16，单位均为DataBlock。
         asc_transto5hd_b16(VA0, VA2, 16, 16, 1);
+        if (j < 3) {
+            // 下一组将改写地址列表，需先等待PIPE_V消费本组地址完成。
+            asc_sync_notify(PIPE_V, PIPE_S, EVENT_ID0);
+            asc_sync_wait(PIPE_V, PIPE_S, EVENT_ID0);
+        }
     }
-    asc_sync_vec(0);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(layout_out, dst, TOTAL_ELEMENTS * sizeof(uint16_t));
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void check(aclError status, const char* operation)

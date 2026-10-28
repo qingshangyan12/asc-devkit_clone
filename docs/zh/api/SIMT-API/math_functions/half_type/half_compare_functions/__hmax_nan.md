@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最大值。任一输入为nan时结果为nan。
 
-![](../../../../figures/zh-cn_formulaimage_0000002545918676.png)
+![](../../../../figures/formulaimage_0000002545918676.png)
 
 ## 函数原型
 
@@ -95,3 +95,11 @@ half __hmax_nan(const half x, const half y)
         dst[idx] = __hmax_nan(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: nan, 0.5, 2.5, -3.75
+y: -1.25, -0.25, 3.25, nan
+result: nan, 0.5, 3.25, nan
+```

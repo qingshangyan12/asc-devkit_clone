@@ -303,8 +303,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
 // SoleNHR（CcuSchedAllGatherSoleNHR）的 AIV prepare：
 // 将 hccl CcuTempAllGatherNHR1DMem2Mem::PrepareLaunchArgs 的 host 侧参数计算搬到设备侧。
-// KFC 单 mission 下固定单 die 语义：die0Size/die0LastSize 即全量分片（hccl dieNum=1 口径，
-// die1 参数省略，见 docs/migration/ccu-sched-allgather-sole-nhr-migration.md 4.2 节）。
+// D4 双 die：按 dieSplitRatioPermille（res[1]，注册期 GetChannelBwCoeff 带宽比）切分
+// die0/die1 尺寸（RS 2die SplitDataFor2Dies 口径），双 mission 共享同一参数帧、kernelArg.axisId
+// 区分实例；单 die（permille=1000）不切分，等价单 die 语义。
+// 常量参数（die0LastSize=die0Size、repeatNum=1、三 stride=0）由 kernel 内联。
 // 布局见 KfcAllGatherSoleNhrParamIndex，与 KFC dispatch、kernel 形参逐槽一致。
 // TopoMatch1D 生成全域单层（sub-rank == 全局 rank），ccuParam_.rankId 口径与 kernel rankId 一致。
 template <const auto& config>
@@ -319,24 +321,37 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
-    xnData_[KFC_AG_SOLE_NHR_OP_ID] = GetOpId(commParam);
+    // D4 双 die 切分（RS 2die SplitDataFor2Dies 口径）：permille ∈ (0,1000) 且非小数据
+    // （>rankNum*4 元素）才切分；单 die（permille=1000）不切分，die1Size=0
+    const uint64_t sliceCount = sliceSize / dataTypeSize;
+    uint64_t die0Size = sliceSize;
+    uint64_t die1Size = 0;
+    if (ccuParam_.dieSplitRatioPermille > 0U && ccuParam_.dieSplitRatioPermille < 1000U &&
+        sliceCount > ccuParam_.rankNum * 4U) {
+        die0Size = sliceCount * ccuParam_.dieSplitRatioPermille / 1000U * dataTypeSize;
+        die1Size = sliceSize - die0Size;
+    }
     xnData_[KFC_AG_SOLE_NHR_INPUT] = inputBase;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT] = outputBase;
-    xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = sliceSize;
-    xnData_[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE] = sliceSize;
-    xnData_[KFC_AG_SOLE_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U; // sole executor repeatNum=1
-    xnData_[KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE] = 0U;
+    xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = die0Size;
+    xnData_[KFC_AG_SOLE_NHR_DIE1_SIZE] = die1Size;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE] = outputSliceStride;
-    xnData_[KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE] = 0U; // sole executor 双 repeat stride=0
-    xnData_[KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE] = 0U;
-    xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL] =
-        (inputBase == outputBase + outputSliceStride * ccuParam_.rankId) ? 1U : 0U;
+    // in-place（input == output + stride*rankId）时两 die 的 goSize 均按 0 字节计算：
+    // CalcGoSize(0) 全零，GroupCopy 内部 CCU_IF 块均不触发——kernel 无需 isInputOutputEqual 参数
+    const bool isInputOutputEqual = (inputBase == outputBase + outputSliceStride * ccuParam_.rankId);
+    const uint64_t die0CopySize = isInputOutputEqual ? 0U : die0Size;
+    const uint64_t die1CopySize = isInputOutputEqual ? 0U : die1Size;
     CalcGoSize(
-        sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
+        die0CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_0],
+        ccuProtocolVersion_);
+    CalcGoSize(
+        die1CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_0],
         ccuProtocolVersion_);
     KERNEL_LOG(
-        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, equal=%llu\n", sliceSize, outputSliceStride,
-        xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL]);
+        KERNEL_INFO,
+        "AG sole-NHR prepare: slice=0x%llx, die0=0x%llx, die1=0x%llx, outStride=0x%llx, "
+        "copy(d0/d1)=0x%llu/0x%llu\n",
+        sliceSize, die0Size, die1Size, outputSliceStride, die0CopySize, die1CopySize);
 }
 
 template <const auto& config>
@@ -541,14 +556,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     const uint64_t sliceSize = commParam->count * dataSize;
     xnData_[4] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[5] = 0;
+    xnData_[5] = commParam->skipLocalRankCopy;
     xnData_[6] = 0;
     CalcPeerOnlyChunkParams(sliceSize, &xnData_[7], &xnData_[8]);
     KERNEL_LOG(
         KERNEL_INFO,
-        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
+        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, skipLocalRankCopy=%llu, "
         "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
-        xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
+        xnData_[1], xnData_[2], xnData_[4], sliceSize, xnData_[5], CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
 }
 
 // SoleNHRMultiLink（CcuSchedReduceScatterSoleNHRMultiLink）的 AIV prepare：

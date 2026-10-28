@@ -15,7 +15,7 @@
 
 | 产品 | CANN软件版本 |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -77,6 +77,7 @@ add_executable(demo
 # 5、设置链接器语言为ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
 
+```
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。

@@ -29,7 +29,7 @@
 
 获取两个输入数据中的最小值。
 
-![](../../../figures/zh-cn_formulaimage_0000002552510939.png)
+![](../../../figures/formulaimage_0000002552510939.png)
 
 ## 函数原型
 
@@ -79,3 +79,11 @@ inline long long int llmin(const long long int x, const long long int y)
         dst[idx] = llmin(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+y: -20, 0, 15, 7
+result: -20, 0, 15, -7
+```

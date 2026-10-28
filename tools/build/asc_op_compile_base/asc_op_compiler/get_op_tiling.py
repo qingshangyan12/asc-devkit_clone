@@ -1226,8 +1226,13 @@ def _gen_tiling_copy_through_reserved_ub():
     constexpr uint32_t copy_tile_size = 8192;
     for (uint32_t stack_offset = 0; stack_offset < all_bytes; stack_offset += copy_tile_size) {
         uint32_t copy_size = stack_offset + copy_tile_size < all_bytes ? copy_tile_size : all_bytes - stack_offset;
+#if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+        copy_gm_to_ubuf_align_v2(((__ubuf__ uint8_t *)tilingdata_in_ub),
+        ((__gm__ uint8_t *)p_tilingdata) + stack_offset, 0, 1, copy_size, 0, 0, false, false, 0, 0, 0, false);
+#else
         copy_gm_to_ubuf_align_v2(((__ubuf__ uint8_t *)tilingdata_in_ub),
         ((__gm__ uint8_t *)p_tilingdata) + stack_offset, 0, 1, copy_size, 0, 0, false, 0, 0, 0);
+#endif
         set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
         wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
         copy_data_align64(((uint8_t*)tilingdata) + stack_offset, ((__ubuf__ uint8_t *)tilingdata_in_ub), copy_size);
@@ -1335,9 +1340,8 @@ def get_tiling_data_func_head():
 def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
-    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
-        (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || \
-        (__NPU_ARCH__ == 9202) || defined(__GET_CODE_CHANNEL__)\n"
+    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || \
+        __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size(
         "all_bytes",
@@ -1370,10 +1374,10 @@ p_tilingdata",
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, false, 0, 0, 0, false);\n"
     class_body += get_tilingdata_preload()
     class_body += "#elif __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
+__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0);\n"
-    class_body += "#elif __NPU_ARCH__ != 3102\n"
+    class_body += "#elif __NPU_ARCH__ != 3102 && __NPU_ARCH__ != 3103\n"
     class_body += "    copy_gm_to_ubuf(((__ubuf__ uint8_t *)tilingdata_in_ub), p_tilingdata, 0, 1,\
 len_burst, 0, 0);\n"
     class_body += "#else\n"
@@ -1387,8 +1391,8 @@ len_burst, 0, 0);\n"
         "all_bytes", "__ubuf__", "(__ubuf__ uint8_t *)tilingdata_in_ub"
     )
     class_body += "#else\n"
-    class_body += "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
+    class_body += "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
     class_body += "    constexpr uint64_t bytes_align64 = (all_bytes + 63) / 64 * 64 + 8;\n"
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__ubuf__ uint8_t *)tilingdata_in_ub, bytes_align64);\n"
     class_body += "#else\n"

@@ -43,13 +43,13 @@ __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T
 
 ## 参数说明
 
-**表1**模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-**表2**参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -63,7 +63,7 @@ __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T
 
 ## 数据类型
 
-**表3**数据类型组合
+**表3** 数据类型组合
 
 | src0 | src1 | dst |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename DstTensor, typename Src0Tensor, typename Src1Tensor>
 __simd_vf__ inline void madd_vf(

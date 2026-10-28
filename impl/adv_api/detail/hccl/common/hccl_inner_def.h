@@ -75,7 +75,8 @@ struct CommonPrepareParamCcu {
     HcclReduceOp op;
     uint64_t strideCount;
     uint8_t repeat = 1U;
-    uint8_t reservedPartA[7];
+    uint8_t skipLocalRankCopy = 0U;
+    uint8_t reservedPartA[6];
     AlltoAllVParamExt paramExt;       // only used by AlltoAllV
     AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
     uint8_t reservedPartB[8];
@@ -185,6 +186,16 @@ enum class CcuProtocolVersion : uint8_t {
     CCU_V2 = 1U,
     INVALID = 2U,
 };
+
+// Arch-based CCU protocol version: A6 (9201/9202) uses V2, others (A5/3510) use V1.
+__aicore__ inline constexpr CcuProtocolVersion GetArchCcuProtocolVersion()
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    return CcuProtocolVersion::CCU_V2;
+#else
+    return CcuProtocolVersion::CCU_V1;
+#endif
+}
 
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
