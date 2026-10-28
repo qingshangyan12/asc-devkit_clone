@@ -24,12 +24,8 @@ template <typename T>
 constexpr __aicore__ inline void CheckDuplicateSupportedType()
 {
     static_assert(
-        SupportType<
-            T, bool, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t,
-            half, bfloat16_t, int16_t, uint16_t, int32_t, uint32_t, float>(),
-        "Duplicate instr only support "
-        "bool/int8_t/uint8_t/fp4x2_e2m1_t/fp4x2_e1m2_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/"
-        "fp8_e8m0_t/half/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t/float"
+        SupportType<T, bool, int8_t, uint8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "Duplicate instr only support bool/int8_t/uint8_t/half/int16_t/uint16_t/int32_t/uint32_t/float"
         "type on current device");
 }
 
