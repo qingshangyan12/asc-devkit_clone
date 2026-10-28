@@ -1169,6 +1169,18 @@ def compile_op_common_part(
     compile_info.op_type = op_info.op_type
     compile_info.code_channel = code_channel
     compile_info.tiling_key_list = tiling_key_list
+    context = get_context()
+    kernel_template_input = context.get_addition("kernel-template-input") if context is not None else None
+    if kernel_template_input:
+        CommonUtility.print_compile_log(
+            "", f'Parameter "kernel-template-input" has been set to "{kernel_template_input}" '
+            f'while kernel_name={op_info.kernel_name}.', AscendCLogLevel.LOG_INFO
+        )
+        filtered_keys = ", ".join(str(key) for key in sorted(compile_info.tiling_key_list, key=int))
+        CommonUtility.print_compile_log(
+            "", f"Filtered tilingkey list is {{{filtered_keys}}} while kernel_name={op_info.kernel_name}.",
+            AscendCLogLevel.LOG_INFO
+        )
     compile_info.tiling_key_group_map = tiling_key_group_map
     compile_info.compile_log_path = compile_log_path
     compile_info.hard_sync = infered_info_from_ifile.hard_sync or hardware_sync_in_asm
