@@ -57,7 +57,14 @@ from .ascendc_common_utility import (
     convert_customized_config_to_inferchannel,
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
-from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
+from .ascendc_compile_dfx import (
+    DFXParamType,
+    DFXPointType,
+    DFXArgInfo,
+    DFXSectionGenerator,
+    build_kernel_param_metadata_from_formals,
+    generate_param_metadata,
+)
 from .ascendc_compile_v220 import (
     _get_compile_cmd_and_section_content,
     get_v220_kernel_type_mix_flag,
@@ -229,6 +236,9 @@ def _gen_kernel_func_declare_head(
     super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
         tiling_info, super_kernel_params, func_params
     )
+    param_metadata = build_kernel_param_metadata_from_formals(
+        None if global_var_storage.get_variable("ascendc_enable_super_kernel") is True else func_params
+    )
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         global_var_storage.set_variable("ascendc_sub_super_kernel_params", super_kernel_params)
         context = get_context()
@@ -253,7 +263,7 @@ def _gen_kernel_func_declare_head(
         called_func_params_type = ", ".join(func_params)
         called_func_params = called_func_params_type.replace("GM_ADDR ", "")
         called_func_params = called_func_params.replace("__early_read_before_pre_task_done__ ", "")
-    return source, workspace_idx, called_func_params, called_func_params_type
+    return source, workspace_idx, called_func_params, called_func_params_type, param_metadata
 
 
 def _gen_usr_workspace_codes():
@@ -441,8 +451,8 @@ def gen_kernel_fun(
         f"static __aicore__ inline __attribute__((always_inline)) void ascendc_{auto_gen_kernel_func}("
     )
 
-    source_declare_pub, workspace_idx, called_func_params, called_func_params_type = _gen_kernel_func_declare_head(
-        is_mix, is_single_and_using_hard_sync, opinfo, tiling_info
+    source_declare_pub, workspace_idx, called_func_params, called_func_params_type, param_metadata = (
+        _gen_kernel_func_declare_head(is_mix, is_single_and_using_hard_sync, opinfo, tiling_info)
     )
     source += kernel_func_dec_pub
     source += source_declare_pub
@@ -571,12 +581,18 @@ def gen_kernel_fun(
     source += called_func_params_type + ") {\n"
     source += "    " + source_declare_pub_fun + "\n"
     source += "}\n\n"
+    source += generate_param_metadata(auto_gen_kernel_func, param_metadata)
 
     for tiling_key in compile_info.tiling_key_list:
         if compile_info.tiling_key_group_map is not None:
             if tiling_key in compile_info.tiling_key_group_map.keys():
                 source += gen_kernel_fun_with_tiling_key_slave(
-                    compile_info, tiling_key, source_declare_pub_fun, gen_func_attributes, source_declare_pub
+                    compile_info,
+                    tiling_key,
+                    source_declare_pub_fun,
+                    gen_func_attributes,
+                    source_declare_pub,
+                    param_metadata,
                 )
     source += "#endif\n"
     # write code into file
@@ -594,6 +610,7 @@ def gen_kernel_fun_with_tiling_key_slave(
     source_declare_pub_fun: str,
     gen_func_attributes: str,
     source_declare: str,
+    param_metadata,
 ):
     source = ""
     if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
@@ -627,6 +644,7 @@ def gen_kernel_fun_with_tiling_key_slave(
                             source += source_declare
                         source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
+                        source += generate_param_metadata(kernel_name_of_tk, param_metadata)
                         source += "#endif\n"
                         source += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL && defined({vec_core_type})\n"
                         kernel_name_of_tk = get_kernel_fun_name_with_tiling_key_and_kernel_type(
@@ -641,6 +659,7 @@ def gen_kernel_fun_with_tiling_key_slave(
                             source += source_declare
                         source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
+                        source += generate_param_metadata(kernel_name_of_tk, param_metadata)
                         source += "#endif\n"
                     else:
                         raise Exception(f"unsupported kernel type {kernel_type} for tiling key {tiling_key}")
