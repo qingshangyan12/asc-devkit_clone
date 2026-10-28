@@ -14,70 +14,18 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_ATOMIC_H
 #endif
 
 #ifndef INCLUDE_C_API_ATOMIC_ATOMIC_H
 #define INCLUDE_C_API_ATOMIC_ATOMIC_H
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
-#include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl.h"
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-#include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-
-// A6(9201) reuses the arch-common atomic implementations provided for A5(3510).
-#include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
+#include "c_api/atomic/datamove_atomic.h"
+#include "c_api/atomic/scalar_atomic.h"
 
 #endif
 
-__aicore__ inline void asc_set_atomic_add_float();
-__aicore__ inline void asc_set_atomic_add_int8();
-__aicore__ inline void asc_set_atomic_add_int16();
-__aicore__ inline void asc_set_atomic_add_int32();
-
-__aicore__ inline void asc_set_atomic_none();
-__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
-__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
-__aicore__ inline void asc_set_atomic_add_bfloat();
-__aicore__ inline void asc_set_atomic_add_float16();
-__aicore__ inline void asc_set_atomic_max_bfloat();
-__aicore__ inline void asc_set_atomic_max_float();
-__aicore__ inline void asc_set_atomic_max_float16();
-__aicore__ inline void asc_set_atomic_max_int8();
-__aicore__ inline void asc_set_atomic_max_int16();
-__aicore__ inline void asc_set_atomic_max_int32();
-__aicore__ inline void asc_set_atomic_min_bfloat();
-__aicore__ inline void asc_set_atomic_min_float();
-__aicore__ inline void asc_set_atomic_min_float16();
-__aicore__ inline void asc_set_atomic_min_int8();
-__aicore__ inline void asc_set_atomic_min_int16();
-__aicore__ inline void asc_set_atomic_min_int32();
-
-[[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
-             "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
-asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
-
-// ==================== Deprecated interfaces ====================
-
-[[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_add_int();
-
-[[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_max_int();
-
-[[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
-__aicore__ inline void asc_set_atomic_min_int();
-
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_ATOMIC_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_ATOMIC_H
 #endif
