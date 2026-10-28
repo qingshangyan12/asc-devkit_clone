@@ -106,10 +106,7 @@ fixpipe_value = l1_value & 0x00007fe0ffffe0ff
 ```bash
 source ${install_path}/cann/set_env.sh
 mkdir -p build && cd build
-# Ascend950DT/Ascend950PR (dav-3510)
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
-# or Ascend960DT (dav-9201)
-# cmake -DCMAKE_ASC_ARCHITECTURES=dav-9201 .. && make -j
 python3 ../scripts/gen_data.py
 ./demo 2>&1 | tee run.log
 python3 ../scripts/verify_result.py output/output.bin output/golden.bin run.log \

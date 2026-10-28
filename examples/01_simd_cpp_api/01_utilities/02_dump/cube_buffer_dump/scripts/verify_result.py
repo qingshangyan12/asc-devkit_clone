@@ -21,6 +21,8 @@ import numpy as np
 OUTPUT_ELEMENT_COUNT = 16 * 16
 A_ELEMENT_COUNT = 16 * 32
 A_L1_DUMP_ELEMENT_COUNT = 32
+MMAD_N = 32
+B_L1_ELEMENT_COUNT = 32 * MMAD_N
 BIAS_ELEMENT_COUNT = 16
 QUANT_ELEMENT_COUNT = 16
 HIFLOAT8_ONE_BITS = 0x08
@@ -85,6 +87,27 @@ def read_dump_input(a_path, bias_path, scale_path):
     return a_expected, bias.tolist(), [int(value) for value in quant]
 
 
+def build_l0a_golden():
+    return [HIFLOAT8_ONE_VALUE] * A_ELEMENT_COUNT
+
+
+def build_l0b_golden():
+    golden = []
+    for _ in range(32 // 16):
+        for n in range(MMAD_N):
+            value = HIFLOAT8_ONE_VALUE if n < 16 else 0.0
+            golden.extend([value] * 16)
+    return golden
+
+
+def resolve_npu_arch(text, explicit_arch):
+    if explicit_arch == "9201" or explicit_arch == "3510":
+        return explicit_arch
+    if explicit_arch == "auto":
+        return "9201" if "position=L0A" in text else "3510"
+    raise RuntimeError(f"unsupported npu_arch: {explicit_arch} (expected auto, 3510 or 9201)")
+
+
 def check_equal(name, actual, expected):
     if actual == expected:
         print(f"{name}: PASS")
@@ -102,11 +125,13 @@ def check_equal(name, actual, expected):
 
 
 def main():
-    if len(sys.argv) != 7:
-        print(f"Usage: {sys.argv[0]} <output.bin> <golden.bin> <run.log> <a.bin> <bias.bin> <scale.bin>")
+    if len(sys.argv) < 7 or len(sys.argv) > 8:
+        print(f"Usage: {sys.argv[0]} <output.bin> <golden.bin> <run.log> <a.bin> <bias.bin> <scale.bin> [npu_arch]")
+        print("npu_arch: auto (default), 3510 or 9201; 9201 additionally checks L0A/L0B DumpTensor records")
         return 1
 
     text = Path(sys.argv[3]).read_text(encoding="utf-8")
+    npu_arch = resolve_npu_arch(text, sys.argv[7] if len(sys.argv) == 8 else "auto")
     a_input, bias_input, fixpipe_input = read_dump_input(Path(sys.argv[4]), Path(sys.argv[5]), Path(sys.argv[6]))
     fixpipe_expected = [value & FIXPIPE_QUANT_VISIBLE_MASK for value in fixpipe_input]
     checks = [
@@ -137,6 +162,21 @@ def main():
             fixpipe_expected,
         ),
     ]
+    if npu_arch == "9201":
+        checks.extend(
+            [
+                check_equal(
+                    "HiFloat8 A L0A data check",
+                    parse_dump(text, 200, A_ELEMENT_COUNT, float, ("data_type=hifloat8", "position=L0A")),
+                    build_l0a_golden(),
+                ),
+                check_equal(
+                    "HiFloat8 B L0B data check",
+                    parse_dump(text, 202, B_L1_ELEMENT_COUNT, float, ("data_type=hifloat8", "position=L0B")),
+                    build_l0b_golden(),
+                ),
+            ]
+        )
     if all(checks):
         print("test pass!")
         return 0
