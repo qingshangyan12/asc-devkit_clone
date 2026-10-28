@@ -24,7 +24,6 @@
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
 #include "external_alg_parser.h"
-#include "include/adv_api/hccl/internal/hccl_msg.h"
 
 #include <vector>
 #include <memory>
@@ -164,7 +163,6 @@ HcclResult HcclAllocOpResCtx(
 
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr);
-
 
 // AllToAll适配AllToAllV
 HcclResult ConvertAlltoAllParam(
