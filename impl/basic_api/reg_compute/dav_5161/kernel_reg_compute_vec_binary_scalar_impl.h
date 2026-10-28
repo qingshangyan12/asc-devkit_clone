@@ -137,31 +137,15 @@ __simd_callee__ inline void ShiftRightsImpl(RegT& dstReg, RegT& srcReg, ScalarT 
     using ActualT = typename RegT::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>(),
         "current data type is not supported on current device!");
     static_assert(SupportType<ScalarT, int16_t>(), "current scalar data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftRights api only supported Mode ZEROING on current device!");
 
-    if constexpr (sizeof(ActualT) < 8) {
-        constexpr auto modeValue = GetMaskMergeMode<mode>();
-        vshrs(dstReg, srcReg, scalar, mask, modeValue);
-    } else if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            RegT dstTemp;
-            ShiftRightsB64Impl(dstTemp, srcReg, scalar, mask);
-            dstReg = dstTemp;
-        } else if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg);
-            ShiftRightsB64Impl(traitTwoDstReg, traitTwoSrcReg0, scalar, maskTrait2);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
-        }
-    }
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vshrs(dstReg, srcReg, scalar, mask, modeValue);
 }
 template <typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __simd_callee__ inline void ShiftRightsB64Impl(RegT& dstReg, RegT& srcReg, ScalarT scalar, MaskReg& mask)
