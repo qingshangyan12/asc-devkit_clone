@@ -1,4 +1,4 @@
-# asc_copy_l12fb
+# asc_copy_l12fb（NPU架构版本2201）
 
 ## 产品支持情况
 
