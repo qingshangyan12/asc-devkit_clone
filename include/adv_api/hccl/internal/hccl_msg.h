@@ -230,17 +230,15 @@ struct OpResCtx {
     uint64_t workspaceSize;
     uint64_t rankId;
     uint64_t rankSize;
-    AlgInfo algInfo[HCCL_ALG_MAX_NUM];
+    AlgInfo algInfo[HCCL_ALG_SUPPORT_NUM];
 
     uint64_t xnAddr;                   // Xn寄存器起始地址
     uint64_t ckeAddr;                  // CKE寄存器起始地址
-    uint64_t sprAddr;                  // spr寄存器地址，预留
-    uint64_t res[HCCL_API_MAX_OP_NUM]; // MS地址，预留
-    uint64_t resCtx;                   // 资源地址，用于资源下发时的处理
-    uint32_t opType[HCCL_API_MAX_OP_NUM];
-    uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
-    uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
-    bool isKfc[HCCL_API_MAX_OP_NUM];
+    uint64_t res[3];                   // CCU scratch/dieSplit/missionCnt
+    uint32_t opType[HCCL_ALG_SUPPORT_NUM];
+    uint32_t algorithmType[HCCL_ALG_SUPPORT_NUM];
+    uint64_t opParamSize[HCCL_ALG_SUPPORT_NUM];
+    bool isKfc[HCCL_ALG_SUPPORT_NUM];
     uint64_t commEngine;
 };
 
