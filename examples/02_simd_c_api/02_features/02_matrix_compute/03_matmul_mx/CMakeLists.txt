@@ -1,4 +1,3 @@
-#!/bin/bash
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,31 +8,26 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-set -euo pipefail
+cmake_minimum_required(VERSION 3.16)
 
-CASE_REL=02_simd_c_api/00_introduction/01_add/c_api_sync_add
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../../../_case_entry.sh"
-presmoke_case_init "$CASE_REL"
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
-case_build() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
-}
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "matmul_mx only supports dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
+endif()
 
-case_run() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./c_api_add_example)
-}
+find_package(ASC REQUIRED)
 
-case_verify() {
-    mkdir -p "$BUILD_DIR"
-    :
-}
+if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
+    include_directories($ENV{ASCEND_HOME_PATH}/tools/cpudebug/include)
+endif()
 
-case_clean() {
-    presmoke_default_clean
-}
+project(kernel_samples LANGUAGES ASC CXX)
 
-presmoke_case_main "$@"
+add_executable(demo
+    matmul_mx.asc
+)
+
+target_compile_options(demo PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+)

@@ -65,9 +65,17 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src)
 
 ## 约束说明
 
-src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+src.mask需通过[with_mask](../reg_tensor/reg_tensor.md)接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+
+## 关键特性说明
+
+### 精度提升
+
+当源操作数数据类型为half时，将half提升精度到float后进行计算，再将结果转为half后输出。
 
 ## 调用示例
+
+以下示例的输入和输出均为UB中的half类型Tensor，每次处理128个元素，使用全有效mask。
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -79,7 +87,7 @@ src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void log2_example(InputTensor input, OutputTensor output)
 {
-    auto mask = asc::te::experimental::all_mask<float>();
+    auto mask = asc::te::experimental::all_mask<half>();
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
     auto dst = asc::te::experimental::log2(src);
     asc::te::experimental::store(output, asc::te::make_coord(0), dst);

@@ -163,9 +163,16 @@
 | [select](reg_vector_compute/compare_and_select/select.md) | 根据条件Mask从两个源寄存器中逐元素选择数据。 |
 | [数据填充](reg_vector_compute/data_padding/data_padding.md) | 根据mask将源操作数src的最低位元素或者一个scalar操作数填充到目的操作数。 |
 | [fill](reg_vector_compute/data_padding/fill.md) | 将标量或源寄存器最低位元素广播并填充到目的寄存器。 |
-| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 给定源操作数src0和src1，将src0和src1中的元素交织或解交织存入结果操作数。 |
+| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 对寄存器数据执行交织、解交织、按索引收集、位宽压缩与扩展、按掩码筛选及前缀计数。 |
 | [interleave（数据寄存器交织）](reg_vector_compute/data_reorder/interleave.md) | 将两个源寄存器中的元素交织到两个结果寄存器。 |
 | [deinterleave（数据寄存器解交织）](reg_vector_compute/data_reorder/deinterleave.md) | 将两个源寄存器中的元素解交织到两个结果寄存器。 |
+| [gather](reg_vector_compute/data_reorder/gather.md) | 根据索引寄存器逐元素收集源寄存器中的数据。 |
+| [pack](reg_vector_compute/data_reorder/pack.md) | 提取源元素的低半位宽数据，压缩后写入结果寄存器的低半部分或高半部分。 |
+| [unpack](reg_vector_compute/data_reorder/unpack.md) | 选取源寄存器的低半部分或高半部分，将元素位宽扩展为原来的两倍。 |
+| [compress](reg_vector_compute/data_reorder/compress.md) | 根据筛选掩码将选中的源元素按原顺序连续排列在结果寄存器的低位。 |
+| [expand](reg_vector_compute/data_reorder/expand.md) | 根据掩码生成排除当前位置的前缀计数索引。 |
+| [索引生成](reg_vector_compute/reg_index/reg_index.md) | 以标量为基值生成寄存器索引序列。 |
+| [iota](reg_vector_compute/reg_index/iota.md) | 以标量为基值生成步长为1的递增或递减序列。 |
 | [histograms](reg_vector_compute/histogram_compute/histograms.md) | 统计输入值的频率分布或累计分布，并在目的寄存器原值上累加统计结果。 |
 | [reduce_sum](reg_vector_compute/reduction_compute/reduce_sum.md) | 按指定归约范围对源寄存器中的有效元素求和。 |
 | [reduce_max](reg_vector_compute/reduction_compute/reduce_max.md) | 按指定归约范围计算源寄存器中有效元素的最大值。 |

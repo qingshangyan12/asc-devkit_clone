@@ -71,6 +71,32 @@ std::vector<std::vector<KernelHandle>> CcuStFixture::lastHandleGroups_;
 
 const std::vector<std::vector<KernelHandle>>& CcuStFixture::LastHandleGroups() { return lastHandleGroups_; }
 
+// 新契约下 tiling.algConfig 的裸名归为 NONE（不再作为强制算法、也不产出 algName），
+// 但 CcuSt 用例仍以裸名直接指定待测算法。此处沿用 test_ccu_mc2.cpp 的适配方式：
+// 算法名由用例直接指定，并按旧强制路径（topo 准备 -> 引擎准备 -> 资源校验）完成准备。
+// 空串表示用例未指定（BuildTiling 会把空串写成 "default"）；含 '['/'=' 的名字仍走生产路径。
+static bool PrepareCaseSpecifiedAlg(
+    HcclComm comm, const Mc2CcTilingInner& tiling, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)
+{
+    const std::string algConfig = tiling.algConfig;
+    if (algConfig.empty() || algConfig == "default" || algConfig.find('[') != std::string::npos ||
+        algConfig.find('=') != std::string::npos) {
+        return false;
+    }
+    const OpParam opParamBackup = opParam;
+    if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS ||
+        PrepareEngineForAlg(opParam, algConfig) != HCCL_SUCCESS ||
+        CheckForcedAlgResource(comm, opParam, topoInfo.get(), algConfig) != HCCL_SUCCESS) {
+        opParam = opParamBackup;
+        topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+        return false;
+    }
+    algName = algConfig;
+    HCCL_INFO("[CcuStFixture] case specified algName[%s] accepted.", algName.c_str());
+    return true;
+}
+
 KernelHandle CcuStFixture::RegisterKernelForRank(
     uint32_t rank, uint32_t rankSize, const CcuStScenario& scenario, const TopoMeta& topoMeta,
     const Mc2CcTilingInner& tiling)
@@ -118,6 +144,9 @@ KernelHandle CcuStFixture::RegisterKernelForRank(
         HCCL_ERROR("[CcuStFixture] rank[%u] TryForcedAlgAndPrepareEngine failed", rank);
         CleanupHostEnv(comm);
         return 0;
+    }
+    if (!forcedAlgAccepted) {
+        forcedAlgAccepted = PrepareCaseSpecifiedAlg(comm, tiling, opParam, topoInfo, algName);
     }
     if (!forcedAlgAccepted) {
         if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {

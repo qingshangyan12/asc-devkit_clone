@@ -17,10 +17,10 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-2)")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-3)")
 
-if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, but got ${SCENARIO_NUM}")
+if(NOT SCENARIO_NUM MATCHES "^[1-3]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2 or 3, but got ${SCENARIO_NUM}")
 endif()
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
