@@ -74,7 +74,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
             {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = 0;
-                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
             }
             if constexpr (MICRO_NUM_PER_ITER > 1) {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
@@ -87,7 +87,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
                     maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
-                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
             }
         }
     }
@@ -123,7 +123,7 @@ __aicore__ inline void VecDupLevel0Template(
             if constexpr (SupportBytes<T, 1>()) {
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
             }
-            if constexpr (isMaskBitMode) {
+            if constexpr (isSetMask) {
                 maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 8);
                 ExpandBitMaskToUB<T>(maskArrayStruct.maskArray, maskBuf);
             }
