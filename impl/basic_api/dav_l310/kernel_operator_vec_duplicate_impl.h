@@ -74,12 +74,16 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
             {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = 0;
-                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
+                    maskReg);
             }
             if constexpr (MICRO_NUM_PER_ITER > 1) {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
-                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
+                    maskReg);
             }
         } else {
             for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
@@ -87,7 +91,9 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
                     maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
-                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride, maskReg);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
+                    maskReg);
             }
         }
     }
