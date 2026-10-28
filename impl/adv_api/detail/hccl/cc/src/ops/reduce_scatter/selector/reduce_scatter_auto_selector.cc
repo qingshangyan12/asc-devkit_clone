@@ -380,6 +380,31 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuScheduleMesh1D(
     } else {
         ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize;
     }
+
+    // KFC SoleMeshChunk 移植（hccl rs-sched-perf 的 IsPipelinedReadReduceEligible）：
+    // 8P 且人均元素数>=chunkCount 时选 Pipelined ReadReduce（先于数据量上限判定，同 hccl 顺序）。
+    // TwoShot 已注册可经强制算法名启用，但默认不自动选择（与 hccl CCU_RS_ENABLE_MS_ACCUM=false 一致）。
+    constexpr bool CCU_RS_ENABLE_PIPELINED_READ_REDUCE = true;
+    constexpr bool CCU_RS_ENABLE_MS_ACCUM = false;
+    constexpr u64 CCU_PIPELINED_READ_REDUCE_CHUNK_COUNT = 28;
+    constexpr u32 CCU_PIPELINED_READ_REDUCE_RANK_SIZE = 8;
+    const bool outputTypeSupported = opParam.DataDes.outputType == HcclDataType::HCCL_DATA_TYPE_RESERVED ||
+                                      opParam.DataDes.outputType == opParam.DataDes.dataType;
+    const bool pipelinedReadReduceCandidate = CCU_RS_ENABLE_PIPELINED_READ_REDUCE && !CCU_RS_ENABLE_MS_ACCUM &&
+                                              outputTypeSupported &&
+                                              topoInfo->userRankSize == CCU_PIPELINED_READ_REDUCE_RANK_SIZE &&
+                                              topoInfo->level0MeshType != Level0MeshType::TWO_DIE_REGULAR &&
+                                              topoInfo->level0MeshType != Level0MeshType::TWO_DIE_NOT_REGULAR &&
+                                              opParam.DataDes.count / topoInfo->userRankSize >=
+                                                  CCU_PIPELINED_READ_REDUCE_CHUNK_COUNT;
+    if (pipelinedReadReduceCandidate) {
+        selectAlgName = "CcuSchedReduceScatterSoleMeshChunkPipelined";
+        HCCL_INFO(
+            "[ReduceScatterAutoSelector][%s] select [%s], rankSize[%u], dataSize[%llu]", __func__,
+            selectAlgName.c_str(), topoInfo->userRankSize, static_cast<unsigned long long>(dataSize));
+        return SelectorStatus::MATCH;
+    }
+
     if (dataSize * ratio >= RS_M2M_1D_MAX_DATA_SIZE) {
         HCCL_DEBUG(
             "[ReduceScatterAutoSelector] dataSize[%lu] * ratio[%f] >= MAX_DATA_SIZE[%lu].", dataSize, ratio,

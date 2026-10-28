@@ -513,6 +513,37 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                                         return false;
                                     }
                                     value &= static_cast<uint16_t>(~bodyOp.mask);
+                                } else if (bodyOp.code == OpCode::READ) {
+                                    // GroupReduce V1/V2 的 loop body：远端 RemoteAddr → CcuBuffer
+                                    const uint64_t readLen =
+                                        state.variables.count(bodyOp.src1) ? state.variables[bodyOp.src1] : 0;
+                                    if (readLen == 0) {
+                                        state.events[bodyOp.immediate] |= bodyOp.mask;
+                                        continue;
+                                    }
+                                    auto remoteIt = state.program->remoteAddresses.find(bodyOp.src0);
+                                    if (remoteIt == state.program->remoteAddresses.end()) {
+                                        result = Result::CONTRACT_ERROR;
+                                        SetError("GroupCopy loop body READ source handle is invalid");
+                                        return false;
+                                    }
+                                    const uint64_t srcAddr = state.addresses[remoteIt->second.first] + addrOffset;
+                                    uint8_t* srcPtr = nullptr;
+                                    uint32_t srcRank = 0;
+                                    if (!ResolveMemory(states, srcAddr, readLen, srcPtr, srcRank)) {
+                                        result = Result::OUT_OF_RANGE;
+                                        SetError("GroupCopy loop body READ source memory is out of range");
+                                        return false;
+                                    }
+                                    if (srcRank != ChannelRemoteRank(bodyOp.channel)) {
+                                        result = Result::CONTRACT_ERROR;
+                                        SetError("GroupCopy loop body READ source resolves to the wrong rank");
+                                        return false;
+                                    }
+                                    std::vector<uint8_t>& dstBuffer = state.buffers[bodyOp.dst + msIdx];
+                                    dstBuffer.resize(readLen);
+                                    std::memmove(dstBuffer.data(), srcPtr, static_cast<size_t>(readLen));
+                                    state.events[bodyOp.immediate] |= bodyOp.mask;
                                 } else if (bodyOp.code == OpCode::LOCAL_REDUCE) {
                                     // GroupLocalReduce 的 loop body：CcuBuffer 间逐源规约（buffers[0] += buffers[i]）
                                     const uint64_t reduceLen =

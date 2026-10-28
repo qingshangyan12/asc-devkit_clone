@@ -62,6 +62,11 @@ HcclResult InheritKfcServerKernelArg(
                                     param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isReduceScatterNhr2Die =
         srcName == "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    const bool isReduceScatterChunkPipelined =
+        srcName == "CcuKernelKfcReduceScatterMesh1DReadReducePipelined" &&
+        param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    const bool isReduceScatterMsAccum = srcName == "CcuKernelKfcReduceScatterMesh1DMsAccum" &&
+                                        param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isAllToAllV = srcName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAllReduce =
@@ -135,6 +140,7 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (
         isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce ||
+        isReduceScatterChunkPipelined || isReduceScatterMsAccum ||
         (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
@@ -246,6 +252,11 @@ HcclResult CcuTempKfcServer::CalcRes(
                                         param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isReduceScatterNhr2Die = sourceName == "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem" &&
                                             param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isReduceScatterChunkPipelined =
+            sourceName == "CcuKernelKfcReduceScatterMesh1DReadReducePipelined" &&
+            param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isReduceScatterMsAccum = sourceName == "CcuKernelKfcReduceScatterMesh1DMsAccum" &&
+                                            param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isAlltoAll =
             sourceName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
         const bool isAllToAllV =
@@ -263,7 +274,8 @@ HcclResult CcuTempKfcServer::CalcRes(
                                  isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die);
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
-             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr) ||
+             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr &&
+             !isReduceScatterChunkPipelined && !isReduceScatterMsAccum) ||
             !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",

@@ -19,6 +19,8 @@
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_read_reduce.h"
+#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_ms_accum.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
@@ -47,6 +49,12 @@ static_assert(
 static_assert(
     KFC_CONCURRENT_RS_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent ReduceScatter parameters exceed the KFC server load width");
+static_assert(
+    KFC_RS_CHUNK_PIPELINED_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "Pipelined chunk ReduceScatter parameters exceed the KFC server load width");
+static_assert(
+    KFC_RS_TWO_SHOT_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "TwoShot ReduceScatter parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -324,6 +332,28 @@ static void DispatchKfcSubKernel(
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum,
                 ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType,
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
+        } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_MESH_CHUNK_PIPELINED) {
+            // SoleMeshChunkPipelined 单帧布局见 KfcReduceScatterMeshChunkPipelinedParamIndex（[0]=opId，
+            // [1..8] 紧凑参数；token 走 ctx.token）。chunkCount 恒 4*(rankSize-1)，按 kernelArg.rankSize
+            // 计算后以标量转发；chunk 尺寸紧凑编码（base/align/extraUnits/tail）由 kernel 内重建。
+            CcuReduceScatterMesh1DReadReducePipelinedKernel(
+                param[KFC_RS_CHUNK_PIPELINED_INPUT], param[KFC_RS_CHUNK_PIPELINED_OUTPUT], ctx.token,
+                param[KFC_RS_CHUNK_PIPELINED_LOCAL_INPUT_OFFSET], param[KFC_RS_CHUNK_PIPELINED_SLICE_SIZE],
+                param[KFC_RS_CHUNK_PIPELINED_CHUNK_BASE_SIZE], param[KFC_RS_CHUNK_PIPELINED_CHUNK_ALIGN],
+                param[KFC_RS_CHUNK_PIPELINED_CHUNK_EXTRA_UNITS], param[KFC_RS_CHUNK_PIPELINED_CHUNK_TAIL],
+                ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+                4U * (static_cast<uint32_t>(ctx.arg->rankSize) - 1U), ctx.arg->opParam.DataDes.dataType,
+                ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+        } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_MESH_CHUNK_TWO_SHOT) {
+            // SoleMeshChunkTwoShot 单帧布局见 KfcReduceScatterMeshChunkTwoShotParamIndex（[0]=opId，
+            // [1..7]；goSize 四元组由 kernel 侧 AllocGoResource(16,1,ckeNum)+GroupReduce 消费）。
+            CcuReduceScatterMesh1DMsAccumKernel(
+                param[KFC_RS_TWO_SHOT_INPUT], param[KFC_RS_TWO_SHOT_OUTPUT], ctx.token,
+                param[KFC_RS_TWO_SHOT_LOCAL_INPUT_OFFSET], param[KFC_RS_TWO_SHOT_GO_ADDR_OFFSET],
+                param[KFC_RS_TWO_SHOT_GO_LOOP_PARAM], param[KFC_RS_TWO_SHOT_GO_PARALLEL_PARAM],
+                param[KFC_RS_TWO_SHOT_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+                ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
         } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_MESH) {
             // 并发 RS 的 Mesh mission 读 [1..15] 紧凑区间，形参顺序与 kernel 定义一致。
             CcuReduceScatterMesh1DMem2MemKernel(
