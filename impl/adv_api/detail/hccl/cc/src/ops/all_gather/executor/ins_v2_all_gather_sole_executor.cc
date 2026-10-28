@@ -230,7 +230,7 @@ REGISTER_EXEC_V2(
     InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, AlgEngine::AICPU, "sole[nhr.multi_channel]",
-    COND_NONE, FLAG_NONE, 0);
+    COND_NONE, FLAG_CLOS, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 

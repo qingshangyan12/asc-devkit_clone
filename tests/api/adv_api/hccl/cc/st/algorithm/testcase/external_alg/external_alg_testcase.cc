@@ -247,6 +247,24 @@ TopoInfoWithNetLayerDetails MakeFlatMesh1DTopo(u32 rankSize = 8U)
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeClosTopo(u32 rankSize = 8U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.topoLevelNums = 1U;
+    topo.level0Topo = Level0Shape::CLOS;
+    topo.netLayerDetails.netLayerNum = 1U;
+    topo.netLayerDetails.netLayers = {0U};
+    topo.netLayerDetails.localNetInsSizeOfLayer = {rankSize};
+    topo.topoInstDetailsOfLayer.resize(1U);
+    auto& details = topo.topoInstDetailsOfLayer[0];
+    details.topoInstNum = 1U;
+    details.rankNumForTopoType[COMM_TOPO_CLOS] = {rankSize};
+    return topo;
+}
+
 TopoInfoWithNetLayerDetails MakeUbxTopo(u32 rankSize = 16U)
 {
     TopoInfoWithNetLayerDetails topo{};
@@ -376,6 +394,51 @@ TEST(ExtAlgRules, MachineFlagsAreMutuallyExclusive)
     EXPECT_TRUE(FlagFlat1D(&multi));
 }
 
+TEST(ExtAlgRules, ClosFlagMatchesLevel0Shape)
+{
+    auto clos = MakeClosTopo();
+    auto mesh = MakeFlatMesh1DTopo();
+    auto ubx = MakeUbxTopo();
+    auto pcie = MakePcieMixTopo();
+    auto multi = MakeMultiLevelTopo();
+    EXPECT_TRUE(FlagClos(&clos));
+    clos.topoLevelNums = 2U;
+    EXPECT_TRUE(FlagClos(&clos));
+    EXPECT_FALSE(FlagClos(nullptr));
+    EXPECT_FALSE(FlagClos(&mesh));
+    EXPECT_FALSE(FlagClos(&ubx));
+    EXPECT_FALSE(FlagClos(&pcie));
+    EXPECT_FALSE(FlagClos(&multi));
+}
+
+TEST(ExtAlgResolver, AllGatherNhrMultiLinkRequiresClos)
+{
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    ASSERT_TRUE(ParseExternalAlg("sole[nhr.multi_channel]", spec, errMsg));
+    auto clos = MakeClosTopo();
+    auto mesh = MakeFlatMesh1DTopo();
+    auto ubx = MakeUbxTopo();
+    auto pcie = MakePcieMixTopo();
+    auto multi = MakeMultiLevelTopo();
+    for (auto engine : {CommEngine::COMM_ENGINE_AICPU, CommEngine::COMM_ENGINE_AICPU_TS}) {
+        auto op = MakeOpParam();
+        op.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+        op.engine = engine;
+        std::string algName;
+        for (u32 levels : {1U, 2U}) {
+            clos.topoLevelNums = levels;
+            EXPECT_EQ(ResolveExternalAlg(op, &clos, spec, algName, errMsg), ResolveStatus::RESOLVED);
+            EXPECT_EQ(algName, "AicpuAllGatherSoleNHRMultiLink");
+        }
+        for (const TopoInfoWithNetLayerDetails* topo :
+             {&mesh, &ubx, &pcie, &multi, static_cast<TopoInfoWithNetLayerDetails*>(nullptr)}) {
+            EXPECT_EQ(ResolveExternalAlg(op, topo, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+            EXPECT_TRUE(algName.empty());
+        }
+    }
+}
+
 TEST(ExtAlgRules, EngineMatchMatrix)
 {
     OpParam op = MakeOpParam();
@@ -417,6 +480,7 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         const char* expected;
     };
     TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+    TopoInfoWithNetLayerDetails clos = MakeClosTopo();
     TopoInfoWithNetLayerDetails ubx = MakeUbxTopo();
     TopoInfoWithNetLayerDetails pcie = MakePcieMixTopo();
     TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
@@ -427,7 +491,7 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHR"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr.multi_channel]", &clos, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRMultiJetty"},
@@ -726,6 +790,8 @@ TEST(ExtAlgResolver, RuleTableBinding)
     EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_UBX], &FlagUbx);
     EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_MULTI_LEVEL], &FlagMultiLevel);
     EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_FLAT_1D], &FlagFlat1D);
+    EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_CLOS], &FlagClos);
+    EXPECT_STREQ(MachineFlagName(FLAG_CLOS), "FLAG_CLOS");
     EXPECT_STREQ(VariantCondName(COND_Z_AXIS), "COND_Z_AXIS");
     EXPECT_STREQ(MachineFlagName(FLAG_FLAT_1D), "FLAG_FLAT_1D");
     EXPECT_STREQ(VariantCondName(-1), "n/a");
