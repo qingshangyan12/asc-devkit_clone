@@ -104,6 +104,12 @@ struct Mc2CcuBuiltinCtx {
 
 static_assert(
     sizeof(OpResCtx) == sizeof(HcclApi::OpResCtx), "Host and device OpResCtx layouts must have the same size.");
+static_assert(
+    offsetof(OpResCtx, commEngine) == offsetof(HcclApi::OpResCtx, commEngine),
+    "Host and device OpResCtx commEngine offsets must match.");
+static_assert(
+    offsetof(OpResCtx, opParamSize) == offsetof(HcclApi::OpResCtx, opParamSize),
+    "Host and device OpResCtx opParamSize offsets must match.");
 
 bool IsSupportedMc2OpType(HcclCMDType opType)
 {

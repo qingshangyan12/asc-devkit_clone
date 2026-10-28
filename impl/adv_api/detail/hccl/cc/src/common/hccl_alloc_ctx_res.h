@@ -24,6 +24,7 @@
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
 #include "external_alg_parser.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 
 #include <vector>
 #include <memory>
@@ -71,18 +72,16 @@ struct OpResCtx {
     uint64_t workSpaceSize;
     uint64_t rankId;
     uint64_t rankSize;
-    AlgInfo algInfo[MAX_CC_TILING_NUM];
+    AlgInfo algInfo[HcclApi::HCCL_ALG_SUPPORT_NUM];
 
     // for ccu
     uint64_t xnAddr;                    // xn寄存器起始地址
     uint64_t ckeAddr;                   // cke寄存器起始地址
-    uint64_t sprAddr;                   // spr寄存器起始地址
-    uint64_t res[Hccl::MC2_MAX_OP_NUM]; // MS地址，预留
-    uint64_t resCtx;                    // 资源地址，用于资源下发时的处理
-    uint32_t opType[Hccl::MC2_MAX_OP_NUM];
-    uint32_t algorithmType[Hccl::MC2_MAX_OP_NUM];
-    uint64_t opParamSize[Hccl::MC2_MAX_OP_NUM];
-    bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
+    uint64_t res[3];                   // CCU scratch/dieSplit/missionCnt
+    uint32_t opType[HcclApi::HCCL_ALG_SUPPORT_NUM];
+    uint32_t algorithmType[HcclApi::HCCL_ALG_SUPPORT_NUM];
+    uint64_t opParamSize[HcclApi::HCCL_ALG_SUPPORT_NUM];
+    bool isKfc[HcclApi::HCCL_ALG_SUPPORT_NUM];
     uint64_t commEngine;
 };
 

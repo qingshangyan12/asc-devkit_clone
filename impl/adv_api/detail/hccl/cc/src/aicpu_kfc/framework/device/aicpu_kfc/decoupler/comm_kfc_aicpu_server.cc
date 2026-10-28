@@ -354,7 +354,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
         KeepAlive();
     }
 
-    for (u32 i = 0U; i < 8U; ++i) {
+    for (u32 i = 0U; i < HcclApi::HCCL_ALG_SUPPORT_NUM; ++i) {
         const HcclApi::AlgInfo& algInfo = ctx->algInfo[i];
         const u64 opParamKey = algInfo.opParam;
         if (opParamKey == 0U) {
