@@ -17,7 +17,7 @@
 #include <thread>
 #include <condition_variable>
 #include <chrono>
-
+#include "kernel_vectorized.h"
 #include "stub_def.h"
 
 namespace cce {
