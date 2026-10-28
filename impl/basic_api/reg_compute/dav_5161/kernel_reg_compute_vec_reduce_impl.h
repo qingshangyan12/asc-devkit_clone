@@ -96,9 +96,6 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(S& dstReg, V srcReg, Mask
             Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
             Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>>()),
         "ReduceDataBlock unsupport this datatype on current device");
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(),
-        "current ReduceDataBlock api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcgadd(dstReg, srcReg, mask, modeValue);
 }
