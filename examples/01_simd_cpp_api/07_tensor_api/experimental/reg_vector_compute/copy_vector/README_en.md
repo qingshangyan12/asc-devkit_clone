@@ -72,7 +72,7 @@ Run the following steps in the sample root directory to build and execute the op
   ```
 
   The `scenario_num` passed when generating data must match the `SCENARIO_NUM` used at build time. To run a
-  different scenario, change both values to the corresponding number from 1 through 6.
+  different scenario, change both values to the corresponding number from 1 through 5.
 
   To use NPU simulation, add the following build option:
 

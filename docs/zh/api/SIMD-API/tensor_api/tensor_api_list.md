@@ -144,6 +144,7 @@
 | [-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对两个源操作数逐元素执行减法计算。 |
 | [*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
 | [/](reg_vector_compute/basic_arithmetic/div.md) | 对两个源操作数逐元素执行除法计算。 |
+| [div](reg_vector_compute/basic_arithmetic/div_software.md) | 对两个源操作数逐元素执行除法计算，支持通过模板参数配置除法精度和算法。 |
 | [prelu](reg_vector_compute/basic_arithmetic/prelu.md) | 对源操作数逐元素执行PReLU计算。 |
 | [relu](reg_vector_compute/basic_arithmetic/relu.md) | 对源操作数逐元素执行ReLU计算。 |
 | [sqrt](reg_vector_compute/basic_arithmetic/sqrt.md) | 对源操作数逐元素计算平方根。 |

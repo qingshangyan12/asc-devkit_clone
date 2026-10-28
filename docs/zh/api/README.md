@@ -1741,6 +1741,7 @@
                 -   [neg](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/neg.md)
                 -   [*](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/operator_mul.md)
                 -   [/](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/div.md)
+                -   [div](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/div_software.md)
                 -   [prelu](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/prelu.md)
                 -   [relu](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/relu.md)
                 -   [sqrt](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/sqrt.md)
