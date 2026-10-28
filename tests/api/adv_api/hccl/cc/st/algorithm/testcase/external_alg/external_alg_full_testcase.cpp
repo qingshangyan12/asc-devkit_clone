@@ -44,25 +44,28 @@ TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
     }
 }
 
-// 三态识别与解析失败契约（裸名不再单独成态，归为 NONE）
+// 四态识别与解析失败契约（fork 保留裸名态：--alg 直指注册名）
 TEST(ExtAlgForced, FourStateClassification)
 {
+    std::string bareName;
     ExternalAlgSpec spec;
     std::string errMsg;
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("", spec, errMsg), ForcedAlgKind::NONE);
-    EXPECT_EQ(ClassifyForcedAlgConfig("InsAllGatherMesh1D", spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlgConfig("", bareName, spec, errMsg), ForcedAlgKind::NONE);
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", spec, errMsg), ForcedAlgKind::LEGACY);
+    EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", bareName, spec, errMsg), ForcedAlgKind::LEGACY);
 
-    EXPECT_EQ(ClassifyForcedAlgConfig("parallel[mesh, nhr]", spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("InsAllGatherMesh1D", bareName, spec, errMsg), ForcedAlgKind::BARE_NAME);
+    EXPECT_EQ(bareName, "InsAllGatherMesh1D");
+
+    EXPECT_EQ(ClassifyForcedAlgConfig("parallel[mesh, nhr]", bareName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_TRUE(errMsg.empty());
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
 
     // 解析失败: spec 复位为默认值 + errMsg 非空（ClassifyForcedAlgConfig 契约）。
     // 默认值 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
     // 失败态断言用默认值判据: layers 空 + orderStrong 复位
-    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", bareName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
     EXPECT_TRUE(spec.layers.empty());
     EXPECT_FALSE(spec.orderStrong);
@@ -115,9 +118,10 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     EXPECT_TRUE(CheckCcuAlgorithmsRegistered(goodList, 1U));
 
     // 解析层 errMsg 三要素：解析失败消息含原文
+    std::string bareName;
     ExternalAlgSpec spec;
     std::string errMsg;
-    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", bareName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_NE(errMsg.find("sole[ring]"), std::string::npos); // 要素1: 原文
     EXPECT_NE(errMsg.find("atom"), std::string::npos);       // 要素3: 原因（词表外原子）
 
