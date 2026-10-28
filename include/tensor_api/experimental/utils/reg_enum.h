@@ -137,6 +137,10 @@ enum class mem_type {
 
 enum class div_algo { INTRINSIC, PRECISION_0ULP_FTZ_TRUE };
 
+enum class merge_mode {
+    zeroing,
+    merging,
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc

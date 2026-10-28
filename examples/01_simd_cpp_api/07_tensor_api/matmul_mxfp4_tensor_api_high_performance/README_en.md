@@ -263,7 +263,7 @@ asc::te::copy(l0c2gm_atom.with(fixpipe_params), c.slice(asc::te::make_coord(m_bl
 
 ### Pipeline Synchronization
 
-When using static Tensor programming, synchronization is key to performance and correctness. This example uses `asc_lock` and `asc_unlock` to manage producer-consumer dependencies between pipelines and assigns independent slots to the Ping/Pong buffers at each level:
+When using static Tensor programming, synchronization is key to performance and correctness. This example uses `asc::te::mutex` to manage producer-consumer dependencies between pipelines and assigns independent slots to the Ping/Pong buffers at each level:
 
 | Data | Write Pipeline | Read Pipeline | Slot |
 |------|----------------|---------------|------|
@@ -277,17 +277,19 @@ A/B data have the same lifecycle, so they share slots by Ping/Pong phase. ScaleA
 Large-packet synchronization locks a buffer for reading at the start of the packet and releases it after the last element is consumed:
 
 ```cpp
+mutex<PIPE_MTE1> pipe_mte1_get_data_slot_data_read_idx_mutex(get_data_slot(data_read_idx));
+mutex<PIPE_MTE1> pipe_mte1_get_scale_slot_scale_read_idx_mutex(get_scale_slot(scale_read_idx));
 if (k_offset_in_data_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_data_slot(data_read_idx));
+    pipe_mte1_get_data_slot_data_read_idx_mutex.lock();
 }
 if (((k_offset_in_data_chunk + 1) == data_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_data_slot(data_read_idx));
+    pipe_mte1_get_data_slot_data_read_idx_mutex.unlock();
 }
 if (k_offset_in_scale_chunk == 0) {
-    asc_lock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    pipe_mte1_get_scale_slot_scale_read_idx_mutex.lock();
 }
 if (((k_offset_in_scale_chunk + 1) == scale_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, get_scale_slot(scale_read_idx));
+    pipe_mte1_get_scale_slot_scale_read_idx_mutex.unlock();
 }
 ```
 
