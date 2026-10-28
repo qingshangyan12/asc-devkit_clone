@@ -44,6 +44,9 @@
 <!-- npu="9030" id15 -->
 - Kirin9030：支持
 <!-- end id15 -->
+<!-- npu="9050" id16 -->
+- Kirin9050：支持
+<!-- end id16 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Move_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -96,6 +99,9 @@ Ascend 950PR&950DT系列产品，目的操作数与源操作数的数据类型�
 <!-- npu="x90,9020,9030" id13 -->
 Kirinx90、Kirin9020、Kirin9030系列产品，不支持bfloat16_t
 <!-- end id13 -->
+<!-- npu="9050" id17 -->
+Kirin9050系列产品，不支持bfloat16_t、b64。
+<!-- end id17 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Move_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>

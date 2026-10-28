@@ -41,7 +41,12 @@
 <!-- npu="9020" id13 -->
 - Kirin9020：支持
 <!-- end id13 -->
+<!-- npu="9030" id16 -->
 - Kirin9030：支持
+<!-- end id16 -->
+<!-- npu="9050" id17 -->
+- Kirin9050：支持
+<!-- end id17 -->
 <!-- @re<!-- npu="9030" id14 -->
 Kirin9030处理器系列产品
 <!-- end id14 -->f: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous_res.md#id1 -->
@@ -211,9 +216,14 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     | RegTraitNumTwo | &bull; 单搬入 普通搬运接口<br>&bull; 单搬入 PostUpdate扩展搬运接口 | complex32/b64 |
 <!-- npu="9020" id15 -->
 - 针对Kirin 9020处理器系列产品：
-  - RegTraitNumOne：b8、b16（不支持bfloat16_t）、b32；b64仅支持PostUpdate扩展搬运接口（单搬入）。
+  - RegTraitNumOne：b8、b16（不支持bfloat16_t）、b32。
   - RegTraitNumTwo：不支持
 <!-- end id15 -->
+<!-- npu="9050" id18 -->
+- 针对Kirin 9050处理器系列产品：
+  - RegTraitNumOne：b8、b16（不支持bfloat16_t）、b32。
+  - RegTraitNumTwo：不支持
+<!-- end id18 -->
 
 
 ## 关键特性说明<a name="section18316112542110"></a>
