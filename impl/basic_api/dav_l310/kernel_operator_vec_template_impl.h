@@ -396,6 +396,7 @@ __simd_vf__ inline void VecBinaryVFImpl(
     }
 }
 }
+}
 
 template <auto func, bool isSetMask, bool isMaskBitMode, BinaryFuncMode funcMode = BinaryFuncMode::NORMAL, typename T, typename U>
 __aicore__ inline void VecBinaryImplTemplate(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint64_t maskArray[], const uint64_t maskCount,
