@@ -10,7 +10,7 @@
 
 /*!
  * \file kernel_reg_compute_vec_ternary_scalar_impl.h
- * \brief AscendC c310 support vaxpy level 0/2 api.
+ * \brief AscendC 5161 support vaxpy level 0/2 api.
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
