@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -38,7 +38,7 @@ L0C Buffer到Global Memory搬运支持不量化输出、`float`到`half`或`bflo
 
 随路量化、随路Relu、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。图中的F32到F16、F32到BF16为非量化模式，仅进行cast。其余路径为不量化模式、随路scalar量化模式或随路tensor量化模式。
 
-针对Ascend 950PR/Ascend 950DT：
+针对Ascend 950PR&950DT系列产品：
 
 **图1**  L0C2GM流程图
 
@@ -53,7 +53,7 @@ L0C Buffer到Global Memory搬运支持不量化输出、`float`到`half`或`bflo
     __aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst, const SrcTensor& src)
     ```
 
-- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L0C Buffer到Global Memory的非量化搬运。
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用[默认trait](../../algorithm.md#copy_traits)执行L0C Buffer到Global Memory的非量化搬运。
 
     ```cpp
     template <typename DstTensor, typename SrcTensor>
@@ -149,7 +149,7 @@ L0C Buffer到Global Memory搬运支持不量化输出、`float`到`half`或`bflo
 
 |参数名|输入/输出|描述|
 |--------|--------|--------|
-|atom|输入|搬运原子对象，可由`make_copy`接口构造。|
+|atom|输入|搬运原子对象，封装特定搬运通路的Operation、Trait与可选运行时Params组合，可由`make_copy`接口构造，详见[Algorithm](../../algorithm.md#copy_atom)。|
 |dst|输出|目的张量，存储位置为`location::gm`。支持`ND`、`DN`、`NZ`、`NC1HWC0`、`NHWC`和`NCHW`数据格式。|
 |src|输入|源张量，存储位置为`location::l0c`，数据格式为`NZ`，通常为`mmad`的计算结果。|
 |quant|输入|可选量化参数。传入`uint64_t`时表示scalar量化参数，传入张量时表示tensor量化参数，张量位于L1 Buffer，元素类型为`uint64_t`。|
@@ -279,6 +279,7 @@ L0C Buffer到Global Memory搬运根据是否传入量化参数自动选择量化
 
 ## 约束说明
 
+- 量化和ReLU参数不能为inf/nan和非规格化数。
 - 源矩阵`NZ`格式，地址要求64字节对齐。目的矩阵`DN`或`ND`格式时，地址要求1字节对齐，`NZ`格式时，地址要求32字节对齐。
 - 目的矩阵为`NZ`输出时，N方向大小需要为16的倍数；`b8`类型通道合并场景为32的倍数，`float`使能`enable_channel_split`通道拆分场景为8的倍数。
 - tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。详情参见[随路量化](../cube_store_key_features/quant_pre.md)。
@@ -295,6 +296,8 @@ L0C Buffer到Global Memory搬运涉及[随路量化](../cube_store_key_features/
 
 ## 调用示例
 
+`make_copy`的两种传参形式：`make_copy(operation, trait)`直接指定静态trait；`make_copy(operation)`使用通路默认trait构造，并可进一步通过`.with(params)`绑定`l0c_to_gm_params`运行时参数；未绑定params时使用默认值。
+
 ### 卷积输出
 
 以下示例将L0C Buffer中形状为`(H * W, C)`的NZ矩阵搬运到Global Memory，并转换为NHWC格式。将目的layout替换为`nchw_layout_ptn`或`nc1hwc0_layout_ptn`，可分别完成NCHW或NC1HWC0格式输出。
@@ -310,11 +313,14 @@ constexpr uint32_t c = 16;
 
 __aicore__ inline void copy_conv_output_l0c_to_gm(__gm__ float* gm_addr)
 {
+    // __cc__ 表示L0C Buffer地址空间，__gm__ 表示Global Memory地址空间
     __cc__ float l0c_buf[h * w * c];
 
+    // 源张量：NZ格式，C0取16（NZ格式的列分形大小，默认为16）
     auto l0c = make_tensor(
         make_mem_ptr(l0c_buf),
         make_frame_layout<nz_layout_ptn, 16>(h * w, c));
+    // 目的张量：NHWC格式（GM侧按目标格式选择layout pattern）
     auto gm = make_tensor(
         make_mem_ptr(gm_addr), make_frame_layout<nhwc_layout_ptn>(1, h, w, c));
 
@@ -325,14 +331,18 @@ __aicore__ inline void copy_conv_output_l0c_to_gm(__gm__ float* gm_addr)
 
 ### 不量化输出
 
+不量化模式下，L0C中的数据直接输出到Global Memory（源与目的类型一致时），或在`float`到`half`/`bfloat16_t`之间直接转换输出。
+
 ```cpp
 #include "tensor_api/tensor.h"
 
 using namespace asc::te;
 
-__aicore__ inline void copy_l0c_to_gm_example()
+__aicore__ inline void copy_l0c_to_gm_example(__cc__ float* l0c_addr, __gm__ float* gm_addr, uint32_t m, uint32_t n)
 {
+    // 源张量：L0C中的mmad输出，固定为NZ格式，C0取16
     auto l0c = make_tensor(make_mem_ptr(l0c_addr), make_frame_layout<nz_layout_ptn, 16>(m, n));
+    // 目的张量：GM侧使用nd_ext布局（行优先扩展布局）
     auto gm = make_tensor(make_mem_ptr(gm_addr), make_frame_layout<nd_ext_layout_ptn>(m, n));
 
     l0c_to_gm_params params;
@@ -343,12 +353,14 @@ __aicore__ inline void copy_l0c_to_gm_example()
 
 ### scalar量化输出
 
+scalar量化模式下，整个C矩阵共用同一个量化参数。量化参数通过`uint64_t`标量传入。
+
 ```cpp
 #include "tensor_api/tensor.h"
 
 using namespace asc::te;
 
-__aicore__ inline void copy_l0c_to_gm_example()
+__aicore__ inline void copy_l0c_to_gm_example(__cc__ float* l0c_addr, __gm__ half* gm_addr, uint32_t m, uint32_t n)
 {
     auto l0c = make_tensor(make_mem_ptr(l0c_addr), make_frame_layout<nz_layout_ptn, 16>(m, n));
     auto gm = make_tensor(make_mem_ptr(gm_addr), make_frame_layout<nd_ext_layout_ptn>(m, n));
@@ -361,12 +373,14 @@ __aicore__ inline void copy_l0c_to_gm_example()
 
 ### tensor量化输出
 
+tensor量化模式下，量化参数为位于L1 Buffer的张量，每个channel维度对应一个量化参数。量化张量元素类型为`uint64_t`，形状为`(1, n)`。
+
 ```cpp
 #include "tensor_api/tensor.h"
 
 using namespace asc::te;
 
-__aicore__ inline void copy_l0c_to_gm_example()
+__aicore__ inline void copy_l0c_to_gm_example(__cc__ float* l0c_addr, __gm__ half* gm_addr, __cbuf__ uint64_t* l1_quant_addr, uint32_t m, uint32_t n)
 {
     auto l0c = make_tensor(make_mem_ptr(l0c_addr), make_frame_layout<nz_layout_ptn, 16>(m, n));
     auto gm = make_tensor(make_mem_ptr(gm_addr), make_frame_layout<nd_ext_layout_ptn>(m, n));

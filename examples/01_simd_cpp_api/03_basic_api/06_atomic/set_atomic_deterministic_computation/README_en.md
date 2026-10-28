@@ -6,9 +6,9 @@ This example first introduces the necessity and specific implementation scheme o
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 ```
@@ -217,7 +217,7 @@ The Scalar unit accesses semaphores on GM through two access methods:
    Use the GetValue and SetValue member functions of GlobalTensor. In this case, developers must manually call the [DataCacheCleanAndInvalid](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0177.html) API to ensure data consistency across multiple cores.
 
 2. **Access bypassing DCache**
-   Use [WriteGmByPassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) and ReadGmByPassDCache. This method ensures multi-core data consistency without additional operations.
+   Use [WriteGmBypassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) and ReadGmBypassDCache. This method ensures multi-core data consistency without additional operations.
 
 Performance difference between the two schemes: bypassing DCache has relatively poorer performance, but if the amount of data read from or written to GM is small, the bypass-DCache method can be considered.
 The inter-core synchronization scheme also requires intra-core synchronization. The roles of the three intra-core synchronization points are described as follows:
@@ -303,9 +303,9 @@ The core logic of these two scenarios is the same, with the difference being tha
 
 ### 2.3 Notes
 
-#### (1) When `SCENARIO_NUM=3`, the example does not support Ascend 950PR/Ascend 950DT.
-When `SCENARIO_NUM=1` and `SCENARIO_NUM=2`, the example supports Ascend 950PR/Ascend 950DT.
-When `SCENARIO_NUM=3`, it calls `DataCopy` to transfer data from L1 to GM. However, under the Ascend 950PR/Ascend 950DT architecture, the DataCopy API does not support the L1 Buffer -> GM path. Therefore, when `SCENARIO_NUM=3`, the example does not support Ascend 950PR/Ascend 950DT. To support Ascend 950PR/Ascend 950DT, refer to the compatibility scheme in the [basic API migration guide](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_compatibility_10_00005.html).
+#### (1) When `SCENARIO_NUM=3`, the example does not support Ascend 950PR&950DT products.
+When `SCENARIO_NUM=1` and `SCENARIO_NUM=2`, the example supports Ascend 950PR&950DT products.
+When `SCENARIO_NUM=3`, it calls `DataCopy` to transfer data from L1 to GM. However, under the Ascend 950PR&950DT products architecture, the DataCopy API does not support the L1 Buffer -> GM path. Therefore, when `SCENARIO_NUM=3`, the example does not support Ascend 950PR&950DT products. To support Ascend 950PR&950DT products, refer to the compatibility scheme in the [basic API migration guide](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_compatibility_10_00005.html).
 
 #### (2) When `SCENARIO_NUM=2`, the example does not support static tensor programming.
 When SCENARIO_NUM=2, it calls `IBSet` and `IBWait` for inter-core synchronization. However, the internal implementation of these two APIs requires the TPipe framework for intra-core synchronization. Therefore, when SCENARIO_NUM=2, the example does not support static tensor programming.

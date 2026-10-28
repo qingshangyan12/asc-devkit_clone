@@ -1,5 +1,7 @@
 # Ascend C样例
 
+简体中文 | [English](./README_en.md)
+
 本目录提供Ascend C不同编程方式的使用样例，覆盖基础调用、调试工具、功能特性、API类库和性能实践等内容。
 
 ## 样例列表
@@ -18,6 +20,6 @@
 
 | 产品型号 | npu-arch参数 |
 | ---- | ---- |
-| Ascend 950PR/Ascend 950DT | --npu-arch=dav-3510 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 | --npu-arch=dav-2201 |
-| Atlas 推理系列产品AI Core | --npu-arch=dav-2002 |
+| Ascend 950PR&950DT系列产品 | --npu-arch=dav-3510 |
+| Atlas A3系列产品<br>Atlas A2系列产品 | --npu-arch=dav-2201 |
+| Atlas推理系列产品AI Core | --npu-arch=dav-2002 |

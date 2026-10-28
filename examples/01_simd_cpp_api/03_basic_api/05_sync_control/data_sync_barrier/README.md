@@ -8,9 +8,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -40,7 +40,7 @@
 下面按步骤介绍本样例中 `DataSyncBarrier` 的使用场景：
 
 1. 系统中有两个 AIV 核，分别记为核 0 和核 1。GM 中的两个变量 `x` 和 `y` 初始值都为 1。
-2. 核 0 先通过标量流水接口`WriteGmByPassDCache`向 `srcGm[1]` 写入 `x=7`。
+2. 核 0 先通过标量流水接口`WriteGmBypassDCache`向 `srcGm[1]` 写入 `x=7`。
 3. 核 0 再插入 `DataSyncBarrier<AscendC::MemDsbT::DDR>()`，等待前一次 GM 写操作完成。
 4. 核 0 随后向 `srcGm[0]` 写入 `y=6`。
 5. 核 1 持续轮询 `srcGm[0]`，直到读到 `y=6`，再读取 `srcGm[1]`，并将 `2 * x` 写入输出。
@@ -90,7 +90,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu` | 运行模式：NPU运行、CPU调试|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2系列产品和 Atlas A3系列产品，dav-3510 对应 Ascend 950PR&950DT系列产品 |
 
 - 执行结果
 

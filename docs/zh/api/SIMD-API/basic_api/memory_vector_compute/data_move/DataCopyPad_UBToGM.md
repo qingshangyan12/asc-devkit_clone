@@ -5,50 +5,50 @@
 ### 不支持数据搬运模式mode的原型
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_UBToGM_res.md#id1 -->
 
 ### 支持数据搬运模式mode的原型
 
 <!-- npu="950" id8 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id8 -->
 <!-- npu="A3" id9 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id9 -->
 <!-- npu="910b" id10 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id10 -->
 <!-- npu="310b" id11 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id11 -->
 <!-- npu="310p" id12 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id12 -->
 <!-- npu="310p" id13 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id13 -->
 <!-- npu="910" id14 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_UBToGM_res.md#id2 -->
 
@@ -78,10 +78,10 @@
 
 <!-- npu="950" id15 -->
 
-- 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
+- 支持配置设置数据搬运模式mode（仅Ascend 950PR&950DT系列产品支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
+    // 该函数原型仅支持Ascend 950PR&950DT系列产品
     template <typename T, PaddingMode mode = PaddingMode::Normal>
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
     ```
@@ -103,19 +103,51 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor_intro.md)。<br>起始地址无地址对齐约束。 |
 | src | 输入 | 源操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)。<br>起始地址需要保证32字节对齐。 |
-| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考[表3](#table_ub2gm_pad_3)。 |
+| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明见下文。 |
 
 下文表格中列出的结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。
+
+<!-- npu="950" id25 -->
+
+针对Ascend 950PR&950DT系列产品，DataCopyExtParams结构体参数定义请参考[表3](#table_ub2gm_pad_3)。
 
 **表3**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_3"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
+| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 65535]。 |
+| blockLen | 指定该指令每个连续传输数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, $2^{21}−1$]，单位：1B。<br>**注：blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小**。 |
+| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为int64_t，取值范围为[0, 65535]。 |
+| dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为int64_t，取值范围为[0, $2^{40}−1$]。 |
+| rsv | 预留参数，当前需设置为0。 |
+
+<!-- end id25 -->
+
+<!-- npu="A3,910b,310b" id26 -->
+
+针对如下型号，DataCopyExtParams结构体参数定义请参考[表4](#table_ub2gm_pad_4)：
+
+<!-- npu="A3" id28 -->
+- Atlas A3系列产品
+<!-- end id28 -->
+<!-- npu="910b" id29 -->
+- Atlas A2系列产品
+<!-- end id29 -->
+<!-- npu="310b" id30 -->
+- Atlas 200I/500 A2推理产品
+<!-- end id30 -->
+
+**表4**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_4"></a>
+
+| 参数名 | 描述 |
+| :--- | :--- |
 | blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]。 |
-| blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]**，blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小**。 |
-| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。不同产品中srcStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。 |
-| dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。不同产品中dstStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。 |
-| rsv | 保留字段。 |
+| blockLen | 指定该指令每个连续传输数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, $2^{21}−1$]，单位：1B。<br>**注：blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小**。 |
+| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为uint32_t，取值范围为[0, $2^{32}−1$]。 |
+| dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，取值范围为[0, $2^{32}−1$]。 |
+| rsv | 预留参数，当前需设置为0。 |
+
+<!-- end id26 -->
 
 下面通过两个场景介绍UB到Global Memory的非对齐搬运，分别对应32字节对齐和非32字节对齐：
 
@@ -141,25 +173,25 @@
 
 <!-- npu="950" id16 -->
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
+- Ascend 950PR&950DT系列产品，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 
 <!-- end id16 -->
 
 <!-- npu="A3" id17 -->
 
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+- Atlas A3系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 <!-- end id17 -->
 
 <!-- npu="910b" id18 -->
 
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+- Atlas A2系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 <!-- end id18 -->
 
 <!-- npu="310b" id19 -->
 
-- Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+- Atlas 200I/500 A2推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 <!-- end id19 -->
 
@@ -170,36 +202,52 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 位于UB的源地址必须32字节对齐，位于Global Memory的目的地址必须1字节对齐。
-- DataCopyExtParams结构体参数的值需在取值范围内：
+<!-- npu="950" id20 -->
+- 针对Ascend 950PR&950DT系列产品，DataCopyExtParams结构体参数的数据类型和取值范围如下：
 
-    **表4**  DataCopyExtParams结构体参数取值范围
+    **表5**  DataCopyExtParams结构体参数的数据类型和取值范围
 
-    | 参数名 | 取值范围 |
-    | --- | --- |
-    | blockCount | [0, 4095] |
-    | blockLen | [0, 2097151] |
-    | srcStride | [0, 2^32 - 1] |
-    | dstStride | [0, 2^32 - 1] |
+    | 参数名 | 数据类型 | 取值范围 |
+    | --- | --- | --- |
+    | blockCount | uint16_t | [0, 65535] |
+    | blockLen | uint32_t | [0, $2^{21}−1$] |
+    | srcStride | int64_t | [0, 65535] |
+    | dstStride | int64_t | [0, $2^{40}−1$] |
 
-    <!-- npu="950" id20 -->
+<!-- end id20 -->
+<!-- npu="A3,910b,310b" id27 -->
+- 针对如下型号，DataCopyExtParams结构体参数的数据类型和取值范围如下：
+  <!-- npu="A3" id31 -->
+  - Atlas A3系列产品
+  <!-- end id31 -->
+  <!-- npu="910b" id32 -->
+  - Atlas A2系列产品
+  <!-- end id32 -->
+  <!-- npu="310b" id33 -->
+  - Atlas 200I/500 A2推理产品
+  <!-- end id33 -->
 
-    > [!NOTE]说明
-    > 特别地，针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的数据类型和取值范围如下：
-    > - srcStride：数据类型为int64_t，取值范围为[0, 65535]。
-    > - dstStride：数据类型为int64_t，取值范围为[0, 2^40-1]。
+    **表6**  DataCopyExtParams结构体参数的数据类型和取值范围
 
-    <!-- end id20 -->
+    | 参数名 | 数据类型 | 取值范围 |
+    | --- | --- | --- |
+    | blockCount | uint16_t | [0, 4095] |
+    | blockLen | uint32_t | [0, $2^{21}−1$] |
+    | srcStride | uint32_t | [0, $2^{32}−1$] |
+    | dstStride | uint32_t | [0, $2^{32}−1$] |
+
+<!-- end id27 -->
 
 <!-- npu="A3,910b,950" id24 -->
 - 当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   <!-- npu="A3" id21 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  - Atlas A3系列产品
   <!-- end id21 -->
   <!-- npu="910b" id22 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  - Atlas A2系列产品
   <!-- end id22 -->
   <!-- npu="950" id23 -->
-  - Ascend 950PR/Ascend 950DT
+  - Ascend 950PR&950DT系列产品
   <!-- end id23 -->
 <!-- end id24 -->
 

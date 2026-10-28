@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example combines calls to the `ReadGmByPassDCache` and `WriteGmByPassDCache` interfaces to read and write data from GM addresses without going through DCache. This example adds 100 to the read values and writes them to the output address.
+This example combines calls to the `ReadGmBypassDCache` and `WriteGmBypassDCache` interfaces to read and write data from GM addresses without going through DCache. This example adds 100 to the read values and writes them to the output address.
 
 When multiple cores operate on GM addresses, if the data cannot be aligned to Cache Line boundaries, the DCache path reads and writes in Cache Line sizes, which causes random data overwriting between cores. In this case, the approach of reading and writing GM addresses directly without going through DCache can be adopted to avoid the random overwriting issue.
 
@@ -10,9 +10,9 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -30,9 +30,9 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 ## Example Description
 
 - Example function:  
-  Combine calls to `ReadGmByPassDCache` and `WriteGmByPassDCache` to implement:
-  1. Use `ReadGmByPassDCache` to read int32_t elements one by one from GM addresses
-  2. Use `WriteGmByPassDCache` to write the read values plus 100 to the output GM addresses
+  Combine calls to `ReadGmBypassDCache` and `WriteGmBypassDCache` to implement:
+  1. Use `ReadGmBypassDCache` to read int32_t elements one by one from GM addresses
+  2. Use `WriteGmBypassDCache` to write the read values plus 100 to the output GM addresses
 
 - Example specifications:
   <table>
@@ -80,7 +80,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu` | Run mode: NPU execution, CPU debug |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products/Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
   
 - Execution result
 

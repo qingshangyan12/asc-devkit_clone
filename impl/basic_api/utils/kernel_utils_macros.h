@@ -26,13 +26,7 @@
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 
-#ifndef likely
-#define likely(x) __builtin_expect(!!(x), 1)
-#endif
-#ifndef unlikely
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#endif
-
+#include "utils/base/sys_macros.h"
 #include "../kernel_macros.h"
 #include "../kernel_log.h"
 #include "../kernel_event.h"
@@ -83,24 +77,6 @@ enum SidOutSMMU {
 };
 #endif
 
-#ifndef __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
-#define __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
-// define macro for deterministic compile options
-enum KernelMetaType : uint8_t {
-    KERNEL_TYPE_AIV_ONLY,
-    KERNEL_TYPE_AIC_ONLY,
-    KERNEL_TYPE_MIX_AIV_1_0,
-    KERNEL_TYPE_MIX_AIC_1_0,
-    KERNEL_TYPE_MIX_AIC_1_1,
-    KERNEL_TYPE_MIX_AIC_1_2,
-    KERNEL_TYPE_AICORE,
-    KERNEL_TYPE_VECTORCORE,
-    KERNEL_TYPE_MIX_AICORE,
-    KERNEL_TYPE_MIX_VECTOR_CORE,
-    KERNEL_TYPE_MAX,
-};
-#endif
-
 enum KernelType {
     K_TYPE_AICORE = 1,       // c100/m200
     K_TYPE_AIC = 2,          // v220-cube
@@ -117,12 +93,19 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
-    B_TYPE_SK_INFO = 5
+    B_TYPE_SK_INFO = 5,
+    B_TYPE_SPECIALIZATION_RESOURCE_ID = 6,
+    B_TYPE_ICACHE_PRELOAD_FLAG = 7
 };
 
 struct BaseTlv { // definition of TLV head
     unsigned short type;
     unsigned short len;
+};
+
+struct BinaryMetaSpecializationResourceId {
+    BaseTlv head;
+    char value[64];
 };
 
 struct BinaryMetaVersion {
@@ -151,6 +134,12 @@ struct BinaryMetaOptionalParam {
 struct BinaryMetaAscFeature {
     BaseTlv head;
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
+};
+
+struct BinaryMetaIcachePreloadFlag {
+    BaseTlv head;
+    uint16_t icachePreloadFlag; // 0: no preload, 1: preload
+    uint16_t reserved;
 };
 
 enum FuncMetaType {                       // function level TLV type
@@ -236,7 +225,8 @@ enum class CacheRwMode { READ = 1, WRITE = 2, RW = 3 };
 
 #if defined(__NPU_ARCH__) &&                                                                             \
         (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163) ||                        \
+         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162 || \
+         __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) ||                                                \
     defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
@@ -357,38 +347,12 @@ struct SknlKernelMap {
         g_sknl_map_, __COUNTER__) = {                                                                    \
         {B_TYPE_SK_INFO, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
 
-// In order to pass __COUNTER__ to variable name, need 3 times of MACRO to pass argument
-#define TILING_STRUCT_SECTION_INIT_BASE(counter, val)                                                                 \
-    static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling." #val))) = \
-        sizeof(val)
-#define TILING_STRUCT_SECTION_INIT(counter, val) TILING_STRUCT_SECTION_INIT_BASE(counter, val)
-
-#ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define ENABLE_FEATURE_FOR_COMPILE(f, val) auto __enable_feature_for_compile_##f = val
-#define ENABLE_FEATURE_FOR_TILING(expression, val) auto __enable_custom_tiling val = expression
-#define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
-#else
-#define ENABLE_FEATURE_FOR_COMPILE(f, val)
-#define ENABLE_FEATURE_FOR_TILING(expression, val) TILING_STRUCT_SECTION_INIT(__COUNTER__, val)
-#define REGISTER_NONE_TILING
-#endif
+#define TILING_STRUCT_SECTION_INIT_BASE(counter, val) ASCENDC_TILING_STRUCT_SECTION_INIT_BASE_IMPL(counter, val)
+#define TILING_STRUCT_SECTION_INIT(counter, val) ASCENDC_TILING_STRUCT_SECTION_INIT_IMPL(counter, val)
+#define ENABLE_FEATURE_FOR_COMPILE(f, val) ASCENDC_ENABLE_FEATURE_FOR_COMPILE_IMPL(f, val)
+#define ENABLE_FEATURE_FOR_TILING(expression, val) ASCENDC_ENABLE_FEATURE_FOR_TILING_IMPL(expression, val)
 
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-#define KERNEL_TASK_TYPE(key, value)
-#define KERNEL_TASK_TYPE_DEFAULT(value)
-#else
-#define KERNEL_TASK_TYPE(key, value) ENABLE_FEATURE_FOR_COMPILE(key, value)
-#ifndef __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
-#define __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
-#define KERNEL_TASK_TYPE_DEFAULT(value) ENABLE_FEATURE_FOR_COMPILE(default, value)
-#endif
-#endif
-
-#define REGISTER_TILING_DEFAULT(tiling_struct) ENABLE_FEATURE_FOR_TILING(default, tiling_struct)
-#define REGISTER_TILING_FOR_TILINGKEY(expression, tiling_struct) ENABLE_FEATURE_FOR_TILING(expression, tiling_struct)
 
 #ifndef ONE_CORE_DUMP_SIZE
 #define ONE_CORE_DUMP_SIZE (1024 * 1024)
@@ -406,46 +370,30 @@ namespace AscendC {
 constexpr size_t DUMP_UINTSIZE = ONE_CORE_DUMP_SIZE;
 } // namespace AscendC
 
-#include <stdint.h>
-#ifndef TILING_KEY_VAR
-#if defined(ASCENDC_CPU_DEBUG)
-extern uint64_t g_tilingKey;
+#ifdef TILING_KEY_VAR
+#undef ASCENDC_TILING_KEY_VAR_IMPL
+#define ASCENDC_TILING_KEY_VAR_IMPL TILING_KEY_VAR
 #else
-#if __NPU_ARCH__ == 2002
-[[block_local]] uint64_t g_tilingKey;
-#else
-[[workgroup_local]] __gm__ uint64_t g_tilingKey;
-#endif
-#endif
-#define TILING_KEY_VAR g_tilingKey
+#define TILING_KEY_VAR ASCENDC_TILING_KEY_VAR_IMPL
 #endif
 
-#define TILING_KEY_IS(k) (TILING_KEY_VAR == (k))
+#define TILING_KEY_LIST_INOUT(...) ASCENDC_TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)
+#define TILING_KEY_LIST_INOUT_IMPL(...) ASCENDC_TILING_KEY_LIST_INOUT_BASE_IMPL(__VA_ARGS__)
 
-#define TILING_KEY_LIST_INOUT(...) TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)
-#define TILING_KEY_LIST_INOUT_IMPL(...) \
-    TILING_KEY_ARGS_CONCAT(TILING_KEY_INDEX_INOUT_, TILING_KEY_ARG_COUNT(__VA_ARGS__)(__VA_ARGS__))
+#define TILING_KEY_INDEX_INOUT_1(a) ASCENDC_TILING_KEY_INDEX_INOUT_1(a)
+#define TILING_KEY_INDEX_INOUT_2(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_2(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_3(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_3(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_4(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_4(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_5(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_5(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_6(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_6(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_7(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_7(a, __VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_8(a, ...) ASCENDC_TILING_KEY_INDEX_INOUT_8(a, __VA_ARGS__)
 
-#define TILING_KEY_INDEX_INOUT_1(a) TILING_KEY_VAR == (a)
-#define TILING_KEY_INDEX_INOUT_2(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_1(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_3(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_2(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_4(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_3(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_5(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_4(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_6(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_5(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_7(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_6(__VA_ARGS__)
-#define TILING_KEY_INDEX_INOUT_8(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_7(__VA_ARGS__)
+#define TILING_KEY_ARG_COUNT(...) ASCENDC_TILING_KEY_ARG_COUNT_IMPL(__VA_ARGS__)
+#define TILING_KEY_ARG_COUNT_IMPL(...) ASCENDC_TILING_KEY_ARG_COUNT_BASE_IMPL(__VA_ARGS__)
 
-#define TILING_KEY_ARG_COUNT(...) TILING_KEY_ARG_COUNT_IMPL(__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-#define TILING_KEY_ARG_COUNT_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
-
-#define TILING_KEY_ARGS_CONCAT(a, b) TILING_KEY_ARGS_CONCAT_IMPL(a, b)
-#define TILING_KEY_ARGS_CONCAT_IMPL(a, b) a##b
-
-#ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__)) "TILING_KEY_LIST"
-#else
-#define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__))
-#endif
+#define TILING_KEY_ARGS_CONCAT(a, b) ASCENDC_TILING_KEY_ARGS_CONCAT_IMPL(a, b)
+#define TILING_KEY_ARGS_CONCAT_IMPL(a, b) ASCENDC_TILING_KEY_ARGS_CONCAT_BASE_IMPL(a, b)
 
 namespace impl_mode {
 #ifdef SUPPORT_OUT_OF_BOUND_INDEX_
@@ -478,10 +426,25 @@ const uint64_t KEEP_FP16 = 0;
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
 constexpr bool g_gm_overflow_check = true;
 constexpr uint64_t g_oomAddrRangeMaxSize = 128;
+namespace AscendC {
+namespace Internal {
+constexpr uint8_t g_oomStorageShapeMagic = 0x4FU;
+constexpr uint8_t g_oomStorageShapeVersion = 1U;
+constexpr uint8_t g_oomTensorViewVersion = 1U;
+constexpr uint8_t g_oomNibbleMask = 0x0fU;
+constexpr uint8_t g_oomDescriptorTypeTensor = 1U;
+constexpr uint8_t g_oomDescriptorTypeTensorList = 2U;
+constexpr uint64_t g_oomStorageShapeHeaderSize = 2UL;
+constexpr uint64_t g_oomTensorDescriptorHeaderSize = 10UL;
+constexpr uint64_t g_oomTensorListDescriptorHeaderSize = 12UL;
+constexpr uint64_t g_oomTensorViewDescriptorSize = 9UL;
+} // namespace Internal
+} // namespace AscendC
 struct OomAddrRange {
     uintptr_t addr[g_oomAddrRangeMaxSize];
     uint64_t len[g_oomAddrRangeMaxSize];
     uint8_t isLevelOnePointer[g_oomAddrRangeMaxSize];
+    __gm__ uint8_t* tensorListStorageShape[g_oomAddrRangeMaxSize];
     uint64_t count;
 };
 __BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange;

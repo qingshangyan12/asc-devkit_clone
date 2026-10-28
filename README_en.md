@@ -2,6 +2,8 @@
 
 # Ascend C
 
+English | [简体中文](./README.md)
+
 <h4>Multi-layer APIs built on C/C++, unlocking full chip programmability for ultimate performance</h4>
 
 [![community](https://img.shields.io/badge/docs-community-brightgreen.svg?style=flat)](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)
@@ -9,7 +11,7 @@
 [![examples](https://img.shields.io/badge/examples-repo-orange.svg?style=flat)](examples)
 [![asc-tools](https://img.shields.io/badge/asc--tools-repo-6f42c1.svg?style=flat)](https://gitcode.com/cann/asc-tools)
 [![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](LICENSE)
-[![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](CONTRIBUTING.md)
+[![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](CONTRIBUTING_en.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
 
 </div>
@@ -41,7 +43,7 @@
 - VitePress documentation site built to provide AscendC document preview capability ([PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)).
 - Overview of performance optimization for hybrid SIMD and SIMT programming added ([PR#2736](https://gitcode.com/cann/asc-devkit/pull/2736)).
 
-For detailed information on all historical releases and updates, please refer to [CHANGELOG.md](./CHANGELOG.md).
+For detailed information on all historical releases and updates, please refer to [CHANGELOG_en.md](./CHANGELOG_en.md).
 
 ## 🚀 Overview
 
@@ -85,7 +87,7 @@ Ascend C adopts a layered architecture design, building a complete operator deve
 
 The capability definition and description of each layer are as follows:
 - **Language Extension Layer (SIMT API)**: Native C programming interface for multi-threaded parallel scenarios, supports industry-standard SIMT programming model, ensures consistent cross-technology development experience, and enables high-performance operator development in discrete and irregular computing scenarios.
-- **Language Extension Layer (SIMD C API)**: C-level underlying programming interface based on SIMD vectorized programming model for ultimate performance tuning, natively supports array-style memory allocation and pointer-based computing primitives, with instruction-level zero-encapsulation-overhead hardware access capability. Ascend 950PR/Ascend 950DT architecture adds support for SIMD/SIMT hybrid programming mode, covering multi-form parallel computing scenarios.
+- **Language Extension Layer (SIMD C API)**: C-level underlying programming interface based on SIMD vectorized programming model for ultimate performance tuning, natively supports array-style memory allocation and pointer-based computing primitives, with instruction-level zero-encapsulation-overhead hardware access capability. Ascend 950PR&950DT products architecture adds support for SIMD/SIMT hybrid programming mode, covering multi-form parallel computing scenarios.
 - **Tensor API**: Core C++ Tensor-level programming interface for high-performance operator development. Takes memory layout (Layout) as a first-class citizen of Tensor abstraction, natively supports Tensor objects carrying Layout semantics; built-in Layout algebra can automatically complete memory layout index derivation and layout transformation management, significantly reducing development complexity in complex memory layout scenarios, and improving code maintainability and cross-architecture portability.
 - **Basic API**: C++ class library interface based on single-instruction abstraction, provides basic programming capability centered on Tensor objects without Layout constraints; relies on TPipe/TQue framework to uniformly manage memory scheduling and execution synchronization, shielding underlying hardware implementation details.
 - **High-level API (Adv API)**: Standardized abstract encapsulation of single-core general computing algorithms, provides out-of-the-box public algorithm implementations, shields underlying hardware instruction details, and supports rapid algorithm verification and engineering prototype delivery.
@@ -97,7 +99,7 @@ The capability definition and description of each layer are as follows:
 - **Python Frontend (PyAsc)**: Encapsulates the full underlying programmability of the chip based on Python language, continuously improves Tensor programming capability under the Layout system, adds support for SIMT programming model, and enables development of high-performance operators through Python interfaces.
 
 ### How to Select Multi-layer APIs for Operator Development
-- **Development in C/C++**: Please refer to [Ascend C Multi-level API Selection Guide](./docs/zh/asc_how_to_choose_api.md) for details
+- **Development in C/C++**: Please refer to [Ascend C Multi-level API Selection Guide](./docs/en/asc_how_to_choose_api.md) for details
 - **Python-based development for full programmability and ultimate performance**: Ascend C Python frontend [PyAsc](https://gitcode.com/cann/pyasc) is recommended
 - **Python-based development for rapid verification and ease of use**: [PyPTO](https://gitcode.com/cann/pypto) is recommended
 
@@ -134,8 +136,8 @@ This repository mainly contains Ascend C programming APIs and necessary cmake bu
 
 If you want to quickly experience project building and operator sample execution, please refer to the following documents for tutorials.
 
-- [Compilation and Building](docs/zh/quick_start.md): Introduces environment setup, compilation & execution, and local verification.
-- [Sample Execution](examples/README.md): Provides operator development samples and introduces the end-to-end execution method.
+- [Compilation and Building](docs/en/quick_start.md): Introduces environment setup, compilation & execution, and local verification.
+- [Sample Execution](examples/README_en.md): Provides operator development samples and introduces the end-to-end execution method.
 
 ## 🧰 clangd/IDE Support
 
@@ -225,7 +227,7 @@ If you want to quickly experience project building and operator sample execution
   | Document | Description |
   |----------|-------------|
   |[CANN Community Contribution Guide](https://gitcode.com/cann/community)| General processing flow of CANN community Issues, PRs, etc. |
-  |[ASC-DevKit Contribution Guide](./CONTRIBUTING.md) | Contribution guide for Ascend C APIs, documents and samples. |
+  |[ASC-DevKit Contribution Guide](./CONTRIBUTING_en.md) | Contribution guide for Ascend C APIs, documents and samples. |
 
 - **Others**
 

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <unordered_set>
 #include <utility>
 
 #include <boost/filesystem.hpp>
@@ -32,11 +33,12 @@ namespace {
 namespace fs = boost::filesystem;
 
 constexpr uint32_t MAX_MANIFEST_BYTES = 8U * 1024U * 1024U;
-constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 1U * 1024U * 1024U;
-constexpr uint32_t MAX_BUNDLE_BYTES = 256U * 1024U * 1024U;
+constexpr uint32_t MAX_RESOURCE_FILE_BYTES = 256U * 1024U * 1024U;
+constexpr uint32_t MAX_MANIFEST_RESOURCE_BYTES = 512U * 1024U * 1024U;
+constexpr uint32_t MAX_BUNDLE_BYTES = 1024U * 1024U * 1024U;
 constexpr size_t MAX_MANIFEST_COUNT = 4096U;
-constexpr size_t MAX_FILES_PER_MANIFEST = 4096U;
-constexpr size_t MAX_FILES_PER_BUNDLE = 65536U;
+constexpr size_t MAX_FILES_PER_MANIFEST = 65536U;
+constexpr size_t MAX_FILES_PER_BUNDLE = 131072U;
 constexpr size_t MAX_DIRECTORY_DEPTH = 64U;
 
 class ResourceBudget final {
@@ -61,6 +63,17 @@ public:
             return false;
         }
         totalBytes_ += size;
+        return true;
+    }
+
+    bool Merge(const ResourceBudget& other)
+    {
+        if (other.totalBytes_ > MAX_BUNDLE_BYTES - totalBytes_ ||
+            other.fileCount_ > MAX_FILES_PER_BUNDLE - fileCount_) {
+            return false;
+        }
+        totalBytes_ += other.totalBytes_;
+        fileCount_ += other.fileCount_;
         return true;
     }
 
@@ -159,7 +172,7 @@ bool DiscoverManifestFiles(const std::string& manifestSearchRoot, std::vector<st
 
 bool LoadResourceFile(
     const fs::path& source, const std::string& manifestRoot, const std::string& manifestPath, ResourceBudget& budget,
-    ManifestUnit& unit)
+    uint32_t& manifestResourceBytes, ManifestUnit& unit)
 {
     std::vector<uint8_t> data;
     if (!FileUtils::ReadRegularFile(source.string(), MAX_RESOURCE_FILE_BYTES, data)) {
@@ -174,6 +187,11 @@ bool LoadResourceFile(
         ASCENDLOGE("Manifest exceeds resource file count limit: %s", manifestPath.c_str());
         return false;
     }
+    if (data.size() > MAX_MANIFEST_RESOURCE_BYTES - manifestResourceBytes) {
+        ASCENDLOGE("Manifest exceeds resource payload limit: %s", manifestPath.c_str());
+        return false;
+    }
+    manifestResourceBytes += static_cast<uint32_t>(data.size());
     if (!budget.AddResource(static_cast<uint32_t>(data.size()), "manifest resource " + source.string())) {
         return false;
     }
@@ -200,6 +218,7 @@ bool LoadResourceFiles(
     boost::system::error_code error;
     fs::recursive_directory_iterator iterator(fs::path(directory), fs::directory_options::none, error);
     const fs::recursive_directory_iterator end;
+    uint32_t manifestResourceBytes = 0U;
     if (error) {
         ASCENDLOGE("Failed to enumerate manifest resource_path %s: %s", directory.c_str(), error.message().c_str());
         return false;
@@ -224,7 +243,9 @@ bool LoadResourceFiles(
         } else if (!fs::is_regular_file(status)) {
             ASCENDLOGE("Manifest resource_path contains a non-regular file: %s", source.c_str());
             return false;
-        } else if (!LoadResourceFile(source, manifestRoot, manifestPath, budget, unit)) {
+        }
+        if (fs::is_regular_file(status) &&
+            !LoadResourceFile(source, manifestRoot, manifestPath, budget, manifestResourceBytes, unit)) {
             return false;
         }
         if (!AdvanceIterator(iterator, directory)) {
@@ -293,9 +314,20 @@ bool CollectedManifestRepository::Load(std::vector<ManifestUnit>& units) const
     ASCENDLOGI("Discovered %zu manifest(s)", manifests.size());
     units.clear();
     units.reserve(manifests.size());
+    std::unordered_set<std::string> resources;
     for (const std::string& manifest : manifests) {
         ManifestUnit unit;
-        if (!LoadUnit(manifest, budget, unit)) {
+        ResourceBudget unitBudget;
+        if (!LoadUnit(manifest, unitBudget, unit)) {
+            return false;
+        }
+        const std::string resourceId = Json::parse(unit.json).at("resource_id").get<std::string>();
+        if (!resources.emplace(resourceId).second) {
+            ASCENDLOGW("Deduplicated duplicate resource_id %s from %s", resourceId.c_str(), manifest.c_str());
+            continue;
+        }
+        if (!budget.Merge(unitBudget)) {
+            ASCENDLOGE("Collected resources exceed bundle limits at manifest: %s", manifest.c_str());
             return false;
         }
         units.push_back(std::move(unit));

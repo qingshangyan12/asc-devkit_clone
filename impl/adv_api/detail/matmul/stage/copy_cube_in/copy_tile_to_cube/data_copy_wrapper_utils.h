@@ -40,8 +40,7 @@ constexpr int32_t MAX_BLOCK_COUNT_SIZE_MM_API = 4095;
 constexpr int32_t MM_NUM_TWO = 2;
 
 template <typename TransT>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void NDPadZeroForWidth(
     LocalTensor<TransT>& dst, const int height, const int calcWidth, const int tail, int offset)
 {
@@ -93,8 +92,7 @@ __aicore__ inline void NDPadZeroForWidth(
 }
 
 template <typename TransT>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void NDPadZeros(
     LocalTensor<TransT>& dst, const int height, const int calcWidth, const int gCol, const int width,
     bool isBankConflict)
@@ -312,7 +310,7 @@ __aicore__ inline void CopyNZ2NZImplByLoadData(
 }
 #endif
 
-template <typename SrcT, typename TransT, bool HasScalePos = false>
+template <typename SrcT, typename TransT, bool HasScalePos = false, bool preAllocation = false>
 __aicore__ inline void CopyNZ2NZImpl(
     const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
     const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
@@ -339,9 +337,17 @@ __aicore__ inline void CopyNZ2NZImpl(
     }
     if (srcStride >= UINT16_MAX) {
         for (int32_t i = 0; i < Ceil(width, c0Size_); ++i) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
             DataCopy(
-                dst[i * alignHeight * c0Size_], src[srcOffset + i * gRow * c0Size_],
+                dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
+                src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
+                {1, static_cast<uint16_t>(blockLen), 0, 0}, preAllocation);
+#else
+            DataCopy(
+                dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
+                src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
                 {1, static_cast<uint16_t>(blockLen), 0, 0});
+#endif
         }
     } else {
         uint16_t nburst = Ceil(width, c0Size_);
@@ -355,10 +361,18 @@ __aicore__ inline void CopyNZ2NZImpl(
                 }
             }
         }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        DataCopy(
+            dst, src[srcOffset],
+            {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
+             static_cast<uint16_t>(dstStride)},
+            preAllocation);
+#else
         DataCopy(
             dst, src[srcOffset],
             {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
              static_cast<uint16_t>(dstStride)});
+#endif
     }
 #endif
 }
@@ -393,8 +407,7 @@ __aicore__ inline void CopyNZ2NZImpl(
 }
 
 template <typename TransT>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void NDTrans2NZForInt8(
     LocalTensor<TransT>& dst, LocalTensor<TransT>& src, const int calcHeight, const int calcWidth,
     const bool isBankConflict)
@@ -449,8 +462,7 @@ __aicore__ inline void NDTrans2NZForInt8(
 }
 
 template <typename SrcT, typename TransT>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void NDTrans2NZForFP16(
     LocalTensor<TransT>& dst, LocalTensor<TransT>& src, const int calcHeight, const int calcWidth,
     const bool isBankConflict)
@@ -505,8 +517,7 @@ __aicore__ inline void NDTrans2NZForFP16(
 }
 
 template <typename SrcT, typename TransT>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void NDTrans2NZ(
     LocalTensor<TransT>& dst, LocalTensor<TransT>& src, const int calcHeight, const int calcWidth,
     const bool isBankConflict)

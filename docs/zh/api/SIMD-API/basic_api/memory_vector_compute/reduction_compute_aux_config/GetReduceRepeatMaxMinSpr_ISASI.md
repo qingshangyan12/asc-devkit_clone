@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR&950DT系列产品：不支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI_res.md#id1 -->
 
@@ -38,11 +38,11 @@
 - 获取调用[ReduceRepeat<MAX/MIN>](../reduction_compute/ReduceRepeat.md)时所有repeat内的最值及其索引，或获取调用[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)得到的最值（此时获取的索引不准确）。该函数原型仅支持如下型号：
 
     <!-- npu="A3" id9 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    - Atlas A3系列产品
     <!-- end id9 -->
 
     <!-- npu="910b" id10 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    - Atlas A2系列产品
     <!-- end id10 -->
 
     ```cpp
@@ -54,7 +54,7 @@
 
 <!-- npu="310p" id11 -->
 
-- 获取调用[ReduceRepeat<MAX/MIN>](../reduction_compute/ReduceRepeat.md)时所有repeat内的最值，或获取调用[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)得到的最值。该函数原型仅支持Atlas 推理系列产品AI Core。
+- 获取调用[ReduceRepeat<MAX/MIN>](../reduction_compute/ReduceRepeat.md)时所有repeat内的最值，或获取调用[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)得到的最值。该函数原型仅支持Atlas推理系列产品AI Core。
 
     ```cpp
     template <typename T>
@@ -81,6 +81,7 @@
 ## 数据类型
 
 操作数支持的数据类型为：`half`、`float`。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI_res.md#id2 -->
 
 ## 返回值说明
 
@@ -93,6 +94,7 @@
 - 用于[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)场景时，仅可获取准确最值，不能获取对应的准确索引；如需准确索引，以[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)自身输出为准。
 - 索引`maxMinIndex`按操作数数据类型存储，比如操作数使用`half`类型时，`maxMinIndex`是按照`half`类型进行存储的，如果按照`half`格式进行读取，`maxMinIndex`的值是不对的，因此`maxMinIndex`的读取需要使用`reinterpret_cast`方法转换到整数类型，若输入数据类型是`half`，需要使用`reinterpret_cast<uint16_t*>`，若输入是`float`，需要使用`reinterpret_cast<uint32_t*>`。
 - 操作数数据类型T，需要与所使用的归约接口目的操作数数据类型一致，否则会导致精度错误。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI_res.md#id3 -->
 
 ## 调用示例
 
@@ -104,10 +106,10 @@
 
     - 针对如下型号：
       <!-- npu="A3" id13 -->
-      - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+      - Atlas A3系列产品
       <!-- end id13 -->
       <!-- npu="910b" id14 -->
-      - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+      - Atlas A2系列产品
       <!-- end id14 -->
 
       ```cpp
@@ -124,7 +126,7 @@
 
     <!-- npu="310p" id15 -->
 
-    - 针对Atlas 推理系列产品AI Core：
+    - 针对Atlas推理系列产品AI Core：
 
         ```cpp
         AscendC::LocalTensor<float> src;
@@ -143,10 +145,10 @@
 
     - 针对如下型号，`GetReduceRepeatMaxMinSpr`仅用于获取最大值，不能用于获取`ReduceMax`对应的准确索引。
       <!-- npu="A3" id17 -->
-      - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+      - Atlas A3系列产品
       <!-- end id17 -->
       <!-- npu="910b" id18 -->
-      - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+      - Atlas A2系列产品
       <!-- end id18 -->
 
       ```cpp
@@ -164,7 +166,7 @@
 
     <!-- npu="310p" id19 -->
 
-    - 针对Atlas 推理系列产品AI Core版本，可在调用`ReduceMax`后直接调用`GetReduceRepeatMaxMinSpr`指令获取最大值。
+    - 针对Atlas推理系列产品AI Core版本，可在调用`ReduceMax`后直接调用`GetReduceRepeatMaxMinSpr`指令获取最大值。
 
         ```cpp
         AscendC::LocalTensor<float> src;

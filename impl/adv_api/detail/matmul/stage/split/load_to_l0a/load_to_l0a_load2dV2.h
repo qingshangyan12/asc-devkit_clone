@@ -46,7 +46,7 @@ public:
     __aicore__ inline ~LoadToL0A(){};
 
     __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M) const {};
-    __aicore__ inline void SetScalar(A_T scalar){};
+    __aicore__ inline void SetScalar(A_T scalar) {};
 
     __aicore__ inline void Load(
         const LocalTensor<L0A_T>& dst, const LocalTensor<A_T>& aMatrix, uint16_t aL1M, uint16_t aL1K, uint16_t madM,
@@ -159,7 +159,7 @@ private:
         uint16_t aL1MOffset, uint16_t aL1KOffset, const LocalTensor<AuxDtype>& l1AAuxMatrix, uint16_t aAuxL1K,
         uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -187,6 +187,14 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
+#if __NPU_ARCH__ == 9201
+        else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
+            loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
+            loadDataMxParams.yStep = kStep * FP4_TWO;
+            loadDataMxParams.srcStride = aAuxL1K * FP4_TWO;
+            loadDataMxParams.dstStride = CeilDiv(madK, c0Size_) * FP4_TWO;
+        }
+#endif
         LoadData(dst, aMatrix, l1AAuxMatrix, loadDataParams, loadDataMxParams);
 #endif
     }
@@ -196,7 +204,7 @@ private:
         uint16_t aL1MOffset, uint16_t aL1KOffset, const LocalTensor<AuxDtype>& l1AAuxMatrix, uint16_t aAuxL1K,
         uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -223,6 +231,14 @@ private:
             loadDataMxParams.srcStride = CeilDiv(aAuxL1K, FP8_TWO);
             loadDataMxParams.dstStride = CeilDiv(madK, c0Size_ * FP8_TWO);
         }
+#if __NPU_ARCH__ == 9201
+        else if constexpr (SupportType<A_T, hifloat4x2_t>()) { // scale dtype is b32, need to load with b16
+            loadDataMxParams.yStartPosition = aAuxL1KOffset * FP4_TWO;
+            loadDataMxParams.yStep = kStep * FP4_TWO;
+            loadDataMxParams.srcStride = aAuxL1K * FP4_TWO;
+            loadDataMxParams.dstStride = CeilDiv(madK, c0Size_) * FP4_TWO;
+        }
+#endif
         LoadData(dst, aMatrix, l1AAuxMatrix, loadDataParams, loadDataMxParams);
 #endif
     }

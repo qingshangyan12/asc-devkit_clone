@@ -28,7 +28,8 @@ HcclResult SendRecvWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& t
 
 HcclResult SendRecvBatchWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread);
 
-HcclResult SendRecvBatchWriteReduce(const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread);
+HcclResult SendRecvBatchWriteReduce(
+    const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread, bool fusePostNotify = false);
 
 HcclResult SendWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread);
 
@@ -76,6 +77,9 @@ HcclResult PreSyncInterThreads(
 HcclResult PostSyncInterThreads(
     const ThreadHandle& mainThread, const std::vector<ThreadHandle>& subThreads,
     const std::vector<u32>& notifyIdxSubToMain);
+
+float Fp16ToFp32(uint16_t fp16Bits);
+uint16_t Fp32ToFp16(float value);
 
 HcclResult AicpuReduce(
     const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice, const HcclDataType dataType,

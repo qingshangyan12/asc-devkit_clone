@@ -6,25 +6,25 @@
 
 已知注意力的正向计算公式为：
 
-![](../../figures/zh-cn_formulaimage_0000001943999269.png)
+![](../../figures/formulaimage_0000001943999269.png)
 
 为方便表达，以变量S和P表示计算公式：
 
-![](../../figures/zh-cn_formulaimage_0000001910040302.png)
+![](../../figures/formulaimage_0000001910040302.png)
 
-![](../../figures/zh-cn_formulaimage_0000001943999757.png)
+![](../../figures/formulaimage_0000001943999757.png)
 
-![](../../figures/zh-cn_formulaimage_0000001943999845.png)
+![](../../figures/formulaimage_0000001943999845.png)
 
 则注意力的反向计算公式为：
 
-![](../../figures/zh-cn_formulaimage_0000001910041146.png)
+![](../../figures/formulaimage_0000001910041146.png)
 
-![](../../figures/zh-cn_formulaimage_0000001910082134.png)
+![](../../figures/formulaimage_0000001910082134.png)
 
-![](../../figures/zh-cn_formulaimage_0000001910042246.png)
+![](../../figures/formulaimage_0000001910042246.png)
 
-![](../../figures/zh-cn_formulaimage_0000001910044466.png)
+![](../../figures/formulaimage_0000001910044466.png)
 
 计算流程图如下：
 
@@ -33,31 +33,31 @@
 
 按照FlashAttention反向计算流程的实现，简介整体计算流程如下。对本算子的算法感兴趣的用户可简单了解，无需重点关注。
 
-1.  重计算p，本步骤重计算了FlashAttention流程中的softmax结果p，计算结果保存在ub中。
+1.  重计算p，本步骤重计算了FlashAttention流程中的softmax结果p，计算结果保存在Unified Buffer（UB）中。
 
-    ![](../../figures/zh-cn_formulaimage_0000002098517589.png)
+    ![](../../figures/formulaimage_0000002098517589.png)
 
 2.  计算dp，该计算包含matmul计算和dropout计算，matmul计算中，左矩阵为dy，右矩阵为转置后的value。
 
-    ![](../../figures/zh-cn_formulaimage_0000002062439026.png)
+    ![](../../figures/formulaimage_0000002062439026.png)
 
 3.  计算ds，本计算中，FlashSoftmaxGrad计算的入参为dy、正向输出attention\_in，该结果与dp做减操作，最终的结果与p相乘得到结果ds。
 
-    ![](../../figures/zh-cn_formulaimage_0000002098517777.png)
+    ![](../../figures/formulaimage_0000002098517777.png)
 
 4.  计算dq，本计算将ds结果与key做matmul计算，并将结果与scale相乘得到结果dq。
 
-    ![](../../figures/zh-cn_formulaimage_0000002062439086.png)
+    ![](../../figures/formulaimage_0000002062439086.png)
 
 5.  计算dk，本计算将转置后的ds结果与query做matmul计算，并将结果与scale相乘得到结果dk。
 
-    ![](../../figures/zh-cn_formulaimage_0000002098517781.png)
+    ![](../../figures/formulaimage_0000002098517781.png)
 
 6.  计算dv，本计算将p的结果做drop计算，转置后与dy做matmul计算。
 
-    ![](../../figures/zh-cn_formulaimage_0000002062439090.png)
+    ![](../../figures/formulaimage_0000002062439090.png)
 
-本案例的验证平台为Atlas A2 训练系列产品/Atlas A2 推理系列产品，以两个场景为例，第一个场景的输入维度信息为：B=1，N1=12，N2=12，S1=6144，S2=6144，D=128，causal场景，即atten\_mask的形状为下三角，如[图2](#fig9977418514)。第二个场景的输入维度信息为：B=24，N1=5，N2=5，S1=9216，S2=9216，D=64，不带atten\_mask和drop\_mask输入。主要涉及的优化手段包括tiling基本块大小调整，核间负载均衡，CV流水并行，MTE2流水优化以及FixPipe流水优化等优化手段。
+本案例的验证平台为Atlas A2系列产品，以两个场景为例，第一个场景的输入维度信息为：B=1，N1=12，N2=12，S1=6144，S2=6144，D=128，causal场景，即atten\_mask的形状为下三角，如[图2](#fig9977418514)。第二个场景的输入维度信息为：B=24，N1=5，N2=5，S1=9216，S2=9216，D=64，不带atten\_mask和drop\_mask输入。主要涉及的优化手段包括tiling基本块大小调整，核间负载均衡，CV流水并行，MTE2流水优化以及FixPipe流水优化等优化手段。
 
 **图2**  causal场景atten\_mask形状<a name="fig9977418514"></a>  
 ![](../../figures/causal_mask.png "causal场景atten_mask形状")
@@ -70,7 +70,7 @@
 
 通过观察分析流水图和Profiling数据，结合优化经验来判断性能瓶颈点。在优化过程中不同阶段可能会出现不同的瓶颈点，需要不断优化以达到最佳性能。
 
--   根据优化经验，循环间会存在一些不必要的性能开销，循环越多性能可能越差；满足Unified Buffer（UB）最大空间限制的情况下，UB切分的基本块越大，循环越少。算子中通过InitBuffer接口分配UB buffer大小。
+-   根据优化经验，循环间会存在一些不必要的性能开销，循环越多性能可能越差；满足UB最大空间限制的情况下，UB切分的基本块越大，循环越少。算子中通过InitBuffer接口分配UB buffer大小。
 
     ```
     pipe->InitBuffer(ubBuffer, 120 * 1024);  

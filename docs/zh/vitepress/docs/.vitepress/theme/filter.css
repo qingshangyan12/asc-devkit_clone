@@ -73,45 +73,6 @@
   overflow-x: auto;
 }
 
-.vp-doc table {
-  display: table;
-  width: auto;
-  max-width: 100%;
-}
-
-.vp-doc .vp-table-scroll {
-  width: 100%;
-  max-width: 100%;
-  margin: 16px 0;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-}
-
-.vp-doc .vp-table-scroll > table {
-  margin: 0;
-}
-
-.vp-doc table.vp-table-mixed-layout {
-  width: 100%;
-  table-layout: fixed;
-}
-
-.vp-doc table.vp-table-mixed-layout col.vp-table-compact-column {
-  width: var(--vp-table-column-width);
-}
-
-.vp-doc table .vp-table-compact-cell,
-.vp-doc table .vp-table-nowrap {
-  white-space: nowrap;
-  word-break: keep-all;
-  overflow-wrap: normal;
-}
-
-.vp-doc table.vp-table-mixed-layout td:not(.vp-table-compact-cell) pre {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
 .vp-doc table th[width],
 .vp-doc table td[width] {
   width: auto;
@@ -149,6 +110,42 @@
 }
 .VPSidebarItem:not(.level-0).is-active > .item .link > .text {
   color: var(--vp-c-brand-1);
+}
+
+/* Keep linked group titles navigable while the remaining row toggles children. */
+.VPSidebarItem.collapsible.is-link > .item > .link {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.VPSidebarItem.collapsible.is-link > .item > .link > .text {
+  flex-grow: 0;
+}
+
+.VPSidebarItem.collapsible.is-link > .item > .sidebar-row-toggle {
+  align-self: stretch;
+  flex: 1 1 24px;
+  min-width: 12px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.VPSidebarItem.collapsible.is-link > .item > .sidebar-row-toggle:hover {
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 56%, transparent);
+}
+
+.VPSidebarItem.collapsible.is-link.is-active > .item {
+  border-radius: 6px;
+  background: var(--vp-c-brand-soft);
+}
+
+.VPSidebarItem.collapsible.is-link.is-active > .item > .link {
+  background: transparent;
 }
 
 .home-layout .VPFeatures .items {

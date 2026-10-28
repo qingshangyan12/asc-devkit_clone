@@ -4,13 +4,13 @@
 
 This example shows how to use the Ascend C C API to move input data from GM (Global Memory) to L1 Buffer. It supports Nz, ND, and DN input formats and vector-quantization parameter movement. After the input is moved, the example moves data from L1 Buffer to L0A Buffer and L0B Buffer, performs matrix multiplication, and uses Fixpipe to move the L0C Buffer result to GM (Global Memory).
 
-This example applies to Ascend 950PR/Ascend 950DT (`dav-3510`) and can run in NPU execution or NPU simulation mode. CPU debug mode is not provided.
+This example applies to Ascend 950PR&950DT products (`dav-3510`) and can run in NPU execution or NPU simulation mode. CPU debug mode is not provided.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -64,7 +64,7 @@ All device-side movement and compute use asynchronous Ascend C C API calls. `asc
   <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>
 
-**Scenario 3: DN input, half input type (Ascend 950PR/Ascend 950DT only)**
+**Scenario 3: DN input, half input type (Ascend 950PR&950DT products only)**
 
 - Input: A [128, 128] in `half` DN format; B [128, 256] in `half` DN format
 - Output: C [128, 256] in `float` ND format
@@ -78,8 +78,8 @@ All device-side movement and compute use asynchronous Ascend C C API calls. `asc
 
 - Input: A [128, 128] in `half` ND format; B [128, 256] in `half` ND format; quantization parameters [256] in `uint64_t`
 - Output: C [128, 256] in `int8_t` ND format
-- Implementation: Configure ND2NZ parameters with `asc_set_gm2l1_nz_para`, then use `asc_copy_gm2l1_nd2nz` to move input data from GM to L1 and perform matrix multiplications; use `asc_copy_gm2l1` and `asc_copy_l12fb` to move quantization parameters from GM through L1 to Fixpipe Buffer; configure their address with `asc_set_l0c2gm_config`, then use `asc_copy_l0c2gm` with `VQF322B8_PRE` for vector-quantized output
-- Description: The `float` matrix multiplication result is vector-quantized to `int8_t`; each C matrix column uses one quantization parameter. `asc_set_l0c2gm_config` configures the Fixpipe vector-quantization parameter address through `quant_pre`, which uses 128B address units. The parameter file must therefore be rounded up to 128B, with any padding zero-filled. In this example, the `[256] uint64_t` parameters occupy 2048B and already meet this requirement. Moving these parameters from L1 to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32.
+- Implementation: Configure ND2NZ parameters with `asc_set_gm2l1_nz_para`, then use `asc_copy_gm2l1_nd2nz` to move input data from GM to L1 and perform matrix multiplications; use `asc_copy_gm2l1` and `asc_copy_l12fb` to move quantization parameters from GM through L1 to Fixpipe Buffer; configure their address with `asc_set_l0c_copy_config`, then use `asc_copy_l0c2gm` with `VQF322B8_PRE` for vector-quantized output
+- Description: The `float` matrix multiplication result is vector-quantized to `int8_t`; each C matrix column uses one quantization parameter. `asc_set_l0c_copy_config` configures the Fixpipe vector-quantization parameter address through `quant_pre_addr`, which uses 128B address units. The parameter file must therefore be rounded up to 128B, with any padding zero-filled. In this example, the `[256] uint64_t` parameters occupy 2048B and already meet this requirement. Moving these parameters from L1 to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32.
 
 ## Build and Run
 
@@ -125,7 +125,7 @@ Run the following steps in the example root directory to build and execute the e
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | 1-4 | Scenario number |
 
 - Expected result

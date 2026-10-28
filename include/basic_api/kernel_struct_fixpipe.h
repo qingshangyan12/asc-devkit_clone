@@ -35,7 +35,7 @@
 #endif
 
 #if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
-    (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
 #define CANN_ASC_ENABLE_FIX_SHIFT
 #endif
 
@@ -48,50 +48,55 @@ enum class CO2Layout : uint8_t {
 
 struct FixpipeConfig {
     CO2Layout format;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     bool isToUB;
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     bool enableFixVal = false;
 #endif
 
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
           ,
           isToUB(false)
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
           ,
           enableFixVal(false)
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
           ,
           isToUB(isToUB_)
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
           ,
           enableFixVal(false)
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_, bool enableFixVal_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
           ,
           isToUB(isToUB_)
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
           ,
           enableFixVal(enableFixVal_)
 #endif
     {}
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#if (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 constexpr FixpipeConfig CFG_NZ_FIX = {CO2Layout::NZ, false, true};
 #endif
 constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ, false};
@@ -163,6 +168,36 @@ struct FixpipeParamsV220 {
     bool reluEn = false;
     uint8_t unitFlag = 0;
     bool isChannelSplit = false;
+};
+
+struct FixpipeParamsV516 {
+    __aicore__ FixpipeParamsV516() {}
+
+    __aicore__ FixpipeParamsV516(
+        const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn, const uint32_t dstStrideIn)
+        : nSize(nSizeIn), mSize(mSizeIn), srcStride(srcStrideIn), dstStride(dstStrideIn)
+    {}
+
+    __aicore__ FixpipeParamsV516(
+        const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn, const uint32_t dstStrideIn,
+        const uint16_t ndNumIn, const uint16_t srcNdStrideIn, const uint16_t dstNdStrideIn)
+        : nSize(nSizeIn),
+          mSize(mSizeIn),
+          srcStride(srcStrideIn),
+          dstStride(dstStrideIn),
+          ndNum(ndNumIn),
+          srcNdStride(srcNdStrideIn),
+          dstNdStride(dstNdStrideIn)
+    {}
+
+    uint16_t nSize = 0;
+    uint16_t mSize = 0;
+    uint16_t srcStride = 0;
+    uint32_t dstStride = 0;
+    // Params: used for nz2nd
+    uint16_t ndNum = 1;
+    uint16_t srcNdStride = 0;
+    uint16_t dstNdStride = 0;
 };
 
 // 根据模板参数选结构体

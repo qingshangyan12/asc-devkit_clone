@@ -22,7 +22,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 ```
@@ -67,7 +67,7 @@
 - 参数说明：
   - layoutMode = RegLayout::ZERO: Cast接口将数据写入yReg索引2\*N+0的位置，用于配合StoreAlign接口搬出yReg的2\*N位置的数据
   - satMode = SatMode::SAT：本场景介绍浮点数转整数的饱和模式，输入数据超过输出数据类型最值时，结果为输出类型的对应最值。例如输入float值为32768.0，对应整数32768，则取int16_t的最大值，输出int16_t值为32767
-  - roundMode = RoundMode::CAST_ROUND：本场景介绍round（四舍五入取整）舍入模式。例如输入half值为2.5，则输出int32值为3
+  - roundMode = RoundMode::CAST_ROUND：向最近的整数舍入；当输入值恰好位于两个整数的中间时，向远离零的方向舍入。例如输入float值为2.5和-2.5时，分别输出int16_t值3和-3
   - mask：Cast接口中，mask会按照入输入和输出中，位宽较大的数据类型来筛选，所以本场景按照float数据类型生成MaskReg
 - 样例规格：
   <table>
@@ -122,7 +122,7 @@
   |------|--------|------|
   | `SCENARIO_NUM` | 1、2 | 样例执行场景：场景1：数据类型位宽小转大、场景2：数据类型位宽大转小 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR&950DT系列产品 |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

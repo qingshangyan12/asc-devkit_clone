@@ -3,40 +3,48 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-提供数据搬运功能，将数据从Unified Buffer (UB)搬运到L1 Buffer。
+头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
+
+提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。
 
 本接口支持以下两种数据搬运方式：
 
 - 连续数据搬运
 
-    将一段连续数据从UB搬运到L1 Buffer。
+    将一段连续数据从UB搬运到L1 Buffer，如图1所示。
+
+    **图1**  连续搬运示意图
+    ![](../figures/asc_copy_ub2l1_continuous.png "连续搬运示意图")
 
 - 高维切分数据搬运
 
-    将多个连续传输数据块从UB搬运到L1 Buffer。每个数据块的长度以及相邻数据块之间的间隔均以DataBlock（32字节）为单位指定。
+    将多个连续传输数据块从UB搬运到L1 Buffer。每个数据块的长度以及相邻数据块之间的间隔均以DataBlock（32字节）为单位指定，如图2所示。
+
+    **图2**  高维切分搬运示意图
+    ![](../figures/asc_copy_ub2l1_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 
@@ -69,9 +77,9 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的L1 Buffer的起始地址。 |
-| src | 输入 | 源UB的起始地址。 |
-| size | 输入 | 搬运数据大小，单位为字节。 |
+| dst | 输出 | 目的L1 Buffer的起始地址。需要32字节对齐。 |
+| src | 输入 | 源UB的起始地址。需要32字节对齐。 |
+| size | 输入 | 搬运数据大小，单位为字节。取值范围：[32, 4095×32]，且需为32的整数倍。 |
 
 ### 高维切分数据搬运
 
@@ -79,12 +87,12 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的L1 Buffer的起始地址。 |
-| src | 输入 | 源UB的起始地址。 |
+| dst | 输出 | 目的L1 Buffer的起始地址。需要32字节对齐。 |
+| src | 输入 | 源UB的起始地址。需要32字节对齐。 |
 | burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
-| burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
-| src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔），单位为DataBlock（32字节）。 |
-| dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔），单位为DataBlock（32字节）。 |
+| burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, $2^{16}−1$]。 |
+| src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔），单位为DataBlock（32字节）。取值范围：[0, $2^{16}−1$]。 |
+| dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔），单位为DataBlock（32字节）。取值范围：[0, $2^{16}−1$]。 |
 
 ## 返回值说明
 
@@ -99,15 +107,20 @@ PIPE_MTE3
 ### 通用约束
 
 - 本接口在非AIV上调用直接返回。
+- 本接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为1：2的配置。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
+
+### 连续搬运模式约束
+
+- `size`需为32的整数倍，否则`size/32`截断后实际搬运字节数不足，多出非整32字节部分被丢弃。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -157,16 +170,15 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
         asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
         asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
         asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-        asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, false, false, true);
+        asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, asc_unit_flag_mode::DISABLE, false, false, true);
         asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_set_l0c_copy_nz_para(1, 0, 0);
-        asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
-            static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+        asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
+            asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
         asc_sync_pipe(PIPE_FIX);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* name, const std::vector<float>& data)

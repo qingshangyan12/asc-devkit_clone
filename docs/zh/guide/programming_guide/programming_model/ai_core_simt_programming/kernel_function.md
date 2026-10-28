@@ -20,7 +20,7 @@ __global__ void vec_add(float* x, float* y, float* z)
 
 -   使用函数类型限定符\_\_global\_\_，标识它是一个核函数（Kernel）。
 -   核函数（Kernel）必须具有void返回类型。
--   核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/syntax_restrictions/functions.md#section_kernel_function_argument_list_constraint)。
+-   核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/cpp_language_restrictions/general_restrictions.md#section_kernel_func_param_restriction)。
 
 ## 核函数（Kernel）的调用<a name="section33493239410"></a>
 
@@ -105,4 +105,5 @@ int main()
     return 0;
 }
 ```
+
 在本示例中，目标处理元素总数为1000个。按单块256线程的策略划分，Host侧实际向硬件下发了4个线程块，总计启动了$4 \times 256 = 1024$个物理线程。当程序运行至最后一个线程块即blockIdx.x为3时，该块内末尾的24个线程（从索引1000到1023）推导出的global_index将落在[1000, 1023]区间。此时，通过if (global_index < vector_length)这道边界拦截，这部分超出有效数据范围的“多余”线程将直接结束任务并安全退出。该机制在保证计算结果完备性的同时，有效规避了内存越界访问的风险。

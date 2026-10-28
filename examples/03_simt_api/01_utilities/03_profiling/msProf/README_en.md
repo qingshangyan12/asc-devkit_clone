@@ -4,12 +4,11 @@
 
 This example is based on the Gather operator and demonstrates how to collect on-board performance data using msOpProf. Users can quickly locate software and hardware performance bottlenecks of operators based on the output performance data, improving the efficiency of operator performance analysis.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -82,7 +81,7 @@ Run the following steps in the root directory of this example to build and execu
 
   | Option | Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products) |
 
   The following output indicates that the accuracy verification is successful.
   ```

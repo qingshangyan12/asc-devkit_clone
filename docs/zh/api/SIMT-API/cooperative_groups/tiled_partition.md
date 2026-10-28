@@ -3,27 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/tiled_partition_res.md#id1 -->
 
 ## 功能说明
+
+头文件路径为：`"simt_api/cooperative_groups.h"`。
 
 `tiled_partition` API用于将一个线程组划分为多个更小、固定大小的子组，以便线程在以更精细的粒度上进行协作。提供模板和非模板两个版本的接口，分别用于编译时确定划分大小以及运行时确定划分大小的场景。模板版本支持创建跨Warp的`thread_block_tile`。
 
@@ -59,7 +61,7 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| parent | 输入 | 被划分的父组，类型只能是`thread_block`或`coalesced_group`。 |
+| parent | 输入 | 被划分的父组，类型支持`thread_group`、`thread_block`、`coalesced_group`。 |
 | tilesz | 输入 | 指定划分出的子组大小。 |
 
 ## 返回值说明
@@ -78,10 +80,11 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         // 无需使用跨warp的thread_block_tile
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
@@ -90,17 +93,17 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         __ubuf__ block_tile_memory<1024> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);
-        ...
     }
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         // 无需使用跨warp的thread_block_tile
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
@@ -109,6 +112,5 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         __ubuf__ block_tile_memory<1024> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);
-        ...
     }
     ```

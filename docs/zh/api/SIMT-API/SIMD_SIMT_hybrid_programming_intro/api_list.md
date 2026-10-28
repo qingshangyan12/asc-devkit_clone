@@ -269,7 +269,7 @@
 | [__low2half2](../math_functions/half_type/half_precision_conversion_functions/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
 | [__low2float](../math_functions/half_type/half_precision_conversion_functions/__low2float.md) | 将输入数据的低16位转换为浮点数并返回结果。 |
 | [__lowhigh2highlow](../math_functions/half_type/half_precision_conversion_functions/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
-| [__high2half](../math_functions/half_type/half_precision_conversion_functions/__high2half.md) | 提取输入half2的高16位，并返回 |
+| [__high2half](../math_functions/half_type/half_precision_conversion_functions/__high2half.md) | 提取输入half2的高16位，并返回。 |
 | [__high2half2](../math_functions/half_type/half_precision_conversion_functions/__high2half2.md) | 将输入数据的高16位填充到half2并返回结果。 |
 | [__high2float](../math_functions/half_type/half_precision_conversion_functions/__high2float.md) | 将输入数据的高16位转换为float类型并返回结果。 |
 | [__highs2half2](../math_functions/half_type/half_precision_conversion_functions/__highs2half2.md) | 分别提取两个half2输入的高16位，并填充到half2中。返回填充后的数据。 |
@@ -671,7 +671,7 @@
 | [cyl_bessel_i0f](../math_functions/float_math_functions/cyl_bessel_i0f.md) | 获取输入数据x的0阶常规修正圆柱贝塞尔函数的值。 |
 | [cyl_bessel_i1f](../math_functions/float_math_functions/cyl_bessel_i1f.md) | 获取输入数据x的1阶常规修正圆柱贝塞尔函数的值。 |
 | [normcdff](../math_functions/float_math_functions/normcdff.md) | 获取输入数据x的标准正态分布的累积分布函数值。 |
-| [normcdfinvf](../math_functions/float_math_functions/normcdfinvf.md) | 获取输入数据x的标准正态累积分布的逆函数 |
+| [normcdfinvf](../math_functions/float_math_functions/normcdfinvf.md) | 获取输入数据x的标准正态累积分布的逆函数。 |
 | [j0f](../math_functions/float_math_functions/j0f.md) | 获取输入数据x的0阶第一类贝塞尔函数j0的值。 |
 | [j1f](../math_functions/float_math_functions/j1f.md) | 获取输入数据x的1阶第一类贝塞尔函数j1的值。 |
 | [jnf](../math_functions/float_math_functions/jnf.md) | 获取输入数据x的n阶第一类贝塞尔函数jn的值。 |
@@ -783,14 +783,16 @@
 | [__umulhi](../math_functions/integer_math_functions/__umulhi.md) | 获取输入uint32类型数据x和y乘积的高32位。 |
 | [__mul64hi](../math_functions/integer_math_functions/__mul64hi.md) | 获取输入int64类型数据x和y乘积的高64位。 |
 | [__umul64hi](../math_functions/integer_math_functions/__umul64hi.md) | 获取输入uint64类型数据x和y乘积的高64位。 |
+| [asc_uintdiv](../math_functions/integer_math_functions/asc_uintdiv.md) | 使用magic和shift参数执行快速无符号除法。 |
+| [asc_get_uintdiv_magic_and_shift](../math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) | 根据无符号除数计算快速除法所需的magic和shift参数。 |
 | [__mul_i32toi64](../math_functions/integer_math_functions/__mul_i32toi64.md) | 计算输入32位整数x和y的乘积，返回64位结果。 |
 | [__brev](../math_functions/integer_math_functions/__brev.md) | 将输入数据的位序反转，返回反转后的值。 |
 | [__clz](../math_functions/integer_math_functions/__clz.md) | 从输入数据的二进制最高有效位开始，返回连续的前导零的位数。 |
 | [__ffs](../math_functions/integer_math_functions/__ffs.md) | 从二进制输入数据的最低位开始，查找第一个值为1的比特位的位置，并返回该位置的索引，索引从1开始计数；如果二进制数据中没有1，则返回0。 |
 | [__popc](../math_functions/integer_math_functions/__popc.md) | 统计输入数据从二进制的高位到低位比特位为1的数量。 |
 | [__byte_perm](../math_functions/integer_math_functions/__byte_perm.md) | 由输入的两个4字节的uint32_t类型数据组成一个8个字节的64比特位的整数，通过选择器s指定选取其中的4个字节，将这4个字节从低位到高位拼成一个uint32_t类型的整数。 |
-| [__sad](../math_functions/integer_math_functions/__sad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
-| [__usad](../math_functions/integer_math_functions/__usad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
+| [__sad](../math_functions/integer_math_functions/__sad.md) | 对输入数据x、y、z，计算\|x - y\|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
+| [__usad](../math_functions/integer_math_functions/__usad.md) | 对输入数据x、y、z，计算\|x - y\|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
 | [__mul24](../math_functions/integer_math_functions/__mul24.md) | 获取输入int32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__umul24](../math_functions/integer_math_functions/__umul24.md) | 获取输入uint32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__hadd](../math_functions/integer_math_functions/__hadd.md) | 获取输入int32类型数据x和y的平均值，避免中间求和溢出。 |
@@ -816,7 +818,18 @@
 
 ## 协作组<a name="section_cooperative_groups"></a>
 
-**表27**  thread_block接口
+**表27**  thread_group接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [tiled_partition](../cooperative_groups/thread_group/thread_group_constructor.md) | 获取类型擦除后的thread_group子组对象。 |
+| [sync](../cooperative_groups/thread_group/sync.md) | 同步thread_group组内所有线程。 |
+| [size](../cooperative_groups/thread_group/size.md) | 获取thread_group组内线程总数。 |
+| [num_threads](../cooperative_groups/thread_group/num_threads.md) | 获取thread_group组内线程总数。 |
+| [thread_rank](../cooperative_groups/thread_group/thread_rank.md) | 获取当前线程在thread_group组内的排名。 |
+| [get_type](../cooperative_groups/thread_group/get_type.md) | 获取thread_group对象表示的协作组类型。 |
+
+**表28**  thread_block接口
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -829,24 +842,6 @@
 | [group_index](../cooperative_groups/thread_block/group_index.md) | 获取当前线程块在网格中的三维索引。 |
 | [group_dim](../cooperative_groups/thread_block/group_dim.md) | 获取线程块的维度。 |
 | [dim_threads](../cooperative_groups/thread_block/dim_threads.md) | 获取线程块内线程的三维维度。 |
-
-**表28**  coalesced_group接口
-
-| 接口名 | 功能描述 |
-| --- | --- |
-| [coalesced_threads](../cooperative_groups/coalesced_group/coalesced_group_constructor.md) | 获取当前活跃线程组成的协作组对象。 |
-| [sync](../cooperative_groups/coalesced_group/sync.md) | 同步组内所有线程。 |
-| [size](../cooperative_groups/coalesced_group/size.md) | 获取组内线程总数。 |
-| [num_threads](../cooperative_groups/coalesced_group/num_threads.md) | 获取组内线程总数。 |
-| [thread_rank](../cooperative_groups/coalesced_group/thread_rank.md) | 获取当前线程在组内的排名。 |
-| [meta_group_rank](../cooperative_groups/coalesced_group/meta_group_rank.md) | 获取当前协作组在父组的排名。 |
-| [meta_group_size](../cooperative_groups/coalesced_group/meta_group_size.md) | 获取父组被划分时创建的子组数量。 |
-| [shfl](../cooperative_groups/coalesced_group/shfl.md) | 组内线程的数据交换，直接读取组内指定线程的数据。 |
-| [shfl_up](../cooperative_groups/coalesced_group/shfl_up.md) | 获取组内当前线程向前偏移delta的线程的数据。 |
-| [shfl_down](../cooperative_groups/coalesced_group/shfl_down.md) | 获取组内当前线程向后偏移delta的线程的数据。 |
-| [ballot](../cooperative_groups/coalesced_group/ballot.md) | 判断组内每个活跃线程的输入是否非零。 |
-| [any](../cooperative_groups/coalesced_group/any.md) | 判断是否有组内线程的输入不为0。 |
-| [all](../cooperative_groups/coalesced_group/all.md) | 判断是否所有组内线程的输入均不为0。 |
 
 **表29**  thread_block_tile接口
 
@@ -867,7 +862,25 @@
 | [any](../cooperative_groups/thread_block_tile/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../cooperative_groups/thread_block_tile/all.md) | 判断是否所有组内线程的输入均不为0。 |
 
-**表30**  协作组通用与划分接口
+**表30**  coalesced_group接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [coalesced_threads](../cooperative_groups/coalesced_group/coalesced_group_constructor.md) | 获取当前活跃线程组成的协作组对象。 |
+| [sync](../cooperative_groups/coalesced_group/sync.md) | 同步组内所有线程。 |
+| [size](../cooperative_groups/coalesced_group/size.md) | 获取组内线程总数。 |
+| [num_threads](../cooperative_groups/coalesced_group/num_threads.md) | 获取组内线程总数。 |
+| [thread_rank](../cooperative_groups/coalesced_group/thread_rank.md) | 获取当前线程在组内的排名。 |
+| [meta_group_rank](../cooperative_groups/coalesced_group/meta_group_rank.md) | 获取当前协作组在父组的排名。 |
+| [meta_group_size](../cooperative_groups/coalesced_group/meta_group_size.md) | 获取父组被划分时创建的子组数量。 |
+| [shfl](../cooperative_groups/coalesced_group/shfl.md) | 组内线程的数据交换，直接读取组内指定线程的数据。 |
+| [shfl_up](../cooperative_groups/coalesced_group/shfl_up.md) | 获取组内当前线程向前偏移delta的线程的数据。 |
+| [shfl_down](../cooperative_groups/coalesced_group/shfl_down.md) | 获取组内当前线程向后偏移delta的线程的数据。 |
+| [ballot](../cooperative_groups/coalesced_group/ballot.md) | 判断组内每个活跃线程的输入是否非零。 |
+| [any](../cooperative_groups/coalesced_group/any.md) | 判断是否有组内线程的输入不为0。 |
+| [all](../cooperative_groups/coalesced_group/all.md) | 判断是否所有组内线程的输入均不为0。 |
+
+**表31**  协作组通用与划分接口
 
 | 接口名 | 功能描述 |
 | --- | --- |

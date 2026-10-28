@@ -4,13 +4,11 @@
 
 本样例以Gather算子为例，在不同数据量场景下，展示不同的线程块配置策略对算子性能的影响，并提供相应的优化指导。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -18,7 +16,9 @@
 ├── grid_dim_config
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
-│   └── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── grid_config.asc        // Ascend C算子实现 & 调用样例
+│   ├── README.md              // 样例说明文档
+│   └── README_en.md           // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -271,11 +271,21 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
   ./grid_config                                                                      # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                       | 可选值      | 说明                                                          |
   | -------------------------- | ----------- | ------------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT）    |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU架构：本样例仅支持dav-3510（Ascend 950PR&950DT系列产品）    |
   | `SCENARIO_NUM`             | `1`-`13`    | 样例类型，默认为1                                             |
 
   执行结果如下，说明精度对比成功。
@@ -284,7 +294,11 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+## 性能调试
+
+### msOpProf工具介绍
+
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 使用`msOpProf`工具获取详细性能数据：
 

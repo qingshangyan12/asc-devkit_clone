@@ -2,10 +2,10 @@
 
 ## 功能说明
 
-kernel侧TransData接口的计算需要开发者预留/申请临时空间，本接口用于在host侧获取预留/申请的最大和最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。
+核函数（Kernel）侧TransData接口的计算需要开发者预留/申请临时空间，本接口用于在host侧获取预留/申请的最大和最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到核函数（Kernel）侧使用。
 
 -   为保证功能正确，预留/申请的临时空间大小不能小于最小临时空间大小。
--   在最小临时空间-最大临时空间范围内，随着临时空间增大，kernel侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。该接口**最大临时空间当前等于最小临时空间**。
+-   在最小临时空间-最大临时空间范围内，随着临时空间增大，核函数（Kernel）侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。该接口**最大临时空间当前等于最小临时空间**。
 
 ## 函数原型
 
@@ -24,8 +24,8 @@ bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform
 | dstShape | 输入 | 输出目的操作数的shape大小，参数类型为[AscendC::TensorShape](../data_structures/TensorShape.md)，参数取值与TransData接口的params.dstLayout参数中的shape信息保持一致。 |
 | dataType | 输入 | 输入的数据类型，参数类型为[AscendC::TensorDataType](../data_structures/TensorDataType.md)，当前只支持half/float/uint16_t/int16_t数据类型的输入。 |
 | config | 输入 | 数据格式转换的场景，参数取值与TransData接口的config参数保持一致。当前支持的转换场景有：NCDHW -> NDC1HWC0、NDC1HWC0 -> NCDHW、NCDHW -> FRACTAL_Z_3D、FRACTAL_Z_3D -> NCDHW。TransDataConfig类型，具体定义如下方代码所示。 |
-| maxValue | 输出 | TransData接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。 <br>maxValue仅作为参考值，有可能大于UB剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
-| minValue | 输出 | TransData接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
+| maxValue | 输出 | TransData接口能完成计算所需的最大临时空间大小，单位为字节，超出该值的空间不会被该接口使用。 <br>maxValue仅作为参考值，有可能大于UB剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
+| minValue | 输出 | TransData接口能完成计算所需最小临时空间大小，单位为字节。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
 
 ```
 struct TransDataConfig {

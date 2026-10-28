@@ -30,7 +30,7 @@ On top of the underlying programming interface system, Ascend C further provides
 | **Operator Template Libraries (ATVC/ATVOSS/BLAZE, etc.)** | Algorithm developers | Provide high-performance template implementations of typical operators covering Vector, Cube and other computing paradigms, support template-based customized expansion, quickly adapt to high-performance computing requirements of business scenarios, and precipitate end-to-end performance optimization best practices |
 | **High-Level API** | Algorithm developers | Encapsulate general single-core computing algorithm primitives such as Softmax and Matmul, shield underlying hardware implementation details, enable developers to quickly build algorithm logic, efficiently complete function verification and scheme prototyping, and shorten the cycle from idea to runnable operator |
 
-In addition, the joint ecosystem is continuously building foundational components such as **asc-stl** (C++ standard library for kernel programming) and **asc-mathdx**(on-device linear algebra library) to continuously enrich the Ascend C operator programming ecosystem.
+In addition, the joint ecosystem is continuously building foundational components such as **asc-stl** (C++ standard library for programming kernel functions) and **asc-mathdx** (on-device linear algebra library) to continuously enrich the Ascend C operator programming ecosystem.
 
 ---
 
@@ -89,7 +89,6 @@ As a vectorized programming interface in the Ascend C language extension layer, 
 **Core Features**
 - **Native C Language Paradigm Compatibility**: Supports the standard C language operator development mode, natively supports array-style memory allocation and pointer-based computing primitives; all interfaces uniformly adopt the snake_case naming convention with the `asc_xxx` prefix, featuring clear semantics and high recognizability, which reduces developers' understanding and access costs.
 - **Systematic SIMD Vectorized Interfaces**: Provides a full-scenario matrix of continuous vector computing interfaces to meet the development needs of most conventional operators. Take the basic vector addition interface as an example: `asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)`, with intuitive interface definition and concise calling logic.
-- **Hierarchical Synchronization Mechanism Design**: Balances development efficiency and performance controllability by providing layered synchronization capabilities. For rapid development and function verification scenarios, it has a built-in simplified synchronization management mechanism, and is equipped with integrated computing interfaces with the `_sync` suffix (e.g., `asc_add_sync(...)`). Developers can quickly complete function implementation without explicitly managing synchronization timing.
 - **Advanced Data Layout Control Capability**: For ultimate performance tuning scenarios, it provides advanced computing interfaces with control parameters such as `repeat`/`stride`, supports flexible configuration of data access stride, repeated calculation modes and memory layout strategies, enabling developers to deeply customize computing logic and fully tap the upper limit of hardware computing power.
 
 **Applicable Scenarios**
@@ -97,7 +96,6 @@ As a vectorized programming interface in the Ascend C language extension layer, 
 - Production-grade high-performance operator development scenarios that require in-depth mining of hardware computing power and ultimate performance tuning.
 
 **Reference Examples**
-- [SIMD Add Operator Example (Synchronized Integrated Computing Interface)](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
 - For more examples, please refer to the [examples directory](../../examples)
 
 ---
@@ -113,7 +111,7 @@ C++-level low-level programming interface for in-depth development of high-perfo
 - **Layout as First-Class Citizen Design**: Incorporates data layout (Layout) into the native attribute system of Tensor. Through unified layout abstraction and algebraic operation capabilities, it automatically simplifies memory index derivation and layout transformation logic, significantly reduces development complexity in complex data layout scenarios, and improves code maintainability.
 - **Zero-Cost Compilation Abstraction**: All layers from arch to algorithm are lightweight compilation encapsulations; no virtual functions, no dynamic memory allocation, and the runtime performance is completely equivalent to handwritten C code.
 - **Three-Layer Decoupling with Separation of Concerns**: Hardware instructions (arch), atomic layer (atom), and algorithm layer (algorithm) evolve independently; for new architectures, only changes in the arch layer are required, and code in the atom and algorithm layers barely needs modification.
-- **Highly Composable Lego-Style Design**: Any atom can adapt to any algorithm, and any layout can be combined with any atom; kernels are built through modular building-block splicing, which greatly reduces kernel development costs.
+- **Highly Composable Lego-Style Design**: Any atom can adapt to any algorithm, and any layout can be combined with any atom; kernels are built through modular building-block splicing, which greatly reduces kernel function development costs.
 - **Native Architecture Portability**: User code is programmed against algorithm/atom interfaces, and hardware differences are shielded by arch layer specialization; it well supports cross-architecture and cross-chip code migration and reuse.
 
 **Applicable Scenarios**

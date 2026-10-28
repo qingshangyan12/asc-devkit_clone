@@ -4,13 +4,11 @@
 
 This example implements a generalized shape Gather operator based on the Ascend C SIMT programming model, including the basic gather and enhanced gather_v2. The gather operator collects specified rows from a two-dimensional input tensor, while the gather_v2 operator supports collecting data along a specified dimension from multi-dimensional input tensors and supports batch_dims batch processing mode. This example demonstrates the development method for operators with discrete memory access in generalized scenarios.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Versions
-
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -159,11 +157,21 @@ Execute the following steps in the root directory of this example to compile and
   ./gather_v2                   # Execute the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Compilation Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU Architecture: This example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU Architecture: This example only supports dav-3510 (Ascend 950PR&950DT products) |
 
   The execution result is as follows, indicating that the accuracy comparison succeeds:
 

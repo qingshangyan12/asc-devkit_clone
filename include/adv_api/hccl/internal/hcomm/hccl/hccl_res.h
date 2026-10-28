@@ -11,9 +11,9 @@
 #define HCCL_RES_H
 
 #include <stdint.h>
-#include "acl/acl_rt.h"
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
+#include "acl_base_rt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,6 +149,29 @@ extern HcclResult HcclThreadAcquire(
 extern HcclResult HcclThreadAcquireWithStream(
     HcclComm comm, CommEngine engine, aclrtStream stream, uint32_t notifyNum, ThreadHandle* thread);
 
+typedef enum {
+    HCCL_DED_THREAD_TYPE_INVALID = -1,
+    HCCL_DED_THREAD_TYPE_AICPU_LAUNCH = 0,
+    HCCL_DED_THREAD_TYPE_AICPU_LAUNCH_GE = 1,
+    HCCL_DED_THREAD_TYPE_AICPU_ORDER_LAUNCH_OPBASE = 2,
+    HCCL_DED_THREAD_TYPE_AICPU_ORDER_LAUNCH_ACLGRAPH = 3,
+    HCCL_DED_THREAD_TYPE_AICPU_ORDER_LAUNCH_GE = 4,
+    HCCL_DED_THREAD_TYPE_AICPU_ORDER_LAUNCH_DEVICE = 5
+} HcclDedicatedThreadType;
+
+/**
+ * @brief 申请专用thread
+ * @param[in] comm 通信域句柄
+ * @param[in] useType 专用线程使用类型(HCCL_DED_THREAD_TYPE_AICPU_LAUNCH等)
+ * @param[in] notifyNumPerThread 每线程的通知数量
+ * @param[out] thread 返回的线程句柄
+ * @return HcclResult 执行结果状态码
+ * @note 内部逻辑：先判断通信域中是否已存在该useType对应的专用线程，
+ *       若存在则直接返回，不存在则调用HcclThreadAcquire创建并缓存(图模式下不创建直接返回0)
+ */
+extern HcclResult HcclDedicatedThreadAcquire(
+    HcclComm comm, HcclDedicatedThreadType useType, uint32_t notifyNumPerThread, ThreadHandle* thread);
+
 /** @} */ // 通信引擎资源管理
 
 /**
@@ -169,6 +192,28 @@ extern HcclResult HcclThreadAcquireWithStream(
 extern HcclResult HcclChannelAcquire(
     HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescs, uint32_t channelNum,
     ChannelHandle* channels);
+
+/**
+ * @brief 查询通信域上已存在的通信通道
+ * @param[in] comm 通信域句柄
+ * @param[in] engine 通信引擎类型
+ * @param[in] channelDescs 通道描述列表
+ * @param[in] channelNum channel数量
+ * @param[out] channels 查询结果句柄列表，非0表示该通道已存在可复用，0表示需新建
+ * @return HcclResult 执行结果状态码
+ */
+extern HcclResult HcclChannelQuery(
+    HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescs, uint32_t channelNum,
+    ChannelHandle* channels);
+
+/**
+ * @brief 销毁指定句柄列表对应的通信通道
+ * @param[in] comm 通信域句柄
+ * @param[in] channels 待销毁的通道句柄列表
+ * @param[in] channelNum 通道数量
+ * @return HcclResult 执行结果状态码
+ */
+extern HcclResult HcclChannelDestroy(HcclComm comm, const ChannelHandle* channels, uint32_t channelNum);
 
 /**
  * @brief 获取指定channel的Hccl通信缓存

@@ -3,11 +3,11 @@
 <!-- npu="950,A3" id1 -->
 >[!NOTE]说明 
 ><!-- npu="A3" id2 -->
->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，暂不支持ONNX框架算子调用。
+>针对Atlas A3系列产品，暂不支持ONNX框架算子调用。
 ><!-- end id2 -->
 >
 ><!-- npu="950" id3 -->
->针对Ascend 950PR/Ascend 950DT，暂不支持ONNX框架算子调用。
+>针对Ascend 950PR&950DT系列产品，暂不支持ONNX框架算子调用。
 ><!-- end id3 -->
 <!-- end id1 -->
 
@@ -27,7 +27,7 @@ LeakyReluCustom
 │   │   ├── leaky_relu_custom_plugin.cc // ONNX框架适配插件实现文件    
 │   ├── CMakeLists.txt
 ├── op_host                      // host侧实现文件
-├── op_kernel                    // kernel侧实现文件
+├── op_kernel                    // 核函数（Kernel）侧实现文件
 └── scripts                      // 自定义算子工程打包相关脚本所在目录
 ```
 

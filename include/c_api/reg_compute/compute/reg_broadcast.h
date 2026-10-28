@@ -21,8 +21,8 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_BROADCAST_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/reg_broadcast_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value, vector_bool mask);

@@ -3,18 +3,19 @@
 本节汇总介绍了Mmad计算接口在边界值输入下的输出结果，数据类型见基础API下的[mmad](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)，以下内容针对如下型号生效：
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT系列产品
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A3系列产品
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Atlas A2系列产品
 <!-- end id3 -->
 
 **表1**  Mmad特殊值/边界值输入的计算结果说明
 
 <a name="table7822641411"></a>
+
 | C矩阵的数据类型 | Mmad子阶段 | A矩阵的元素取值 | B矩阵的元素取值 | dst的元素取值<br>（INF/NAN模式） |
 | --- | --- | --- | --- | --- |
 | float | 乘法阶段 | +inf | norm(> 0.0)/+inf | +inf |

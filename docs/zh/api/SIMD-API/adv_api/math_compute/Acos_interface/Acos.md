@@ -3,29 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
 <!-- npu="910" id8 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id8 -->
 <!-- npu="x90" id1 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id1 -->
 <!-- npu="9030" id2 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id2 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/Acos_interface/Acos_res.md#id1 -->
 
@@ -33,9 +33,9 @@
 
 按元素做反余弦函数计算，计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002183047492.png)
+![](../../../../figures/formulaimage_0000002183047492.png)
 
-![](../../../../figures/zh-cn_formulaimage_0000002223323813.png)
+![](../../../../figures/formulaimage_0000002223323813.png)
 
 ## 函数原型
 
@@ -106,7 +106,7 @@
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 <!-- npu="950" id9 -->
--   针对Ascend 950PR/Ascend 950DT，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
+-   针对Ascend 950PR&950DT系列产品，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
     -   配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
     -   配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id9 -->

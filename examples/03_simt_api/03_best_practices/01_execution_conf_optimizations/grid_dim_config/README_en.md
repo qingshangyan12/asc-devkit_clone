@@ -4,13 +4,11 @@
 
 This example uses the Gather operator to demonstrate the impact of different thread block configuration strategies on operator performance under different data volume scenarios, and provides corresponding optimization guidance.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -18,7 +16,9 @@ This example uses the Gather operator to demonstrate the impact of different thr
 ├── grid_dim_config
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Build project file
-│   └── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── grid_config.asc        // Ascend C operator implementation & invocation example
+│   ├── README.md              // Sample documentation
+│   └── README_en.md           // English sample documentation
 ```
 
 ## Example Description
@@ -271,11 +271,21 @@ Run the following steps in the root directory of this example to build and execu
   ./grid_config                                                                      # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                       | Values      | Description                                                          |
   | -------------------------- | ----------- | ------------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT)    |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products)    |
   | `SCENARIO_NUM`             | `1`-`13`    | Example type, default is 1                                             |
 
   The following output indicates that the accuracy verification is successful.
@@ -284,7 +294,11 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 Use the `msOpProf` tool to collect detailed performance data:
 

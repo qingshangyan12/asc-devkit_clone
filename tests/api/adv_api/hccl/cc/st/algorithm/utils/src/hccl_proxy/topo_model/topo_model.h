@@ -45,7 +45,7 @@ private:
     void Init910BLinkMap();
     void Init910CLinkMap();
     void Init910DLinkMap();
-    void InitTopoInstsMap(uint32_t serverId, uint32_t rankId, const std::vector<uint32_t>& phyIds);
+    void InitTopoInstsMap(uint32_t serverId, uint32_t rankId, const std::vector<uint32_t>& phyIds, bool mesh1dClos);
     std::vector<uint32_t> GetAllRanks(const std::vector<uint32_t>& phyIds, uint32_t rankId);
     std::vector<uint32_t> CheckRowPeerDevice(const std::vector<uint32_t>& phyIds, uint32_t rankId, uint32_t rowId);
     std::vector<uint32_t> CheckColPeerDevice(const std::vector<uint32_t>& phyIds, uint32_t rankId, uint32_t colId);
@@ -56,10 +56,15 @@ private:
     void Create910DLinks(uint32_t srcRank, uint32_t dstRank);
     void InitL1L2TopoInsts(uint32_t podNum);
     void InitHostDpuInfo(uint32_t serverNum);
+    void InitUbxTopo();
+    void InitPureClosTopo();
 
 private:
     bool is2D{false};
     bool isDpuEnable{false};
+    bool isUbxTopo_{false};
+    bool is2DieL1Link_{false};
+    bool isPureClosTopo_{false};
     std::vector<uint32_t> allRankList_;
     std::map<uint32_t, std::vector<uint32_t>> serverId2RankList_;
     std::map<uint32_t, std::vector<uint32_t>> podId2RankList_;

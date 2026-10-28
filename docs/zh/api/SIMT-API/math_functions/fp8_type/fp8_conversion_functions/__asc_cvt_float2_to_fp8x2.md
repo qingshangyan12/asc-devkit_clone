@@ -3,27 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/fp8_type/fp8_conversion_functions/__asc_cvt_float2_to_fp8x2_res.md#id1 -->
 
 ## 功能说明
+
+头文件路径为：`"simt_api/asc_fp8.h"`。
 
 将float2类型数据的两个分量，按照CAST\_RINT模式转换为指定类型（float8\_e4m3x2\_t和float8\_e5m2x2\_t）的8位浮点数，并根据指定的饱和模式（饱和或非饱和）进行溢出处理。转换结果以位级打包形式存储为\_\_asc\_fp8x2\_storage\_t类型，该类型为16位无符号整数unsigned short int，用于存储float8\_e4m3x2\_t或float8\_e5m2x2\_t类型的数据。
 
@@ -73,19 +75,13 @@ inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __a
 
 SIMT编程场景当前不支持使用该接口。
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp8.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp8.h"
-```
-
 ## 调用示例
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp8.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_asc_cvt_float2_to_fp8x2(__gm__ float2* input, __gm__ uint16_t* output, uint32_t input_total_length)
     {
@@ -101,3 +97,10 @@ SIMT编程场景当前不支持使用该接口。
         asc_vf_call<simt_asc_cvt_float2_to_fp8x2>(dim3(1024), (__gm__ float2*)input, output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x(float2)：(-1.5, 0.5), (17.25, -17.25), (600.0, -600.0), (nan, inf)
+result(float8_e4m3x2_t)：(-1.5, 0.5), (18, -18), (nan, nan), (nan, nan)
+```

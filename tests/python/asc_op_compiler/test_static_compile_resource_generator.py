@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import importlib.util
 import os
 from dataclasses import dataclass
 from enum import Enum
@@ -69,14 +70,11 @@ class _CommandSession:
         self._sk_bind_records.append(command)
 
 
-MODULE_DIR = os.path.realpath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "../../../tools/build/asc_op_compile_base/asc_op_compiler",
-    )
-)
-sys.path.insert(0, MODULE_DIR)
-import static_compile_resource_generator as generator
+FRAMEWORK_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), "../../../tools/build"))
+if FRAMEWORK_PATH not in sys.path:
+    sys.path.insert(0, FRAMEWORK_PATH)
+
+from asc_op_compile_base.asc_op_compiler import static_compile_resource_generator as generator
 
 
 class TestStaticCompileResourceGenerator(unittest.TestCase):
@@ -93,17 +91,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         os.makedirs(os.path.join(self.cann_root, "include"))
         self.bisheng = os.path.join(self.cann_root, "bin", "bisheng")
         Path(self.bisheng).touch()
-        self.env_patch = mock.patch.dict(
-            os.environ, {"ASCEND_HOME_PATH": self.cann_root}, clear=False
-        )
+        self.env_patch = mock.patch.dict(os.environ, {"ASCEND_HOME_PATH": self.cann_root}, clear=False)
         self.env_patch.start()
         self.addCleanup(self.env_patch.stop)
 
         os.makedirs(self.input_root)
         self.source_path = os.path.join(self.input_root, "add_custom.cpp")
-        Path(self.source_path).write_text(
-            'extern "C" void add_custom() {}\n', encoding="utf-8"
-        )
+        Path(self.source_path).write_text('extern "C" void add_custom() {}\n', encoding="utf-8")
         self.wrapper_path = os.path.join(self.input_root, "add_custom_kernel.cpp")
         Path(self.wrapper_path).write_text(
             "#ifndef ADD_CUSTOM_KERNEL\n"
@@ -123,9 +117,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             encoding="utf-8",
         )
         self.sk_bind_path = os.path.join(self.input_root, "sk_bind.cpp")
-        Path(self.sk_bind_path).write_text(
-            '#include "kernel_operator.h"\n', encoding="utf-8"
-        )
+        Path(self.sk_bind_path).write_text('#include "kernel_operator.h"\n', encoding="utf-8")
         self.tiling_path = os.path.join(self.input_root, "add_custom_tiling_data.h")
         Path(self.tiling_path).write_text(
             "#ifndef ADD_CUSTOM_TILING_DATA_H\n"
@@ -138,19 +130,12 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         Path(self.dynamic_object).write_bytes(b"\x7fELFtest-object")
         self.metadata_path = os.path.join(self.input_root, "add_custom.json")
         Path(self.metadata_path).write_text(
-            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}), encoding="utf-8"
         )
         self.resource_id = "a" * 64
 
     def make_compile_context(
-        self,
-        *,
-        kernel_name="add_custom",
-        code_channel=2,
-        kernel_types=None,
-        wrapper_path=None,
-        symbols=None,
+        self, *, kernel_name="add_custom", code_channel=2, kernel_types=None, wrapper_path=None, symbols=None
     ):
         return SimpleNamespace(
             kernel_name=kernel_name,
@@ -172,9 +157,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             compile_command_session=_CommandSession(_RecordingMode.EXECUTE_AND_RECORD),
         )
 
-    def make_recorded_commands(
-        self, compile_info, options, constant_info_files, chip_version
-    ):
+    def make_recorded_commands(self, compile_info, options, constant_info_files, chip_version):
         if compile_info.no_set_kernel_type:
             core_types = (
                 ("cube", "vec")
@@ -213,13 +196,9 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             for constant_info_file in constant_info_files:
                 argv.extend(["-include", constant_info_file])
             raw_kernel_type = compile_info.raw_tiling_key_kernel_type.get(
-                "100000",
-                compile_info.tiling_key_kernel_type.get("100000"),
+                "100000", compile_info.tiling_key_kernel_type.get("100000")
             )
-            if (
-                chip_version == "c310"
-                and getattr(raw_kernel_type, "name", "") == "KERNEL_TYPE_AIC_ONLY"
-            ):
+            if chip_version == "c310" and getattr(raw_kernel_type, "name", "") == "KERNEL_TYPE_AIC_ONLY":
                 argv.append("-DRAW_AIC_ONLY_DUMP_TENSOR")
             commands.append(
                 _KernelCompileCommand(
@@ -274,43 +253,24 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         basic_context = basic_context or self.make_compile_context()
         basic_options = basic_options or self.make_options()
-        constant_info_files = tuple(
-            dict.fromkeys(item.template_path for item in constant_infos)
-        )
-        basic_context.compile_command_session = _CommandSession(
-            _RecordingMode.EXECUTE_AND_RECORD
-        )
-        for command in self.make_recorded_commands(
-            basic_context, basic_options, constant_info_files, chip_version
-        ):
+        constant_info_files = tuple(dict.fromkeys(item.template_path for item in constant_infos))
+        basic_context.compile_command_session = _CommandSession(_RecordingMode.EXECUTE_AND_RECORD)
+        for command in self.make_recorded_commands(basic_context, basic_options, constant_info_files, chip_version):
             basic_context.compile_command_session.submit(command)
         if sk_context is not None:
-            sk_context.compile_command_session = _CommandSession(
-                _RecordingMode.RECORD_ONLY
-            )
+            sk_context.compile_command_session = _CommandSession(_RecordingMode.RECORD_ONLY)
             for command in self.make_recorded_commands(
-                sk_context,
-                sk_options or self.make_options(),
-                constant_info_files,
-                chip_version,
+                sk_context, sk_options or self.make_options(), constant_info_files, chip_version
             ):
                 sk_context.compile_command_session.submit(command)
         size_by_tiling_key = (
-            {
-                "tiling_data": (
-                    {"100000": 8}
-                    if tiling_key_data_size is None
-                    else tiling_key_data_size
-                )
-            }
+            {"tiling_data": ({"100000": 8} if tiling_key_data_size is None else tiling_key_data_size)}
             if constant_info_size_by_tiling_key is None
             else constant_info_size_by_tiling_key
         )
         tiling_info = SimpleNamespace(
             default_tiling_size=default_tiling_size,
-            tiling_key_data_size=(
-                {"100000": 8} if tiling_key_data_size is None else tiling_key_data_size
-            ),
+            tiling_key_data_size=({"100000": 8} if tiling_key_data_size is None else tiling_key_data_size),
             tiling_data_file_path=self.tiling_path,
         )
         self._last_snapshot = generator.ManifestInputSnapshot(
@@ -325,23 +285,18 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             constant_infos=constant_infos,
             constant_info_size_by_tiling_key=size_by_tiling_key,
         )
-        return generator._KernelCompileRecordBuilder(
-            self._last_snapshot,
-            constant_infos,
-            size_by_tiling_key,
-        ).build()
+        return generator._KernelCompileRecordBuilder(self._last_snapshot, constant_infos, size_by_tiling_key).build()
 
     def make_request(
         self,
         records,
         *,
-        sk_cap_bitmap=None,
         sk_kernel_attribute="",
         basic_kernel_attribute="",
         sk_bind_compile_options=(),
         sk_bind_command=None,
     ):
-        if sk_bind_command is None and sk_cap_bitmap is not None:
+        if sk_bind_command is None and sk_bind_compile_options:
             sk_bind_output = os.path.join(self.input_root, "sk_bind.o")
             sk_bind_command = _SkBindCommand(
                 source_path=self.sk_bind_path,
@@ -366,9 +321,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             snapshot.sk_compile_info.global_kernel_attribute = sk_kernel_attribute
             snapshot.basic_compile_info.global_kernel_attribute = basic_kernel_attribute
             if sk_bind_command is not None:
-                snapshot.sk_compile_info.compile_command_session.submit_sk_bind(
-                    sk_bind_command
-                )
+                snapshot.sk_compile_info.compile_command_session.submit_sk_bind(sk_bind_command)
         return generator.ManifestInputSnapshot(
             soc_version=snapshot.soc_version,
             kernel_spec_dir=snapshot.kernel_spec_dir,
@@ -378,11 +331,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             tiling_info=snapshot.tiling_info,
             workspace_idx=snapshot.workspace_idx,
             sk_compile_info=snapshot.sk_compile_info,
-            sk_cap_bitmap=sk_cap_bitmap,
             constant_infos=snapshot.constant_infos,
-            constant_info_size_by_tiling_key=(
-                snapshot.constant_info_size_by_tiling_key
-            ),
+            constant_info_size_by_tiling_key=(snapshot.constant_info_size_by_tiling_key),
         )
 
     def generate(self, snapshot):
@@ -393,27 +343,48 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertTrue(reference.startswith(prefix))
         return reference[len(prefix) :]
 
+    def test_include_paths_are_relative_to_installed_source(self):
+        marker = "${source_file_path}"
+        cases = (
+            ("dynamic/add.cpp", "ascendc/common", "../ascendc/common"),
+            ("src/fa/op_kernel/fa.cpp", "src/ascendc/common", "../../common"),
+            ("impl/ascendc/a/op_kernel/dynamic/a.cpp", "impl/ascendc/common", "../../../common"),
+        )
+        for source, common_root, common_relative in cases:
+            with self.subTest(source=source):
+                source = Path(self.root, source)
+                paths = generator.ManifestSourcePaths(source)
+                common = Path(self.root, common_root)
+                argv = [f"-I{source.parent}", "-I", str(common), f"-include{common}/header.h"]
+                expected = [
+                    f"-I{marker}",
+                    "-I",
+                    f"{marker}/{common_relative}",
+                    f"-include{marker}/{common_relative}/header.h",
+                ]
+                self.assertEqual(paths.rewrite(argv), expected)
+                self.assertFalse(paths.warned)
+        paths = generator.ManifestSourcePaths(Path(self.root, "external/add.cpp"))
+        self.assertEqual(paths.rewrite(["-I" + str(Path(self.root, "external"))]), ["-I${source_file_path}"])
+
     def test_normalize_source_include_options(self):
         replacement = "${source_file_path}"
         source_argument = self.wrapper_path
         missing_include = os.path.join(self.input_root, "missing")
         cases = (
-            ("split", ["-I", self.input_root]),
-            ("joined", ["-I" + self.input_root]),
-            ("missing split", ["-I", missing_include]),
-            ("missing joined", ["-I" + missing_include]),
+            ("split", ["-I", self.input_root], []),
+            ("joined", ["-I" + self.input_root], []),
+            ("missing split", ["-I", missing_include], ["-I", missing_include]),
+            ("missing joined", ["-I" + missing_include], ["-I" + missing_include]),
         )
-        for name, include_options in cases:
+        for name, include_options, preserved in cases:
             with self.subTest(name=name):
                 argv = [self.bisheng, *include_options, source_argument]
                 self.assertEqual(
                     generator._normalize_source_include_options(
-                        argv,
-                        self.source_path,
-                        replacement,
-                        insertion_before=source_argument,
+                        argv, self.source_path, replacement, insertion_before=source_argument
                     ),
-                    [self.bisheng, "-I", replacement, source_argument],
+                    [self.bisheng, *preserved, "-I", replacement, source_argument],
                 )
 
     def test_manifest_package_writer_writes_snapshot(self):
@@ -425,18 +396,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         Path(compile_info.dst_file).write_bytes(b"\x7fELFtest-object")
         metadata_path = os.path.join(self.input_root, "add_custom.json")
         Path(metadata_path).write_text(
-            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}), encoding="utf-8"
         )
         options = self.make_options()
-        for command in self.make_recorded_commands(
-            compile_info, options, (self.tiling_path,), "c220"
-        ):
+        for command in self.make_recorded_commands(compile_info, options, (self.tiling_path,), "c220"):
             compile_info.compile_command_session.submit(command)
         tiling_info = SimpleNamespace(
-            default_tiling_size=0,
-            tiling_key_data_size={"100000": 16},
-            tiling_data_file_path=self.tiling_path,
+            default_tiling_size=0, tiling_key_data_size={"100000": 16}, tiling_data_file_path=self.tiling_path
         )
         snapshot = generator.ManifestInputSnapshot(
             soc_version="Ascend910B",
@@ -450,20 +416,16 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
         manifest_path = generator.ManifestPackageWriter(snapshot).write()
 
-        self.assertEqual(
-            manifest_path,
-            os.path.join(self.output_root, "add_custom", self.manifest_name),
-        )
+        self.assertEqual(manifest_path, os.path.join(self.output_root, "add_custom", self.manifest_name))
         manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
         self.assertEqual(manifest["resource_id"], self.resource_id)
         self.assertEqual(manifest["kernels"][0]["kernel_name"], "add_custom_100000")
         self.assertEqual(manifest["kernels"][0]["constant_infos"][0]["byte_size"], 24)
+        self.assertEqual(manifest["kernels"][0]["constant_infos"][0]["arg_type"], "pointer")
         self.assertTrue(os.path.isdir(os.path.join(self.output_dir, "resources")))
 
     def test_basic_mix_manifest_uses_static_wrapper_and_tiling_template(self):
-        records = self.make_records(
-            basic_context=self.make_compile_context(code_channel=0),
-        )
+        records = self.make_records(basic_context=self.make_compile_context(code_channel=0))
         Path(self.wrapper_path).write_text(
             Path(self.wrapper_path).read_text(encoding="utf-8")
             + "// wrapper content read during Manifest generation\n",
@@ -473,35 +435,19 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
         manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         self.assertEqual(
-            set(manifest),
-            {
-                "soc_version",
-                "resource_id",
-                "source_file",
-                "resource_path",
-                "options",
-                "kernels",
-            },
+            set(manifest), {"soc_version", "resource_id", "source_file", "resource_path", "options", "kernels"}
         )
         self.assertEqual(manifest["source_file"], "add_custom.cpp")
         self.assertEqual(manifest["resource_path"], "resources")
         self.assertEqual(manifest["options"]["common_compile"][:2], ["-c", "-O3"])
 
         kernel = manifest["kernels"][0]
-        self.assertEqual(
-            kernel["link_options"],
-            ["-m", "aicorelinux", "-Ttext=0", "-q", "-x"],
-        )
+        self.assertEqual(kernel["link_options"], ["-m", "aicorelinux", "-Ttext=0", "-q", "-x"])
         constant_info = kernel["constant_infos"][0]
         self.assertEqual(constant_info["template"], "@@STATIC_VALUE_tiling_data@@")
-        self.assertEqual(
-            constant_info["file"],
-            "${resource}/resources/include/add_custom_tiling_data.h",
-        )
+        self.assertEqual(constant_info["file"], "${resource}/resources/include/add_custom_tiling_data.h")
         template_path = os.path.join(
-            self.output_dir,
-            "resources",
-            self.resource_logical_path(manifest, constant_info["file"]),
+            self.output_dir, "resources", self.resource_logical_path(manifest, constant_info["file"])
         )
         template_text = Path(template_path).read_text(encoding="utf-8")
         self.assertEqual(template_text.count("@@STATIC_VALUE_tiling_data@@"), 1)
@@ -509,49 +455,27 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         basic = kernel["objects"][0]
         self.assertEqual(basic["object_name"], "basic")
         self.assertEqual(basic["object_type"], "basic")
-        self.assertEqual(
-            basic["outputs"],
-            [
-                "${output}/add_custom_100000.aic.o",
-                "${output}/add_custom_100000.aiv.o",
-            ],
-        )
+        self.assertEqual(basic["outputs"], ["${output}/add_custom_100000.aic.o", "${output}/add_custom_100000.aiv.o"])
         serialized = json.dumps(manifest)
         self.assertNotIn("intermediates", serialized)
-        for old_name in (
-            "static_inputs",
-            "token",
-            "obj_name",
-            "obj_type",
-            "option",
-            "link_option",
-        ):
+        for old_name in ("static_inputs", "token", "obj_name", "obj_type", "option", "link_option"):
             self.assertNotIn(f'"{old_name}"', serialized)
-        self.assertNotIn(self.root, serialized)
+        self.assertNotIn(self.source_path, serialized)
+        self.assertNotIn(self.wrapper_path, serialized)
+        self.assertNotIn(self.tiling_path, serialized)
         resource_root = os.path.join(self.output_dir, "resources")
         self.assertEqual(
-            {
-                os.path.relpath(path, resource_root)
-                for path in Path(resource_root).rglob("*")
-                if path.is_file()
-            },
-            {
-                "src/add_custom_kernel.cpp",
-                "include/add_custom_tiling_data.h",
-            },
+            {os.path.relpath(path, resource_root) for path in Path(resource_root).rglob("*") if path.is_file()},
+            {"src/add_custom_kernel.cpp", "include/add_custom_tiling_data.h"},
         )
-        self.assertFalse(
-            os.path.exists(os.path.join(resource_root, "src", "add_custom.cpp"))
-        )
+        self.assertFalse(os.path.exists(os.path.join(resource_root, "src", "add_custom.cpp")))
 
         for command in basic["commands"]:
             self.assertEqual(command["type"], "compile")
             self.assertNotIn("stage", command)
             expanded_cmd = list(command["cmd"])
             option_index = expanded_cmd.index("${options:common_compile}")
-            expanded_cmd[option_index : option_index + 1] = manifest["options"][
-                "common_compile"
-            ]
+            expanded_cmd[option_index : option_index + 1] = manifest["options"]["common_compile"]
             self.assertIn("-DCONST_TILING", expanded_cmd)
             self.assertTrue(
                 any(
@@ -563,32 +487,19 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             self.assertLess(
                 expanded_cmd.index("${source_file_path}"),
                 next(
-                    index
-                    for index, value in enumerate(expanded_cmd)
-                    if value.startswith("${resource}/resources/src/")
+                    index for index, value in enumerate(expanded_cmd) if value.startswith("${resource}/resources/src/")
                 ),
             )
-            self.assertFalse(
-                any(
-                    "missing_joined" in value or "missing_split" in value
-                    for value in expanded_cmd
-                )
-            )
+            self.assertIn("-I${source_file_path}/missing_joined", expanded_cmd)
+            self.assertIn("${source_file_path}/missing_split", expanded_cmd)
             include_index = expanded_cmd.index("-include")
-            self.assertEqual(
-                expanded_cmd[include_index + 1],
-                constant_info["file"],
-            )
+            self.assertEqual(expanded_cmd[include_index + 1], constant_info["file"])
 
         wrapper_reference = next(
-            arg
-            for arg in basic["commands"][0]["cmd"]
-            if arg.startswith("${resource}/resources/src/")
+            arg for arg in basic["commands"][0]["cmd"] if arg.startswith("${resource}/resources/src/")
         )
         wrapper_path = os.path.join(
-            self.output_dir,
-            "resources",
-            self.resource_logical_path(manifest, wrapper_reference),
+            self.output_dir, "resources", self.resource_logical_path(manifest, wrapper_reference)
         )
         wrapper_text = Path(wrapper_path).read_text(encoding="utf-8")
         self.assertNotIn("@@STATIC_VALUE_tiling_data@@", wrapper_text)
@@ -608,17 +519,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         template_text = generator.static_tiling_template_text(dynamic_header)
 
         self.assertIn("#undef GET_TILING_DATA_PTR_WITH_STRUCT", template_text)
-        static_definition = template_text[
-            template_text.rfind("#define GET_TILING_DATA_PTR_WITH_STRUCT") :
-        ]
+        static_definition = template_text[template_text.rfind("#define GET_TILING_DATA_PTR_WITH_STRUCT") :]
         self.assertIn("__ascendc_static_tiling_data", static_definition)
         self.assertIn("__ascendc_static_full_##dst_ptr", static_definition)
         self.assertNotIn("(tiling_struct *)tiling_ptr", static_definition)
 
     def test_static_tiling_template_ignores_generic_class_name(self):
-        dynamic_header = (
-            "InitTilingData<T>();\nInitTilingData<ValidTiling>();\n#endif\n"
-        )
+        dynamic_header = "InitTilingData<T>();\nInitTilingData<ValidTiling>();\n#endif\n"
 
         template_text = generator.static_tiling_template_text(dynamic_header)
 
@@ -657,10 +564,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         records = self.make_records(
             constant_infos=constant_infos,
-            constant_info_size_by_tiling_key={
-                "tiling_data": {"100000": 8},
-                "block_dim": {"100000": 4},
-            },
+            constant_info_size_by_tiling_key={"tiling_data": {"100000": 8}, "block_dim": {"100000": 4}},
         )
 
         result = self.generate(self.make_request(records))
@@ -673,6 +577,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 {
                     "name": "tiling_data",
                     "parameter_index": 4,
+                    "arg_type": "pointer",
                     "byte_size": 8,
                     "file": "${resource}/resources/include/add_custom_tiling_data.h",
                     "template": "@@STATIC_VALUE_tiling_data@@",
@@ -680,33 +585,25 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 {
                     "name": "block_dim",
                     "parameter_index": 5,
+                    "arg_type": "pointer",
                     "byte_size": 4,
                     "file": "${resource}/resources/include/add_custom_tiling_data.h",
                     "template": block_dim_template,
                 },
             ],
         )
-        template_path = os.path.join(
-            self.output_dir,
-            "resources",
-            "include",
-            "add_custom_tiling_data.h",
-        )
+        template_path = os.path.join(self.output_dir, "resources", "include", "add_custom_tiling_data.h")
         template_text = Path(template_path).read_text(encoding="utf-8")
         for constant_info in kernel["constant_infos"]:
             self.assertEqual(template_text.count(constant_info["template"]), 1)
         for command in kernel["objects"][0]["commands"]:
             expanded_cmd = list(command["cmd"])
             option_index = expanded_cmd.index("${options:common_compile}")
-            expanded_cmd[option_index : option_index + 1] = manifest["options"][
-                "common_compile"
-            ]
+            expanded_cmd[option_index : option_index + 1] = manifest["options"]["common_compile"]
             self.assertEqual(
-                [
-                    expanded_cmd[index + 1]
-                    for index, value in enumerate(expanded_cmd[:-1])
-                    if value == "-include"
-                ].count(kernel["constant_infos"][0]["file"]),
+                [expanded_cmd[index + 1] for index, value in enumerate(expanded_cmd[:-1]) if value == "-include"].count(
+                    kernel["constant_infos"][0]["file"]
+                ),
                 1,
             )
 
@@ -719,225 +616,120 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertEqual(records[0].tiling_key, "100000")
 
     def test_missing_exact_tiling_size_uses_default_size(self):
-        records = self.make_records(
-            default_tiling_size=16,
-            tiling_key_data_size={"200000": 8},
-        )
+        records = self.make_records(default_tiling_size=16, tiling_key_data_size={"200000": 8})
 
         self.assertEqual(records[0].constant_infos[0].byte_size, 16)
 
     def test_grouped_tiling_key_reuses_master_compile_identity(self):
         Path(self.metadata_path).write_text(
-            json.dumps(
-                {
-                    "kernelList": [
-                        {
-                            "kernelName": "add_custom_100000",
-                        },
-                        {
-                            "kernelName": "add_custom_100001",
-                        },
-                    ]
-                }
-            ),
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}, {"kernelName": "add_custom_100001"}]}),
             encoding="utf-8",
         )
         compile_context = self.make_compile_context(code_channel=0)
         compile_context.tiling_key_group_map = {"100000": ["100001"]}
 
-        records = self.make_records(
-            basic_context=compile_context,
-            tiling_key_data_size={"100000": 8, "100001": 12},
-        )
+        records = self.make_records(basic_context=compile_context, tiling_key_data_size={"100000": 8, "100001": 12})
 
         self.assertEqual(
             [(record.tiling_key, record.compile_tiling_key) for record in records],
             [("100000", "100000"), ("100001", "100000")],
         )
-        self.assertEqual(
-            [record.constant_infos[0].byte_size for record in records],
-            [8, 12],
-        )
-        master_commands, slave_commands = (
-            records[0].commands,
-            records[1].commands,
-        )
+        self.assertEqual([record.constant_infos[0].byte_size for record in records], [8, 12])
+        master_commands, slave_commands = (records[0].commands, records[1].commands)
         self.assertEqual(
             [command.compile_symbol for command in slave_commands],
             [command.compiled_symbol for command in master_commands],
         )
         self.assertEqual(
             [command.compiled_symbol for command in slave_commands],
-            [
-                "add_custom_100001_mix_aic",
-                "add_custom_100001_mix_aiv",
-            ],
+            ["add_custom_100001_mix_aic", "add_custom_100001_mix_aiv"],
         )
         for command in slave_commands:
             self.assertIn("-DTILING_KEY_VAR=100000UL", command.argv)
-            self.assertIn(
-                f"-Dauto_gen_add_custom_kernel={command.compile_symbol}",
-                command.argv,
-            )
-            self.assertIn(
-                "-Dadd_custom=add_custom_100000_tilingkey",
-                command.argv,
-            )
+            self.assertIn(f"-Dauto_gen_add_custom_kernel={command.compile_symbol}", command.argv)
+            self.assertIn("-Dadd_custom=add_custom_100000_tilingkey", command.argv)
 
         result = self.generate(self.make_request(records))
         manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         self.assertEqual(
-            [kernel["kernel_name"] for kernel in manifest["kernels"]],
-            ["add_custom_100000", "add_custom_100001"],
+            [kernel["kernel_name"] for kernel in manifest["kernels"]], ["add_custom_100000", "add_custom_100001"]
         )
         slave_basic = manifest["kernels"][1]["objects"][0]
         self.assertEqual(
-            slave_basic["outputs"],
-            [
-                "${output}/add_custom_100001.aic.o",
-                "${output}/add_custom_100001.aiv.o",
-            ],
+            slave_basic["outputs"], ["${output}/add_custom_100001.aic.o", "${output}/add_custom_100001.aiv.o"]
         )
         for command in slave_basic["commands"]:
             self.assertIn("-DTILING_KEY_VAR=100000UL", command["cmd"])
             self.assertTrue(
                 any(
-                    value.startswith(
-                        "-Dauto_gen_add_custom_kernel=add_custom_100000_mix_ai"
-                    )
+                    value.startswith("-Dauto_gen_add_custom_kernel=add_custom_100000_mix_ai")
                     for value in command["cmd"]
                 )
             )
 
         Path(self.metadata_path).write_text(
-            json.dumps(
-                {
-                    "kernelList": [
-                        {
-                            "kernelName": "add_custom_100001",
-                        }
-                    ]
-                }
-            ),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100001"}]}), encoding="utf-8"
         )
-        exact_slave_records = self.make_records(
-            basic_context=compile_context,
-            tiling_key_data_size={"100001": 12},
-        )
+        exact_slave_records = self.make_records(basic_context=compile_context, tiling_key_data_size={"100001": 12})
         self.assertEqual(exact_slave_records[0].constant_infos[0].byte_size, 12)
 
         c310_records = self.make_records(
-            basic_context=compile_context,
-            chip_version="c310",
-            tiling_key_data_size={"100000": 8, "100001": 12},
+            basic_context=compile_context, chip_version="c310", tiling_key_data_size={"100000": 8, "100001": 12}
         )
         c310_slave = c310_records[0]
         self.assertEqual(c310_slave.compile_tiling_key, "100000")
-        self.assertTrue(
-            all(
-                "--cce-aicore-arch=dav-c310-" in " ".join(command.argv)
-                for command in c310_slave.commands
-            )
-        )
+        self.assertTrue(all("--cce-aicore-arch=dav-c310-" in " ".join(command.argv) for command in c310_slave.commands))
 
     def test_logical_symbol_rewrites_only_trailing_tiling_key(self):
         cases = (
-            (
-                "op100000_add_100000",
-                "op100000_add_100001",
-            ),
-            (
-                "op100000_add_100000_mix_aic",
-                "op100000_add_100001_mix_aic",
-            ),
-            (
-                "op100000_add_100000_mix_aiv",
-                "op100000_add_100001_mix_aiv",
-            ),
+            ("op100000_add_100000", "op100000_add_100001"),
+            ("op100000_add_100000_mix_aic", "op100000_add_100001_mix_aic"),
+            ("op100000_add_100000_mix_aiv", "op100000_add_100001_mix_aiv"),
         )
         for compile_symbol, expected in cases:
             with self.subTest(compile_symbol=compile_symbol):
-                self.assertEqual(
-                    generator._logical_symbol(
-                        compile_symbol,
-                        "100000",
-                        "100001",
-                    ),
-                    expected,
-                )
+                self.assertEqual(generator._logical_symbol(compile_symbol, "100000", "100001"), expected)
 
-        with self.assertRaisesRegex(
-            generator.ManifestCommandError,
-            "does not end with master tiling key 100000",
-        ):
-            generator._logical_symbol(
-                "op100000_add_200000_mix_aic",
-                "100000",
-                "100001",
-            )
+        with self.assertRaisesRegex(generator.ManifestCommandError, "does not end with master tiling key 100000"):
+            generator._logical_symbol("op100000_add_200000_mix_aic", "100000", "100001")
 
     def test_grouped_tiling_key_rejects_ambiguous_or_missing_master(self):
         first_context = self.make_compile_context()
         first_context.tiling_key_group_map = {"100000": ["100001"]}
         second_context = self.make_compile_context()
         second_context.tiling_key_group_map = {"200000": ["100001"]}
-        with self.assertRaisesRegex(
-            generator.ManifestCommandError,
-            "tiling key 100001 belongs to multiple masters",
-        ):
-            generator.build_tiling_key_group_index(
-                first_context,
-                second_context,
-            )
+        with self.assertRaisesRegex(generator.ManifestCommandError, "tiling key 100001 belongs to multiple masters"):
+            generator.build_tiling_key_group_index(first_context, second_context)
 
         Path(self.metadata_path).write_text(
-            json.dumps({"kernelList": [{"kernelName": "add_custom_100001"}]}),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100001"}]}), encoding="utf-8"
         )
         first_context.tiling_key_group_map = {"200000": ["100001"]}
         with self.assertRaisesRegex(
-            generator.ManifestCommandError,
-            "master tiling key 200000 has no physical compile command",
+            generator.ManifestCommandError, "master tiling key 200000 has no physical compile command"
         ):
             self.make_records(basic_context=first_context)
 
         Path(self.metadata_path).write_text(
-            json.dumps({"kernelList": [{"kernelName": "add_custom_unknown"}]}),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_unknown"}]}), encoding="utf-8"
         )
         with self.assertRaisesRegex(
-            generator.ManifestCommandError,
-            "cannot determine tiling key for kernel add_custom_unknown",
+            generator.ManifestCommandError, "cannot determine tiling key for kernel add_custom_unknown"
         ):
             self.make_records()
 
     def test_grouped_tiling_key_sk_renames_slave_symbol_after_master_compile(self):
         Path(self.metadata_path).write_text(
-            json.dumps(
-                {
-                    "kernelList": [
-                        {"kernelName": "add_custom_100001"},
-                    ]
-                }
-            ),
-            encoding="utf-8",
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100001"}]}), encoding="utf-8"
         )
         basic_context = self.make_compile_context(
-            code_channel=0,
-            symbols=[
-                "add_custom_100000_mix_aic",
-                "add_custom_100000_mix_aiv",
-            ],
+            code_channel=0, symbols=["add_custom_100000_mix_aic", "add_custom_100000_mix_aiv"]
         )
         sk_context = self.make_compile_context(
             kernel_name="add_custom_sk",
             code_channel=0,
             wrapper_path=self.sk_wrapper_path,
-            symbols=[
-                "add_custom_sk_100000_mix_aic",
-                "add_custom_sk_100000_mix_aiv",
-            ],
+            symbols=["add_custom_sk_100000_mix_aic", "add_custom_sk_100000_mix_aiv"],
         )
         basic_context.tiling_key_group_map = {"100000": ["100001"]}
         sk_context.tiling_key_group_map = {"100000": ["100001"]}
@@ -970,7 +762,6 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         result = self.generate(
             self.make_request(
                 records,
-                sk_cap_bitmap=3,
                 sk_kernel_attribute="__global__ [aicore]",
                 basic_kernel_attribute="__global__ [aicore]",
                 sk_bind_compile_options=[*options.compile_options, "-DREAL_BIND_ARGV"],
@@ -981,42 +772,23 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertNotIn("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__=4", json.dumps(manifest))
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertIn("-DREAL_BIND_ARGV", sk_object["commands"][2]["cmd"])
-        self.assertTrue(
-            all("stage" not in command for command in sk_object["commands"])
-        )
+        self.assertTrue(all("stage" not in command for command in sk_object["commands"]))
         sk_compiles = sk_object["commands"][:2]
         for core_suffix, command in zip(("aic", "aiv"), sk_compiles):
             self.assertIn("-DTILING_KEY_VAR=100000UL", command["cmd"])
-            self.assertIn(
-                f"-Dauto_gen_add_custom_kernel="
-                f"add_custom_100000_mix_{core_suffix}_static_sk",
-                command["cmd"],
-            )
-            self.assertIn(
-                "-Dadd_custom=add_custom_100000_tilingkey",
-                command["cmd"],
-            )
-            self.assertIn(
-                f"${{output}}/add_custom_100001.{core_suffix}.sk_source.o",
-                command["cmd"],
-            )
+            self.assertIn(f"-Dauto_gen_add_custom_kernel=add_custom_100000_mix_{core_suffix}_static_sk", command["cmd"])
+            self.assertIn("-Dadd_custom=add_custom_100000_tilingkey", command["cmd"])
+            self.assertIn(f"${{output}}/add_custom_100001.{core_suffix}.sk_source.o", command["cmd"])
 
         logical_renames = sk_object["commands"][3:5]
         for core_suffix, command in zip(("aic", "aiv"), logical_renames):
             self.assertEqual(command["type"], "objcopy")
             self.assertIn(
-                f"--redefine-sym=add_custom_sk_100001_mix_{core_suffix}="
-                f"add_custom_100001_mix_{core_suffix}_static_sk",
+                f"--redefine-sym=add_custom_sk_100001_mix_{core_suffix}=add_custom_100001_mix_{core_suffix}_static_sk",
                 command["cmd"],
             )
-            self.assertIn(
-                f"--strip-symbol=add_custom_100000_mix_{core_suffix}_static_sk",
-                command["cmd"],
-            )
-            self.assertEqual(
-                command["cmd"][-1],
-                f"${{output}}/add_custom_100001.{core_suffix}.sk.o",
-            )
+            self.assertIn(f"--strip-symbol=add_custom_100000_mix_{core_suffix}_static_sk", command["cmd"])
+            self.assertEqual(command["cmd"][-1], f"${{output}}/add_custom_100001.{core_suffix}.sk.o")
 
         self.assertEqual(
             sk_object["outputs"],
@@ -1033,35 +805,26 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             ],
         )
         bind_reference = next(
-            value
-            for value in sk_object["commands"][2]["cmd"]
-            if value.startswith("${resource}/resources/src/sk_bind_")
+            value for value in sk_object["commands"][2]["cmd"] if value.startswith("${resource}/resources/src/sk_bind_")
         )
         bind_source = Path(
-            self.output_dir,
-            "resources",
-            self.resource_logical_path(manifest, bind_reference),
+            self.output_dir, "resources", self.resource_logical_path(manifest, bind_reference)
         ).read_text(encoding="utf-8")
         for core_suffix in ("aic", "aiv"):
             self.assertIn(
-                f"SK_BIND(add_custom_100001_mix_{core_suffix}, 3, "
+                f"SK_BIND(add_custom_100001_mix_{core_suffix}, "
+                "(__ASCENDC_SK_CAP_WAIT_FLAG__ | __ASCENDC_SK_CAP_SET_FLAG__ | __ASCENDC_SK_CAP_DISABLE_DCCI__), "
                 f"add_custom_100001_mix_{core_suffix}_static_sk,",
                 bind_source,
             )
         sk_wrapper_reference = next(
-            value
-            for value in sk_compiles[0]["cmd"]
-            if value.startswith("${resource}/resources/src/")
+            value for value in sk_compiles[0]["cmd"] if value.startswith("${resource}/resources/src/")
         )
         static_sk_wrapper = Path(
-            self.output_dir,
-            "resources",
-            self.resource_logical_path(manifest, sk_wrapper_reference),
+            self.output_dir, "resources", self.resource_logical_path(manifest, sk_wrapper_reference)
         ).read_text(encoding="utf-8")
         self.assertIn(
-            "add_custom_sk_100001_mix_aic(\n"
-            "    __gm__ uint64_t *param, sk::SkSystemArgs *sargs)",
-            static_sk_wrapper,
+            "add_custom_sk_100001_mix_aic(\n    __gm__ uint64_t *param, sk::SkSystemArgs *sargs)", static_sk_wrapper
         )
         self.assertNotIn("uint64_t args_offset", static_sk_wrapper)
 
@@ -1069,22 +832,16 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         dynamic_sk_symbol = "add_custom_abcd1234_100000_tilingkey"
         basic_context = self.make_compile_context(symbols=["add_custom_100000"])
         sk_context = self.make_compile_context(
-            kernel_name="add_custom_abcd1234",
-            wrapper_path=self.sk_wrapper_path,
-            symbols=[dynamic_sk_symbol],
+            kernel_name="add_custom_abcd1234", wrapper_path=self.sk_wrapper_path, symbols=[dynamic_sk_symbol]
         )
         options = self.make_options(source_include_style="joined")
         records = self.make_records(
-            basic_context=basic_context,
-            basic_options=options,
-            sk_context=sk_context,
-            sk_options=options,
+            basic_context=basic_context, basic_options=options, sk_context=sk_context, sk_options=options
         )
 
         result = self.generate(
             self.make_request(
                 records,
-                sk_cap_bitmap=3,
                 sk_kernel_attribute="__global__ [aicore]",
                 basic_kernel_attribute="__global__ [aicore]",
                 sk_bind_compile_options=options.compile_options,
@@ -1094,9 +851,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertEqual(sk_object["object_name"], "sk")
         self.assertEqual(sk_object["object_type"], "sk")
-        self.assertTrue(
-            all("stage" not in command for command in sk_object["commands"])
-        )
+        self.assertTrue(all("stage" not in command for command in sk_object["commands"]))
         self.assertEqual(
             sk_object["outputs"],
             [
@@ -1110,40 +865,26 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         sk_compile = sk_object["commands"][0]["cmd"]
         expanded_sk_compile = list(sk_compile)
         option_index = expanded_sk_compile.index("${options:common_compile}")
-        expanded_sk_compile[option_index : option_index + 1] = manifest["options"][
-            "common_compile"
-        ]
+        expanded_sk_compile[option_index : option_index + 1] = manifest["options"]["common_compile"]
         self.assertTrue(
             any(
                 expanded_sk_compile[index : index + 2] == ["-I", "${source_file_path}"]
                 for index in range(len(expanded_sk_compile) - 1)
             )
         )
-        self.assertIn(
-            "-Dauto_gen_add_custom_kernel=add_custom_100000_static_sk",
-            sk_compile,
-        )
-        self.assertIn(
-            "-Dadd_custom=add_custom_100000_tilingkey",
-            sk_compile,
-        )
-        self.assertEqual(
-            sk_object["commands"][2]["cmd"][0],
-            "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-        )
+        self.assertIn("-Dauto_gen_add_custom_kernel=add_custom_100000_static_sk", sk_compile)
+        self.assertIn("-Dadd_custom=add_custom_100000_tilingkey", sk_compile)
+        self.assertEqual(sk_object["commands"][2]["cmd"][0], "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy")
         bind_compile = sk_object["commands"][1]["cmd"]
         self.assertNotIn("${source_file_path}", bind_compile)
-        self.assertNotIn(self.input_root, json.dumps(bind_compile))
+        self.assertNotIn(self.input_root, bind_compile)
+        self.assertNotIn("-I" + self.input_root, bind_compile)
+        self.assertIn("-I${source_file_path}/missing_joined", bind_compile)
+        self.assertIn("${source_file_path}/missing_split", bind_compile)
         bind_reference = next(
-            value
-            for value in sk_object["commands"][1]["cmd"]
-            if value.startswith("${resource}/resources/src/sk_bind_")
+            value for value in sk_object["commands"][1]["cmd"] if value.startswith("${resource}/resources/src/sk_bind_")
         )
-        bind_path = os.path.join(
-            self.output_dir,
-            "resources",
-            self.resource_logical_path(manifest, bind_reference),
-        )
+        bind_path = os.path.join(self.output_dir, "resources", self.resource_logical_path(manifest, bind_reference))
         bind_text = Path(bind_path).read_text(encoding="utf-8")
         self.assertIn("add_custom_100000_static_sk", bind_text)
         self.assertNotIn(dynamic_sk_symbol, bind_text)
@@ -1156,37 +897,125 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         real_replace = os.replace
 
         def fail_stage_publish(source, destination):
-            if destination == self.output_dir and os.path.basename(source).startswith(
-                ".add_custom.stage."
-            ):
+            if destination == self.output_dir and os.path.basename(source).startswith(".add_custom.stage."):
                 raise OSError("publish failed")
             return real_replace(source, destination)
 
         with mock.patch.object(generator.os, "replace", side_effect=fail_stage_publish):
-            with self.assertRaisesRegex(
-                generator.ManifestPublishError, "failed to publish"
-            ):
+            with self.assertRaisesRegex(generator.ManifestPublishError, "failed to publish"):
                 self.generate(request)
 
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
-        self.assertFalse(
-            any(
-                name.startswith(".add_custom.stage.")
-                for name in os.listdir(self.output_root)
-            )
-        )
+        self.assertFalse(any(name.startswith(".add_custom.stage.") for name in os.listdir(self.output_root)))
 
-        with mock.patch.object(
-            generator,
-            "_fsync_directory",
-            side_effect=OSError("fsync failed"),
+        with mock.patch.object(generator, "_fsync_directory", side_effect=OSError("fsync failed")):
+            with self.assertRaisesRegex(generator.ManifestPublishError, "failed to publish"):
+                self.generate(request)
+
+        self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
+
+
+def _load_adapter_generator():
+    # Exercise the adapter implementation using the standalone host dependencies.
+    name = "asc_op_compile_base.asc_op_compiler._adapter_generator_test"
+    source = Path(FRAMEWORK_PATH) / "asc_op_compile_base/adapter/static_compile_resource_generator.py"
+    spec = importlib.util.spec_from_file_location(name, source)
+    module = importlib.util.module_from_spec(spec)
+    dependencies = {
+        name: module,
+        "tbe.common": SimpleNamespace(context=generator.context_module),
+        "tbe.tvm": SimpleNamespace(error_mgr=generator.error_mgr),
+    }
+    with mock.patch.dict(sys.modules, dependencies):
+        spec.loader.exec_module(module)
+    return module
+
+
+class TestManifestPublication(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+
+        def fail(_code, message):
+            raise RuntimeError(message)
+
+        patch = mock.patch.object(generator.utility_module.CommonUtility, "ascendc_raise_python_err", side_effect=fail)
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def compilation(self, mode="Normal"):
+        compilation = generator.KernelSpecCompilation.__new__(generator.KernelSpecCompilation)
+        compilation.enabled = mode != "None"
+        compilation._kernel_spec_mode = mode
+        compilation.kernel_spec_dir = str(self.root)
+        compilation.compile_info = SimpleNamespace(kernel_name="AddTest")
+        compilation.basic_compile_info = compilation.compile_info
+        compilation.sk_compile_info = None
+        compilation.resource_id = "a" * 64
+        compilation.record_sk_commands = False
+        return compilation
+
+    def test_publication_io_error_reports_task_context(self):
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+            writer.return_value.write.side_effect = OSError("disk full")
+            with self.assertRaisesRegex(RuntimeError, "kernel=AddTest.*mode=Normal.*output_dir=.*disk full"):
+                with self.compilation() as compilation:
+                    compilation.publish_manifest(None, 4)
+
+    def test_publication_uses_writer_without_rechecking_files(self):
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer, mock.patch.object(
+            Path, "is_file", side_effect=AssertionError("publication is handled by the writer")
         ):
-            with self.assertRaisesRegex(
-                generator.ManifestPublishError, "failed to publish"
-            ):
-                self.generate(request)
+            writer.return_value.write.return_value = None
+            with self.compilation() as compilation:
+                compilation.publish_manifest(None, 4)
+            writer.return_value.write.assert_called_once()
+        with self.compilation("None"):
+            pass
+        compilation = self.compilation()
+        compilation.enabled = False
+        with compilation:
+            pass
 
-        self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
+    def test_compilation_error_is_preserved(self):
+        original = ValueError("device compile failed")
+        with self.assertRaises(ValueError) as raised:
+            with self.compilation():
+                raise original
+        self.assertIs(raised.exception, original)
+
+    def test_generation_failure_still_cleans_up_and_restores_sk_state(self):
+        compilation = self.compilation("SK")
+        compilation.record_sk_commands = True
+        compilation._global_state = {"ascendc_enable_super_kernel": False}
+        compilation.cleanup = mock.Mock()
+        with mock.patch.object(
+            generator.storage_module.global_var_storage, "set_variable"
+        ) as restore, mock.patch.object(
+            generator, "ManifestPackageWriter", side_effect=generator.ManifestGenerationError("generation failed")
+        ):
+            with self.assertRaisesRegex(RuntimeError, "generation failed"):
+                with compilation:
+                    compilation.publish_manifest(None, 4)
+            compilation.cleanup.assert_called_once()
+            restore.assert_called_once_with("ascendc_enable_super_kernel", False)
+
+
+class TestAdapterManifestPublication(TestManifestPublication):
+    def setUp(self):
+        original = generator
+        globals()["generator"] = _load_adapter_generator()
+        self.addCleanup(globals().__setitem__, "generator", original)
+        super().setUp()
+
+
+class TestAdapterStaticCompileResourceGenerator(TestStaticCompileResourceGenerator):
+    def setUp(self):
+        original = generator
+        globals()["generator"] = _load_adapter_generator()
+        self.addCleanup(globals().__setitem__, "generator", original)
+        super().setUp()
 
 
 if __name__ == "__main__":

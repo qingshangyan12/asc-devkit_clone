@@ -18,7 +18,6 @@
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "kfc_server_protocol.h"
-#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
@@ -34,6 +33,9 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem = false;
     KfcServerRole role = KfcServerRole::DEFAULT;
     uint32_t jettyNum = 4;
+    // SoleNHR 2Die：die 维编号/总数（双 die 时每 mission 一个 die 实例，dispatch 转发给 kernel）
+    uint32_t axisId = 0;
+    uint32_t axisSize = 1;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
@@ -59,8 +61,7 @@ struct KfcServerContext : CcuKernelCtxBase {
     const char* exportDieSig;
     const char* importDieSig;
 
-    // TODO：当前missionNum_=1，missionIndex_=0---
-    // 用于Mission间同步信号
+    // 当前missionNum_=1，missionIndex_=0，用于Mission间同步信号
     std::vector<const char*> exportMissoinSig;
     std::vector<const char*> importMissionSig;
     // 用于Mission间同步变量

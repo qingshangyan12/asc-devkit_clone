@@ -22,8 +22,8 @@
 
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/sys_misc_intf_impl.h"
 #endif
 
 namespace __asc_aicore {

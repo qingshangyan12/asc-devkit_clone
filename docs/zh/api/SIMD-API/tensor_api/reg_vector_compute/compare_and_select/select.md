@@ -3,30 +3,30 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-头文件路径：`"include/tensor_api/experimental/arch/vector/compare_and_select.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/compare_and_select.h"`。
 
 给定两个源操作数src0和src1，根据condition的比特位值选取元素，得到目的操作数。当condition的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
 
@@ -34,7 +34,8 @@
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> select(reg_tensor<bool> condition, reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline reg_tensor<T> select(
+    const reg_tensor<bool>& condition, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
@@ -71,10 +72,10 @@ __simd_vf__ inline void select_vf(T x_tensor, U y_tensor, V z_tensor,
         auto mask = asc::te::experimental::update_mask<data_type>(count);
         uint32_t offset = i * one_repeat_size;
         const auto coord = asc::te::make_coord(offset);
-        auto x_reg = x_tensor.load(coord).with_mask(mask);
-        auto y_reg = y_tensor.load(coord).with_mask(mask);
-        auto z_reg = asc::te::experimental::select((x_reg > y_reg), x_reg, y_reg);
-        z_tensor.store(coord, z_reg);
+        auto x_reg = asc::te::experimental::load(x_tensor, coord).with_mask(mask);
+        auto y_reg = asc::te::experimental::load(y_tensor, coord);
+        auto z_reg = asc::te::experimental::select(condition, x_reg, y_reg);
+        asc::te::experimental::store(z_tensor, coord, z_reg);
     }
 }
 ```

@@ -2,7 +2,7 @@
 
 Ascend C提供一组HCCL通信类高阶API，方便算子核函数（Kernel）开发用户在AI Core侧灵活管理通算融合算子中计算与通信任务的执行顺序。
 
-HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语接口（以下统称为Prepare接口），对标[集合通信C++接口](https://gitcode.com/cann/hccl/blob/master/docs/zh/api_ref/comm_op_interface/README.md)，当前支持[AllReduce](AllReduce.md)、[AllGather](AllGather.md)、[ReduceScatter](ReduceScatter.md)、[AlltoAll](AlltoAll.md)、[AlltoAllV](AlltoAllV.md)、[AlltoAllvWrite](AlltoAllvWrite.md)、[BatchWrite](BatchWrite.md)接口。本章的所有接口运行在AI Core上，且不执行通信任务，而是由用户调用Prepare接口将对应类型的通信任务信息发送给AI CPU或CCU服务端，并在合适的时机通过[Commit](Commit.md)接口通知AI CPU或CCU上的服务端执行对应的通信任务。<!-- npu="950" id1 -->注意，当前Ascend 950PR/Ascend 950DT上仅支持CCU服务端。<!-- end id1 -->
+HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语接口（以下统称为Prepare接口），对标[集合通信C++接口](https://gitcode.com/cann/hccl/blob/master/docs/zh/api_ref/comm_op_interface/README.md)，当前支持[AllReduce](AllReduce.md)、[AllGather](AllGather.md)、[ReduceScatter](ReduceScatter.md)、[AlltoAll](AlltoAll.md)、[AlltoAllV](AlltoAllV.md)、[AlltoAllvWrite](AlltoAllvWrite.md)、[BatchWrite](BatchWrite.md)接口。本章的所有接口运行在AI Core上，且不执行通信任务，而是由用户调用Prepare接口将对应类型的通信任务信息发送给AI CPU或CCU服务端，并在合适的时机通过[Commit](Commit.md)接口通知AI CPU或CCU上的服务端执行对应的通信任务。<!-- npu="950" id1 -->注意，当前Ascend 950PR&950DT系列产品上仅支持CCU服务端。<!-- end id1 -->
 
 所谓合适的时机，取决于用户编排的是先通信后计算的任务，还是先计算后通信的任务。对于这两种场景，简述如下：
 
@@ -15,13 +15,13 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 ![](../../../../figures/ai_core_hccl_dispatch.png "AI-Core下发HCCL通信任务机制")
 
 <!-- npu="950" id3 -->
-**图2** Ascend 950PR/Ascend 950DT  AI Core下发HCCL通信任务机制  
+**图2** Ascend 950PR&950DT系列产品  AI Core下发HCCL通信任务机制  
 ![](../../../../figures/ascend950pr_950dt_ai_core_hccl_dispatch.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
 <!-- end id3 -->
 
 <!-- npu="A3" id2 -->
 > [!CAUTION]注意
->对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，在AI CPU作为服务端的场景中，HCCL通信API的功能依赖开放AI CPU用户态下发调度任务，存在一定的安全风险，用户需要自行确保AI Core自定义算子的安全可靠，防止恶意攻击行为。
+>对于Atlas A3系列产品，在AI CPU作为服务端的场景中，HCCL通信API的功能依赖开放AI CPU用户态下发调度任务，存在一定的安全风险，用户需要自行确保AI Core自定义算子的安全可靠，防止恶意攻击行为。
 <!-- end id2 -->
 
 实现AI Core下发一个通信任务的具体步骤如下：
@@ -34,7 +34,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
         AllGatherCustomTilingData, tilingData, tilingGM); // AllGatherCustomTilingData为对应算子头文件定义的结构体
 
     Hccl<HcclServerType::HCCL_SERVER_TYPE_AICPU> hccl; // 通过模板入参的方式选择硬件类型
-    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子核函数（Kernel）中，通过此方式获取HCCL context
 
     hccl.InitV2(contextGM, &tilingData);
     ```
@@ -50,7 +50,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     GET_TILING_DATA_WITH_STRUCT(AllGatherCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子核函数（Kernel）中，通过此方式获取HCCL context
 
     hccl.InitV2(contextGM, &tilingData);
     if (SetCcTilingV2(offsetof(AllGatherCustomTilingData, mc2CcTiling)) != HCCL_SUCCESS) {
@@ -75,6 +75,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     **表1**  HcclDataType参数说明
 
     <a name="table116710585514"></a>
+
     | 数据类型 | 说明 |
     | --- | --- |
     | HcclDataType | HCCL任务的数据类型。HcclDataType为枚举类型，定义如下代码所示。<br>    HCCL_DATA_TYPE_INT8：int8 <br>    HCCL_DATA_TYPE_INT16：int16 <br>    HCCL_DATA_TYPE_INT32：int32 <br>    HCCL_DATA_TYPE_FP16： half或float16 <br>    HCCL_DATA_TYPE_FP32： float <br>    HCCL_DATA_TYPE_INT64：int64 <br>    HCCL_DATA_TYPE_UINT64：uint64 <br>    HCCL_DATA_TYPE_UINT8：uint8 <br>    HCCL_DATA_TYPE_UINT16：uint16 <br>    HCCL_DATA_TYPE_UINT32：uint32 <br>    HCCL_DATA_TYPE_FP64：float64 <br>    HCCL_DATA_TYPE_BFP16：bfloat16 <br>    HCCL_DATA_TYPE_INT128：int128，预留类型，暂不支持 <br>    HCCL_DATA_TYPE_HIF8：hif8 <br>    HCCL_DATA_TYPE_FP8E4M3：fp8e4m3 <br>    HCCL_DATA_TYPE_FP8E5M2：fp8e5m2 <br>    HCCL_DATA_TYPE_FP8E8M0：fp8e8m0 <br>    HCCL_DATA_TYPE_RESERVED：暂不支持使用  |
@@ -105,6 +106,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     **表2**  HcclReduceOp参数说明
 
     <a name="table2469980529"></a>
+
     | 数据类型 | 说明 |
     | --- | --- |
     | HcclReduceOp | Reduce操作类型。HcclReduceOp为枚举类型，定义如下代码所示。<br> HCCL_REDUCE_SUM：sum <br>    HCCL_REDUCE_PROD：prod <br>    HCCL_REDUCE_MAX：max <br>    HCCL_REDUCE_MIN：min <br>    HCCL_REDUCE_RESERVED：暂不支持使用 |
@@ -175,7 +177,7 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(
     GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子核函数（Kernel）中，通过此方式获取HCCL context
     if (AscendC::g_coreType == AIV) {                 // 指定AIV核通信
         hccl.InitV2(contextGM, &tilingData);
         auto ret = hccl.SetCcTilingV2(offsetof(ReduceScatterCustomTilingData, reduceScatterCcTiling));
@@ -218,7 +220,7 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(
     GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子核函数（Kernel）中，通过此方式获取HCCL context
     if (AscendC::g_coreType == AIV) {                 // 指定AIV核通信
         hccl.InitV2(contextGM, &tilingData);
         auto ret = hccl.SetCcTilingV2(offsetof(ReduceScatterCustomTilingData, reduceScatterCcTiling));

@@ -3,27 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/thread_block_tile/thread_block_tile_constructor_res.md#id1 -->
 
 ## 功能说明
+
+头文件路径为：`"simt_api/cooperative_groups.h"`。
 
 `thread_block_tile`不提供默认构造函数，可通过`tiled_partition()`接口从另一个协作组中划分得到。
 
@@ -58,11 +60,12 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
     constexpr int THREAD_NUM = 1024;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
@@ -73,25 +76,23 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         __ubuf__ block_tile_memory<THREAD_NUM> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);                   // 按照64个线程为一组划分thread_block
-        ...
     }
 
     int main()
     {
-        ...
-        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>(...);             // 线程块中创建的线程数必须小于等于`block_tile_memory`的模板参数
-        ...
+        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>();             // 线程块中创建的线程数必须小于等于`block_tile_memory`的模板参数
     }
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     constexpr int THREAD_NUM = 1024;
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
@@ -102,13 +103,10 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         __ubuf__ block_tile_memory<THREAD_NUM> scratch = {};                    // 混合编程场景下需使用此方式在UB创建对象
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);                   // 使用UB临时存储划分thread_block
-        ...
     }
 
-    __global__ __vector__ void global_kernel(...)
+    __global__ __vector__ void global_kernel()
     {
-        ...
-        asc_vf_call<simt_kernel>(dim3(THREAD_NUM), ...);                        // 拉起SIMT VF时配置的线程数必须小于等于 block_tile_memory 的模板参数
-        ...
+        asc_vf_call<simt_kernel>(dim3(THREAD_NUM));                        // 拉起SIMT VF时配置的线程数必须小于等于 block_tile_memory 的模板参数
     }
     ```

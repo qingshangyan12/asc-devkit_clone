@@ -3,38 +3,38 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-头文件路径：`"tensor_api/arch/vector/experimental/type_conversion.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/type_conversion.h"`。
 
 命名空间：`asc::te::experimental`。
 
 `cast`用于寄存器数据类型转换，将源操作数`reg_tensor<SrcType>`中的有效元素转换为`DstType`，支持浮点转整数、浮点转浮点、整数转浮点和整数转整数。转换过程中可能发生位宽或精度变化，可通过编译期`cast_options`配置以下行为：
 
-- `cast_layout`：源类型和目的类型位宽不同时，单条指令的有效计算量以位宽较大的类型为准。该配置指定位宽较小的元素在同组元素中的位置。
-- `cast_round_mode`：指定发生精度损失时的舍入方式。
-- `cast_sat_mode`：指定转换结果超出目的类型表示范围时采用饱和还是非饱和处理。
+- [cast_layout](../aux_data_types/cast_layout.md)：源类型和目的类型位宽不同时，单条指令的有效计算量以位宽较大的类型为准。该配置指定位宽较小的元素在同组元素中的位置。
+- [cast_round_mode](../aux_data_types/cast_round_mode.md)：指定发生精度损失时的舍入方式。
+- [cast_sat_mode](../aux_data_types/cast_sat_mode.md)：指定转换结果超出目的类型表示范围时采用饱和还是非饱和处理。
 
 接口使用`src.mask`筛选源操作数中的有效元素，底层转换采用zeroing模式，mask未选中的目的元素置0。返回值保存转换结果，并原样传递`src.mask`，便于后续计算或`local_tensor::store`写回。
 
@@ -77,9 +77,9 @@ constexpr cast_options default_cast_ops = {
 
 | 配置项 | 取值和说明 |
 | --- | --- |
-| `layout` | `cast_layout::zero`、`cast_layout::one`、`cast_layout::two`、`cast_layout::three`，分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由源、目的类型的位宽比决定；同位宽转换仅支持`zero`。 |
-| `round` | `cast_round_mode::rint`：舍入到最近值，正好位于中间值时舍入到偶数；`cast_round_mode::round`：舍入到最近值，正好位于中间值时远离0；`cast_round_mode::floor`：向负无穷方向舍入；`cast_round_mode::ceil`：向正无穷方向舍入；`cast_round_mode::trunc`：向0方向舍入。仅在转换可能损失精度且对应组合支持该模式时生效。 |
-| `sat` | `cast_sat_mode::not_sat`：非饱和模式，超出范围时按目标格式截断或保留该浮点格式支持的特殊值；`cast_sat_mode::sat`：饱和模式，超出范围时钳位到目的类型边界。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
+| `layout` | [cast_layout](../aux_data_types/cast_layout.md)类型，支持`cast_layout::zero`、`cast_layout::one`、`cast_layout::two`、`cast_layout::three`，分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由源、目的类型的位宽比决定；同位宽转换仅支持`zero`。 |
+| `round` | [cast_round_mode](../aux_data_types/cast_round_mode.md)类型，支持`cast_round_mode::rint`：舍入到最近值，正好位于中间值时舍入到偶数；`cast_round_mode::round`：舍入到最近值，正好位于中间值时远离0；`cast_round_mode::floor`：向负无穷方向舍入；`cast_round_mode::ceil`：向正无穷方向舍入；`cast_round_mode::trunc`：向0方向舍入。仅在转换可能损失精度且对应组合支持该模式时生效。 |
+| `sat` | [cast_sat_mode](../aux_data_types/cast_sat_mode.md)类型，支持`cast_sat_mode::not_sat`：非饱和模式，超出范围时按目标格式截断或保留该浮点格式支持的特殊值；`cast_sat_mode::sat`：饱和模式，超出范围时钳位到目的类型边界。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
 
 > [!NOTE]  
 > `default_cast_ops`仅表示接口的默认参数，不表示所有类型组合均支持该配置。若默认配置不在对应转换行的支持范围内，必须显式传入`cast_options`。
@@ -102,6 +102,8 @@ constexpr cast_options default_cast_ops = {
 | `float → hifloat8_t` | `zero`、`one`、`two`、`three` | `round` | `not_sat`、`sat` |
 | `half → int4x2_t` | `zero`、`one`、`two`、`three` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
 | `half → hifloat8_t` | `zero`、`one` | `round` | `not_sat`、`sat` |
+
+`cast`支持的类型为寄存器元素类型，对于`int4x2_t`相关的转换，可以通过从UB中的元素类型为`int4b_t`的Tensor搬入后，使用返回的`reg_tensor<int4x2_t>`参与转换；`cast<int4x2_t>`的结果可通过`store`写入`int4b_t` Tensor。
 
 ## 关键特性说明
 
@@ -130,7 +132,7 @@ constexpr cast_options default_cast_ops = {
 - 位宽比为4时，可选择`zero`、`one`、`two`或`three`，对应每组中的第0至第3个位置。
 - 源、目的类型位宽相同时，使用`zero`。
 
-`cast`只完成寄存器计算，不会隐式调整UB中的数据排布。连续处理Tensor数据时，应使`local_tensor::load`、`cast_options::layout`和`local_tensor::store`的排布保持一致。常见用法如下：
+`cast`只完成寄存器计算，不会隐式调整Unified Buffer（UB）中的数据排布。连续处理Tensor数据时，应使`local_tensor::load`、`cast_options::layout`和`local_tensor::store`的排布保持一致。常见用法如下：
 
 | 转换方向 | 搬入 | 搬出 |
 | --- | --- | --- |
@@ -142,7 +144,7 @@ constexpr cast_options default_cast_ops = {
 
 对于尾块，建议按照源、目的类型中位宽较大的类型计算单寄存器逻辑元素数，并用相同类型调用`update_mask`。这样可使搬入/搬出sideband模式、`layout`和mask对应同一组逻辑元素。
 
-`int4x2_t`、`fp4x2_e2m1_t`和`fp4x2_e1m2_t`每个存储单元包含两个4 bit元素。它们与16 bit类型转换时，指令按两个元素一组读写；从16 bit类型转换到4 bit打包类型时，每组mask以偶数位为有效控制位。
+int4b_t在寄存器上以两个逻辑元素打包为一个字节，内存Tensor使用`int4b_t`，寄存器使用`int4x2_t`。`int4x2_t`、`fp4x2_e2m1_t`和`fp4x2_e1m2_t`每个存储单元包含两个4 bit元素。它们与16 bit类型转换时，指令按两个元素一组读写；从16 bit类型转换到4 bit打包类型时，每组mask以偶数位为有效控制位。
 
 ## 返回值说明
 

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file load_to_l0_utils.h
@@ -14,7 +14,8 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0_UTILS_H__
 #endif
@@ -59,9 +60,8 @@ __aicore__ inline constexpr LoadInstrType GetLoadInstrType()
         return LoadInstrType::LOAD2DV2;
     }
 
-    if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportLoad2dTranspose() &&
-        IsSameTypeV<A_T, int8_t>) {
-            return LoadInstrType::LOAD2DTRANSPOSE;
+    if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportLoad2dTranspose() && IsSameTypeV<A_T, int8_t>) {
+        return LoadInstrType::LOAD2DTRANSPOSE;
     }
 
     if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportLoad3dV2()) {
@@ -72,9 +72,11 @@ __aicore__ inline constexpr LoadInstrType GetLoadInstrType()
 }
 
 template <typename A_TYPE>
-__aicore__ inline constexpr GemvMode GetGemvMode() {
-    return (A_TYPE::format == CubeFormat::VECTOR) ? GemvMode::VECTOR :
-        ((A_TYPE::format == CubeFormat::SCALAR) ? GemvMode::SCALAR : GemvMode::MATRIX);
+__aicore__ inline constexpr GemvMode GetGemvMode()
+{
+    return (A_TYPE::format == CubeFormat::VECTOR) ?
+               GemvMode::VECTOR :
+               ((A_TYPE::format == CubeFormat::SCALAR) ? GemvMode::SCALAR : GemvMode::MATRIX);
 }
 
 enum class LoadL0bInstrType {
@@ -91,9 +93,10 @@ __aicore__ inline constexpr LoadL0bInstrType GetLoadL0bInstrType()
         return LoadL0bInstrType::LOAD2DV2;
     }
 
-    if constexpr (AscendC::Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportLoad2dTranspose() &&
+    if constexpr (
+        AscendC::Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportLoad2dTranspose() &&
         (IsSameTypeV<B_T, int8_t> || IsSameTypeV<B_T, int4b_t>)) {
-            return LoadL0bInstrType::LOAD2DTRANSPOSE;
+        return LoadL0bInstrType::LOAD2DTRANSPOSE;
     }
 
     if constexpr (AscendC::Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportLoad3dV2()) {
@@ -112,9 +115,15 @@ __aicore__ inline constexpr auto GetAuxDataType()
         uint8_t auxData = 0;
         return auxData;
     } else if constexpr (HasScalePosition<INPUT_TYPE>::value) {
-        uint8_t mxData = get_imm(0);
-        fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
-        return mxType;
+        using ScaleT = typename INPUT_TYPE::SCALE_T;
+        if constexpr (IsSameTypeV<ScaleT, fp8_e8m0_t>) {
+            uint8_t mxData = get_imm(0);
+            fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
+            return mxType;
+        } else {
+            AscendC::hif4_scale mxType;
+            return mxType;
+        }
     } else {
         uint8_t defaultData = 0;
         return defaultData;
@@ -124,9 +133,9 @@ __aicore__ inline constexpr auto GetAuxDataType()
     return defaultData;
 #endif
 }
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0_UTILS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

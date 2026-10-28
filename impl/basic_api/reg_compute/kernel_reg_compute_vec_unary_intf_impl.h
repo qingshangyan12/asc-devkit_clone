@@ -27,8 +27,16 @@
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_vec_unary_impl.h"
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
+#include "../../basic_api/reg_compute/dav_5161/kernel_reg_compute_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_unary_impl.h"
+#elif __NPU_ARCH__ == 5162
+#include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_vec_unary_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_vec_unary_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_vec_unary_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_unary_impl.h"
 #endif

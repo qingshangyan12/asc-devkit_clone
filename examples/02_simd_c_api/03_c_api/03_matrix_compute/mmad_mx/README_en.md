@@ -10,7 +10,7 @@ This example also describes K-axis transfer alignment and zero-padding for the F
 
 | Product | CANN Version |
 |---------|--------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -117,7 +117,7 @@ FP4 and FP8 use different storage widths along the K axis, so the padding ranges
 
 In Scenario 3, after the GM-to-L1 transfer moves the `K = 70` data and applies its 32-byte-granularity padding, the initialized K-axis range in L1 ends at the 96-element boundary, while `asc_mmad_mx` computes 128 elements. The example calls `asc_fill_l1` for A and B. Starting at K-axis offset 96, it writes one 32-byte zero block for every aligned row and clears the `[96, 128)` range.
 
-The destination of `asc_fill_l1` is addressed as `uint16_t`, and its start offset is calculated as `AlignHeight * (CeilAlign(PACKED_K, 32) / 2)`. In the FP8 scenario, A and B use `M_ALIGN = 48` and `N_ALIGN = 64` as their respective `AlignHeight` values, so their start offsets are 2304 and 3072 `uint16_t` elements. The two operations set `repeat` to 48 and 64, respectively, with `blk_num = 1` and `dst_gap = 0`, continuously covering one 32-byte block for every aligned row. After clearing, `asc_sync_pipe(PIPE_MTE1)` ensures that the L1 writes finish before the L1-to-L0A/L0B transfers begin.
+The destination of `asc_fill_l1` is addressed as `uint16_t`, and its start offset is calculated as `AlignHeight * (CeilAlign(PACKED_K, 32) / 2)`. In the FP8 scenario, A and B use `M_ALIGN = 48` and `N_ALIGN = 64` as their respective `AlignHeight` values, so their start offsets are 2304 and 3072 `uint16_t` elements. The two operations set `repeat` to 48 and 64, respectively, with `blk_num = 1` and `dst_gap = 0`, continuously covering one 32-byte block for every aligned row. 
 
 When changing K in this example, recalculate `PACKED_K`, `ScaleK`, and `ALIGN_K` together, and handle any remaining padding according to the K-axis range actually covered by the GM-to-L1 transfer.
 
@@ -134,6 +134,8 @@ When changing K in this example, recalculate `PACKED_K`, `ScaleK`, and `ALIGN_K`
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
+
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Install the data generation dependencies:
 

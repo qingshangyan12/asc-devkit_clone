@@ -10,7 +10,7 @@
 
     **currentShapeSize = \(currBuff - extraBuf\) / maxLiveNodeCnt / typeSize**
 
--   算子实现需要调用两个kernel侧API KernelIntf1、KernelIntf2，利用两个GetXxxTmpBufferFactorSize（其中Xxx为需要调用的两个高阶API）接口的两组输出值\(maxLiveNodeCnt、extraBuf\)以及当前现有的临时空间，推导单次最大计算元素数量currentShapeSize为：
+-   算子实现需要调用两个核函数（Kernel）侧API KernelIntf1、KernelIntf2，利用两个GetXxxTmpBufferFactorSize（其中Xxx为需要调用的两个高阶API）接口的两组输出值\(maxLiveNodeCnt、extraBuf\)以及当前现有的临时空间，推导单次最大计算元素数量currentShapeSize为：
 
     **currentShapeSize1 = \(currBuff - extraBuf1\) / maxLiveNodeCnt1 / typeSize**
 
@@ -34,7 +34,7 @@ void GetMeanTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCo
 | --- | --- | --- |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | maxLiveNodeCount | 输出 | 最大存活节点数，表示临时空间是单次计算数据量所占空间的多少倍。 |
-| extraBuffer | 输出 | 使用的额外临时空间大小，单位为byte。 |
+| extraBuffer | 输出 | 使用的额外临时空间大小，单位为字节。 |
 
 ## 返回值说明
 

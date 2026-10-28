@@ -2,14 +2,16 @@
 
 asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。
 
+头文件路径为：`"c_api/defs/enum.h"`。
+
 ## 枚举类具体定义
 
 ```cpp
 enum class asc_saturation_mode : uint8_t {
-    FLOAT,
-    FLOAT8,
-    INT,
-    CAST
+    FLOAT = 48,
+    FLOAT8 = 50,
+    INT = 53,
+    CAST = 59
 };
 ```
 

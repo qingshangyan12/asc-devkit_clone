@@ -51,17 +51,17 @@ SelectorStatus AutoSelectorBase::Select(
         HCCL_DEBUG("[asc][AlgoSelect][AutoSelectorBase::Select] try CCU_SCHED, opType[%d].", opParam.opType);
         ret = SelectCcuScheduleAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
         if (ret == SelectorStatus::NOT_MATCH) {
-            opParam.opExecuteConfig = OpExecuteConfig::CCU_FAIL;
-            HCCL_INFO(
-                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED not match, fallback to CCU_FAIL, "
-                "opType[%d].",
+            // CCU(KFC)上下文无法运行 AICPU 算法，选不到即失败，不降级
+            HCCL_WARNING(
+                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED not match, opType[%d], fail without AICPU "
+                "fallback.",
                 opParam.opType);
-        } else {
-            HCCL_INFO(
-                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED matched, opType[%d], algName[%s].",
-                opParam.opType, selectAlgName.c_str());
             return ret;
         }
+        HCCL_INFO(
+            "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED matched, opType[%d], algName[%s].", opParam.opType,
+            selectAlgName.c_str());
+        return ret;
     }
     if (ProcessAivConfig(opParam, topoInfo, configAlgMap, selectAlgName, ret)) {
         HCCL_INFO(
@@ -374,6 +374,31 @@ bool AutoSelectorBase::IsTwoLevelNetLayer(const TopoInfoWithNetLayerDetails* top
         topoInfo->topoLevelNums, topoInfo->netLayerDetails.netLayerNum, level1Idx,
         topoInfo->netLayerDetails.localNetInsSizeOfLayer[0]);
     return true;
+}
+
+// 与 hccl AutoSelectorBase::CalcFrameNum 逐行一致：level0 实例数 GCD 推导框数。
+u32 AutoSelectorBase::CalcFrameNum(const TopoInfoWithNetLayerDetails* topoInfo)
+{
+    u32 frameNum = 0;
+    if (topoInfo->topoLevelNums <= 1 || topoInfo->netLayerDetails.instSizeListOfLayer[0].empty()) {
+        return frameNum;
+    }
+    u32 gcd = topoInfo->netLayerDetails.instSizeListOfLayer[0][0];
+    for (size_t i = 1; i < topoInfo->netLayerDetails.instSizeListOfLayer[0].size(); ++i) {
+        u32 a = gcd;
+        u32 b = topoInfo->netLayerDetails.instSizeListOfLayer[0][i];
+        while (b != 0) {
+            u32 r = a % b;
+            a = b;
+            b = r;
+        }
+        gcd = a;
+        if (gcd == 1) {
+            break;
+        }
+    }
+    frameNum = (gcd > 0) ? topoInfo->userRankSize / gcd : 0;
+    return frameNum;
 }
 
 bool AutoSelectorBase::IsInputOutputOverlap(const OpParam& opParam) const

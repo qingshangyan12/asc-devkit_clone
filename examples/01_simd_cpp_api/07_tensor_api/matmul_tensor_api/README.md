@@ -8,9 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
-
-> **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -33,13 +31,13 @@
   C = A * B
   $$
 - 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入输出规格如下表所示：
+  本样例参数m = 512, n = 1024, k = 512，调用16个核完成计算，输入输出规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">A</td><td align="center">[m, k]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[k, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
@@ -70,7 +68,7 @@
 
     4. **切片接口**：使用slice + make_coord + make_shape获取张量的子区域
        - 实现分核逻辑：每个核处理不同的数据块
-       - 实现分块逻辑：baseM/baseK/baseN的基础块切分
+       - 实现分块逻辑：base_m/base_k/base_n的基础块切分
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数。
@@ -126,9 +124,9 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR&950DT系列产品 |
 
-  > **说明：** 本样例仅支持dav-3510架构（对应 Ascend 950PR/Ascend 950DT）。
+  > **说明：** 本样例仅支持dav-3510架构（对应 Ascend 950PR&950DT系列产品）。
 
 - 执行结果
   执行结果如下，说明精度对比成功。

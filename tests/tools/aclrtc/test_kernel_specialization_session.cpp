@@ -161,7 +161,9 @@ private:
             {"kernels", Json::array(
                             {{{"kernel_name", "add_custom_100000"},
                               {"constant_infos", Json::array(
-                                                     {{{"parameter_index", 0},
+                                                     {{{"name", "tiling"},
+                                                       {"parameter_index", 0},
+                                                       {"arg_type", "pointer"},
                                                        {"byte_size", 2},
                                                        {"file", "${resource}/resources/include/constants.h"},
                                                        {"template", "@@STATIC_TILING@@"}}})},
@@ -376,6 +378,11 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
     EXPECT_EQ(firstResource.manifest, manifest);
     EXPECT_EQ(firstResource.externalSourceDirectoryPath, sourceDirectoryPath);
     EXPECT_TRUE(fs::is_regular_file(firstResource.ownedResourceDirectoryPath / "payload.bin"));
+
+    MaterializedKernelCompilationResource missingResource;
+    EXPECT_EQ(
+        KernelSpecializationSession::LoadAndMaterializeCompilationResource("missing-resource", missingResource),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     MaterializedKernelCompilationResource secondResource;
     ASSERT_EQ(

@@ -6,9 +6,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 ```
@@ -217,7 +217,7 @@ Scalar单元访问GM上的信号量，存在两种访问方式：
    使用 GlobalTensor的成员函数GetValue 和 SetValue 进行操作。这种情况下，开发者需要手动调用[DataCacheCleanAndInvalid](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0177.html)接口，以确保多核间数据的一致性。
 
 2. **不通过DCache 访问**
-   使用[WriteGmByPassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) 和 ReadGmByPassDCache。这种方式无需额外操作即可保证多核间数据的一致性。
+   使用[WriteGmBypassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) 和 ReadGmBypassDCache。这种方式无需额外操作即可保证多核间数据的一致性。
 
 两种方案在性能上的差异：不经过DCache，性能会较差，但是如果读写GM数据较少，可以考虑使用不经过DCache的方法。
 核间同步方案中也需要与核内同步配合使用，现将三处核内同步作用说明如下：
@@ -303,9 +303,9 @@ $$
 
 ### 2.3 注意事项
 
-#### (1) 当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR/Ascend 950DT。
-当`SCENARIO_NUM=1` 和 `SCENARIO_NUM=2`样例支持 Ascend 950PR/Ascend 950DT。
-当`SCENARIO_NUM=3` 时，调用 `DataCopy` 从L1向GM搬出数据，然而在Ascend 950PR/Ascend 950DT架构下，DataCopy接口不支持L1 Buffer -> GM通路，因此当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR/Ascend 950DT。如果要支持Ascend 950PR/Ascend 950DT，可以参考[基础API迁移指导](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_compatibility_10_00005.html)中的兼容性方案。
+#### (1) 当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR&950DT系列产品。
+当`SCENARIO_NUM=1` 和 `SCENARIO_NUM=2`样例支持 Ascend 950PR&950DT系列产品。
+当`SCENARIO_NUM=3` 时，调用 `DataCopy` 从L1向GM搬出数据，然而在Ascend 950PR&950DT系列产品架构下，DataCopy接口不支持L1 Buffer -> GM通路，因此当 `SCENARIO_NUM=3` 时，样例不支持 Ascend 950PR&950DT系列产品。如果要支持Ascend 950PR&950DT系列产品，可以参考[基础API迁移指导](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_compatibility_10_00005.html)中的兼容性方案。
 
 #### (2) 当 `SCENARIO_NUM=2` 时，样例不支持静态 tensor 编程方式。
 当SCENARIO_NUM=2 时，调用了`IBSet` 和 `IBWait` 做核间同步，然而以上两个接口内部实现需要借助TPipe框架做核内同步，因此当SCENARIO_NUM=2 时，样例不支持静态 tensor 编程方式。

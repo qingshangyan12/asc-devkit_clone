@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-设置B矩阵的位置，数据格式，数据类型，是否转置等信息，这些信息需要和kernel侧的设置保持一致。
+设置B矩阵的位置，数据格式，数据类型，是否转置等信息，这些信息需要和核函数（Kernel）侧的设置保持一致。
 
 ## 函数原型
 
@@ -36,6 +36,6 @@ int32_t SetBType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans
 ```
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
-// 设置B矩阵，buffer位置为GM，数据格式为ND，数据类型为bfloat16，默认不转置
+// 设置B矩阵，buffer位置为GM，数据格式为ND，数据类型为half，默认不转置
 tiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
 ```

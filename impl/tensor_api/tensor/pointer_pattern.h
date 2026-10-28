@@ -61,16 +61,30 @@ __aicore__ inline auto make_mem_ptr(Addr arg)
 }
 
 template <typename PtrPattern, typename Iterator, enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
-__aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
+__aicore__ inline auto make_mem_ptr(Iterator iterator)
 {
     return make_location_mem_ptr<PtrPattern>(iterator);
 }
 
 template <typename Iterator, enable_make_ptr_by_iter<Iterator> = 0>
-__aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
+__aicore__ inline auto make_mem_ptr(Iterator iterator)
 {
     using ptr_pattern = get_attribute_location<typename iter_ele<Iterator>::type*>;
     return make_location_mem_ptr<ptr_pattern>(iterator);
+}
+
+template <typename T>
+__aicore__ inline constexpr size_t get_scale_divisor()
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+    if constexpr (Std::is_same_v<Std::remove_cvref_t<T>, hifloat4x2_t>) {
+        return scale_divisor_hif4;
+    } else {
+        return scale_divisor;
+    }
+#else
+    return scale_divisor;
+#endif
 }
 
 } // namespace te

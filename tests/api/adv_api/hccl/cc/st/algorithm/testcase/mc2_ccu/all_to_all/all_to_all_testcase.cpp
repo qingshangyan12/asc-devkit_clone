@@ -27,7 +27,53 @@ CcuStScenario MakeScenario(const TopoMeta& topoMeta, HcclDataType dataType, uint
     return scenario;
 }
 
+// 单server内全部 phyId 携带 MESH_1D_CLOS_PHYID_MARK 时，TopoModel 按 MESH_1D_CLOS 建模
+// （单方向 1D Mesh 实例 + 覆盖 server 全部 rank 的 CLOS 实例，selector 判定 meshNum==closNum）
+TopoMeta MakeMesh1dClosTopo(const std::vector<uint32_t>& phyIds)
+{
+    ServerMeta server;
+    for (auto phyId : phyIds) {
+        server.push_back(phyId | MESH_1D_CLOS_PHYID_MARK);
+    }
+    return TopoMeta{{server}};
+}
+
 } // namespace
+
+// ===== 大禹纯 CLOS（DIE0-only 建链）=====
+// scenario.pureClosTopo=true 时 TopoModel 把 L0 建模为单 CLOS 实例全互联（UBC_CTP 链路），
+// selector 走纯 CLOS 分支选 CcuSchedAllToAllSoleMesh，模板 CalcChannelRequestMesh1DOnDie
+// 在 devPhyId 4/4 翻转 die 的双 die 链路中只取 DIE0（stub：devPhyId>=4 → die1）。
+// phyId {0..3} 落 DIE0、{4..7} 落 DIE1，8 rank 即双 die 混布场景。
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_2Rank_PureClos_Fp16_100B)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_8Rank_PureClos_Fp16_64B)
+{
+    // 8 rank 双 die 混布（phyId 0-3 = die0，4-7 = die1）：盲选建链会混出跨 die 通道集，
+    // DIE0-only 过滤后 7 条通道全部落在 die0
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 64);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_8Rank_PureClos_Fp32_1KB)
+{
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP32, 1024);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
 
 // ===== 拓扑泛化（FP16, CcuSchedAllToAllSoleMesh）=====
 TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_2Rank_SingleDie_Fp16_100B)
@@ -251,4 +297,26 @@ TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_LogLevel_Control_2Rank_SingleDie_
     }
     std::string errorOnlyOutput = testing::internal::GetCapturedStdout();
     EXPECT_EQ(errorOnlyOutput.find("INFO"), std::string::npos);
+}
+
+// ===== MultiJetty（MESH_1D_CLOS 双实例：单方向 Mesh + CLOS）=====
+// selector 语义（alltoall_auto_selector.cc SelectMesh1DClosAlgo）：
+// meshNum==closNum 且 rankSize<=4 且 dataSize>512B → CcuSchedAllToAllSoleMeshConcurrent，否则 MultiJetty
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllMesh1DMultiJetty_4Rank_Mesh1DClos_Fp16_100B)
+{
+    // 100B <= BIG_DATA_SIZE_LIMIT(512B)，Concurrent 让位条件不满足 → MultiJetty
+    TopoMeta topo = MakeMesh1dClosTopo({0, 1, 2, 3});
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100);
+    scenario.expectedAlgName = "CcuSchedAllToAllMesh1DMultiJetty";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllMesh1DMultiJetty_8Rank_Mesh1DClos_Fp16_64B)
+{
+    // rankSize=8 > CONCURRENT_RANK_LIMIT(4)，Concurrent 让位条件必然不满足 → MultiJetty
+    TopoMeta topo = MakeMesh1dClosTopo({0, 1, 2, 3, 4, 5, 6, 7});
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 64);
+    scenario.expectedAlgName = "CcuSchedAllToAllMesh1DMultiJetty";
+    VerifyScenario(scenario);
 }

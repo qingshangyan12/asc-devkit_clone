@@ -3,25 +3,25 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id7 -->
 <!-- npu="310p" id8 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id8 -->
 <!-- npu="910" id9 -->
-- Atlas 训练系列产品：支持
+- Atlas训练系列产品：支持
 <!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -29,7 +29,7 @@
 提供Host侧打印Log的功能。开发者可以在算子的TilingFunc代码中使用ASC\_CPU\_LOG\_XXX接口来输出相关内容。一般情况下，开发者也可以选择使用printf等Host侧通用的打印方式进行调试。然而，在Tiling下沉场景中，由于Tiling函数运行在AI CPU上，必须使用本接口进行打印。
 
 -   非Tiling下沉场景，日志输出到plog中。比如，debug级别的日志输出到/root/ascend/log/debug/plog中，日志级别通过环境变量ASCEND_GLOBAL_LOG_LEVEL控制。会打印日志级别、时间戳、日志所在代码行和日志所在函数名。
--   Tiling下沉场景，日志不会输出到plog中，而是需要落盘并进行解析。算子运行之前需要开启Dump功能，使得日志Dump功能生效。如何开启Dump功能依赖于具体的网络运行方式。以TorchAir图模式为例，需要配置enable\_dump、dump\_path、dump\_mode等Dump参数。详细说明可参考[算子data dump功能](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/ascend_ir/features/advanced/data_dump.md)。示例如下：
+-   Tiling下沉场景，日志不会输出到plog中，而是需要落盘并进行解析。算子运行之前需要开启Dump功能，使得日志Dump功能生效。如何开启Dump功能依赖于具体的网络运行方式。以TorchAir图模式为例，需要配置enable\_dump、dump\_path、dump\_mode等Dump参数。详细说明可参考[算子data dump功能](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/ascend_ir/features/advanced/data_dump.md)。示例如下：
 
     ```
     import torch_npu, torchair

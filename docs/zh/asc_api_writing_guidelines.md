@@ -257,7 +257,7 @@ Neg_ISASI.md的内容如下：
 
 【级别】强制
 
-【描述】每个接口的md文件须按如下顺序组织章节（均为二级标题），其中数据类型、关键特性、需要包含的头文件章节可视接口实际情况选填。例如高阶API中的Sin接口，其不同芯片支持的数据类型相同，无需单独章节描述差异，可随参数说明一并描述。例如基础API统一在功能说明中描述需要包含的头文件，可以不需要"需要包含的头文件"章节。同一类API的章节结构应保持统一。
+【描述】每个接口的md文件须按如下顺序组织章节（均为二级标题），其中数据类型、关键特性章节可视接口实际情况选填。例如高阶API中的Sin接口，其不同芯片支持的数据类型相同，无需单独章节描述差异，可随参数说明一并描述。同一类API的章节结构应保持统一。
 
 ```text
 产品支持情况
@@ -267,7 +267,6 @@ Neg_ISASI.md的内容如下：
 数据类型
 返回值说明
 约束说明
-需要包含的头文件
 关键特性说明
 调用示例
 ```
@@ -296,25 +295,25 @@ Neg_ISASI.md的内容如下：
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 ```
 
@@ -330,25 +329,25 @@ Neg_ISASI.md的内容如下：
 ## 产品支持情况
 
 <!-- npu="950" id8 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id8 -->
 <!-- npu="A3" id9 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id9 -->
 <!-- npu="910b" id10 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id10 -->
 <!-- npu="310b" id11 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id11 -->
 <!-- npu="310p" id12 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id12 -->
 <!-- npu="310p" id13 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id13 -->
 <!-- npu="910" id14 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id14 -->
 ```
 
@@ -389,13 +388,12 @@ Neg_ISASI.md的内容如下：
 
 【级别】强制
 
-【描述】须提供接口所在的头文件及使用该接口时需包含的头文件。若在前文章节已按API分类有总体介绍或者有单独章节介绍，功能说明中则无需重复介绍。头文件路径用反引号包裹。
+【描述】须提供接口所在的头文件及使用该接口时需包含的头文件。若在前文章节已按API分类有总体介绍，功能说明中则无需重复介绍。头文件路径用反引号包裹。
 
 【正例】  
 头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`。
 
-【例外】  
-- 如果有单独的章节“需要包含的头文件”单独说明需要包含的头文件，此处无需列出。
+【例外】
 - 如果在上文章节统一说明一类接口需要包含的头文件，此处无需列出。
 
 ### API-FUNC-02 引入新概念时须增加必要的解释或者增加至相关概念的超链接
@@ -600,27 +598,27 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 - 该原型支持如下产品型号：
 
     <!-- npu="950" id16 -->
-    Ascend 950PR/Ascend 950DT 
+    Ascend 950PR&950DT系列产品 
     <!-- end id16 -->
 
     <!-- npu="A3" id17 -->
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品 
+    Atlas A3系列产品 
     <!-- end id17 -->
 
     <!-- npu="910b" id18 -->
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品 
+    Atlas A2系列产品 
     <!-- end id18 -->
 
     <!-- npu="310b" id19 -->
-    Atlas 200I/500 A2 推理产品 
+    Atlas 200I/500 A2推理产品 
     <!-- end id19 -->
 
     <!-- npu="x90" id20 -->
-    Kirin X90 
+    Kirin X90处理器系列产品 
     <!-- end id20 -->
 
     <!-- npu="9030" id21 -->
-    Kirin 9030 
+    Kirin 9030处理器系列产品 
     <!-- end id21 -->
 
     ```cpp
@@ -633,15 +631,15 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 - 该原型支持如下产品型号：
 
     <!-- npu="310p" id23 -->
-    Atlas 推理系列产品AI Core 
+    Atlas推理系列产品AI Core 
     <!-- end id23 -->
 
     <!-- npu="310p" id24 -->
-    Atlas 推理系列产品Vector Core 
+    Atlas推理系列产品Vector Core 
     <!-- end id24 -->
 
     <!-- npu="910" id25 -->
-    Atlas 训练系列产品 
+    Atlas训练系列产品 
     <!-- end id25 -->
 
     ```cpp
@@ -791,7 +789,7 @@ dataCopyParams给出了其数据类型所在的头文件目录和详细介绍。
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
 <!-- npu="950" id26 -->
-- 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，支持的取值范围情况如下：
+- 针对Ascend 950PR&950DT系列产品，核间同步的模式为模式4时，支持的取值范围情况如下：
     - AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。
     - AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。
     - AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。
@@ -985,11 +983,8 @@ AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
  
  
  【级别】强制 
- 
- 
- 【描述】样例代码中不应出现`using namespace AscendC`等不规范用法，在调用接口、枚举时需要加上命名空间限定。
 
- 【级别】强制
+ 【描述】样例代码中不应出现`using namespace AscendC`等不规范用法，在调用接口、枚举时需要加上命名空间限定。
 
  【正例】枚举值和接口名都加上AscendC命名空间。
 
@@ -1059,11 +1054,13 @@ bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、f
 
 ## 12 图元规范
 
+图元模板请参考[Ascend C领域制图模板](./figures/asc_templates.xml)（以draw.io模板为例）。
+
 ### API-FIGURE-00 图元字体和字号须符合要求
 
 【级别】强制
 
-【描述】中文须使用方正兰亭黑简体，英文须使用Huawei Sans。中文不能小于9pt（相当于12像素），全角字符；英文不能小于8pt（相当于10像素），半角字符。
+【描述】使用方正兰亭黑简体。中文不能小于9pt（相当于12像素），全角字符；英文不能小于8pt（相当于10像素），半角字符。
 
 ### API-FIGURE-01 图形宽度须符合要求
 
@@ -1075,7 +1072,7 @@ bool、int4b_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、f
 
 【级别】强制
 
-【描述】完成绘制后，须点击页面适应到绘图，并增加白底背景，以确保在IDE和浏览器的深色风格下，仍能够清晰地显示图中的深色线条。
+【描述】完成绘制后，须增加白底背景，以确保在IDE和浏览器的深色风格下，仍能够清晰地显示图中的深色线条。
 
 ### API-FIGURE-03 图元之间的连线应选择无跳线样式
 
@@ -1194,7 +1191,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 ```text
 <!-- npu="950" id27 -->
-本接口在Ascend 950PR/Ascend 950DT上支持counter模式。
+本接口在Ascend 950PR&950DT系列产品上支持counter模式。
 <!-- end id27 -->
 ```
 
@@ -1263,8 +1260,3 @@ asc_get_ar_spr接口文档示例如下：
 | 7 | 语句逻辑 | 语句须通顺、逻辑清晰，避免出现语病或语义歧义。例如，"本节主要描述不同数据类型之间精度转换时的舍入行为"不应写成"本节主要描述不同数据类型之间精度转换时的舍入行为进行介绍"。 |
 | 8 | 链接引用 | 链接引用规则：同一个代码仓内编程指南和API、example样例之间的链接均使用相对链接。 |
 | 9 | 列表 | 当只有一个条目时，不应使用无序列表符号，直接以正文形式呈现。 |
-
-
-
-
-

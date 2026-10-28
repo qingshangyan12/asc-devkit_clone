@@ -4,13 +4,11 @@
 
 Taking the [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) interface as an example, this sample uses five groups of controlled experiments to demonstrate the performance differences of `asc_atomic_add()` under various usage scenarios — including different memory tiers (Global Memory / Unified Buffer), different atomic-accumulation organizations (direct atomic add / intra-block UB accumulation followed by GM writeback), whether the return value is used, the contention intensity on the same address, the Sector distribution of target addresses, and different data types (int32_t, int64_t) — and provides corresponding optimization guidance.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Versions
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -429,11 +427,21 @@ Execute the following steps in the sample root directory to build and run the sa
   ./atomic_add_perf
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build options:
 
   | Option | Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR&950DT products) |
   | `SCENARIO_NUM` | `1`-`16` | Scenario number to test. The scale (Block×Thread), data type, whether the return value is used, `target_count`, `threads_per_target`, and `target_stride` for each scenario are configured centrally by `get_scenario_config()` in the source |
   | `SKIP_VALIDATION` | `ON`/`OFF` | Whether to skip result validation; default `OFF`. The UB-only scenarios of Case 1/3 have no GM result and automatically skip validation; recommended to set to `ON` when profiling GM-writeback scenarios with `msopprof` |
 

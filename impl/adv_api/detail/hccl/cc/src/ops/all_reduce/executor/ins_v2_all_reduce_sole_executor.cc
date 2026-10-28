@@ -10,13 +10,35 @@
 
 #include "ins_v2_all_reduce_sole_executor.h"
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
+#include "ins_temp_all_reduce_nhr.h"
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
 #endif
+#include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 #include "ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.h"
+#include "alg_meta_registry.h"
+#include "external_alg_rules.h"
+
+#include <type_traits>
 
 namespace mc2_ops_hccl {
+
+namespace {
+template <typename InsAlgTemplate>
+typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+typename std::enable_if<!std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllReduceSoleExecutor()
@@ -112,6 +134,9 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS && resCtx.topoInfo.isPod) {
+        CHK_RET(SetChannelsPerRankIfSupported(*algTemplate, templateAlgRes.channels));
+    }
     u32 templateScratchMultiplier =
         algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
 
@@ -250,19 +275,42 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshTwoShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DTwoShot);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshTwoShot, AlgEngine::AICPU, "sole[mesh.two_shot]", COND_NONE,
+    FLAG_NONE, 0);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    InsTempAllReduceNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DOneShot);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, AlgEngine::AICPU, "sole[mesh.one_shot]", COND_NONE,
+    FLAG_NONE, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempKfcAllReduceMesh1DMem2Mem);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 #endif
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHRAicpuReduce, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    InsTempAllReduceAicpuReduceNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHRAicpuReduce, AlgEngine::AICPU, "sole[nhr]", COND_SPECIAL_DT,
+    FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshChunkTwoShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DTwoShotMeshChunk);
-
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshChunkTwoShot, AlgEngine::AICPU, "sole[mesh.two_shot.chunk]",
+    COND_NONE, FLAG_NONE, 0);
 } // namespace mc2_ops_hccl

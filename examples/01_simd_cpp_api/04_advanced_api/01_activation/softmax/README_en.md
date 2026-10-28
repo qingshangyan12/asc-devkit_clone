@@ -12,9 +12,9 @@ AdjustSoftMaxRes is used for post-processing of SoftMax computation results. Whe
 
 | Product | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -32,7 +32,7 @@ AdjustSoftMaxRes is used for post-processing of SoftMax computation results. Whe
 
 - Example function:
 
-  This example performs row-wise SoftMax computation on the input tensor and uses AdjustSoftMaxRes for post-processing of the computation result. When specified values (0xFF7FFFFF, that is, the maximum finite value of float type) exist in the input max, it adjusts the data at the corresponding positions in the output to custom values (0.0, that is, floating-point zero). This mechanism is commonly used in attention mask scenarios to set the softmax output of invalid positions to zero.
+  This example performs row-wise SoftMax computation on the input tensor and uses AdjustSoftMaxRes for post-processing of the computation result. `0xFF7FFFFF` is the IEEE 754 bit pattern of the minimum finite float value (approximately -3.4028235e+38). The data generation script sets the first input row to this value so that its max matches the specified value, and the corresponding SoftMax output row is adjusted to 0.0. This mechanism is commonly used in attention mask scenarios to set the SoftMax output of invalid positions to zero.
 
 - Example specifications:
 
@@ -102,7 +102,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution result
 

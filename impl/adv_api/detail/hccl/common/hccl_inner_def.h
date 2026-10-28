@@ -75,7 +75,8 @@ struct CommonPrepareParamCcu {
     HcclReduceOp op;
     uint64_t strideCount;
     uint8_t repeat = 1U;
-    uint8_t reservedPartA[7];
+    uint8_t skipLocalRankCopy = 0U;
+    uint8_t reservedPartA[6];
     AlltoAllVParamExt paramExt;       // only used by AlltoAllV
     AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
     uint8_t reservedPartB[8];
@@ -116,7 +117,7 @@ struct HcclCombineOpParam {
     uint32_t rankId;        // id of this rank
     uint32_t rankNum;       // num of ranks in this comm group
     uint64_t winSize;       // size of each windows memory
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
     uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
@@ -177,6 +178,24 @@ constexpr uint64_t CCU_MEMSLICE_SIZE = 4096; // CCU MS size, MC2 is not aware of
 constexpr uint64_t CCU_MSG_CKE_INIT_VALUE = 0;
 constexpr uint64_t CCU_MSG_CKE_SET_VALUE = 1;
 constexpr uint64_t CCU_MAX_COMM_DATA = 268435456; // 256 * 1024 * 1024
+constexpr uint8_t HCCL_CCU_DEV_TYPE_A5 = 6U;
+constexpr uint8_t HCCL_CCU_DEV_TYPE_A6 = 8U;
+
+enum class CcuProtocolVersion : uint8_t {
+    CCU_V1 = 0U,
+    CCU_V2 = 1U,
+    INVALID = 2U,
+};
+
+// Arch-based CCU protocol version: A6 (9201/9202) uses V2, others (A5/3510) use V1.
+__aicore__ inline constexpr CcuProtocolVersion GetArchCcuProtocolVersion()
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    return CcuProtocolVersion::CCU_V2;
+#else
+    return CcuProtocolVersion::CCU_V1;
+#endif
+}
 
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
@@ -199,6 +218,7 @@ struct CcuPrepareParam {
     uint8_t alltoallvCnt = 0;
     __gm__ CCUMsgExt* ccuMsgExt;
     uint64_t scratchAddr;
+    uint64_t dieSplitRatioPermille = 1000U; // 1000=不切分；(0,1000)=die0 千分比（KFC 经 OpResCtx 传入）
 };
 
 struct AlltoAllVParamCcu {

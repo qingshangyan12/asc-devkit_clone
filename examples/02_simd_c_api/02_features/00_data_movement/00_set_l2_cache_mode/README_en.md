@@ -16,7 +16,7 @@ When MTE2 moves data from Global Memory (GM) to Unified Buffer (UB), the `l2_cac
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -48,7 +48,7 @@ Based on the two scenarios described above, this sample designs 4 Cases for comp
 
 ### Performance Metrics Description
 
-The performance data in this section is collected on Ascend 950 series products. Ascend 950PR/Ascend 950DT is referred to as Ascend 950 series for short.
+The performance data in this section is collected on Ascend 950 series products. Ascend 950PR&950DT products is referred to as Ascend 950 series for short.
 
 Different performance collection commands are used to obtain different performance metrics:
 
@@ -287,7 +287,7 @@ In the sample root directory, perform the following steps to build and run the s
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN installation directory.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the sample
 

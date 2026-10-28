@@ -37,7 +37,8 @@ using namespace HcclSim;
 
 namespace mc2_ops_hccl {
 uint32_t g_hcclEngineCtxCopyCallCount = 0;
-}
+uint32_t g_stubEndpointBwCoeff = 1; // 均匀带宽：双 die 场景 dieSplitRatio=0.5（0 会导致 p0+p1=0 不切分）
+} // namespace mc2_ops_hccl
 
 namespace {
 struct SymWinStub {
@@ -197,6 +198,8 @@ HcclResult HcclRankGraphGetEndpointInfo(
     uint32_t* intInfo = static_cast<uint32_t*>(info);
     if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_DIE_ID) {
         *intInfo = (endpointDesc->loc.device.devPhyId >= 4) ? 1 : 0;
+    } else if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_BW_COEFF) {
+        *intInfo = mc2_ops_hccl::g_stubEndpointBwCoeff;
     } else {
         *intInfo = 0;
     }
@@ -393,6 +396,29 @@ HcclResult HcclChannelAcquire(
         simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
 }
 
+HcclResult HcclChannelQuery(
+    HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescList, uint32_t listNum,
+    ChannelHandle* channelList)
+{
+    CHK_PTR_NULL(comm);
+    (void)engine;
+    for (uint32_t i = 0; i < listNum; i++) {
+        channelList[i] = 0; // 全部视为新建
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult HcclChannelDestroy(HcclComm comm, const ChannelHandle* channels, uint32_t channelNum)
+{
+    CHK_PTR_NULL(comm);
+    (void)channels;
+    (void)channelNum;
+    return HCCL_SUCCESS;
+}
+
+bool HcommIsSupportHcclChannelQuery() { return true; }
+bool HcommIsSupportHcclChannelDestroy() { return true; }
+
 HcclResult HcclEngineCtxCreate(HcclComm comm, const char* ctxTag, CommEngine engine, uint64_t size, void** ctx)
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
@@ -421,6 +447,16 @@ HcclResult HcclThreadAcquireWithStream(
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
     return simComm->independentOpThreadMgr_->HcclThreadAcquireWithStream(engine, stream, notifyNum, thread);
+}
+
+bool HcommIsSupportHcclDedicatedThreadAcquire() { return true; }
+
+HcclResult HcclDedicatedThreadAcquire(
+    HcclComm comm, HcclDedicatedThreadType useType, uint32_t notifyNumPerThread, ThreadHandle* thread)
+{
+    auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
+    CHK_PTR_NULL(simComm);
+    return simComm->independentOpThreadMgr_->HcclDedicatedThreadAcquire(useType, notifyNumPerThread, thread);
 }
 
 HcclResult HcclEngineCtxGet(HcclComm comm, const char* engineTag, CommEngine engine, void** ctx, uint64_t* size)
@@ -927,6 +963,12 @@ int32_t HcommWaitResponse(uint64_t handle, void* dst, size_t sizeByte, uint32_t*
 HcclResult HcclChannelGetRemoteMems(
     HcclComm comm, ChannelHandle channel, uint32_t* memNum, CommMem** remoteMems, char*** memTags)
 {
+    CHK_PTR_NULL(memNum);
+    CHK_PTR_NULL(remoteMems);
+    CHK_PTR_NULL(memTags);
+    *memNum = 0U;
+    *remoteMems = nullptr;
+    *memTags = nullptr;
     HCCL_WARNING("[%s] not support.", __func__);
     return HCCL_SUCCESS;
 }

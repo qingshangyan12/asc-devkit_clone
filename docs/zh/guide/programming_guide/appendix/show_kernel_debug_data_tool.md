@@ -8,23 +8,24 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品：支持
+- Atlas推理系列产品：支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/guide/programming_guide/appendix/show_kernel_debug_data_tool_res.md#id1 -->
 
 ## 工具安装
 
@@ -63,12 +64,12 @@
 
     | 参数 | 可选/必选 | 说明 |
     | --- | --- | --- |
-    | <bin_file_path> | 必选 | kernel侧调试信息落盘的bin文件或包含bin文件的目录路径，例如“/input/dump_workspace.bin”。 |
+    | <bin_file_path> | 必选 | 核函数（Kernel）侧调试信息落盘的bin文件或包含bin文件的目录路径，例如“/input/dump_workspace.bin”。 |
     | <output_path> | 可选 | 解析结果的保存路径，例如“/output_dir”。默认是当前命令行执行目录下。 |
 
 -   **API方式**
 
-    获取kernel侧调试信息并解析成可读文件。函数原型如下。
+    获取核函数（Kernel）侧调试信息并解析成可读文件。函数原型如下。
 
     ```
     def show_kernel_debug_data(bin_file_path: str, output_path: str = './') -> None
@@ -76,7 +77,7 @@
 
     其中，输入参数说明如下。函数无输出参数和返回值。
 
-    -   bin\_file\_path：kernel侧调试信息落盘的bin文件或包含bin文件的目录路径，字符串类型。
+    -   bin\_file\_path：核函数（Kernel）侧调试信息落盘的bin文件或包含bin文件的目录路径，字符串类型。
     -   output\_path：解析结果的保存路径，字符串类型，默认是当前接口调用脚本所在目录下。
 
     调用示例参考如下代码。

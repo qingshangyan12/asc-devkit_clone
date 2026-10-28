@@ -19,7 +19,7 @@
 #include "simt_api/asc_simt.h"
 #include "simt_api/device_types.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_INF_FP16 __ushort_as_half((unsigned short)0x7C00U)
 #define ASCRT_MAX_NORMAL_FP16 __ushort_as_half((unsigned short)0x7BFFU)
@@ -597,6 +597,8 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hfmax2_relu(const half2 x, const h
 static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hcmadd(const half2 x, const half2 y, const half2 z);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ float2 __half22float2(const half2 x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __float22half2_rz(const float2 x);
 
 #include "impl/simt_api/asc_fp16_impl.h"
 

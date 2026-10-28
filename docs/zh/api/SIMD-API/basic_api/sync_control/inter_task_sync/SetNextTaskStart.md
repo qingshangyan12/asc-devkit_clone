@@ -6,31 +6,31 @@
 ## 产品支持情况<a name="section17196114513104"></a>
 
 <!-- npu="950" id21 -->
-- Ascend 950PR/Ascend 950DT：支持，该接口生效
+- Ascend 950PR&950DT系列产品：支持，该接口生效
 <!-- end id21 -->
 <!-- npu="A3" id22 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持，该接口生效
+- Atlas A3系列产品：支持，该接口生效
 <!-- end id22 -->
 <!-- npu="910b" id23 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持，仅保证编译兼容，实际功能不生效。
+- Atlas A2系列产品：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id23 -->
 <!-- npu="310b" id24 -->
-- Atlas 200I/500 A2 推理产品：支持，仅保证编译兼容，实际功能不生效。
+- Atlas 200I/500 A2推理产品：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id24 -->
 <!-- npu="310p" id25 -->
-- Atlas 推理系列产品AI Core：支持，仅保证编译兼容，实际功能不生效。
+- Atlas推理系列产品AI Core：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id25 -->
 <!-- npu="310p" id26 -->
-- Atlas 推理系列产品Vector Core：支持，仅保证编译兼容，实际功能不生效。
+- Atlas推理系列产品Vector Core：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id26 -->
 <!-- npu="910" id27 -->
-- Atlas 训练系列产品：支持，仅保证编译兼容，实际功能不生效。
+- Atlas训练系列产品：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id27 -->
 <!-- npu="x90" id28 -->
-- Kirin X90：支持，仅保证编译兼容，实际功能不生效。
+- Kirin X90处理器系列产品：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id28 -->
 <!-- npu="9030" id29 -->
-- Kirin 9030：支持，仅保证编译兼容，实际功能不生效。
+- Kirin 9030处理器系列产品：支持，仅保证编译兼容，实际功能不生效。
 <!-- end id29 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/inter_task_sync/SetNextTaskStart_res.md#id1 -->
 
@@ -55,27 +55,27 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 - 该原型支持如下产品型号：
 
     <!-- npu="950" id1 -->
-    Ascend 950PR/Ascend 950DT 
+    Ascend 950PR&950DT系列产品 
     <!-- end id1 -->
 
     <!-- npu="A3" id2 -->
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品 
+    Atlas A3系列产品 
     <!-- end id2 -->
 
     <!-- npu="910b" id3 -->
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品 
+    Atlas A2系列产品 
     <!-- end id3 -->
 
     <!-- npu="310b" id4 -->
-    Atlas 200I/500 A2 推理产品 
+    Atlas 200I/500 A2推理产品 
     <!-- end id4 -->
 
     <!-- npu="x90" id5 -->
-    Kirin X90 
+    Kirin X90处理器系列产品 
     <!-- end id5 -->
 
     <!-- npu="9030" id6 -->
-    Kirin 9030 
+    Kirin 9030处理器系列产品 
     <!-- end id6 -->
 
     ```cpp
@@ -88,15 +88,15 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 - 该原型支持如下产品型号：
 
     <!-- npu="310p" id7 -->
-    Atlas 推理系列产品AI Core 
+    Atlas推理系列产品AI Core 
     <!-- end id7 -->
 
     <!-- npu="310p" id8 -->
-    Atlas 推理系列产品Vector Core 
+    Atlas推理系列产品Vector Core 
     <!-- end id8 -->
 
     <!-- npu="910" id9 -->
-    Atlas 训练系列产品 
+    Atlas训练系列产品 
     <!-- end id9 -->
 
     ```cpp
@@ -124,15 +124,16 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 该接口适用于TorchAir图模式开发场景，且需在启用SuperKernel特性后方可生效。具体内容请参考[图内标定SuperKernel范围](https://www.hiascend.com/document/detail/zh/Pytorch/latest/devguide/TorchAir/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)。
+- 该接口适用于TorchAir图模式开发场景，且需在启用SuperKernel特性后方可生效。具体内容请参考[图内标定SuperKernel范围](https://gitcode.com/Ascend/torchair/blob/master/docs/zh/ascend_ir/features/advanced/super_kernel_scope.md)。
 - 在算子运行过程中，需要保证此接口在每个核上都被调用，且每个核上仅被调用一次。
 - 若子核函数（Kernel）某个TilingKey分支调用了此接口，则开发者需要保证当前算子可能会运行的所有TilingKey均调用了此接口，否则会出现因同步指令数量不匹配而卡住的现象。
+- 本接口内部实现会占用核间同步flagId，若与CrossCoreSetFlag/CrossCoreWaitFlag同时使用需注意避免flagId冲突，详见[核间同步flagId占用说明](../inter_core_sync/key_features.md#inter_core_sync_flagid_usage)。
 
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
 AscendC::DataCopy(dstGlobal, dstLocal, TOTAL_LENGTH);
-// 在最后一条搬运指令后调用，使之后的指令可与后续子kernel并行执行。
+// 在最后一条搬运指令后调用，使之后的指令可与后续子核函数（Kernel）并行执行。
 AscendC::SetNextTaskStart();
 ```
 

@@ -104,11 +104,49 @@ HcclResult CcuAlgTemplateBase::GetChannelDieId(
     return HcclResult::HCCL_SUCCESS;
 }
 
+HcclResult CcuAlgTemplateBase::GetChannelBwCoeff(
+    HcclComm comm, uint32_t rankId, const HcclChannelDesc& channelDesc, uint32_t& bwCoeff) const
+{
+    EndpointAttrBwCoeff tmpBwCoeff{};
+    uint32_t infoLen = sizeof(EndpointAttrBwCoeff);
+    CHK_RET(HcclRankGraphGetEndpointInfo(
+        comm, rankId, &(channelDesc.localEndpoint), ENDPOINT_ATTR_BW_COEFF, infoLen, &tmpBwCoeff));
+    bwCoeff = tmpBwCoeff;
+    HCCL_INFO("[CcuAlgTemplateBase::GetChannelBwCoeff] rank[%d]: get channel bwCoeff [%d]", rankId, bwCoeff);
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult CcuAlgTemplateBase::ReverseChannelPerDieIfNeed(
+    const HcclComm comm, const u32 myRankId, std::vector<std::vector<HcclChannelDesc>>& channelsPerDie) const
+{
+    if (channelsPerDie.size() <= 1) {
+        HCCL_ERROR(
+            "[ReverseChannelPerDieIfNeed] channelsPerDie.size() = [%u], there's no channel on both dies",
+            channelsPerDie.size());
+        return HCCL_E_PTR;
+    }
+    if (channelsPerDie[0].size() < 1 || channelsPerDie[1].size() < 1) {
+        HCCL_ERROR("[ReverseChannelPerDieIfNeed] there's no channel in channelsPerDie");
+        return HCCL_E_PTR;
+    }
+    uint32_t portNum0 = 0;
+    uint32_t portNum1 = 0;
+    GetChannelBwCoeff(comm, myRankId, channelsPerDie[0][0], portNum0);
+    GetChannelBwCoeff(comm, myRankId, channelsPerDie[1][0], portNum1);
+
+    if (portNum0 < portNum1) {
+        // 2个die出框端口数不同，将端口数多的channel放在前面
+        std::swap(channelsPerDie[0], channelsPerDie[1]);
+    }
+    HCCL_INFO("portNum0 = %lld,portNum1 = %lld", portNum0, portNum1);
+    return HCCL_SUCCESS;
+}
+
 /* nhr算法，需要遍历得到的channelDesc，判断使用几个die，如果是1个die，则还需要得到dieId。
    以便于算法挑选相应dieId的channelDesc */
 HcclResult CcuAlgTemplateBase::GetDieInfoFromChannelDescs(
-    HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
-    uint32_t& dieNum, uint32_t& dieId)
+    const HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
+    uint32_t& dieNum, uint32_t& dieId) const
 {
     constexpr u32 LINK_NUM_1 = 1;
     constexpr u32 LINK_NUM_2 = 2;
@@ -146,8 +184,7 @@ HcclResult CcuAlgTemplateBase::GetDieInfoFromChannelDescs(
             return HcclResult::HCCL_E_INTERNAL;
         }
     }
-    // 为适配不对称场景，当前nhr仅使能1个die
-    dieNum = LINK_NUM_1;
+    dieNum = LINK_NUM_2;
     HCCL_INFO("[CcuAlgTemplateBase::GetDieNumFromChannelDescs] 2 channels on 2 dies, dieNum = 2.");
     return HcclResult::HCCL_SUCCESS;
 }
@@ -156,11 +193,11 @@ HcclResult CcuAlgTemplateBase::GetDieInfoFromChannelDescs(
 HcclResult CcuAlgTemplateBase::SelectChannelToVec(
     const HcclComm comm, const u32 myRankId, const u32 rmtRankId,
     const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, const u32 dieId,
-    std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels)
+    std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels) const
 {
     auto it = rank2ChannelIdx.find(rmtRankId);
-    if (it != rank2ChannelIdx.end()) {
-        // 已经有对应channel，直接返回成功
+    if (it != rank2ChannelIdx.end() && channels.size() > it->second) {
+        // 已映射且索引在当前 die 组内有效才跳过（双 die 下同一对端在两组各占同位次）
         return HcclResult::HCCL_SUCCESS;
     }
 

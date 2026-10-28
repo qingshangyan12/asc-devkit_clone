@@ -15,6 +15,15 @@
 
 namespace mc2_ops_hccl {
 
+// KFC 直调捕获（ST）与 KFC server 继承共用的注册期元数据；InheritKfcServerKernelArg 的
+// isReduceScatter 分支不读该 arg（按 subCommRanks 重建），此处填充不影响生产 KFC 路径。
+struct CcuKernelArgKfcReduceScatterMesh1DMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 class CcuTempKfcReduceScatterMesh1DMem2Mem : public CcuTempKfcMesh1DMem2MemBase {
 public:
     CcuTempKfcReduceScatterMesh1DMem2Mem() = default;
@@ -36,6 +45,13 @@ public:
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& templateDataParams,
         TemplateResource& templateResource) override;
+
+    // KFC 路径不消费 per-rank 通道（kernelArg 持有），仅为并发 executor 的 AICPU 分支编译期实例化提供空壳。
+    HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels) const
+    {
+        (void)channels;
+        return HCCL_SUCCESS;
+    }
 };
 
 } // namespace mc2_ops_hccl

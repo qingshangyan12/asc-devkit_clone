@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR&950DT系列产品：不支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/BatchWrite_res.md#id1 -->
 
@@ -28,11 +28,11 @@
 集合通信BatchWrite的任务下发接口，返回该任务的标识handleId给用户。BatchWrite实现了一种点对点通信，这是一种直接传输数据的通信模式，能够同时将多份数据发送到不同的Global Memory地址上。
 
 <!-- npu="A3" id7 -->
-对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，BatchWrite通信支持在相同或不同的昇腾AI Server之间进行。
+对于Atlas A3系列产品，BatchWrite通信支持在相同或不同的昇腾AI Server之间进行。
 <!-- end id7 -->
 
 <!-- npu="910b" id8 -->
-对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，BatchWrite通信必须在不同昇腾AI Server（通常是8卡或16卡的昇腾NPU设备组成的服务器形态的统称）之间进行。
+对于Atlas A2系列产品，BatchWrite通信必须在不同昇腾AI Server（通常是8卡或16卡的昇腾NPU设备组成的服务器形态的统称）之间进行。
 <!-- end id8 -->
 
 **图1**  BatchWrite示意图  
@@ -57,13 +57,13 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。<!-- npu="A3" id9 --><br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。<!-- end id9 --><!-- npu="910b" id10 --><br><br>对于Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL_usage.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。<!-- end id10 --> |
-| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<!-- npu="A3" id11 --><br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。<!-- end id11 --> |
-| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<!-- npu="910b" id12 --><br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。<!-- end id12 --> |
+| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。<!-- npu="A3" id9 --><br><br>对于Atlas A3系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。<!-- end id9 --><!-- npu="910b" id10 --><br><br>对于Atlas A2系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL_usage.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。<!-- end id10 --> |
+| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<!-- npu="A3" id11 --><br><br>对于Atlas A3系列产品，该参数取值不能大于等于2048。<!-- end id11 --> |
+| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<!-- npu="910b" id12 --><br><br>Atlas A2系列产品，该参数仅支持取值为0。<!-- end id12 --> |
 
 <!-- npu="A3" id14 -->
 ```
-// Atlas A3 训练系列产品/Atlas A3 推理系列产品
+// Atlas A3系列产品
 struct BatchWriteItem {
     uint64_t type;
     uint32_t res1[5];
@@ -79,7 +79,7 @@ struct BatchWriteItem {
 
 <!-- npu="910b" id15 -->
 ```
-// Atlas A2 训练系列产品/Atlas A2 推理系列产品
+// Atlas A2系列产品
 struct BatchWriteItem {
     uint64_t localBuf;
     uint64_t remoteBuf;
@@ -100,16 +100,17 @@ struct BatchWriteItem {
 -   若HCCL对象的[config模板参数](HCCL_template_params.md#hccl-template-params)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL_template_params.md#hccl-template-params)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 <!-- npu="910b" id13 -->
--   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
+-   对于Atlas A2系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
 <!-- end id13 -->
--   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](../../../basic_api/cache_control/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
+-   batchWriteInfo指向的描述符区域不能与本次通信的源数据、目的数据区域重叠，否则写入描述符字段时会覆盖待发送的数据。建议将描述符存放在独立预留的区域（例如workspace）中，并保证描述符区域按64字节对齐。
+-   通信任务信息写入batchWriteInfo后，必须通过调用[DataCacheCleanAndInvalid](../../../basic_api/cache_control/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。SINGLE_CACHE_LINE模式每次只刷新传入地址所在的Cache Line，不会随itemNum自动扩展，需逐条刷新以覆盖所有描述符。
 
 ## 调用示例
 
 <!-- npu="910b" id16 -->
 -   不同AI Server之间的点对点通信
 
-    在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，假设本卡要将不同的数据分别发送到其它AI Server的2卡、3卡的指定位置，通过调用一次BatchWrite接口，实现批量点对点通信。
+    在Atlas A2系列产品上，假设本卡要将不同的数据分别发送到其它AI Server的2卡、3卡的指定位置，通过调用一次BatchWrite接口，实现批量点对点通信。
 
     ```
     struct BatchWriteItem {
@@ -188,7 +189,7 @@ struct BatchWriteItem {
 <!-- npu="A3" id17 -->
 -   <a name="batchwrite_multi_queue"></a>多个队列的点对点通信
 
-    在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以通过调用一次BatchWrite接口，实现批量点对点通信。
+    在Atlas A3系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以将两条通信任务分别下发到不同的通信队列上并行执行。
 
     ```
     struct BatchWriteItem {
@@ -214,7 +215,9 @@ struct BatchWriteItem {
             hccl.InitV2(contextGM, &tilingData);
             hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
 
-            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(inputGM);
+            // 描述符不能与输入、输出数据区域重叠，此处从workspace中划分出描述符区域；
+            // 发送数据源地址为inputGM，两条描述符分别指向outputGM1、outputGM2
+            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(workspace);
 
             sendInfo->type = 0UL;
             sendInfo->length = 64U;
@@ -231,14 +234,17 @@ struct BatchWriteItem {
             (sendInfo + 1)->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM2) & 0xFFFFFFFF);
             (sendInfo + 1)->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM2) >> 32) & 0xFFFFFFFF);
 
-            // 确保cache中的数据已刷新到GM地址上
+            // 确保cache中的数据已刷新到GM地址上：每条描述符占64字节，
+            // 逐条刷新，保证两条描述符所在的Cache Line均已刷新到GM
             GlobalTensor<int64_t> tempTensor;
-            tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
-            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            for (uint32_t i = 0U; i < 2U; ++i) {
+                tempTensor.SetGlobalBuffer((__gm__ int64_t*)(sendInfo + i));
+                DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            }
 
             // 分别将两次拷贝部署在队列0、队列1上
             auto handleId0 = hccl.BatchWrite<true>(sendInfo, 1U, 0U);
-            auto handleId1 = hccl.BatchWrite<true>(sendInfo, 1U, 1U);
+            auto handleId1 = hccl.BatchWrite<true>(sendInfo + 1, 1U, 1U);
 
             // 在所有队列上阻塞BatchWrite通信任务，所有队列将等到通信任务全部完成后再继续往下执行，实现所有队列的同步
             const uint16_t queueNum = hccl.GetQueueNum();

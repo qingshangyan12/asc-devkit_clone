@@ -2,7 +2,7 @@
 
 **特性说明：**
 
-unitFlag的核心功能体现为：Mmad和FixPipe接口引入了单元标志（unit-flag）机制，通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后，对于L0C Buffer中的每个内存块（512B），提供一个单元标志位，用于指示该块是否可读或可写。
+unitFlag的核心功能体现为：Mmad和FixPipe接口引入了单元标志（unit-flag）机制，通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后，对于L0C Buffer中的内存块，硬件提供单元标志位指示该块是否可读或可写，内存块的具体大小由硬件行为控制，用户无需感知。
 
 Mmad和Fixpipe接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
@@ -65,6 +65,8 @@ AscendC::Fixpipe(cGM, c, fixpipeParams);
 ```
 
 开启与不开启unitFlag功能的完整示例：[UnitFlag示例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag)
+
+注意，开启unitFlag功能不会提升Mmad和Fixpipe指令的性能，性能提升源自于Mmad和Fixpipe指令的细粒度并行，降低了同步延迟。下表展示了是否开启unitFlag功能对Mmad指令性能的影响，实测数据显示开启unitFlag功能对性能无影响。
 
 **表1** 性能示例说明（以输入数据类型half为例，无业务实测表示忽略指令的前后序操作，只考虑单指令性能，包含带宽延迟等开销）
 

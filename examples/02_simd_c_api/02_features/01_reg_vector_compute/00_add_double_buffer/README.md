@@ -10,7 +10,7 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | == CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | == CANN 9.2.0 |
 
 ## 目录结构
 
@@ -115,7 +115,7 @@ $$
 | Vector计算 | 当前组输入和输出Mutex | 等待输入就绪和z Buffer可写。 |
 | MTE3搬出 | 输出：Ping为2，Pong为3 | 等待当前轮z计算完成。 |
 
-所有轮次下发后调用`asc_sync_pipe(PIPE_ALL)`等待流水结束。接口说明参见[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md)。
+所有轮次下发后调用`asc_sync_pipe(PIPE_ALL)`等待流水结束。接口说明参见[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md)。
 
 Ping/Pong Buffer使用两组独立的x、y、z Buffer交替处理数据块，使MTE2搬入、Vector计算和MTE3搬出能够跨轮重叠，但需要额外占用一组UB Buffer。
 
@@ -238,6 +238,8 @@ $$
 ```bash
 source ${install_path}/cann/set_env.sh
 ```
+
+> **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 在本样例目录编译并运行指定场景：
 

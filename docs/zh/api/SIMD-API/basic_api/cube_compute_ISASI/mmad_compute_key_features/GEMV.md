@@ -5,14 +5,14 @@
 Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自动启用Gemv功能，该操作退化为1×K维度的行向量与K×N维度矩阵之间的乘法运算。
 
 <!-- npu="950" id1 -->
-针对Ascend 950PR/Ascend 950DT产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭。
+针对Ascend 950PR&950DT系列产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭。
 <!-- end id1 -->
 
 **特性约束：**
 
 1. 1×K矩阵A需满足512B地址对齐，K个数据连续存储；以half类型为例，当K=256时，软件侧可视作16\*16分块，配置m=1后硬件解析为1\*256向量，可通过LoadData接口将256个half数据从L1 Buffer搬至L0A Buffer。
 
-2. C矩阵是一个（1\*N）的向量，当1×N向量被划分为多个1×16子向量时，每个子向量在L0C Buffer中占用1024B。但实际有效数据仅占最低32B或64B。例如，当N=50时，共划分4个1\*16子向量，占用4\*512B = 2048B，其中有效数据仅为4\*32B = 128B。
+2. C矩阵是一个（1\*N）的向量，当1×N向量被划分为多个1×16子向量时，每个子向量在L0C Buffer中占用1024B，但实际有效数据仅占最低64B。例如，当N=50时，共划分4个1\*16子向量，占用4\*1024B = 4096B，其中有效数据仅为4\*64B = 256B。
 
 **图1** GEMV模式，矩阵乘示意图
 
@@ -48,7 +48,7 @@ M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进
 | B | 4096 * 256 | half |
 | C | 1 * 256 | float |
 
-A矩阵为1\* 4096的向量，从软件侧可以视为64\*64的（针对Ascend 950PR/Ascend 950DT产品为NZ分形）数据，通过LoadData搬运到L0A Buffer上；
+A矩阵为1\* 4096的向量，从软件侧可以视为64\*64的（针对Ascend 950PR&950DT系列产品为NZ分形）数据，通过LoadData搬运到L0A Buffer上；
 
 C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用16 \* 1024B = 16384B\(f162f32\)，其中有效数据仅仅为16 \* 64B = 1024B；
 
@@ -68,7 +68,7 @@ AscendC::Mmad(c, a, b, mmadParams);
 ```
 
 <!-- npu="950" id2 -->
-针对Ascend 950PR/Ascend 950DT产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭，示例如下：
+针对Ascend 950PR&950DT系列产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭，示例如下：
 
 ```cpp
 AscendC::MmadParams mmadParams;

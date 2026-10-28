@@ -12,19 +12,19 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
-option(CANN_ASC_USE_EXPERIMENTAL "Enable experimental CANN ASC APIs" OFF)
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 if(NOT DEFINED SCENARIO_NUM)
-    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4/5/6")
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4/5/6/7")
 endif()
 
 if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQUAL 3 AND
-   NOT SCENARIO_NUM EQUAL 4 AND NOT SCENARIO_NUM EQUAL 5 AND NOT SCENARIO_NUM EQUAL 6)
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5 or 6, got: ${SCENARIO_NUM}")
+   NOT SCENARIO_NUM EQUAL 4 AND NOT SCENARIO_NUM EQUAL 5 AND NOT SCENARIO_NUM EQUAL 6 AND
+   NOT SCENARIO_NUM EQUAL 7)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, 6 or 7, got: ${SCENARIO_NUM}")
 endif()
 
 add_executable(demo
@@ -37,7 +37,6 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    $<$<AND:$<COMPILE_LANGUAGE:ASC>,$<BOOL:${CANN_ASC_USE_EXPERIMENTAL}>>:-DCANN_ASC_USE_EXPERIMENTAL>
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")

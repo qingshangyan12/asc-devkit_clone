@@ -10,6 +10,10 @@
 
 #include "topo_model.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <string>
+
 namespace HcclSim {
 
 constexpr uint32_t GRID_SIZE = 8;
@@ -17,6 +21,10 @@ constexpr uint32_t NetLayerL0 = 0;
 constexpr uint32_t NetLayerL1 = 1;
 constexpr uint32_t NetLayerL2 = 2;
 constexpr uint32_t SERVER_CLOS_INSTID = 16;
+// 与产品侧 channel.cc 的 PORT_IDX / NON_ISOLATED_PORT 对齐（ProcessLinksForChannelMutiJetty 的
+// CLOS 分支要求 src/dst 端口字节相等且为非隔离口）。
+constexpr uint32_t UBX_PORT_IDX = 5U;
+constexpr uint8_t UBX_NON_ISOLATED_PORT = 127U;
 
 TopoModel::TopoModel(const TopoMeta& topoMeta)
 {
@@ -28,8 +36,16 @@ TopoModel::TopoModel(const TopoMeta& topoMeta)
         uint32_t rankNumInPod = 0;
         for (auto& server : pod) {
             uint32_t rankNumInServer = 0;
-            InitTopoInstsMap(serverId, rankId, server);
-            for (auto& phyId : server) {
+            // 剥离 MESH_1D_CLOS 标记位，server 内全部 phyId 均携带标记时按 MESH_1D_CLOS 建模
+            std::vector<uint32_t> phyIds;
+            phyIds.reserve(server.size());
+            bool mesh1dClos = !server.empty();
+            for (auto markedPhyId : server) {
+                phyIds.push_back(markedPhyId & ~MESH_1D_CLOS_PHYID_MARK);
+                mesh1dClos = mesh1dClos && (markedPhyId & MESH_1D_CLOS_PHYID_MARK) != 0;
+            }
+            InitTopoInstsMap(serverId, rankId, phyIds, mesh1dClos);
+            for (auto phyId : phyIds) {
                 rankId2PhyId_[rankId] = phyId;
                 rankId2ServerId_[rankId] = serverId;
                 rankId2PodId_[rankId] = superpodId;
@@ -57,6 +73,63 @@ TopoModel::TopoModel(const TopoMeta& topoMeta)
     Init910DLinkMap();
     InitL1L2TopoInsts(superpodId);
     InitHostDpuInfo(serverId);
+
+    // UBX（MESH_1D_CLOS）opt-in 模式：默认关闭，不影响既有用例的 1DMESH 推导。
+    char* ubxEnv = getenv("ENABLE_UBX_TOPO_FOR_LLT");
+    if (ubxEnv != nullptr && std::string(ubxEnv) == "1") {
+        isUbxTopo_ = true;
+        InitUbxTopo();
+    }
+
+    // 双 die L1 双链路 opt-in：默认关闭（每 pair 单 L1 链路 → dieNum=1）。
+    char* twoDieEnv = getenv("ENABLE_2DIE_L1_LINK_FOR_LLT");
+    if (twoDieEnv != nullptr && std::string(twoDieEnv) == "1") {
+        is2DieL1Link_ = true;
+    }
+
+    // 大禹纯 CLOS opt-in：默认关闭。开启后 L0 只保留一个覆盖全 server rank 的 CLOS 实例
+    // （GetTopoType 返回 COMM_TOPO_CLOS，无 mesh 实例），L0 链路协议置 UBC_CTP，
+    // 对应纯 CLOS 单层组网（selector 纯 CLOS 分支 + CalcChannelRequestMesh1DOnDie DIE 过滤建链）。
+    char* pureClosEnv = getenv("ENABLE_PURE_CLOS_TOPO_FOR_LLT");
+    if (pureClosEnv != nullptr && std::string(pureClosEnv) == "1") {
+        isPureClosTopo_ = true;
+        InitPureClosTopo();
+    }
+}
+
+// UBX 模式：L0 只保留一个覆盖全 server rank 的 CLOS 实例（GetTopoType 返回 COMM_TOPO_CLOS），
+// 并将所有 endpoint 的端口字节对齐为非隔离口，使 ProcessLinksForChannelMutiJetty 的
+// CLOS+port-equal 分支（NHR MultiJetty 通道计算）在 sim 下可产出通道。
+void TopoModel::InitUbxTopo()
+{
+    for (const auto& serverEntry : serverId2RankList_) {
+        const uint32_t serverId = serverEntry.first;
+        instId2RankIds_[serverId][SERVER_CLOS_INSTID] = serverEntry.second;
+        for (auto& devEntry : dev2TopoInsts_[serverId]) {
+            devEntry.second.clear();
+            devEntry.second.push_back(SERVER_CLOS_INSTID);
+        }
+    }
+    for (auto& endpointEntry : rankId2Endpoint_) {
+        endpointEntry.second.commAddr.eid[UBX_PORT_IDX] = UBX_NON_ISOLATED_PORT;
+    }
+}
+
+// 大禹纯 CLOS 模式：每个 server 的 L0 只保留一个覆盖全部 rank 的 CLOS 实例（GetTopoType 返回
+// COMM_TOPO_CLOS）。CalcLevel0TopoShape 据此判定 topoInstNum==1 且 rankNumForTopoType[CLOS]==1 →
+// Level0Shape::CLOS。链路协议在 Create910DLinks 的 isPureClosTopo_ 分支置 UBC_CTP。
+void TopoModel::InitPureClosTopo()
+{
+    for (const auto& serverEntry : serverId2RankList_) {
+        const uint32_t serverId = serverEntry.first;
+        instId2RankIds_[serverId].clear();
+        // 单一 CLOS 实例覆盖 server 内全部 rank；复用 SERVER_CLOS_INSTID（GetTopoType 对它返回 CLOS）
+        instId2RankIds_[serverId][SERVER_CLOS_INSTID] = serverEntry.second;
+        for (auto& devEntry : dev2TopoInsts_[serverId]) {
+            devEntry.second.clear();
+            devEntry.second.push_back(SERVER_CLOS_INSTID);
+        }
+    }
 }
 
 void TopoModel::InitHostDpuInfo(uint32_t serverNum)
@@ -88,7 +161,8 @@ void TopoModel::InitL1L2TopoInsts(uint32_t podNum)
     level2TopoInsts_.push_back(0);
 }
 
-void TopoModel::InitTopoInstsMap(uint32_t serverId, uint32_t rankId, const std::vector<uint32_t>& phyIds)
+void TopoModel::InitTopoInstsMap(
+    uint32_t serverId, uint32_t rankId, const std::vector<uint32_t>& phyIds, bool mesh1dClos)
 {
     for (auto phyId : phyIds) {
         auto rowId = phyId / GRID_SIZE;
@@ -117,6 +191,12 @@ void TopoModel::InitTopoInstsMap(uint32_t serverId, uint32_t rankId, const std::
         if (rowRankIds.size() > 1 && colRankIds.size() > 1) {
             is2D = true;
             dev2TopoInsts_[serverId][phyId].push_back(SERVER_CLOS_INSTID);
+        }
+
+        // MESH_1D_CLOS场景：仅单方向mesh（X/Y异或）+ 覆盖server内全部rank的CLOS实例，共2个实例
+        if (mesh1dClos && (rowRankIds.size() > 1) != (colRankIds.size() > 1)) {
+            dev2TopoInsts_[serverId][phyId].push_back(SERVER_CLOS_INSTID);
+            instId2RankIds_[serverId][SERVER_CLOS_INSTID] = GetAllRanks(phyIds, rankId);
         }
     }
 }
@@ -355,6 +435,47 @@ void TopoModel::GetEndpointNum(uint32_t curRank, uint32_t layer, uint32_t topoIn
 void TopoModel::GetEndpointDesc(
     uint32_t curRank, uint32_t layer, uint32_t topoInstId, uint32_t* descNum, EndpointDesc* endpointDesc)
 {
+    // UBX 模式：L0 按实例成员 rank 返回 endpoint 描述，供产品侧 GetTopoTypeByLink 匹配链路归属实例。
+    if (layer == NetLayerL0 && isUbxTopo_) {
+        const uint32_t serverId = rankId2ServerId_[curRank];
+        const auto serverIt = instId2RankIds_.find(serverId);
+        if (serverIt != instId2RankIds_.end()) {
+            const auto instIt = serverIt->second.find(topoInstId);
+            if (instIt != serverIt->second.end() && descNum != nullptr && endpointDesc != nullptr) {
+                const uint32_t capacity = *descNum;
+                const uint32_t count = std::min(capacity, static_cast<uint32_t>(instIt->second.size()));
+                for (uint32_t i = 0; i < count; i++) {
+                    endpointDesc[i] = rankId2Endpoint_[instIt->second[i]];
+                }
+                *descNum = count;
+                return;
+            }
+        }
+    }
+
+    // 非 UBX 的 L0 查询（如 MESH_1D_CLOS 标记位拓扑）：返回 topo 实例内全部 rank 的 endpoint
+    // （GetTopoTypeByLink 按实例成员 endpoint 归属判定 link 所属实例）
+    if (layer == NetLayerL0) {
+        const uint32_t serverId = rankId2ServerId_[curRank];
+        const auto serverIt = instId2RankIds_.find(serverId);
+        if (serverIt == instId2RankIds_.end() || descNum == nullptr || endpointDesc == nullptr) {
+            *descNum = 0;
+            return;
+        }
+        const auto instIt = serverIt->second.find(topoInstId);
+        if (instIt == serverIt->second.end()) {
+            *descNum = 0;
+            return;
+        }
+        const uint32_t capacity = *descNum;
+        const uint32_t count = std::min(capacity, static_cast<uint32_t>(instIt->second.size()));
+        for (uint32_t i = 0; i < count; i++) {
+            endpointDesc[i] = rankId2Endpoint_[instIt->second[i]];
+        }
+        *descNum = count;
+        return;
+    }
+
     // 仅支持hostdpu使用，暂时仅支持layer1的出框的通信对端查询
     if (layer != NetLayerL1) {
         printf("[ERROR][GetEndpointDesc] not support for layer[%u]\n", layer);
@@ -586,6 +707,15 @@ void TopoModel::Create910DLinks(uint32_t srcRank, uint32_t dstRank)
         link.linkAttr.linkProtocol =
             isDpuEnable ? CommProtocol::COMM_PROTOCOL_ROCE : CommProtocol::COMM_PROTOCOL_UBC_CTP;
         allLinkMap_[rankPair][NetLayerL1].push_back(link);
+        // 双 die L1 双链路 opt-in：同 pair 追加第二条链路，src/dst endpoint 的 devPhyId 翻转
+        // die 位（+4 mod 8，与 HcclRankGraphGetEndpointInfo 的 devPhyId>=4→die1 判定配合），
+        // 使 GetDieInfoFromChannelDescs 探测到 2 链路 2 die → dieNum=2（SoleNHR2die 双 mission）。
+        if (is2DieL1Link_) {
+            CommLink dieLink = link;
+            dieLink.srcEndpointDesc.loc.device.devPhyId = (link.srcEndpointDesc.loc.device.devPhyId + 4U) % 8U;
+            dieLink.dstEndpointDesc.loc.device.devPhyId = (link.dstEndpointDesc.loc.device.devPhyId + 4U) % 8U;
+            allLinkMap_[rankPair][NetLayerL1].push_back(dieLink);
+        }
     }
 
     // level0 同server才有level0链路
@@ -595,6 +725,25 @@ void TopoModel::Create910DLinks(uint32_t srcRank, uint32_t dstRank)
 
     uint32_t srcPhyId = rankId2PhyId_[srcRank];
     uint32_t dstPhyId = rankId2PhyId_[dstRank];
+
+    // 大禹纯 CLOS：每对 rank 生成 die0/die1 各一条 UBC_CTP 链路（模拟 12 出口 = DIE0×8 + DIE1×4，
+    // 每个 die 对全部 peer 可达；stub 端 HcclRankGraphGetEndpointInfo 按 devPhyId>=4 判 die1）。
+    // CCU 侧 CalcChannelRequestMesh1DOnDie 只取 die0 → 通道集同 die；die1 链路留给 AICPU 盲选散布。
+    if (isPureClosTopo_) {
+        CommLink die0Link = link;
+        die0Link.srcEndpointDesc.loc.device.devPhyId = srcPhyId % 4U;
+        die0Link.dstEndpointDesc.loc.device.devPhyId = dstPhyId % 4U;
+        die0Link.linkAttr.linkProtocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+        allLinkMap_[rankPair][NetLayerL0].push_back(die0Link);
+
+        CommLink die1Link = link;
+        die1Link.srcEndpointDesc.loc.device.devPhyId = srcPhyId % 4U + 4U;
+        die1Link.dstEndpointDesc.loc.device.devPhyId = dstPhyId % 4U + 4U;
+        die1Link.linkAttr.linkProtocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+        allLinkMap_[rankPair][NetLayerL0].push_back(die1Link);
+        return; // 不走 link910d_/is2D 的常规 L0 建链
+    }
+
     auto protocol = link910d_.find({srcPhyId, dstPhyId});
     if (protocol != link910d_.end()) {
         link.linkAttr.linkProtocol = protocol->second;

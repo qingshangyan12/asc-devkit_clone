@@ -18,9 +18,8 @@
 
 本案例的算子规格如下：
 
-**表1**  算子规格
+**表1**  算子规格<a name="table101751125175213"></a>
 
-<a name="table101751125175213"></a>
 <table><thead align="left"><tr id="row8175525185219"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1417582516529"><a name="p1417582516529"></a><a name="p1417582516529"></a>输入</p>
 </th>
 <th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.2"><p id="p417532575212"><a name="p417532575212"></a><a name="p417532575212"></a>Shape</p>
@@ -66,17 +65,17 @@ Tiling参数如下：
 
 ## 获取性能数据<a name="section1910315281533"></a>
 
-使用msOpProf工具获取[算子仿真流水图](../../performance_analysis/collect_performance_data.md#section17259539153513)和[上板Profiling](../../performance_analysis/collect_performance_data.md#section17953123893415)数据。相较于基础场景，Tiling常量化在编译期期间将部分或全部Tiling参数由变量转化为常数值，在算子执行时直接使用常量化的Tiling参数，可以减少Scalar性能开销，所以重点分析Scalar流水。
+使用msOpProf工具获取[算子仿真流水图](../../performance_analysis/collect_performance_data.md#section17259539153513)和[上板Profiling](../../performance_analysis/collect_performance_data.md#section17953123893415)数据。相较于基础场景，Tiling常量化在编译期间将部分或全部Tiling参数由变量转化为常数值，在算子执行时直接使用常量化的Tiling参数，可以减少Scalar性能开销，所以重点分析Scalar流水。
 
 ## 分析主要瓶颈点<a name="section93975169548"></a>
 
 -   优化前的流水图如下，默认不开启Tiling常量化，Tiling参数需要从Host侧拷贝到核函数（Kernel）侧，导致Matmul初始化时的Scalar计算较多，第一个MTE2指令开始于3.536us左右，MTE2前的指令头开销在算子整个流水中占比较大，因此需要优化Scalar计算。
 
-    ![](../../../figures/zh-cn_image_0000002411422713.png)
+    ![](../../../figures/image_0000002411422713.png)
 
 -   优化前的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为10.62us，从G列的aic\_scalar\_time数据来看，Scalar平均耗时6.32us。
 
-    ![](../../../figures/zh-cn_image_0000002411018580.png)
+    ![](../../../figures/image_0000002411018580.png)
 
 ## 设计优化方案<a name="section10569929145417"></a>
 
@@ -135,11 +134,11 @@ Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 -   优化后的流水图如下，通过开启Tiling全量常量化，无需将Tiling参数从Host侧拷贝到核函数（Kernel）侧，在编译期完成Tiling常量化，减少了Matmul初始化时的Scalar计算。从0us起到第一个MTE2指令发起，这之间的时间为Matmul初始化时间，Matmul初始化时间从优化前的3.536us减少到2.185us，性能有所提升。
 
-    ![](../../../figures/zh-cn_image_0000002377921500.png)
+    ![](../../../figures/image_0000002377921500.png)
 
 -   优化后的Profiling数据如下，从C列的aic\_time数据来看，多个核中最大算子执行耗时为7.87us，相较于优化前的10.62us提升了25.9%。从G列的aic\_scalar\_time数据来看，Scalar平均耗时3.38us，相较于优化前的6.32us提升了46.5%。
 
-    ![](../../../figures/zh-cn_image_0000002411019880.png)
+    ![](../../../figures/image_0000002411019880.png)
 
 ## 总结<a name="section252011820413"></a>
 

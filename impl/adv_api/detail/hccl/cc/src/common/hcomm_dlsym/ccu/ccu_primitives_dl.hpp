@@ -11,9 +11,6 @@
 #ifndef CCU_PRIMITIVES_DL_HPP
 #define CCU_PRIMITIVES_DL_HPP
 
-#if CANN_VERSION_NUM >= 90100000
-#include "ccu_primitives.hpp"
-#else
 #include "ccu_primitives_impl_dl.h"
 #include "ccu_control_flow_macro_dl.h"
 #include "ccu_variable_dl.hpp"
@@ -36,7 +33,7 @@ using LoopGroupConfig = ::CcuLoopGroupConfig;
 // ==================== 资源创建 ====================
 
 template <typename T>
-inline T GetResByChannel(ChannelHandle /*channel*/, uint32_t /*index*/)
+inline T GetResByChannel(ChannelHandle /*channel*/, uint32_t /*varIndex*/)
 {
     static_assert(
         sizeof(T) == 0, "ccu::GetResByChannel<T> is not specialized for this type T; "
@@ -179,5 +176,4 @@ inline CcuResult WriteReduce(
 } // namespace ccu
 } // namespace AscendC
 
-#endif // CANN_VERSION_NUM >= 90100000
 #endif // CCU_PRIMITIVES_DL_HPP

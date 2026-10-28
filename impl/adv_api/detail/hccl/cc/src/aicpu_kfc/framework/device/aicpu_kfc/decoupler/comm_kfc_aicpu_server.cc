@@ -9,9 +9,13 @@
  */
 #include "comm_kfc_aicpu_server.h"
 #include <algorithm>
+#include <cstddef>
+#include <limits>
 #include <numeric>
 #include "adapter_rts_common.h"
 #include "alg_param.h"
+#include "hccl_diag.h"
+#include "hcomm_device_profiling_dl.h"
 #include "log.h"
 #include "common/aicpu_kfc_utils.h"
 #ifndef MC2_SERVER_ONLY
@@ -23,10 +27,11 @@
 #include "hccl_common.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "hcomm_res_defs.h"
 
 using namespace HcclApi;
 namespace {
-static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
+static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 960UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL};
@@ -60,7 +65,40 @@ HcclResult IsDevice950(bool& isDevice950)
 {
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
-    isDevice950 = (deviceType == DevType::DEV_TYPE_950);
+    isDevice950 = (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960);
+    return HCCL_SUCCESS;
+}
+
+// HCOMM ThreadEntity v0 兼容视图，对应 HCOMM pkg_inc/hcomm/hcomm_res_entity_defs.h 的 HcommThreadEntity。
+// 仅消费 ABI 头和 compatThreadHandle 偏移，资源字段保持不透明。
+struct ThreadEntityV0 {
+    CommAbiHeader abiHeader;
+    uint8_t resourceFields[64]; // devInfo、notify、SQ 等资源字段，MC2 不解包。
+    ThreadHandle compatThreadHandle;
+    uint8_t reserved[168];
+};
+static constexpr uint32_t THREAD_ENTITY_VERSION = 0U;
+static constexpr uint32_t THREAD_ENTITY_MAGIC_WORD = 0x0fcf0f6fU;
+static_assert(sizeof(CommAbiHeader) == 16, "thread entity ABI header layout mismatch");
+static_assert(offsetof(ThreadEntityV0, compatThreadHandle) == 80, "thread entity compat handle offset mismatch");
+static_assert(sizeof(ThreadEntityV0) == 256, "thread entity size mismatch");
+
+// device 侧把 HCOMM 发布的 ThreadEntity 句柄还原为 AICPU Thread 对象地址；version/magic 均不匹配才视为旧句柄。
+HcclResult UnwrapThreadHandle(ThreadHandle& handle)
+{
+    CHK_PRT_RET(handle == 0U, HCCL_ERROR("Main thread handle is null."), HCCL_E_PTR);
+    const auto* entity = reinterpret_cast<const ThreadEntityV0*>(handle);
+    if (entity->abiHeader.magicWord != THREAD_ENTITY_MAGIC_WORD && entity->abiHeader.version != THREAD_ENTITY_VERSION) {
+        return HCCL_SUCCESS; // 旧句柄即 Thread 对象地址，无需解包。
+    }
+    CHK_PRT_RET(
+        entity->abiHeader.version != THREAD_ENTITY_VERSION || entity->abiHeader.size < sizeof(ThreadEntityV0),
+        HCCL_ERROR(
+            "Invalid thread entity ABI, magicWord[%#x], version[%u], size[%u].", entity->abiHeader.magicWord,
+            entity->abiHeader.version, entity->abiHeader.size),
+        HCCL_E_PARA);
+    CHK_PRT_RET(entity->compatThreadHandle == 0U, HCCL_ERROR("Thread entity compat handle is null."), HCCL_E_INTERNAL);
+    handle = entity->compatThreadHandle;
     return HCCL_SUCCESS;
 }
 
@@ -71,7 +109,9 @@ HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& t
         HCCL_ERROR(
             "Invalid main thread for commName[%s], opParamKey %#llx.", execCtx.commName.c_str(), execCtx.opParamKey),
         HCCL_E_PARA);
-    thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
+    ThreadHandle rawThread = execCtx.mainThread;
+    CHK_RET(UnwrapThreadHandle(rawThread));
+    thread = reinterpret_cast<hccl::Thread*>(rawThread);
     CHK_PTR_NULL(thread);
     streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
     CHK_PTR_NULL(streamLite);
@@ -107,6 +147,122 @@ void LogOpenOpParamBrief(const char* stage, const std::vector<uint8_t>& opParam)
             static_cast<unsigned long long>(param->DataDes.count), static_cast<u32>(param->DataDes.dataType),
             static_cast<u32>(param->DataDes.outputType), static_cast<unsigned long long>(param->DataDes.strideCount));
     }
+}
+
+u64 SafeMultiplyForDfx(u64 lhs, u64 rhs)
+{
+    if (lhs == 0U || rhs == 0U) {
+        return 0U;
+    }
+    if (lhs > std::numeric_limits<u64>::max() / rhs) {
+        HCCL_WARNING(
+            "[%s] DFX value overflow, lhs[%llu], rhs[%llu].", __func__, static_cast<unsigned long long>(lhs),
+            static_cast<unsigned long long>(rhs));
+        return 0U;
+    }
+    return lhs * rhs;
+}
+
+u64 SafeAddForDfx(u64 lhs, u64 rhs)
+{
+    if (lhs > std::numeric_limits<u64>::max() - rhs) {
+        HCCL_WARNING(
+            "[%s] DFX value overflow, lhs[%llu], rhs[%llu].", __func__, static_cast<unsigned long long>(lhs),
+            static_cast<unsigned long long>(rhs));
+        return 0U;
+    }
+    return lhs + rhs;
+}
+
+u64 GetDfxDataTypeSize(HcclDataType dataType)
+{
+    switch (dataType) {
+        case HCCL_DATA_TYPE_INT8:
+        case HCCL_DATA_TYPE_UINT8:
+        case HCCL_DATA_TYPE_HIF8:
+        case HCCL_DATA_TYPE_FP8E5M2:
+        case HCCL_DATA_TYPE_FP8E4M3:
+        case HCCL_DATA_TYPE_FP8E8M0:
+            return 1U;
+        case HCCL_DATA_TYPE_INT16:
+        case HCCL_DATA_TYPE_UINT16:
+        case HCCL_DATA_TYPE_FP16:
+        case HCCL_DATA_TYPE_BFP16:
+            return 2U;
+        case HCCL_DATA_TYPE_INT32:
+        case HCCL_DATA_TYPE_UINT32:
+        case HCCL_DATA_TYPE_FP32:
+            return 4U;
+        case HCCL_DATA_TYPE_INT64:
+        case HCCL_DATA_TYPE_UINT64:
+        case HCCL_DATA_TYPE_FP64:
+            return 8U;
+        case HCCL_DATA_TYPE_INT128:
+            return 16U;
+        default:
+            return 0U;
+    }
+}
+
+HcclResult BuildOpenDfxOpInfo(
+    const mc2_ops_hccl::OpParam& param, const HcclMsg& msg, const HcclMsgExt& extMsg, u32 rankNum, u32 repeatCnt,
+    u64 mainThread, HcclDfxOpInfo& dfxOpInfo)
+{
+    const bool isAllToAll = param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV;
+    const HcclDataType inputType = isAllToAll ? param.all2AllVDataDes.sendType : param.DataDes.dataType;
+    const HcclDataType outputType =
+        isAllToAll ? param.all2AllVDataDes.recvType :
+                     (param.DataDes.outputType == HCCL_DATA_TYPE_RESERVED ? inputType : param.DataDes.outputType);
+    const u64 repeat = static_cast<u64>(repeatCnt);
+    u64 inputCount = SafeMultiplyForDfx(msg.dataCnt, repeat);
+    u64 outputCount = inputCount;
+    u64 dfxCount = inputCount;
+
+    if (isAllToAll) {
+        inputCount = 0U;
+        outputCount = 0U;
+        for (u32 i = 0U; i < rankNum; ++i) {
+            inputCount = SafeAddForDfx(inputCount, extMsg.sendCounts[i]);
+            outputCount = SafeAddForDfx(outputCount, extMsg.recvCounts[i]);
+        }
+        inputCount = SafeMultiplyForDfx(inputCount, repeat);
+        outputCount = SafeMultiplyForDfx(outputCount, repeat);
+        dfxCount = inputCount;
+    } else if (param.opType == HCCL_CMD_ALLGATHER) {
+        outputCount = SafeMultiplyForDfx(inputCount, rankNum);
+    } else if (param.opType == HCCL_CMD_REDUCE_SCATTER) {
+        inputCount = SafeMultiplyForDfx(outputCount, rankNum);
+    }
+
+    dfxOpInfo.opMode = static_cast<u32>(param.opMode);
+    dfxOpInfo.opType = static_cast<u32>(param.opType);
+    dfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
+    dfxOpInfo.dataType = static_cast<u32>(inputType);
+    dfxOpInfo.outputType = static_cast<u32>(outputType);
+    dfxOpInfo.dataCount = param.dataCount == 0U ? dfxCount : static_cast<u64>(param.dataCount);
+    dfxOpInfo.root = param.root;
+    dfxOpInfo.engine = param.engine;
+    dfxOpInfo.cpuTsThread = mainThread;
+    dfxOpInfo.cpuWaitAicpuNotifyIdx = param.aicpuRecordCpuIdx;
+    dfxOpInfo.inputMemAddr = reinterpret_cast<u64>(param.inputPtr);
+    dfxOpInfo.inputMemSize =
+        param.inputSize == 0U ? SafeMultiplyForDfx(inputCount, GetDfxDataTypeSize(inputType)) : param.inputSize;
+    dfxOpInfo.outputMemAddr = reinterpret_cast<u64>(param.outputPtr);
+    dfxOpInfo.outputMemSize =
+        param.outputSize == 0U ? SafeMultiplyForDfx(outputCount, GetDfxDataTypeSize(outputType)) : param.outputSize;
+    const s32 sRet = strncpy_s(dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), param.algTag, sizeof(dfxOpInfo.algTag) - 1U);
+    CHK_PRT_RET(
+        sRet != EOK, HCCL_ERROR("[%s] copy algTag[%s] failed, ret[%d].", __func__, param.algTag, sRet), HCCL_E_MEMORY);
+    HCCL_INFO(
+        "[%s] commName[%s], algTag[%s], opType[%u], dataType[%u], outputType[%u], dataCount[%llu], "
+        "mainControlThread[%#llx], notifyIdx[%u], input[%#llx, %llu], output[%#llx, %llu].",
+        __func__, param.commName, dfxOpInfo.algTag, dfxOpInfo.opType, dfxOpInfo.dataType, dfxOpInfo.outputType,
+        static_cast<unsigned long long>(dfxOpInfo.dataCount), static_cast<unsigned long long>(dfxOpInfo.cpuTsThread),
+        dfxOpInfo.cpuWaitAicpuNotifyIdx, static_cast<unsigned long long>(dfxOpInfo.inputMemAddr),
+        static_cast<unsigned long long>(dfxOpInfo.inputMemSize),
+        static_cast<unsigned long long>(dfxOpInfo.outputMemAddr),
+        static_cast<unsigned long long>(dfxOpInfo.outputMemSize));
+    return HCCL_SUCCESS;
 }
 
 u32 ReadAicpuOrderDfxValue(u64 addr)
@@ -536,6 +692,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    bool commAcquired = false;
+    std::string acquiredCommName{};
+    bool dfxRegistered = false;
+    HcclResult executionRet = HCCL_SUCCESS;
+    HcclResult profilingRet = HCCL_SUCCESS;
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -561,7 +722,40 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopAfterFormat] group %u, msgPos %u, repeatIdx %u, ret %u, runParamSize %zu.", groupIdx_,
             msgPos, i, ret, runParam.size());
-        CHK_RET(ret);
+        if (ret != HCCL_SUCCESS) {
+            executionRet = ret;
+            break;
+        }
+
+        if (i == 0U && execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+            if (runParam.size() < sizeof(mc2_ops_hccl::OpParam)) {
+                HCCL_ERROR(
+                    "Group %u: run op param size %zu is smaller than OpParam size %zu for DFX registration.", groupIdx_,
+                    runParam.size(), sizeof(mc2_ops_hccl::OpParam));
+                executionRet = HCCL_E_PARA;
+                break;
+            }
+            const auto* dfxParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data());
+            HcclDfxOpInfo dfxOpInfo{};
+            ret = BuildOpenDfxOpInfo(*dfxParam, msg, extMsg, rankNum_, repeatCnt, execCtx->mainThread, dfxOpInfo);
+            if (ret == HCCL_SUCCESS) {
+                acquiredCommName = dfxParam->commName;
+                ret = static_cast<HcclResult>(HcommAcquireComm(acquiredCommName.c_str()));
+                commAcquired = (ret == HCCL_SUCCESS);
+            }
+            if (ret == HCCL_SUCCESS) {
+                ret = HcclDfxRegOpInfoByCommId(
+                    const_cast<char*>(dfxParam->commName), reinterpret_cast<void*>(&dfxOpInfo));
+            }
+            if (ret != HCCL_SUCCESS) {
+                HCCL_ERROR(
+                    "Group %u: failed to register DFX context for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
+                executionRet = ret;
+                break;
+            }
+            dfxRegistered = true;
+        }
 
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
@@ -578,7 +772,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopAfterWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.", groupIdx_, msgPos,
             i, turnIdx, ret);
-        CHK_RET(ret);
+        if (ret != HCCL_SUCCESS) {
+            executionRet = ret;
+            break;
+        }
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
@@ -595,7 +792,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopAfterKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.", groupIdx_,
             msgPos, i, turnIdx, ret);
-        CHK_RET(ret);
+        if (ret != HCCL_SUCCESS) {
+            executionRet = ret;
+            break;
+        }
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
@@ -612,7 +812,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopAfterPost] group %u, msgPos %u, repeatIdx %u, turnIdx %u, ret %u.", groupIdx_, msgPos,
             i, turnIdx, ret);
-        CHK_RET(ret);
+        if (ret != HCCL_SUCCESS) {
+            executionRet = ret;
+            break;
+        }
 
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
@@ -621,6 +824,33 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
     }
+
+    if (dfxRegistered) {
+        HcclResult ret = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
+        if (ret != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "Group %u: failed to report DFX tasks for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
+            if (profilingRet == HCCL_SUCCESS) {
+                profilingRet = ret;
+            }
+        }
+    }
+
+    HcclResult releaseRet = HCCL_SUCCESS;
+    if (commAcquired) {
+        releaseRet = static_cast<HcclResult>(HcommReleaseComm(acquiredCommName.c_str()));
+        if (releaseRet != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "Group %u: failed to release comm context for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                acquiredCommName.c_str(), static_cast<unsigned long long>(opParamKey), releaseRet);
+        }
+    }
+    if (executionRet != HCCL_SUCCESS) {
+        return executionRet;
+    }
+    CHK_RET(profilingRet);
+    CHK_RET(releaseRet);
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
     return HCCL_SUCCESS;
@@ -796,7 +1026,11 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
             continue;
         }
 
-        auto* thread = reinterpret_cast<hccl::Thread*>(execCtx.mainThread);
+        ThreadHandle rawThread = execCtx.mainThread;
+        if (UnwrapThreadHandle(rawThread) != HCCL_SUCCESS) {
+            continue;
+        }
+        auto* thread = reinterpret_cast<hccl::Thread*>(rawThread);
         if (thread == nullptr) {
             MC2_TIMEOUT_LOG(
                 isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,

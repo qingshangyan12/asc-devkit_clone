@@ -18,9 +18,8 @@ AI Core的抽象硬件架构可以分为[**计算单元**](#section_compute_unit
 
 AI Core中的计算单元主要包括Scalar、Vector和Cube三类。
 
-**表1** 计算单元
+**表1** 计算单元<a name="zh-cn_topic_0000001588832845_table14884154362"></a>
 
-<a name="zh-cn_topic_0000001588832845_table14884154362"></a>
 | 组件名称 | 组件功能 | 对应编程概念 |
 | --- | --- | --- |
 | Scalar | 执行地址计算、循环控制等标量计算工作，并把矢量计算、矩阵计算、数据搬运、同步指令发射给对应单元执行。 | 核函数（Kernel）中的控制逻辑、同步控制API。 |
@@ -66,7 +65,7 @@ AI Core中的计算单元主要包括Scalar、Vector和Cube三类。
 
 | 计算方式 | 数据暂存位置 | 特点 | 适用场景 |
 | --- | --- | --- | --- |
-| Membase | Local Memory（UB） | 每步计算结果写回UB | NPU架构版本2201 |
+| Membase | Unified Buffer（UB） | 每步计算结果写回UB | NPU架构版本2201 |
 | Regbase | 寄存器（VF Reg） | 中间结果可暂存寄存器，减少UB读写 | NPU架构版本3510 |
 
 >[!NOTE]说明

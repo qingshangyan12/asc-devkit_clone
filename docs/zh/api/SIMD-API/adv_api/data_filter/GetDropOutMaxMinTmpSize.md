@@ -27,8 +27,8 @@ void GetDropOutMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_
 | srcShape | 输入 | 输入的shape信息，参数类型为[AscendC::TensorShape](../data_structures/TensorShape.md)。 |
 | typeSize | 输入 | 计算的数据类型大小，half=2，float=4。 |
 | isReuseSource | 输入 | 预留参数，暂未启用，保持默认值false即可。 |
-| maxValue | 输出 | 输出DropOut接口所需的tiling信息（最大临时空间大小）。<br> 说明：maxValue仅作为参考值，有可能大于UB剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
-| minValue | 输出 | 输出DropOut接口所需的tiling信息（最小临时空间大小）。 |
+| maxValue | 输出 | 输出DropOut接口所需的tiling信息（最大临时空间大小，单位为字节）。<br> 说明：maxValue仅作为参考值，有可能大于UB剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
+| minValue | 输出 | 输出DropOut接口所需的tiling信息（最小临时空间大小，单位为字节）。 |
 
 ## 返回值说明
 
@@ -44,7 +44,7 @@ GetDropOutMaxMinTmpSize无返回值。
 
 ## 调用示例
 
-下文呈现了一个host侧调用**GetDropOutMaxMinTmpSize**接口的使用示例，通过该接口获取DropOut计算所需的最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。配套的kernel侧使用样例请参考[调用示例](DropOut.md#section642mcpsimp)。
+下文呈现了一个host侧调用**GetDropOutMaxMinTmpSize**接口的使用示例，通过该接口获取DropOut计算所需的最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到核函数（Kernel）侧使用。配套的核函数（Kernel）侧使用样例请参考[调用示例](DropOut.md#section642mcpsimp)。
 
 ```
 #include <vector>

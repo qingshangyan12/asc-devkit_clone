@@ -36,6 +36,9 @@
 #include "kernel_prof_trace_intf.h"
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_dump_tensor_intf.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#include "kernel_operator_mem_intf.h"
+#endif
 #include "kernel_operator_common_intf.h"
 #if !(                       \
     defined(__NPU_ARCH__) && \
@@ -47,13 +50,13 @@
 #include "kernel_operator_vec_vconv_intf.h"
 #endif
 #include "kernel_operator_scalar_intf.h"
+#include "kernel_operator_vec_transpose_intf.h"
 #if !(                       \
     defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 #include "kernel_operator_vec_reduce_intf.h"
 #include "kernel_operator_proposal_intf.h"
 #include "kernel_operator_determine_compute_sync_intf.h"
-#include "kernel_operator_vec_transpose_intf.h"
 #include "kernel_operator_vec_gather_intf.h"
 #include "kernel_operator_vec_scatter_intf.h"
 #include "kernel_operator_vec_brcb_intf.h"

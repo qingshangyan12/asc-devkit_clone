@@ -2,17 +2,17 @@
 
 ## Overview
 
-This example uses the Ascend C C API to move matrix data from UB (Unified Buffer) to L1 (L1 Buffer). It keeps the original Nz-input and ND-input UB-to-L1 matrix multiplication scenarios, changes the matrix shape to a non-aligned shape, and adds a GM->UB->L1->UB->GM bidirectional data path scenario. It applies to Ascend 950PR/Ascend 950DT (`dav-3510`) and can run in NPU execution or NPU simulation mode.
+This example uses the Ascend C C API to move matrix data from UB (Unified Buffer) to L1 (L1 Buffer). It keeps the original Nz-input and ND-input UB-to-L1 matrix multiplication scenarios, changes the matrix shape to a non-aligned shape, and adds a GM->UB->L1->UB->GM bidirectional data path scenario. It applies to Ascend 950PR&950DT products (`dav-3510`) and can run in NPU execution or NPU simulation mode.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_ub2l1
 │   ├── scripts
 │   │   ├── gen_data.py                // Generates input and golden data
@@ -54,7 +54,7 @@ Use the `SCENARIO_NUM` build parameter to select an input scenario. Scenarios 1 
 
 - Input: A has the logical shape `[127, 129]` and is padded to `[128, 144]` in `half` Nz format. B input is not used in this scenario
 - Output: The `[128, 144]` Nz-format A data after the L1 round trip, in `half` type
-- Implementation: Scenario 3 uses `asc_get_phy_buf_addr` to manage UB and L1 addresses with fixed offsets, avoiding a mismatch between the UB address written by AIC and the UB address read by AIV. The AIV side uses `asc_copy_gm2ub` and `asc_copy_ub2l1` for GM->UB->L1. After the L1 data is ready, the AIC side uses `asc_copy_l12ub_sync` for synchronous L1->UB movement. The AIV side then waits for the AIC notification and writes the UB data back to GM with `asc_copy_ub2gm`.
+- Implementation: Scenario 3 uses `asc_get_phy_buf_addr` to manage UB and L1 addresses with fixed offsets, avoiding a mismatch between the UB address written by AIC and the UB address read by AIV. The AIV side uses `asc_copy_gm2ub` and `asc_copy_ub2l1` for GM->UB->L1. After the L1 data is ready, the AIC side uses `asc_copy_l12ub` followed by `asc_sync` for synchronous L1->UB movement. The AIV side then waits for the AIC notification and writes the UB data back to GM with `asc_copy_ub2gm`.
 
 ### Data Flow and Synchronization
 
@@ -62,7 +62,7 @@ Use the `SCENARIO_NUM` build parameter to select an input scenario. Scenarios 1 
 2. In scenario 1, the AIV side establishes MTE2-to-MTE3 synchronization, then calls `asc_copy_ub2l1` to copy Nz-format data contiguously from UB to L1. In scenario 2, it first establishes MTE2-to-V synchronization, then calls `copy_ub_nd_to_nz`, which calls `asc_copy_ub2ub` for each C0 column block to rearrange ND-format data in UB into Nz format. It then establishes V-to-MTE3 synchronization and calls `asc_copy_ub2l1` to copy the data contiguously from UB to L1.
 3. In scenarios 1 and 2, `__mix__(1, 2)` starts two AIVs. AIV0 performs the actual data movement and calls `asc_sync_intra_arrive` to notify the AIC side. Both AIVs call `asc_sync_block_arrive` to participate in the group-level synchronization. The AIC side first waits for the real data producer with `asc_sync_intra_wait`, and then waits for the group-level synchronization with `asc_sync_block_wait` before reading L1 data.
 4. In scenarios 1 and 2, the AIC side calls `asc_copy_l12l0a` and `asc_copy_l12l0b_transpose` to move Nz-format data from L1 Buffer to L0A Buffer and L0B Buffer, then calls `asc_sync_notify` and `asc_sync_wait` to establish MTE1-to-M synchronization before calling `asc_mmad` for the non-aligned logical matrix multiplication.
-5. In scenarios 1 and 2, the AIC side calls `asc_sync_notify` and `asc_sync_wait` to establish M-to-FIX synchronization, then calls `asc_set_l0c2gm_nz2nd` to configure the conversion from Nz format to ND format and uses the Fixpipe API `asc_copy_l0c2gm` to move the `[127, 130]` result to GM.
+5. In scenarios 1 and 2, the AIC side calls `asc_sync_notify` and `asc_sync_wait` to establish M-to-FIX synchronization, then calls `asc_set_l0c_copy_nz_para` to configure the conversion from Nz format to ND format and uses the Fixpipe API `asc_copy_l0c2gm` to move the `[127, 130]` result to GM.
 6. In scenario 3, AIV0 uses a fixed UB offset to complete GM->UB->L1 and notifies the AIC side with `asc_sync_intra_arrive`. Both AIVs call `asc_sync_block_arrive` to participate in the group-level synchronization. The AIC side synchronously moves L1 data to the fixed UB offset for AIV0 and notifies AIV0 with `asc_sync_intra_arrive`. AIV0 writes the round-trip data back to GM with `asc_copy_ub2gm`.
 
 The required pipeline dependencies are established during processing. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
@@ -77,7 +77,7 @@ Run the following steps in the example root directory.
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:**`${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 
@@ -105,7 +105,7 @@ Run the following steps in the example root directory.
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `1`, `2`, `3` | Scenario number |
 
 - Expected result

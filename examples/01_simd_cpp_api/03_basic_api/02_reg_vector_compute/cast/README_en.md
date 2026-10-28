@@ -22,7 +22,7 @@ This example supports two data type conversion scenarios. Select a scenario thro
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
@@ -67,7 +67,7 @@ This example performs data type conversion on the input vector. When the input a
 - Parameter description:
   - layoutMode = RegLayout::ZERO: The Cast API writes data to yReg at index 2\*N+0, used with the StoreAlign API to store data from the 2\*N positions of yReg
   - satMode = SatMode::SAT: This scenario demonstrates the saturation mode for floating-point to integer conversion. When the input data exceeds the output data type range, the result is the corresponding extreme value of the output type. For example, if the input float value is 32768.0, corresponding to integer 32768, the maximum value of int16_t is taken, and the output int16_t value is 32767
-  - roundMode = RoundMode::CAST_ROUND: This scenario demonstrates the round (round to nearest integer) rounding mode. For example, if the input half value is 2.5, the output int32 value is 3
+  - roundMode = RoundMode::CAST_ROUND: Rounds to the nearest integer. If the input is exactly halfway between two integers, it rounds away from zero. For example, float inputs 2.5 and -2.5 produce int16_t outputs 3 and -3, respectively
   - mask: In the Cast API, the mask filters based on the wider data type between input and output, so this scenario generates MaskReg based on the float data type
 - Example specifications:
   <table>
@@ -122,7 +122,7 @@ Run the following steps in the root directory of this example to build and run i
   |--------|--------|-------------|
   | `SCENARIO_NUM` | 1, 2 | Example execution scenario: Scenario 1: narrow to wide data type, Scenario 2: wide to narrow data type |
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution result
   The following execution result indicates that the precision comparison is successful.

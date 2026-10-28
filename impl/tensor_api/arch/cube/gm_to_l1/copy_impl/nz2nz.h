@@ -57,8 +57,9 @@ public:
             dst_stride >>= 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
-            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, src.engine().get_cache_mode(), src_stride,
-            dst_stride);
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0,
+            static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
@@ -75,7 +76,8 @@ public:
     // big_fractal_size big-fractals each become matrix_num * big_fractal_size contiguous blocks that
     // share the same per-big-fractal stride. src_nd_matrix_stride/dst_nz_matrix_stride are unused here
     // because that contiguity makes the single src_stride/dst_stride describe the whole sequence.
-    template <typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
     __aicore__ inline static void emit_copy(
         const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout, const DstLayout& dst_layout,
         uint16_t matrix_num, uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
@@ -90,7 +92,7 @@ public:
 
         uint8_t left_padding_cnt = 0;
         uint8_t right_padding_cnt = 0;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         auto block_count = big_fractal_size * matrix_num;
         auto block_len = small_fractal_size * c0_size<>;
@@ -103,7 +105,7 @@ public:
         }
         copy_gm_to_l1_align_v2_instr::data_copy(
             dst.data().get(), src.data().get(), block_count, block_len, left_padding_cnt, right_padding_cnt, cache_mode,
-            src_stride, dst_stride);
+            src_stride, dst_stride, trait.pre_allocation);
     }
 };
 } // namespace te

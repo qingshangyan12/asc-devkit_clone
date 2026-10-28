@@ -11,13 +11,11 @@ This example, based on the Gather operator, demonstrates the dynamic library com
 Figure 1: Code structure and call relationship
 </p>
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -53,6 +51,8 @@ For more bisheng compilation options and usage, refer to [AI-Core Operator Compi
 In a CMake project, use `add_library` with the `SHARED` keyword to compile `.asc` files into a dynamic shared library:
 
 ```cmake
+# Enable SIMT compilation mode
+set(CMAKE_ASC_ENABLE_SIMT ON)
 # Compile .asc file into a dynamic shared library
 add_library(gather_kernel SHARED
     gather_kernel.asc
@@ -99,7 +99,7 @@ Run the following steps in the root directory of this example to build and execu
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
     ```
 
-    > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
+    > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Execution Result
 

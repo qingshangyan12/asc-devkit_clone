@@ -111,6 +111,52 @@ bool GetExternalInputExecTimeout(double& execTimeOut)
     return true;
 }
 
+HcclResult ParseMultipleDimensionSplitRatio()
+{
+    const char* multipleDimensionSplitRatioEnv = std::getenv("HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO");
+    if (multipleDimensionSplitRatioEnv == nullptr) {
+        g_algEnvConfig.multipleDimensionSplitRatioSet = false;
+        g_algEnvConfig.multipleDimensionSplitRatio = 0;
+        return HCCL_SUCCESS;
+    }
+
+    std::string multipleDimensionSplitRatioStr(multipleDimensionSplitRatioEnv);
+    if (!IsValidTimeoutFormat(multipleDimensionSplitRatioStr)) {
+        HCCL_WARNING(
+            "[ParseMultipleDimensionSplitRatio] HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO[%s] format is invalid, use "
+            "default.",
+            multipleDimensionSplitRatioStr.c_str());
+        g_algEnvConfig.multipleDimensionSplitRatioSet = false;
+        g_algEnvConfig.multipleDimensionSplitRatio = 0;
+        return HCCL_E_PARA;
+    }
+
+    double multipleDimensionSplitRatio = 0;
+    if (SalStrToDouble(multipleDimensionSplitRatioStr, multipleDimensionSplitRatio) != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[ParseMultipleDimensionSplitRatio] HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO[%s] parse failed, use default.",
+            multipleDimensionSplitRatioStr.c_str());
+        g_algEnvConfig.multipleDimensionSplitRatioSet = false;
+        g_algEnvConfig.multipleDimensionSplitRatio = 0;
+        return HCCL_E_PARA;
+    }
+
+    g_algEnvConfig.multipleDimensionSplitRatioSet = true;
+    g_algEnvConfig.multipleDimensionSplitRatio = multipleDimensionSplitRatio;
+    return HCCL_SUCCESS;
+}
+
+bool GetExternalInputMultipleDimensionSplitRatio(double& multipleDimensionSplitRatio)
+{
+    std::lock_guard<std::mutex> lock(g_algEnvConfigMutex);
+    if (!g_algEnvConfig.multipleDimensionSplitRatioSet) {
+        return false;
+    }
+
+    multipleDimensionSplitRatio = g_algEnvConfig.multipleDimensionSplitRatio;
+    return true;
+}
+
 /* 入口 */
 HcclResult InitEnvConfig()
 {
@@ -245,6 +291,21 @@ HcclResult InitEnvConfig()
         HCCL_ERROR(
             "[InitEnvParam]errNo[0x%016llx] In init environment param, parse "
             "HCCL_DEBUG_CONFIG failed. errorno[%d]",
+            HCCL_ERROR_CODE(ret), ret),
+        ret);
+
+    // 解析 Parallel 算法多维切分比例
+    ret = ParseMultipleDimensionSplitRatio();
+    const char* splitRatioEnv = std::getenv("HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO");
+    std::string splitRatioValue = (splitRatioEnv != nullptr) ? std::string(splitRatioEnv) : "null";
+    RPT_ENV_ERR(
+        ret != HCCL_SUCCESS, "EI0001", std::vector<std::string>({"value", "env", "expect"}),
+        std::vector<std::string>({splitRatioValue, "HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO", "a number in [0, 1]"}));
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[Init][EnvVarParam]errNo[0x%016llx] In init env variable param, parse "
+            "HCCL_ALG_MULTIPLE_DIMENSION_SPLIT_RATIO failed. errorno[%d]",
             HCCL_ERROR_CODE(ret), ret),
         ret);
 
@@ -945,6 +1006,8 @@ const bool& GetExternalInputHcclAicpuUnfold()
 
 const uint8_t& GetExternalInputHcclAicpuCacheEnable() { return g_algEnvConfig.aicpuCacheEnable; }
 
+const u8& GetExternalInputHcclDeterministic() { return g_algEnvConfig.hcclDeterministic; }
+
 const bool& GetExternalInputHcclAivMode() { return g_algEnvConfig.aivMode; }
 
 const bool& GetExternalInputHcclAivOnlyMode() { return g_algEnvConfig.aivOnlyMode; }
@@ -980,7 +1043,7 @@ bool RunIndependentOpExpansion(DevType deviceType)
     }
 
 #ifdef MACRO_DEV_TYPE_NEW
-    if (deviceType == DevType::DEV_TYPE_950) {
+    if (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960) {
 #else
     if (deviceType == DevType::DEV_TYPE_910_95) {
 #endif

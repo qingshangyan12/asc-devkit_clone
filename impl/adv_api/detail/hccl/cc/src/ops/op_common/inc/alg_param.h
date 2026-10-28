@@ -19,6 +19,7 @@
 #include <functional>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
@@ -31,6 +32,7 @@
 #include "binary_stream.h"
 #include "hccl_ccu_res_dl.h"
 #include "ccu_types.h"
+#include "acl_base_rt.h"
 
 namespace mc2_ops_hccl {
 
@@ -71,6 +73,7 @@ constexpr uint32_t OP_ALG_LENGTH = 128;                                       //
 constexpr uint32_t ALG_TAG_LENGTH = TAG_LENGTH + OP_ALG_LENGTH;
 constexpr uint32_t MAX_TAG_LENGTH = 255;
 constexpr uint32_t AICPU_CONTROL_NOTIFY_NUM = 2;
+constexpr uint32_t UNFOLD_THREAD_NOTIFY_NUM = 3;
 constexpr uint32_t MAX_MEM_TAG_LENGTH = OP_ALG_LENGTH + 32;
 constexpr uint32_t RES_PACK_TAG_LENGTH = 255;
 constexpr uint32_t MAX_TEMP_NUM_IN_ALGO = 8; // 单个算法中最大template数量
@@ -96,7 +99,7 @@ constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 // Z axis detour 需要
 constexpr u32 MESH_CHANNELS_NUM = 1;
 
-constexpr uint64_t CCU_MAX_RANK_SIZE = 16;
+constexpr uint64_t CCU_MAX_RANK_SIZE = 64; // 与老树 A2A/A2AV CCU 上限对齐（hccl A2AV_CCU_MAX_RANK_SIZE=64）
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
@@ -329,6 +332,10 @@ struct CcuKernelArgBase {
     // std::vector<ChannelHandle> channels;
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
     uint32_t channelCount;
+    // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
+    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    uint32_t algSubType = 0;
+    std::shared_ptr<void> algArg;
 };
 
 // ccu kernel register所需信息
@@ -401,15 +408,35 @@ static_assert(
 static_assert(
     sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
 
+struct ParallelChannelPortInfo {
+    bool isValid = false;
+    bool isInterPod = false;
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+};
+
+static_assert(
+    std::is_trivially_copyable<ParallelChannelPortInfo>::value,
+    "ParallelChannelPortInfo must be trivially copyable for serialization");
+
+// dieSplitRatio ∈ (0,1) 表示有效双 die 切分；1.0/0.0（单 die 或未设置）统一折算为 1000（不切分）。
+// OpResCtx/kernelArg 以千分比整数传递到 AIV/ST，消费侧按 sliceCount*permille/1000 切分。
+inline uint64_t DieSplitRatioToPermille(double ratio)
+{
+    return (ratio > 0.0 && ratio < 1.0) ? static_cast<uint64_t>(ratio * 1000.0 + 0.5) : 1000U;
+}
+
 // A5用了cntNotify
 struct AlgResourceRequest {
     double dieSplitRatio = 0.0;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 notifyNumOnMainThread = 0;
     u32 slaveThreadNum = 0;
     std::vector<u32> notifyNumPerThread;
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {
@@ -501,6 +528,7 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
@@ -532,6 +560,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
         binaryStream << dieSplitRatio;
+        binaryStream << parallelPortInfo;
         binaryStream << kfcServerArgs;
         binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
@@ -570,6 +599,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
         binaryStream >> dieSplitRatio;
+        binaryStream >> parallelPortInfo;
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
@@ -614,6 +644,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* inputSymWindow = nullptr;
     void* outputSymWindow = nullptr;
     bool supportSymmetricMemory{false};
+    bool symMemChecked{false};
     u64 inputOffset = 0;
     u64 outputOffset = 0;
     HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址
@@ -654,6 +685,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
             void* recvCounts;
             void* sdispls;
             void* rdispls; // 指向变长区指针
+            void* peerRdispls;
         } all2AllVDataDes;
         struct {
             HcclDataType sendType;
@@ -684,8 +716,9 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     ThreadHandle deviceOrderThread = 0;     // device侧保序流
     u64 varMemSize{0};
     u8 varData[0];
-    u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子
-    bool isKfc = false; // 标记是否使用KFC Server kernel
+    u64 ccuKfcArgs[4];     // 测试，ccu-kfc作为通信算子
+    bool isKfc = false;    // 标记是否使用KFC Server kernel
+    bool checkRes = false; // 仅校验资源是否充足，不实际下发
 };
 
 struct AlgDesc {

@@ -3,26 +3,38 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -36,12 +48,16 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 ![](../../../../figures/maskreg_process.png "MaskReg计算过程")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
 - CreateMask接口
+
   ```cpp
   template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg CreateMask()
   ```
+
 - UpdateMask接口
+
   ```cpp
   template <typename T, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue)
@@ -178,6 +194,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
       }
     }
     ```
+
   >[!NOTE]说明
   >
   >当数据类型为int16_t（操作数为16位）时，每次循环内能够处理的元素个数Mask∈[1, 128]。当count>128时，仍按一次repeat（128元素）执行，不支持超过128元素的Mask控制。
@@ -266,25 +283,40 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   }
   ```
 
+<!-- npu="910b,A3,950" id8 -->
+
 ### NPU架构版本2201与NPU架构版本3510之间Mask机制对比
 
 本节对比[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)基于Reg矢量计算中Mask机制的差异。
 
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- npu="910b" id9 -->
+- 针对Atlas A2系列产品
 
   - Mask寄存器长度为256bit。
 
   - 每一个element对应1bit的Mask，数据类型不同，每次循环内能够处理的元素个数最大值不同。当操作数类型为b16时，一次循环中最多有128个元素参与计算；当操作数类型为b32时，一次循环中最多有64个元素参与计算；当操作数类型为b64时，一次循环中最多有32个元素参与计算。详细见[掩码相关参数](../../memory_vector_compute/SIMD_compute/mask.md#sheet2)。
+<!-- end id9 -->
 
-- 针对Ascend 950PR/Ascend 950DT
+<!-- npu="A3" id10 -->
+- 针对Atlas A3系列产品
+
+  - Mask寄存器长度为256bit。
+
+  - 每一个element对应1bit的Mask，数据类型不同，每次循环内能够处理的元素个数最大值不同。当操作数类型为b16时，一次循环中最多有128个元素参与计算；当操作数类型为b32时，一次循环中最多有64个元素参与计算；当操作数类型为b64时，一次循环中最多有32个元素参与计算。详细见[掩码相关参数](../../memory_vector_compute/SIMD_compute/mask.md#sheet2)。
+<!-- end id10 -->
+
+<!-- npu="950" id11 -->
+- 针对Ascend 950PR&950DT系列产品
 
   - MaskReg寄存器长度为VL/8，即256bit。
 
   - 当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
+<!-- end id11 -->
 
 **图8** NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比<a id="fig8"></a>
 
 ![](../../../../figures/memory_vs_reg_mask_comparison.png "NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比")
+<!-- end id8 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
