@@ -25,8 +25,7 @@ inline void check_condition(bool condition, const char* violation_message, const
     if (condition) {
         return;
     }
-    std::fprintf(stderr, "ASC_HOST_CHECK_CONDITION failed: %s, file=%s, line=%d\n",
-        violation_message, file, line);
+    std::fprintf(stderr, "ASC_HOST_CHECK_CONDITION failed: %s, file=%s, line=%d\n", violation_message, file, line);
     std::exit(EXIT_FAILURE);
 }
 
