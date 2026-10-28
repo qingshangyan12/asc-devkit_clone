@@ -31,6 +31,7 @@ enum MachineFlagId {
     FLAG_UBX,          // level0 为 MESH_1D_CLOS 且非 pcie 混插
     FLAG_MULTI_LEVEL,  // 多层网且 level0 为 MESH_1D
     FLAG_FLAT_1D,      // level0 非 MESH_1D_CLOS（A2A 裸名专用）
+    FLAG_CLOS,         // level0 为 CLOS，与 NHR MultiLink 自动选路一致
     MACHINE_FLAG_COUNT
 };
 
@@ -44,6 +45,7 @@ bool FlagPcieMix(const TopoInfoWithNetLayerDetails* topo);
 bool FlagUbx(const TopoInfoWithNetLayerDetails* topo);
 bool FlagMultiLevel(const TopoInfoWithNetLayerDetails* topo);
 bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo);
+bool FlagClos(const TopoInfoWithNetLayerDetails* topo);
 
 bool EngineMatch(AlgEngine candEngine, const OpParam& opParam);
 

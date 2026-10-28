@@ -103,6 +103,12 @@ bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo)
     return topo->level0Topo != Level0Shape::MESH_1D_CLOS;
 }
 
+bool FlagClos(const TopoInfoWithNetLayerDetails* topo)
+{
+    // Auto selection permits level0 CLOS in both single- and multi-level branches.
+    return topo != nullptr && topo->level0Topo == Level0Shape::CLOS;
+}
+
 // DPU 行服务 CPU 引擎请求；AICPU 行兼容 AICPU_TS
 bool EngineMatch(AlgEngine candEngine, const OpParam& opParam)
 {
@@ -133,6 +139,7 @@ constexpr MachineFlag MACHINE_FLAG_BINDING[MACHINE_FLAG_COUNT] = {
     FlagUbx,        // FLAG_UBX
     FlagMultiLevel, // FLAG_MULTI_LEVEL
     FlagFlat1D,     // FLAG_FLAT_1D
+    FlagClos,       // FLAG_CLOS
 };
 
 // 枚举新增槽位而内表漏填时尾部为 nullptr，编译期拦截
@@ -164,6 +171,7 @@ static_assert(MACHINE_FLAG_BINDING[FLAG_PCIE_MIX] == FlagPcieMix, "table binding
 static_assert(MACHINE_FLAG_BINDING[FLAG_UBX] == FlagUbx, "table binding drifted");
 static_assert(MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL] == FlagMultiLevel, "table binding drifted");
 static_assert(MACHINE_FLAG_BINDING[FLAG_FLAT_1D] == FlagFlat1D, "table binding drifted");
+static_assert(MACHINE_FLAG_BINDING[FLAG_CLOS] == FlagClos, "table binding drifted");
 static_assert(NoHole(VARIANT_COND_BINDING, VARIANT_COND_COUNT), "variant cond binding has holes");
 static_assert(NoHole(MACHINE_FLAG_BINDING, MACHINE_FLAG_COUNT), "machine flag binding has holes");
 
@@ -174,10 +182,8 @@ const VariantCond VARIANT_COND_TABLE[VARIANT_COND_COUNT] = {
 };
 
 const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT] = {
-    MACHINE_FLAG_BINDING[FLAG_PCIE_MIX],
-    MACHINE_FLAG_BINDING[FLAG_UBX],
-    MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL],
-    MACHINE_FLAG_BINDING[FLAG_FLAT_1D],
+    MACHINE_FLAG_BINDING[FLAG_PCIE_MIX], MACHINE_FLAG_BINDING[FLAG_UBX],  MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL],
+    MACHINE_FLAG_BINDING[FLAG_FLAT_1D],  MACHINE_FLAG_BINDING[FLAG_CLOS],
 };
 
 const char* VariantCondName(int id)
@@ -188,7 +194,8 @@ const char* VariantCondName(int id)
 
 const char* MachineFlagName(int id)
 {
-    static const char* NAMES[MACHINE_FLAG_COUNT] = {"FLAG_PCIE_MIX", "FLAG_UBX", "FLAG_MULTI_LEVEL", "FLAG_FLAT_1D"};
+    static const char* NAMES[MACHINE_FLAG_COUNT] = {
+        "FLAG_PCIE_MIX", "FLAG_UBX", "FLAG_MULTI_LEVEL", "FLAG_FLAT_1D", "FLAG_CLOS"};
     return (id >= 0 && id < MACHINE_FLAG_COUNT) ? NAMES[id] : "n/a";
 }
 } // namespace mc2_ops_hccl
