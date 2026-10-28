@@ -680,7 +680,7 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ int __mulhi(int x, int y);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __umulhi(unsigned int x, unsigned int y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ long long __mul64hi(long long x, long long y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long __mul64hi(long long x, long long y);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned long long __umul64hi(unsigned long long x, unsigned long long y);
 
@@ -696,43 +696,43 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned long __brev(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(int x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(long long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long long x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __ffs(int x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __ffs(long long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long long x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __ffs(long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned int x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long long x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ float __saturatef(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __saturatef(float x);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __sad(int x, int y, unsigned int z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __sad(int x, int y, unsigned int z);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __usad(unsigned int x, unsigned int y, unsigned int z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __usad(unsigned int x, unsigned int y, unsigned int z);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __mul24(int x, int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __mul24(int x, int y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __umul24(unsigned int x, unsigned int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __umul24(unsigned int x, unsigned int y);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ float __fdividef(float x, float y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __hadd(int x, int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __hadd(int x, int y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ int __rhadd(int x, int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __rhadd(int x, int y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __uhadd(unsigned int x, unsigned int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __uhadd(unsigned int x, unsigned int y);
 
-static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __urhadd(unsigned int x, unsigned int y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __urhadd(unsigned int x, unsigned int y);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int32_t laneid();
 
