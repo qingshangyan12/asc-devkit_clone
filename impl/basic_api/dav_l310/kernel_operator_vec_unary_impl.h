@@ -181,9 +181,9 @@ __aicore__ inline void VecUnaryLevel0Template(
 
 #define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                        \
     template <typename T, bool isSetMask = true>                                                     \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst,                                                \ 
-                                     __ubuf__ T* src,                                                \                                            
-                                     const uint64_t mask,                                            \ 
+    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst,                                                \
+                                     __ubuf__ T* src,                                                \
+                                     const uint64_t mask,                                            \
                                      const uint8_t repeatTimes,                                      \
                                      const UnaryRepeatParams& reapeatParams) \
     {                                                                                                  \
@@ -193,9 +193,9 @@ __aicore__ inline void VecUnaryLevel0Template(
 #define UNARY_VEC_BITWISE_NOT_SUPPORT(FUNC_NAME)                                                     \
     template <typename T, bool isSetMask = true>                                                     \
     __aicore__ inline void FUNC_NAME(                                                                \
-        __ubuf__ T* dst,                                                \ 
+        __ubuf__ T* dst,                                                \
                                      __ubuf__ T* src,                                                \
-        const uint64_t mask[2],                                         \ 
+        const uint64_t mask[2],                                         \
                                      const uint8_t repeatTimes,                                      \
         const UnaryRepeatParams& reapeatParams)                                                      \
     {                                                                                                \
@@ -210,11 +210,11 @@ __aicore__ inline void VecUnaryLevel0Template(
     }
 
 #define UNARY_VEC_NORMAL_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                 \
-    \                                              
-    template <typename T = DATA_TYPE, bool isSetMask = true>                                 \                                              
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \ 
-                                     __ubuf__ DATA_TYPE* src,                                \ 
-                                     const uint64_t mask,                                    \ 
+    \
+    template <typename T = DATA_TYPE, bool isSetMask = true>                                 \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \
+                                     __ubuf__ DATA_TYPE* src,                                \
+                                     const uint64_t mask,                                    \
                                      const uint8_t repeatTimes,                              \
                                      const UnaryRepeatParams& repeatParams)                                          \
     {                                                                                        \
@@ -240,9 +240,9 @@ __aicore__ inline void VecUnaryLevel0Template(
 
 #define UNARY_VEC_BITWISE_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                  \
     template <typename T = DATA_TYPE, bool isSetMask = true>                                 \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \ 
-                                     __ubuf__ DATA_TYPE* src,                                \ 
-                                     const uint64_t mask[2],                                 \ 
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \
+                                     __ubuf__ DATA_TYPE* src,                                \
+                                     const uint64_t mask[2],                                 \
                                      const uint8_t repeatTimes,                              \
                                      const UnaryRepeatParams& repeatParams) \
     {                                                                                          \
