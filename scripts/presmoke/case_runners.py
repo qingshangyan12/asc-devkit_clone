@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import json
+import shlex
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List
@@ -181,7 +182,7 @@ def mode_supported(context: CaseRunnerContext, info: RunnerInfo, mode: str) -> b
 
 
 def make_runner_cell(context: CaseRunnerContext, runner_dir: Path, info: RunnerInfo, mode: str) -> Cell:
-    runner = runner_dir / "run.sh"
+    runner = shlex.quote(str(runner_dir / "run.sh"))
     command_env = {
         "PRESMOKE_PROJECT_ROOT": str(context.project_root),
         "PRESMOKE_ARCH": context.arch,
