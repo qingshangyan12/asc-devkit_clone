@@ -70,10 +70,10 @@ private:
 
         if constexpr (trait.mmad_type == mmad_type::normal) {
             mmad_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
-                                  static_cast<uint8_t>(params.unit_flag), trait.disable_gemv, init_with_btbuf, false);
+                                  static_cast<asc_unit_flag_mode>(params.unit_flag), trait.disable_gemv, init_with_btbuf, false);
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
             mmad_mx_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
-                                     static_cast<uint8_t>(params.unit_flag), trait.disable_gemv, init_with_btbuf,
+                                     static_cast<asc_unit_flag_mode>(params.unit_flag), trait.disable_gemv, init_with_btbuf,
                                      false);
         }
     }

@@ -55,7 +55,7 @@ public:
             dst_stride >>= 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, block_count, block_len, 0,
-                                                            0, src.engine().get_cache_mode(), src_stride, dst_stride,
+                                                            0, static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
                                                             trait.pre_allocation);
     }
 
@@ -89,7 +89,7 @@ public:
 
         uint8_t left_padding_cnt = 0;
         uint8_t right_padding_cnt = 0;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         auto block_count = big_fractal_size * matrix_num;
         auto block_len = small_fractal_size * c0_size<>;

@@ -64,7 +64,7 @@ public:
         }
         copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, matrix_num, 1, dst_stride, dst_matrix_stride,
-            src_col_stride * sizeof(type), src.engine().get_cache_mode(), n_value, d_value, src_matrix_stride, false,
+            src_col_stride * sizeof(type), static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), n_value, d_value, src_matrix_stride, false,
             trait.pre_allocation);
     }
 
@@ -109,7 +109,7 @@ public:
         uint16_t loop2_dst_stride = dst_nz_n_stride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_Stride
         uint16_t loop4_dst_stride = dst_nz_matrix_stride * sizeof(fp8_e8m0_t) / c0_size<>;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         // scale use b16 for movement
         copy_gm_to_l1_multi_nd2nz_instr::data_copy(reinterpret_cast<__cbuf__ half*>(dst.data().get()),
                                                    reinterpret_cast<__gm__ half*>(src.data().get()), nd_num,
