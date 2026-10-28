@@ -15,6 +15,7 @@ op compile
 """
 
 import os
+import copy
 import sys
 import stat
 import shutil
@@ -267,10 +268,15 @@ class OpCompilation:
             return
         if impl_mode_default is not None:
             logger.debug("impl_mode_cfg [%s]. impl_mode_default: [%s].", impl_mode_cfg, impl_mode_default)
+        previously_optional = op_info.get("_normalized_impl_mode") == impl_mode_cfg and op_info.get(
+            "optional_impl_mode_flag", False
+        )
         op_info[OpcOptions.IMPL_MODE], opt_impl_mode_flag = self.__check_update_impl_mode(
             impl_mode_cfg, impl_mode_default
         )
+        opt_impl_mode_flag = opt_impl_mode_flag or previously_optional
         op_info["optional_impl_mode_flag"] = opt_impl_mode_flag
+        op_info["_normalized_impl_mode"] = op_info[OpcOptions.IMPL_MODE]
         logger.debug(
             "ImplMode of Op[%s] is %s, opt_impl_mode_flag is %d.",
             op_info.get(CompileParam.OP_TYPE),
@@ -332,6 +338,9 @@ class OpCompilation:
             single_op_obj = SingleOpCompile(op, op_info, self.__opc_compile_args)
             logger.debug("Call SingleOpCompile.")
             json_file_path = single_op_obj.op_compile()
+            if op_info.get("_deterministic_discovery_only"):
+                self.__compile_res = True
+                return json_file_path
             self.__single_op_post_compile(op, op_info, json_file_path)
 
             logger.debug(
@@ -349,6 +358,23 @@ class OpCompilation:
         finally:
             # delete compile result(.o\.json) files by kernel_name if necessary
             self.__del_compile_res_files(op_info)
+
+    def __auto_split_levels(self, op, op_info, idx, declared_groups):
+        """Compile only level artifacts after a preprocess-only capability probe."""
+        from asc_op_compile_base.common.deterministic import normalize_deterministic
+
+        groups = [normalize_deterministic(None, group)[1] for group in declared_groups]
+        if sorted(groups) not in ([(0,), (1, 2), (3,)], [(0, 1, 2), (3,)]):
+            return False
+        for group in groups:
+            group_op, group_info = copy.deepcopy(op), copy.deepcopy(op_info)
+            group_op[OpcOptions.BIN_FILENAME] = op[OpcOptions.BIN_FILENAME] + "_level" + "_".join(map(str, group))
+            group_info[OpcOptions.DETERMINISTIC] = "false" if group == (0,) else "true"
+            group_info[OpcOptions.DETERMINISTIC_LEVEL] = ",".join(map(str, group))
+            self.__single_op_compile(group_op, group_info, idx)
+            if self.__compile_res is not True:
+                return True
+        return True
 
     def __single_op_compile_all_deterministic(self, op, op_info, idx):
         def rename_output_op(output_name, new_output_name):
@@ -504,6 +530,34 @@ class OpCompilation:
                     CompileParam.EXTRA_SETTINGS: op.get(CompileParam.EXTRA_SETTINGS, None),
                     OpcOptions.DETERMINISTIC_LEVEL: op.get(OpcOptions.DETERMINISTIC_LEVEL, ""),
                 }
+                from asc_op_compile_base.common.deterministic import normalize_deterministic, parse_levels
+
+                requested_levels = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC_LEVEL)
+                if requested_levels is None:
+                    requested_levels = op_info.get(OpcOptions.DETERMINISTIC_LEVEL)
+                if parse_levels(requested_levels) is not None:
+                    requested_flag = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
+                    flag, levels = normalize_deterministic(
+                        None if requested_flag == "all" else requested_flag, requested_levels
+                    )
+                    op_info[OpcOptions.DETERMINISTIC] = "true" if flag else "false"
+                    op_info[OpcOptions.DETERMINISTIC_LEVEL] = ",".join(map(str, levels))
+                    self.__single_op_compile(op, op_info, idx)
+                    continue
+                # AscendC discovers capability by preprocessing, never by first
+                # compiling a large boolean compatibility object.
+                if self.__is_ascendc:
+                    probe_op, probe_info = copy.deepcopy(op), copy.deepcopy(op_info)
+                    probe_op[OpcOptions.BIN_FILENAME] = op[OpcOptions.BIN_FILENAME] + "_level_discovery"
+                    probe_info["_deterministic_discovery_only"] = True
+                    declared_groups = self.__single_op_compile(probe_op, probe_info, idx)
+                    if self.__compile_res is not True:
+                        return
+                    if self.__auto_split_levels(op, op_info, idx, declared_groups or []):
+                        if self.__compile_res is not True:
+                            return
+                        continue
+                # Operators without declared level selectors retain legacy dispatch.
                 deterministic = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
                 if deterministic is None:
                     self.__single_op_compile(op, op_info, idx)
@@ -512,6 +566,8 @@ class OpCompilation:
                     self.__single_op_compile(op, op_info, idx)
                 elif deterministic == "all":
                     self.__single_op_compile_all_deterministic(op, op_info, idx)
+                if self.__compile_res is not True:
+                    return
         else:
             logger.warn("Current opc only support single op compile, comment is %s.", str(comment))
             self.__compile_res = False
