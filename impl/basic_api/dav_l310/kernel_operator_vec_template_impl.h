@@ -35,8 +35,8 @@ __aicore__ inline bool IsCounterMode()
 }
 
 template <bool isSetMask = true, bool isNormalMode = true, bool isMaskBitMode = true>
-__simd_callee__ inline uint32_t VecMicroGetCount(const uint64_t maskArray[], const uint64_t maskCount, 
-                                                 __ubuf__ uint64_t *maskBuf)
+__simd_callee__ inline uint32_t VecMicroGetCount(
+    const uint64_t maskArray[], const uint64_t maskCount, __ubuf__ uint64_t* maskBuf)
 {
     if constexpr (isNormalMode && !isMaskBitMode && !isSetMask) {
         return 0;
@@ -118,7 +118,7 @@ __simd_callee__ inline uint16_t VecMicroGetRepeatTimes(uint32_t count, const uin
 }
 
 template <typename T, bool isSetMask = true, bool isNormalMode = true, bool isMaskBitMode = true>
-__simd_callee__ inline Reg::MaskReg VecMicroGetMaskReg(__ubuf__ uint64_t *maskBuf, uint32_t &count)
+__simd_callee__ inline Reg::MaskReg VecMicroGetMaskReg(__ubuf__ uint64_t* maskBuf, uint32_t& count)
 {
     Reg::MaskReg maskReg;
     if constexpr (isNormalMode && !isMaskBitMode && !isSetMask) {
@@ -398,8 +398,11 @@ __simd_vf__ inline void VecBinaryVFImpl(
 }
 }
 
-template <auto func, bool isSetMask, bool isMaskBitMode, BinaryFuncMode funcMode = BinaryFuncMode::NORMAL, typename T, typename U>
-__aicore__ inline void VecBinaryImplTemplate(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint64_t maskArray[], const uint64_t maskCount,
+template <
+    auto func, bool isSetMask, bool isMaskBitMode, BinaryFuncMode funcMode = BinaryFuncMode::NORMAL, typename T,
+    typename U>
+__aicore__ inline void VecBinaryImplTemplate(
+    __ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint64_t maskArray[], const uint64_t maskCount,
     const uint8_t repeatTimes, const BinaryRepeatParams& repeatParams)
 {
     constexpr bool TUCompare = sizeof(T) > sizeof(U);
@@ -409,7 +412,7 @@ __aicore__ inline void VecBinaryImplTemplate(__ubuf__ T* dst, __ubuf__ U* src0, 
     } else {
         ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
     }
-    __ubuf__ uint64_t *maskBuf = nullptr;
+    __ubuf__ uint64_t* maskBuf = nullptr;
     uint16_t maskArraySize = (maskArray == nullptr) ? 0 : MASK_ARRAY_SIZE;
     BasicAPIMaskStruct maskArrayStruct;
     for (uint16_t i = 0; i < maskArraySize; i++) {
