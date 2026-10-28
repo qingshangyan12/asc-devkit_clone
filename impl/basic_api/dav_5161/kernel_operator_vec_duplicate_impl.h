@@ -57,11 +57,8 @@ template <typename T>
 __aicore__ inline void DuplicateImpl(__ubuf__ T* dstLocal, const T& scalarValue, const int32_t& calCount)
 {
     CheckDuplicateSupportedType<T>();
-    if constexpr (SupportType<T, uint64_t, int64_t, complex32, complex64>()) {
-        DuplicateFromScalarImpl<T, Reg::RegTensor<T, Reg::RegTraitNumTwo>>(dstLocal, scalarValue, calCount);
-    } else {
-        DuplicateFromScalarImpl<T, Reg::RegTensor<T, Reg::RegTraitNumOne>>(dstLocal, scalarValue, calCount);
-    }
+    DuplicateFromScalarImpl<T, Reg::RegTensor<T, Reg::RegTraitNumOne>>(dstLocal, scalarValue, calCount);
+    
 }
 
 } // namespace AscendC
