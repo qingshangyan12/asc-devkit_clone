@@ -34,7 +34,11 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {}
-    void TearDown() { GlobalMockObject::verify(); }
+    void TearDown()
+    {
+        GlobalMockObject::verify();
+        GlobalMockObject::reset();
+    }
 };
 
 TEST_F(TestTiling, TestAddInputTdMallocFailed)
@@ -86,20 +90,20 @@ TEST_F(TestTiling, TestPlatformAscendCReserveLocalMemory)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
     constexpr uint64_t mockUBSize = 128 * 1024;
     MOCKER_CPP(
         &fe::PlatFormInfos::GetLocalMemSize,
-        void(fe::PlatFormInfos::*)(const fe::LocalMemType& mem_type, uint64_t& size))
+        void (fe::PlatFormInfos::*)(const fe::LocalMemType& mem_type, uint64_t& size))
         .stubs()
         .with(mockcpp::any(), outBound(mockUBSize))
         .will(returnValue(false));
 
     MOCKER_CPP(
         &platform_ascendc::PlatformAscendC::GetSocVersion,
-        platform_ascendc::SocVersion(platform_ascendc::PlatformAscendC::*)(void) const)
+        platform_ascendc::SocVersion (platform_ascendc::PlatformAscendC::*)(void) const)
         .stubs()
         .will(returnValue(platform_ascendc::SocVersion::ASCEND310P));
     uint64_t ubSize, l1Size;
@@ -224,7 +228,7 @@ TEST_F(TestTiling, TestPlatformAscendC)
     platfrom_stub_set_npuarch("3510");
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(true));
     plat.GetCoreMemSize(platform_ascendc::CoreMemType::BT, bt_size);
@@ -675,7 +679,7 @@ TEST_F(TestTiling, TestGetSocVersion)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
 
@@ -690,7 +694,7 @@ TEST_F(TestTiling, TestGetNpuArchFailed)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
 
@@ -726,7 +730,7 @@ TEST_F(TestTiling, TestCoreNum)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
 
@@ -743,7 +747,7 @@ TEST_F(TestTiling, TestGetLibApiWorkSpaceSize)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
 
@@ -758,7 +762,7 @@ TEST_F(TestTiling, TestPlatformAscendCManager)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
 
@@ -773,12 +777,12 @@ TEST_F(TestTiling, TestGetVectorCoreNum)
 
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
     MOCKER_CPP(
         &platform_ascendc::PlatformAscendC::GetSocVersion,
-        platform_ascendc::SocVersion(platform_ascendc::PlatformAscendC::*)(void) const)
+        platform_ascendc::SocVersion (platform_ascendc::PlatformAscendC::*)(void) const)
         .stubs()
         .will(returnValue(platform_ascendc::SocVersion::ASCEND310P));
 
@@ -792,7 +796,7 @@ TEST_F(TestTiling, TestGetVecRegLen)
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .will(returnValue(false));
     uint32_t ret = plat.GetVecRegLen();
@@ -807,7 +811,7 @@ TEST_F(TestTiling, TestGetVecRegLenWhenSizeExceed)
     std::string largeValue = "5000000000";
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
@@ -824,7 +828,7 @@ TEST_F(TestTiling, TestGetVecRegLenWhenSizeStrIllegal)
     std::string largeValue = "25x";
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
@@ -841,7 +845,7 @@ TEST_F(TestTiling, TestGetVecRegLenNormal)
     std::string largeValue = "256";
     MOCKER_CPP(
         &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+        bool (fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
@@ -898,13 +902,13 @@ TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
     const char* customSocVersion = "Ascend910B1";
 
     MOCKER_CPP(
-        &fe::PlatformInfoManager::InitRuntimePlatformInfos, uint32_t(fe::PlatformInfoManager::*)(const std::string&))
+        &fe::PlatformInfoManager::InitRuntimePlatformInfos, uint32_t (fe::PlatformInfoManager::*)(const std::string&))
         .stubs()
         .will(returnValue(static_cast<uint32_t>(0)));
 
     MOCKER_CPP(
         &fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
-        uint32_t(fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
+        uint32_t (fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
         .stubs()
         .will(returnValue(static_cast<uint32_t>(0)));
 

@@ -142,13 +142,18 @@ void ContextBuilderImpl::AddInputTd(
 {
     ASCENDC_ASSERT(tilingCtxBuilder_ != nullptr, return, CXT_ASCENDC_LOGE("tilingCtxBuilder_ is nullptr!"));
     int64_t tensorSize = context_ascendc::DataUtils::GetTensorSizeByStorageShape(storageShape, dtype);
-    if (tensorSize < 0) {
-        CXT_ASCENDC_LOGE("tensor idx: %d size is below 0", index);
+    if (tensorSize <= 0) {
+        CXT_ASCENDC_LOGE("tensor idx: %d size is invalid", index);
         errFlag_ = true;
         return;
     }
     size_t totalSize = 0UL;
     auto dataPtr = gert::Tensor::CreateFollowing(dtype, static_cast<size_t>(tensorSize), totalSize);
+    if (dataPtr == nullptr || dataPtr.get() == nullptr) {
+        CXT_ASCENDC_LOGE("CreateFollowing failed for input idx: %d, tensorSize: %ld", index, tensorSize);
+        errFlag_ = true;
+        return;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(dataPtr.get());
     tensor->MutableOriginShape() = storageShape.GetOriginShape();
     tensor->MutableStorageShape() = storageShape.GetStorageShape();
@@ -165,13 +170,18 @@ void ContextBuilderImpl::AddInputTd(
     ASCENDC_ASSERT(tilingCtxBuilder_ != nullptr, return, CXT_ASCENDC_LOGE("tilingCtxBuilder_ is nullptr!"));
 
     int64_t tensorSize = context_ascendc::DataUtils::GetTensorSizeByStorageShape(storageShape, dtype);
-    if (tensorSize < 0) {
-        CXT_ASCENDC_LOGE("tensor idx: %d size is below 0", index);
+    if (tensorSize <= 0) {
+        CXT_ASCENDC_LOGE("tensor idx: %d size is invalid", index);
         errFlag_ = true;
         return;
     }
     size_t totalSize = 0UL;
     auto tensorPtr = gert::Tensor::CreateFollowing(dtype, static_cast<size_t>(tensorSize), totalSize);
+    if (tensorPtr == nullptr || tensorPtr.get() == nullptr) {
+        CXT_ASCENDC_LOGE("CreateFollowing failed for input idx: %d, tensorSize: %ld", index, tensorSize);
+        errFlag_ = true;
+        return;
+    }
     auto iter = SET_CONST_DATA_FUNC_MAP.find(dtype);
     if (iter != SET_CONST_DATA_FUNC_MAP.cend()) {
         auto res = iter->second(constValues, static_cast<size_t>(tensorSize), totalSize, tensorPtr);
@@ -200,8 +210,8 @@ void ContextBuilderImpl::AddInputTd(
 {
     ASCENDC_ASSERT(tilingCtxBuilder_ != nullptr, return, CXT_ASCENDC_LOGE("tilingCtxBuilder_ is nullptr!"));
     int64_t tensorSize = context_ascendc::DataUtils::GetTensorSizeByStorageShape(storageShape, dtype);
-    if (tensorSize < 0) {
-        CXT_ASCENDC_LOGE("tensor idx: %d size is below 0", index);
+    if (tensorSize <= 0) {
+        CXT_ASCENDC_LOGE("tensor idx: %d size is invalid", index);
         errFlag_ = true;
         return;
     }
@@ -220,6 +230,13 @@ void ContextBuilderImpl::AddInputTd(
     }
     size_t totalSize = 0UL;
     auto tensorPtr = gert::Tensor::CreateFollowing(dtype, static_cast<size_t>(tensorSize), totalSize);
+    if (tensorPtr == nullptr || tensorPtr.get() == nullptr) {
+        CXT_ASCENDC_LOGE("CreateFollowing failed for input idx: %d, tensorSize: %ld", index, tensorSize);
+        free(buffer);
+        buffer = nullptr;
+        errFlag_ = true;
+        return;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(tensorPtr.get());
     errno_t err = memcpy_s(tensor->GetData<uint8_t>(), totalSize - sizeof(gert::Tensor), buffer, tensorSize);
     if (err != EOK) {
@@ -325,13 +342,18 @@ void ContextBuilderImpl::AddOutputTd(
 {
     ASCENDC_ASSERT(tilingCtxBuilder_ != nullptr, return, CXT_ASCENDC_LOGE("tilingCtxBuilder_ is nullptr!"));
     int64_t tensorSize = context_ascendc::DataUtils::GetTensorSizeByStorageShape(storageShape, dtype);
-    if (tensorSize < 0) {
-        CXT_ASCENDC_LOGE("tensor idx: %d size is below 0", index);
+    if (tensorSize <= 0) {
+        CXT_ASCENDC_LOGE("tensor idx: %d size is invalid", index);
         errFlag_ = true;
         return;
     }
     size_t totalSize = 0UL;
     auto dataPtr = gert::Tensor::CreateFollowing(dtype, static_cast<size_t>(tensorSize), totalSize);
+    if (dataPtr == nullptr || dataPtr.get() == nullptr) {
+        CXT_ASCENDC_LOGE("CreateFollowing failed for output idx: %d, tensorSize: %ld", index, tensorSize);
+        errFlag_ = true;
+        return;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(dataPtr.get());
     tensor->MutableOriginShape() = storageShape.GetOriginShape();
     tensor->MutableStorageShape() = storageShape.GetStorageShape();
@@ -468,6 +490,10 @@ int64_t GetTensorSizeByStorageShape(const gert::StorageShape& storageShape, cons
 
 bool SetConstDataWithFloat16(void* rawData, int64_t bufferLen, int64_t holderSize, std::unique_ptr<uint8_t[]>& dstData)
 {
+    if (dstData == nullptr || dstData.get() == nullptr || rawData == nullptr) {
+        CXT_ASCENDC_LOGE("Set Const Data Failed! dstData or rawData is nullptr.");
+        return false;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(dstData.get());
     auto floatValues = std::vector<float>(
         reinterpret_cast<float*>(rawData), reinterpret_cast<float*>(rawData) + bufferLen * OFFSET / sizeof(float));
@@ -492,6 +518,10 @@ bool SetConstDataWithFloat16(void* rawData, int64_t bufferLen, int64_t holderSiz
 
 bool SetConstDataWithBF16(void* rawData, int64_t bufferLen, int64_t holderSize, std::unique_ptr<uint8_t[]>& dstData)
 {
+    if (dstData == nullptr || dstData.get() == nullptr || rawData == nullptr) {
+        CXT_ASCENDC_LOGE("Set Const Data Failed! dstData or rawData is nullptr.");
+        return false;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(dstData.get());
     auto floatValues = std::vector<float>(
         reinterpret_cast<float*>(rawData), reinterpret_cast<float*>(rawData) + bufferLen * OFFSET / sizeof(float));
@@ -517,6 +547,10 @@ bool SetConstDataWithBF16(void* rawData, int64_t bufferLen, int64_t holderSize, 
 template <typename T>
 bool SetConstData(void* rawData, int64_t bufferLen, int64_t holderSize, std::unique_ptr<uint8_t[]>& dstData)
 {
+    if (dstData == nullptr || dstData.get() == nullptr || rawData == nullptr) {
+        CXT_ASCENDC_LOGE("Set Const Data Failed! dstData or rawData is nullptr.");
+        return false;
+    }
     auto tensor = reinterpret_cast<gert::Tensor*>(dstData.get());
     std::vector<uint8_t> constValues =
         std::vector<uint8_t>(reinterpret_cast<uint8_t*>(rawData), reinterpret_cast<uint8_t*>(rawData) + bufferLen);
