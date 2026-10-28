@@ -45,10 +45,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 
     // initTiling is nullptr, get opType from context
     hcclContext_ = (__gm__ OpResCtx*)context;
-    ASCENDC_HCCL_API_CHECK(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
     const uint32_t opType = hcclContext_->opType[0];
-    ASCENDC_HCCL_API_CHECK(
+    ASCENDC_HCCL_API_ASSERT(
         opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return; },
         "Call InitV2 failed, ensure cmdType is valid");
     ccOpParamTable_[opType] = hcclContext_->algInfo[0].opParam;
