@@ -226,7 +226,7 @@ __aicore__ inline void LoadDataImpl(
         LoadData2DL12L0BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     } else if (dstScope == Hardware::L1) {
-        LoadData2DL12L1BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+        LoadData2DL12L1Cal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
     }
 #else
     }
