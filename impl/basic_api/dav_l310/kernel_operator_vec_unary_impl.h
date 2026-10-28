@@ -24,6 +24,8 @@
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_vec_template_impl.h"
 #include "kernel_operator_vec_template_impl.h"
+#include "kernel_operator_vec_template_impl.h"
+#include "kernel_operator_vec_template_impl.h"
 #include "../../../include/basic_api/kernel_struct_unary.h"
 
 namespace AscendC {
