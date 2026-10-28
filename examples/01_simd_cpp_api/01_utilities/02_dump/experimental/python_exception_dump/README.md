@@ -21,7 +21,8 @@
 ```text
 ├── python_exception_dump
 │   ├── examples
-│   │   └── demo_ifa.py                  // demo：正常调用 + 故障注入 + 产物自检
+│   │   ├── demo_add.py                  // Add：正常调用 + 故障注入 + 产物自检
+│   │   └── aclnn_add.py                 // ctypes调用本地AddCustom算子包
 │   ├── npuops_exception_dump
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // 外挂库对外C接口
@@ -58,11 +59,9 @@
 
   请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓或[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)的安装说明，选取支持的`Python`版本配套发行版，完成`torch`和`torch-npu`的安装。
 
-- 安装前置依赖
+- 算子依赖
 
-  ```bash
-  pip3 install ascend_ops    # demo调用的IFA算子所在pip包
-  ```
+  样例通过`ctypes`调用本仓库[自定义算子工程样例](../../../../02_features/99_acl_based/00_acl_compilation/custom_op/README.md)编译安装的`AddCustom`。算子源码直接复用原工程。
 
 - 配置环境变量
 
@@ -79,24 +78,40 @@
   在本样例根目录下执行如下步骤，编译外挂库并运行demo。
 
   ```bash
+  # 从当前Dump样例根目录定位已有custom_op工程
+  SAMPLE_DIR="$PWD"
+  CUSTOM_OP_DIR="$(cd ../../../../02_features/99_acl_based/00_acl_compilation/custom_op && pwd)"
+  cmake -S "$CUSTOM_OP_DIR" -B "$CUSTOM_OP_DIR/build"
+  cmake --build "$CUSTOM_OP_DIR/build" --target binary package -j8
+  bash "$CUSTOM_OP_DIR"/build/custom_opp_*.run --install-path="$SAMPLE_DIR/custom_opp"
+  source "$SAMPLE_DIR/custom_opp/vendors/customize/bin/set_env.bash"
+  export NPUOPS_ADD_LIB="$SAMPLE_DIR/custom_opp/vendors/customize/op_api/lib/libcust_opapi.so"
+
   cd npuops_exception_dump && bash build.sh && cd ..    # 编译外挂库so（产物输出到 lib/）
-  python3 examples/demo_ifa.py                          # 执行demo
+  python3 examples/demo_add.py                          # 执行demo
   ```
 
   > **说明：** 外挂库so为环境相关二进制、不入库，运行前须先编译；tensor dump为纯Python，无此要求。
 
 - 执行结果
 
-  demo流程：正常调用IFA算子（调用边界自动dump输入/输出）→ 故障注入污染block_table触发AICore kernel异常 → 外挂库回调自动dump异常信息与args → 脚本自检产物。全部通过时退出码0，关键输出如下：
+  demo流程：正常调用本地`aclnnAddCustom`，计算两个16384元素的连续float16 ND tensor之和（`x = (arange(16384) % 1024).to(float16)`，`y = ones(16384, dtype=float16)`），在调用边界dump输入/输出并核对计算结果；随后在独立子进程中将同一个Add算子的输出地址替换为故意无效的非空对齐地址`0x100000000000`，触发设备端访问异常。输入tensor仍有效，故障调用前可完整dump输入。外挂库回调自动dump异常公共信息和原始args，父进程在CPU侧校验全部产物。输入x按1024取模，使输入和加法结果均可由float16精确表示。
 
   ```text
-  [SIZE-OK] args.bin: 1264 bytes == expected 1264
-  [INFO-OK] kernel_name / error_code / args_dumped（3条）
-  [INPUT-OK] / [OUTPUT-OK] / query大小 / 污染block_table读回
-  [PASS] IFA exception dump OK
+  normal Add run OK
+  caught expected device execution error: aclrtSynchronizeStream failed: ...
+  [DATA-OK] normal/fault input tensors and normal x + y output
+  [INFO-OK] <实际Add kernel名>, error=<实际非零错误码>
+  [SIZE-OK] args.bin: <实际字节数> bytes == callback args_bytes
+  [DATA-OK] input and injected output pointers found in raw kernel args
+  [PASS] Add exception dump OK
   ```
 
-  产物输出至包根`./exception_dump_ifa/`。错误码具体数值与CANN版本相关（不同版本可能不同，判定以kernel_name命中 + args落盘为准）。
+  退出码为0表示正常计算、设备异常和产物校验均通过。不会把单纯的Python异常或Host参数校验失败当成设备异常测试成功。
+
+  每次运行在当前目录下的`./exception_dump_add/run_*/`创建独立目录，避免历史产物导致误判；也可通过`--dump-dir /path/to/dumps`指定父目录。目录包含正常/故障调用的`input_add_*`、正常调用的`output_add_normal_*`、回调的`*_info.txt`和`*_args.bin`，以及记录故意无效输出地址的`fault.json`。
+
+  **故障注入说明：** Add算子源码未作修改；仅故障调用的输出tensor描述符使用无效device指针。该地址不对应可读输出tensor，故障路径不执行输出dump。异常worker结束后不复用失败的NPU上下文，父进程只读本次运行的文件。回调对全部kernel启用，校验时要求实际kernel名包含`add`、错误码非零、args大小等于同前缀`_info.txt`中的`args_bytes`，并从args中找出两个输入tensor元信息记录的device指针和故意无效的输出地址，不写死特定芯片的kernel名、错误码或args长度。
 
 ## FAQ
 
@@ -123,7 +138,7 @@ enable_exception_dump(["my_kernel"])
 out = run_with_tensor_dump(torch.ops.my_lib.my_op, tag="my_op", *args, **kwargs)
 
 # 3)（可选）手动dump指定tensor
-dump_tensors({"query": q, "block_table": bt}, stage="input")
+dump_tensors({"x": x, "y": y}, stage="input")
 ```
 
 无需修改任何C++代码、无需重编业务工程；仅异常dump需加载so，tensor dump为纯Python。验证：触发kernel异常后，确认dump目录生成`_args.bin`与`_info.txt`（error_code / kernel_name与Runtime日志一致），使用了步骤2/3时另确认`input_*` / `output_*`产物已生成。

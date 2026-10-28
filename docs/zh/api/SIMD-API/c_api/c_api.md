@@ -494,7 +494,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_madd](reg_compute/reg_fused/asc_madd.md)|madd（multiply-add），对源操作数执行逐元素乘法和加法。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_mul_scalar_float2half_rn](reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)|将float类型源操作数逐元素乘以标量后，按照RINT舍入模式转换为half类型。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_mula](reg_compute/reg_fused/asc_mula.md)|根据掩码将两个源寄存器按元素相乘，并与目的寄存器累加。|`c_api/reg_compute/compute/reg_fused.h`|
-|[asc_prelu](reg_compute/reg_fused/asc_prelu.md)|源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_prelu](reg_compute/reg_fused/asc_prelu.md)|源操作数src0大于等于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_relu](reg_compute/reg_fused/asc_relu.md)|逐元素执行ReLU运算。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_exp_sub](reg_compute/reg_fused/asc_exp_sub.md)|根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数。|`c_api/reg_compute/compute/reg_fused.h`|
 
@@ -733,11 +733,18 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_sync_subblock_arrive](sync/inter_core_sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
 |[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
 
-## 其他操作
+## 试验接口
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[指令发射队列空闲槽位查询](experimental/asc_get_pipe_idle_slot_count.md)|获取指定流水线对应发射队列当前的空闲槽位数量。|`c_api/experimental/asc_get_pipe_idle_slot_count.h`|
+|[双返回值结构体](experimental/pair.md)|承载试验接口的两个寄存器返回结果。|`c_api/experimental/pair.h`|
+|[asc_add_carry](experimental/asc_add_carry.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_sub_carry](experimental/asc_sub_carry.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_mull](experimental/asc_mull.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_arith_exp.h`|
+|[asc_intlv](experimental/asc_intlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_permute_sel_exp.h`|
+|[asc_deintlv](experimental/asc_deintlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/reg_permute_sel_exp.h`|
+|[asc_loadalign_deintlv](experimental/asc_loadalign_deintlv.md)|通过函数返回值输出两个寄存器结果的试验接口。|`c_api/experimental/loadalign_exp.h`|
 
 ## 特殊寄存器访问
 

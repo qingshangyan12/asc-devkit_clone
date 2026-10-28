@@ -23,8 +23,8 @@ namespace AscendC {
  * \param [in] n, input actual number of calculations in each row of the input data
  * \param [in] typeSize, size of the input data type, in bytes
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetSumMaxMinTmpSize(
     const uint32_t n, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxSize, uint32_t& minSize);

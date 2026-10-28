@@ -25,8 +25,8 @@ namespace AscendC {
  * @param [in] typeSize : src tensor dtype size
  * @param [in] isLastAxis : whether to operate along the last axis
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return max temporary local space size
- * @return min temporary local space size
+ * @param [out] maxValue : maximum temporary local space size, in bytes
+ * @param [out] minValue : minimum temporary local space size, in bytes
  */
 void GetCumSumMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource,

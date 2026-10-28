@@ -23,7 +23,6 @@
 #include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "hccl_symbol_loader.h"
-#include <set>
 
 using namespace std;
 using namespace HcclApi;
@@ -77,9 +76,6 @@ bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {
     if (commEngine != 5U && commEngine != 6U) {
         return false;
-    }
-    if (REGISTERED_CCU_ALGORITHMS.count(algConfig) != 0U) {
-        return true;
     }
     if (algConfig.find('[') == std::string::npos) {
         return false;

@@ -97,6 +97,7 @@ Atlas 200I/500 A2推理产品，支持的数据类型为：int8_t、uint8_t、in
 <!-- npu="310p" id11 -->
 Atlas推理系列产品AI Core，支持的数据类型为：uint16_t、half、uint32_t、float。
 <!-- end id11 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI_res.md#id2 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -145,6 +146,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：uint16_t、half、ui
   - Atlas推理系列产品AI Core
   <!-- end id22 -->
 <!-- end id21 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

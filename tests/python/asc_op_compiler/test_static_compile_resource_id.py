@@ -30,13 +30,16 @@ from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import CommonUti
 
 class TestStaticCompileResourceId(unittest.TestCase):
     def setUp(self):
+        soc = mock.patch.object(MODULE.global_var_storage, "get_variable", return_value="Ascend910B")
+        soc.start()
+        self.addCleanup(soc.stop)
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.object_path = os.path.join(self.temp_dir.name, "kernel.o")
         Path(self.object_path).write_bytes(b"\x7fELFkernel")
 
-    def test_resource_id_is_the_digest_of_the_object(self):
-        expected = hashlib.sha256(Path(self.object_path).read_bytes()).hexdigest()
+    def test_resource_id_is_the_digest_of_object_and_soc(self):
+        expected = hashlib.sha256(Path(self.object_path).read_bytes() + b"\0Ascend910B").hexdigest()
         resource_id = MODULE.calculate_resource_id(self.object_path)
         self.assertEqual(resource_id, expected)
         self.assertEqual(len(resource_id), MODULE._RESOURCE_ID_VALUE_SIZE)
@@ -45,6 +48,36 @@ class TestStaticCompileResourceId(unittest.TestCase):
         baseline = MODULE.calculate_resource_id(self.object_path)
         Path(self.object_path).write_bytes(b"\x7fELFkernel-rebuilt")
         self.assertNotEqual(MODULE.calculate_resource_id(self.object_path), baseline)
+
+    def test_embedded_resource_id_distinguishes_soc_without_modifying_input(self):
+        original = Path(self.object_path).read_bytes()
+        identifiers = []
+        for soc in ("Ascend910B", "Ascend910_93", "Ascend910B"):
+            with self.subTest(soc=soc):
+                values = {
+                    "ascendc_short_soc_version": soc,
+                    "ascendc_compiler_path": "fake-ccec",
+                    "ascendc_enable_ccache": False,
+                }
+                with mock.patch.object(
+                    MODULE.global_var_storage, "get_variable", side_effect=values.get
+                ), mock.patch.object(CommonUtility, "run_cmd_inner") as run_command, mock.patch.object(
+                    MODULE, "get_soc_spec", return_value="dav-c220-cube"
+                ), mock.patch.object(MODULE, "link_resource_id_obj"):
+                    identifier = MODULE.embed_resource_id(self.object_path, False)
+                self.assertEqual(identifier, hashlib.sha256(original + b"\0" + soc.encode("utf-8")).hexdigest())
+                self.assertEqual(Path(self.object_path).read_bytes(), original)
+                self.assertEqual(len(run_command.call_args_list), 1)
+                self.assertEqual(run_command.call_args.args[0][0], "fake-ccec")
+                identifiers.append(identifier)
+        self.assertNotEqual(identifiers[0], identifiers[1])
+        self.assertEqual(identifiers[0], identifiers[2])
+
+    def test_missing_soc_is_rejected(self):
+        for soc in (None, ""):
+            with self.subTest(soc=soc), mock.patch.object(MODULE.global_var_storage, "get_variable", return_value=soc):
+                with self.assertRaisesRegex(MODULE.ResourceIdError, "non-empty target SoC"):
+                    MODULE.calculate_resource_id(self.object_path)
 
     def test_metadata_layout_matches_kernel_utils_macros_header(self):
         header = Path(os.path.join(TOP_PATH, "impl/basic_api/utils/kernel_utils_macros.h")).read_text(encoding="utf-8")
