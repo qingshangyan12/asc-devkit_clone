@@ -15,6 +15,11 @@
 #ifndef INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H
 #define INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_CHECK_CONDITION_H__
+#endif
+
 namespace AscendC {
 
 inline void check_condition(bool condition, const char* violation_message, const char* file, int line);
@@ -25,5 +30,10 @@ inline void check_condition(bool condition, const char* violation_message, const
 
 #define ASC_HOST_CHECK_CONDITION(condition, violation_message) \
     AscendC::check_condition((condition), (violation_message), __FILE__, __LINE__)
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_CHECK_CONDITION_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_CHECK_CONDITION_H__
+#endif
 
 #endif // INCLUDE_UTILS_DEBUG_CHECK_CONDITION_H

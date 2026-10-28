@@ -12,23 +12,17 @@
 - Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2推理产品：支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas推理系列产品Vector Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas训练系列产品：支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 
 ## 功能说明
 
@@ -49,7 +43,7 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过，条件为`false`时终止当前进程。 |
-| violation_message | 输入 | 条件不成立时输出的自定义错误信息。 |
+| violation_message | 输入 | 条件不成立时输出的自定义错误信息。传入`nullptr`时，输出默认信息`No violation message provided.`。 |
 
 ## 返回值说明
 
@@ -57,21 +51,20 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 
 ## 约束说明
 
-- 仅支持在Host侧C++代码中调用，不支持在Device侧代码中调用。
-- 条件不成立时，接口终止当前进程，不返回调用方继续执行。`EXIT_FAILURE`的具体数值由C++标准库实现定义，调用方不能依赖其具体数值。
-- `condition`表达式只求值一次。为避免难以预期的行为，传入的表达式不应包含副作用。
+- 仅支持在Host侧代码中调用，不支持在Device侧代码中调用。
+- 条件不成立时，接口终止当前进程。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构。
 
-<!-- npu="950" id10 -->
+<!-- npu="950" id8 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id10 -->
+<!-- end id8 -->
 
 ```cpp
 #include <iostream>
@@ -118,11 +111,11 @@ int main()
     half* dst_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&src0_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     // 在申请设备内存后，使用`ASC_HOST_CHECK_CONDITION`检查设备指针。
-    ASC_HOST_CHECK_CONDITION(src0_device != nullptr, "error src0_device is nullptr");
+    ASC_HOST_CHECK_CONDITION(src0_device != nullptr, "src0_device is nullptr.");
     aclrtMalloc(reinterpret_cast<void**>(&src1_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    ASC_HOST_CHECK_CONDITION(src1_device != nullptr, "error src1_device is nullptr");
+    ASC_HOST_CHECK_CONDITION(src1_device != nullptr, "src1_device is nullptr.");
     aclrtMalloc(reinterpret_cast<void**>(&dst_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    ASC_HOST_CHECK_CONDITION(dst_device != nullptr, "error dst_device is nullptr");
+    ASC_HOST_CHECK_CONDITION(dst_device != nullptr, "dst_device is nullptr.");
 
     aclrtMemcpy(src0_device, DATA_BYTES, src0.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, DATA_BYTES, src1.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
@@ -142,11 +135,12 @@ int main()
 以`src0_device`为空为例，输出格式如下：
 
 ```text
-ASC_HOST_CHECK_CONDITION failed: error src0_device is nullptr, file=example.asc, line=46
+[ERROR] ASC_HOST_CHECK_CONDITION failed: src0_device is nullptr., file=example.asc, line=46
 ```
 
 输出中的信息来源如下：
 
-- `error src0_device is nullptr`：由宏参数`violation_message`得到，即调用方传入的自定义错误信息。
+- `[ERROR] ASC_HOST_CHECK_CONDITION failed:`：接口固定输出的错误前缀，无需调用方提供。
+- `src0_device is nullptr.`：由宏参数`violation_message`得到，即调用方传入的自定义错误信息。
 - `example.asc`：由预定义宏`__FILE__`得到，即包含`ASC_HOST_CHECK_CONDITION`调用的源文件名。实际输出可能是文件名、相对路径或绝对路径，取决于编译命令。
 - `46`：由预定义宏`__LINE__`得到，即`ASC_HOST_CHECK_CONDITION`在源文件中的调用行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。
