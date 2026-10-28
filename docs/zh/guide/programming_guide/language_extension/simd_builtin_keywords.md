@@ -543,6 +543,18 @@ $$
 
 更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
 
+使用内置数据类型时需要导入对应的头文件：
+
+**表6**  内置数据类型的头文件
+
+| 提供层级 | 数据类型 | 需要包含的头文件 |
+| --- | --- | --- |
+| 语言扩展层C API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double | c_api/asc_simd.h |
+| 基础API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64 | kernel_operator.h |
+
+> [!NOTE]说明  
+> `c_api/asc_simd.h`属于语言扩展层C API，面向底层硬件能力，而complex32和complex64是基础API在硬件能力之上提供的C++复合类型，因此并未放入`c_api/asc_simd.h`中。
+
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
