@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
-#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
@@ -345,7 +344,6 @@ HcclResult AllocAndCopyOpResCtx(
     CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
     return HCCL_SUCCESS;
 }
-
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
@@ -370,7 +368,6 @@ HcclResult HcclAllocOpResCtx(
     CHK_RET(FillRankInfo(comm, resCtx));
     return AllocAndCopyOpResCtx(comm, ctxTag, commEngine, resCtx, opResCtxPtr);
 }
-
 
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr)

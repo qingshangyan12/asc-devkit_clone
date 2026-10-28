@@ -24,7 +24,6 @@
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
 #include "external_alg_parser.h"
-#include "include/adv_api/hccl/internal/hccl_msg.h"
 
 #include <vector>
 #include <memory>
@@ -48,6 +47,7 @@ constexpr uint32_t MAX_HCOM_NUM = 3U;
 constexpr uint32_t INIT_TILING_VERSION = 100U;
 constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
+
 struct Mc2ServerCfg {
     uint32_t version;
     uint8_t debugMode;
@@ -160,7 +160,6 @@ HcclResult HcclAllocOpResCtx(
 
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr);
-
 
 // AllToAll适配AllToAllV
 HcclResult ConvertAlltoAllParam(
