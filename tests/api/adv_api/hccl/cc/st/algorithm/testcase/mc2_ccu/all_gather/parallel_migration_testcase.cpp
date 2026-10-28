@@ -10,13 +10,21 @@
 
 #include "ccu_fixture.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "sim_world.h"
 #include "acl/acl_rt.h"
+#include "mockcpp/mockcpp.hpp"
 
 #include <algorithm>
 #include <functional>
 #include <numeric>
+
+namespace mc2_ops_hccl {
+CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx);
+CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx);
+} // namespace mc2_ops_hccl
 
 namespace HcclSim {
 namespace CcuSt {
@@ -58,8 +66,19 @@ std::vector<KfcNhrStepInfo> NhrSteps(uint32_t rank, uint32_t size)
 
 class ParallelAllGatherMigrationTest : public ::testing::Test {
 protected:
-    void SetUp() override { RegisterManager::Global().Reset(); }
-    void TearDown() override { RegisterManager::Global().Reset(); }
+    void SetUp() override
+    {
+        RegisterManager::Global().Reset();
+        MOCKER(mc2_ops_hccl::SlaveKfcServerGenCircularQueue)
+            .stubs()
+            .will(invoke(mc2_ops_hccl::KfcServerGenCircularQueue));
+    }
+    void TearDown() override
+    {
+        GlobalMockObject::verify();
+        GlobalMockObject::reset();
+        RegisterManager::Global().Reset();
+    }
 
     // 直接编译产品 KFC server + dispatch + 两阶段子核，不替换算法计算。
     // 当前 RuntimeWorld 每 rank 只有一个执行上下文，故分别验证 Mesh/NHR
@@ -169,20 +188,21 @@ protected:
             arg.algSubType = mc2_ops_hccl::KFC_PARALLEL_ALL_GATHER_SUB_TYPE;
             auto parallel = std::make_shared<mc2_ops_hccl::KfcParallelAllGatherArg>();
             arg.algArg = parallel;
-            arg.opParam.opType = HCCL_CMD_ALLGATHER;
+            arg.opType = HCCL_CMD_ALLGATHER;
             arg.role =
                 mesh ? mc2_ops_hccl::KfcServerRole::ALL_GATHER_MESH : mc2_ops_hccl::KfcServerRole::ALL_GATHER_NHR;
+            arg.missionIndex = mission;
             parallel->rankSizeLevel0 = meshSize;
             parallel->rankIdxLevel0 = m;
             parallel->rankSizeLevel1 = nhrSize;
             parallel->rankIdxLevel1 = n;
-            arg.rankSize = mesh ? meshSize : nhrSize;
-            arg.rankId = mesh ? m : n;
+            const uint32_t subRankSize = mesh ? meshSize : nhrSize;
+            const uint32_t subRankId = mesh ? m : n;
             parallel->jettyNum = 1;
             parallel->stepInfoVector = NhrSteps(n, nhrSize);
             std::vector<ChannelHandle> channels;
-            for (uint32_t peer = 0; peer < arg.rankSize; ++peer) {
-                if (peer == arg.rankId) {
+            for (uint32_t peer = 0; peer < subRankSize; ++peer) {
+                if (peer == subRankId) {
                     continue;
                 }
                 parallel->rank2ChannelIdx[peer] = channels.size();
@@ -202,6 +222,16 @@ protected:
                     rank + 1, "parallel-kfc",
                     [&](void*) {
                         CompilerContext::Current().ConfigureProgram(rank, ranks, channels);
+                        mc2_ops_hccl::CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem subKernelArg{};
+                        subKernelArg.algArg = parallel;
+                        subKernelArg.channelCount = arg.channelCount;
+                        std::copy(channels.begin(), channels.end(), subKernelArg.channels);
+                        FunctionCaptureScope subKernel([&]() {
+                            const auto result =
+                                mesh ? mc2_ops_hccl::CcuKfcParallelAllGatherMesh1DMem2MemKernel(&subKernelArg) :
+                                       mc2_ops_hccl::CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(&subKernelArg);
+                            return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
+                        });
                         return mc2_ops_hccl::CcuKfcServerKernel(&arg) == CCU_SUCCESS ? Result::SUCCESS :
                                                                                        Result::CONTRACT_ERROR;
                     },
@@ -210,7 +240,8 @@ protected:
             ASSERT_EQ(registry.RegisterEnd(rank + 1), Result::SUCCESS);
             launches[rank] = {
                 handle,
-                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission, 0x1000U + rank},
+                {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission, 0x1000U + rank,
+                 0x1000U},
                 &memory};
         }
         RuntimeWorld runtime;
@@ -224,6 +255,7 @@ protected:
                 << " actual=" << static_cast<uint32_t>(*mismatch.first)
                 << " expected=" << static_cast<uint32_t>(*mismatch.second);
             for (uint32_t entry = 0; entry < 2; ++entry) {
+                EXPECT_EQ(memories[rank].parameter[CKE_WORD + mission * 2 * CKE_REGION + entry], 0U);
                 EXPECT_EQ(memories[rank].parameter[CKE_WORD + (mission * 2 + 1) * CKE_REGION + entry], 1U);
             }
         }

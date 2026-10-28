@@ -55,6 +55,7 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllVMesh1D"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAlltoAllVMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo == Level0Shape::CLOS) {
         // 大禹纯 CLOS：CCU 单 kernel 全 channel 必须同 die（hcomm CheckChannelsDie），

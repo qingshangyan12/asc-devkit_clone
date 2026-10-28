@@ -16,6 +16,8 @@
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "../template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "../template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #endif
 #include "topo_match_pcie_mix.h"
 #include "alg_data_trans_wrapper.h"
@@ -125,6 +127,12 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
         arg->rank2ChannelIdx = nhr->rank2ChannelIdx;
         mesh->algSubType = nhr->algSubType = KFC_PARALLEL_ALL_GATHER_SUB_TYPE;
         mesh->algArg = nhr->algArg = arg;
+        intraTempRequest.ccuKernelInfos[0].kernelFunc =
+            reinterpret_cast<void*>(CcuKfcParallelAllGatherMesh1DMem2MemKernel);
+        interTempRequest.ccuKernelInfos[0].kernelFunc =
+            reinterpret_cast<void*>(CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel);
+        intraTempRequest.ccuKernelInfos[0].subKernelName = KFC_FUNC_PARALLEL_ALL_GATHER_MESH1D_MEM2MEM_NAME;
+        interTempRequest.ccuKernelInfos[0].subKernelName = KFC_FUNC_PARALLEL_ALL_GATHER_NHR1D_MULTI_JETTY_MEM2MEM_NAME;
     }
 #endif
     constexpr u32 SUB_MAIN_THREAD_NUM = 2;

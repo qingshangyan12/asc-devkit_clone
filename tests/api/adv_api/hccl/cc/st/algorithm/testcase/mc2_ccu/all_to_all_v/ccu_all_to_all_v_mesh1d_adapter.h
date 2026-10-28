@@ -19,7 +19,7 @@
 namespace HcclSim {
 namespace CcuSt {
 
-constexpr uint32_t ALL_TO_ALL_V_TASK_ARG_COUNT = 10;
+constexpr uint32_t ALL_TO_ALL_V_TASK_ARG_COUNT = 32;
 constexpr uint32_t ALL_TO_ALL_V_EXT_FIELD_COUNT = 4;
 
 struct AllToAllVKernelConfig {

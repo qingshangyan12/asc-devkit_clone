@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "kfc_server_protocol.h"
 #include "ccu_all_to_all_mesh1d_adapter.h"
 #include "ccu_all_to_all.h"
 
@@ -15,6 +16,8 @@
 #include "ccu_primitives_stub.h"
 #include "ccu_kernel_alg_base.h"
 #include "alg_param.h"
+
+#include <algorithm>
 
 namespace HcclSim {
 namespace CcuSt {
@@ -61,26 +64,34 @@ Result CaptureAllToAllMesh1DKernel(void* kernelArg)
         return Result::PARAM_ERROR;
     }
 
-    std::array<AscendC::ccu::Variable, ALL_TO_ALL_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-
-    const CcuResult result = mc2_ops_hccl::CcuAlltoAllMesh1DKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], config.channels.data(),
-        static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.loadFromMem);
+    mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D arg{};
+    arg.rankSize = config.rankSize;
+    arg.rankId = config.rankId;
+    arg.loadFromMem = config.loadFromMem;
+    arg.channelCount = static_cast<uint32_t>(config.channels.size());
+    std::copy(config.channels.begin(), config.channels.end(), arg.channels);
+    const CcuResult result = mc2_ops_hccl::CcuAlltoAllMesh1DKernel(&arg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
 std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig& config)
 {
-    return {config.inputAddress, config.outputAddress, config.token,     config.sliceSize,
-            config.srcStride,    config.srcOffset,     config.dstOffset, config.goSize[0],
-            config.goSize[1],    config.goSize[2],     config.goSize[3]};
+    std::vector<uint64_t> args = {
+        0,
+        config.inputAddress,
+        config.outputAddress,
+        config.sliceSize,
+        config.srcStride,
+        config.srcOffset,
+        config.dstOffset,
+        config.goSize[0],
+        config.goSize[1],
+        config.goSize[2],
+        config.goSize[3]};
+    args.insert(args.begin() + mc2_ops_hccl::KFC_FUNC_TOKEN_ARG_INDEX, config.token);
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
