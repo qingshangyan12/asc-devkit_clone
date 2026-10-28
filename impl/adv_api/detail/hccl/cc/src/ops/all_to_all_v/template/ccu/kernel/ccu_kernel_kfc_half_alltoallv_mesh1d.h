@@ -11,6 +11,7 @@
 #define HCCL_CCU_KERNEL_KFC_HALF_ALL_TO_ALL_V_MESH_1D_H
 
 #include "ccu_kernel_alg_base.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -34,11 +35,15 @@ namespace mc2_ops_hccl {
 //   - token 通过 kfcServerArgs[5] 传递，不占用 xn 槽位
 //   - 轮次由 AIC 侧调用 AlltoAllvWrite 的次数决定，host 推 submitInfo 不影响轮次
 //   - 两 mission 读同一份 xn 参数帧（AIC 只写一份），MissionPreSync 栅栏保证起跑时序
+//   - 双 mission 共享同一组 channel（CalcRes 两 kernel 同 channels）：PreSync 的 buffer/token
+//     通知位必须按 missionIndex 错开（m0 bit1/bit2，m1 bit3/bit4）——同一位会被两个 mission
+//     各 post 一次各 wait 一次，wait 消费位后第二个 wait 永远等不到（死锁）。
+//     hostMissionIndex 为构图期常量（与 kfcServerArgs 运行时值同源），用于计算本 mission 的位。
 CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
     ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex);
+    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex, uint32_t hostMissionIndex);
 
 } // namespace mc2_ops_hccl
 

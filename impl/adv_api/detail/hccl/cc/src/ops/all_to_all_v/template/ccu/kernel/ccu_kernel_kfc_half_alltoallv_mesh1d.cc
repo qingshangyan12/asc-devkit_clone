@@ -24,6 +24,13 @@ constexpr uint16_t HA2AV_TOKEN_BIT = 1U << HA2AV_TOKEN_XN_ID;
 // 每个 Event 有 16 个 bit，一个 peer 占一个 bit，与 AllGather Mem2Mem 口径一致
 constexpr uint32_t HA2AV_BITS_PER_EVENT = 16;
 
+// 双 mission 共享同一组 channel：PreSync/PostSync 的通知位按 missionIndex 错开，
+// 否则同一位被两个 mission 各 post 一次、各 wait 一次，wait 消费位后第二个 wait
+// 永远等不到（死锁）。hostMissionIndex 为构图期常量，这里用编译期三元选位。
+constexpr uint16_t HA2AV_POST_SYNC_BITS[KFC_MAX_MISSION_NUM] = {HA2AV_POST_SYNC_BIT, HA2AV_POST_SYNC_BIT << 1};
+constexpr uint16_t HA2AV_BUFFER_BITS[KFC_MAX_MISSION_NUM] = {HA2AV_BUFFER_BIT, HA2AV_BUFFER_BIT << 1};
+constexpr uint16_t HA2AV_TOKEN_BITS[KFC_MAX_MISSION_NUM] = {HA2AV_TOKEN_BIT, HA2AV_TOKEN_BIT << 1};
+
 struct KfcHalfAlltoAllVMesh1DContext : CcuKernelCtxBase {
     const ChannelHandle* channels{nullptr};
     uint32_t channelCount{0};
@@ -47,6 +54,8 @@ struct KfcHalfAlltoAllVMesh1DContext : CcuKernelCtxBase {
     // 阶段 3-1：双 mission 参数
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    // 构图期常量（与 kfcServerArgs 运行时值同源）：选本 mission 的通知位
+    uint32_t hostMissionIndex = 0;
 };
 
 static CcuResult InitResource(KfcHalfAlltoAllVMesh1DContext& ctx)
@@ -108,16 +117,20 @@ static CcuResult LoadArgsFromMem(
 
 static CcuResult PreSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 {
-    // 把本端 cclBuffer 地址与 token 广播给所有对端
+    // 把本端 cclBuffer 地址与 token 广播给所有对端。
+    // 通知位按 missionIndex 错开（双 mission 共享 channel，同一位会死锁）：
+    // m0 用 bit1/bit2，m1 用 bit3/bit4（构图期常量选位，非运行时分支）。
+    const uint16_t bufferBit = HA2AV_BUFFER_BITS[ctx.hostMissionIndex];
+    const uint16_t tokenBit = HA2AV_TOKEN_BITS[ctx.hostMissionIndex];
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
-            ctx.channels[i], ctx.peerBuffer[ctx.rankId], HA2AV_BUFFER_XN_ID, HA2AV_BUFFER_CKE_IDX, HA2AV_BUFFER_BIT));
+            ctx.channels[i], ctx.peerBuffer[ctx.rankId], HA2AV_BUFFER_XN_ID, HA2AV_BUFFER_CKE_IDX, bufferBit));
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
-            ctx.channels[i], ctx.token[ctx.rankId], HA2AV_TOKEN_XN_ID, HA2AV_TOKEN_CKE_IDX, HA2AV_TOKEN_BIT));
+            ctx.channels[i], ctx.token[ctx.rankId], HA2AV_TOKEN_XN_ID, HA2AV_TOKEN_CKE_IDX, tokenBit));
     }
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], HA2AV_BUFFER_CKE_IDX, HA2AV_BUFFER_BIT));
-        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], HA2AV_TOKEN_CKE_IDX, HA2AV_TOKEN_BIT));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], HA2AV_BUFFER_CKE_IDX, bufferBit));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], HA2AV_TOKEN_CKE_IDX, tokenBit));
     }
     return CCU_SUCCESS;
 }
@@ -125,9 +138,9 @@ static CcuResult PreSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 // 源端保序方案，当前最大支持 8P 通信域；通道保序方案明确后可放开
 static CcuResult PostSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 {
-    // 阶段 3-1：远程 Post 同步仅在 mission 0 执行
-    // 单 mission 模式（missionNum==1）时 missionIndex 必然为 0，保持现有行为
-    // 双 mission 模式（missionNum==2）时仅 missionIndex==0 执行远程同步
+    // 远程 Post 同步仅在 mission 0 执行（与 hcomm 原版一致：Mi1 不做远程 Post）。
+    // 单 mission 时 missionIndex 必然为 0，保持现有行为。mission 0 的 post 位
+    // （bit0）当前无并发使用者：mission 1 不做 Post，preSync 位已按 mission 错开。
     // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
     CCU_IF(ctx.missionNum == 2)
     {
@@ -283,7 +296,7 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
     ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex)
+    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex, uint32_t hostMissionIndex)
 {
     KfcHalfAlltoAllVMesh1DContext ctx;
     ctx.channels = channels;
@@ -295,6 +308,7 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     // 阶段 3-1：设置 mission 参数
     ctx.missionNum = missionNum;
     ctx.missionIndex = missionIndex;
+    ctx.hostMissionIndex = hostMissionIndex;
 
     CCU_CHK_RET(InitResource(ctx));
     ctx.localWinAddr = localWinAddr;

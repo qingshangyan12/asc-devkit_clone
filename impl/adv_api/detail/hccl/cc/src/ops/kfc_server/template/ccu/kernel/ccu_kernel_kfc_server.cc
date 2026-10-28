@@ -444,12 +444,14 @@ static void DispatchKfcSubKernel(
         // [4..7]=goSize [8]=remoteWinOffset
         // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位。
         // 双 mission：两个 server 各自 dispatch 本 kernel，missionNum/missionIndex
-        // 来自各自的 kfcServerArgs，kernel 内按 missionIndex 选 A/B 切片。
+        // 来自各自的 kfcServerArgs，kernel 内按 missionIndex 选 A/B 切片；
+        // hostMissionIndex 为构图期常量，kernel 用它选本 mission 的 PreSync 通知位
+        // （双 mission 共享 channel，同一位会死锁）。
         CcuKfcHalfAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             ctx.token, ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex);
+            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex, ctx.arg->hostMissionIndex);
     }
 }
 
