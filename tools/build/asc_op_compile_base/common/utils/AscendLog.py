@@ -113,7 +113,7 @@ class AscendLog:
         """
         if self.log is None:
             return
-        self.log.DlogRecord(ctypes.c_int(module), self.level.debug, ctypes.c_char_p(fmt.replace("%", "%%")))
+        self.log.DlogRecord(ctypes.c_int(module), self.level.debug, ctypes.c_char_p(fmt.encode("utf-8")))
 
     def info(self: any, module: any, fmt: str) -> None:
         """
@@ -124,7 +124,7 @@ class AscendLog:
         """
         if self.log is None:
             return
-        self.log.DlogRecord(ctypes.c_int(module), self.level.info, ctypes.c_char_p(fmt.replace("%", "%%")))
+        self.log.DlogRecord(ctypes.c_int(module), self.level.info, ctypes.c_char_p(fmt.encode("utf-8")))
 
     def warn(self: any, module: any, fmt: str) -> None:
         """
@@ -135,7 +135,7 @@ class AscendLog:
         """
         if self.log is None:
             return
-        self.log.DlogRecord(ctypes.c_int(module), self.level.warning, ctypes.c_char_p(fmt.replace("%", "%%")))
+        self.log.DlogRecord(ctypes.c_int(module), self.level.warning, ctypes.c_char_p(fmt.encode("utf-8")))
 
     def error(self: any, module: any, fmt: str) -> None:
         """
@@ -146,7 +146,7 @@ class AscendLog:
         """
         if self.log is None:
             return
-        self.log.DlogRecord(ctypes.c_int(module), self.level.error, ctypes.c_char_p(fmt.replace("%", "%%")))
+        self.log.DlogRecord(ctypes.c_int(module), self.level.error, ctypes.c_char_p(fmt.encode("utf-8")))
 
     def event(self: any, module: any, fmt: str) -> None:
         """
@@ -157,7 +157,7 @@ class AscendLog:
         """
         if self.log is None:
             return
-        self.log.DlogRecord(ctypes.c_int(module), self.level.event, ctypes.c_char_p(fmt.replace("%", "%%")))
+        self.log.DlogRecord(ctypes.c_int(module), self.level.event, ctypes.c_char_p(fmt.encode("utf-8")))
 
     def set_level(self: any, module: any, level: any, event: any) -> None:
         """
