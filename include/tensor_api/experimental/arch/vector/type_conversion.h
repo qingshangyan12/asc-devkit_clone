@@ -28,11 +28,6 @@ namespace te {
 namespace experimental {
 
 /**
- * @brief Defines the default register cast options with zero layout, rint rounding, and no saturation.
- */
-constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
-
-/**
  * @ingroup tensor_api.experimental.reg_compute.reg_cast
  * @brief Converts the active elements of a register tensor to another element type.
  *
@@ -42,7 +37,7 @@ constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::r
  * @note Source and destination element types must differ. Supported option combinations are architecture-dependent.
  * @param [in] src Source register tensor.
  */
-template <typename DstType, const cast_options& opt = default_cast_ops, typename SrcType>
+template <typename DstType, const cast_options& opt, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
 
 /**

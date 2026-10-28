@@ -24,6 +24,10 @@ using asc::te::experimental::cast_options;
 using asc::te::experimental::cast_round_mode;
 using asc::te::experimental::cast_sat_mode;
 
+constexpr cast_options value_initialized_options{};
+static_assert(value_initialized_options.layout == cast_layout::unknown &&
+              value_initialized_options.round == cast_round_mode::unknown &&
+              value_initialized_options.sat == cast_sat_mode::unknown);
 constexpr cast_options float_to_half_options = {cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat};
 constexpr cast_options half_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
 constexpr cast_options int16_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
@@ -102,7 +106,7 @@ __simd_vf__ inline void cast_reg_loop(const SrcTensor src, DstTensor dst, uint32
     }
 }
 
-template <typename To, const cast_options& opt = asc::te::experimental::default_cast_ops, typename From, size_t N>
+template <typename To, const cast_options& opt, typename From, size_t N>
 void cast_one_register(From input_value, To (&dst_data)[N])
 {
     using src_reg_type = typename asc::te::experimental::reg_tensor<From>::reg_type;

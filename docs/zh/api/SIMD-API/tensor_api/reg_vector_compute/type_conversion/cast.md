@@ -42,19 +42,9 @@
 
 ```cpp
 template <typename DstType,
-          const cast_options& opt = default_cast_ops,
+          const cast_options& opt,
           typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src)
-```
-
-默认配置为：
-
-```cpp
-constexpr cast_options default_cast_ops = {
-    cast_layout::zero,
-    cast_round_mode::rint,
-    cast_sat_mode::not_sat
-};
+__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src)
 ```
 
 ## 参数说明
@@ -64,7 +54,7 @@ constexpr cast_options default_cast_ops = {
 | 参数名 | 描述 |
 | --- | --- |
 | `DstType` | 目的元素类型，必须与`SrcType`不同。支持的数据类型组合请参考[数据类型](#数据类型)。 |
-| `opt` | `cast_options`类型的编译期常量，默认值为`default_cast_ops`。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
+| `opt` | 需显式指定的`cast_options`类型编译期常量。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
 | `SrcType` | 源元素类型，由函数实参自动推导，无需显式指定。 |
 
 **表2** 参数说明
@@ -82,7 +72,7 @@ constexpr cast_options default_cast_ops = {
 | `sat` | [cast_sat_mode](../aux_data_types/cast_sat_mode.md)类型，`not_sat`表示非饱和模式，`sat`表示饱和模式；无需选择饱和模式时使用`unknown`。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
 
 > [!NOTE]  
-> `default_cast_ops`仅表示接口的默认参数，不表示所有类型组合均支持该配置。若默认配置不在对应转换行的支持范围内，必须显式传入`cast_options`。
+> `cast_options{}`的三个字段默认为`unknown`，当前支持的转换均不接受三项同时为`unknown`,请根据类型组合设置对应字段。
 
 ## 数据类型
 
