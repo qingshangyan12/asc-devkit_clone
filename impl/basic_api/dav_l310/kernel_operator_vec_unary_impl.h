@@ -31,7 +31,7 @@
 namespace AscendC {
 namespace Internal {
 template <auto func, typename T, typename RegType>
-__simd_vf__ inline void VecUnaryLevel2VFImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
+__simd_vf__ inline void VecUnaryLevel2VFImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
     RegType srcReg;
     RegType dstReg;
@@ -48,7 +48,7 @@ __simd_vf__ inline void VecUnaryLevel2VFImpl(__ubuf__ T *dst, __ubuf__ T *src, c
 }
 
 template <auto func, typename T>
-__aicore__ inline void VecUnaryLevel2ImplTemplate(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
+__aicore__ inline void VecUnaryLevel2ImplTemplate(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
     if constexpr (SupportBytes<T, 8>()) {
         VecUnaryLevel2VFImpl<func, T, Reg::RegTensor<T, Reg::RegTraitNumTwo>>(dst, src, count);
@@ -58,9 +58,9 @@ __aicore__ inline void VecUnaryLevel2ImplTemplate(__ubuf__ T *dst, __ubuf__ T *s
 }
 
 template <auto func, bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T>
-__simd_vf__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, const BasicAPIMaskStruct maskArrayStruct, 
-                                             const uint64_t maskCount, const uint8_t repeatTimes, 
-                                             const UnaryRepeatParams repeatParams, __ubuf__ uint64_t *maskBuf)
+__simd_vf__ inline void VecUnaryLevel0VFImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const BasicAPIMaskStruct maskArrayStruct, const uint64_t maskCount,
+    const uint8_t repeatTimes, const UnaryRepeatParams repeatParams, __ubuf__ uint64_t* maskBuf)
 {
     uint32_t count =
         VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
@@ -136,16 +136,16 @@ __simd_vf__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, c
 }
 
 template <auto func, bool isSetMask, bool isMaskBitMode, typename T>
-__aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t maskArray[], 
-                                              const uint64_t maskCount, const uint8_t repeatTimes,
-                                              const UnaryRepeatParams repeatParams)
+__aicore__ inline void VecUnaryLevel0Template(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t maskArray[], const uint64_t maskCount, const uint8_t repeatTimes,
+    const UnaryRepeatParams repeatParams)
 {
     if constexpr (isMaskBitMode) {
         ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
     } else {
         ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
     }
-    __ubuf__ uint64_t *maskBuf = nullptr;
+    __ubuf__ uint64_t* maskBuf = nullptr;
     uint16_t maskArraySize = (maskArray == nullptr) ? 0 : MASK_ARRAY_SIZE;
     BasicAPIMaskStruct maskArrayStruct;
     for (uint16_t i = 0; i < maskArraySize; i++) {
@@ -177,8 +177,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
         }
     }
 }
-}  // namespace Internal
-
+} // namespace Internal
 
 #define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                        \
     template <typename T, bool isSetMask = true>                                                     \
@@ -205,7 +204,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 
 #define UNARY_VEC_COUNTER_NOT_SUPPORT(FUNC_NAME)                                                     \
     template <typename T>                                                                            \
-    __aicore__ inline void FUNC_NAME(__ubuf__ T *dst, __ubuf__ T *src, const int32_t& calCount)      \
+    __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& calCount)      \
     {                                                                                                \
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); }); \
     }
@@ -270,7 +269,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
     }
 
 #define UNARY_VEC_COUNTER_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                                   \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst, __ubuf__ DATA_TYPE *src, const int32_t &calCount) \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const int32_t& calCount) \
     {                                                                                                           \
         __VEC_SCOPE__                                                                                           \
         {                                                                                                       \
@@ -282,29 +281,31 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
             uint16_t repeatTimes = CeilDivision(calCount, sregLower);                                           \
             for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {                                              \
                 preg = CreatePredicate<DATA_TYPE>(sreg);                                                        \
-                DataCopy(vreg0, src, i * sregLower);                                                            \
+                DataCopy(vreg0, src, i* sregLower);                                                             \
                 OP_NAME(vreg1, vreg0, preg);                                                                    \
-                DataCopy(dst, vreg1, i * sregLower, preg);                                                      \
+                DataCopy(dst, vreg1, i* sregLower, preg);                                                       \
             }                                                                                                   \
         }                                                                                                       \
     }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
-                               const UnaryRepeatParams& repeatParams)
+__aicore__ inline void AbsImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, int16_t, float, int32_t>()), 
-                 "current data type is not supported on current device!");
+    static_assert(
+        (SupportType<T, half, int16_t, float, int32_t>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Abs<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
-                               const UnaryRepeatParams& repeatParams)
+__aicore__ inline void AbsImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, int16_t, float, int32_t>()), 
-                  "current data type is not supported on current device!");
+    static_assert(
+        (SupportType<T, half, int16_t, float, int32_t>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Abs<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
 }
@@ -318,8 +319,9 @@ UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, int16_t);
 UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, int32_t);
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void ReluImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
-                                const UnaryRepeatParams& repeatParams)
+__aicore__ inline void ReluImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float, int32_t>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Relu<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -327,8 +329,9 @@ __aicore__ inline void ReluImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void ReluImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
-                                const UnaryRepeatParams& repeatParams)
+__aicore__ inline void ReluImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float, int32_t>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Relu<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -341,8 +344,9 @@ UNARY_VEC_COUNTER_IMPL(ReluImpl, Relu, float);
 UNARY_VEC_COUNTER_IMPL(ReluImpl, Relu, int32_t);
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTimes,
-                               const UnaryRepeatParams& repeatParams)
+__aicore__ inline void ExpImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTimes,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Exp<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -350,8 +354,9 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTimes,
-                               const UnaryRepeatParams& repeatParams)
+__aicore__ inline void ExpImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTimes,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Exp<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -363,8 +368,9 @@ UNARY_VEC_COUNTER_IMPL(ExpImpl, Exp, half);
 UNARY_VEC_COUNTER_IMPL(ExpImpl, Exp, float);
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
-                                const UnaryRepeatParams& repeatParams)
+__aicore__ inline void SqrtImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Sqrt<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -372,8 +378,9 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
-                                const UnaryRepeatParams& repeatParams)
+__aicore__ inline void SqrtImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Sqrt<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -386,7 +393,7 @@ UNARY_VEC_COUNTER_IMPL(SqrtImpl, Sqrt, float);
 
 namespace RegRsqrt {
 template <typename T, typename RegT, bool precisionMode = false>
-__simd_callee__ inline void Rsqrt(RegT &dstReg, RegT &srcReg, Reg::MaskReg &mask)
+__simd_callee__ inline void Rsqrt(RegT& dstReg, RegT& srcReg, Reg::MaskReg& mask)
 {
     Reg::MaskReg cmpMask;
     Reg::Duplicate(dstReg, static_cast<T>(1.0f), mask);
@@ -413,33 +420,37 @@ __simd_callee__ inline void Rsqrt(RegT &dstReg, RegT &srcReg, Reg::MaskReg &mask
         }
     }
 }
-}  // namespace RegRsqrt
+} // namespace RegRsqrt
 
 template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
-__aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
-                                 const UnaryRepeatParams& repeatParams)
+__aicore__ inline void RsqrtImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
-    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
-                         config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (
+        config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
+        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     }
 }
 
 template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
-__aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
-                                 const UnaryRepeatParams& repeatParams)
+__aicore__ inline void RsqrtImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
-    } else if constexpr (config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
-                         config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
+    } else if constexpr (
+        config.algo == RsqrtAlgo::FAST_INVERSE || config.algo == RsqrtAlgo::PRECISION_0ULP_FTZ_FALSE ||
+        config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = RegRsqrt::Rsqrt<T, Reg::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
     }
@@ -463,8 +474,9 @@ UNARY_VEC_COUNTER_IMPL(ReciprocalImpl, Rec, half);
 UNARY_VEC_COUNTER_IMPL(ReciprocalImpl, Rec, float);
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
-                              const UnaryRepeatParams& repeatParams)
+__aicore__ inline void LnImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Ln<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -472,8 +484,9 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
 }
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
-                              const UnaryRepeatParams& repeatParams)
+__aicore__ inline void LnImpl(
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Ln<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -481,7 +494,7 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
 }
 
 template <typename T>
-__aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
+__aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     constexpr auto func = Reg::Ln<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
@@ -518,10 +531,11 @@ UNARY_VEC_COUNTER_IMPL(NotImpl, Not, uint32_t);
 UNARY_VEC_COUNTER_IMPL(NotImpl, Not, int32_t);
 
 template <typename T>
-__aicore__ inline void NegImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
+__aicore__ inline void NegImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
-    static_assert((SupportType<T, int8_t, int16_t, int32_t, half, float>()),
-                  "current data type is not supported on current device!");
+    static_assert(
+        (SupportType<T, int8_t, int16_t, int32_t, half, float>()),
+        "current data type is not supported on current device!");
     if constexpr (SupportBytes<T, 8>()) {
         constexpr auto func = Reg::Neg<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
