@@ -34,7 +34,11 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {}
-    void TearDown() { GlobalMockObject::verify(); }
+    void TearDown()
+    { 
+        GlobalMockObject::verify();
+        GlobalMockObject::reset();
+    }
 };
 
 TEST_F(TestTiling, TestAddInputTdMallocFailed)
