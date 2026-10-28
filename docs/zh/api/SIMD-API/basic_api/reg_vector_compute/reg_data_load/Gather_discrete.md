@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9050" id8 -->
-- Kirin 9050处理器系列产品：支持
+- Kirin9050处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
@@ -35,6 +35,15 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="x90" id12 -->
+- KirinX90处理器系列产品：支持
+<!-- end id12 -->
+<!-- npu="9020" id13 -->
+- Kirin9020处理器系列产品：支持
+<!-- end id13 -->
+<!-- npu="9030" id14 -->
+- Kirin9030处理器系列产品：支持
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Gather_discrete_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -124,6 +133,9 @@ __simd_callee__ inline void Gather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index,
     | uint64_t | uint64_t | uint64_t | RegTensor<uint64_t, RegTraitNumOne> | RegTensor<uint64_t, RegTraitNumOne> | - |
     | uint64_t | uint64_t | uint64_t | RegTensor<uint64_t, RegTraitNumOne> | RegTensor<uint64_t, RegTraitNumTwo> | index的前32个数有效 |
     | uint64_t | uint64_t | uint64_t | RegTensor<uint64_t, RegTraitNumTwo> | RegTensor<uint64_t, RegTraitNumTwo> | - |
+<!-- npu="x90,9020,9030" id15 -->
+- 针对KirinX90处理器系列产品、Kirin9020处理器系列产品和Kirin9030处理器系列产品,暂不支持bfloat16_t/int64_t/uint64_t数据类型。
+<!-- end id15 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -143,4 +155,3 @@ __simd_vf__ inline void GatherVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubu
     }
 }
 ```
-

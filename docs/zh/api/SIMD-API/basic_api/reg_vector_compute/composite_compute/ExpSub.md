@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9050" id8 -->
-- Kirin 9050处理器系列产品：支持
+- Kirin9050处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
@@ -35,6 +35,15 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9020" id12 -->
+- Kirin9020处理器系列产品：支持
+<!-- end id12 -->
+<!-- npu="9030" id13 -->
+- Kirin9030处理器系列产品：支持
+<!-- end id13 -->
+<!-- npu="x90" id14 -->
+- KirinX90处理器系列产品：支持
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/ExpSub_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -105,6 +114,11 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 - 源操作数类型为half时，Vector计算单元一次计算只处理最多64个元素，mask的有效情况以输入数据类型为准，只有偶数位有效，有效位共128bit，参考下图：
 
   ![ExpSub处理half类型示意图](../../../../figures/reg_expsub_half.png)
+
+- Kirin9020处理器系列产品，支持数据类型为：half、float。
+- Kirin9030处理器系列产品，支持数据类型为：half、float。
+- Kirin9050处理器系列产品，支持数据类型为：half、float。
+- KirinX90处理器系列产品，支持数据类型为：half、float。
 
 ## 关键特性说明
 

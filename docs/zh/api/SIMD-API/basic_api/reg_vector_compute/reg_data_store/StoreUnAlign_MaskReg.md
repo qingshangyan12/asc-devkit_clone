@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9050" id8 -->
-- Kirin 9050处理器系列产品：支持
+- Kirin9050处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
@@ -35,6 +35,18 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="x90" id12 -->
+- KirinX90：不支持
+<!-- end id12 -->
+<!-- npu="9020" id13 -->
+- Kirin9020：不支持
+<!-- end id13 -->
+<!-- npu="9030" id14 -->
+- Kirin9030：不支持
+<!-- end id14 -->
+<!-- npu="9050" id15 -->
+- Kirin9050：不支持
+<!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_MaskReg_res.md#id1 -->
 
 ## 功能说明
@@ -113,4 +125,3 @@ __simd_vf__ inline void StoreUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr,
     AscendC::Reg::StoreUnAlignPost(dstAddr, ureg, 0);
 }
 ```
-

@@ -26,11 +26,14 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id19 -->
+- Kirin9020处理器系列产品：支持
+<!-- end id19 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id1 -->
 
 ### 传入config的原型
@@ -57,11 +60,14 @@
 - Atlas训练系列产品：不支持
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90处理器系列产品：不支持
+- KirinX90处理器系列产品：不支持
 <!-- end id17 -->
 <!-- npu="9030" id18 -->
-- Kirin 9030处理器系列产品：不支持
+- Kirin9030处理器系列产品：不支持
 <!-- end id18 -->
+<!-- npu="9020" id23 -->
+- Kirin9020处理器系列产品：不支持
+<!-- end id23 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id2 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -147,6 +153,16 @@ $dst_i = \sqrt{src_i}$
 
 T支持的数据类型为：half、float。
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id3 -->
+
+<!-- npu="9020" id24 -->
+- 针对Kirin9020处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id24 -->
+<!-- npu="9030" id28 -->
+- 针对Kirin9030处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id28 -->
+<!-- npu="x90" id31 -->
+- 针对KirinX90处理器系列产品，T支持的数据类型为：half、float。
+<!-- end id31 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

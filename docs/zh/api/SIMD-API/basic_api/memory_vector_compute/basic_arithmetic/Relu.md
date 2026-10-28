@@ -24,11 +24,14 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9020" id18 -->
+- Kirin9020处理器系列产品：支持
+<!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Relu_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -108,12 +111,17 @@ $dst_i = \max(0, src_i)$
 - 针对Atlas训练系列产品，T支持的数据类型为：half。
 <!-- end id15 -->
 <!-- npu="x90" id16 -->
-- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、int32_t、float。
+- 针对KirinX90处理器系列产品，T支持的数据类型为：half、int32_t、float。
 <!-- end id16 -->
 <!-- npu="9030" id17 -->
-- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、int32_t、float。
+- 针对Kirin9030处理器系列产品，T支持的数据类型为：half、int32_t、float。
 <!-- end id17 -->
+
+<!-- npu="9020" id19 -->
+- 针对Kirin9020处理器系列产品，T支持的数据类型为：half、int32_t、float。
+<!-- end id19 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Relu_res.md#id2 -->
+
 
 ## 返回值说明<a name="section38228281712"></a>
 

@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9050" id8 -->
-- Kirin 9050处理器系列产品：支持
+- Kirin9050处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
@@ -35,6 +35,18 @@
 <!-- npu="kirin3" id11 -->
 - KirinDev0003处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="x90" id12 -->
+- KirinX90：支持
+<!-- end id12 -->
+<!-- npu="9020" id14 -->
+- Kirin9020：支持
+<!-- end id14 -->
+<!-- npu="9030" id15 -->
+- Kirin9030：支持
+<!-- end id15 -->
+<!-- npu="9050" id16 -->
+- Kirin9050：支持
+<!-- end id16 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Move_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -84,6 +96,12 @@
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
 <!-- end id8 -->
+<!-- npu="x90,9020,9030" id13 -->
+Kirinx90、Kirin9020、Kirin9030系列产品，不支持bfloat16_t
+<!-- end id13 -->
+<!-- npu="9050" id17 -->
+Kirin9050系列产品，不支持bfloat16_t、b64。
+<!-- end id17 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Move_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>

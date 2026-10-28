@@ -24,11 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
+- Kirin9020处理器系列产品：支持
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
+- Kirin9050处理器系列产品：支持
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002566538879_section106841136114319"></a>
@@ -118,12 +120,13 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 <!-- end id15 -->
 
 <!-- npu="x90" id16 -->
-Kirin X90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+KirinX90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 <!-- end id16 -->
-
+Kirin9020处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 <!-- npu="9030" id17 -->
-Kirin 9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+Kirin9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 <!-- end id17 -->
+Kirin9050处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 
 ## 返回值说明
 

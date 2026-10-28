@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="x90" id8 -->
+- KirinX90：支持
+<!-- end id8 -->
+<!-- npu="9020" id9 -->
+- Kirin9020：支持
+<!-- end id9 -->
+<!-- npu="9030" id10 -->
+- Kirin9030：支持
+<!-- end id10 -->
+<!-- npu="9050" id12 -->
+- Kirin9050：支持
+<!-- end id12 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/Store_res.md#id1 -->
 
 ## 功能说明
@@ -72,6 +84,10 @@ Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐
 
 - 当RegTensor模板参数regTrait为RegTraitNumOne时支持的数据类型为：b8、b16、b32、b64。
 - 当RegTensor模板参数regTrait为RegTraitNumTwo时支持的数据类型为：complex32、b64。
+<!-- npu="9020" id11 -->
+- Kirin9020处理器系列产品：仅支持RegTraitNumOne，不支持RegTraitNumTwo，支持的数据类型为：b8、b16（不支持bfloat16_t）、b32。
+<!-- end id11 -->
+- Kirin9050处理器系列产品：仅支持RegTraitNumOne，不支持RegTraitNumTwo，支持的数据类型为：b8、b16（不支持bfloat16_t）、b32。
 
 ## 返回值说明
 
