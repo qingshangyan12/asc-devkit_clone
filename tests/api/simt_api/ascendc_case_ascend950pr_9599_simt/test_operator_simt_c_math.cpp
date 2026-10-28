@@ -183,3 +183,19 @@ TEST_F(FloatComputeTestsuite1, MathIntegerTest)
     res_after = copysignf(x_f, y_f);
     EXPECT_EQ(res_after, 1.0f);
 }
+
+void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)
+{
+    if (std::isnan(xExpected)) {
+        EXPECT_TRUE(std::isnan(x));
+    } else if (std::isinf(xExpected)) {
+        EXPECT_TRUE(std::isinf(x));
+        if (xExpected > 0.0) {
+            EXPECT_GT(x, 0.0);
+        } else {
+            EXPECT_LT(x, 0.0);
+        }
+    } else {
+        EXPECT_NEAR(x, xExpected, epsilon);
+    }
+}
