@@ -15,6 +15,7 @@ if(NOT PROJECT_SOURCE_DIR)
         include(FetchContent)
 
         set(CANN_CMAKE_TAG "master")
+        message("111111111111111test")
         if(CANN_3RD_LIB_PATH AND EXISTS "${CANN_3RD_LIB_PATH}/cmake-${CANN_CMAKE_TAG}.tar.gz")
             FetchContent_Declare(
                 cann-cmake
@@ -28,6 +29,7 @@ if(NOT PROJECT_SOURCE_DIR)
                 GIT_TAG        ${CANN_CMAKE_TAG}
                 GIT_SHALLOW    TRUE
             )
+            message("11111111112222test")
         endif()
 
         FetchContent_GetProperties(cann-cmake)
