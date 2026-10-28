@@ -513,33 +513,40 @@ $$
 
 ## 内置数据类型
 
+使用以下数据类型时需要导入对应的头文件：
+
 **表5**  内置数据类型
 
-| 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
-| --- | --- | --- | --- | --- |
-| 整型 | int4b_t | 有符号4位整数。 | 8 | [-8, 7] |
-| 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
-| 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
-| 整型 | int8_t | signed char | 8 | [-128, 127] |
-| 整型 | uint8_t | unsigned char | 8 | [0, 255] |
-| 浮点型 | fp4x2_e2m1_t | 两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-6, 6] |
-| 浮点型 | fp4x2_e1m2_t | 两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-7×2<sup>-2</sup>, 7×2<sup>-2</sup>] |
-| 浮点型 | hifloat8_t | 符号位宽为1，指数位宽和尾数位宽由点域编码决定。 | 8 | 点域编码决定数据精度与取值范围。 |
-| 浮点型 | fp8_e8m0_t | 符号位宽为0，指数位宽为8，尾数位宽为0。 | 8 | [2<sup>-127</sup>, 2<sup>127</sup>] |
-| 浮点型 | fp8_e5m2_t | 符号位宽为1，指数位宽为5，尾数位宽为2。 | 8 | [2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>] |
-| 浮点型 | fp8_e4m3fn_t | 符号位宽为1，指数位宽为4，尾数位宽为3。 | 8 | [2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>] |
-| 整型 | int16_t | signed short | 16 | [-32768, 32767] |
-| 整型 | uint16_t | unsigned short | 16 | [0, 65535] |
-| 浮点型 | half | 符号位宽为1，指数位宽为5，尾数位宽为10。 | 16 | [2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
-| 浮点型 | bfloat16_t | 符号位宽为1，指数位宽为8，尾数位宽为7。 | 16 | [2<sup>120</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>120</sup>] |
-| 整型 | int32_t | signed int | 32 | [-2147483648, 2147483647] |
-| 整型 | uint32_t | unsigned int | 32 | [0, 4294967295] |
-| 浮点型 | float | 符号位宽为1，指数位宽为8，尾数位宽为23。 | 32 | [2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
-| 复数型 | complex32 | 实部和虚部都是half类型的复数。 | 32 | 实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
-| 整型 | int64_t | signed long | 64 | [-9223372036854775808, 9223372036854775807] |
-| 整型 | uint64_t | unsigned long | 64 | [0, 18446744073709551615] |
-| 浮点型 | double | 符号位宽为1，指数位宽为11，尾数位宽为52。 | 64 | [2<sup>971</sup> - 2<sup>1024</sup>, 2<sup>1024</sup> - 2<sup>971</sup>] |
-| 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+<table>
+<thead>
+<tr><th>类型</th><th>数据类型</th><th>描述</th><th>Size（bit）</th><th>取值范围</th><th>头文件</th></tr>
+</thead>
+<tbody>
+<tr><td>整型</td><td>int4b_t</td><td>有符号4位整数。</td><td>8</td><td>[-8, 7]</td><td rowspan="18">c_api/asc_simd.h</td></tr>
+<tr><td>布尔型</td><td>bool</td><td>全0代表false，否则代表true。</td><td>8</td><td>true、false</td></tr>
+<tr><td>整型</td><td>int4x2_t</td><td>两个有符号4位整数打包为一个8比特存储单元。</td><td>8</td><td>每个元素的取值范围为[-8, 7]。</td></tr>
+<tr><td>整型</td><td>int8_t</td><td>signed char</td><td>8</td><td>[-128, 127]</td></tr>
+<tr><td>整型</td><td>uint8_t</td><td>unsigned char</td><td>8</td><td>[0, 255]</td></tr>
+<tr><td>浮点型</td><td>fp4x2_e2m1_t</td><td>两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。</td><td>8</td><td>[-6, 6]</td></tr>
+<tr><td>浮点型</td><td>fp4x2_e1m2_t</td><td>两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。</td><td>8</td><td>[-7×2<sup>-2</sup>, 7×2<sup>-2</sup>]</td></tr>
+<tr><td>浮点型</td><td>hifloat8_t</td><td>符号位宽为1，指数位宽和尾数位宽由点域编码决定。</td><td>8</td><td>点域编码决定数据精度与取值范围。</td></tr>
+<tr><td>浮点型</td><td>fp8_e8m0_t</td><td>符号位宽为0，指数位宽为8，尾数位宽为0。</td><td>8</td><td>[2<sup>-127</sup>, 2<sup>127</sup>]</td></tr>
+<tr><td>浮点型</td><td>fp8_e5m2_t</td><td>符号位宽为1，指数位宽为5，尾数位宽为2。</td><td>8</td><td>[2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>]</td></tr>
+<tr><td>浮点型</td><td>fp8_e4m3fn_t</td><td>符号位宽为1，指数位宽为4，尾数位宽为3。</td><td>8</td><td>[2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>]</td></tr>
+<tr><td>整型</td><td>int16_t</td><td>signed short</td><td>16</td><td>[-32768, 32767]</td></tr>
+<tr><td>整型</td><td>uint16_t</td><td>unsigned short</td><td>16</td><td>[0, 65535]</td></tr>
+<tr><td>浮点型</td><td>half</td><td>符号位宽为1，指数位宽为5，尾数位宽为10。</td><td>16</td><td>[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]</td></tr>
+<tr><td>浮点型</td><td>bfloat16_t</td><td>符号位宽为1，指数位宽为8，尾数位宽为7。</td><td>16</td><td>[2<sup>120</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>120</sup>]</td></tr>
+<tr><td>整型</td><td>int32_t</td><td>signed int</td><td>32</td><td>[-2147483648, 2147483647]</td></tr>
+<tr><td>整型</td><td>uint32_t</td><td>unsigned int</td><td>32</td><td>[0, 4294967295]</td></tr>
+<tr><td>浮点型</td><td>float</td><td>符号位宽为1，指数位宽为8，尾数位宽为23。</td><td>32</td><td>[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]</td></tr>
+<tr><td>复数型</td><td>complex32</td><td>实部和虚部都是half类型的复数。</td><td>32</td><td>实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]</td><td>kernel_operator.h</td></tr>
+<tr><td>整型</td><td>int64_t</td><td>signed long</td><td>64</td><td>[-9223372036854775808, 9223372036854775807]</td><td rowspan="3">c_api/asc_simd.h</td></tr>
+<tr><td>整型</td><td>uint64_t</td><td>unsigned long</td><td>64</td><td>[0, 18446744073709551615]</td></tr>
+<tr><td>浮点型</td><td>double</td><td>符号位宽为1，指数位宽为11，尾数位宽为52。</td><td>64</td><td>[2<sup>971</sup> - 2<sup>1024</sup>, 2<sup>1024</sup> - 2<sup>971</sup>]</td></tr>
+<tr><td>复数型</td><td>complex64</td><td>实部和虚部都是float类型的复数。</td><td>64</td><td>实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]</td><td>kernel_operator.h</td></tr>
+</tbody>
+</table>
 
 更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
 
