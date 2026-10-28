@@ -101,6 +101,10 @@
 
 | 接口或类型名 | 功能描述 |
 | --- | --- |
+| [cast_layout](reg_vector_compute/aux_data_types/cast_layout.md) | 指定寄存器类型转换中的数据排布位置。 |
+| [cast_round_mode](reg_vector_compute/aux_data_types/cast_round_mode.md) | 指定寄存器类型转换的舍入方式。 |
+| [cast_sat_mode](reg_vector_compute/aux_data_types/cast_sat_mode.md) | 指定寄存器类型转换是否采用饱和模式。 |
+| [merge_mode](reg_vector_compute/aux_data_types/merge_mode.md) | 指定带Mask的寄存器写入操作中，目的寄存器未被选中元素的处理方式。 |
 | [reg_tensor](reg_vector_compute/reg_tensor/reg_tensor.md) | 封装矢量数据寄存器及其掩码寄存器，用于寄存器数据计算。 |
 | [reg_pair](reg_vector_compute/reg_tensor/reg_pair.md) | 保存两个元素类型相同的`reg_tensor`，用于具有双结果的寄存器接口。 |
 | [all_mask](reg_vector_compute/mask_reg_compute/all_mask.md) | 创建与指定元素类型位宽匹配的全有效Mask寄存器。 |
