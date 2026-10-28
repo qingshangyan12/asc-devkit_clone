@@ -32,6 +32,9 @@
 <!-- npu="x90" id11 -->
 - Kirin X90处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9050" id15 -->
+- Kirin9050处理器系列产品：支持
+<!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/Axpy_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -100,6 +103,9 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 <!-- npu="x90" id13 -->
 - 针对Kirin X90处理器系列产品，支持的数据类型为：half、float。
 <!-- end id13 -->
+<!-- npu="9050" id14 -->
+- 针对Kirin 9050处理器系列产品，支持的数据类型为：half、float。
+<!-- end id14 -->
 
 ## 调用示例<a name="section98571172212"></a>
 
