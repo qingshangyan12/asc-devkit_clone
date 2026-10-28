@@ -81,6 +81,72 @@ __aicore__ inline uint8_t FetchAndIncPrimitiveIdInControlMsg(__gm__ ControlHcclM
     return seqNum;
 }
 
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+__aicore__ inline void PublishHcclMsgA5(__gm__ ControlHcclMsg* controlMsgGM, __gm__ HcclMsg* dst)
+{
+    // Both objects are published under one barrier/DSB pair. The two DCCI operations still cover
+    // their respective cache lines, but the normal A5 Prepare avoids duplicate sync sequences.
+    AscendC::Barrier();
+    GlobalTensor<int64_t> globalMsg;
+    globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(controlMsgGM));
+    __asm__("NOP");
+    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
+    globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(dst));
+    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
+    DataSyncBarrier<MemDsbT::ALL>();
+}
+
+__aicore__ inline void AssembleHcclMsgV2A5(
+    const CommonPrepareParam& param, HcclTilingVersion ver, HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst,
+    __gm__ ControlHcclMsg* controlMsgGM)
+{
+    HcclMsg tmp{};
+    const bool isFinalize = (param.commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE);
+    uint8_t seqNum = 0U;
+    if (isFinalize) {
+        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 0U;
+        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 0U;
+        controlMsgGM->resetSeq = 0U;
+    } else {
+        if (controlMsgGM->resetSeq > 0U) {
+            controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 0U;
+            controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 1U;
+            controlMsgGM->resetSeq = 0U;
+        }
+        seqNum = controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX];
+        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = static_cast<uint8_t>(seqNum + 1U);
+    }
+
+    tmp.commType.msgType = param.commType.msgType;
+    if (!isFinalize) {
+        tmp.opType = param.op;
+        tmp.sendBuffer = reinterpret_cast<uint64_t>(param.sendBuf);
+        tmp.recvBuffer = reinterpret_cast<uint64_t>(param.recvBuf);
+        tmp.dataCnt = param.count;
+        tmp.strideCount = param.strideCount;
+        if (ver == HcclTilingVersion::DEPRECATED_TILING_VERSION) {
+            tmp.addMsg.v0Msg.hcclDataType = param.dataType;
+            tmp.addMsg.v0Msg.repeatCnt = param.repeat;
+            tmp.addMsg.v0Msg.selfHandleID = handle;
+            tmp.addMsg.v0Msg.seqNum = seqNum;
+            tmp.addMsg.v0Msg.version = ver;
+        } else {
+            tmp.addMsg.v1Msg.ccOpTilingData = tiling;
+            tmp.addMsg.v1Msg.hcclDataType = param.dataType;
+            tmp.addMsg.v1Msg.repeatCnt = param.repeat;
+            tmp.addMsg.v1Msg.selfHandleID = handle;
+            tmp.addMsg.v1Msg.seqNum = seqNum;
+            tmp.addMsg.v1Msg.version = ver;
+        }
+    }
+    tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;
+    CopyHcclMsg(reinterpret_cast<const uint8_t*>(&tmp), dst);
+
+    // Publish the control state and the complete message after all writes are done.
+    PublishHcclMsgA5(controlMsgGM, dst);
+}
+#endif
+
 __aicore__ inline void AssembleHcclMsgV2(
     const CommonPrepareParam& param, HcclTilingVersion ver, HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst,
     __gm__ ControlHcclMsg* controlMsgGM)
