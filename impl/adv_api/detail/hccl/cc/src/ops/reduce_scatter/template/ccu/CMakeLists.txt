@@ -13,6 +13,8 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_mesh_1D_read_reduce.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_mesh_1D_ms_accum.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.cc
     # Legacy direct-launch CCU templates are retained but use APIs unavailable in the KFC-only mc2_client.

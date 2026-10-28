@@ -342,6 +342,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
             CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
+        } else if (algorithmType ==
+                   static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleMeshChunkPipelined)) {
+            ccuUsedXnNum_ = KFC_RS_CHUNK_PIPELINED_PARAM_NUM;
+            CcuPrepareForReduceScatterChunkPipelinedM2M(&handleParamGM_[handleId]);
+        } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleMeshChunkTwoShot)) {
+            ccuUsedXnNum_ = KFC_RS_TWO_SHOT_PARAM_NUM;
+            CcuPrepareForReduceScatterTwoShotM2M(&handleParamGM_[handleId]);
         } else {
             ccuUsedXnNum_ = 24;
             CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);

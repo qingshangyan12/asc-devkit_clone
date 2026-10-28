@@ -18,6 +18,8 @@
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_read_reduce.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_ms_accum.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
 #endif
 #include "alg_meta_registry.h"
@@ -301,6 +303,21 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE,
     FLAG_NONE, 0);
+// KFC RS SoleMeshChunk 移植（hccl rs-sched-perf）：Pipelined=ReadReduce 流水（自动选择），
+// TwoShot=MsAccum（默认不自动选择，可经强制算法名启用）。两者均单 mission，参数经 KFC server
+// 单帧下发，无需 scratch。
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshChunkPipelined, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterMesh1DReadReduce);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshChunkPipelined, AlgEngine::CCU,
+    "sole[mesh.chunk.pipelined]", COND_NONE, FLAG_NONE, 0);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshChunkTwoShot, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterMesh1DMsAccum);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshChunkTwoShot, AlgEngine::CCU,
+    "sole[mesh.chunk.twoshot]", COND_NONE, FLAG_NONE, 0);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshPeerOnly, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);

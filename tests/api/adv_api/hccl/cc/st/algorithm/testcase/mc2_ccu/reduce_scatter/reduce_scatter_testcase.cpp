@@ -308,10 +308,16 @@ CcuStScenario MakeSelectorScenario(
 
 } // namespace
 
-// 单层单 die mesh：selector 选 SoleMesh
+// 单层单 die mesh：selector 8P 且人均元素数>=28（chunkCount）选 Pipelined ReadReduce
 TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16)
 {
     VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 32));
+}
+
+// 单层单 die mesh 8P 小数据量（人均元素数<28）：保持选 SoleMesh（mem2mem 路径）
+TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16_SmallCount)
+{
+    VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 16));
 }
 
 // 两级 2server×4P（GCD=4 → Level1Nhr=false，level0 双 mesh 实例）：总数据量 <512K 走多实例小数据分支，
@@ -319,4 +325,105 @@ TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16)
 TEST_F(CcuStReduceScatter, Selector_2LevelMesh_2Server8Rank_Fp16)
 {
     VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50));
+}
+
+// ============================================================================
+// CcuSchedReduceScatterSoleMeshChunkPipelined / SoleMeshChunkTwoShot
+// （KFC RS SoleMeshChunk 移植：Pipelined=ReadReduce 流水，TwoShot=MsAccum GroupReduce；
+//  经强制算法名指定，TwoShot 不参与自动选择）
+// ============================================================================
+
+namespace {
+
+CcuStScenario MakeMeshChunkScenario(
+    const std::string& algName, const TopoMeta& topoMeta, HcclDataType dataType, uint64_t count,
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM)
+{
+    const uint32_t rankSize = CcuStFixture::CountRanks(topoMeta);
+    const uint64_t typeSize = DATATYPE_SIZE_TABLE[dataType];
+    const uint64_t sliceSize = count * typeSize;
+    CcuStScenario scenario;
+    scenario.topoMeta = topoMeta;
+    scenario.dataType = dataType;
+    scenario.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    scenario.expectedAlgName = algName;
+    scenario.algConfig = algName;
+    scenario.count = count;
+    scenario.reduceType = reduceType;
+    scenario.sizes.assign(rankSize, std::vector<uint64_t>(rankSize, sliceSize));
+    return scenario;
+}
+
+} // namespace
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_2Rank_Fp16_50Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 50));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_4Rank_Fp16_100Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1, 2, 3}}}}, HCCL_DATA_TYPE_FP16, 100));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_8Rank_Fp16_28Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16,
+        28));
+}
+
+// 8P 大份额：chunk 基块达 4096 对齐档，28 chunk 全满块+尾块
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_8Rank_Fp16_LargeSlice)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16,
+        16ULL * 1024));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_2Rank_Fp16_ZeroLength)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 0));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkPipelined_2Rank_Fp32_Max)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkPipelined", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP32, 25,
+        HCCL_REDUCE_MAX));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkTwoShot_2Rank_Fp16_50Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkTwoShot", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 50));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkTwoShot_4Rank_Fp32_25Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkTwoShot", TopoMeta{{{{0, 1, 2, 3}}}}, HCCL_DATA_TYPE_FP32, 25));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkTwoShot_8Rank_Fp16_32Elem)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkTwoShot", TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16,
+        32));
+}
+
+// slice=65536B=LoopSize(16*4096)：goSize 走 m=1,n=0,p=0 整循环分支
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkTwoShot_2Rank_GoSize_LoopSize)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkTwoShot", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 32768));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleMeshChunkTwoShot_2Rank_Fp16_ZeroLength)
+{
+    VerifyScenario(MakeMeshChunkScenario(
+        "CcuSchedReduceScatterSoleMeshChunkTwoShot", TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 0));
 }

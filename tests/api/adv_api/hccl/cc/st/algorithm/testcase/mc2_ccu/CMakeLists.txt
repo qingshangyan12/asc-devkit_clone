@@ -48,11 +48,15 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_read_reduce.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_ms_accum.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_read_reduce.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_ms_accum.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.cc
@@ -122,6 +126,7 @@ add_executable(
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/peer_only_local_copy_testcase.cpp
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh1d_adapter.cc
+    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh_chunk_adapter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_multilink_adapter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_2die_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/all_reduce_testcase.cpp

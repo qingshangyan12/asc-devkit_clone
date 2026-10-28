@@ -253,6 +253,42 @@ enum KfcConcurrentReduceScatterParamIndex : uint32_t {
     KFC_CONCURRENT_RS_PARAM_NUM = 25,
 };
 
+// SoleMeshChunkPipelined（CcuSchedReduceScatterSoleMeshChunkPipelined，移植自 hccl rs-sched-perf 的
+// CcuReduceScatterMesh1DReadReducePipelinedKernel）单帧 xnData 布局：[0]=opId 哨兵，token 走 dispatch
+// 的 ctx.token 不占槽。chunkCount 不占槽（恒 4*(rankSize-1)，dispatch 按 kernelArg.rankSize 计算后以
+// 标量转发）；28 个逐 chunk 尺寸放不进 32 槽单 die 帧，故采用紧凑编码：
+// sizes[i] = base + (i < extraUnits ? align : 0)，末块再加 tail——与 AIV prepare
+// （CcuPrepareForReduceScatterChunkPipelinedM2M = hccl 模板 4096→128→dataTypeSize 级联对齐切分）
+// 及 kernel 内重建公式三处必须逐值一致。
+enum KfcReduceScatterMeshChunkPipelinedParamIndex : uint32_t {
+    KFC_RS_CHUNK_PIPELINED_OP_ID = 0,
+    KFC_RS_CHUNK_PIPELINED_INPUT = 1,
+    KFC_RS_CHUNK_PIPELINED_OUTPUT = 2,
+    KFC_RS_CHUNK_PIPELINED_LOCAL_INPUT_OFFSET = 3,
+    KFC_RS_CHUNK_PIPELINED_SLICE_SIZE = 4,
+    KFC_RS_CHUNK_PIPELINED_CHUNK_BASE_SIZE = 5,
+    KFC_RS_CHUNK_PIPELINED_CHUNK_ALIGN = 6,
+    KFC_RS_CHUNK_PIPELINED_CHUNK_EXTRA_UNITS = 7,
+    KFC_RS_CHUNK_PIPELINED_CHUNK_TAIL = 8,
+    KFC_RS_CHUNK_PIPELINED_PARAM_NUM = 9,
+};
+
+// SoleMeshChunkTwoShot（CcuSchedReduceScatterSoleMeshChunkTwoShot，移植自 hccl rs-sched-perf 的
+// CcuReduceScatterMesh1DMsAccumKernel）单帧 xnData 布局：[0]=opId 哨兵，token 不占槽；
+// goSize 四元组对应 AIV prepare（CcuPrepareForReduceScatterTwoShotM2M）的
+// CalcGoSize(sliceSize, MS_ACCUM_REDUCE_SCATTER_LOOP_COUNT=16, 4096) 口径（= hccl 模板 taskArgs）。
+enum KfcReduceScatterMeshChunkTwoShotParamIndex : uint32_t {
+    KFC_RS_TWO_SHOT_OP_ID = 0,
+    KFC_RS_TWO_SHOT_INPUT = 1,
+    KFC_RS_TWO_SHOT_OUTPUT = 2,
+    KFC_RS_TWO_SHOT_LOCAL_INPUT_OFFSET = 3,
+    KFC_RS_TWO_SHOT_GO_ADDR_OFFSET = 4,
+    KFC_RS_TWO_SHOT_GO_LOOP_PARAM = 5,
+    KFC_RS_TWO_SHOT_GO_PARALLEL_PARAM = 6,
+    KFC_RS_TWO_SHOT_GO_RESIDUAL = 7,
+    KFC_RS_TWO_SHOT_PARAM_NUM = 8,
+};
+
 } // namespace HcclKfcProtocol
 
 #endif

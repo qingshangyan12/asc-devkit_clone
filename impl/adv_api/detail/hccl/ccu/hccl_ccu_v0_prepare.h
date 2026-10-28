@@ -29,6 +29,11 @@ static_assert(
 static_assert(KFC_AG_SOLE_NHR_PARAM_NUM <= CCU_USED_XN_NUM, "SoleNHR AllGather parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllToAll parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_RS_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent ReduceScatter parameters exceed XN capacity");
+static_assert(
+    KFC_RS_CHUNK_PIPELINED_PARAM_NUM <= CCU_USED_XN_NUM,
+    "Pipelined chunk ReduceScatter parameters exceed XN capacity");
+static_assert(
+    KFC_RS_TWO_SHOT_PARAM_NUM <= CCU_USED_XN_NUM, "TwoShot ReduceScatter parameters exceed XN capacity");
 static_assert(KFC_PARALLEL_AG_STORAGE_NUM <= CCU_USED_XN_NUM, "Parallel AllGather parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
@@ -658,6 +663,75 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         "RS concur chunk debug: slice=0x%llx, mesh=0x%llx, nhr=0x%llx, chunk=0x%llx, meshLoop=0x%llx, "
         "meshTail=0x%llx\n",
         sliceSize, meshSize, nhrSize, chunkSize, xnData_[KFC_CONCURRENT_RS_MESH_CHUNK_LOOP_NUM], meshTailSize);
+}
+
+// SoleMeshChunkPipelined（CcuSchedReduceScatterSoleMeshChunkPipelined）的 AIV prepare：
+// 移植自 hccl rs-sched-perf 的 CcuTempReduceScatterMesh1DReadReduce(Pipelined)::KernelRun host 侧切分。
+// chunkCount 恒 4*(rankNum-1)（不占 HBM 槽，由 KFC dispatch 按 kernelArg.rankSize 计算后以标量转发）；
+// chunk 尺寸以紧凑编码下发（base/align/extraUnits/tail），kernel 内按同公式重建——级联对齐
+// (4096→128→dataTypeSize) 与 hccl 模板逐行一致。布局见 KfcReduceScatterMeshChunkPipelinedParamIndex，
+// 与 KFC dispatch、kernel 形参三处索引必须一致。
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterChunkPipelinedM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    xnData_[KFC_RS_CHUNK_PIPELINED_OP_ID] = GetOpId(commParam);
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceSize = commParam->count * dataTypeSize; // 每 rank 输出份
+    const uint64_t repeatOffset = sliceSize * ccuParam_.repeatIndex;
+    const uint64_t sliceStride = commParam->strideCount == 0U ? sliceSize : commParam->strideCount * dataTypeSize;
+    xnData_[KFC_RS_CHUNK_PIPELINED_INPUT] = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
+    xnData_[KFC_RS_CHUNK_PIPELINED_OUTPUT] = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
+    xnData_[KFC_RS_CHUNK_PIPELINED_LOCAL_INPUT_OFFSET] = static_cast<uint64_t>(ccuParam_.rankId) * sliceStride;
+    xnData_[KFC_RS_CHUNK_PIPELINED_SLICE_SIZE] = sliceSize;
+
+    // 与 hccl CcuTempReduceScatterMesh1DReadReduce::KernelRun 的 chunk 切分逐行对齐
+    const uint64_t chunkCount = 4U * (ccuParam_.rankNum - 1U);
+    uint64_t align = 4096U;
+    if (sliceSize / chunkCount < align) {
+        align = 128U;
+    }
+    if (sliceSize / chunkCount < align) {
+        align = dataTypeSize;
+    }
+    const uint64_t baseSize = (sliceSize / chunkCount / align) * align;
+    const uint64_t remainder = sliceSize - baseSize * chunkCount;
+    const uint64_t extraUnits = remainder / align;
+    const uint64_t tail = remainder - extraUnits * align;
+    xnData_[KFC_RS_CHUNK_PIPELINED_CHUNK_BASE_SIZE] = baseSize;
+    xnData_[KFC_RS_CHUNK_PIPELINED_CHUNK_ALIGN] = align;
+    xnData_[KFC_RS_CHUNK_PIPELINED_CHUNK_EXTRA_UNITS] = extraUnits;
+    xnData_[KFC_RS_CHUNK_PIPELINED_CHUNK_TAIL] = tail;
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "RS chunk-pipelined prepare: slice=0x%llx, chunkCount=%llu, base=0x%llx, align=0x%llx, extra=%llu, "
+        "tail=0x%llx\n",
+        sliceSize, chunkCount, baseSize, align, extraUnits, tail);
+}
+
+// SoleMeshChunkTwoShot（CcuSchedReduceScatterSoleMeshChunkTwoShot）的 AIV prepare：
+// 移植自 hccl rs-sched-perf 的 CcuTempReduceScatterMesh1DMsAccum::KernelRun host 侧参数计算——
+// goSize 口径 CalcGoSize(sliceSize, MS_ACCUM_REDUCE_SCATTER_LOOP_COUNT=16, CCU_MEMSLICE_SIZE)，
+// 与 kernel 侧 AllocGoResource(16, 1, ckeNum) 写入的 moConfig 配套。布局见
+// KfcReduceScatterMeshChunkTwoShotParamIndex，与 KFC dispatch、kernel 形参三处索引必须一致。
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterTwoShotM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    xnData_[KFC_RS_TWO_SHOT_OP_ID] = GetOpId(commParam);
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceSize = commParam->count * dataTypeSize; // 每 rank 输出份
+    const uint64_t repeatOffset = sliceSize * ccuParam_.repeatIndex;
+    const uint64_t sliceStride = commParam->strideCount == 0U ? sliceSize : commParam->strideCount * dataTypeSize;
+    xnData_[KFC_RS_TWO_SHOT_INPUT] = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
+    xnData_[KFC_RS_TWO_SHOT_OUTPUT] = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
+    xnData_[KFC_RS_TWO_SHOT_LOCAL_INPUT_OFFSET] = static_cast<uint64_t>(ccuParam_.rankId) * sliceStride;
+    constexpr uint64_t msAccumLoopCount = 16U; // 与 hccl MS_ACCUM_REDUCE_SCATTER_LOOP_COUNT 一致
+    CalcGoSize(
+        sliceSize, msAccumLoopCount, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_TWO_SHOT_GO_ADDR_OFFSET], ccuProtocolVersion_);
+    KERNEL_LOG(
+        KERNEL_INFO, "RS two-shot prepare: slice=0x%llx, stride=0x%llx, goAddrOffset=0x%llx\n", sliceSize, sliceStride,
+        xnData_[KFC_RS_TWO_SHOT_GO_ADDR_OFFSET]);
 }
 
 // SoleNHR 2Die（CcuSchedReduceScatterSoleNHR）的 AIV prepare：
