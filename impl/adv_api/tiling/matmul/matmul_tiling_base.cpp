@@ -65,7 +65,7 @@ constexpr int32_t UB_SIZE = 192 * 1024 - 256;
         TILING_LOG_DEBUG("The input %s size should be greater than 0, currently, it is %d.", #val, val); \
     }
 
-static void InitMatmulApiTilingBaseCommon(MatmulApiTilingBase& tiling)
+static inline void InitMatmulApiTilingBaseCommon(MatmulApiTilingBase& tiling)
 {
     tiling.aType_.isDB = true;
     tiling.bType_.isDB = true;
