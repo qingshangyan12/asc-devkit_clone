@@ -1941,30 +1941,30 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long long x)
 {
     int2 val = (int2&)x;
     if (val.y == 0)
-        return __clz(val.x) + 32;
+        return __clz(static_cast<unsigned int>(val.x)) + 32;
     else
-        return __clz(val.y);
+        return __clz(static_cast<unsigned int>(val.y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long x)
 {
     int2 val = (int2&)x;
     if (val.y == 0)
-        return __clz(val.x) + 32;
+        return __clz(static_cast<unsigned int>(val.x)) + 32;
     else
-        return __clz(val.y);
+        return __clz(static_cast<unsigned int>(val.y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long long a)
 {
     int2 val = (int2&)a;
-    return __popc(val.x) + __popc(val.y);
+    return __popc(static_cast<unsigned int>(val.x)) + __popc(static_cast<unsigned int>(val.y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long a)
 {
     int2 val = (int2&)a;
-    return __popc(val.x) + __popc(val.y);
+    return __popc(static_cast<unsigned int>(val.x)) + __popc(static_cast<unsigned int>(val.y));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long long x)
@@ -1974,9 +1974,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long long x)
         return 0;
     }
     if (val.x == 0) {
-        return __ffs(val.y) + 32;
+        return __ffs(static_cast<unsigned int>(val.y)) + 32;
     } else {
-        return __ffs(val.x);
+        return __ffs(static_cast<unsigned int>(val.x));
     }
 }
 
@@ -1987,9 +1987,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long x)
         return 0;
     }
     if (val.x == 0) {
-        return __ffs(val.y) + 32;
+        return __ffs(static_cast<unsigned int>(val.y)) + 32;
     } else {
-        return __ffs(val.x);
+        return __ffs(static_cast<unsigned int>(val.x));
     }
 }
 
