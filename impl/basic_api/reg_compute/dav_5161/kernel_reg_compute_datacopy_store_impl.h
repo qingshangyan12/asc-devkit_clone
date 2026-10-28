@@ -364,6 +364,7 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_t c
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportBytes<ActualT, 1, 2, 4>(), "Store only support type b8/b16/b32 on current device");
+    static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     UnalignRegForStore ureg;
     DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstAddr, srcReg, ureg, count);
     DataCopyUnAlignPostImpl<T, PostLiteral::POST_MODE_UPDATE>(dstAddr, ureg, 0);
