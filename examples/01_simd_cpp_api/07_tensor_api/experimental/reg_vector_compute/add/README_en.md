@@ -10,9 +10,11 @@ The computation is as follows:
 dst[i] = src0[i] + src1[i]
 ```
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR&950DT products
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 

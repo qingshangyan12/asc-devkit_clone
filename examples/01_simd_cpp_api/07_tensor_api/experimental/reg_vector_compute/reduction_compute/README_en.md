@@ -14,9 +14,11 @@ dst[128] = min(src[0:64])
 
 Only the first element of each result region is valid. The remaining elements are not verified.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR&950DT products
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -74,7 +76,7 @@ Only the first element of each result region is valid. The remaining elements ar
 
 ## Build and Run
 
-This sample has been verified with CANN 9.2.0, `dav-3510`, and NPU simulation mode. Run the following steps from the sample root directory.
+This sample requires CANN 9.3.0 or later and uses `dav-3510` in NPU simulation mode. Run the following steps from the sample root directory.
 
 - Configure environment variables
 
@@ -82,7 +84,7 @@ This sample has been verified with CANN 9.2.0, `dav-3510`, and NPU simulation mo
   source ${install_path}/set_env.sh
   ```
 
-  `${install_path}` is the CANN 9.2.0 installation directory, for example `/usr/local/Ascend/cann-9.2.0`.
+  `${install_path}` is the CANN 9.3.0 or later installation directory, for example `/usr/local/Ascend/cann-9.3.0`.
 
 - Build and run
 

@@ -8,7 +8,7 @@ This example implements the `fill` operation in scalar fill mode based on the Te
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -44,7 +44,7 @@ fill
 Perform the following steps in the example root directory to build and run the example.
 
 - Configure environment variables  
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install).
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 

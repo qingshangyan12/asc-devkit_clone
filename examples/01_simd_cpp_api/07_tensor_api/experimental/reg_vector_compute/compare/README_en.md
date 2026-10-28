@@ -11,9 +11,11 @@ The sample supports the following two comparison scenarios, selected by the CMak
 | 1 | The right operand is a `reg_tensor`: compares one vector with another vector element by element. |
 | 2 | The right operand is an immediate: compares a vector with a scalar element by element. |
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR&950DT products
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -86,7 +88,7 @@ Perform the following steps in the sample root directory to build and run the sa
 
 - Configure Environment Variables
 
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install).
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 

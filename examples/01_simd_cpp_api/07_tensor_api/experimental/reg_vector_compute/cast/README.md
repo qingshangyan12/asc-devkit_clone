@@ -10,9 +10,11 @@
 y[i] = convert<To>(x[i])
 ```
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -125,7 +127,7 @@ y[i] = convert<To>(x[i])
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
