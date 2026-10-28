@@ -1880,8 +1880,9 @@ TEST_P(TEST_OPBUILD_SOC_CASE, GeneratesLowercaseIniWithRegisteredConfig)
 
 INSTANTIATE_TEST_SUITE_P(
     ComputeUnitCase, TEST_OPBUILD_SOC_CASE,
-    testing::Values("", "ascend960dt;ascend960pr;ascend950", "ascend960DT;ascend960PR;Ascend950",
-                    "ASCEND960DT;ASCEND960PR;ASCEND950"));
+    testing::Values(
+        "", "ascend960dt;ascend960pr;ascend950", "ascend960DT;ascend960PR;Ascend950",
+        "ASCEND960DT;ASCEND960PR;ASCEND950"));
 
 TEST_F(TEST_OPBUILD, GenerateCodeForComputeUnits)
 {
