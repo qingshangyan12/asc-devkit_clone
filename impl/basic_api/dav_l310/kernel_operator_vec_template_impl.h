@@ -305,45 +305,10 @@ __simd_vf__ inline void VecBinaryVFImpl(
                     dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
             }
             constexpr uint32_t blkBaseOfMicro = 0;
-            __ubuf__ U* src0Micro = 
-                src0 + 
-                (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
-            __ubuf__ U* src1Micro =
-                src1 +
-                (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
-            __ubuf__ T* dstMicro =
-                dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkU;
-            Reg::RegTensor<T> dstVreg;
-            Reg::RegTensor<U> srcVreg0, srcVreg1;
-            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                srcVreg0, src0Micro, repeatParams.src0BlkStride, maskRegSrc);
-            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                srcVreg1, src1Micro, repeatParams.src1BlkStride, maskRegSrc);
-            if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
-               Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                   dstVreg, dstMicro, repeatParams.dstBlkStride, maskRegDst);
-               }
-            func(dstVreg, srcVreg0, srcVreg1, maskReg);
-            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
-            }
-            if constexpr (MICRO_NUM_PER_ITER > 1) {
-                maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
-                maskRegSrc = maskReg;
-                maskRegDst = maskReg;
-                if constexpr (sizeof(U) == 2 * sizeof(T)) {
-                    Reg::MaskPack(maskRegDst, maskReg);
-            } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
-                Reg::MaskPack(maskRegSrc, maskReg);
-            }
-            constexpr uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
             __ubuf__ U* src0Micro =
-                src0 +
-                (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
+                src0 + (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
             __ubuf__ U* src1Micro =
-                src1 +
-                (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
+                src1 + (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
             __ubuf__ T* dstMicro =
                 dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkU;
             Reg::RegTensor<T> dstVreg;
@@ -356,44 +321,80 @@ __simd_vf__ inline void VecBinaryVFImpl(
             if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
                 Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                     dstVreg, dstMicro, repeatParams.dstBlkStride, maskRegDst);
-               }
+            }
             func(dstVreg, srcVreg0, srcVreg1, maskReg);
             Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
+        }
+        if constexpr (MICRO_NUM_PER_ITER > 1) {
+            maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
+            maskRegSrc = maskReg;
+            maskRegDst = maskReg;
+            if constexpr (sizeof(U) == 2 * sizeof(T)) {
+                Reg::MaskPack(maskRegDst, maskReg);
+            } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
+                Reg::MaskPack(maskRegSrc, maskReg);
             }
-        } else {
-            for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
-                if constexpr ((!isNormalMode) || isSetMask) {
-                    maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
-                    maskRegSrc = maskReg;
-                    maskRegDst = maskReg;
-                    if constexpr (sizeof(U) == 2 * sizeof(T)) {
-                        Reg::MaskPack(maskRegDst, maskReg);
-                    } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
-                       Reg::MaskPack(maskRegSrc, maskReg);
-                    }
-                }
-                const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
-                __ubuf__ U *src0Micro = src0 + (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
-                __ubuf__ U *src1Micro = src1 + (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
-                __ubuf__ T *dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkU;
-                Reg::RegTensor<T> dstVreg;
-                Reg::RegTensor<U> srcVreg0, srcVreg1;
-                Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-                Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            constexpr uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
+            __ubuf__ U* src0Micro =
+                src0 + (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
+            __ubuf__ U* src1Micro =
+                src1 + (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
+            __ubuf__ T* dstMicro =
+                dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkU;
+            Reg::RegTensor<T> dstVreg;
+            Reg::RegTensor<U> srcVreg0, srcVreg1;
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 srcVreg0, src0Micro, repeatParams.src0BlkStride, maskRegSrc);
-                Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 srcVreg1, src1Micro, repeatParams.src1BlkStride, maskRegSrc);
-                if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
-               Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                dstVreg, dstMicro, repeatParams.dstBlkStride, maskRegDst);
-               }
-               func(dstVreg, srcVreg0, srcVreg1, maskReg);
-               Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                   dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
+            if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dstVreg, dstMicro, repeatParams.dstBlkStride, maskRegDst);
             }
+            func(dstVreg, srcVreg0, srcVreg1, maskReg);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
         }
     }
+    else
+    {
+        for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
+            if constexpr ((!isNormalMode) || isSetMask) {
+                maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+                maskRegSrc = maskReg;
+                maskRegDst = maskReg;
+                if constexpr (sizeof(U) == 2 * sizeof(T)) {
+                    Reg::MaskPack(maskRegDst, maskReg);
+                } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
+                    Reg::MaskPack(maskRegSrc, maskReg);
+                }
+            }
+            const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
+            __ubuf__ U* src0Micro =
+                src0 + (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
+            __ubuf__ U* src1Micro =
+                src1 + (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
+            __ubuf__ T* dstMicro =
+                dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkU;
+            Reg::RegTensor<T> dstVreg;
+            Reg::RegTensor<U> srcVreg0, srcVreg1;
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                srcVreg0, src0Micro, repeatParams.src0BlkStride, maskRegSrc);
+            Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                srcVreg1, src1Micro, repeatParams.src1BlkStride, maskRegSrc);
+            if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dstVreg, dstMicro, repeatParams.dstBlkStride, maskRegDst);
+            }
+            func(dstVreg, srcVreg0, srcVreg1, maskReg);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
+        }
+    }
+}
 }
 
 template <auto func, bool isSetMask, bool isMaskBitMode, BinaryFuncMode funcMode = BinaryFuncMode::NORMAL, typename T, typename U>
