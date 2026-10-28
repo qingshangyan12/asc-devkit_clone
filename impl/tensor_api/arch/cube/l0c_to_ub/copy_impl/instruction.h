@@ -52,7 +52,7 @@ public:
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, m_size, nz2nd_en, "copy_l0c_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_ub instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unit_flag, "copy_l0c_to_ub instruction");
-        if constexpr (current_arch_version == arch_version::v9201) {
+        if constexpr (current_arch_version == arch_version::v9201 || current_arch_version == arch_version::v9202) {
             asc_copy_l0c2ub(
                 dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
                 static_cast<uint16_t>(src_stride), 0, unit_flag, quant_pre, relu_pre, is_channel_split, nz2nd_en,
@@ -61,6 +61,25 @@ public:
             asc_copy_l0c2ub(
                 dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
                 static_cast<uint16_t>(src_stride), sub_block_id, dual_dst_ctl, unit_flag, quant_pre, relu_pre,
+                is_channel_split, nz2nd_en, nz2dn_en, false);
+        }
+    }
+
+    template <QuantMode_t quant_pre, typename DstType, typename SrcType>
+    __aicore__ inline static void data_copy(
+        __ubuf__ DstType* dst, __cc__ SrcType* src, uint32_t n_size, uint32_t m_size, uint32_t src_stride,
+        uint32_t dst_stride, asc_relu_pre_mode relu_pre, asc_unit_flag_mode unit_flag, bool is_channel_split,
+        bool nz2nd_en, bool nz2dn_en, bool enable_row_max, bool enable_group_max)
+    {
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, n_size, "n_size", "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_n, n_size, is_channel_split, nz2nd_en, nz2dn_en, "copy_l0c_to_ub");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_m, m_size, nz2nd_en, "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_fixpipe_stride, src_stride, dst_stride, "copy_l0c_to_ub instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_unit_flag, unit_flag, "copy_l0c_to_ub instruction");
+        if constexpr (current_arch_version == arch_version::v9202) {
+            asc_copy_l0c2ub(
+                dst, src, static_cast<uint16_t>(n_size), static_cast<uint16_t>(m_size), dst_stride,
+                static_cast<uint16_t>(src_stride), 0, enable_row_max, enable_group_max, unit_flag, quant_pre, relu_pre,
                 is_channel_split, nz2nd_en, nz2dn_en, false);
         }
     }
