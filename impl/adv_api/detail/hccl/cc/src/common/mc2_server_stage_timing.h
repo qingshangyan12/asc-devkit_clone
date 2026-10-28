@@ -66,6 +66,65 @@ inline bool& Enabled()
     static thread_local bool enabled;
     return enabled;
 }
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+// Diagnostic schema 1: fixed order shared with the benchmark parser. Durations are
+// inclusive; child phases must not be added to their parents. No per-call logging.
+enum DetailPhase : uint32_t {
+    DFX_REGISTER,
+    CCORE_WAIT,
+    KERNEL_DISPATCH,
+    CCORE_RECORD,
+    BATCH_START,
+    BATCH_END,
+    CACHE_POLICY,
+    CACHE_LOOKUP,
+    CAPTURE_CREATE,
+    CAPTURE_BEGIN,
+    MISS_EXECUTE,
+    CAPTURE_END,
+    CACHE_PUBLISH,
+    HIT_REPLAY,
+    VAR_RESTORE,
+    EXECUTOR_CREATE,
+    ALGORITHM_EXECUTE,
+    DETAIL_PHASE_COUNT
+};
+// Native 64-bit integer arithmetic; no allocation, atomics or floating-point
+// work in the measured path. Accumulate directly into the 30-launch batch.
+struct DetailBatch {
+    uint64_t ns[DETAIL_PHASE_COUNT];
+    uint64_t calls[DETAIL_PHASE_COUNT];
+};
+inline DetailBatch& DetailTotals()
+{
+    static thread_local DetailBatch totals{};
+    return totals;
+}
+class DetailScope {
+public:
+    explicit DetailScope(DetailPhase phase) : phase_(phase), start_(Enabled() ? Now() : 0) {}
+    ~DetailScope() { Stop(); }
+    DetailScope(const DetailScope&) = delete;
+    DetailScope& operator=(const DetailScope&) = delete;
+    void Stop()
+    {
+        if (start_ == 0)
+            return;
+        const uint64_t end = Now();
+        if (end >= start_) {
+            auto& totals = DetailTotals();
+            totals.ns[phase_] += end - start_;
+            ++totals.calls[phase_];
+        } else {
+            Get().status = STATUS_INVALID_TIMESTAMPS;
+        }
+        start_ = 0;
+    }
+private:
+    DetailPhase phase_;
+    uint64_t start_;
+};
+// MC2_CACHE_DETAIL_DIAG END
 struct Batch {
     uint64_t init, msg, sq, first, last;
     uint32_t count;
@@ -86,11 +145,17 @@ inline void Start(bool enabled, uintptr_t context = 0)
     Enabled() = enabled;
     if (!enabled) {
         Totals() = {};
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        DetailTotals() = {};
+        // MC2_CACHE_DETAIL_DIAG END
         Context() = 0;
         return;
     }
     if (Context() != context) {
         Totals() = {};
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        DetailTotals() = {};
+        // MC2_CACHE_DETAIL_DIAG END
         Context() = context;
     }
 
@@ -175,15 +240,48 @@ inline void Finish(uint32_t status)
     b.sq += sq;
     if (s.status)
         b.status = s.status;
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    auto& detail = DetailTotals();
+    // MC2_CACHE_DETAIL_DIAG END
     if (++b.count != SAMPLES_PER_BATCH)
         return;
     HCCL_RUN_INFO(
         "[MC2_SERVER_PERF] schema=%u first=%llu last=%llu count=%u init_mean_ns=%.6f msg_parse_mean_ns=%.6f "
-        "sq_expand_mean_ns=%.6f cache=%d status=%d",
+        "sq_expand_mean_ns=%.6f cache=%d status=%d"
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        " detail_schema=1 detail_ns=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu "
+        "detail_calls=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu"
+        // MC2_CACHE_DETAIL_DIAG END
+        ,
         LOG_SCHEMA_VERSION, static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last), b.count,
         static_cast<double>(b.init) / SAMPLES_PER_BATCH, static_cast<double>(b.msg) / SAMPLES_PER_BATCH,
-        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status);
+        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        ,
+        static_cast<unsigned long long>(detail.ns[DFX_REGISTER]), static_cast<unsigned long long>(detail.ns[CCORE_WAIT]),
+        static_cast<unsigned long long>(detail.ns[KERNEL_DISPATCH]), static_cast<unsigned long long>(detail.ns[CCORE_RECORD]),
+        static_cast<unsigned long long>(detail.ns[BATCH_START]), static_cast<unsigned long long>(detail.ns[BATCH_END]),
+        static_cast<unsigned long long>(detail.ns[CACHE_POLICY]), static_cast<unsigned long long>(detail.ns[CACHE_LOOKUP]),
+        static_cast<unsigned long long>(detail.ns[CAPTURE_CREATE]), static_cast<unsigned long long>(detail.ns[CAPTURE_BEGIN]),
+        static_cast<unsigned long long>(detail.ns[MISS_EXECUTE]), static_cast<unsigned long long>(detail.ns[CAPTURE_END]),
+        static_cast<unsigned long long>(detail.ns[CACHE_PUBLISH]), static_cast<unsigned long long>(detail.ns[HIT_REPLAY]),
+        static_cast<unsigned long long>(detail.ns[VAR_RESTORE]), static_cast<unsigned long long>(detail.ns[EXECUTOR_CREATE]),
+        static_cast<unsigned long long>(detail.ns[ALGORITHM_EXECUTE]),
+        static_cast<unsigned long long>(detail.calls[DFX_REGISTER]), static_cast<unsigned long long>(detail.calls[CCORE_WAIT]),
+        static_cast<unsigned long long>(detail.calls[KERNEL_DISPATCH]), static_cast<unsigned long long>(detail.calls[CCORE_RECORD]),
+        static_cast<unsigned long long>(detail.calls[BATCH_START]), static_cast<unsigned long long>(detail.calls[BATCH_END]),
+        static_cast<unsigned long long>(detail.calls[CACHE_POLICY]), static_cast<unsigned long long>(detail.calls[CACHE_LOOKUP]),
+        static_cast<unsigned long long>(detail.calls[CAPTURE_CREATE]), static_cast<unsigned long long>(detail.calls[CAPTURE_BEGIN]),
+        static_cast<unsigned long long>(detail.calls[MISS_EXECUTE]), static_cast<unsigned long long>(detail.calls[CAPTURE_END]),
+        static_cast<unsigned long long>(detail.calls[CACHE_PUBLISH]), static_cast<unsigned long long>(detail.calls[HIT_REPLAY]),
+        static_cast<unsigned long long>(detail.calls[VAR_RESTORE]), static_cast<unsigned long long>(detail.calls[EXECUTOR_CREATE]),
+        static_cast<unsigned long long>(detail.calls[ALGORITHM_EXECUTE])
+        // MC2_CACHE_DETAIL_DIAG END
+    );
     b = {};
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    detail = {};
+    // MC2_CACHE_DETAIL_DIAG END
 }
 } // namespace Mc2ServerStageTiming
 #endif

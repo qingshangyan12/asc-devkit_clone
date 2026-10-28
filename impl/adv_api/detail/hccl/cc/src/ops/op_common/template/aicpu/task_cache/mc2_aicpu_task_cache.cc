@@ -767,16 +767,30 @@ HcclResult RunMc2BoundReplay(
 {
     auto& scope = *currentReplayScope;
     auto& domain = *scope.domain_;
-    CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::BATCH_START);
+        // MC2_CACHE_DETAIL_DIAG END
+        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    }
     auto finish = [&](HcclResult result) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::BATCH_END);
+        // MC2_CACHE_DETAIL_DIAG END
         const auto end = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
         return result == HCCL_SUCCESS ? end : result;
     };
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope policyTiming(Mc2ServerStageTiming::CACHE_POLICY);
+    // MC2_CACHE_DETAIL_DIAG END
     if (!domain.supported || GetExternalInputHcclAicpuCacheEnable() == 0U || !IsSupportedOp(param.opType) ||
         param.opMode == OpMode::OFFLOAD || RequiresAicpuReduction(param) || param.supportSymmetricMemory ||
         param.hcclComm != domain.comm || param.inputPtr == nullptr || param.outputPtr == nullptr ||
         resources.topoInfo.userRankSize <= 1U || resources.threads.empty() ||
         (param.engine != CommEngine::COMM_ENGINE_AICPU_TS && param.engine != CommEngine::COMM_ENGINE_CCU)) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         return finish(execute());
     }
     Mc2AicpuTaskCachePlan addressPlan;
@@ -794,6 +808,9 @@ HcclResult RunMc2BoundReplay(
             regular ? GetRegularSpans(param, resources.topoInfo.userRankSize, inputSpan, outputSpan, domain.shape) :
                       GetAllToAllVSpans(param, resources.topoInfo.userRankSize, inputSpan, outputSpan, domain.shape);
         if (!valid || (inputSpan == 0 && outputSpan == 0)) {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            policyTiming.Stop();
+            // MC2_CACHE_DETAIL_DIAG END
             return finish(execute());
         }
         addressPlan.sizes = {{inputSpan, outputSpan}};
@@ -806,6 +823,12 @@ HcclResult RunMc2BoundReplay(
         domain.shape.AddU64(param.hcclBuff.size);
         domain.shape.AddU64(reinterpret_cast<uintptr_t>(param.inputSymWindow));
         domain.shape.AddU64(reinterpret_cast<uintptr_t>(param.outputSymWindow));
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope lookupTiming(Mc2ServerStageTiming::CACHE_LOOKUP);
+        // MC2_CACHE_DETAIL_DIAG END
         if (domain.recent && domain.recent->key == domain.shape.words) {
             image = domain.recent;
         } else {
@@ -815,7 +838,13 @@ HcclResult RunMc2BoundReplay(
             }
         }
     }
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    policyTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
     if (IsOverlapping(addressPlan)) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         return finish(execute());
     }
     if (image) {
@@ -824,9 +853,15 @@ HcclResult RunMc2BoundReplay(
         scope.repeatSizes_ = addressPlan.sizes;
         scope.repeatEntry_ = image;
         domain.recent = image;
-        const auto result = finish(
-            static_cast<HcclResult>(
-                Mc2HcommReplayV1(3, &image->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr)));
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope replayTiming(Mc2ServerStageTiming::HIT_REPLAY);
+        // MC2_CACHE_DETAIL_DIAG END
+        const auto replayResult = static_cast<HcclResult>(
+            Mc2HcommReplayV1(3, &image->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr));
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        replayTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
+        const auto result = finish(replayResult);
         if (result != HCCL_SUCCESS) {
             scope.repeatReady_ = false;
             domain.Clear();
@@ -834,30 +869,77 @@ HcclResult RunMc2BoundReplay(
         return result;
     }
     if (domain.bytes >= DOMAIN_BUDGET || replayBytes.load() >= TOTAL_REPLAY_BUDGET) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         return finish(execute());
     }
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope createTiming(Mc2ServerStageTiming::CAPTURE_CREATE);
+    // MC2_CACHE_DETAIL_DIAG END
     std::unique_ptr<ReplayImage> captured(new ReplayImage);
     auto ret = static_cast<HcclResult>(Mc2HcommReplayV1(0, &captured->handle, nullptr, nullptr, 0, nullptr));
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    createTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
     if (ret != HCCL_SUCCESS) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         return finish(execute());
     }
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope beginTiming(Mc2ServerStageTiming::CAPTURE_BEGIN);
+    // MC2_CACHE_DETAIL_DIAG END
     ret = static_cast<HcclResult>(
         Mc2HcommReplayV1(1, &captured->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr));
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    beginTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
     if (ret != HCCL_SUCCESS) {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        policyTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         return finish(execute());
     }
     Mc2ServerStageTiming::Cache(false);
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope executeTiming(Mc2ServerStageTiming::MISS_EXECUTE);
+    // MC2_CACHE_DETAIL_DIAG END
     ret = execute();
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    executeTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope flushTiming(Mc2ServerStageTiming::BATCH_END);
+    // MC2_CACHE_DETAIL_DIAG END
     const auto flush = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    flushTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
     if (ret != HCCL_SUCCESS || flush != HCCL_SUCCESS) {
         return ret != HCCL_SUCCESS ? ret : flush;
     }
-    CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    {
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::BATCH_START);
+        // MC2_CACHE_DETAIL_DIAG END
+        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+    }
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope endTiming(Mc2ServerStageTiming::CAPTURE_END);
+    // MC2_CACHE_DETAIL_DIAG END
     ret = static_cast<HcclResult>(Mc2HcommReplayV1(2, &captured->handle, nullptr, nullptr, 0, &captured->bytes));
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    endTiming.Stop();
+    // MC2_CACHE_DETAIL_DIAG END
     ret = finish(ret);
     if (ret != HCCL_SUCCESS) {
         return ret;
     }
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    Mc2ServerStageTiming::DetailScope publishTiming(Mc2ServerStageTiming::CACHE_PUBLISH);
+    // MC2_CACHE_DETAIL_DIAG END
     captured->bytes += domain.shape.words.size() * sizeof(uint64_t) * 2U + sizeof(ReplayImage);
     if (captured->bytes > DOMAIN_BUDGET - domain.bytes) {
         return HCCL_SUCCESS;
