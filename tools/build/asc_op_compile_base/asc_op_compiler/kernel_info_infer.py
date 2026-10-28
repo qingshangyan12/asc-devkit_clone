@@ -22,7 +22,8 @@ from asc_op_compile_base.common.buildcfg.buildcfg_mapping import enable_vector_c
 from asc_op_compile_base.common.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from asc_op_compile_base.common.utils.log_utils import AscendCLogLevel, CompileStage
 from .get_op_tiling import OpInfo
-from .template_tiling import extract_template_tiling_info, decode_tiling
+from .template_tiling import extract_template_tiling_info, decode_tiling, discover_deterministic_groups
+from asc_op_compile_base.common.deterministic import get_level_discovery_context
 from .global_storage import global_var_storage
 from .ascendc_constants import (
     InferChannelParamsFromIFile,
@@ -373,6 +374,12 @@ REGISTER_TILING_DEFAULT"
                 fd.close()
         except Exception as err:
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read dst_i_file failed, reason is:", err))
+        discovery_context = get_level_discovery_context()
+        if discovery_context is not None:
+            groups = discover_deterministic_groups(content)
+            discovery_context.add_addition("declared_deterministic_level_groups", groups)
+            discovery_context.add_addition("deterministic_discovery_complete", True)
+            return None
         hard_sync = KernelInfoInfer.get_hard_sync_instr_from_i_file(content)
         global_var_storage.set_variable("ascendc_op_with_syncall", hard_sync)
         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
