@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9050" id8 -->
-- Kirin 9050处理器系列产品：支持
+- Kirin9050处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="kirin1" id9 -->
 - KirinDev0001处理器系列产品：支持
@@ -215,12 +215,12 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     | RegTraitNumOne | 所有单搬入接口和双搬入接口 | b8/b16/b32/b64 |
     | RegTraitNumTwo | &bull; 单搬入 普通搬运接口<br>&bull; 单搬入 PostUpdate扩展搬运接口 | complex32/b64 |
 <!-- npu="9020" id15 -->
-- 针对Kirin 9020处理器系列产品：
+- 针对Kirin9020处理器系列产品：
   - RegTraitNumOne：b8、b16（不支持bfloat16_t）、b32。
   - RegTraitNumTwo：不支持
 <!-- end id15 -->
 <!-- npu="9050" id18 -->
-- 针对Kirin 9050处理器系列产品：
+- 针对Kirin9050处理器系列产品：
   - RegTraitNumOne：b8、b16（不支持bfloat16_t）、b32。
   - RegTraitNumTwo：不支持
 <!-- end id18 -->
@@ -324,4 +324,3 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
         }
     }
     ```
-

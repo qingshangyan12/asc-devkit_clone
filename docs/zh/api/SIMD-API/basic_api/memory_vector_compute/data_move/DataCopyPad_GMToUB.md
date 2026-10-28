@@ -26,7 +26,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id39 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id39 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB_res.md#id1 -->
 
@@ -54,7 +54,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id14 -->
 <!-- npu="9020" id40 -->
-- Kirin 9020处理器系列产品：不支持
+- Kirin9020处理器系列产品：不支持
 <!-- end id40 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB_res.md#id2 -->
 
@@ -267,7 +267,7 @@
 <!-- end id23 -->
 <!-- npu="9020" id41 -->
 
-- Kirin 9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+- Kirin9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 
 <!-- end id41 -->
 

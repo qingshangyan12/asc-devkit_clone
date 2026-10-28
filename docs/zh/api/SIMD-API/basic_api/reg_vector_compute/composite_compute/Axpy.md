@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id8 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id10 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id10 -->
 <!-- npu="x90" id11 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id11 -->
 <!-- npu="9050" id15 -->
 - Kirin9050处理器系列产品：支持
@@ -95,16 +95,16 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 - 本接口操作数为寄存器，不涉及地址对齐。
 - 本接口不修改全局寄存器的值。
 <!-- npu="9020" id9 -->
-- 针对Kirin 9020处理器系列产品，支持的数据类型为：half、float。
+- 针对Kirin9020处理器系列产品，支持的数据类型为：half、float。
 <!-- end id9 -->
 <!-- npu="9030" id12 -->
-- 针对Kirin 9030处理器系列产品，支持的数据类型为：half、float。
+- 针对Kirin9030处理器系列产品，支持的数据类型为：half、float。
 <!-- end id12 -->
 <!-- npu="x90" id13 -->
-- 针对Kirin X90处理器系列产品，支持的数据类型为：half、float。
+- 针对KirinX90处理器系列产品，支持的数据类型为：half、float。
 <!-- end id13 -->
 <!-- npu="9050" id14 -->
-- 针对Kirin 9050处理器系列产品，支持的数据类型为：half、float。
+- 针对Kirin9050处理器系列产品，支持的数据类型为：half、float。
 <!-- end id14 -->
 
 ## 调用示例<a name="section98571172212"></a>

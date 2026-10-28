@@ -24,7 +24,7 @@
 - Atlas训练系列产品：不支持
 <!-- end id19 -->
 <!-- npu="9020" id6 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToGM_NZ2ND_res.md#id1 -->
 
@@ -121,7 +121,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id5 -->
 <!-- npu="9020" id7 -->
-- Kirin 9020处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+- Kirin9020处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id7 -->
 
 ## 返回值说明<a name="section129001927113216"></a>

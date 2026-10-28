@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id13 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id13 -->
 <!-- npu="9030" id14 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id14 -->
 <!-- npu="x90" id15 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/Sort32_res.md#id1 -->
 
@@ -109,13 +109,13 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
 - 每次迭代输入src0要求128B\(float\)/64B\(half\)对齐，src1要求128B对齐，输出dst要求256B对齐。
 
 <!-- npu="9020" id16 -->
-- Kirin 9020处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
+- Kirin9020处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
 <!-- end id16 -->
 <!-- npu="9030" id17 -->
-- Kirin 9030处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
+- Kirin9030处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
 <!-- end id17 -->
 <!-- npu="x90" id18 -->
-- Kirin X90处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
+- KirinX90处理器系列产品，支持src0数据类型：half，src1数据类型：uint32，dst数据类型：half。
 <!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/Sort32_res.md#id3 -->
 

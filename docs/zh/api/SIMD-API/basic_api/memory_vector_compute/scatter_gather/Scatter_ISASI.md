@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id23 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id23 -->
 <!-- npu="9020" id24 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id24 -->
 <!-- npu="9030" id25 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id25 -->
 <!-- npu="A3,910b" id8 -->
 >[!NOTE]说明
@@ -108,15 +108,15 @@ Atlas推理系列产品AI Core，支持的数据类型为：uint16_t、half、ui
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI_res.md#id2 -->
 
 <!-- npu="x90" id26 -->
-Kirin X90处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+KirinX90处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id26 -->
 
 <!-- npu="9020" id27 -->
-Kirin 9020处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+Kirin9020处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id27 -->
 
 <!-- npu="9030" id28 -->
-Kirin 9030处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+Kirin9030处理器系列产品，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id28 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
@@ -169,7 +169,7 @@ Kirin 9030处理器系列产品，支持的数据类型为：int16_t、uint16_t�
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI_res.md#id3 -->
 
 <!-- npu="x90,9020,9030" id29 -->
-- - 针对Kirin X90处理器系列产品、Kirin 9020处理器系列产品、Kirin 9030处理器系列产品，该接口通过VF调用[Reg矢量计算](../../reg_vector_compute/reg_vector_compute.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+- - 针对KirinX90处理器系列产品、Kirin9020处理器系列产品、Kirin9030处理器系列产品，该接口通过VF调用[Reg矢量计算](../../reg_vector_compute/reg_vector_compute.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
 <!-- end id29 -->
 
 ## 调用示例<a name="section11276201527"></a>

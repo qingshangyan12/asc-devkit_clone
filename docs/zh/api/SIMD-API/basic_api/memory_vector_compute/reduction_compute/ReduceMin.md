@@ -24,13 +24,13 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="9020" id32 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id32 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin_res.md#id1 -->
 
@@ -116,14 +116,14 @@
 - Atlas训练系列产品，支持half。
 <!-- end id15 -->
 <!-- npu="x90" id16 -->
-- Kirin X90处理器系列产品，支持half、float。
+- KirinX90处理器系列产品，支持half、float。
 <!-- end id16 -->
 <!-- npu="9030" id17 -->
-- Kirin 9030处理器系列产品，支持half、float。
+- Kirin9030处理器系列产品，支持half、float。
 <!-- end id17 -->
 
 <!-- npu="9020" id33 -->
-- Kirin 9020处理器系列产品，支持half、float。
+- Kirin9020处理器系列产品，支持half、float。
 <!-- end id33 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin_res.md#id2 -->
 
@@ -182,10 +182,10 @@
   - Atlas训练系列产品
   <!-- end id29 -->
   <!-- npu="x90" id30 -->
-  - Kirin X90处理器系列产品
+  - KirinX90处理器系列产品
   <!-- end id30 -->
   <!-- npu="9030" id31 -->
-  - Kirin 9030处理器系列产品
+  - Kirin9030处理器系列产品
   <!-- end id31 -->
 <!-- end id24 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin_res.md#id3 -->

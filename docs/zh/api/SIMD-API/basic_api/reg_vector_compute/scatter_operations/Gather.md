@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id9 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="9020" id10 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id10 -->
 <!-- npu="9030" id11 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/scatter_operations/Gather_res.md#id1 -->
 
@@ -86,7 +86,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 - 源操作数和目的操作数的数据类型需保持一致。
 - 索引值和目的操作数的数据类型位宽需保持一致。
 <!-- npu="x90,9020,9030" id12 -->
-- 针对Kirin X90处理器系列产品、Kirin 9020处理器系列产品和Kirin 9030处理器系列产品,不支持uint32_t。
+- 针对KirinX90处理器系列产品、Kirin9020处理器系列产品和Kirin9030处理器系列产品,不支持uint32_t。
 <!-- end id12 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

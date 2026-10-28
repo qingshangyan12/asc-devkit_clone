@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id8 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- npu="x90" id10 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id10 -->
 <!-- npu="9050" id14 -->
 - Kirin9050处理器系列产品：支持
@@ -107,13 +107,13 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 - 对于算术位移（有符号数据类型），如果srcReg0小于0，位移量大于数据类型位宽，则输出-1；如果srcReg0大于0，位移量大于数据类型位宽，则输出0。
 - srcReg1不支持设置为负数，负数行为未定义。
 <!-- npu="9020" id11 -->
-- 针对Kirin 9020处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+- 针对Kirin9020处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id11 -->
 <!-- npu="9030" id12 -->
-- 针对Kirin 9030处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+- 针对Kirin9030处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id12 -->
 <!-- npu="x90" id13 -->
-- 针对Kirin X90处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+- 针对KirinX90处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id13 -->
 <!-- npu="9050" id15 -->
 - 针对Kirin9050处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。

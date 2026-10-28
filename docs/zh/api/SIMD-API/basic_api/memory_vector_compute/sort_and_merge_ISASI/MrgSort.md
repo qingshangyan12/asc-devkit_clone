@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id13 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id13 -->
 <!-- npu="9030" id14 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id14 -->
 <!-- npu="x90" id15 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort_res.md#id1 -->
 
@@ -102,9 +102,9 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 <!-- end id12 -->
 
 <!-- npu="x90,9020,9030" id16 -->
-- 针对Kirin 9020处理器系列产品，支持数据类型为：half。
-- 针对Kirin 9030处理器系列产品，支持数据类型为：half。
-- 针对Kirin X90处理器系列产品，支持数据类型为：half。
+- 针对Kirin9020处理器系列产品，支持数据类型为：half。
+- 针对Kirin9030处理器系列产品，支持数据类型为：half。
+- 针对KirinX90处理器系列产品，支持数据类型为：half。
 <!-- end id16 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort_res.md#id3 -->
 

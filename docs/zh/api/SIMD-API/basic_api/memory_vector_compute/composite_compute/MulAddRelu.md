@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id19 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id19 -->
 <!-- npu="9030" id20 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id20 -->
 <!-- npu="9020" id21 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id21 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulAddRelu_res.md#id1 -->
 
@@ -118,15 +118,15 @@ Atlas推理系列产品AI Core，支持的数据类型为：half、float。
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulAddRelu_res.md#id2 -->
 
 <!-- npu="x90" id22 -->
-Kirin X90处理器系列产品，支持的数据类型为：half、float。
+KirinX90处理器系列产品，支持的数据类型为：half、float。
 <!-- end id22 -->
 
 <!-- npu="9030" id23 -->
-Kirin 9030处理器系列产品，支持的数据类型为：half、float。
+Kirin9030处理器系列产品，支持的数据类型为：half、float。
 <!-- end id23 -->
 
 <!-- npu="9020" id24 -->
-Kirin 9020处理器系列产品，支持的数据类型为：half、float。
+Kirin9020处理器系列产品，支持的数据类型为：half、float。
 <!-- end id24 -->
 ## 返回值说明<a name="section640mcpsimp"></a>
 

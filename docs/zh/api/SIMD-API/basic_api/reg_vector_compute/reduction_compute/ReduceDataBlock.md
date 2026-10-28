@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9020" id10 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id10 -->
 <!-- npu="9030" id11 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id11 -->
 <!-- npu="x90" id12 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id12 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/ReduceDataBlock_res.md#id1 -->
 
@@ -111,13 +111,13 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 - mask为空场景及异常值处理参考[mask为空场景及异常值处理](#mask为空场景及异常值处理)。
 - 指令内累加顺序采用二叉树累加方式，规则参考[ReduceType::SUM累加顺序](#ReduceType::SUM累加顺序)。
 <!-- npu="9020" id9 -->
-- 针对Kirin 9020处理器系列产品，支持数据类型为：half、float。
+- 针对Kirin9020处理器系列产品，支持数据类型为：half、float。
 <!-- end id9 -->
 <!-- npu="9030" id13 -->
-- 针对Kirin 9030处理器系列产品，支持数据类型为：half、float。
+- 针对Kirin9030处理器系列产品，支持数据类型为：half、float。
 <!-- end id13 -->
 <!-- npu="x90" id14 -->
-- 针对Kirin X90处理器系列产品，支持数据类型为：half、float。
+- 针对KirinX90处理器系列产品，支持数据类型为：half、float。
 <!-- end id14 -->
 
 ## 关键特性<a name="zh-cn_topic_0000002568852247_section18972943153217"></a>

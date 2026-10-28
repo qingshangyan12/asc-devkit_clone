@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id27 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id27 -->
 <!-- npu="9030" id28 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id28 -->
 <!-- npu="9020" id29 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id29 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask_res.md#id1 -->
 
@@ -253,7 +253,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 <!-- npu="x90" id30 -->
 
-**表**  Kirin X90处理器系列产品数据类型组合情况
+**表**  KirinX90处理器系列产品数据类型组合情况
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
@@ -268,7 +268,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 <!-- npu="9030" id31 -->
 
-**表**  Kirin 9030处理器系列产品数据类型组合情况
+**表**  Kirin9030处理器系列产品数据类型组合情况
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
@@ -283,7 +283,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 <!-- npu="9020" id32 -->
 
-**表**  Kirin 9020处理器系列产品数据类型组合情况
+**表**  Kirin9020处理器系列产品数据类型组合情况
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |

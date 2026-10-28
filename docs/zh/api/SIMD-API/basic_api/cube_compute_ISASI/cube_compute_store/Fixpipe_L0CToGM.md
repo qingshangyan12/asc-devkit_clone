@@ -225,7 +225,7 @@
 <!-- end id22 -->
 
 <!-- npu="x90" id23 -->
-针对Kirin X90处理器系列产品，Fixpipe接口支持的数据类型组合如下：
+针对KirinX90处理器系列产品，Fixpipe接口支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（GM） |
 | ---------- | ---------- |
@@ -235,7 +235,7 @@
 <!-- end id23 -->
 
 <!-- npu="9030" id24 -->
-针对Kirin 9030处理器系列产品，Fixpipe接口支持的数据类型组合如下：
+针对Kirin9030处理器系列产品，Fixpipe接口支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（GM） |
 | ---------- | ---------- |
@@ -330,4 +330,3 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../example
 <!-- end id30 -->
 
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id4 -->
-

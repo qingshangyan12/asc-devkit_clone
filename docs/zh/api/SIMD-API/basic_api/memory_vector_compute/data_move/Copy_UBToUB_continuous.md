@@ -24,13 +24,13 @@
 - Atlas训练系列产品：不支持
 <!-- end id17 -->
 <!-- npu="x90" id18 -->
-- Kirin X90处理器系列产品：支持
+- KirinX90处理器系列产品：支持
 <!-- end id18 -->
 <!-- npu="9030" id19 -->
-- Kirin 9030处理器系列产品：支持
+- Kirin9030处理器系列产品：支持
 <!-- end id19 -->
 <!-- npu="9020" id2 -->
-- Kirin 9020处理器系列产品：支持
+- Kirin9020处理器系列产品：支持
 <!-- end id2 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/Copy_UBToUB_continuous_res.md#id1 -->
 
@@ -80,7 +80,7 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 <!-- npu="950" id1 -->
 Ascend 950PR&950DT系列产品，支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
 <!-- end id1 -->
-- Kirin 9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。
+- Kirin9020处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。
 
 ## 返回值说明
 
