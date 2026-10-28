@@ -85,15 +85,6 @@ __simd_callee__ inline void Sqrt(U& dstReg, U& srcReg, MaskReg& mask)
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：half、float。
 
-<!-- npu="9020" id15 -->
-- 针对Kirin 9020处理器系列产品，T支持的数据类型为：half、float。
-<!-- end id15 -->
-<!-- npu="9030" id16 -->
-- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
-<!-- end id16 -->
-<!-- npu="x90" id17 -->
-- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
-<!-- end id17 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

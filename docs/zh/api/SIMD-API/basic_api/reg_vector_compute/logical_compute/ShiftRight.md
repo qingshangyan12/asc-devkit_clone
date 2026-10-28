@@ -32,6 +32,9 @@
 <!-- npu="x90" id10 -->
 - Kirin X90处理器系列产品：支持
 <!-- end id10 -->
+<!-- npu="9050" id14 -->
+- Kirin9050处理器系列产品：支持
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/logical_compute/ShiftRight_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -112,6 +115,9 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 <!-- npu="x90" id13 -->
 - 针对Kirin X90处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id13 -->
+<!-- npu="9050" id15 -->
+- 针对Kirin9050处理器系列产品，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id15 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
