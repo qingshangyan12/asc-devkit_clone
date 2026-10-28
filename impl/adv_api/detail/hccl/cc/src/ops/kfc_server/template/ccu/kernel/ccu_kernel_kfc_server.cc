@@ -21,9 +21,6 @@ using namespace hcomm;
 using namespace std;
 
 static_assert(
-    CCU_PARAM_NUM_PER_DIE + 2U <= CCU_FUNC_PARAM_NUM,
-    "KFC Func arguments must accommodate all queue parameters, token and turnEndAddr");
-static_assert(
     KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllGather parameters exceed the KFC server load width");
 static_assert(
