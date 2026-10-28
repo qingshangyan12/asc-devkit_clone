@@ -9,6 +9,7 @@
  */
 #include "include/adv_api/hccl/hccl_mc2.h"
 #include "log.h"
+#include "mc2_ccu_perf_probe.h"
 #include "sal.h"
 #include "alg_env_config.h"
 #include "hccl_inner.h"
@@ -27,6 +28,8 @@
 #include "hcomm_host_profiling_dl.h"
 #include "runtime/rt.h"
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 using namespace mc2_ops_hccl;
 
@@ -1226,6 +1229,8 @@ uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 
 uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx, uint32_t ccResCtxSize)
 {
+    const char* perfEnv = std::getenv("MC2_PERF_ACCEPTANCE");
+    Mc2CcuPerfProbe::KernelScope perfScope(perfEnv != nullptr && std::strcmp(perfEnv, "1") == 0);
     CHK_PTR_NULL(ccResCtx);
     if (ccResCtxSize < sizeof(OpResCtx)) {
         HCCL_ERROR(
@@ -1235,6 +1240,7 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
 
     OpResCtx opResHost{};
     CcuResult loadRet = CopyOpResCtxToHost(ccResCtx, opResHost);
+    Mc2CcuPerfProbe::PollBegin();
     if (loadRet != CCU_SUCCESS) {
         HCCL_ERROR("[Mc2CcKernelLaunch] failed to load OpResCtx, ret[%d].", loadRet);
         return HCCL_E_INTERNAL;
@@ -1247,6 +1253,7 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
         case COMM_ENGINE_CCU: {
             OpParam opParamHost{};
             loadRet = CopyOpParamToHost(opResHost, opParamHost);
+            Mc2CcuPerfProbe::Parsed();
             if (loadRet != CCU_SUCCESS) {
                 HCCL_ERROR("[Mc2CcKernelLaunch] failed to load OpParam, ret[%d].", loadRet);
                 return HCCL_E_INTERNAL;
@@ -1255,6 +1262,7 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
             // The CCU launch stream is carried by the thread handles in the resource context.
             (void)stream;
             CcuResult launchRet = LaunchCcuKernel(comm, opParamHost);
+            Mc2CcuPerfProbe::Submitted(static_cast<int>(launchRet));
             if (launchRet != CCU_SUCCESS) {
                 HCCL_ERROR("[Mc2CcKernelLaunch] CcuKernelLaunch failed, ret[%d].", launchRet);
                 return HCCL_E_INTERNAL;
