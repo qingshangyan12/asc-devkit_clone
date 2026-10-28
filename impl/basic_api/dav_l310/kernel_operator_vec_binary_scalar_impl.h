@@ -206,6 +206,9 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
         VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
     newRepeatTimes = VecLogicalGetRepeatTimes<T, isNormalMode>(count, repeatTime);
+    constexpr uint32_t BLK_NUM_PER_MICRO = GetVecLen() / GetDataBlockSizeInBytes();
+    constexpr uint16_t MICRO_NUM_PER_ITER = DEFAULT_BLK_NUM / BLK_NUM_PER_MICRO;
+    static_assert(DEFAULT_BLK_NUM % BLK_NUM_PER_MICRO == 0, "logical iteration must cover integral micro iters");
     Reg::MaskReg maskReg;
     if constexpr (isNormalMode && !isSetMask) {
         maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
@@ -213,14 +216,14 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
         if constexpr (isNormalMode) {
-            count =countPerLogicalIter;
+            count = countPerLogicalIter;
         }
         if constexpr (isNormalMode && isMaskBitMode && isSetMask) {
             {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = 0;
-                __ubuf__ T* srcMicro = src + (index * repeatParams.srcRepStride +blkBaseOfMicro * repeatParams.srcBlkStride) *ElePerBlkT;
-                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +blkBaseOfMicro * repeatParams.dstBlkStride) *ElePerBlkT;
+                __ubuf__ T* srcMicro = src + (index * repeatParams.srcRepStride + blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
+                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> dstVreg;
                 Reg::RegTensor<T> srcVreg;
                 Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
@@ -246,8 +249,8 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
                     maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
-                __ubuf__ T* srcMicro = src + (index * repeatParams.srcRepStride +blkBaseOfMicro * repeatParams.srcBlkStride) *ElePerBlkT;
-                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +blkBaseOfMicro * repeatParams.dstBlkStride) *ElePerBlkT;
+                __ubuf__ T* srcMicro = src + (index * repeatParams.srcRepStride + blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
+                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> dstVreg;
                 Reg::RegTensor<T> srcVreg;
                 Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
@@ -324,7 +327,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
     static_assert(DEFAULT_BLK_NUM % BLK_NUM_PER_MICRO == 0, "logical iteration must cover integral micro iters");
     Reg::MaskReg maskReg;
     if constexpr (isNormalMode && !isSetMask) {
-        maskReg = VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+        maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
     }
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
     constexpr bool isStrideSrc0 = (scalarIdx == 1);
@@ -337,9 +340,9 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
             {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = 0;
-                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride +blkBaseOfMicro * repeatParams.srcBlkStride) *ElePerBlkT;
+                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride + blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
                 __ubuf__ T* patternSrc = isStrideSrc0 ? src1 : src0;
-                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +blkBaseOfMicro * repeatParams.dstBlkStride) *ElePerBlkT;
+                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> vDstReg;
                 Reg::RegTensor<T> VStridedReg;
                 Reg::RegTensor<T> VPatternReg;
@@ -356,9 +359,9 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
             if constexpr (MICRO_NUM_PER_ITER > 1) {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
                 constexpor uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
-                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride +blkBaseOfMicro * repeatParams.srcBlkStride) *ElePerBlkT;
+                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride + blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
                 __ubuf__ T* patternSrc = isStrideSrc0 ? src1 : src0;
-                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +blkBaseOfMicro * repeatParams.dstBlkStride) *ElePerBlkT;
+                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> vDstReg;
                 Reg::RegTensor<T> VStridedReg;
                 Reg::RegTensor<T> VPatternReg;
@@ -378,9 +381,9 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
                     maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
-                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride +blkBaseOfMicro * repeatParams.srcBlkStride) *ElePerBlkT;
+                __ubuf__ T* strideMicro = (isStrideSrc0 ? src0 : src1) + (index * repeatParams.srcRepStride + blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
                 __ubuf__ T* patternSrc = isStrideSrc0 ? src1 : src0;
-                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +blkBaseOfMicro * repeatParams.dstBlkStride) *ElePerBlkT;
+                __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> vDstReg;
                 Reg::RegTensor<T> VStridedReg;
                 Reg::RegTensor<T> VPatternReg;
@@ -428,9 +431,10 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
             if constexpor (SupportBytes<T, 1>()) {
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
             }
-            if constexpor (isSetMask) {
+            if constexpr (isSetMask) {
                 maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 8);
                 ExpandBitMaskToUB<T>(maskArrayStruct.maskArray, maskBuf);
+            }
         }
         // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
         VecBinaryScalarLevel0VFImpl<func, isSetMask, isMaskBitMode, true, T, pattern, scalarIdx>(
