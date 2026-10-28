@@ -1663,13 +1663,15 @@ class TestCompileOp(unittest.TestCase):
             output_shape_depend_on_compute=[0],
         )
         tiling_info = TilingInfo()
-        kernel_func_desc, idx = _gen_kernel_func_declare_head(kernel_func_desc, True, True, op_info, tiling_info)
+        kernel_func_desc, idx, _, _, param_metadata = _gen_kernel_func_declare_head(True, True, op_info, tiling_info)
         print(kernel_func_desc)
         self.assertEqual(
             "GM_ADDR ffts_addr, GM_ADDR mc2_test, GM_ADDR y_in__, GM_ADDR z_out_, GM_ADDR __ascendc_output_shape, GM_ADDR workspace) {\n",
             kernel_func_desc,
         )
         self.assertEqual(idx, 5)
+        self.assertIsNotNone(param_metadata)
+        self.assertEqual((param_metadata.count, param_metadata.total_size), (6, 48))
 
     def test_super_kernel_zero_workspace_wrapper(self):
         op_info = OpInfo(
@@ -2161,7 +2163,10 @@ class TestCompileOp(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         with open(compile_info.gen_kernel_func_file, "r") as generated_kernel_file:
-            self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", generated_kernel_file.read())
+            generated_source = generated_kernel_file.read()
+            self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", generated_source)
+            self.assertIn("g_ascendc_param_metadata_", generated_source)
+            self.assertIn('section(".ascend.meta." ASCENDC_PARAM_STRINGIFY(', generated_source)
         os.remove(compile_info.gen_kernel_func_file)
         assert "-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
