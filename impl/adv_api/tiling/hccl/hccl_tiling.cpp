@@ -23,6 +23,7 @@
 #include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "hccl_symbol_loader.h"
+#include <set>
 
 using namespace std;
 using namespace HcclApi;
