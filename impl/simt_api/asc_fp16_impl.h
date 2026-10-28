@@ -1456,8 +1456,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp10(half2 x)
 
 #endif // ASCENDC_USE_LEGACY_PRECISION
 
-#endif
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __heq(half x, half y) { return (x == y) && !__hisnan(x) && !__hisnan(y); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hne(half x, half y) { return (x != y) && !__hisnan(x) && !__hisnan(y); }
@@ -1784,6 +1782,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hcmadd(const half2 x, const half2 
     h.y = img_tmp;
     return h;
 }
+
+#endif
 
 #endif // IMPL_SIMT_API_ASC_FP16_IMPL_H
 
