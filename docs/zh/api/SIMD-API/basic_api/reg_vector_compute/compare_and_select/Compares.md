@@ -107,16 +107,16 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 通过mask参数控制的未选中元素在目的操作数中被置零。
 
 <!-- npu="9020" id15 -->
-- Kirin9020处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float、bfloat16_t。
+- Kirin9020处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
 <!-- end id15 -->
 <!-- npu="9030" id16 -->
-- Kirin9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float、bfloat16_t。
+- Kirin9030处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
 <!-- end id16 -->
 <!-- npu="9050" id17 -->
-- Kirin9050处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float、bfloat16_t。
+- Kirin9050处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
 <!-- end id17 -->
 <!-- npu="x90" id18 -->
-- KirinX90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float、bfloat16_t。
+- KirinX90处理器系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
 <!-- end id18 -->
 
 ## 调用示例<a name="section12223121385116"></a>
