@@ -25,7 +25,9 @@ using asc::te::experimental::cast_round_mode;
 using asc::te::experimental::cast_sat_mode;
 
 constexpr cast_options float_to_half_options = {cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat};
-constexpr cast_options int32_to_float_options = {cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat};
+constexpr cast_options half_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
+constexpr cast_options int16_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
+constexpr cast_options int32_to_float_options = {cast_layout::unknown, cast_round_mode::floor, cast_sat_mode::unknown};
 
 template <typename DstType, typename SrcType, cast_round_mode Round, cast_layout... Layouts>
 constexpr bool supports_saturated_and_unsaturated_casts()
@@ -46,17 +48,27 @@ static_assert(!asc::te::experimental::detail::reg_cast_op<
 static_assert(!asc::te::experimental::detail::reg_cast_op<
               half, float, cast_layout::zero, cast_round_mode::hybrid, cast_sat_mode::not_sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<
+              float, half, cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown>::supported);
+static_assert(!asc::te::experimental::detail::reg_cast_op<
               float, half, cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
+static_assert(asc::te::experimental::detail::reg_cast_op<
+              float, int16_t, cast_layout::one, cast_round_mode::unknown, cast_sat_mode::unknown>::supported);
+static_assert(!asc::te::experimental::detail::reg_cast_op<
+              float, int16_t, cast_layout::one, cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
+static_assert(asc::te::experimental::detail::reg_cast_op<
+              int32_t, int16_t, cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown>::supported);
+static_assert(asc::te::experimental::detail::reg_cast_op<
+              float, int32_t, cast_layout::unknown, cast_round_mode::floor, cast_sat_mode::unknown>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<
               half, float, cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat>::supported);
 static_assert(asc::te::experimental::detail::reg_cast_op<
-              uint8_t, int32_t, cast_layout::two, cast_round_mode::rint, cast_sat_mode::sat>::supported);
+              uint8_t, int32_t, cast_layout::two, cast_round_mode::unknown, cast_sat_mode::sat>::supported);
 static_assert(!asc::te::experimental::detail::reg_cast_op<
-              float, half, cast_layout::two, cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
+              float, half, cast_layout::two, cast_round_mode::unknown, cast_sat_mode::unknown>::supported);
 
 using half_reg = asc::te::experimental::reg_tensor<half>;
 static_assert(AscendC::Std::is_same_v<
-              decltype(asc::te::experimental::cast<float>(AscendC::Std::declval<half_reg>())),
+              decltype(asc::te::experimental::cast<float, half_to_float_options>(AscendC::Std::declval<half_reg>())),
               asc::te::experimental::reg_tensor<float>>);
 
 class tensor_api_reg_cast_3510 : public testing::Test {
@@ -112,13 +124,13 @@ void cast_one_register(From input_value, To (&dst_data)[N])
     cast_reg_loop<To, opt>(src, dst, src_elements_per_reg, src_elements_per_reg);
 }
 
-TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float)
+TEST_F(tensor_api_reg_cast_3510, converts_half_to_float_without_rounding_or_saturation)
 {
     using dst_reg_type = typename asc::te::experimental::reg_tensor<float>::reg_type;
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg]{};
 
-    cast_one_register<float>(static_cast<half>(0.0F), dst_data);
+    cast_one_register<float, half_to_float_options>(static_cast<half>(0.0F), dst_data);
 
     for (float value : dst_data) {
         EXPECT_EQ(value, 0.0F);
@@ -146,6 +158,19 @@ TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
     __ubuf__ float dst_data[dst_elements_per_reg]{};
 
     cast_one_register<float, int32_to_float_options>(0, dst_data);
+
+    for (float value : dst_data) {
+        EXPECT_EQ(value, 0.0F);
+    }
+}
+
+TEST_F(tensor_api_reg_cast_3510, converts_int16_to_float_without_rounding_or_saturation)
+{
+    using dst_reg_type = typename asc::te::experimental::reg_tensor<float>::reg_type;
+    constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
+    __ubuf__ float dst_data[dst_elements_per_reg]{};
+
+    cast_one_register<float, int16_to_float_options>(0, dst_data);
 
     for (float value : dst_data) {
         EXPECT_EQ(value, 0.0F);

@@ -43,8 +43,6 @@ struct cast_element_bits {
 
 #define ASC_CAST_POSITION_2_zero ASC_POSITION_EVEN
 #define ASC_CAST_POSITION_2_one ASC_POSITION_ODD
-#define ASC_CAST_POSITION_2_two ASC_POSITION_EVEN
-#define ASC_CAST_POSITION_2_three ASC_POSITION_ODD
 #define ASC_CAST_POSITION_4_zero ASC_DISPERSE_FIRST_QUARTER
 #define ASC_CAST_POSITION_4_one ASC_DISPERSE_SECOND_QUARTER
 #define ASC_CAST_POSITION_4_two ASC_DISPERSE_THIRD_QUARTER
@@ -60,9 +58,7 @@ struct cast_element_bits {
         {                                                                                           \
             constexpr uint32_t dst_bits = cast_element_bits<TO>::value;                             \
             constexpr uint32_t src_bits = cast_element_bits<FROM>::value;                           \
-            if constexpr (dst_bits == src_bits) {                                                   \
-                FUNC(dst, src, mask);                                                               \
-            } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {          \
+            if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {                  \
                 dst = FUNC(src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                \
             } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {          \
                 dst = FUNC(src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                \
@@ -80,6 +76,7 @@ struct cast_element_bits {
         template <typename DstReg, typename SrcReg>                                                 \
         __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                  \
         {                                                                                           \
+            static_assert(cast_element_bits<TO>::value == cast_element_bits<FROM>::value);          \
             FUNC(dst, src, mask);                                                                   \
         }                                                                                           \
     }
@@ -90,8 +87,6 @@ struct cast_element_bits {
 #undef ASC_REG_CAST_OP_NO_POSITION
 #undef ASC_CAST_POSITION_2_zero
 #undef ASC_CAST_POSITION_2_one
-#undef ASC_CAST_POSITION_2_two
-#undef ASC_CAST_POSITION_2_three
 #undef ASC_CAST_POSITION_4_zero
 #undef ASC_CAST_POSITION_4_one
 #undef ASC_CAST_POSITION_4_two
