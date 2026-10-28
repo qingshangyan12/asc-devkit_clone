@@ -153,7 +153,7 @@ def validate_fixed_schedule_coverage(
 ) -> None:
     if args.schedule != "fixed" or schedule_file is None:
         return
-    if args.filter or args.exclude:
+    if args.filter or args.exact_filter or args.exclude:
         return
 
     schedule_order = read_schedule_file(schedule_file)
