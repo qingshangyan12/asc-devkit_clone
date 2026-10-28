@@ -12,9 +12,11 @@ dst[i] = src[index[i]], 0 <= i < 128
 
 Indexes range from 0 to 127 and represent element positions within the source register, not byte offsets or global GM indexes. The 128 `half` elements exactly fill one 256-byte register.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 

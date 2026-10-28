@@ -10,9 +10,11 @@ The sample covers seven conversion scenarios (numbered 1–7) between floating-p
 y[i] = convert<To>(x[i])
 ```
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -135,7 +137,7 @@ y[i] = convert<To>(x[i])
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/set_env.sh

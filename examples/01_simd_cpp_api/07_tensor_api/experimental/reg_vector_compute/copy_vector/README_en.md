@@ -8,9 +8,11 @@ Scenarios 1 through 3 use `int8_t` tensors with a shape of `[32, 32]`. Scenario 
 tensor with a shape of `[1024]`. Scenario 5 pads an input of shape `[32, 24]` to produce an output of shape
 `[32, 32]`. Each scenario validates the entire output.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR&950DT products
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Sample Scenarios
 
@@ -41,7 +43,7 @@ The kernels for all five scenarios are declared with `__global__ __vector__`.
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
