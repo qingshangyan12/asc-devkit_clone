@@ -88,8 +88,9 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams)
@@ -152,7 +153,9 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
@@ -456,7 +459,10 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+                              (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
@@ -472,7 +478,9 @@ __aicore__ inline void Mmad(
 {
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
+#endif
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
@@ -627,8 +635,9 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
     SetFmatrixImpl(l1H, l1W, padList, fmatrixMode);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     SetFmatrixImpl(param, fmatrixMode);

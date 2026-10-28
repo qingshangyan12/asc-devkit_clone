@@ -130,6 +130,10 @@ __aicore__ inline __inout_pipe__(V) void Gemm(
 
         dataCopyParams.blockLen = dst.GetSize() * sizeof(PrimT<T>) / 1024;
         DataCopy(l0c, dst, dataCopyParams, enhancedParams);
+#else
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(KERNEL_ERROR, "Gemm dst only supports L0C Buffer(C2) on current device");
+        });
 #endif
     }
 
