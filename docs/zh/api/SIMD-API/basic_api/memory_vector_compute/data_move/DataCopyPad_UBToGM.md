@@ -67,6 +67,8 @@
 - 如[图1](#fig_datacopypad3)所示，对于32字节对齐搬运场景，从UB读取的所有数据都会搬运至Global Memory。
 - 如[图2](#fig_datacopypad4)所示，对于非32字节对齐的场景，在读取UB数据时会填入dummy假数据，对齐到32B，搬入Global Memory时会将dummy空数据丢弃，从而实现UB到Global Memory的非对齐搬运。
 
+该接口支持数据经[PCIe通路](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/envvar/docs/zh/env-vars/OP_PCIE_THROUGH_ACCESS_HOST_MEM_CHECK_ENABLE.md)搬运。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 - 不支持配置设置数据搬运模式mode

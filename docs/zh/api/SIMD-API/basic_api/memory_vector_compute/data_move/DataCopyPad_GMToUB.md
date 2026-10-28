@@ -78,6 +78,8 @@
 - 配置结构体[DataCopyPadExtParams](#table_gm2ub_pad_5)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
 - 使用寄存器配置接口[SetPadValue](../data_move_aux_config/SetPadValue_ISASI.md)在接口外部设置需要填充的数据，此时DataCopyPadExtParams的参数isPad需要设置为false。
 
+该接口支持数据经[PCIe通路](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/envvar/docs/zh/env-vars/OP_PCIE_THROUGH_ACCESS_HOST_MEM_CHECK_ENABLE.md)搬运。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 - 不支持配置设置数据搬运模式mode
