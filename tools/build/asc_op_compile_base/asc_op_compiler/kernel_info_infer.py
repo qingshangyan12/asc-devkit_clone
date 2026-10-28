@@ -17,6 +17,7 @@ import os
 import stat
 import copy
 import re
+from asc_op_compile_base.common.context import get_context
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from asc_op_compile_base.common.buildcfg.buildcfg_mapping import enable_vector_core
 from asc_op_compile_base.common.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
@@ -492,6 +493,18 @@ REGISTER_TILING_DEFAULT"
             extract_template_tiling_info(declare_param_str, select_param_str)
             decode_tiling_result = decode_tiling()
             tiling_key_list = [str(k) for k in decode_tiling_result.keys()]
+            context = get_context()
+            kernel_template_input = context.get_addition("kernel-template-input") if context is not None else None
+            if kernel_template_input:
+                CommonUtility.print_compile_log(
+                    "", f'Parameter "kernel-template-input" has been set to "{kernel_template_input}" '
+                    f'while kernel_name={op_info.kernel_name}.', AscendCLogLevel.LOG_INFO
+                )
+                filtered_keys = ", ".join(str(key) for key in sorted(decode_tiling_result))
+                CommonUtility.print_compile_log(
+                    "", f"Filtered tilingkey list is {{{filtered_keys}}} while kernel_name={op_info.kernel_name}.",
+                    AscendCLogLevel.LOG_INFO
+                )
             if len(tiling_key_list) == 0:
                 raise Exception("no match kernel template input!")
             # ==================== All SEL checks
