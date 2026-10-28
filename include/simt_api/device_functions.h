@@ -696,9 +696,9 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned long __brev(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(int x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long long x);
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(long long x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long x);
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __clz(long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __ffs(int x);
 
@@ -708,9 +708,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned int x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long long x);
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long long x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long x);
+static __SIMT_DEVICE_FUNCTIONS_DECL__ int __popc(unsigned long x);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s);
 

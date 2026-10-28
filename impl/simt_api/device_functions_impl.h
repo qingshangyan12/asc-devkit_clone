@@ -1937,56 +1937,28 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long __mul64hi(long long x, long long
     return res;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long long x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long long x)
 {
-    int2 val = (int2 &)x;
-    if (val.y == 0)
-        return __clz(val.x) + 32;
-    else
-        return __clz(val.y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __clz(long x)
-{
-    int2 val = (int2 &)x;
-    if (val.y == 0)
-        return __clz(val.x) + 32;
-    else
-        return __clz(val.y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long long a) {
-    int2 val = (int2 &)a;
-    return __popc(val.x) + __popc(val.y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __popc(unsigned long a) {
-    int2 val = (int2 &)a;
-    return __popc(val.x) + __popc(val.y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long long x) {
-    int2 val = (int2 &)x;
-    if (val.x == 0 && val.y == 0){
+    int2 val = (int2&)x;
+    if (val.x == 0 && val.y == 0) {
         return 0;
     }
     if (val.x == 0) {
         return __ffs(val.y) + 32;
-    }
-    else{
+    } else {
         return __ffs(val.x);
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long x) {
-    int2 val = (int2 &)x;
-    if (val.x == 0 && val.y == 0){
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __ffs(long x)
+{
+    int2 val = (int2&)x;
+    if (val.x == 0 && val.y == 0) {
         return 0;
     }
-    if (val.x == 0){
+    if (val.x == 0) {
         return __ffs(val.y) + 32;
-    }
-    else {
+    } else {
         return __ffs(val.x);
     }
 }
@@ -1999,9 +1971,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __saturatef(float x)
     return __fmaxf(0.0, __fminf(1.0, x));
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __sad(int x, int y, unsigned int z) {
-    return z + abs(x - y);
-}
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __sad(int x, int y, unsigned int z) { return z + abs(x - y); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __usad(unsigned int x, unsigned int y, unsigned int z)
 {
