@@ -1378,6 +1378,10 @@ def compile_op(
         compile_log_path,
         origin_func_name,
     )
+    from .deterministic import get_level_discovery_context
+
+    if get_level_discovery_context(get_context()) is not None:
+        return
     CommonUtility.print_compile_log(
         op_info.kernel_name, "precompile to get some simple kernel info success", AscendCLogLevel.LOG_INFO
     )
