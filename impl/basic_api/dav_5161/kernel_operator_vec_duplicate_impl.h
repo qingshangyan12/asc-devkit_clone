@@ -58,7 +58,6 @@ __aicore__ inline void DuplicateImpl(__ubuf__ T* dstLocal, const T& scalarValue,
 {
     CheckDuplicateSupportedType<T>();
     DuplicateFromScalarImpl<T, Reg::RegTensor<T, Reg::RegTraitNumOne>>(dstLocal, scalarValue, calCount);
-    
 }
 
 } // namespace AscendC

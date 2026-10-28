@@ -374,7 +374,7 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         Tuple<ActualT, ActualU>, Tuple<uint16_t, uint8_t>, Tuple<int16_t, int8_t>, Tuple<uint32_t, uint16_t>,
         Tuple<uint32_t, int16_t>, Tuple<int32_t, int16_t>, Tuple<float, half>, Tuple<float, bfloat16_t>,
         Tuple<half, hifloat8_t>, Tuple<half, uint8_t>, Tuple<half, int8_t>, Tuple<float, int16_t>,
-        Tuple<half, float8_e4m3_t>, Tuple<bfloat16_t, fp8_e8m0_t>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<float, hifloat8_t>,
+        Tuple<half, fp8_e4m3fn_t>, Tuple<bfloat16_t, fp8_e8m0_t>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<float, hifloat8_t>,
         Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>, Tuple<half, int4x2_t>, Tuple<int16_t, int4x2_t>>();
     constexpr bool satLayMergeCast = SupportType<
         Tuple<ActualT, ActualU>, Tuple<uint8_t, uint16_t>, Tuple<uint8_t, int16_t>, Tuple<uint16_t, uint32_t>,
