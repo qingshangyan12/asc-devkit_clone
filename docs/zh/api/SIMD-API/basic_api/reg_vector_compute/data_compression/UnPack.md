@@ -37,7 +37,6 @@
 <!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_compression/UnPack_res.md#id1 -->
 
-
 ## 功能说明<a name="section1922292299"></a>
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf.h"`。

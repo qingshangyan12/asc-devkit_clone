@@ -25,7 +25,6 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/GetUserTag_res.md#id1 -->
 
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 获取指定Tensor块的Tag信息，用户可以根据Tag信息对Tensor进行不同操作。

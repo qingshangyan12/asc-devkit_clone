@@ -147,7 +147,6 @@ struct l1_to_ub_trait_default {
 };
 ```
 
-
 ## 返回值说明
 
 `copy`无返回值。`make_copy`返回`copy_atom`对象。

@@ -25,7 +25,6 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/ToFile_res.md#id1 -->
 
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 只限于CPU调试，将LocalTensor数据Dump到文件中，用于精度调试，文件保存在执行目录。

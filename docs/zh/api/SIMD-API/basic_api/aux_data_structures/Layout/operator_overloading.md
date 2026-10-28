@@ -25,7 +25,6 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/operator_overloading_res.md#id1 -->
 
-
 ## 功能说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section36583473819"></a>
 
 重载运算符\(\)，内部实现为调用[Crd2Idx](../Coordinate/Crd2Idx.md)接口，将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index）。

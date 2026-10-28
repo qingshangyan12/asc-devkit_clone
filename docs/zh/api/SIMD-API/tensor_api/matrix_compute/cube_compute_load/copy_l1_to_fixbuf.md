@@ -146,7 +146,6 @@ struct l1_to_fixbuf_trait_default {
 };
 ```
 
-
 ## 数据类型
 
 源张量和目的张量的数据类型要求是`uint64_t`。

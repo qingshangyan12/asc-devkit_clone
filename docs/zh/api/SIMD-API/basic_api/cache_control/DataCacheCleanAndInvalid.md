@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -84,7 +78,6 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 > [!NOTE]说明 
 > 对于Atlas推理系列产品AI Core，仅支持不配置dcciDst参数的原型。
 <!-- end id14 -->
-
 
 ## 参数说明<a name="section622mcpsimp"></a>
 

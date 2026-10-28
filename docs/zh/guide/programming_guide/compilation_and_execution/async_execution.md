@@ -57,11 +57,8 @@ CANN Runtime内置默认计算流，所有未显式指定计算流的运算操�
 典型<<<\>\>\>异步调用的场景是：将主机与设备计算操作重叠执行，从而提升主机侧与设备侧计算资源利用率。
 ![核函数（Kernel）异步调用](../../figures/asynchronous_execution.png)
 
-
 同样地，将aclrtMemcpy替换成aclrtMemcpyAsync接口，可以实现主机与设备的内存传输与计算操作重叠执行，从而降低甚至消除内存传输带来的性能开销。
 ![内存传输异步并发执行](../../figures/asynchronous_execution_async.png)
-
-
 
 ## 同步等待
 

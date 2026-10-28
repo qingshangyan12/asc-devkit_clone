@@ -13,7 +13,6 @@
 
 上述编译过程示意图如下：
 
-
 ![](../../../../figures/operator_project_compilation_diagram.png "算子工程编译示意图")
 
 ### 基本流程
@@ -590,7 +589,6 @@ npu_op_package_add(${package_name}
         ascendc_kernels
 )
 ```
-
 
 > [!NOTE]说明
 > - 示例在顶层集中列出各算子的Host源文件和核函数（Kernel）源码信息，是为了展示`npu_op_*`接口的调用关系；如果工程有自己的目录封装，只要最终传给`npu_op_code_gen`的Host源文件、传给`npu_op_kernel_sources`的`OP_TYPE`/`KERNEL_DIR`/`KERNEL_FILE`，以及传给`npu_op_kernel_library`的`SRC_BASE`匹配即可。

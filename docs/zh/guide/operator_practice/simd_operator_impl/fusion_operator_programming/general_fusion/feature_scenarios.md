@@ -28,7 +28,6 @@ Atlas A2系列产品不支持通算融合算子的重执行。
 
 -   算子编译时，配置编译宏AICORE\_EXCEPTION\_RESTART，如下所示。具体的编译宏配置阶段和方式请参考[支持自定义编译选项](../../../../programming_guide/advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md#custom-compile-options)。
 
-
     ```
     add_ops_compile_options(ALL OPTIONS -DAICORE_EXCEPTION_RESTART)
     ```

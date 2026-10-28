@@ -114,7 +114,6 @@ aclrtCreateStream(&stream);
 CHECK_ACL(aclopExecuteV2(opType, inputDesc.size(), inputDesc.data(), inputBuffers.data(),
                              outputDesc.size(), outputDesc.data(), outputBuffers.data(), opAttr, stream));
 
-
 // 7.阻塞应用运行，直到指定Stream中的所有任务都完成
 aclrtSynchronizeStream(stream);
 

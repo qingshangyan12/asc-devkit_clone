@@ -25,7 +25,6 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetValue_res.md#id1 -->
 
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 设置LocalTensor中的某个值。
@@ -87,7 +86,6 @@ for (int32_t i = 0; i < srcLen; ++i) {
 }
 // 示例1结果如下：
 // 数据(inputLocal): [100 100 100  ... 100]
-
 
 // srcLen = 256, num = 99, M=50
 // 示例2

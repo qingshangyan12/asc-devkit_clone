@@ -114,7 +114,6 @@ bool __hbgeux2(half2 x, half2 y)
   </tr>
 </table>
 
-
 ## 约束说明
 
 无

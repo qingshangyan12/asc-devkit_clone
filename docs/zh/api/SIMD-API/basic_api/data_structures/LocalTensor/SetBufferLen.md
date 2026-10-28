@@ -25,7 +25,6 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetBufferLen_res.md#id1 -->
 
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 设置Buffer的元素个数。当用户调用operator\[\]函数创建新LocalTensor时，建议调用该接口设置新LocalTensor的元素个数，便于编译器对内存及同步进行自动优化。

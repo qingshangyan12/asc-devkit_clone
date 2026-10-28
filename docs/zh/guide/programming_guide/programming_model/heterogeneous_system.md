@@ -8,10 +8,8 @@
 
 下图演示了运行在Host CPU上的代码通过调用CANN Runtime API将核函数（Kernel）下发到AI Core的流程。由于Host Memory与Device Memory拥有独立的内存空间，需要显式调用Runtime API进行数据传输。典型流程为：Host代码先将输入数据从Host Memory传输到Device Memory，随后启动Device侧核函数（Kernel）并等待其执行完成，最后将计算结果从Device Memory拷贝回Host Memory。
 
-
 **图1**  核函数（Kernel）调度示意图<a name="fig573916102285"></a><br>
 <img src="../../figures/kernel_sched_2.png" alt="核函数（Kernel）调度示意图" width="520px">
-
 
 >[!NOTE]说明
 > 关于Task/Stream等Runtime运行时管理的详细介绍，请参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/9.3.0-beta.1/docs/zh/api_ref/README.md)。

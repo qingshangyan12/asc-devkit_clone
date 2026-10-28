@@ -52,7 +52,6 @@
 <!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_constructor_res.md#id2 -->
 
-
 ## 功能说明<a name="section618mcpsimp"></a>
 
 LocalTensor构造函数。

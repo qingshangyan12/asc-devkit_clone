@@ -25,12 +25,6 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id1 -->
 
 ### 传入bias的原型
@@ -56,12 +50,6 @@
 <!-- npu="910" id16 -->
 - Atlas训练系列产品：不支持
 <!-- end id16 -->
-<!-- npu="x90" id17 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id17 -->
-<!-- npu="9030" id18 -->
-- Kirin 9030处理器系列产品：不支持
-<!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id2 -->
 
 ## 功能说明
@@ -263,25 +251,6 @@ Atlas A2系列产品
 | half | half | float |
 
 <!-- end id26 -->
-
-<!-- npu="x90" id27 -->
-**表11** dst、fm、filter、bias支持的精度类型组合（Kirin X90处理器系列产品）
-
-| 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
-| --- | --- | --- | --- |
-| int8_t | int8_t | int32_t | int32_t |
-| half | half | half | half |
-
-<!-- end id27 -->
-
-<!-- npu="9030" id28 -->
-**表12** dst、fm、filter、bias支持的精度类型组合（Kirin 9030处理器系列产品）
-
-| 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
-| --- | --- | --- | --- |
-| half | half | half | half |
-
-<!-- end id28 -->
 
 ## 返回值说明
 

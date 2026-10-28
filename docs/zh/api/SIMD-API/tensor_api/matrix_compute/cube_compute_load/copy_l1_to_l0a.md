@@ -225,7 +225,6 @@ struct img2col_params {
 | enable_f_matrix_ctrl | `false` | FeatureMap属性选择标识，当前仅支持`false`。 |
 | pad_value | `0` | padding区域的填充值。模板参数PadType通常需要与目的张量的元素类型一致。目的张量为`fp8_e4m3fn_t`、`fp8_e5m2_t`或`hifloat8_t`类型时，不支持直接使用对应的8位浮点类型作为PadType，需要先将padding值转换为接口支持的整型编码后传入。 |
 
-
 ## 数据类型
 
 支持的数据类型包括：

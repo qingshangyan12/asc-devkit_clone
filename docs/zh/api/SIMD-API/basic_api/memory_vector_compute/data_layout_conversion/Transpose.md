@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 <!-- npu="9050" id10 -->
 - Kirin 9050处理器系列产品：支持
 <!-- end id10 -->
@@ -173,30 +167,6 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 
 <!-- end id14 -->
 
-<!-- npu="x90" id15 -->
-
-**表**  Kirin X90处理器系列产品 sharedTmpBuffer所需的内存<a id="table4"></a>
-
-| transposeType | sharedTmpBuffer所需的大小 |
-| :-- | :-- |
-| TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
-| TRANSPOSE_NCHW2NHWC | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<br>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize + 2)  * h0 \* w0 \* sizeof(type); |
-| TRANSPOSE_NHWC2NCHW | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<br>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize \* 2 + 1) \* h0 \* w0 \* sizeof(type); |
-
-<!-- end id15 -->
-
-<!-- npu="9030" id16 -->
-
-**表**  Kirin 9030处理器系列产品 sharedTmpBuffer所需的内存<a id="table4"></a>
-
-| transposeType | sharedTmpBuffer所需的大小 |
-| :-- | :-- |
-| TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
-| TRANSPOSE_NCHW2NHWC | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<br>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize + 2)  * h0 \* w0 \* sizeof(type); |
-| TRANSPOSE_NHWC2NCHW | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<br>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize \* 2 + 1) \* h0 \* w0 \* sizeof(type); |
-
-<!-- end id16 -->
-
 ## 数据类型
 
 - 普通转置：
@@ -224,14 +194,6 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
   <!-- npu="910" id22 -->
   Atlas训练系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
   <!-- end id22 -->
-
-  <!-- npu="x90" id23 -->
-  Kirin X90处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
-  <!-- end id23 -->
-
-  <!-- npu="9030" id24 -->
-  Kirin 9030处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
-  <!-- end id24 -->
 
   <!-- npu="9050" id36 -->
   Kirin 9050处理器系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
@@ -289,14 +251,6 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
     <!-- npu="310p" id33 -->
     Atlas推理系列产品AI Core，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
     <!-- end id33 -->
-
-    <!-- npu="x90" id34 -->
-    Kirin X90处理器系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
-    <!-- end id34 -->
-
-    <!-- npu="9030" id35 -->
-    Kirin 9030处理器系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
-    <!-- end id35 -->
 
     <!-- npu="9050" id40 -->
     Kirin 9050处理器系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。

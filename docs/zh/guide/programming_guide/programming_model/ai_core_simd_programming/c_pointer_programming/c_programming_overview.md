@@ -16,7 +16,6 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 <img src="../../../../figures/aicore_mem_2.png" alt="AI Core存储层次结构" width="800"/>
 
-
 ### 外部存储（Global Memory）
 
 Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数（Kernel）可直接访问Global Memory。Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
@@ -117,7 +116,6 @@ __global__ __vector__ void add_custom(...) {
 #### AIV内部存储之Register File
 
 [NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./reg_vector_computation.md)中，有关寄存器类型等描述。
-
 
 #### AIC内部存储L1 Buffer & L0 Buffer
 
@@ -373,7 +371,6 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 ### Mix CV融合计算
 
 将矢量计算与矩阵计算融合在同一个算子中，即为CV融合算子，可进一步提升整体性能。开发者可根据业务场景，自由融合Vector、Cube算子以优化性能 —— 融合了Cube计算和Vector计算的算子统称为CV融合算子。例如LLM大模型核心的Flash Attention算子，就是将Matmul（Cube）、Scale（Vector）、Mask（Vector）、SoftMax（Vector）等操作融合为一个算子，核心实现如下：
-
 
 ![Flash Attention核心实现](../../../../figures/flash_attn.png)
 

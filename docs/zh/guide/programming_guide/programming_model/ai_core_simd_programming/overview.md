@@ -24,7 +24,6 @@ AI Core是昇腾NPU的基础核心计算单元，采用「控制单元\+异构�
 
 - **本地存储**：AI Core片内高速存储体系，用于缓存计算中间数据，规避频繁访问低速全局内存的性能损耗，降低访存延迟。其中Cube计算单元配套[L1 Buffer](../../advanced_programming/hardware_implementation/basic_architecture.md)、[L0C Buffer](../../advanced_programming/hardware_implementation/basic_architecture.md)等；Vector计算单元配套统一缓存[Unified Buffer（UB）](../../advanced_programming/hardware_implementation/basic_architecture.md)。<!-- npu="950" id1 -->Ascend 950PR&950DT系列产品的AI Core向量单元新增可编程向量寄存器（Register），单寄存器大小为256B。<!-- end id1 -->
 
-
 ### 基于硬件单元的三类标准算子
 
 根据算子核心计算逻辑对硬件单元的依赖差异，AI Core算子可划分为三大标准类型，通过专属修饰符标准化硬件资源调度规则，统一全域算子开发规范：
