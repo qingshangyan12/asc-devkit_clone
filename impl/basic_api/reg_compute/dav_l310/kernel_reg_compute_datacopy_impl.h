@@ -112,24 +112,14 @@ __simd_callee__ inline void DataCopyImpl(RegT& dstReg, __ubuf__ T*& srcUbAddr, i
 {
     using ActualT = typename RegT::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     CheckLoadDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
 
-    if constexpr (SupportBytes<ActualT, 8>()) {
-        if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
-            vlds(
-                (RegTensor<uint32_t>&)dstReg, (__local_mem__ uint32_t*&)srcUbAddr, postUpdateStride * 2, distValue,
-                postValue);
-        } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            constexpr auto dintlvDist =
-                std::integral_constant<::Dist, static_cast<::Dist>(LoadDist::DIST_DINTLV_B32)>();
-            vlds(
-                (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1],
-                (__local_mem__ uint32_t*&)srcUbAddr, postUpdateStride * 2, dintlvDist, postValue);
-        }
+    if constexpr (SupportBytes<ActualT, 1>()) {
+        vlds((RegTensor<uint8_t>&)dstReg, (__ubuf__ uint8_t*&)srcUbAddr, postUpdateStride, distValue, postValue);
     } else {
-        static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
         if constexpr (Std::is_same_v<T, bool>) {
             vlds((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*&)srcUbAddr, postUpdateStride, distValue, postValue);
         } else if constexpr (SupportBytes<ActualT, 4>()) {
@@ -688,7 +678,7 @@ __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "Load only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "Load only support type b8/b16/b32 on current device");
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     UnalignRegForLoad ureg;
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
@@ -711,7 +701,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstUbAddr, MaskReg& mask, A
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstUbAddr, MaskReg& mask)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
         "StoreAlign not support this dist on current device");
@@ -742,7 +732,7 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_t c
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "Store only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "Store only support type b8/b16/b32 on current device");
     UnalignRegForStore ureg;
     DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstAddr, srcReg, ureg, count);
     DataCopyUnAlignPostImpl<T, PostLiteral::POST_MODE_UPDATE>(dstAddr, ureg, 0);
