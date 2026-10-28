@@ -44,6 +44,9 @@
 <!-- npu="9030" id14 -->
 - Kirin9030：支持
 <!-- end id14 -->
+<!-- npu="9050" id16 -->
+- Kirin9050：支持
+<!-- end id16 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -124,8 +127,11 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 当RegTensor模板参数regTrait为RegTraitNumOne时，支持的数据类型为：b8、b16、b32、b64。
 - 当RegTensor模板参数regTrait为RegTraitNumTwo时，支持的数据类型为：complex32、b64。
 <!-- npu="9020" id15 -->
-- Kirin9020处理器系列产品：仅支持RegTraitNumOne，不支持RegTraitNumTwo，支持的数据类型为：b8、b16（不支持bfloat16_t）、b32、b64。
+- Kirin9020处理器系列产品：仅支持RegTraitNumOne，不支持RegTraitNumTwo，支持的数据类型为：b8、b16（不支持bfloat16_t）、b32。
 <!-- end id15 -->
+<!-- npu="9050" id17 -->
+- Kirin9050处理器系列产品：仅支持RegTraitNumOne，不支持RegTraitNumTwo，支持的数据类型为：b8、b16（不支持bfloat16_t）、b32。
+<!-- end id17 -->
 
 ## 返回值说明
 

@@ -44,6 +44,9 @@
 <!-- npu="9030" id14 -->
 - Kirin9030：不支持
 <!-- end id14 -->
+<!-- npu="9050" id15 -->
+- Kirin9050：不支持
+<!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_MaskReg_res.md#id1 -->
 
 ## 功能说明
