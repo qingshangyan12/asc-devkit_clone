@@ -75,6 +75,24 @@ static inline int __popc(unsigned int x)
     return count;
 }
 
+static inline int __ffs(unsigned int x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    int lsb = x & (~x + 1);
+    return __builtin_ctz(lsb) + 1;
+}
+
+static inline int __clz(int x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    int lsb = x & (~x + 1);
+    return __builtin_ctz(lsb) + 1;
+}
+
 static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
 {
     uint32_t a0 = (uint32_t)x;
