@@ -33,6 +33,9 @@ HcclResult InheritKfcServerKernelArg(
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+    // 构图期宿主常量：MissionPreSync 按 mission 选择同步 tag 依赖它（CCU_IF 是运行时分支，
+    // 两个分支的 tag 注册都会执行，会造成双 mission kernel 间 exported tag 冲突）
+    kfcArg->hostMissionIndex = missionIndex;
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         const auto* baseArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
         CHK_PTR_NULL(baseArg);
