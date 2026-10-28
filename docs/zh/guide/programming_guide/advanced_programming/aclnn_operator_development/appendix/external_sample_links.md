@@ -11,7 +11,7 @@
 
 ### msOpGen工具生成自定义算子工程模板
 
-- [msOpGen样例](https://gitcode.com/cann/asc-tools/tree/master/examples/03_msopgen)。
+- [msOpGen样例](https://gitcode.com/cann/asc-tools/tree/9.3.0-beta.1/examples/03_msopgen)。
   - 说明：基于AddCustom算子演示如何使用msOpGen工具生成自定义算子工程模板，并通过ACLNN调用示例验证生成的自定义算子。
 
 ### TilingData传递属性
@@ -54,5 +54,5 @@
 
 ## 其他参考
 
-- [《图开发》](https://gitcode.com/cann/ge/blob/master/docs/zh/user_guides/graph_dev/README.md)。
+- [《图开发》](https://gitcode.com/cann/ge/blob/9.3.0-beta.1/docs/zh/user_guides/graph_dev/README.md)。
   - 说明：Ascend Graph图开发的完整指南，适用于算子入图场景。
