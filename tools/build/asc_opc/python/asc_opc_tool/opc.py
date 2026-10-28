@@ -207,6 +207,11 @@ class OpcOptionParser:
             "whether to compile operators in deterministic mode. \
                              Default value: all",
         )
+        self.__define_option(
+            OpcOptions.DETERMINISTIC_LEVEL,
+            None,
+            "offline deterministic levels: 0, 1, 2, 3 or comma separated deterministic levels",
+        )
         self.__define_option(OpcOptions.SIMPLE_KEY_MODE, None, "simplified key mode.")
         self.__define_option(OpcOptions.DYNAMIC_PARAM_MODE, None, "dynamic param mode.")
         self.__define_option(OpcOptions.TILING_KEY, None, "tiling key list.")
@@ -662,6 +667,16 @@ class OpcOptionParser:
         if deterministic not in {"all", "true", "false"}:
             logger.error("Invalid deterministic option {}, support all/true/false.".format(deterministic))
             return False
+
+        from asc_op_compile_base.common.deterministic import normalize_deterministic
+
+        levels = self.get_option(OpcOptions.DETERMINISTIC_LEVEL)
+        if levels is not None:
+            try:
+                normalize_deterministic(None if deterministic == "all" else deterministic, levels)
+            except ValueError as error:
+                logger.error(str(error))
+                return False
 
         if not self.check_simplified_mode_params():
             return False

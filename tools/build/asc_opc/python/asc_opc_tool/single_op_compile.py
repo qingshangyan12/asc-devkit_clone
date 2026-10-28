@@ -17,6 +17,8 @@ opc single op compile
 import copy
 import inspect
 
+from asc_op_compile_base.common.deterministic import parse_levels
+
 import asc_op_compile_base.common.utils.log as logger
 
 from asc_op_compile_base.common.buildcfg import build_config
@@ -207,7 +209,17 @@ class SingleOpCompile:
                 context.add_addition(OpcOptions.SPK_OPT, sub_kernel_option)
                 context.add_addition(OpcOptions.OUTPUT, output_path)
                 context.add_addition(OpcOptions.KERNEL_TEMPLATE_INPUT, kernel_template_input)
+                context.add_addition(
+                    "deterministic_level_filter", parse_levels(self.__op_info.get(OpcOptions.DETERMINISTIC_LEVEL))
+                )
+                context.add_addition(
+                    "deterministic_discovery_only", self.__op_info.get("_deterministic_discovery_only", False)
+                )
                 op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
+                if self.__op_info.get("_deterministic_discovery_only"):
+                    if not context.get_addition("deterministic_discovery_complete"):
+                        raise RuntimeError("AscendC wrapper did not complete selector preprocessing")
+                    return context.get_addition("declared_deterministic_level_groups") or []
 
                 # fetch json file path for build result.
                 json_file_path = context.get_build_res("json_file_path")
@@ -231,7 +243,17 @@ class SingleOpCompile:
                 context.add_addition(OpcOptions.SPK_OPT, sub_kernel_option)
                 context.add_addition(OpcOptions.OUTPUT, output_path)
                 context.add_addition(OpcOptions.KERNEL_TEMPLATE_INPUT, kernel_template_input)
+                context.add_addition(
+                    "deterministic_level_filter", parse_levels(self.__op_info.get(OpcOptions.DETERMINISTIC_LEVEL))
+                )
+                context.add_addition(
+                    "deterministic_discovery_only", self.__op_info.get("_deterministic_discovery_only", False)
+                )
                 op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
+                if self.__op_info.get("_deterministic_discovery_only"):
+                    if not context.get_addition("deterministic_discovery_complete"):
+                        raise RuntimeError("AscendC wrapper did not complete selector preprocessing")
+                    return context.get_addition("declared_deterministic_level_groups") or []
 
                 # fetch json file path for build result.
                 json_file_path = context.get_build_res("json_file_path")
@@ -253,7 +275,17 @@ class SingleOpCompile:
                 context.add_addition(OpcOptions.SPK_OPT, sub_kernel_option)
                 context.add_addition(OpcOptions.OUTPUT, output_path)
                 context.add_addition(OpcOptions.KERNEL_TEMPLATE_INPUT, kernel_template_input)
+                context.add_addition(
+                    "deterministic_level_filter", parse_levels(self.__op_info.get(OpcOptions.DETERMINISTIC_LEVEL))
+                )
+                context.add_addition(
+                    "deterministic_discovery_only", self.__op_info.get("_deterministic_discovery_only", False)
+                )
                 op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
+                if self.__op_info.get("_deterministic_discovery_only"):
+                    if not context.get_addition("deterministic_discovery_complete"):
+                        raise RuntimeError("AscendC wrapper did not complete selector preprocessing")
+                    return context.get_addition("declared_deterministic_level_groups") or []
 
                 # fetch json file path for build result.
                 json_file_path = context.get_build_res("json_file_path")
@@ -314,9 +346,10 @@ class SingleOpCompile:
             "enable_super_kernel": enable_super_kernel,
         }
 
-        if deterministic_level != "":
-            build_config_kwargs["deterministic_level"] = deterministic_level
-            logger.debug("deterministic_level is {}".format(deterministic_level))
+        levels = parse_levels(deterministic_level)
+        if levels is not None:
+            # Runtime scalar is distinct from the offline multi-level selector.
+            build_config_kwargs["deterministic_level"] = levels[0] if len(levels) == 1 else -1
 
         with build_config(**build_config_kwargs):
             json_file_path = self.__call_op()
