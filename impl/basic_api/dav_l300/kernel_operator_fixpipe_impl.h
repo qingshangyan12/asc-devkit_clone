@@ -220,6 +220,28 @@ __aicore__ inline void SetLoop3Para(const FixpipeParamsL300<config.format>& intr
 
 // contains loop info and cal n size for each loop
 // move data L0C->L1
+namespace Internal {
+template <typename DstT, const FixpipeConfig& config>
+__aicore__ inline void ResolveFixpipeOffsetsL300(
+    const FixpipeParamsL300<config.format>& intriParams, const FixpipeTiling& fixpipeTiling, uint16_t nIterIndex,
+    uint32_t& srcOffset, uint32_t& dstOffset, bool& nz2ndEn)
+{
+    uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
+    // Loop1_src_stride in unit of C0_size
+    srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
+    dstOffset = 0;
+    // If NZ2ND/NZ2DN is enabled, it is the dst_D value in unit of element. Loop2_dst_stride
+    // If NZ2ND/NZ2DN is disabled, it is in unit of element, Loop1_dst_stride
+    nz2ndEn = false;
+    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
+        dstOffset = nIterIndex * fixpipeTiling.nSize;
+        nz2ndEn = true;
+    } else {
+        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
+    }
+}
+} // namespace Internal
+
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL0cToL1(
     __cbuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL300<config.format>& intriParams,
@@ -231,19 +253,11 @@ __aicore__ inline void FixpipeL0cToL1(
             KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
                           "L0C Buffer(CO1) and dst position is L1 Buffer(C1), isChannelSplit must be set as false \n"));
 
-    uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
-    // Loop1_src_stride in unit of C0_size
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
-    uint32_t dstOffset = 0;
-    // If NZ2ND/NZ2DN is enabled, it is the dst_D value in unit of element. Loop2_dst_stride
-    // If NZ2ND/NZ2DN is disabled, it is in unit of element, Loop1_dst_stride
-    bool nz2ndEn = false;
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        dstOffset = nIterIndex * fixpipeTiling.nSize;
-        nz2ndEn = true;
-    } else {
-        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    bool nz2ndEn;
+    Internal::ResolveFixpipeOffsetsL300<DstT, config>(
+        intriParams, fixpipeTiling, nIterIndex, srcOffset, dstOffset, nz2ndEn);
     // LOC -> L1 only n direction need fixpipeTiling, m no need fixpipeTiling
     return copy_matrix_cc_to_cbuf(
         (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
@@ -293,16 +307,11 @@ __aicore__ inline void FixpipeL0cToOut(
                 KERNEL_ERROR, "Failed to check format value in Fixpipe, "
                               "when isChannelSplit is set true, format must be set as NZ \n"));
     }
-    uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
-    uint32_t dstOffset = 0;
-    bool nz2ndEn = false;
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        dstOffset = nIterIndex * fixpipeTiling.nSize;
-        nz2ndEn = true;
-    } else {
-        dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    bool nz2ndEn;
+    Internal::ResolveFixpipeOffsetsL300<DstT, config>(
+        intriParams, fixpipeTiling, nIterIndex, srcOffset, dstOffset, nz2ndEn);
     if constexpr (g_gm_overflow_check) {
         bool isSrc = false;
         uint16_t dstEleSize = sizeof(DstT);

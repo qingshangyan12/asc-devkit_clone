@@ -24,6 +24,7 @@
 #define IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_GRAD_IMPL_H
 
 #include "softmax_common_impl.h"
+#include "softmax_tail_state.h"
 
 namespace AscendC {
 template <typename T>
@@ -136,19 +137,9 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
         SoftmaxGradFrontGenericNDImpl(
             dstTensor, gradTensor, srcTensor, workLocal, tiling, offset1, offset2, splitSize, reduceSize,
             reduceSumParam);
-        offset1 += tiling.splitSize;
-        offset2 += tiling.reduceSize;
-        if (i == (tiling.rangeM - 1)) {
-            if (tiling.tailM == 0) {
-                break;
-            }
-            offset1 = tiling.rangeM * tiling.splitSize;
-            offset2 = tiling.rangeM * tiling.reduceSize;
-            splitSize = tiling.tailSplitSize;
-            reduceSize = tiling.tailReduceSize;
-            reduceSumParam.originalSrcM = tiling.tailM;
-            reduceSumParam.srcM = tiling.tailM;
-            reduceSumParam.dstM = tiling.tailM;
+        if (!Internal::AdvanceSoftmaxV300Tail<true>(
+                tiling, i, offset1, offset2, splitSize, reduceSize, reduceSumParam)) {
+            break;
         }
     }
 #endif
@@ -208,19 +199,8 @@ __aicore__ inline void SoftmaxGradPostProcess(
         for (uint32_t i = 0; i <= tiling.rangeM; i++) {
             SoftMaxGradGenericNDImpl(
                 dst, gradTensor, src, workLocal, tiling, offset1, offset2, splitSize, reduceSize, reduceParam);
-            offset1 += tiling.splitSize;
-            offset2 += tiling.reduceSize;
-            if (i == (tiling.rangeM - 1)) {
-                if (tiling.tailM == 0) {
-                    break;
-                }
-                offset2 = tiling.rangeM * tiling.reduceSize;
-                offset1 = tiling.rangeM * tiling.splitSize;
-                splitSize = tiling.tailSplitSize;
-                reduceSize = tiling.tailReduceSize;
-                reduceParam.originalSrcM = tiling.tailM;
-                reduceParam.srcM = tiling.tailM;
-                reduceParam.dstM = tiling.tailM;
+            if (!Internal::AdvanceSoftmaxV300Tail(tiling, i, offset1, offset2, splitSize, reduceSize, reduceParam)) {
+                break;
             }
         }
     }

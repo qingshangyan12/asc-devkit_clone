@@ -211,6 +211,16 @@ void GetReduceProdMaxMinTmpSize(
     maxValue = minValue = k * ((last * GetTypeSize(dataType) + ONE_BLK_SIZE - 1u) / ONE_BLK_SIZE * ONE_BLK_SIZE);
 }
 
+namespace {
+inline bool IsExtendedReduceExtremaType(const AscendC::TensorDataType dataType)
+{
+    return dataType == ge::DT_INT8 || dataType == ge::DT_UINT8 || dataType == ge::DT_INT16 ||
+           dataType == ge::DT_UINT16 || dataType == ge::DT_FLOAT16 || dataType == ge::DT_BF16 ||
+           dataType == ge::DT_INT32 || dataType == ge::DT_UINT32 || dataType == ge::DT_FLOAT ||
+           dataType == ge::DT_INT64 || dataType == ge::DT_UINT64;
+}
+} // namespace
+
 void GetReduceMaxMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
     bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
@@ -220,11 +230,7 @@ void GetReduceMaxMaxMinTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201) {
         ASCENDC_HOST_ASSERT(
-            dataType == ge::DT_INT8 || dataType == ge::DT_UINT8 || dataType == ge::DT_INT16 ||
-                dataType == ge::DT_UINT16 || dataType == ge::DT_FLOAT16 || dataType == ge::DT_BF16 ||
-                dataType == ge::DT_INT32 || dataType == ge::DT_UINT32 || dataType == ge::DT_FLOAT ||
-                dataType == ge::DT_INT64 || dataType == ge::DT_UINT64,
-            return, "[ReduceMax][GetReduceMaxMaxMinTmpSize] it only supports \
+            IsExtendedReduceExtremaType(dataType), return, "[ReduceMax][GetReduceMaxMaxMinTmpSize] it only supports \
                 int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t \
                 type on this platform.");
     } else {
@@ -246,11 +252,7 @@ void GetReduceMinMaxMinTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201) {
         ASCENDC_HOST_ASSERT(
-            dataType == ge::DT_INT8 || dataType == ge::DT_UINT8 || dataType == ge::DT_INT16 ||
-                dataType == ge::DT_UINT16 || dataType == ge::DT_FLOAT16 || dataType == ge::DT_BF16 ||
-                dataType == ge::DT_INT32 || dataType == ge::DT_UINT32 || dataType == ge::DT_FLOAT ||
-                dataType == ge::DT_INT64 || dataType == ge::DT_UINT64,
-            return, "[ReduceMin][GetReduceMinMaxMinTmpSize] it only supports \
+            IsExtendedReduceExtremaType(dataType), return, "[ReduceMin][GetReduceMinMaxMinTmpSize] it only supports \
                 int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t \
                 type on this platform.");
     } else {

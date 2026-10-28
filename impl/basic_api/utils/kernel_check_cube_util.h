@@ -24,6 +24,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "../kernel_utils.h"
+#include "kernel_check_tensor_metadata.h"
 namespace AscendC {
 namespace check {
 struct MmadApiParams {
@@ -195,14 +196,8 @@ struct LoadData2dApiParams {
         dstGap = dstGapIn;
         ifTranspose = ifTransposeIn;
         addrMode = addrModeIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     uint64_t dstAddr = 0;
     uint64_t srcAddr = 0;
@@ -241,14 +236,8 @@ struct LoadData2dv2ApiParams {
         dstStride = dstStrideIn;
         ifTranspose = ifTransposeIn;
         sid = sidIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     uint64_t dstAddr = 0;
     uint64_t srcAddr = 0;
@@ -302,14 +291,8 @@ struct LoadData3dv1ApiParams {
         repeatMode = repeatModeIn;
         repeatTime = repeatTimeIn;
         cSize = cSizeIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     uint64_t dstAddr = 0;
     uint64_t srcAddr = 0;
@@ -373,14 +356,8 @@ struct LoadData3dv2ApiParams {
         filterSizeW = false;
         filterSizeH = false;
         fMatrixCtrl = false;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     uint64_t dstAddr = 0;
     uint64_t srcAddr = 0;
@@ -440,14 +417,8 @@ struct LoadData3dv2ProApiParams {
         filterSizeW = false;
         filterSizeH = false;
         fMatrixCtrl = false;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
     }
     uint64_t dstAddr = 0;
     uint64_t srcAddr = 0;

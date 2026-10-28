@@ -738,6 +738,18 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
 }
 
+template <typename T, typename CopyParams>
+__aicore__ inline void DataCopyPadL12GMCheckedCopy(__gm__ T* dst, __cbuf__ T* src, const CopyParams& intriParams)
+{
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
+    }
+    copy_cbuf_to_gm_align(
+        dst, src, 0, static_cast<uint16_t>(intriParams.blockCount), intriParams.blockLen,
+        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+}
+
 template <typename T>
 __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
@@ -747,13 +759,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
                 KERNEL_ERROR, "unsupported dtype for data copy from L1 Buffer(TSCM) to global on current device");
         });
     }
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
-    copy_cbuf_to_gm_align(
-        dst, src, 0, static_cast<uint16_t>(intriParams.blockCount), intriParams.blockLen,
-        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadL12GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>
@@ -765,13 +771,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
                 KERNEL_ERROR, "unsupported dtype for data copy from L1 Buffer(TSCM) to global on current device");
         });
     }
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
-    }
-    copy_cbuf_to_gm_align(
-        dst, src, 0, static_cast<uint16_t>(intriParams.blockCount), intriParams.blockLen,
-        static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
+    DataCopyPadL12GMCheckedCopy(dst, src, intriParams);
 }
 
 template <typename T>

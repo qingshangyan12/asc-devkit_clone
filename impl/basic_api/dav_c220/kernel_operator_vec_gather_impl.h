@@ -49,6 +49,30 @@ __aicore__ inline void GatherbImpl(
     }
 }
 
+namespace Internal {
+template <typename T, bool isArrayMask, typename Mask>
+__aicore__ inline void GatherWithMaskKind(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* srcOffsetLocal, const uint32_t srcLength,
+    const uint32_t srcBaseOffset, const Mask& mask, const uint8_t repeatTime, const uint16_t dstRepStride)
+{
+    uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseOffset;
+#if ASCENDC_CPU_DEBUG
+    uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseOffset;
+    SetModelGatherbSrc0Tensor(cpuAddr, srcLength);
+#endif
+    if constexpr (isArrayMask) {
+        AscendCUtils::SetMask<T>(mask[1], mask[0]);
+    } else {
+        AscendCUtils::SetMask<T>(mask);
+    }
+    if constexpr (sizeof(T) == sizeof(uint16_t)) {
+        vgather((__ubuf__ uint16_t*)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
+    } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
+        vgather((__ubuf__ uint32_t*)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
+    }
+}
+} // namespace Internal
+
 template <typename T>
 __aicore__ inline void GatherImpl(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* srcOffsetLocal, const uint32_t srcLength,
@@ -61,17 +85,8 @@ __aicore__ inline void GatherImpl(
                 KERNEL_ERROR,
                 "Failed to check dtype in Gather, current api support dtype combination "
                 "is src and dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t.\n"));
-        uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseOffset;
-#if ASCENDC_CPU_DEBUG
-        uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseOffset;
-        SetModelGatherbSrc0Tensor(cpuAddr, srcLength);
-#endif
-        AscendCUtils::SetMask<T>(mask);
-        if constexpr (sizeof(T) == sizeof(uint16_t)) {
-            vgather((__ubuf__ uint16_t*)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
-        } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
-            vgather((__ubuf__ uint32_t*)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
-        }
+        Internal::GatherWithMaskKind<T, false>(
+            dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
     }
 }
 
@@ -87,19 +102,8 @@ __aicore__ inline void GatherImpl(
                 KERNEL_ERROR,
                 "Failed to check dtype in Gather, current api support dtype combination "
                 "is src and dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t.\n"));
-        uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseOffset;
-#if ASCENDC_CPU_DEBUG
-        uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseOffset;
-        SetModelGatherbSrc0Tensor(cpuAddr, srcLength);
-#endif
-        AscendCUtils::SetMask<T>(mask[1], mask[0]);
-        if constexpr (sizeof(T) == sizeof(uint16_t)) {
-            vgather(
-                (__ubuf__ uint16_t*)dstLocal, (__ubuf__ uint32_t*)srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
-        } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
-            vgather(
-                (__ubuf__ uint32_t*)dstLocal, (__ubuf__ uint32_t*)srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
-        }
+        Internal::GatherWithMaskKind<T, true>(
+            dstLocal, srcLocal, srcOffsetLocal, srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
     }
 }
 } // namespace AscendC

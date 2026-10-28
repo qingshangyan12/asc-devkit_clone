@@ -62,18 +62,13 @@ public:
         uint32_t dst_shape_columns = get_element<attr_info::shape, attr_info::column, 1>(dst.layout());
         uint32_t dst_stride_rows = get_matrix_element<attr_info::stride, attr_info::row, 1>(dst.layout());
 
-        uint32_t block_count = src_shape_rows;
-        uint32_t block_len = src_shape_columns * sizeof(type);
-        uint64_t src_stride = src_stride_rows * sizeof(type);
-        uint32_t dst_stride = dst_stride_rows * sizeof(type);
-        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
-            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
-             src_stride_rows == dst_stride_rows)) {
-            block_count = 1;
-            block_len = src_shape_rows * src_shape_columns * sizeof(type);
-            src_stride = 0;
-            dst_stride = block_len;
-        }
+        uint32_t block_count;
+        uint32_t block_len;
+        uint64_t src_stride;
+        uint32_t dst_stride;
+        make_compact_block_params<type>(
+            src_shape_rows, src_shape_columns, src_stride_rows, dst_shape_columns, dst_stride_rows, block_count,
+            block_len, src_stride, dst_stride);
         if constexpr (is_b4_type<type>) {
             block_len >>= 1;
             src_stride >>= 1;
@@ -86,6 +81,26 @@ public:
     }
 
 private:
+    template <typename Type>
+    __aicore__ inline static void make_compact_block_params(
+        uint32_t src_shape_rows, uint32_t src_shape_columns, uint32_t src_stride_rows, uint32_t dst_shape_columns,
+        uint32_t dst_stride_rows, uint32_t& block_count, uint32_t& block_len, uint64_t& src_stride,
+        uint32_t& dst_stride)
+    {
+        block_count = src_shape_rows;
+        block_len = src_shape_columns * sizeof(Type);
+        src_stride = src_stride_rows * sizeof(Type);
+        dst_stride = dst_stride_rows * sizeof(Type);
+        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
+            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
+             src_stride_rows == dst_stride_rows)) {
+            block_count = 1;
+            block_len = src_shape_rows * src_shape_columns * sizeof(Type);
+            src_stride = 0;
+            dst_stride = block_len;
+        }
+    }
+
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static constexpr void check_template()
     {
@@ -131,21 +146,13 @@ private:
         // normal mode, dst_stride % c0_size should be 0
         // compact mode, block_len equals dst_stride
         // multi rows copy, dst non-contiguous case
-        uint32_t block_count = src_shape_rows;
-        uint32_t block_len = src_shape_columns * sizeof(type);
-        uint64_t src_stride = src_stride_rows * sizeof(type);
-        uint32_t dst_stride = dst_stride_rows * sizeof(type);
-
-        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
-            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
-             src_stride_rows == dst_stride_rows)) {
-            // compact mode, one line
-            block_count = 1;
-            // must use srcShape, there is a scenario of small to large, using dstShape will cause src out of bound
-            block_len = src_shape_rows * src_shape_columns * sizeof(type);
-            src_stride = 0;
-            dst_stride = block_len;
-        }
+        uint32_t block_count;
+        uint32_t block_len;
+        uint64_t src_stride;
+        uint32_t dst_stride;
+        make_compact_block_params<type>(
+            src_shape_rows, src_shape_columns, src_stride_rows, dst_shape_columns, dst_stride_rows, block_count,
+            block_len, src_stride, dst_stride);
         if constexpr (is_b4_type<type>) {
             // move fp4 as b8, need to be divided by 2
             block_len = block_len >> 1;

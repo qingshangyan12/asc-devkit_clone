@@ -21,6 +21,7 @@
 #endif
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_BASE_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_BASE_IMPL_H
+#include "softmax_common/softmax_shape_metadata.h"
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 3003 || \
                               __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
@@ -52,13 +53,7 @@ __aicore__ inline void SoftMaxImpl(
     ShapeInfo srcShape = src.GetShapeInfo();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxLastAxisMetadata(srcShape, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     // when the shape is changed, need recalculate the softmax's tiling
     if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
         SoftMaxTiling newTiling = tiling;
@@ -107,13 +102,7 @@ __aicore__ inline void SoftMaxImpl(
     ShapeInfo srcShape = src.GetShapeInfo();
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxLastAxisMetadata(srcShape, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (isDataFormatNZ) {
         // when the shape is changed, need recalculate the softmax's tiling
         if (unlikely(srcNDinfo.k != tiling.srcK || originalSrcShape.m != tiling.srcM)) {

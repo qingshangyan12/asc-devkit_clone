@@ -23,6 +23,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "../kernel_utils.h"
+#include "kernel_check_tensor_metadata.h"
 #include "../../../include/basic_api/kernel_struct_transpose.h"
 #include "kernel_check_vec_padding_util.h"
 namespace AscendC {
@@ -215,14 +216,8 @@ struct VecTransposeApiParams {
         repeatTimes = repeatIn;
         dstRepeatStride = dstRepeatStrideIn;
         srcRepeatStride = srcRepeatStrideIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        srcDtypeBytes = srcDtypeBytesIn;
-        dstSize = dstSizeIn;
-        srcSize = srcSizeIn;
-        dstLogicPos = dstPosIn;
-        srcLogicPos = srcPosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        srcPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(srcPosIn)));
+        detail::InitializeCheckTensorPairMetadata(
+            *this, dstDtypeBytesIn, srcDtypeBytesIn, dstSizeIn, srcSizeIn, dstPosIn, srcPosIn);
         index = indexIn;
     }
     VecTransposeApiParams(
@@ -284,14 +279,8 @@ struct VecProposalApiParams {
         dstAddr = dstAddrIn;
         src0Addr = src0AddrIn;
         repeatTimes = repeatIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
     }
     VecProposalApiParams(
         uint64_t dstAddrIn, uint64_t src0AddrIn, uint64_t src1AddrIn, uint8_t repeatIn, uint32_t dstDtypeBytesIn,
@@ -302,18 +291,9 @@ struct VecProposalApiParams {
         src0Addr = src0AddrIn;
         src1Addr = src1AddrIn;
         repeatTimes = repeatIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        src1DtypeBytes = src1DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleMetadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, src1DtypeBytesIn, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn,
+            src0PosIn, src1PosIn);
     }
     VecProposalApiParams(
         uint64_t dstAddrIn, uint64_t src0AddrIn, uint8_t repeatIn, uint32_t dstDtypeBytesIn, uint32_t src0DtypeBytesIn,
@@ -323,14 +303,8 @@ struct VecProposalApiParams {
         dstAddr = dstAddrIn;
         src0Addr = src0AddrIn;
         repeatTimes = repeatIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
         validBit = validBitIn;
         for (size_t i = 0; i < eleSize; i++) {
             elementLengths[i] = elementLenIn[i];

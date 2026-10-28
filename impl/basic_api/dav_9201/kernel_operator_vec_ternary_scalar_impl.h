@@ -22,6 +22,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_IMPL_H
 #include "kernel_operator_common_impl.h"
+#include "kernel_operator_level0_mask_impl.h"
 #include "../kernel_utils.h"
 #include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 #include "kernel_operator_vec_template_impl.h"
@@ -129,10 +130,10 @@ __aicore__ inline void VecAxpyImplTemplate(
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
         ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
-        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
         ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
     }
+    PrepareLevel0Mask9201<isMaskBitMode>(maskArray, maskCount, maskArrayStruct);
     __ubuf__ uint64_t* maskBuf = nullptr;
 
     if (Internal::IsCounterMode()) {

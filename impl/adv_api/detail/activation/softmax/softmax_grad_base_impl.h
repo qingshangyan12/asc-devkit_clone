@@ -37,6 +37,7 @@
 #include "../../api_check/kernel_check/activation/softmax/softmax_grad_front/softmax_grad_front_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
+#include "softmax_common/softmax_shape_metadata.h"
 
 namespace AscendC {
 template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
@@ -51,13 +52,7 @@ __aicore__ inline void SoftmaxGradFrontImpl(
     uint32_t elementNumPerBlk = ONE_BLK_SIZE / sizeof(T);
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxLastAxisMetadata(srcShape, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (isDataFormatNZ) {
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
             SoftMaxTiling newTiling = tiling;
@@ -115,13 +110,7 @@ __aicore__ inline void SoftmaxGradImpl(
 
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
-    if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        srcNDinfo = GetLastAxisShapeND(srcShape);
-        originalSrcShape = GetLastAxisOriginShapeND(srcShape);
-    } else {
-        srcNDinfo = {softmaxShapeInfo.srcM, softmaxShapeInfo.srcK};
-        originalSrcShape = {softmaxShapeInfo.oriSrcM, softmaxShapeInfo.oriSrcK};
-    }
+    Internal::ResolveSoftmaxLastAxisMetadata(srcShape, softmaxShapeInfo, srcNDinfo, originalSrcShape);
     if constexpr (isDataFormatNZ) {
         if (unlikely(srcNDinfo.k != tiling.srcK || srcNDinfo.m != tiling.srcM)) {
             SoftMaxTiling newTiling = tiling;

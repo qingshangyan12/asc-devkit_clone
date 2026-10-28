@@ -534,7 +534,8 @@ __aicore__ inline int64_t asc_get_acc_val()
     return 0;
 }
 
-__aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
+namespace asc_c_api_detail {
+__aicore__ inline void read_reduce_extrema_register(half& val, uint32_t& index)
 {
     if ASC_IS_AIV {
         constexpr uint8_t offset = 32;
@@ -546,48 +547,42 @@ __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
         val = u162half.h;
         index = 0xffffffff & (max_min_cnt >> offset);
     }
+}
+
+__aicore__ inline void read_reduce_extrema_register(float& val, uint32_t& index)
+{
+    if ASC_IS_AIV {
+        constexpr uint8_t offset = 32;
+        int64_t max_min_cnt = get_max_min_cnt();
+        union {
+            float f;
+            uint32_t u;
+        } u322float = {.u = static_cast<uint32_t>(0xffffffff & max_min_cnt)};
+        val = u322float.f;
+        index = 0xffffffff & (max_min_cnt >> offset);
+    }
+}
+
+} // namespace asc_c_api_detail
+
+__aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
+{
+    asc_c_api_detail::read_reduce_extrema_register(val, index);
 }
 
 __aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
 {
-    if ASC_IS_AIV {
-        constexpr uint8_t offset = 32;
-        int64_t max_min_cnt = get_max_min_cnt();
-        union {
-            float f;
-            uint32_t u;
-        } u322float = {.u = static_cast<uint32_t>(0xffffffff & max_min_cnt)};
-        val = u322float.f;
-        index = 0xffffffff & (max_min_cnt >> offset);
-    }
+    asc_c_api_detail::read_reduce_extrema_register(val, index);
 }
 
 __aicore__ inline void asc_get_reduce_min_cnt(half& val, uint32_t& index)
 {
-    if ASC_IS_AIV {
-        constexpr uint8_t offset = 32;
-        int64_t max_min_cnt = get_max_min_cnt();
-        union {
-            half h;
-            uint16_t u;
-        } u162half = {.u = static_cast<uint16_t>(0xffff & max_min_cnt)};
-        val = u162half.h;
-        index = 0xffffffff & (max_min_cnt >> offset);
-    }
+    asc_c_api_detail::read_reduce_extrema_register(val, index);
 }
 
 __aicore__ inline void asc_get_reduce_min_cnt(float& val, uint32_t& index)
 {
-    if ASC_IS_AIV {
-        constexpr uint8_t offset = 32;
-        int64_t max_min_cnt = get_max_min_cnt();
-        union {
-            float f;
-            uint32_t u;
-        } u322float = {.u = static_cast<uint32_t>(0xffffffff & max_min_cnt)};
-        val = u322float.f;
-        index = 0xffffffff & (max_min_cnt >> offset);
-    }
+    asc_c_api_detail::read_reduce_extrema_register(val, index);
 }
 
 __aicore__ inline int64_t asc_get_rsvd_count()

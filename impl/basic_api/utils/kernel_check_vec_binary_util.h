@@ -24,6 +24,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "../kernel_utils.h"
+#include "kernel_check_tensor_metadata.h"
 namespace AscendC {
 namespace check {
 
@@ -46,18 +47,9 @@ struct VecBinaryApiParams {
         dstRepeatStride = dstRepeatStrideIn;
         src0RepeatStride = src0RepeatStrideIn;
         src1RepeatStride = src1RepeatStrideIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        src1DtypeBytes = src1DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleMetadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, src1DtypeBytesIn, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn,
+            src0PosIn, src1PosIn);
     }
 
     // �ⲿ�����޸ģ�����logic_pos�����������ڲ�����log_pos,ԭ�е�pos���������ڲ�ת��
@@ -69,18 +61,9 @@ struct VecBinaryApiParams {
         dstAddr = dstAddrIn;
         src0Addr = src0AddrIn;
         src1Addr = src1AddrIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        src1DtypeBytes = src1DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        src1Size = src1SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        src1LogicPos = src1PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
-        src1Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src1PosIn)));
+        detail::InitializeCheckTensorTripleMetadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, src1DtypeBytesIn, dstSizeIn, src0SizeIn, src1SizeIn, dstPosIn,
+            src0PosIn, src1PosIn);
         calCount = count;
     }
 
@@ -123,14 +106,8 @@ struct VecBinaryScalarApiParams {
         src0BlockStride = src0BlockStrideIn;
         dstRepeatStride = dstRepeatStrideIn;
         src0RepeatStride = src0RepeatStrideIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
     }
 
     VecBinaryScalarApiParams(
@@ -139,14 +116,8 @@ struct VecBinaryScalarApiParams {
     {
         dstAddr = dstAddrIn;
         src0Addr = src0AddrIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
         calCount = count;
     }
 
@@ -166,14 +137,8 @@ struct VecBinaryScalarApiParams {
         src0BlockStride = src0BlockStrideIn;
         dstRepeatStride = dstRepeatStrideIn;
         src0RepeatStride = src0RepeatStrideIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
         scalarPos = scalarPosIn;
         enableFlexibleScalar = 1;
     }
@@ -185,14 +150,8 @@ struct VecBinaryScalarApiParams {
     {
         dstAddr = dstAddrIn;
         src0Addr = src0AddrIn;
-        dstDtypeBytes = dstDtypeBytesIn;
-        src0DtypeBytes = src0DtypeBytesIn;
-        dstSize = dstSizeIn;
-        src0Size = src0SizeIn;
-        dstLogicPos = dstPosIn;
-        src0LogicPos = src0PosIn;
-        dstPos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(dstPosIn)));
-        src0Pos = static_cast<uint8_t>(GetPhyType(static_cast<TPosition>(src0PosIn)));
+        detail::InitializeCheckTensorPairSrc0Metadata(
+            *this, dstDtypeBytesIn, src0DtypeBytesIn, dstSizeIn, src0SizeIn, dstPosIn, src0PosIn);
         calCount = count;
         scalarPos = scalarPosIn;
         enableFlexibleScalar = 1;

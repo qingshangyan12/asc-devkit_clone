@@ -22,6 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
 
 #include "kernel_operator_set_spr_impl.h"
+#include "kernel_operator_fixpipe_tiling_impl.h"
 #include "../kernel_check.h"
 #include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
 #include "../kernel_process_lock.h"
@@ -99,20 +100,7 @@ struct FixpipeTiling {
 __aicore__ inline FixpipeTiling GenFixpipeTiling(uint16_t n)
 {
     FixpipeTiling tiling;
-    // deqTensor/reluTensor in FB valid num is 256
-    uint16_t maxDeqNums = 256;
-    if (n <= maxDeqNums) {
-        tiling.nIterNum = 1;
-        tiling.nSize = n;
-        tiling.isDb = false;
-        tiling.tailNSize = 0;
-    } else {
-        tiling.isDb = true;
-        uint16_t dbMaxDeqNums = maxDeqNums / 2;
-        tiling.nIterNum = n / dbMaxDeqNums;
-        tiling.nSize = dbMaxDeqNums;
-        tiling.tailNSize = n % dbMaxDeqNums;
-    }
+    Internal::FillFixpipeTilingC220(tiling, n);
     return tiling;
 }
 
@@ -318,6 +306,22 @@ __aicore__ inline void FixpipeL0C2GMImplN(
 
 // contains loop info and cal n size for each loop
 // move data L0C->L1
+namespace Internal {
+template <typename T, typename U>
+__aicore__ inline void ResolveFixpipeOffsetsC220(
+    const FixpipeInfoParams<U>& fixpipeInfo, uint16_t nIterIndex, uint32_t& srcOffset, uint32_t& dstOffset)
+{
+    uint16_t cburstNum = fixpipeInfo.tiling.nSize / 16;
+    srcOffset = cburstNum * nIterIndex * fixpipeInfo.srcStride * fixpipeInfo.c0;
+    dstOffset = 0;
+    if (fixpipeInfo.nz2ndEn) {
+        dstOffset = nIterIndex * fixpipeInfo.tiling.nSize;
+    } else {
+        dstOffset = cburstNum * nIterIndex * fixpipeInfo.dstStride * 32 / sizeof(T);
+    }
+}
+} // namespace Internal
+
 template <typename T, typename U>
 __aicore__ inline void FixpipeL0cToL1(
     __cbuf__ T* dst, __cc__ U* src, const FixpipeInfoParams<U>& fixpipeInfo, uint16_t calNSize, uint16_t nIterIndex = 0)
@@ -325,14 +329,9 @@ __aicore__ inline void FixpipeL0cToL1(
     if ASCEND_IS_AIV {
         return;
     }
-    uint16_t cburstNum = fixpipeInfo.tiling.nSize / 16;
-    uint32_t srcOffset = cburstNum * nIterIndex * fixpipeInfo.srcStride * fixpipeInfo.c0;
-    uint32_t dstOffset = 0;
-    if (fixpipeInfo.nz2ndEn) {
-        dstOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-    } else {
-        dstOffset = cburstNum * nIterIndex * fixpipeInfo.dstStride * 32 / sizeof(T);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    Internal::ResolveFixpipeOffsetsC220<T>(fixpipeInfo, nIterIndex, srcOffset, dstOffset);
 
     // LOC -> L1 only n direction need tiling, m no need tiling
     // 910b soc, dst_stride in unit of 32B, input dst_stride in unit of 32B.
@@ -368,14 +367,9 @@ __aicore__ inline void FixpipeL0cToOut(
     if ASCEND_IS_AIV {
         return;
     }
-    uint16_t cburstNum = fixpipeInfo.tiling.nSize / 16;
-    uint32_t srcOffset = cburstNum * nIterIndex * fixpipeInfo.srcStride * fixpipeInfo.c0;
-    uint32_t dstOffset = 0;
-    if (fixpipeInfo.nz2ndEn) {
-        dstOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-    } else {
-        dstOffset = cburstNum * nIterIndex * fixpipeInfo.dstStride * 32 / sizeof(T);
-    }
+    uint32_t srcOffset;
+    uint32_t dstOffset;
+    Internal::ResolveFixpipeOffsetsC220<T>(fixpipeInfo, nIterIndex, srcOffset, dstOffset);
     if constexpr (g_gm_overflow_check) {
         bool isSrc = false;
         uint16_t dstEleSize = sizeof(T);

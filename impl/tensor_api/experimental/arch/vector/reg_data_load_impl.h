@@ -26,6 +26,22 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+template <typename Tensor>
+__simd_callee__ inline void check_unalign_load_tensor()
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_load only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+}
+
 template <load_sideband_mode sideband_mode>
 struct load_from_ptr_impl;
 
@@ -266,17 +282,7 @@ __simd_callee__ inline decltype(auto) load_gather(
 template <typename Tensor>
 __simd_callee__ inline void unalign_load::prepare(const Tensor& src_base)
 {
-    using engine_type = typename Tensor::engine_type;
-    using data_type = typename Tensor::data_type;
-    using reg_data_type = detail::get_reg_data_type<data_type>;
-    static_assert(
-        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "unalign_load only supports tensors located in UB");
-    static_assert(
-        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
-            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
-            detail::is_b64_type_v<reg_data_type>,
-        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+    detail::check_unalign_load_tensor<Tensor>();
 
     asc_loadunalign_pre(ureg, src_base.engine().begin().get());
 }
@@ -284,17 +290,9 @@ __simd_callee__ inline void unalign_load::prepare(const Tensor& src_base)
 template <typename Tensor>
 __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
 {
-    using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
     using reg_data_type = detail::get_reg_data_type<data_type>;
-    static_assert(
-        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "unalign_load only supports tensors located in UB");
-    static_assert(
-        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
-            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
-            detail::is_b64_type_v<reg_data_type>,
-        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+    detail::check_unalign_load_tensor<Tensor>();
 
     reg_tensor<reg_data_type> dst;
     auto src_addr = src_tile.engine().begin().get();
@@ -305,17 +303,9 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
 template <typename Tensor, typename Coord>
 __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coord& coord)
 {
-    using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
     using reg_data_type = detail::get_reg_data_type<data_type>;
-    static_assert(
-        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "unalign_load only supports tensors located in UB");
-    static_assert(
-        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
-            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
-            detail::is_b64_type_v<reg_data_type>,
-        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+    detail::check_unalign_load_tensor<Tensor>();
     TENSOR_API_DEBUG_CHECK(debug_check_coord, src_tile.layout(), coord, "unalign_load::load");
 
     reg_tensor<reg_data_type> dst;

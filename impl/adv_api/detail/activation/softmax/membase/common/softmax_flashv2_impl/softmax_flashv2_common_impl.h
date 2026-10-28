@@ -25,11 +25,11 @@
 
 namespace AscendC {
 
-template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false>
-__aicore__ inline void SoftMaxFlashV2NZImpl(
-    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor, const LocalTensor<T2>& maxTensor,
-    const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inSumTensor,
-    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
+template <typename T1, typename T2, bool isUpdate, bool isBasicBlock, typename SrcT, typename AccT>
+__aicore__ inline void SoftmaxFlashV2NZDispatch(
+    const LocalTensor<SrcT>& dstTensor, const LocalTensor<AccT>& sumTensor, const LocalTensor<AccT>& maxTensor,
+    const LocalTensor<SrcT>& srcTensor, const LocalTensor<SrcT>& expMaxTensor, const LocalTensor<AccT>& inSumTensor,
+    const LocalTensor<AccT>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
 {
     SetMaskNorm();
@@ -46,21 +46,26 @@ __aicore__ inline void SoftMaxFlashV2NZImpl(
 
 template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false>
 __aicore__ inline void SoftMaxFlashV2NZImpl(
+    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor, const LocalTensor<T2>& maxTensor,
+    const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inSumTensor,
+    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
+    const SoftMaxTiling& tiling)
+{
+    SoftmaxFlashV2NZDispatch<T1, T2, isUpdate, isBasicBlock>(
+        dstTensor, sumTensor, maxTensor, srcTensor, expMaxTensor, inSumTensor, inMaxTensor, workLocal, originalSrcShape,
+        tiling);
+}
+
+template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false>
+__aicore__ inline void SoftMaxFlashV2NZImpl(
     const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
     const LocalTensor<half>& srcTensor, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor,
     const LocalTensor<float>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
 {
-    SetMaskNorm();
-    ResetMask();
-    if constexpr (!isUpdate) {
-        SoftmaxFlashV2NZNoUpdateImpl<T1, T2, isBasicBlock>(
-            dstTensor, sumTensor, maxTensor, srcTensor, workLocal, originalSrcShape, tiling);
-    } else {
-        SoftmaxFlashV2NZUpdateImpl<T1, T2, isBasicBlock>(
-            dstTensor, sumTensor, maxTensor, srcTensor, expMaxTensor, inSumTensor, inMaxTensor, workLocal,
-            originalSrcShape, tiling);
-    }
+    SoftmaxFlashV2NZDispatch<T1, T2, isUpdate, isBasicBlock>(
+        dstTensor, sumTensor, maxTensor, srcTensor, expMaxTensor, inSumTensor, inMaxTensor, workLocal, originalSrcShape,
+        tiling);
 }
 
 template <typename T1, typename T2, bool isBasicBlock = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>

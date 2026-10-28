@@ -70,7 +70,7 @@ uint64_t Gcd(uint64_t a, uint64_t b)
     return b;
 }
 
-void CalcCommFactorWithPowerOfTwo(const uint64_t num, const uint64_t numMax, std::vector<uint64_t>& resList)
+static void AppendCommonFactors(const uint64_t num, const uint64_t numMax, std::vector<uint64_t>& resList)
 {
     uint64_t sqrtMax = static_cast<uint64_t>(sqrt(num));
     for (uint64_t i = 1; i <= sqrtMax; ++i) {
@@ -84,6 +84,11 @@ void CalcCommFactorWithPowerOfTwo(const uint64_t num, const uint64_t numMax, std
             }
         }
     }
+}
+
+void CalcCommFactorWithPowerOfTwo(const uint64_t num, const uint64_t numMax, std::vector<uint64_t>& resList)
+{
+    AppendCommonFactors(num, numMax, resList);
 
     for (uint64_t i = CONST_VALUE_2; i <= std::min(num, numMax); i *= CONST_VALUE_2) {
         if (std::find(resList.begin(), resList.end(), i) == resList.end()) {
@@ -95,18 +100,7 @@ void CalcCommFactorWithPowerOfTwo(const uint64_t num, const uint64_t numMax, std
 
 void CalcCommFactor(const uint64_t num, const uint64_t numMax, std::vector<uint64_t>& resList)
 {
-    uint64_t sqrtMax = static_cast<uint64_t>(sqrt(num));
-    for (uint64_t i = 1; i <= sqrtMax; ++i) {
-        if (num % i == 0) {
-            if (i <= numMax) {
-                resList.emplace_back(i);
-            }
-            uint64_t right = num / i;
-            if (right != i && right <= numMax) {
-                resList.emplace_back(right);
-            }
-        }
-    }
+    AppendCommonFactors(num, numMax, resList);
     sort(resList.begin(), resList.end());
 }
 

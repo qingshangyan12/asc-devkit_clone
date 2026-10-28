@@ -27,36 +27,11 @@ namespace AscendC {
  * ************************************************************************************************* */
 
 // Scatter::Level 0 - mask bit mode
-template <typename T>
-__aicore__ inline void ScatterImpl(
+namespace Internal {
+template <typename T, bool isArrayMask, typename Mask>
+__aicore__ inline void ScatterWithMaskKind(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
-    const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
-{
-    uint32_t offsetAddr = (uint64_t)dstLocal + dstBaseAddr;
-#if ASCENDC_CPU_DEBUG
-    uint64_t cpuAddr = (uint64_t)dstLocal + dstBaseAddr;
-    SetModelScatterDst0Tensor(cpuAddr, dstLength);
-#endif
-    uint64_t config = 0;
-    config |= (uint64_t(offsetAddr & 0xFFFFFFFF));
-    config |= (uint64_t(repeatTime & 0xFF) << 56);
-    config |= (uint64_t(srcRepStride & 0xFF) << 40);
-
-    AscendCUtils::SetMask<T>(mask[1], mask[0]);
-    if constexpr (sizeof(T) == sizeof(uint16_t)) {
-        vscatter(dstOffsetLocal, (__ubuf__ uint16_t*)srcLocal, config);
-    } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
-        vscatter(dstOffsetLocal, (__ubuf__ uint32_t*)srcLocal, config);
-    } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "data type should be b16 or b32"); });
-    }
-}
-
-// Scatter::Level 0 - mask count mode
-template <typename T>
-__aicore__ inline void ScatterImpl(
-    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
-    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+    const uint32_t dstBaseAddr, const Mask& mask, const uint8_t repeatTime, const uint8_t srcRepStride)
 {
     uint32_t offsetAddr = (uint64_t)dstLocal + dstBaseAddr;
 #if ASCENDC_CPU_DEBUG
@@ -68,12 +43,40 @@ __aicore__ inline void ScatterImpl(
     config |= (uint64_t(repeatTime & 0xFF) << 56);   // repeat times, Xt[63:56]
     config |= (uint64_t(srcRepStride & 0xFF) << 40); // src repeat stride size, Xt[47:40]
 
-    AscendCUtils::SetMask<T>(mask);
+    if constexpr (isArrayMask) {
+        AscendCUtils::SetMask<T>(mask[1], mask[0]);
+    } else {
+        AscendCUtils::SetMask<T>(mask);
+    }
     if constexpr (sizeof(T) == sizeof(uint16_t)) {
         vscatter(dstOffsetLocal, (__ubuf__ uint16_t*)srcLocal, config);
     } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
         vscatter(dstOffsetLocal, (__ubuf__ uint32_t*)srcLocal, config);
-    } else {
+    }
+}
+} // namespace Internal
+
+template <typename T>
+__aicore__ inline void ScatterImpl(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
+    const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    Internal::ScatterWithMaskKind<T, true>(
+        dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+    if constexpr (sizeof(T) != sizeof(uint16_t) && sizeof(T) != sizeof(uint32_t)) {
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "data type should be b16 or b32"); });
+    }
+}
+
+// Scatter::Level 0 - mask count mode
+template <typename T>
+__aicore__ inline void ScatterImpl(
+    __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
+    const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+{
+    Internal::ScatterWithMaskKind<T, false>(
+        dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseAddr, mask, repeatTime, srcRepStride);
+    if constexpr (sizeof(T) != sizeof(uint16_t) && sizeof(T) != sizeof(uint32_t)) {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "data type should be b16 or b32"); });
     }
 }

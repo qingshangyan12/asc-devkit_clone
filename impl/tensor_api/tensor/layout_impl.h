@@ -71,21 +71,30 @@ __aicore__ inline constexpr auto make_zero_coord_like(const Value& value)
     }
 }
 
+template <typename OriginShape, typename SliceShape>
+struct copy_shape_relation {
+    using origin_shape = Std::remove_cvref_t<OriginShape>;
+    using slice_shape_type = Std::remove_cvref_t<SliceShape>;
+    static constexpr auto origin_shape_depth = nesting_depth_v<origin_shape>;
+    static constexpr auto slice_shape_depth = nesting_depth_v<slice_shape_type>;
+    static constexpr bool is_same_shape = origin_shape_depth == slice_shape_depth &&
+                                          Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
+    static constexpr size_t batch_num = Std::tuple_size_v<origin_shape> - 1;
+    static constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type> &&
+                                          Std::tuple_size_v<origin_shape> >= two_dim_data &&
+                                          origin_shape_depth == batch_num + four_dim_data &&
+                                          slice_shape_depth == batch_num + two_dim_data;
+};
+
 template <typename LayoutType, typename SliceShape>
 __aicore__ inline constexpr decltype(auto) resolve_copy_coord(
     const LayoutType& layout, const SliceShape& slice_shape, const zero_coord_type&)
 {
-    using origin_shape = Std::remove_cvref_t<decltype(layout.shape())>;
-    using slice_shape_type = Std::remove_cvref_t<SliceShape>;
-    constexpr auto origin_shape_depth = nesting_depth_v<origin_shape>;
-    constexpr auto slice_shape_depth = nesting_depth_v<slice_shape_type>;
-    constexpr bool is_same_shape = origin_shape_depth == slice_shape_depth &&
-                                   Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
-    constexpr size_t batch_num = Std::tuple_size_v<origin_shape> - 1;
-    constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type> &&
-                                   Std::tuple_size_v<origin_shape> >= two_dim_data &&
-                                   origin_shape_depth == batch_num + four_dim_data &&
-                                   slice_shape_depth == batch_num + two_dim_data;
+    using shape_relation = copy_shape_relation<decltype(layout.shape()), SliceShape>;
+    constexpr auto origin_shape_depth = shape_relation::origin_shape_depth;
+    constexpr auto slice_shape_depth = shape_relation::slice_shape_depth;
+    constexpr bool is_same_shape = shape_relation::is_same_shape;
+    constexpr bool is_flat_batch = shape_relation::is_flat_batch;
 
     if constexpr (is_same_shape) {
         return make_zero_coord_like(layout.shape());
@@ -194,20 +203,11 @@ __aicore__ inline constexpr decltype(auto) make_slice_shape(
 {
     static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<SliceShape>>, "SliceShape must be a tuple");
-    using origin_shape = Std::remove_cvref_t<decltype(layout.shape())>;
-    using slice_shape_type = Std::remove_cvref_t<SliceShape>;
-    constexpr auto origin_shape_depth = nesting_depth_v<origin_shape>;
-    constexpr auto slice_shape_depth = nesting_depth_v<slice_shape_type>;
-    constexpr bool is_same_shape = origin_shape_depth == slice_shape_depth &&
-                                   Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type>;
-    // Flat multi-batch: same arity on both sides, batch axes are scalars and the last element is the
-    // fractal block on the layout side vs a logical (x, y) pair on the slice side. Depth is then
-    // batch_num + 4 against batch_num + 2. batch_num == 1 covers the classic five-dim/three-dim case.
-    constexpr size_t batch_num = Std::tuple_size_v<origin_shape> - 1;
-    constexpr bool is_flat_batch = Std::tuple_size_v<origin_shape> == Std::tuple_size_v<slice_shape_type> &&
-                                   Std::tuple_size_v<origin_shape> >= two_dim_data &&
-                                   origin_shape_depth == batch_num + four_dim_data &&
-                                   slice_shape_depth == batch_num + two_dim_data;
+    using shape_relation = copy_shape_relation<decltype(layout.shape()), SliceShape>;
+    constexpr auto origin_shape_depth = shape_relation::origin_shape_depth;
+    constexpr auto slice_shape_depth = shape_relation::slice_shape_depth;
+    constexpr bool is_same_shape = shape_relation::is_same_shape;
+    constexpr bool is_flat_batch = shape_relation::is_flat_batch;
 
     if constexpr (is_same_shape) {
         return make_same_slice_shape(coord, layout, slice_shape);

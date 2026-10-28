@@ -18,6 +18,7 @@
 #include <cstdint>
 
 #include "../../detail/host_log.h"
+#include "dequant_tiling_shape.h"
 
 namespace AscendC {
 namespace {
@@ -67,16 +68,9 @@ void GetDequantizeMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)typeSize;
-    std::vector<int64_t> shapeDims = srcShape.GetDims(); // should be 2-dimensional or 1-dimensional
     uint32_t outer = 1;
     uint32_t inner = 0;
-
-    if (shapeDims.size() == EXPECTED_SHAPE_DIM) {
-        outer = static_cast<uint32_t>(shapeDims[0]);
-        inner = static_cast<uint32_t>(shapeDims[1]);
-    } else if (shapeDims.size() == 1) {
-        inner = static_cast<uint32_t>(shapeDims[0]);
-    } else {
+    if (!Internal::ResolveDequantTilingShape(srcShape, outer, inner)) {
         ASCENDC_HOST_ASSERT(false, return, "srcShape should be 1-dimensional / 2-dimensional.");
         return;
     }

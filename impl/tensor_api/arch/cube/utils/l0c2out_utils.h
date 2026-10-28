@@ -93,6 +93,21 @@ struct l0c_out_copy_params {
     uint32_t dst_stride;
 };
 
+template <typename DstTensor, typename DstLayout>
+__aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_stride_params(
+    uint32_t n_size, uint32_t m_size, uint32_t src_stride, const DstLayout& dst_layout)
+{
+    if constexpr (is_l0c_out_nd_format_v<DstTensor>) {
+        return {n_size, m_size, src_stride, get_l0c_out_nd_stride<DstTensor>(dst_layout)};
+    } else if constexpr (is_l0c_out_dn_format_v<DstTensor>) {
+        return {n_size, m_size, src_stride, get_l0c_out_dn_stride<DstTensor>(dst_layout)};
+    } else {
+        return {
+            n_size, m_size, src_stride,
+            static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(dst_layout))};
+    }
+}
+
 template <typename DstTensor, typename SrcTensor, typename DstLayout, typename SrcLayout>
 __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
     const DstLayout& dst_layout, const SrcLayout& src_layout)
@@ -127,15 +142,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
         const uint32_t src_stride =
             static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed);
 
-        if constexpr (is_l0c_out_nd_format_v<DstTensor>) {
-            return {n_size, m_size, src_stride, get_l0c_out_nd_stride<DstTensor>(dst_layout)};
-        } else if constexpr (is_l0c_out_dn_format_v<DstTensor>) {
-            return {n_size, m_size, src_stride, get_l0c_out_dn_stride<DstTensor>(dst_layout)};
-        } else {
-            return {
-                n_size, m_size, src_stride,
-                static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(dst_layout))};
-        }
+        return make_l0c_out_stride_params<DstTensor>(n_size, m_size, src_stride, dst_layout);
     }
 }
 
@@ -148,15 +155,7 @@ __aicore__ inline static constexpr l0c_out_copy_params make_l0c_out_copy_params(
     const uint32_t m_size = static_cast<uint32_t>(Std::min(get_total_row_shape(src_layout), get_shape_rows(dst_shape)));
     const uint32_t src_stride =
         static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed);
-    if constexpr (is_l0c_out_nd_format_v<DstTensor>) {
-        return {n_size, m_size, src_stride, get_l0c_out_nd_stride<DstTensor>(dst_layout)};
-    } else if constexpr (is_l0c_out_dn_format_v<DstTensor>) {
-        return {n_size, m_size, src_stride, get_l0c_out_dn_stride<DstTensor>(dst_layout)};
-    } else {
-        return {
-            n_size, m_size, src_stride,
-            static_cast<uint32_t>(get_element<attr_info::stride, attr_info::column, 1>(dst_layout))};
-    }
+    return make_l0c_out_stride_params<DstTensor>(n_size, m_size, src_stride, dst_layout);
 }
 
 template <typename DstLayout, typename SrcLayout, typename SrcShape>
