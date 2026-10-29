@@ -157,13 +157,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         return;
     }
     __gm__ HcclMsg* hcclSendMsg = hcclMsgArea_->commMsg.singleMsg.sendMsgs + curMsgPosition_[0U];
-    bool msgBusy = (debugMode_ != HCCL_ONLY_COMPUTE);
-    while (msgBusy) {
+    do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
-        const uint32_t msgValid = hcclSendMsg->addMsg.v0Msg.valid;
-        msgBusy = (msgValid == HCCL_MSG_VALID_MASK);
-    }
+    } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[0U]);
     AssembleHcclMsgV2A5(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
 #else
@@ -206,13 +203,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         return;
     }
     __gm__ HcclMsgExt* hcclSendMsg = &(hcclMsgArea_->commMsg.singleMsg.paramExtMsgList[curMsgPosition_[0U]]);
-    bool msgBusy = (debugMode_ != HCCL_ONLY_COMPUTE);
-    while (msgBusy) {
+    do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
-        const uint64_t msgValid = hcclSendMsg->valid;
-        msgBusy = (msgValid == HCCL_MSG_VALID_MASK);
-    }
+    } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
     KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
     uint32_t rankNum = GetRankDim();
     if (!IsValidMsgExtRankNum(rankNum)) {
