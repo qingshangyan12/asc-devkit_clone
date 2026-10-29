@@ -29,6 +29,8 @@
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -209,6 +211,122 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV516& intriParams);
 #endif
+/* ---- Fixpipe / SetFixPipeConfig with raw pointer operands -------------------- */
+/*
+ * @ingroup Fixpipe
+ * @brief After calculation, process the results from raw pointer operands with explicit element types
+ * @param [out] dst output raw pointer; its address space selects the destination pipe
+ * @param [in] src input raw pointer
+ * @param [in] cbufWorkspace raw pointer to the deq tensor quant workspace
+ * @param [in] intriParams fixpipe parameters
+ *
+ * Fixpipe with explicit element types: the pointer operands are deduced *after* the explicit
+ * <T, U, config> parameters, which is the shape the corpus uses for the L0C -> GM / L1 / UB calls.
+ * The address space of `dst` selects the destination pipe.
+ */
+template <
+    typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr,
+    typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams);
+
+template <
+    typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr,
+    typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+/*
+ * @ingroup Fixpipe
+ * @brief After calculation, process the results from raw pointer operands with deduced element types
+ * @param [out] dst output raw pointer; its address space selects the destination pipe
+ * @param [in] src input raw pointer
+ * @param [in] cbufWorkspace raw pointer to the deq tensor quant workspace
+ * @param [in] intriParams fixpipe parameters
+ *
+ * Fixpipe without explicit element types.  The element types are re-deduced from the address-space
+ * qualified pointer parameters of the CubePtrOverload::Fp helpers below; `config` is deduced from
+ * the FixpipeParamsArch3510<> parameter, whose CO2Layout is carried in the config constant.
+ */
+template <
+    typename DstPtr, typename SrcPtr, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename DstPtr, typename SrcPtr, typename WorkspacePtr, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams);
+
+template <
+    typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+/*
+ * @ingroup SetFixPipeAddr
+ * @brief Set the fixpipe element-wise address from a raw pointer operand.
+ * @param [in] eleWiseData element-wise data address, in L1 or UB; the address space selects the pipe
+ * @param [in] c0ChStride stride of the C0 channel
+ */
+template <typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeAddr(DstPtr eleWiseData, uint16_t c0ChStride);
+
+/*
+ * @ingroup SetFixPipeConfig
+ * @brief Set the fixpipe pre-quant or relu address from a raw pointer operand.
+ * @param [in] preData pre-quant (default) or relu address; `setRelu` selects which FPC field it is
+ *                   written into, exactly as in SetFixPipeConfigImpl
+ * @param [in] isUnitFlag unit-flag bit written into FPC[63]
+ *
+ * Unlike the LocalTensor form there is no element-type parameter: a raw pointer already names its
+ * pointee, so an explicit `T` could not be deduced from the argument and would have forced callers
+ * to spell it out.  Leaving only the defaulted `setRelu` ahead of the deduced pointer means
+ * `SetFixPipeConfig(ptr, true)` binds *this* overload -- with the bool as `isUnitFlag` -- instead of
+ * sliding into the two-operand form below, where it would have been read as a quant-tensor address.
+ */
+template <
+    bool setRelu = false, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag = false);
+/*
+ * @ingroup SetFixPipeConfig
+ * @brief Set both the relu and the quant pre-tensor addresses from raw pointer operands.
+ * @param [in] reluPre relu pre-tensor address, written into FPC[7:0]
+ * @param [in] quantPre quant pre-tensor address, written into FPC[15:8]
+ * @param [in] isUnitFlag unit-flag bit written into FPC[63]
+ *
+ * Mirrors the Tensor overload
+ * SetFixPipeConfig(const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool).
+ *
+ * Both operands must themselves be raw pointers (AllPtr, not AnyPtr): the two addresses go to
+ * different FPC fields, so a non-pointer operand -- a bool, an integer -- would otherwise be
+ * accepted in this slot and then stored as an address.
+ */
+template <
+    typename ReluPtr, typename QuantPtr,
+    typename Std::enable_if<CubePtrOverload::AllPtr<ReluPtr, QuantPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(ReluPtr reluPre, QuantPtr quantPre, bool isUnitFlag = false);
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

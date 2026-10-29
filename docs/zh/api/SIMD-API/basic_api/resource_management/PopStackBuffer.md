@@ -43,6 +43,15 @@ template <typename T, TPosition pos>
 __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename T, TPosition pos, typename S>
+__aicore__ inline bool PopStackBuffer(S*& popBuffer)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于出参直接接收地址而不是 tensor；元素的地址空间由指针实参本身区分。裸指针形不返回所申请空间的长度，需要长度的场景请继续使用 LocalTensor 形。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
@@ -88,6 +97,8 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 </tbody>
 </table>
 
+裸指针形的 `popBuffer` 与上表 `popLocal` 语义一致，实参为对应地址空间的裸指针，即出参直接接收地址。
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 表示函数执行的结果，true表示成功，false表示失败。
@@ -96,6 +107,7 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 
 -   该接口不支持嵌套使用，比如函数A中调用了PopStackBuffer，那么调用函数A的其他函数中则不可以再调用PopStackBuffer。
 -   因为当前高阶API内部实现中会使用到本接口，所以算子实现中调用了高阶API的场景，不支持调用该接口。
+-   裸指针形下，`popBuffer` 的地址空间须与 `pos` 一致（例如 `TPosition::VECCALC` 对应 `__ubuf__`），元素类型由显式模板实参或指针实参推导。
 
 ## 调用示例<a name="section837496171220"></a>
 

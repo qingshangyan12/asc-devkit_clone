@@ -228,6 +228,39 @@ __aicore__ inline void IBWait(
     __ib_wait_stub(blockIdx, eventID, isAIVOnly);
 #endif
 }
+/*
+ * Raw-pointer forms of IBSet / IBWait -- definitions.
+ *
+ * CLASS OF CHANGE: forward.  Each pointer form re-views its two raw operands through the shared
+ * helpers (GmTensorOver / UbTensorOver) and then calls the very same LocalTensor / GlobalTensor
+ * overload the Tensor form calls -- see the two definitions below.  No body is re-expressed and no
+ * backend is reached directly, so the Tensor body and the pointer body differ only in how the
+ * operands arrive.
+ *
+ * Two helpers that an earlier revision of this comment described as the pointer-level primitives
+ * (UbScalarReadOnCore / UbScalarWriteOnCore) were never called by anything and have been removed;
+ * the mapping table that named them described a design this file does not use.
+ */
+
+template <
+    bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void IBSet(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBSet<isAIVOnly>(
+        CubePtrOverload::GmTensorOver<int32_t>(gmWorkspace),
+        CubePtrOverload::UbTensorOver<int32_t>(ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t)), blockIdx, eventID);
+}
+
+template <
+    bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void IBWait(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBWait<isAIVOnly>(
+        CubePtrOverload::GmTensorOver<int32_t>(gmWorkspace),
+        CubePtrOverload::UbTensorOver<int32_t>(ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t)), blockIdx, eventID);
+}
 
 /*
  * @ingroup：SyncALL
@@ -245,6 +278,18 @@ __aicore__ inline void SyncAll(
 #else
     SoftSyncAllImpl<isAIVOnly>(
         (__gm__ int32_t*)gmWorkspace.GetPhyAddr(), (__ubuf__ int32_t*)ubWorkspace.GetPhyAddr(), usedCores);
+#endif
+}
+
+template <
+    bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int32_t usedCores)
+{
+#if ASCENDC_CPU_DEBUG
+    SoftSyncAllImpl<false>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
+#else
+    SoftSyncAllImpl<isAIVOnly>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
 #endif
 }
 

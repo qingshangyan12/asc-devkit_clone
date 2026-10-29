@@ -120,6 +120,15 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
     __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
     ```
 
+    **裸指针形（与上面的 tensor 形逐项对应）：**
+
+    ```cpp
+    template <bool isAIVOnly = true, typename GmPtr, typename UbPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+    __aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int32_t usedCores = 0)
+    ```
+
+    > 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor。
+
 - 硬同步
     - 不支持config指定流水
 
@@ -152,6 +161,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
 
+裸指针形下，`gmWorkspace` / `ubWorkspace` / `usedCores` 分别与上表同名 tensor 形参语义一致，`gmWorkspace` / `ubWorkspace` 实参为对应地址空间的裸指针。
+
 ## 返回值说明<a id="section91032023123812"></a>
 
 无
@@ -167,6 +178,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
     - ubWorkspace申请的空间大小要求大于等于GetBlockNum()*32Bytes。
     - 在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
     - usedCores传入数值不能超过算子调用时指定的逻辑AI Core中AIV的数量：GetBlockNum()*GetTaskRatio()，不传此参数表示全核软同步。
+    - 裸指针形下，`gmWorkspace` 须为 Global Memory 上的 `int32_t` 地址，`ubWorkspace` 须为 Unified Buffer 上的 `int32_t` 地址，行为与 tensor 形一致。
 
 - 硬件同步接口约束：
     - 使用硬同步接口时，需根据场景使用合适的核函数（Kernel）修饰符：

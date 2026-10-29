@@ -106,6 +106,24 @@
     __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams)
     ```
 
+**裸指针形（与上面 FixpipeParamsArch3510、FixpipeParamsV220 的 tensor 形逐项对应）：**
+
+```cpp
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams)
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr, typename WorkspacePtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams)
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename DstPtr, typename SrcPtr, typename WorkspacePtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；元素类型 T/U 也可省略，由指针实参推导。FixpipeParamsM300 形暂未提供裸指针形。
+
 ## 参数说明<a id="zh-cn_topic_0000002542828493_section16128134420472"></a>
 
 **表1** Fixpipe模板参数说明
@@ -124,6 +142,8 @@
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64字节对齐。 |
 | intriParams | 输入 | Fixpipe搬运参数，具体定义请参考 "basic_api/kernel_struct_fixpipe.h"。<br>参数说明请参考Fixpipe搬运参数（FixpipeParamsArch3510、FixpipeParamsV220、FixpipeParamsM300）结构体说明。 |
 | cbufWorkspace | 输入 | 量化参数，类型为`LocalTensor<uint64_t>`，支持的物理地址为L1 Buffer（TPosition为C1），地址需满足32字节对齐。<br>&nbsp;&nbsp;&bull; 当quantPre为VDEQF16、VQF322B8_PRE、VREQ8时支持。<br><!-- npu="950" id18 -->&nbsp;&nbsp;&bull; 针对Ascend 950PR&950DT系列产品，除上述外还有VQF322FP8_PRE、VQF322HIF8_PRE、VQF322HIF8_PRE_HYBRID、VQS322BF16_PRE、VQF322F16_PRE、VQF322BF16_PRE、VQF322F32_PRE支持。<br><!-- end id18 -->quantPre介绍请参考Fixpipe搬运参数结构体中quantPre部分。 |
+
+裸指针形的 `dst`、`src`、`cbufWorkspace` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表3** Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
 
@@ -297,6 +317,9 @@
     对于整数类型只有饱和模式。
     L0C Buffer到GM搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id29 -->
+
+- 裸指针形下，`dst` 必须为 GM（`__gm__`）上的裸指针，`src` 必须为 L0C（`__cc__`）上的裸指针，`cbufWorkspace` 必须为 L1（`__cbuf__`）上的 `uint64_t` 裸指针，元素类型由显式 T/U 或指针实参推导。
+
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id3 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
