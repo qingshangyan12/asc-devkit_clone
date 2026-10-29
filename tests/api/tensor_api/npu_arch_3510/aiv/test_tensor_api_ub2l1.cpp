@@ -63,12 +63,12 @@ uint16_t expected_src_gap = 0;
 uint16_t expected_dst_gap = 0;
 
 void copy_ubuf_to_cbuf_stub(
-    __cbuf__ void* dst, __ubuf__ void* src, uint8_t sid, uint16_t block_count, uint16_t block_len, uint16_t src_gap,
+    __cbuf__ void* dst, __ubuf__ void* src, bool dintlv_en, uint16_t block_count, uint16_t block_len, uint16_t src_gap,
     uint16_t dst_gap)
 {
     EXPECT_EQ(dst, expected_l1_dst);
     EXPECT_EQ(src, expected_ub_src);
-    EXPECT_EQ(sid, 0);
+    EXPECT_FALSE(dintlv_en);
     EXPECT_EQ(block_count, expected_block_count);
     EXPECT_EQ(block_len, expected_block_len);
     EXPECT_EQ(src_gap, expected_src_gap);
@@ -86,7 +86,7 @@ void check_copy_params(
     expected_block_len = block_len;
     expected_src_gap = src_gap;
     expected_dst_gap = dst_gap;
-    MOCKER_CPP(copy_ubuf_to_cbuf, void(__cbuf__ void*, __ubuf__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))
+    MOCKER_CPP(copy_ubuf_to_cbuf, void(__cbuf__ void*, __ubuf__ void*, bool, uint16_t, uint16_t, uint16_t, uint16_t))
         .times(1)
         .will(invoke(copy_ubuf_to_cbuf_stub));
     call();

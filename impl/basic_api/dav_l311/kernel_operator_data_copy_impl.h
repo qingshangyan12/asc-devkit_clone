@@ -175,7 +175,7 @@ template <typename T>
 __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     copy_ubuf_to_cbuf(
-        (__cbuf__ void*)dst, (__ubuf__ void*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        (__cbuf__ void*)dst, (__ubuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
         intriParams.srcStride, intriParams.dstStride);
 }
 
@@ -383,7 +383,7 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
             uint32_t offsetDst = ndIdx * dstNzMatrixStride + i * elementsPerBlock * dstNzC0Stride;
             uint32_t offsetSrc = ndIdx * srcNdMatrixStride + i * elementsPerBlock;
             copy_ubuf_to_cbuf(
-                dst + offsetDst, src + offsetSrc, 0, nValue, 1, srcDValue / elementsPerBlock - 1, dstNzNStride - 1);
+                dst + offsetDst, src + offsetSrc, false, nValue, 1, srcDValue / elementsPerBlock - 1, dstNzNStride - 1);
         }
     }
 }

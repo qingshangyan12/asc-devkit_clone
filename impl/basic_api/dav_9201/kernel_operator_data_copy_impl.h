@@ -216,8 +216,7 @@ __aicore__ inline void CopyUbufToCbuf(
     const uint16_t dstStride)
 {
     if ASCEND_IS_AIV {
-        copy_ubuf_to_cbuf(
-            (__cbuf__ void*)dst, (__ubuf__ void*)src, (uint8_t)0, blockCount, blockLen, srcStride, dstStride);
+        copy_ubuf_to_cbuf((__cbuf__ void*)dst, (__ubuf__ void*)src, false, blockCount, blockLen, srcStride, dstStride);
     }
 }
 // only support CubeCore   PIPE_MTE1
