@@ -274,7 +274,7 @@ struct Conv3DForwardConfigParams {
     uint32_t diStartPos;
     uint32_t mStartPos;
     uint32_t ciStartPos;
-    uint32_t res[10]; // Reserved��for 120Byte ailgn
+    uint32_t res[10]; // Reserved, for 120Byte ailgn
 };
 
 struct MatmulUserDefInfo {
