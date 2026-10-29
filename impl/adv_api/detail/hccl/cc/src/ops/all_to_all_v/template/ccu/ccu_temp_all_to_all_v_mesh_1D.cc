@@ -65,15 +65,19 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
             CalcChannelRequestMesh1DOnDie(comm, param, topoInfo, subCommRanks_, channelDescs, PURE_CLOS_CCU_DIE_ID));
     } else if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+    } else if (!topoInfo->level0PcieMix) {
+        // 对齐 hccl CcuTempAlltoAllVMesh1D::CalcChannelRes：非 pcieMix 的 MESH_1D_CLOS 走 MultiJetty
+        // 建链（mesh 链优先，无 mesh 链取端口对等 CLOS 链），与 CcuSchedAllToAllMesh1DMultiJetty 同款
+        CHK_RET(CalcChannelRequestMeshClosMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
     } else {
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
             comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
-        for (const auto& channel : channelDescs) {
-            CHK_PRT_RET(
-                channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
-                HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].", channel.channelProtocol),
-                HCCL_E_INTERNAL);
-        }
+    }
+    for (const auto& channel : channelDescs) {
+        CHK_PRT_RET(
+            channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
+            HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].", channel.channelProtocol),
+            HCCL_E_INTERNAL);
     }
     CHK_PRT_RET(
         channelDescs.size() + 1U != tempRankSize_,
