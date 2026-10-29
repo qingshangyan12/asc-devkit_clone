@@ -282,8 +282,12 @@ Atlas A2系列产品
 
 | 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
 | --- | --- | --- | --- |
+| uint8_t | uint8_t | int32_t | int32_t |
 | int8_t | int8_t | int32_t | int32_t |
 | half | half | half | half |
+| uint8_t | int8_t | int32_t | int32_t |
+| int16_t | int8_t | int32_t | int32_t |
+| int8_t | int4b_t | int32_t | int32_t |
 
 <!-- end id27 -->
 
@@ -292,8 +296,13 @@ Atlas A2系列产品
 
 | 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
 | --- | --- | --- | --- |
+| uint8_t | uint8_t | int32_t | int32_t |
 | int8_t | int8_t | int32_t | int32_t |
 | half | half | half | half |
+| uint8_t | int8_t | int32_t | int32_t |
+| int16_t | int8_t | int32_t | int32_t |
+| int8_t | int4b_t | int32_t | int32_t |
+
 <!-- end id34 -->
 
 <!-- npu="9030" id28 -->
@@ -301,8 +310,11 @@ Atlas A2系列产品
 
 | 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
 | --- | --- | --- | --- |
+| uint8_t | uint8_t | int32_t | int32_t |
 | int8_t | int8_t | int32_t | int32_t |
 | half | half | half | half |
+| uint8_t | int8_t | int32_t | int32_t |
+| int16_t | int8_t | int32_t | int32_t |
 
 <!-- end id28 -->
 
