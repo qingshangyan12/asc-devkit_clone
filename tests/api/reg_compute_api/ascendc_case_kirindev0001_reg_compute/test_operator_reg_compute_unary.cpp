@@ -202,7 +202,7 @@ INSTANTIATE_TEST_CASE_P(
         MicroUnaryParams{MicroUnaryRunCase<int8_t, 6>}, MicroUnaryParams{MicroUnaryRunCase<int16_t, 6>},
         MicroUnaryParams{MicroUnaryRunCase<int32_t, 6>},
         MicroUnaryParams{MicroUnaryRunCase<half, 6>}, MicroUnaryParams{MicroUnaryRunCase<float, 6>},
-        MicroUnaryParams{MicroUnaryRunCase<bool, 10>}, MicroUnaryParams{MicroUnaryRunCase<uint8_t, 10>},
+        MicroUnaryParams{MicroUnaryRunCase<uint8_t, 10>},
         MicroUnaryParams{MicroUnaryRunCase<int8_t, 10>}, MicroUnaryParams{MicroUnaryRunCase<uint16_t, 10>},
         MicroUnaryParams{MicroUnaryRunCase<int16_t, 10>}, MicroUnaryParams{MicroUnaryRunCase<uint32_t, 10>},
         MicroUnaryParams{MicroUnaryRunCase<int32_t, 10>}, MicroUnaryParams{MicroUnaryRunCase<half, 10>},

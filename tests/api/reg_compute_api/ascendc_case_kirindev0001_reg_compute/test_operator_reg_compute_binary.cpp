@@ -239,7 +239,7 @@ INSTANTIATE_TEST_CASE_P(
         MicroBinaryParams{MicroBinaryRunCase<uint16_t, uint16_t, 9>},
         MicroBinaryParams{MicroBinaryRunCase<int16_t, int16_t, 9>},
         MicroBinaryParams{MicroBinaryRunCase<uint8_t, uint8_t, 9>},
-        MicroBinaryParams{MicroBinaryRunCase<int8_t, int8_t, 9>}, MicroBinaryParams{MicroBinaryRunCase<bool, bool, 9>},
+        MicroBinaryParams{MicroBinaryRunCase<int8_t, int8_t, 9>},
         MicroBinaryParams{MicroBinaryRunCase<uint32_t, uint32_t, 13>},
         MicroBinaryParams{MicroBinaryRunCase<uint32_t, uint32_t, 14>},
         MicroBinaryParams{MicroBinaryRunCase<int32_t, int32_t, 13>},

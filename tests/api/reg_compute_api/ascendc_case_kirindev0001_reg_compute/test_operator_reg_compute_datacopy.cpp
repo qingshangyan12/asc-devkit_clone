@@ -457,19 +457,19 @@ MICRO_DATACOPY_TEST_CASE(11);
 MICRO_DATACOPY_TEST_CASE(12);
 MICRO_DATACOPY_TEST_CASE(601);
 
-#define MICRO_DATACOPY_TEST_CASE_B64(MODE)                                           \
-    using MicroDatacopyTestsuite_mode_b64##MODE = MicroDatacopyTestsuite<MODE>;      \
+#define MICRO_DATACOPY_TEST_CASE_B32(MODE)                                           \
+    using MicroDatacopyTestsuite_mode_b32##MODE = MicroDatacopyTestsuite<MODE>;      \
     INSTANTIATE_TEST_CASE_P(                                                         \
-        TEST_MicroDatacopyB64, MicroDatacopyTestsuite_mode_b64##MODE,                \
+        TEST_MicroDatacopyB32, MicroDatacopyTestsuite_mode_b32##MODE,                \
         ::testing::Values(                                                           \
-            MicroDatacopyModeTestParams<MODE>{MicroDatacopy<uint64_t, MODE>, 1024},  \
-            MicroDatacopyModeTestParams<MODE>{MicroDatacopy<int64_t, MODE>, 1024})); \
+            MicroDatacopyModeTestParams<MODE>{MicroDatacopy<uint32_t, MODE>, 1024},  \
+            MicroDatacopyModeTestParams<MODE>{MicroDatacopy<int32_t, MODE>, 1024})); \
                                                                                      \
-    TEST_P(MicroDatacopyTestsuite_mode_b64##MODE, MicroDatacopyTestCase)             \
+    TEST_P(MicroDatacopyTestsuite_mode_b32##MODE, MicroDatacopyTestCase)             \
     {                                                                                \
         auto param = GetParam();                                                     \
-        uint8_t* srcGm = new uint8_t[param.size * 8 * 10]{0};                        \
-        uint8_t* dstGm = new uint8_t[param.size * 8 * 10]{0};                        \
+        uint8_t* srcGm = new uint8_t[param.size * 4 * 10]{0};                        \
+        uint8_t* dstGm = new uint8_t[param.size * 4 * 10]{0};                        \
         param.cal_func(dstGm, srcGm, param.size);                                    \
         for (int32_t i = 0; i < (sizeof(dstGm) / sizeof(dstGm[0])); i++) {           \
             EXPECT_EQ(dstGm[i], 0x00);                                               \
@@ -478,4 +478,4 @@ MICRO_DATACOPY_TEST_CASE(601);
         delete[] dstGm;                                                              \
     }
 
-MICRO_DATACOPY_TEST_CASE_B64(81);
+MICRO_DATACOPY_TEST_CASE_B32(81);

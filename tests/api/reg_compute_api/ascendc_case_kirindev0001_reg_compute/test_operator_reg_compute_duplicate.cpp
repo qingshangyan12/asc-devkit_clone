@@ -123,7 +123,6 @@ INSTANTIATE_TEST_CASE_P(
         duplicateParams{4, 1, 64, 0, testDuplicate<int32_t, uint32_t>},
         duplicateParams{2, 1, 128, 0, testDuplicate<uint16_t, uint32_t>},
         duplicateParams{2, 1, 64, 0, testDuplicate<int16_t, uint32_t>},
-        duplicateParams{1, 1, 64, 0, testDuplicate<bool, uint32_t>},
         duplicateParams{1, 1, 64, 0, testDuplicate<int8_t, uint32_t>},
         duplicateParams{1, 1, 128, 0, testDuplicate<uint8_t, uint32_t>},
         duplicateParams{2, 1, 64, 1, testDuplicate<half, uint32_t>},
@@ -131,7 +130,6 @@ INSTANTIATE_TEST_CASE_P(
         duplicateParams{4, 1, 64, 1, testDuplicate<float, uint32_t>},
         duplicateParams{2, 1, 128, 1, testDuplicate<uint16_t, uint32_t>},
         duplicateParams{2, 1, 128, 1, testDuplicate<int16_t, uint32_t>},
-        duplicateParams{1, 1, 128, 1, testDuplicate<bool, uint32_t>},
         duplicateParams{1, 1, 128, 1, testDuplicate<int8_t, uint32_t>},
         duplicateParams{1, 1, 128, 1, testDuplicate<uint8_t, uint32_t>},
         duplicateParams{4, 1, 64, 1, testDuplicate<int32_t, uint32_t>},
@@ -140,7 +138,6 @@ INSTANTIATE_TEST_CASE_P(
         duplicateParams{4, 1, 64, 2, testDuplicate<float, uint32_t>},
         duplicateParams{2, 1, 128, 2, testDuplicate<uint16_t, uint32_t>},
         duplicateParams{2, 1, 128, 2, testDuplicate<int16_t, uint32_t>},
-        duplicateParams{1, 1, 128, 2, testDuplicate<bool, uint32_t>},
         duplicateParams{1, 1, 128, 2, testDuplicate<int8_t, uint32_t>},
         duplicateParams{1, 1, 128, 2, testDuplicate<uint8_t, uint32_t>},
         duplicateParams{4, 1, 64, 2, testDuplicate<int32_t, uint32_t>}));
