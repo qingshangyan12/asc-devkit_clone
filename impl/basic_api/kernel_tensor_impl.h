@@ -502,6 +502,14 @@ LocalTensor<T>::SetAddrWithOffset(LocalTensor<U>& src, uint32_t offset)
     this->address_.bufferAddr += offset * sizeof(PrimT<U>);
     this->address_.absAddr += offset * sizeof(PrimT<U>);
 }
+template <typename T>
+template <typename S>
+[[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+             "Please do not use it!")]]
+void LocalTensor<T>::SetAddrWithOffset(S*& src, uint32_t offset)
+{
+    this->address_.absAddr = reinterpret_cast<uint8_t*>(src) + offset * sizeof(S);
+}
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
     (__NPU_ARCH__ == 9202)
@@ -976,6 +984,18 @@ LocalTensor<T>::SetAddrWithOffset(LocalTensor<U>& src, uint32_t offset)
     this->address_ = src.address_;
     this->address_.bufferAddr += offset * sizeof(PrimT<U>);
 }
+template <typename T>
+template <typename S>
+[[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+             "Please do not use it!")]]
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(S*& src, uint32_t offset)
+{
+    // The pointer's numeric value IS the buffer address in this build: GetPhyAddr() returns
+    // `bufferAddr + index * sizeof(PrimType)` (kernel_tensor_impl.h:592-604), so a caller obtains
+    // these pointers as `(PrimType*)t.GetPhyAddr()` and no absolute address is involved.
+    this->address_.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uint64_t>(src)) + offset * sizeof(S);
+}
+
 #endif
 template <typename T>
 __aicore__ inline int32_t LocalTensor<T>::GetPosition() const
