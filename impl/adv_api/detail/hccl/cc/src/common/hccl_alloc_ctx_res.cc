@@ -641,24 +641,6 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
         CHK_RET(LoadAICPUKernel());
     }
     CHK_RET(SetOpParamAlgTag(opParam, algName));
-    // Temporary board diagnostic: force only the migrated AllGather pipeline.
-    // This does not probe/register symmetric windows or mark them as checked.
-    if (opParam.opType == HCCL_CMD_ALLGATHER && algName == "AicpuAllGatherPipeLineMeshNHR" &&
-        opParam.opMode == OpMode::OPBASE && opParam.engine == COMM_ENGINE_AICPU_TS) {
-        opParam.supportSymmetricMemory = true;
-        const std::string diagnosticTag = std::string(opParam.algTag) + "_symdiag_v1";
-        CHK_PRT_RET(
-            diagnosticTag.size() >= sizeof(opParam.algTag),
-            HCCL_ERROR("[AG_SYMM_DIAG] algorithm resource tag is too long."), HCCL_E_PARA);
-        CHK_SAFETY_FUNC_RET(strcpy_s(opParam.algTag, sizeof(opParam.algTag), diagnosticTag.c_str()));
-        HCCL_WARNING(
-            "[AG_SYMM_DIAG] forced symmetric memory for algName[%s], algTag[%s], "
-            "inputWindow[%p], outputWindow[%p], inputOffset[%llu], outputOffset[%llu]. "
-            "Window probing is NOT performed; valid windows must be supplied before execution.",
-            algName.c_str(), opParam.algTag, opParam.inputSymWindow, opParam.outputSymWindow,
-            static_cast<unsigned long long>(opParam.inputOffset),
-            static_cast<unsigned long long>(opParam.outputOffset));
-    }
     CHK_RET(FillOpParamAlgName(opParam, algName));
     return HCCL_SUCCESS;
 }
