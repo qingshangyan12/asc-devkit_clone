@@ -11,6 +11,8 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import shutil
+import sys
 import subprocess
 from pathlib import Path
 
@@ -237,3 +239,83 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-dir={root}/input" in arguments
+
+
+def _ops_info_ini(op_names):
+    return "".join(
+        f"[{name}]\ninput0.name=x\ninput0.paramType=required\n"
+        "input0.dtype=float16\ninput0.format=ND\n"
+        "output0.name=y\noutput0.paramType=required\n"
+        "output0.dtype=float16\noutput0.format=ND\n"
+        for name in op_names
+    )
+
+
+@pytest.mark.parametrize(
+    "initial,current",
+    [
+        (("FirstOperatorWithLongName", "RemovedOperatorWithLongName"), ("Add",)),
+        (("A",), ("LongerOperatorName", "SecondOperatorName")),
+        (("A",), ("B",)),
+    ],
+)
+def test_ops_info_cli_rewrites_current_input(tmp_path, initial, current):
+    source = tmp_path / "operators.ini"
+    output = tmp_path / "operators.json"
+    command = [sys.executable, str(FWK_MODULES_DIR / "util/parse_ini_to_json.py"), str(source), str(output)]
+    for names in (initial, current):
+        source.write_text(_ops_info_ini(names), encoding="utf-8")
+        result = subprocess.run(command, text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert set(json.loads(output.read_text(encoding="utf-8"))) == set(names)
+        assert output.stat().st_mode & 0o777 == 0o640
+
+    previous = output.read_bytes()
+    source.write_text(_ops_info_ini(current).replace("paramType=required", "paramType=invalid"), encoding="utf-8")
+    result = subprocess.run(command, text=True, capture_output=True)
+    assert result.returncode != 0
+    assert output.read_bytes() == previous
+
+
+@pytest.mark.parametrize("changed_input", ["ini", "generator"])
+def test_ops_info_target_tracks_input_and_generator(tmp_path, changed_input):
+    source = tmp_path / "operators.ini"
+    source.write_text(_ops_info_ini(("FirstOperatorWithLongName", "RemovedOperatorWithLongName")), encoding="utf-8")
+    tools = tmp_path / "tools"
+    generator = tools / "util/parse_ini_to_json.py"
+    generator.parent.mkdir(parents=True)
+    shutil.copyfile(FWK_MODULES_DIR / "util/parse_ini_to_json.py", generator)
+    build = tmp_path / "build"
+    output = build / "operators.json"
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(ops_info_regeneration NONE)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set(ASCEND_PYTHON_EXECUTABLE "{sys.executable}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{tools}")
+add_ops_info_target(TARGET operators OPS_INFO "{source}" OUTPUT "{output}")
+''',
+        encoding="utf-8",
+    )
+    configure = subprocess.run(["cmake", "-S", str(tmp_path), "-B", str(build)], text=True, capture_output=True)
+    assert configure.returncode == 0, configure.stdout + configure.stderr
+    command = ["cmake", "--build", str(build), "--target", "operators", "--parallel", "4"]
+    first = subprocess.run(command, text=True, capture_output=True)
+    assert first.returncode == 0, first.stdout + first.stderr
+    assert set(json.loads(output.read_text(encoding="utf-8"))) == {
+        "FirstOperatorWithLongName",
+        "RemovedOperatorWithLongName",
+    }
+    previous_mtime = output.stat().st_mtime_ns
+    if changed_input == "ini":
+        source.write_text(_ops_info_ini(("Add",)), encoding="utf-8")
+    else:
+        generator.write_text(
+            generator.read_text(encoding="utf-8") + "\n# Regenerate after a tool update.\n", encoding="utf-8"
+        )
+
+    rebuilt = subprocess.run(command, text=True, capture_output=True)
+    assert rebuilt.returncode == 0, rebuilt.stdout + rebuilt.stderr
+    expected = {"Add"} if changed_input == "ini" else {"FirstOperatorWithLongName", "RemovedOperatorWithLongName"}
+    assert set(json.loads(output.read_text(encoding="utf-8"))) == expected
+    assert output.stat().st_mtime_ns > previous_mtime
