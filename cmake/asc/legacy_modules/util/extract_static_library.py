@@ -41,7 +41,7 @@ def get_objects_in_archive(archive_path: str) -> List[str]:
     """Get objects in archive."""
     result = subprocess.run(["ar", "-t", archive_path], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     display = result.stdout.decode()
-    return display.split()
+    return display.splitlines()
 
 
 def generate_cmake_config_content(target: str, dst_dir: str, objects: List[str]) -> str:
