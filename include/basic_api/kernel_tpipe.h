@@ -517,6 +517,23 @@ public:
     template <typename T>
     __aicore__ inline void ReadSpmBuffer(
         const LocalTensor<T>& readBuffer, const int32_t readSize, int32_t readOffset = 0);
+
+    /*
+     * ReadSpmBuffer with a raw UB pointer.
+     *
+     * The read target is always UB, so a raw pointer identifies it unambiguously and T is deduced
+     * from the operand.  The address is re-wrapped as the LocalTensor view it denotes and handed to
+     * the Tensor overloads above, so the FIFO events and the data movement are exactly theirs.
+     *
+     * A raw pointer carries no ShapeInfo, so the Tensor `readSize` overload's shape-derived default
+     * (readSize == 0 -> size taken from the tensor shape) has no pointer equivalent: on the pointer
+     * path readSize is the size, and 0 means 0.
+     */
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(
+        __ubuf__ T* readBuffer, const DataCopyParams& copyParams, int32_t readOffset = 0);
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(__ubuf__ T* readBuffer, const int32_t readSize, int32_t readOffset = 0);
     __aicore__ inline void DestroyWithoutPipeAll();
     __aicore__ inline void Destroy();
     __aicore__ inline void Reset();
@@ -540,6 +557,12 @@ protected:
     friend __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart);
     template <typename T, TPosition pos>
     friend __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popBuffer);
+    // Raw-pointer form: the out-parameter is a reference to a raw UB pointer.  `S` is deduced
+    // instead of being the explicit `T`, because the call this has to accept is
+    // PopStackBuffer<float, TPosition::VECCALC>(p) with p of type __ubuf__ float*, and `T&` would be
+    // `float&`.  Defined in impl/basic_api/kernel_pop_stack_buffer.h.
+    template <typename T, TPosition pos, typename S>
+    friend __aicore__ inline bool PopStackBuffer(S*& popBuffer);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     void inline SetBufferCtx(Hardware hard, struct BufPoolExtra* bufPool);
 #endif
