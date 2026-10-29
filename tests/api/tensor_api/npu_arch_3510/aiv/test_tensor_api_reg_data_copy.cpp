@@ -74,10 +74,7 @@ REG_DATA_MOVE_WITH_DST_TEST(uint32_t)
 REG_DATA_MOVE_WITH_DST_TEST(int32_t)
 REG_DATA_MOVE_WITH_DST_TEST(float)
 
-TEST_F(TensorApiVectorRegDataCopy3510, MoveWithoutDstBool)
-{
-    TestMoveWithoutDst();
-}
+TEST_F(TensorApiVectorRegDataCopy3510, MoveWithoutDstBool) { TestMoveWithoutDst(); }
 
 TEST_F(TensorApiVectorRegDataCopy3510, MoveMaskUint16)
 {
