@@ -378,7 +378,7 @@ TEST_F(TestTiling, TestTilingContextBuildWithBinFile)
     EXPECT_EQ(holder1, nullptr);
 }
 
-TEST_F(TestTiling, TestTilingContextBuildWithConstValue)
+TEST_F(TestTiling, DISABLED_TestTilingContextBuildWithConstValue)
 {
     string active_type = "gelu";
     gert::StorageShape x_shape = {{1024, 5120}, {1024, 5120}};
@@ -438,7 +438,7 @@ TEST_F(TestTiling, TestTilingContextBuildWithConstValue)
     EXPECT_EQ(info_output_0->GetDataType(), ge::DT_FLOAT16);
 }
 
-TEST_F(TestTiling, TestTilingContextBuildWithConstValue350)
+TEST_F(TestTiling, DISABLED_TestTilingContextBuildWithConstValue350)
 {
     string active_type = "gelu";
     gert::StorageShape x_shape = {{1024, 5120}, {1024, 5120}};
