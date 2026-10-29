@@ -371,9 +371,15 @@ def main() -> int:
         index, gaps = load(args.index_dir if args.index_dir is not None else INDEX_DIR / args.surface)
         results = run_query(args, index, gaps)
         if args.gap is not None and not results and not gaps.get("scope_out_gaps"):
-            print("[]" if args.json else "无登记缺口：原范围外缺口已全部纳入索引范围")
+            if args.json:
+                print("[]")
             return 0
-        print(json.dumps(results, ensure_ascii=False, indent=1) if args.json else render(index, results))
+        paths = sorted({row["path"] for row in results if "path" in row}
+                       | {hint["path"] for row in results for hint in row.get("hints", []) if "path" in hint})
+        if args.json:
+            print(json.dumps(paths, ensure_ascii=False))
+        elif paths:
+            print("\n".join(paths))
         return 0
     except (ValueError, KeyError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
