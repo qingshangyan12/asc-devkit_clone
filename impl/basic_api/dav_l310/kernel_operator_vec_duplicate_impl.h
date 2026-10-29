@@ -89,8 +89,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
         } else {
             for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
                 if constexpr ((!isNormalMode) || isSetMask) {
-                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(
-                        maskBuf, count);
+                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
