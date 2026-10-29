@@ -22,8 +22,8 @@ namespace AscendC {
  *
  * \param [in] srcShape input shape
  * \param [in] typeSize data type size: sizeof(TYPE)
- * \param [out] maxValue max size of tmp buffer
- * \param [out] minValue min size of tmp buffer
+ * \param [out] maxValue max size of tmp buffer, in bytes
+ * \param [out] minValue min size of tmp buffer, in bytes
  * \param [in] isBasicBlock indicate whether enable basicBlock.
    When enable basicBlock, better performance will be achived and more tmp buffer will be needed
  * \return flag for whether the tmp buffer size is calculated successfully

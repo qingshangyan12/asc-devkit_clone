@@ -1106,10 +1106,12 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/half/int8_t | 使得src0+src1=MIN | MIN | +0 | 0 |
 | half/half/int8_t | nan/任意值<br>+inf/-inf | nan | nan | 0 |
 | int16_t/int16_t/int8_t | 0/0 | 0 | 0 | 0 |
-| int16_t/int16_t/int8_t | MAX/MAX | MAX | MAX | MAX |
-| int16_t/int16_t/int8_t | MIN/MIN | MIN | 0 | 0 |
+| int16_t/int16_t/int8_t | MAX/MAX | -2 | 0 | 0 |
+| int16_t/int16_t/int8_t | MIN/MIN | 0 | 0 | 0 |
 
-注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
+注：
+- dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
+- int16_t输入时，src0+src1按int16_t位宽回绕（二进制补码）计算，MAX/MAX相加的中间阶段1结果为-2，MIN/MIN相加的中间阶段1结果为0，之后再进行ReLU和向int8_t的饱和转换。
 
 **表27**  SubReluCast特殊值/边界值输入的计算结果
 
@@ -1132,10 +1134,12 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/half/int8_t | 使得src0-src1=MIN | MIN | +0 | 0 |
 | half/half/int8_t | nan/任意值<br>+inf/+inf<br>-inf/-inf | nan | nan | 0 |
 | int16_t/int16_t/int8_t | 0/0 | 0 | 0 | 0 |
-| int16_t/int16_t/int8_t | MAX/MIN | MAX | MAX | MAX |
-| int16_t/int16_t/int8_t | MIN/MAX | MIN | 0 | 0 |
+| int16_t/int16_t/int8_t | MAX/MIN | -1 | 0 | 0 |
+| int16_t/int16_t/int8_t | MIN/MAX | 1 | 1 | 1 |
 
-注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
+注：
+- dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
+- int16_t输入时，src0-src1按int16_t位宽回绕（二进制补码）计算，MAX/MIN相减的中间阶段1结果为-1，MIN/MAX相减的中间阶段1结果为1，之后再进行ReLU和向int8_t的饱和转换。
 
 **表28**  MulCast特殊值/边界值输入的计算结果
 
@@ -1740,13 +1744,13 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half | 全为nan | nan | 0.0 |
 | half | 全为inf | inf | 65504.0 |
 | half | 全为-inf | -inf | -65504.0 |
-| half | inf，-inf，nan加253个1.0 | nan | 1.0 |
-| half | inf，-inf加254个1.0 | inf | 65504.0 |
-| half | inf，nan加254个1.0 | nan | 1.0 |
-| half | -inf，nan加254个1.0 | nan | 1.0 |
-| half | 255个1.0加一个inf | inf | 65504.0 |
-| half | 255个1.0加一个-inf | 1.0 | 1.0 |
-| half | 255个1.0加一个nan | nan | 1.0 |
+| half | inf，-inf，nan加125个1.0 | nan | 0.0 |
+| half | inf，-inf加126个1.0 | inf | 65504.0 |
+| half | inf，nan加126个1.0 | nan | 0.0 |
+| half | -inf，nan加126个1.0 | nan | 0.0 |
+| half | 127个1.0加一个inf | inf | 65504.0 |
+| half | 127个1.0加一个-inf | 1.0 | 1.0 |
+| half | 127个1.0加一个nan | nan | 0.0 |
 | float | 全为-3.4028235e+38（MIN） | -3.4028235e+38 | -3.4028235e+38 |
 | float | 全为3.4028235e+38（MAX） | 3.4028235e+38 | 3.4028235e+38 |
 | float | 全为0.0 | 0.0 | 0.0 |
@@ -1777,13 +1781,13 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half | 全为nan | nan | 0.0 |
 | half | 全为inf | inf | 65504.0 |
 | half | 全为-inf | -inf | -65504.0 |
-| half | inf，-inf，nan加253个1.0 | nan | 0.0 |
-| half | inf，-inf加254个1.0 | -inf | -65504.0 |
-| half | inf，nan加254个1.0 | nan | 0.0 |
-| half | -inf，nan加254个1.0 | nan | 0.0 |
-| half | 255个1.0加一个inf | 1.0 | 1.0 |
-| half | 255个1.0加一个-inf | -inf | -65504.0 |
-| half | 255个1.0加一个nan | nan | 0.0 |
+| half | inf，-inf，nan加125个1.0 | nan | 0.0 |
+| half | inf，-inf加126个1.0 | -inf | -65504.0 |
+| half | inf，nan加126个1.0 | nan | 0.0 |
+| half | -inf，nan加126个1.0 | nan | 0.0 |
+| half | 127个1.0加一个inf | 1.0 | 1.0 |
+| half | 127个1.0加一个-inf | -inf | -65504.0 |
+| half | 127个1.0加一个nan | nan | 0.0 |
 | float | 全为-3.4028235e+38（MIN） | -3.4028235e+38 | -3.4028235e+38 |
 | float | 全为3.4028235e+38（MAX） | 3.4028235e+38 | 3.4028235e+38 |
 | float | 全为0.0 | 0.0 | 0.0 |
@@ -1814,13 +1818,13 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half | 全为nan | nan | 0.0 |
 | half | 全为inf | inf | 65504.0 |
 | half | 全为-inf | -inf | -65504.0 |
-| half | inf，-inf，nan加253个1.0 | nan | 252.0 |
-| half | inf，-inf加254个1.0 | nan | 254.0 |
-| half | inf，nan加254个1.0 | nan | 254.0 |
-| half | -inf，nan加254个1.0 | nan | 254.0 |
-| half | 255个1.0加一个inf | inf | 65504.0 |
-| half | 255个1.0加一个-inf | -inf | -65248.0 |
-| half | 255个1.0加一个nan | nan | 254.0 |
+| half | inf，-inf，nan加125个1.0 | nan | 124.0 |
+| half | inf，-inf加126个1.0 | nan | 126.0 |
+| half | inf，nan加126个1.0 | nan | 126.0 |
+| half | -inf，nan加126个1.0 | nan | 126.0 |
+| half | 127个1.0加一个inf | inf | 65504.0 |
+| half | 127个1.0加一个-inf | -inf | -65376.0 |
+| half | 127个1.0加一个nan | nan | 126.0 |
 | float | 全为-3.4028235e+38（MIN） | -inf | -inf |
 | float | 全为3.4028235e+38（MAX） | inf | inf |
 | float | 全为0.0 | 0.0 | 0.0 |
@@ -1859,4 +1863,3 @@ Gather和Gatherb属于搬运类接口，不涉及特殊值/边界值。
 ## 掩码操作<a name="section0460049181018"></a>
 
 SetMaskCount、SetMaskNorm、SetVectorMask和ResetMask为掩码配置接口，不涉及特殊值/边界值。
-

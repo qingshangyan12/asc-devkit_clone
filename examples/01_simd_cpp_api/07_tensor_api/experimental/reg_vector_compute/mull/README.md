@@ -4,9 +4,11 @@
 
 本样例介绍如何使用实验性 Tensor API `asc::te::experimental::mull` 对两个 `uint32_t` Tensor 执行逐元素乘法，并分别输出乘积的低32位和高32位。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR&950DT系列产品
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 

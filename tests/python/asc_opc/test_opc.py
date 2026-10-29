@@ -939,14 +939,6 @@ class TestOpc02(unittest.TestCase):
             ("invalid mode", ["--kernel-spec=All"]),
             ("normal without dir", ["--kernel-spec=Normal"]),
             ("sk without dir", ["--kernel-spec=SK"]),
-            (
-                "normal with relocatable binary",
-                ["--kernel-spec=Normal", "--kernel-spec-dir={}", "--op_relocatable_kernel_binary=true"],
-            ),
-            (
-                "sk with relocatable binary",
-                ["--kernel-spec=SK", "--kernel-spec-dir={}", "--op_relocatable_kernel_binary=true"],
-            ),
         )
         for name, args in cases:
             with self.subTest(name=name):
@@ -957,6 +949,23 @@ class TestOpc02(unittest.TestCase):
                         _, result_parser = opc.parse_args()
 
                     self.assertFalse(result_parser.check_input_params())
+
+    def test_relocatable_disables_kernel_spec_before_checking_export_directory(self):
+        for mode in ("Normal", "SK"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as root:
+                directory = os.path.join(root, "unused_export")
+                with RequiredValidArgs() as required_args:
+                    sys.argv = required_args + [
+                        "--kernel-spec=" + mode,
+                        "--kernel-spec-dir=" + directory,
+                        "--op_relocatable_kernel_binary=true",
+                    ]
+                    _, result_parser = opc.parse_args()
+                self.assertTrue(result_parser.check_input_params())
+                self.assertTrue(result_parser.get_option(OpcOptions.RELOCATABLE_BIN))
+                self.assertEqual(result_parser.get_option(OpcOptions.KERNEL_SPEC), "None")
+                self.assertIsNone(result_parser.get_option(OpcOptions.KERNEL_SPEC_DIR))
+                self.assertFalse(os.path.exists(directory))
 
     def test_options_parse_24(self):
         """

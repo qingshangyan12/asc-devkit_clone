@@ -1,4 +1,4 @@
-# asc_copy_l12l0b_arch_3510（3D矩阵搬运）
+# asc_copy_l12l0b（NPU架构版本3510，3D矩阵搬运）
 
 ## 产品支持情况
 

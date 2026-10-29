@@ -12,9 +12,11 @@ dst[i] = src[index[i]], 0 <= i < 128
 
 索引范围为 `[0, 127]`，表示源寄存器内的元素位置，不是字节偏移或 GM 全局索引。128个 `half` 元素恰好占满一个256字节寄存器。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -48,7 +50,7 @@ dst[i] = src[index[i]], 0 <= i < 128
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 layout 构造 GM、UB Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将源数据与索引从 GM 搬运到 UB。
+    2. 使用 `asc::te::mutex` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将源数据与索引从 GM 搬运到 UB。
     3. 使用 `update_mask<half>` 创建128个有效元素的 mask，通过 `load` 加载源数据与索引，并使用 `with_mask` 设置有效元素。
     4. 调用 `gather(source_reg, index_reg)` 完成索引收集，结果继承索引寄存器的 mask。
     5. 使用 `store` 写入 UB 输出 Tensor，再通过 `make_copy(copy_ub_to_gm{})` 和 `copy` 写回 GM。

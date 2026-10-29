@@ -26,8 +26,8 @@ namespace AscendC {
  * @param [in] srcShape, input shape information
  * @param [in] typeSize, input LocalTensor typeSize, half is 2 and float is 4
  * @param [in] isReuseSource, whether to reuse the input space of the source operand
- * @param [out] maxValue, maximum temporary space required
- * @param [out] minValue, minimum temporary space required
+ * @param [out] maxValue, maximum temporary space required, in bytes
+ * @param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReGluMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,

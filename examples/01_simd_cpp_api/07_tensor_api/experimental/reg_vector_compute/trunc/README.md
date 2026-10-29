@@ -12,9 +12,11 @@ y[i] = trunc(x[i])
 
 例如，`3.75` 的输出为 `3.0`，`-3.75` 的输出为 `-3.0`。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR&950DT系列产品
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -88,10 +90,10 @@ y[i] = trunc(x[i])
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造GM、UB上的二维Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
+    2. 使用 `asc::te::mutex` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据寄存器字节数和元素类型大小计算单次处理元素数，使用 `asc::te::experimental::all_mask<T>()` 生成全有效掩码。
     4. 使用 `asc::te::experimental::load` 将UB数据加载到寄存器，调用 `asc::te::experimental::trunc` 向零取整，再通过 `asc::te::experimental::store` 写回UB。
-    5. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
+    5. 使用同一个asc::te::mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心计算代码如下：
 
@@ -109,7 +111,7 @@ y[i] = trunc(x[i])
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
