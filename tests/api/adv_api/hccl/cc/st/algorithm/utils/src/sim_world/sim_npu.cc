@@ -32,6 +32,7 @@ void SimNpu::InitSimNpuRes(const NpuPos& pos)
 void SimNpu::InitMemLayOut()
 {
     memLayout_.clear();
+    backingMems_.clear();
     static uint64_t addr = SIM_MEM_BLOCK_SIZE;
     uint64_t startAddr = (uint64_t)addr & SIM_MEM_MASKER;
     MemBlock inMemBlock{BufferType::INPUT, addr, 0};
@@ -77,6 +78,9 @@ uint64_t SimNpu::AllocMemory(BufferType bufferType, uint64_t len)
     auto index = g_BufferType2Index[bufferType];
     MemBlock& memBlock = memLayout_[index];
     memBlock.size = len;
+    if (backingMems_[bufferType].size() < len) {
+        backingMems_[bufferType].resize(len);
+    }
     return memBlock.startAddr;
 }
 
@@ -191,5 +195,16 @@ HcclResult SimNpu::GetSlice(uint64_t addr, uint64_t dataCount, const HcclDataTyp
     CHK_RET(GetSlice(addr, size, dataSlice));
 
     return HcclResult::HCCL_SUCCESS;
+}
+
+u8* SimNpu::GetBufferBase(BufferType bufferType, uint64_t requiredSize)
+{
+    if (g_BufferType2Index.count(bufferType) == 0) {
+        THROW<InvalidParamsException>("[SimNpu::GetBufferBase] failed, bufferType[%s]", bufferType.Describe().c_str());
+    }
+    if (backingMems_[bufferType].size() < requiredSize) {
+        backingMems_[bufferType].resize(requiredSize);
+    }
+    return backingMems_[bufferType].data();
 }
 } // namespace HcclSim

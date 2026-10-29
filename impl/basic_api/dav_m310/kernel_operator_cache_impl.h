@@ -31,12 +31,12 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void DataCachePreloadImpl(const GlobalTensor<uint64_t>& src, const T cacheOffset)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupport DataCachePreload on current device"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported DataCachePreload on current device"); });
 }
 
 __aicore__ inline int64_t GetICachePreloadStatusImpl()
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupport GetICachePreloadStatus on current device"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported GetICachePreloadStatus on current device"); });
     return 0;
 }
 

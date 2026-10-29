@@ -28,11 +28,16 @@ namespace te {
 namespace experimental {
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
  * @brief Stores register data to a UB tensor at the specified coordinate.
- * @param tensor Destination tensor located in UB.
- * @param coord Coordinate of the first destination element.
- * @param src Source register tensor.
+ *
+ * @override_id
+ * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @archs 3510
  * @note The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate of the first destination element.
+ * @param [in] src Source register tensor.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename Coord,
@@ -40,21 +45,31 @@ template <
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
  * @brief Stores register data at the beginning of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param src Source register tensor.
+ *
+ * @override_id
+ * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @archs 3510
  * @note The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src Source register tensor.
  */
 template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>& src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
  * @brief Interleaves two register tensors and stores the result at the specified coordinate of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param coord Coordinate of the first destination element.
- * @param src0 First source register tensor.
- * @param src1 Second source register tensor.
+ *
+ * @override_id
+ * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @archs 3510
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate of the first destination element.
+ * @param [in] src0 First source register tensor.
+ * @param [in] src1 Second source register tensor.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,
@@ -63,15 +78,100 @@ __simd_callee__ inline void store(
     Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
  * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param src0 First source register tensor.
- * @param src1 Second source register tensor.
+ *
+ * @override_id
+ * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @archs 3510
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src0 First source register tensor.
+ * @param [in] src1 Second source register tensor.
  */
 template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename RegDataType>
 __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Scatters register data from active source lanes to a UB tensor.
+ *
+ * @override_id
+ * te_experimental_store_scatter__Tensor_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_T_Index
+ * @archs 3510
+ * @note The tensor and source register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param [in] index Register tensor containing the destination offsets.
+ * @note The active-lane mask is taken from src.mask. A value of 1 selects the corresponding source element for storage;
+ * a value of 0 excludes it. Unselected elements are not written; the corresponding destination memory is unchanged.
+ */
+template <typename Tensor, typename T, typename Index>
+__simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
+ *
+ * @override_id
+ * te_experimental_store_scatter__Tensor_R_const_Coord_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_Coord_T_Index
+ * @archs 3510
+ * @note The tensor and source register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate used as the base destination position.
+ * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param [in] index Register tensor containing the destination offsets relative to the base position.
+ * @note The active-lane mask is taken from src.mask. A value of 1 selects the corresponding source element for storage;
+ * a value of 0 excludes it. Unselected elements are not written; the corresponding destination memory is unchanged.
+ */
+template <typename Tensor, typename Coord, typename T, typename Index>
+__simd_callee__ inline void store_scatter(
+    Tensor& tensor, const Coord& coord, const reg_tensor<T>& src, const reg_tensor<Index>& index);
+
+/**
+ * @brief Maintains the hardware state for a sequence of unaligned register-to-UB stores.
+ * @note Each store writes one full vector register and does not use reg_tensor::mask.
+ * Destination addresses must form one contiguous stream. All tensors passed to one
+ * session must have the same element type. Call flush() exactly once with the first
+ * destination address after the stores are complete.
+ */
+struct unalign_store {
+    __simd_callee__ unalign_store() = default;
+
+    /**
+     * @brief Stores one full vector register at the beginning of a UB tensor.
+     * @param dst_tile Tensor whose beginning is the destination address for this store.
+     * @param src Source register tensor. Its mask is not used. An int4b_t destination
+     * requires reg_tensor<int4x2_t>.
+     * @param count Number of elements to store.
+     */
+    template <typename Tensor, typename RegDataType>
+    __simd_callee__ inline void store(Tensor dst_tile, const reg_tensor<RegDataType>& src, uint32_t count);
+
+    /**
+     * @brief Stores register data to a UB tensor at the specified coordinate.
+     * @param dst_tile Destination tensor in the unaligned store stream.
+     * @param coord Coordinate of the first destination element.
+     * @param src Source register tensor. Its mask is not used. An int4b_t destination
+     * requires reg_tensor<int4x2_t>.
+     * @param count Number of elements to store.
+     */
+    template <typename Tensor, typename Coord, typename RegDataType>
+    __simd_callee__ inline void store(
+        Tensor dst_tile, const Coord& coord, const reg_tensor<RegDataType>& src, uint32_t count);
+
+    /**
+     * @brief Commits the pending unaligned stores.
+     * @param dst_base Tensor whose beginning is the destination address of the first store.
+     * @param coord Coordinate passed to the unaligned-store post operation.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline void flush(Tensor dst_base, int32_t coord);
+
+private:
+    vector_store_unalign ureg;
+};
 
 } // namespace experimental
 } // namespace te

@@ -13,7 +13,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 - Fixpipe Buffer：用于存放Fixpipe搬运所需的量化参数。
 
 <!-- npu="950" id1 -->
-**针对Ascend 950PR/Ascend 950DT：**
+**针对Ascend 950PR&950DT系列产品：**
 
 各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
@@ -25,10 +25,10 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 <!-- npu="A3,910b" id2 -->
 **针对如下型号：**
 <!-- npu="A3" id3 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A3系列产品
 <!-- end id3 -->
 <!-- npu="910b" id4 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Atlas A2系列产品
 <!-- end id4 -->
 各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_2201.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
@@ -67,15 +67,13 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 
 ![单次迭代内的8个DataBlock进行Exp计算示意图](figures/in_repeat_datablock.png)
 
-- 矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeatTime设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 * 8（每个迭代8个DataBlock）* 32Byte（每个DataBlock 32Byte） = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。由于硬件限制，repeatTime不能超过255。<br/>
-<br/>
+- 矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeatTime设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 * 8（每个迭代8个DataBlock）* 32Byte（每个DataBlock 32Byte） = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。由于硬件限制，repeatTime不能超过255。
 
     **图3** 2次迭代Exp计算
 
     ![2次迭代Exp计算](figures/exp_2_repeat.png)
 
-- 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。<br/>
-<br/>
+- 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
     **图4** 通过mask参数进行掩码操作示意图（以float数据类型为例）
 

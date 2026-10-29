@@ -3,34 +3,34 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-**`asc_enable_fp8`接口已废弃。请使用[asc_disable_hif8](../cube_compute/asc_disable_hif8.md)接口替代。**
+**`asc_enable_fp8`接口已废弃。请使用[asc_disable_hif8](../cube_compute/mmad_compute_aux_config/asc_disable_hif8.md)接口替代。**
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](../cube_compute/asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
+用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](../cube_compute/mmad_compute_aux_config/asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
 
 ## 函数原型
 
@@ -48,8 +48,8 @@ PIPE_S
 
 ## 约束说明
 
-- 与[asc_enable_hif8](../cube_compute/asc_enable_hif8.md)相反，二者不同时生效。
-- 需在[asc_mmad](../cube_compute/asc_mmad.md)执行前调用。
+- 与[asc_enable_hif8](../cube_compute/mmad_compute_aux_config/asc_enable_hif8.md)相反，二者不同时生效。
+- 需在[asc_mmad](../cube_compute/mmad_compute/asc_mmad.md)执行前调用。
 
 ## 调用示例
 

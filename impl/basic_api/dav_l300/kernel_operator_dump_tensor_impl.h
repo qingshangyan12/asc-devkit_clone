@@ -436,7 +436,7 @@ __aicore__ inline void WriteScalar(__gm__ uint8_t* paramAddr, uint32_t paramIdx,
 {
     __gm__ uint64_t* scalarAddr = (__gm__ uint64_t*)paramAddr + paramIdx;
     *scalarAddr = 0;
-    static_assert(!SupportType<T, double>(), "printf unsupport double type");
+    static_assert(!SupportType<T, double>(), "printf unsupported double type");
 
     if constexpr (SupportType<T, half, float>()) {
         *((__gm__ float*)scalarAddr) = static_cast<float>(scalar);

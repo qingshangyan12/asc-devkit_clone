@@ -42,7 +42,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 > [!NOTE]说明
 > 不同的硬件架构，每一种硬件流水类型包含的具体流水会有所差异，详细介绍请参考[硬件实现](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/hardware_implementation.md)章节。
 
-**表1**  指令流水类型和相关说明
+**表1** 指令流水类型和相关说明
 
 | 流水类型 | 含义 |
 | --- | --- |
@@ -71,7 +71,6 @@ typedef enum {
 } pipe_t;
 ```
 
-
 ## 核内同步分类
 
 对上述核内并行流水的同步控制：
@@ -82,7 +81,7 @@ typedef enum {
         - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
         - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
      <!-- npu="950" id3 -->
-     - Ascend 950PR/Ascend 950DT新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水间的同步控制。通过`asc_lock`锁定指定流水（阻塞后续指令），再通过`asc_unlock`释放流水，完成流水间的同步依赖。
+     - Ascend 950PR&950DT系列产品新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水间的同步控制。通过`asc_lock`锁定指定流水（阻塞后续指令），再通过`asc_unlock`释放流水，完成流水间的同步依赖。
         - `asc_lock`：根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应`mutex_id`的Mutex被`asc_unlock`。
         - `asc_unlock`：当前流水的前置指令退出后，根据`mutex_id`释放对应Mutex。
      - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
@@ -101,7 +100,7 @@ typedef enum {
 
 <a id="aic_intra_core_sync_combinations"></a>
 
-**表2**  AIC中所有合法的核内同步组合
+**表2** AIC中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -114,7 +113,7 @@ typedef enum {
 
 <a id="aiv_intra_core_sync_combinations"></a>
 
-**表3**  AIV中所有合法的核内同步组合
+**表3** AIV中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |

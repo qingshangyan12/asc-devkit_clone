@@ -3,30 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，结果写入`dst`。
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
+根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。
 
 `src`中的每个`half`类型元素分别对应`mask`中的一个掩码位。两个连续的`half`类型元素转换为两个连续的4bit有符号整数，转换结果按输入顺序打包到同一个`int4x2_t`存储单元中，共占用1Byte。`mask`中的掩码位为0时，对应的4bit转换结果置0。
 
@@ -39,26 +41,50 @@
 ## 函数原型
 
 ```cpp
-// 占位符形式
-// 非饱和模式
-__simd_callee__ inline void asc_half2int4x2_<round_mode>(
-    vector_int4x2_t& dst,
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2int4x2_<round_mode><sat_mode>(vector_int4x2_t& dst,
+                                                                   vector_half src,
+                                                                   vector_bool mask,
+                                                                   std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
-// 饱和模式
-__simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
-    vector_int4x2_t& dst,
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode><sat_mode>(vector_half src,
+                                                                              vector_bool mask,
+                                                                              std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
 
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
-- `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+- `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+
+`<quarter_pos>`支持`asc_position_quarter_mode`枚举类的四个取值：
+
+```c
+enum class asc_position_quarter_mode {
+    DISPERSE_FIRST_QUARTER = 0,
+    DISPERSE_SECOND_QUARTER,
+    DISPERSE_THIRD_QUARTER,
+    DISPERSE_FOURTH_QUARTER
+};
+```
+
+### 函数原型典型示例
+
+```cpp
+// ROUND舍入模式，非饱和模式，通过引用参数输出结果
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst,
+                                                vector_half src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_quarter_mode,
+                                                                       asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+
+// ROUND舍入模式，非饱和模式，通过函数返回值返回结果
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(vector_half src,
+                                                           vector_bool mask,
+                                                           std::integral_constant<asc_position_quarter_mode,
+                                                                                  asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+```
 
 ## 参数说明
 
@@ -69,13 +95,14 @@ __simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入位置，其他位置清零。 |
+| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入位置，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
-无。
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
@@ -89,12 +116,13 @@ __simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
+
 ```c
 #include <cstdint>
 #include <iostream>

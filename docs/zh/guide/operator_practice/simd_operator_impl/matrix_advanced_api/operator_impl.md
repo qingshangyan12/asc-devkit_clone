@@ -7,8 +7,8 @@
 **图1**  矩阵编程流程示意图<a name="zh-cn_topic_0000001622514006_fig264116391245"></a>  
 ![](../../../figures/mat_prog_flow.png "矩阵编程流程示意图")
 
-host侧自动获取Tiling参数的关键步骤介绍如下：
-<a name="zh-cn_topic_0000001622514006_li19113114819525"></a>
+host侧自动获取Tiling参数的关键步骤介绍如下：<a name="zh-cn_topic_0000001622514006_li19113114819525"></a>
+
 1.  **创建Tiling对象**。
 
     ```
@@ -58,8 +58,7 @@ host侧自动获取Tiling参数的关键步骤介绍如下：
     tilingData.SaveToBuffer(tilingBuf, tcubeTilingSize);
     ```
 
-<a name="zh-cn_topic_0000001622514006_li1032116474330"></a>
-核函数（Kernel）侧使用Matmul API矩阵乘运算的具体步骤如下：
+核函数（Kernel）侧使用Matmul API矩阵乘运算的具体步骤如下：<a name="zh-cn_topic_0000001622514006_li1032116474330"></a>
 
 1.  **创建Matmul对象。**
 
@@ -140,7 +139,7 @@ host侧自动获取Tiling参数的关键步骤介绍如下：
 
 除此之外，单核的Matmul Tiling时，实际参与Matmul计算的shape可以是原始shape中的一部分，singleM, singleN, singleK用于表达实际参与Matmul计算的shape，如下图所示。在单核的情况下，singleM, singleN, singleK会透传给singleCoreM, singleCoreN, singleCoreK。
 
-![](../../../figures/zh-cn_image_0000002533171617.png)
+![](../../../figures/image_0000002533171617.png)
 
 -   核函数（Kernel）运行时设置
     -   [SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)、[SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSingleShape.md)都是运行时修改singleCoreM、singleCoreN、singleCoreK，处理尾块时使用[SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)，Matmul复用（多个Matmul计算复用一个Matmul对象）的场景可以使用SetSingleShape重新设置。

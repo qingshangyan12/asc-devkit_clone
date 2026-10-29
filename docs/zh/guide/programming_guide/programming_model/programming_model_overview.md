@@ -72,7 +72,7 @@
 - **本地存储**：AI Core内置的高速存储资源，用于缓存实时计算所需数据，可有效规避全局Device Memory的高延迟访问问题，显著提升整体计算效率。
 
 <!-- npu="950" id1 -->
-需重点区分架构差异：Ascend 950PR/Ascend 950DT之前的架构中，AI Core仅支持**SIMD**单一执行模型；自Ascend 950PR/Ascend 950DT架构起，AI Core向量处理单元同时兼容SIMD、SIMT两种并行模型，可根据计算任务灵活选择并行方案，适配更多复杂业务场景。
+需重点区分架构差异：Ascend 950PR&950DT系列产品之前的架构中，AI Core仅支持**SIMD**单一执行模型；自Ascend 950PR&950DT系列产品架构起，AI Core向量处理单元同时兼容SIMD、SIMT两种并行模型，可根据计算任务灵活选择并行方案，适配更多复杂业务场景。
 <!-- end id1 -->
 
 > 💡 **为什么要了解AI Core内部结构？**  
@@ -83,16 +83,19 @@
 为提升向量计算在复杂控制流、离散访存等场景下的编程灵活性，新同构架构对SIMD与SIMT进行了深度融合：矩阵计算单元延续SIMD设计，向量计算单元则在SIMD的基础上引入SIMT能力，由此确立了以**SIMD为主、SIMT为辅**的新同构编程模型。在该模型下，矩阵计算和向量计算中的SIMD部分配置了超过90%的算力，为密集计算带来高性能与高算力利用率；向量计算中的SIMT部分则作为灵活性补充，专门应对复杂控制流、离散访存等不规则场景，提升此类场景下算法开发与优化的效率。
 
 ### SIMD编程（主流范式，全系列标准支持）
+
 - **能力范围**：支持向量计算、矩阵计算，以及向量与矩阵的融合计算，覆盖深度学习的大部分核心场景；
 - **适用场景**：规整的、高密度的数据并行任务，如卷积、矩阵乘、逐元素变换等，是昇腾NPU开发的主流选择；
 - **优势**：能效比高，指令执行开销低，可充分发挥硬件性能，接近AI Core的峰值计算能力；
 - **学习路径**：详见[AI Core SIMD编程](./ai_core_simd_programming/overview.md)；算子开发流程参见[SIMD算子实现](../../operator_practice/simd_operator_impl/simd_operator_impl.md)。
 
 <!-- npu="950" id2 -->
+
 ### SIMT编程（辅助补充）
+
 - **能力范围**：仅支持向量计算，不支持矩阵运算或向量与矩阵的融合计算，功能范围相对有限；
 - **适用场景**：离散数据访问、复杂分支控制的向量算子，也适合熟悉SIMT模型的开发者快速上手Ascend C；
-- **限制**：<!-- npu="950" id3 -->当前仅支持Ascend 950PR/Ascend 950DT。<!-- end id3 -->
+- **限制**：<!-- npu="950" id3 -->当前仅支持Ascend 950PR&950DT系列产品。<!-- end id3 -->
   <!-- @ref: asc-devkit/res/docs/zh/guide/programming_guide/programming_model/programming_model_overview_res.md#id1 -->
 - **学习路径**：详见[AI Core SIMT编程](./ai_core_simt_programming/overview.md)；算子开发参见[SIMT算子实现](../../operator_practice/simt_operator_impl/simt_operator_impl.md)。
 <!-- end id2 -->

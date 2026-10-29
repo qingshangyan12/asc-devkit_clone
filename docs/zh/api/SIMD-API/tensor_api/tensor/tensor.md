@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -432,9 +432,12 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
 using namespace asc::te;
 
+// gm_addr为Global Memory的地址偏移量；make_mem_ptr<location::gm, float>将其标记为
+// GM位置、元素类型为float的指针适配器（地址与对齐要求见make_mem_ptr约束）。
 constexpr uint64_t gm_addr = 128;
 
 // 示例1：构造一个GM张量
+// shape为(128, 128)、stride为(128, 1)：行优先连续布局，相邻元素间隔1个元素（单位：元素个数）
 auto gm_layout = make_layout(make_shape(128, 128), make_stride(128, 1));
 auto gm_tensor = make_tensor(make_mem_ptr<location::gm, float>(gm_addr), gm_layout);
 

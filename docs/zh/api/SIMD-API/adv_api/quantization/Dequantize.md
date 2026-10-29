@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/Dequantize_res.md#id1 -->
 
@@ -33,24 +33,24 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 
 -   PER\_TENSOR场景（按张量反量化）：scale和offset的shape为\[1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002295238441.png)
+    ![](../../../figures/formulaimage_0000002295238441.png)
 
 -   PER\_CHANNEL场景（按通道反量化）：srcTensor的shape为\[m, n\]，每个channel维度对应一个量化参数，scale和offset的shape为\[1, n\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002260632216.png)
+    ![](../../../figures/formulaimage_0000002260632216.png)
 
 -   PER\_TOKEN场景（按token反量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002260737926.png)
+    ![](../../../figures/formulaimage_0000002260737926.png)
 
 -   PER\_GROUP场景（按组反量化）：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
     -   k为m方向，即公式中i轴为group的计算方向（kDim=0）：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002295268473.png)
+        ![](../../../figures/formulaimage_0000002295268473.png)
 
     -   k为n方向，即公式中j轴为group的计算方向（kDim=1）：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002295155733.png)
+        ![](../../../figures/formulaimage_0000002295155733.png)
 
 ## 函数原型
 

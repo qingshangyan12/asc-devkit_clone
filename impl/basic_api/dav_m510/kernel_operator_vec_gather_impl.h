@@ -153,7 +153,7 @@ __aicore__ inline void VfGatherApi0B64Normal(
         // the index of lower 32-bit is 2 * i, the index of higher 32-bit is 2 * i + 1
         Muls(indexReg, indexReg, 2, indexMask);
         Adds(oddIndexReg, indexReg, 1, indexMask);
-        // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
+        // Interleave the separately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
         Reg::Gather(dstReg, (__ubuf__ uint32_t*)src + srcBaseIndex, indexU32Reg, dstMask);
         Reg::StoreAlign((__ubuf__ uint32_t*)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
@@ -208,7 +208,7 @@ __aicore__ inline void VfGatherApi0B64Bits(
         // the index of lower 32-bit is 2 * i, the index of higher 32-bit is 2 * i + 1
         Muls(bitsIndexReg, bitsIndexReg, 2, indexMask);
         Adds(bitsOddIndexReg, bitsIndexReg, 1, indexMask);
-        // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
+        // Interleave the separately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, bitsIndexReg, bitsOddIndexReg);
         Reg::Gather(dstReg, (__ubuf__ uint32_t*)src + srcBaseIndex, indexU32Reg, dstMask);
         Reg::StoreAlign((__ubuf__ uint32_t*)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
@@ -384,7 +384,7 @@ __aicore__ inline void VfGatherApi2B64(
         // the index of lower 32-bit is 2*i, the index of higher 32-bit is 2*i+1
         Muls(indexReg, indexReg, 2, indexMask);
         Adds(oddIndexReg, indexReg, 1, indexMask);
-        // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
+        // Interleave the separately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
         Reg::Gather(dstReg, (__ubuf__ uint32_t*)src + srcBaseIndex, indexU32Reg, dstMask);
         Reg::StoreAlign((__ubuf__ uint32_t*)dst + i * u32RepeatCount, dstReg, dstMask);

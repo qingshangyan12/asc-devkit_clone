@@ -3,32 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。参考伪代码如下：
+根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，可通过引用参数或函数返回值输出结果。参考伪代码如下：
 
 ```python
 def asc_int322float_rn(dst, src, mask):
@@ -46,21 +46,31 @@ def asc_int322float_rn(dst, src, mask):
 ## 函数原型
 
 ```c
-// 占位符形式
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
                                                          vector_int32_t src,
                                                          vector_bool mask)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_float asc_int322float_<round_mode>(vector_int32_t src,
+                                                                 vector_bool mask)
 ```
 
-`<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
+**占位符说明如下：**
+
+- `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
 
 ```c
-// RINT舍入模式
+// RINT舍入模式，通过引用参数输出结果
 __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
                                                vector_int32_t src,
                                                vector_bool mask)
+
+// RINT舍入模式，通过函数返回值返回结果
+__simd_callee__ inline vector_float asc_int322float_rn(vector_int32_t src,
+                                                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -77,7 +87,8 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
@@ -91,7 +102,7 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

@@ -27,10 +27,16 @@
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_pack_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_pack_impl.h"
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
+#include "../../basic_api/reg_compute/dav_5161/kernel_reg_compute_pack_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_pack_impl.h"
 #elif __NPU_ARCH__ == 5162
-#include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_pack_impl.h"
+#include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_pack_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_pack_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_pack_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_pack_impl.h"
 #endif
@@ -47,6 +53,14 @@ template <typename T, typename U, HighLowPart part, typename S, typename V>
 __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 {
     UnPackImpl<T, U, part, S, V>(dstReg, srcReg);
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void PackDataBlock(U& dstReg, U& srcReg)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    PackDataBlockImpl<T, U>(dstReg, srcReg);
+#endif
 }
 } // namespace Reg
 } // namespace AscendC

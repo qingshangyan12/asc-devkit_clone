@@ -3,29 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
 <!-- npu="910" id8 -->
-- Atlas 训练系列产品：支持
+- Atlas训练系列产品：支持
 <!-- end id8 -->
 <!-- npu="x90" id1 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id1 -->
 <!-- npu="9030" id2 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id2 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/AscendQuant_res.md#id1 -->
 
@@ -35,15 +35,15 @@
 
 -   PER\_TENSOR量化：整个srcTensor对应一个量化参数，量化参数的shape为\[1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000001666705128.png)
+    ![](../../../figures/formulaimage_0000001666705128.png)
 
 -   PER\_CHANNEL量化：srcTensor的shape为\[m, n\],每个channel维度对应一个量化参数，量化参数的shape为\[n\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000001738671878.png)
+    ![](../../../figures/formulaimage_0000001738671878.png)
 
 -   PER\_TOKEN量化：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一组scale和offset参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。offset是可选输入。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002292403429.png)
+    ![](../../../figures/formulaimage_0000002292403429.png)
 -   PER\_GROUP量化：这里定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。offset是可选输入。
 
     根据输出数据类型的不同，当前PER\_GROUP分为两种场景：fp4x2\_e2m1\_t/fp4x2\_e1m2\_t场景（后续内容中简称为float4场景）和int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（后续内容中简称为b8场景）。
@@ -51,20 +51,20 @@
     -   fp4x2\_e2m1\_t/float4\_e1m2场景（float4场景）
         -   kDim = 0:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292493829.png)
+            ![](../../../figures/formulaimage_0000002292493829.png)
 
         -   kDim = 1:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292493825.png)
+            ![](../../../figures/formulaimage_0000002292493825.png)
 
     -   int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（b8场景）
         -   kDim=0：
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292493833.png)
+            ![](../../../figures/formulaimage_0000002292493833.png)
 
         -   kDim=1：
 
-            ![](../../../figures/zh-cn_formulaimage_0000002068601638.png)
+            ![](../../../figures/formulaimage_0000002068601638.png)
 
 ## 实现原理
 
@@ -185,7 +185,7 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
 -   dstTensor非固定数据类型
 
-    <!-- npu="950" id9 -->仅支持Ascend 950PR/Ascend 950DT。<!-- end id9 -->
+    <!-- npu="950" id9 -->仅支持Ascend 950PR&950DT系列产品。<!-- end id9 -->
 
     -   PER\_TENSOR量化：
         -   通过sharedTmpBuffer入参传入临时空间
@@ -439,44 +439,44 @@ struct AscendQuantParam {
 -   当Scale为float类型时，其取值范围仍为half类型的取值范围。
 -   dstTensor非固定数据类型的函数原型支持情况如下：
     <!-- npu="950" id12 -->
-    - Ascend 950PR/Ascend 950DT：支持。
+    - Ascend 950PR&950DT系列产品：支持。
     <!-- end id12 -->
     <!-- npu="A3" id13 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    - Atlas A3系列产品：不支持。
     <!-- end id13 -->
     <!-- npu="910b" id14 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    - Atlas A2系列产品：不支持。
     <!-- end id14 -->
     <!-- npu="310p" id15 -->
-    - Atlas 推理系列产品AI Core：不支持。
+    - Atlas推理系列产品AI Core：不支持。
     <!-- end id15 -->
     <!-- npu="910" id16 -->
-    - Atlas 训练系列产品：不支持。
+    - Atlas训练系列产品：不支持。
     <!-- end id16 -->
 <!-- npu="910" id10 -->
--   Atlas 训练系列产品仅支持PER\_TENSOR量化，不支持PER\_CHANNEL量化、PER\_TOKEN量化、PER\_GROUP量化。
+-   Atlas训练系列产品仅支持PER\_TENSOR量化，不支持PER\_CHANNEL量化、PER\_TOKEN量化、PER\_GROUP量化。
 <!-- end id10 -->
 
 -   PER\_TOKEN/PER\_GROUP量化场景支持情况如下：
 
     <!-- npu="950" id11 -->
-    - Ascend 950PR/Ascend 950DT：支持。
+    - Ascend 950PR&950DT系列产品：支持。
     <!-- end id11 -->
 
     <!-- npu="A3" id17 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    - Atlas A3系列产品：不支持。
     <!-- end id17 -->
 
     <!-- npu="910b" id18 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    - Atlas A2系列产品：不支持。
     <!-- end id18 -->
 
     <!-- npu="310p" id19 -->
-    - Atlas 推理系列产品AI Core：不支持。
+    - Atlas推理系列产品AI Core：不支持。
     <!-- end id19 -->
 
     <!-- npu="910" id20 -->
-    - Atlas 训练系列产品：不支持。
+    - Atlas训练系列产品：不支持。
     <!-- end id20 -->
 
 -   PER\_TOKEN/PER\_GROUP场景，连续计算方向（即n方向）的数据量要求32B对齐。

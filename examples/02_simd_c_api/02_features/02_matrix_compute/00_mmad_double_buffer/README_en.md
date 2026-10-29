@@ -10,7 +10,7 @@ This sample implements half matrix multiplication with the Ascend C C-API and co
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | == CANN 9.2.0 |
+| Ascend 950PR&950DT products | == CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -211,7 +211,7 @@ Set `SCENARIO_NUM` to `0` or `1`, then rerun CMake, build, execution, and verifi
 | Build option | Values | Description |
 | --- | --- | --- |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture |
-| `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode |
+| `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode |
 | `SCENARIO_NUM` | `0`, `1` (default) | `0` selects the single-buffer baseline; `1` selects L1 double buffering. |
 
 A successful verification prints:

@@ -9,6 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/vector/mask_reg_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/mask_reg_compute.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_IMPL_H
 #endif
@@ -133,6 +135,8 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         asc_intlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
     }
+    result.first.with_mask(all_mask<DataType>());
+    result.second.mask = result.first.mask;
     return result;
 }
 
@@ -152,6 +156,8 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         asc_deintlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
     }
+    result.first.with_mask(all_mask<DataType>());
+    result.second.mask = result.first.mask;
     return result;
 }
 

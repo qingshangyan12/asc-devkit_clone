@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16_math_functions/hsin_res.md#id1 -->
 
@@ -29,7 +29,7 @@
 
 获取输入数据的三角函数正弦值。
 
-![](../../../../figures/zh-cn_formulaimage_0000002576421051.png)
+![](../../../../figures/formulaimage_0000002576421051.png)
 
 ## 函数原型
 
@@ -82,3 +82,10 @@ inline bfloat16_t hsin(bfloat16_t x)
         dst[idx] = hsin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.0, 0.5, -0.5, 1.0, -1.0, 2.0, -2.0, 3.0
+result: 0.0, 0.478516, -0.478516, 0.839844, -0.839844, 0.910156, -0.910156, 0.141602
+```

@@ -3,30 +3,30 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-**`asc_copy_gm2l1`使用`uint8_t decomp_mode`和`uint8_t l2_cache_ctl`的旧常规重载及其`asc_copy_gm2l1_sync`接口已废弃。请使用带`asc_load_l2_cache_mode l2_cache_mode`参数的[asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）](../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md)接口。**
+**`asc_copy_gm2l1`使用`uint8_t decomp_mode`和`uint8_t l2_cache_ctl`的旧常规重载及其`asc_copy_gm2l1_sync`接口已废弃。请使用带`asc_load_l2_cache_mode l2_cache_mode`参数的[asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）](../cube_datamove/cube_compute_load/asc_copy_gm2l1_2d_arch_3510.md)接口。**
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
@@ -36,9 +36,8 @@
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```cpp
+// 占位符形式
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       __gm__ <dtype>* src,
                                       uint32_t m_start_position,
@@ -59,9 +58,9 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ <dtype>* dst,
                                            uint8_t l2_cache_ctl)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
+`dtype`取值为：`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
 
 ### 函数原型典型示例
 
@@ -134,14 +133,14 @@ PIPE_MTE2
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-样例中A、B、C矩阵的shape均为[128,128]，数据格式均为Nz。A和B在GM中以Nz格式存储，分别按8个分形列循环调用本接口的2D矩阵搬运重载搬运到L1 Buffer，每次搬运一个分形列。随后A经[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)搬运到L0A Buffer，B经[asc_copy_l12l0b_transpose](../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md)搬运到L0B Buffer，调用[asc_mmad](../cube_compute/asc_mmad.md)完成计算。C从L0C Buffer搬出到GM时关闭Nz2ND和Nz2DN，保持Nz格式。样例单核占用64KB L1 Buffer、32KB L0A Buffer、32KB L0B Buffer和64KB L0C Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。
+样例中A、B、C矩阵的shape均为[128,128]，数据格式均为Nz。A和B在GM中以Nz格式存储，分别按8个分形列循环调用本接口的2D矩阵搬运重载搬运到L1 Buffer，每次搬运一个分形列。随后A经[asc_copy_l12l0a](../cube_datamove/cube_compute_load/asc_copy_l12l0a_2d_arch_3510.md)搬运到L0A Buffer，B经[asc_copy_l12l0b_transpose](../cube_datamove/cube_compute_load/asc_copy_l12l0b_2d_arch_3510.md)搬运到L0B Buffer，调用[asc_mmad](../cube_compute/mmad_compute/asc_mmad.md)完成计算。C从L0C Buffer搬出到GM时关闭Nz2ND和Nz2DN，保持Nz格式。样例单核占用64KB L1 Buffer、32KB L0A Buffer、32KB L0B Buffer和64KB L0C Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。
 
 ```cpp
 #include <cstdint>

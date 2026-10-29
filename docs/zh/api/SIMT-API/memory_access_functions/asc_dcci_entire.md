@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/memory_access_functions/asc_dcci_entire_res.md#id1 -->
 
@@ -64,20 +64,21 @@ inline void asc_dcci_entire(void *dst)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel_dcci_entire(uint32_t* data, uint32_t* output) {
+    __global__ __launch_bounds__(1024) void kernel_dcci_entire(uint32_t* data, uint32_t* flag, uint32_t* output) {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
-            data[1] = 10;      // 写入数据
+            data[0] = 10;      // 写入数据
             asc_threadfence(); // 确保数据写入完成
-            data[0] = 1;       // 标志位，数据已就绪
+            flag[0] = 1;       // 标志位，数据已就绪
         }
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
-                asc_dcci_entire((void*)(data)); // 从Global Memory读标志位
+            while (*(volatile uint32_t *)flag != 1) {
+                asc_nop(); // 15个cycle后再发送下一个load指令
             }
-            output[0] = data[1]; // 数据就绪，获取数据
+            asc_dcci_entire((void*)(data)); // 刷新核内的整个Data Cache
+            output[0] = data[0]; // 数据就绪，获取数据
         }
     }
     ```
@@ -87,21 +88,30 @@ inline void asc_dcci_entire(void *dst)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_dcci_entire(__gm__ uint32_t* data, __gm__ uint32_t* output)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_dcci_entire(__gm__ uint32_t* data, __gm__ uint32_t* flag, __gm__ uint32_t* output)
     {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
-            data[1] = 10;      // 写入数据
+            data[0] = 10;      // 写入数据
             asc_threadfence(); // 确保数据写入完成
-            data[0] = 1;       // 标志位，数据已就绪
+            flag[0] = 1;       // 标志位，数据已就绪
         }
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
-                asc_dcci_entire((__gm__ void*)(data)); // 从Global Memory读标志位
+            while (*(volatile uint32_t *)flag != 1) {
+                asc_nop(); // 15个cycle后再发送下一个load指令
             }
-            output[0] = data[1]; // 数据就绪，获取数据
+            asc_dcci_entire((__gm__ void*)(data)); // 刷新核内的整个Data Cache
+            output[0] = data[0]; // 数据就绪，获取数据
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+data: 0
+flag: 0
+output: 10
+```

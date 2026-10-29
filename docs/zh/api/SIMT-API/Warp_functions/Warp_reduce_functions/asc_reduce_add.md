@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add_res.md#id1 -->
 
@@ -73,9 +73,12 @@ Warp内所有线程输入val的和。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelReduceAdd(int32_t* dst, int32_t* src)
+    __global__ __launch_bounds__(1024) void KernelReduceAdd(int32_t* dst, int32_t* src, int32_t total_num)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_num) {
+            return;
+        }
         int32_t result = asc_reduce_add(src[idx]);
         if (laneid() == 0) {
             asc_atomic_add(dst, result);
@@ -88,12 +91,22 @@ Warp内所有线程输入val的和。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceAdd(__gm__ int32_t* dst, __gm__ int32_t* src)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceAdd(__gm__ int32_t* dst, __gm__ int32_t* src, int32_t total_num)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_num) {
+            return;
+        }
         int32_t result = asc_reduce_add(src[idx]);
         if (laneid() == 0) {
             asc_atomic_add(dst, result);
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: 17, -8, 42, 3, -25, 60, 11, -37, 24, 5, -14, 73, 8, -2, 39, 19, -31, 54, 7, 12, -18, 28, 66, -9, 33, 1, -45, 22, 48, -5, 36, 15
+dst: 429
+```

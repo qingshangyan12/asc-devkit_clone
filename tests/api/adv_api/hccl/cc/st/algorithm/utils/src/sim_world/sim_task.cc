@@ -166,7 +166,7 @@ const NotifyTypeStub TaskStubWait::GetNotifyType() const { return notifyType; }
 
 const std::string TaskStubWait::GetTag() const { return tag; }
 
-std::string TaskStubLocalPostTo::Describe() const { return StringFormat("[LocalPostTo]:[topicId=%d]", topicIdBack); }
+std::string TaskStubLocalPostTo::Describe() const { return StringFormat("[LocalPostTo]:[topicId=%d]", topicId); }
 
 void TaskStubLocalPostTo::SetPostQid(uint32_t qid) { postQid = qid; }
 

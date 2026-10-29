@@ -986,7 +986,19 @@ template <typename T>
 __aicore__ inline __sync_noalias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_t size, uint32_t bufOffset)
 {
     auto ptr = this->bufStart;
-    ptr->dataLen = size * sizeof(T);
+    using PrimType = PrimT<T>;
+    uint32_t dataLen;
+    if constexpr (IsSameType<PrimType, int4b_t>::value) {
+        dataLen = size / INT4_TWO;
+    } else {
+        dataLen = size * sizeof(PrimType);
+    }
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    ASCENDC_ASSERT((size > 0), { KERNEL_LOG(KERNEL_ERROR, "size should be larger than 0"); });
+    ASCENDC_ASSERT((bufOffset % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "bufOffset should be 32B aligned"); });
+    ASCENDC_ASSERT((dataLen <= bufLen - bufOffset), { KERNEL_LOG(KERNEL_ERROR, "data range exceeds TBuf length"); });
+#endif
+    ptr->dataLen = dataLen;
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(pos);
     addr.bufferHandle = reinterpret_cast<TBufHandle>(ptr);
@@ -1140,7 +1152,7 @@ __aicore__ inline TPipe::~TPipe()
 __aicore__ inline void TPipe::Init()
 {
     ResetPool();
-    // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
+    // for matmul macro, set flag M_MTE1 at the beginning of operator, and also wait flag at the end.
     // matmul macro only use M_MTE1 event id 0 1 currently.
     if ASCEND_IS_AIC {
         auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();

@@ -21,7 +21,7 @@ namespace __asc_aicore {
 template <typename T>
 __aicore__ inline void set_scalar_param_impl(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
-    static_assert(!std::is_same<T, double>::value, "printf unsupport double type");
+    static_assert(!std::is_same<T, double>::value, "printf unsupported double type");
     __gm__ uint64_t* scalarAddr = (__gm__ uint64_t*)paramAddr + paramIdx;
 
     *scalarAddr = 0;

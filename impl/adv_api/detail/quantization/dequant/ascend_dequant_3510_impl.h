@@ -608,7 +608,7 @@ __aicore__ inline void AscendDeQuantPerToken(
     } else if constexpr (SupportType<srcT, float>()) {
         DeQuantPerTokenForF32<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport srcT for AscendDeQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported srcT for AscendDeQuant!"); });
     }
 }
 
@@ -622,7 +622,7 @@ __aicore__ inline void AscendDeQuantPerGroupForCol(
     } else if constexpr (SupportType<srcT, float>()) {
         DeQuantPerGroupForColF32<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport srcT for AscendDeQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported srcT for AscendDeQuant!"); });
     }
 }
 
@@ -634,7 +634,7 @@ __aicore__ inline void AscendDeQuantPerGroupForRow(
     if constexpr (SupportType<srcT, int32_t, float>()) {
         DeQuantPerGroupForRow<dstT, srcT, scaleT, config>(dstTensor, srcTensor, scaleTensor, offsetTensor, para);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport srcT for AscendDeQuant!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported srcT for AscendDeQuant!"); });
     }
 }
 

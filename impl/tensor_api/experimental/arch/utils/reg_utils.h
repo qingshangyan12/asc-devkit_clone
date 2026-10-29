@@ -9,8 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/utils/reg_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/vector_compute.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS_H
 #endif
 
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
@@ -24,6 +26,17 @@ namespace asc {
 namespace te {
 namespace experimental {
 namespace detail {
+
+template <typename T>
+struct reg_tensor_traits;
+
+template <typename T>
+struct reg_tensor_traits<reg_tensor<T>> {
+    using elem_type = T;
+};
+
+template <typename T>
+using reg_elem_t = typename reg_tensor_traits<AscendC::Std::remove_cvref_t<T>>::elem_type;
 
 template <typename T>
 inline constexpr bool is_b4_type_v = AscendC::Std::is_one_of_v<T, fp4x2_e1m2_t, fp4x2_e2m1_t, int4x2_t>;
@@ -55,11 +68,29 @@ __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vect
 }
 
 template <typename T>
+using get_reg_data_type = AscendC::Std::conditional_t<AscendC::Std::is_same_v<T, int4b_t>, int4x2_t, T>;
+
+template <typename T>
 inline constexpr bool supports_float_math_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+
+template <typename T>
+inline constexpr bool supports_abs_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_neg_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_relu_v = ::AscendC::Std::is_one_of_v<T, half, int32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_add_sub_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_carry_v = ::AscendC::Std::is_one_of_v<T, int32_t, uint32_t>;
+
+template <typename T>
+inline constexpr bool supports_mull_v = ::AscendC::Std::is_one_of_v<T, int32_t, uint32_t>;
 
 template <typename T>
 inline constexpr bool supports_mul_v =
@@ -74,8 +105,53 @@ inline constexpr bool supports_min_max_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
 template <typename T>
+inline constexpr bool supports_div_v =
+    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_not_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_and_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+
+template <typename T>
 inline constexpr bool supports_or_v =
     ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+
+template <typename T>
+inline constexpr bool supports_xor_v =
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+
+template <typename T>
+inline constexpr bool supports_shift_v =
+    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>;
+
+template <typename T, typename ShiftType>
+inline constexpr bool supports_shift_pair_v =
+    (::AscendC::Std::is_one_of_v<T, int8_t, uint8_t> && ::AscendC::Std::is_same_v<ShiftType, int8_t>) ||
+    (::AscendC::Std::is_one_of_v<T, int16_t, uint16_t> && ::AscendC::Std::is_same_v<ShiftType, int16_t>) ||
+    (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<ShiftType, int32_t>);
+
+template <typename T>
+inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+
+template <typename T>
+inline constexpr bool supports_abs_diff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+
+template <typename T>
+inline constexpr bool supports_madd_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
+
+template <typename T>
+inline constexpr bool supports_mula_v =
+    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
+
+template <typename T, typename U>
+inline constexpr bool supports_muls_cast_v = ::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>;
 
 } // namespace detail
 } // namespace experimental
@@ -84,7 +160,7 @@ inline constexpr bool supports_or_v =
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS_H
 #endif
