@@ -118,6 +118,10 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::FlattenChannelsToSingleDie(
         CHK_RET(ReverseChannelPerDieIfNeed(comm, myRank_, channelsPerDie));
     }
     channels = channelsPerDie[DIE_0];
+    // 临时诊断（定位后删）：WARNING 级保证落盘
+    HCCL_WARNING(
+        "[CcuTempKfcReduceScatterMesh1DMem2Mem] flatten result: channels[%zu], dieNum[%u], keepDieId[%u]",
+        channels.size(), enableDieNum, (enableDieNum == 1) ? enableDieId : 0);
     return HCCL_SUCCESS;
 }
 
