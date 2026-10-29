@@ -233,7 +233,7 @@ __aicore__ inline void asc_dump_impl(
     if (dump_size <= 0 || blockInfo == nullptr) {
         return;
     }
-    constexpr uint32_t dataBlockSize = 32U;
+    constexpr uint32_t dataBlockSize = get_dump_tensor_payload_alignment<hardware>();
     const uint64_t tensorLength = static_cast<uint64_t>(dump_size) * sizeof(T);
     const uint64_t alignDumpLen64 = ((tensorLength + dataBlockSize - 1U) / dataBlockSize) * dataBlockSize;
     const uint64_t tlvLen64 = sizeof(DumpTensorTlv) + alignDumpLen64;
