@@ -18,10 +18,37 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from presmoke.orchestrate_report import shard_examples
+from presmoke.orchestrate_report import load_pipeline_stage_seconds, shard_examples, write_timings_tsv
 
 
 class OrchestrateShardingTest(unittest.TestCase):
+    def test_tsv_stage_timings_match_json_for_multiple_steps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            steps = [
+                {"kind": kind, "duration_s": duration}
+                for kind, duration in (
+                    ("clean", 0.1),
+                    ("build", 2.0),
+                    ("build", 3.0),
+                    ("run", 1.0),
+                    ("run", 4.0),
+                    ("verify", 0.2),
+                    ("verify", 0.3),
+                )
+            ]
+            steps[3]["npu_slot"] = True
+            steps[3]["wait_s"] = 0.5
+            data = {"results": [{"example": "case/multiple", "duration_s": 10.6, "steps": steps}]}
+            report = root / "report.json"
+            report.write_text(json.dumps(data), encoding="utf-8")
+            timings = root / "ALL_CASE_TIMINGS.tsv"
+            write_timings_tsv(timings, ("full", root, {}, data))
+            from_json = load_pipeline_stage_seconds(report)
+            from_tsv = load_pipeline_stage_seconds(timings)
+            self.assertEqual(from_json["case/multiple"], (5.1, 5.0, 0.5))
+            self.assertEqual(from_tsv, from_json)
+
     def test_custom_op_dependents_and_parallel_package_stay_on_one_card(self) -> None:
         dependency_group = [
             "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib",

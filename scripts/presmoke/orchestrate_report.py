@@ -402,8 +402,8 @@ def load_pipeline_stage_seconds_from_tsv(report_path: Path) -> dict[str, tuple[f
 
 
 def parse_stage_duration(steps: str, kind: str) -> float:
-    match = re.search(r"(?:^|; )%s:([0-9.]+)s" % re.escape(kind), steps)
-    return float(match.group(1)) if match else 0.0
+    matches = re.findall(r"(?:^|; )%s:([0-9.]+)s" % re.escape(kind), steps)
+    return sum((float(value) for value in matches), 0.0)
 
 
 def parse_float(value: object) -> float:
