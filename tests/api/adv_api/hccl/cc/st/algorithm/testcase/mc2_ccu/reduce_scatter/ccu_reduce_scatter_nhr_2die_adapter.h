@@ -22,9 +22,8 @@
 namespace HcclSim {
 namespace CcuSt {
 
-// 与 CcuKfcReduceScatterNHR1D2DieMem2MemKernel 的 21 个 ccu::Variable 形参一一对应
-// （token 亦占一槽，KFC 直调模式下由 taskArgs 提供）。
-constexpr uint32_t REDUCE_SCATTER_NHR_2DIE_TASK_ARG_COUNT = 29;
+// Func ABI: queue [0..2], token [3], queue [3..29], turn-end address [31].
+constexpr uint32_t REDUCE_SCATTER_NHR_2DIE_TASK_ARG_COUNT = 32;
 
 // goSize 口径与 hccl 模板/AIV prepare 一致：(loopCount=8, memSlice=4096*8=32768)
 constexpr uint64_t NHR_2DIE_MEM_SLICE = 32768ULL;
