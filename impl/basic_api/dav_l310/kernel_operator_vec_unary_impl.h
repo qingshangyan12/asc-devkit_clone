@@ -207,8 +207,8 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 
 #define UNARY_VEC_NORMAL_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                 \
     template <typename T = DATA_TYPE, bool isSetMask = true>                                 \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \
-                                     __ubuf__ DATA_TYPE* src,                                \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst,                                \
+                                     __ubuf__ DATA_TYPE *src,                                \
                                      const uint64_t mask,                                    \
                                      const uint8_t repeatTimes,                              \
                                      const UnaryRepeatParams &repeatParams)                  \
@@ -235,8 +235,8 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 
 #define UNARY_VEC_BITWISE_IMPL(FUNC_NAME, OP_NAME, DATA_TYPE)                                \
     template <typename T = DATA_TYPE, bool isSetMask = true>                                 \
-    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst,                                \
-                                     __ubuf__ DATA_TYPE* src,                                \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE *dst,                                \
+                                     __ubuf__ DATA_TYPE *src,                                \
                                      const uint64_t mask[2],                                 \
                                      const uint8_t repeatTimes,                              \
                                      const UnaryRepeatParams &repeatParams)                  \
@@ -310,7 +310,6 @@ UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, half);
 UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, float);
 UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, int16_t);
 UNARY_VEC_COUNTER_IMPL(AbsImpl, Abs, int32_t);
-
 
 template <typename T, bool isSetMask = true>
 __aicore__ inline void ReluImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
