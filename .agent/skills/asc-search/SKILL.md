@@ -1,76 +1,40 @@
 ---
 name: asc-search
-description: OKF 用户侧入口：把 Ascend C API 文档的三类头建立为按适用条件筛选的持久索引，并按算子需求检索候选接口文档。用户需要建索引/检查索引新鲜度、询问“用哪个接口/怎么找 API/某接口配什么用/哪个版本可用”时使用；写头、改词表、标注文档请用 asc-knowledge-create。
+description: Ascend C devkit 的确定性关键词检索入口。输入 API、符号、路径片段或关键词组合，输出检索到的路径。无语义分析、同义词扩展或问答；自然语言接口选型交给 knowledge 仓的 ascendc-devkit-query。
 ---
 
-# OKF 索引与检索（asc-search）
+# Ascend C 关键词检索
 
-本 Skill 覆盖「建立索引 → 使用索引」全流程：索引是三类头（文档 slim 头、include Doxygen、
-examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/query.py`。推导规则唯一事实源是
-[references/index_derivation_contract.md](references/index_derivation_contract.md)；
-建索引细节见 [references/index.md](references/index.md)，检索流程细节见
-[references/retrieve.md](references/retrieve.md)。命令均从仓库根目录执行。
+先解析本 Skill 的真实路径定位脚本，不依赖调用方当前工作目录。查询只读已经准备好的索引。
 
-通过用户 skill 目录的软链加载时，先将当前 `SKILL.md` 路径解析为真实路径，向上三级取得
-对应的 asc-devkit 仓库根目录，并从该目录执行以下命令和读取候选文档。用户当前目录
-可以位于其他项目；检索始终使用安装入口指向的 devkit 仓库。
-
-目标架构统一使用 NPU 架构号表述，默认使用 `3510`。
-
-## 建立索引
+## 准备（安装或显式刷新时）
 
 ```bash
-python3 .agent/skills/asc-search/scripts/build_index.py --scope c_api [--arch 3510] [--cann-version 9.2.0] [--check]
+python3 <skill>/scripts/keyword_search.py build --root <devkit根> --index <外部缓存>/keywords.sqlite3 --source-id <包SHA256或固定Git提交>
 ```
 
-构建按 CANN 版本、架构和 API 层级筛选，只索引同时满足 version 覆盖、archs 命中、层级命中的 API；
-校验不过不出索引，同输入两次构建字节一致。`--check` 做文档漂移检测。
+索引覆盖 docs、include、examples 和 .agent/skills 的文本；不执行语料中的代码。
+索引保存来源标识、内容和检索器指纹；缓存必须在 corpus 之外。
+新文件、删除文件或源内容更新后由准备流程重新构建；查询不自动构建或联网。
 
-## 使用索引
-
-### 步骤 0：索引前置保障
-
-任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认使用 3510 架构并自动检测本地 CANN 版本）：
+## 查询
 
 ```bash
-python3 .agent/skills/asc-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
+python3 <skill>/scripts/keyword_search.py search --index <缓存>/keywords.sqlite3 --query "asc_copy_gm2ub" --kind doc -k 5
+python3 <skill>/scripts/keyword_search.py search --index <缓存>/keywords.sqlite3 --query "GM UB" --json
 ```
 
-筛选条件匹配且指纹新鲜 → 零动作；缺失、筛选条件不符或漂移 → 原地重建（本地 diff，不主动提交）。
-成功后以输出 JSON（`cann_version/arch_label/categories`）作为本次检索的**文档范围**；
-`actions` 含 `rebuilt` 时向用户说明一句。失败时如实报告并停止，不得绕过索引猜测文档。
+空白分隔的关键词为 AND，忽略大小写，按原文字面子串匹配路径、标题、摘要和正文。
+不纠错、不翻译、不扩展同义词、不推断意图、不澄清问题、不阅读候选形成结论。
+支持 `--kind doc|include|example|skill`（可重复）和包内相对路径 `--prefix`。
+分数由路径、标题、摘要与正文匹配决定，同分按路径排序，去重后截取前 k 项。
+stdout 每行一个 corpus 相对路径；`--json` 为字符串数组，仍只包含路径。
+零命中 stdout 为空（JSON 为 []），stderr 为 no_match，退出 0；筛选范围没有文档时 stderr 为 no_coverage，退出 3；错误退出 2。
+不能将无命中或无覆盖解释为 API 不支持。
 
-### 检索循环
+## 结构化兼容接口
 
-1. **意图分析**：抽取阶段/操作/分类/dtype/行为约束/版本产品/具名 API/参数枚举/配套依赖等信号，
-   映射到查询维度；至少 1 个可映射信号且无影响候选集的歧义才检索。不明确时先反问，
-   同一检索需求累计最多 3 轮，每轮最多 3 个问题并给出选项；澄清期间不执行任何查询。
-   达到上限仍不明确时停止反问，说明信息不足，列出已确认条件与待确认项，不猜测条件或推荐接口。
-2. **初查与收窄**：主信号查询，结果过宽时加维度（维度间 AND、逗号值内 OR）。
-3. **空结果降级链**：精确 `--operation` → `--kw` 同义词 → `--api-class` + `--kw` →
-   `--gap` 确认范围外；仍无则如实说明。
-4. **配套展开**：`--deps-of`（含 `--reverse`）、`--enum`/`--param` 反查，保留家族变体。
-5. **收敛与把关**：意图要素全部有候选或确认范围外、依赖闭合后按固定格式作答；
-   脚本只给候选，输出前由你复核相关性与适用条件（筛选条件/condition/deprecated），
-   不相关的不展示；按需只读候选文档支撑推荐所需的章节，禁止全量精读。
-
-完整维度映射表、降级链与策略要点见 [references/retrieve.md](references/retrieve.md)；
-查询 CLI 全部参数见 [references/index.md](references/index.md)。
-
-### 输出格式（不落盘）
-
-```text
-## 候选
-- 路径: docs/zh/api/SIMD-API/c_api/xxx/yyy.md 或 include/... | API: asc_yyy | 用途: 一句话
-```
-
-未检索到候选时直接说明结果；适用条件和待确认事项随候选说明，不单设未覆盖章节。
-返回多个候选且无法确认已覆盖当前需求的全部适用接口时，必须在候选列表后原样注明：
-“候选仅供参考，不代表全量接口。”索引查询成功或候选均已核对，不等于候选集完整。
-
-## 边界
-
-- 只帮找文档，不生成算子代码、不替用户写 kernel。
-- 当前覆盖范围为 `docs/zh/api/SIMD-API/c_api`；范围外层级（adv_api/tensor_api/basic_api/SIMT/
-  AI-CPU 等）如实标注为未覆盖并给出线索。
-- 不改写 `docs/` 正文、include、样例或索引构建产物。
+既有 `build_index.py` 和 `query.py` 保留三类头派生、架构/版本、依赖、参数、枚举等确定性能力。
+`query.py` 默认也只输出路径；其 `--json` 输出路径数组；完整元数据仅保留在内部函数供上层适配器使用。
+参数和推导规则见 [索引参考](references/index.md) 与 [推导契约](references/index_derivation_contract.md)。
+自然语言的意图提取、多轮查询、依赖条件解释和证据阅读属于上层 ascendc-devkit-query。

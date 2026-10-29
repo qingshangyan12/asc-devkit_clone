@@ -1,0 +1,187 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
+schema_version: 1
+cases:
+- id: KW01
+  query: asc_abs
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+      - docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md
+    status: ok
+- id: KW02
+  query: asc_add
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
+      - docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md
+    status: ok
+- id: KW03
+  query: asc_half2float
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md
+      - docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md
+    status: ok
+- id: KW04
+  query: asc_float2e4m3
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md
+    status: ok
+- id: KW05
+  query: asc_float2e5m2
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md
+    status: ok
+- id: KW06
+  query: asc_ndim_copy_gm2ub
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    status: ok
+- id: KW07
+  query: asc_set_ndim_pad_value
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    status: ok
+- id: KW08
+  query: asc_mmad
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md
+    status: ok
+- id: KW09
+  query: asc_lock
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
+    status: ok
+- id: KW10
+  query: asc_unlock
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    status: ok
+- id: KW11
+  query: asc_set_saturation_strategy
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
+    status: ok
+- id: KW12
+  query: asc_set_saturation_flag
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    status: ok
+- id: KW13
+  query: GM UB
+  filters:
+    prefix: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md
+    status: ok
+- id: KW14
+  query: asc_abs
+  filters:
+    kind:
+    - include
+    prefix: include/c_api/
+    k: 5
+  expect:
+    any_paths:
+    - - include/c_api/reg_compute/compute/reg_arith.h
+    status: ok
+- id: KW15
+  query: ASC_ABS
+  filters:
+    kind:
+    - doc
+    k: 5
+  expect:
+    any_paths:
+    - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+    status: ok
+- id: KW16
+  query: nonexistent_asc_api_123456789
+  filters:
+    k: 5
+  expect:
+    count: 0
+    status: no_match
+- id: KW17
+  query: asc_abs
+  filters:
+    prefix: docs/nonexistent/
+    k: 5
+  expect:
+    count: 0
+    status: no_coverage
+- id: KW18
+  query: asc_abs impossible_extra_token_123
+  filters:
+    k: 5
+  expect:
+    count: 0
+    status: no_match
