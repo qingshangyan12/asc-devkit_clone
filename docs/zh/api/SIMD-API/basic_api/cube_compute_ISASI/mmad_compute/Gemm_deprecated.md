@@ -76,7 +76,7 @@
 | 参数名称 | 类型 | 说明 |
 | --- | --- | --- |
 | blockSize | uint32_t | 固定值，恒为16，一个维度内存放的元素个数。 |
-| loopMode | LoopMode | 遍历模式，结构体具体定义为：enum class LoopMode {<br>    MODE_NM = 0,<br>    MODE_MN = 1,<br>    MODE_KM = 2,<br>    MODE_KN = 3<br>};<br> |
+| loopMode | LoopMode | 遍历模式，结构体具体定义为：<br><br><br>enum class LoopMode {<br>    MODE_NM = 0,<br>    MODE_MN = 1,<br>    MODE_KM = 2,<br>    MODE_KN = 3<br>};<br> |
 | mNum | uint32_t | M轴等效数据长度参数值，范围：[1, 4096]。 |
 | nNum | uint32_t | N轴等效数据长度参数值，范围：[1, 4096]。 |
 | kNum | uint32_t | K轴等效数据长度参数值。<br>&bull;当输入张量Src0Local的数据类型为float时，范围：[1, 8192]。<br>&bull;当输入张量Src0Local的数据类型为half时，范围：[1, 16384]。<br>&bull;当输入张量Src0Local的数据类型为int8_t时，范围：[1, 32768]。 |
