@@ -46,9 +46,8 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> move(reg_tensor<T>& dst, const reg_tensor<T>& src)
 {
     static_assert(
-        detail::is_move_support_type<T> && !AscendC::Std::is_same_v<T, bool>,
-        "move with dst input only supports uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
-        "and float.");
+        detail::is_move_support_type<T>, "move with dst input only supports uint8_t, int8_t, uint16_t,"
+                                         "int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     asc_copy(dst.reg, src.reg, src.mask);
     return dst;
 }
