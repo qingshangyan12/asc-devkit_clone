@@ -27,14 +27,14 @@ __aicore__ inline void TestMoveWithDst()
 
     auto result = asc::te::experimental::move(dst, src);
     static_assert(AscendC::Std::is_same_v<decltype(result), asc::te::experimental::reg_tensor<T>>);
-    EXPECT_EQ(dst.mask, allMask.reg);
-    EXPECT_EQ(result.mask, allMask.reg);
+    EXPECT_EQ(dst.mask, noneMask.reg);
+    EXPECT_EQ(result.mask, noneMask.reg);
 
     dst.mask = allMask.reg;
     src.mask = noneMask.reg;
     result = asc::te::experimental::move(dst, src);
-    EXPECT_EQ(dst.mask, noneMask.reg);
-    EXPECT_EQ(result.mask, noneMask.reg);
+    EXPECT_EQ(dst.mask, allMask.reg);
+    EXPECT_EQ(result.mask, allMask.reg);
 }
 
 __aicore__ inline void TestMoveWithoutDst()

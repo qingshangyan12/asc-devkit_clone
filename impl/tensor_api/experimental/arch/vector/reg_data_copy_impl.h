@@ -50,7 +50,6 @@ __simd_callee__ inline reg_tensor<T> move(reg_tensor<T>& dst, const reg_tensor<T
         "move with dst input only supports uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
         "and float.");
     asc_copy(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
     return dst;
 }
 

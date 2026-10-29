@@ -33,7 +33,7 @@
 - `T`为非`bool`类型时，调用双参数重载，未被`src.mask`筛选的位置采用Merging模式，保持`dst.reg`中的原值。
 - `T`为`bool`类型时，调用单参数重载，将`src.reg`中被`src.mask`筛选的bit复制到返回值，未被`src.mask`筛选的bit置0。
 
-完成数据搬运后，接口会将`src.mask`同步写入返回值的`mask`成员。双参数重载还会更新`dst.mask`。
+双参数重载仅使用`src.mask`控制参与搬运的元素，不修改`dst.mask`，返回值的`mask`成员与调用前的`dst.mask`相同。单参数重载会将`src.mask`写入返回值的`mask`成员。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -51,7 +51,7 @@ __simd_callee__ inline reg_tensor<bool> move(const reg_tensor<bool>& src)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | T | 输入 | 双参数重载的模板参数，源、目的寄存器的数据类型，不支持`bool`。单参数重载没有模板参数。 |
-| dst | 输入/输出 | 双参数重载的目的寄存器，类型为`reg_tensor<T>`，数据类型须与`src`完全一致。`src.mask`部分有效时，`dst.reg`需提前初始化，否则未被筛选的位置将出现未知值。接口会将`src.mask`写入`dst.mask`。 |
+| dst | 输入/输出 | 双参数重载的目的寄存器，类型为`reg_tensor<T>`，数据类型须与`src`完全一致。`src.mask`部分有效时，`dst.reg`需提前初始化，否则未被筛选的位置将出现未知值。接口不修改`dst.mask`。 |
 | src | 输入 | 源寄存器，类型为`reg_tensor<T>`。其`mask`成员用于指示参与复制的元素。对于双参数重载，对应位置无效的元素保留`dst.reg`中的原值；对于单参数重载，对应位置无效的bit在返回值中置0。 |
 
 ## 数据类型
@@ -61,7 +61,7 @@ __simd_callee__ inline reg_tensor<bool> move(const reg_tensor<bool>& src)
 
 ## 返回值说明
 
-双参数重载返回`reg_tensor<T>`类型的目的寄存器，单参数重载返回`reg_tensor<bool>`。返回值的`mask`成员与`src.mask`相同。
+双参数重载返回`reg_tensor<T>`类型的目的寄存器，其`mask`成员与调用前的`dst.mask`相同。单参数重载返回`reg_tensor<bool>`，其`mask`成员与`src.mask`相同。
 
 ## 约束说明
 
@@ -69,8 +69,9 @@ __simd_callee__ inline reg_tensor<bool> move(const reg_tensor<bool>& src)
 - 单参数重载仅支持`reg_tensor<bool>`。
 - 调用接口前必须初始化`src.mask`，用于指定参与复制的元素。
 - 双参数重载中，`src.mask`未筛选的位置保持`dst.reg`中的原值。`src.mask`部分有效时，必须在调用接口前初始化`dst.reg`。
+- 双参数重载不修改`dst.mask`，返回值的`mask`成员与调用前的`dst.mask`相同。
 - 单参数重载中，`src.mask`未筛选的bit在返回值中置0。
-- 对所有支持的数据类型，返回值的`mask`成员均为`src.mask`；双参数重载还会将`src.mask`写入`dst.mask`。
+- 单参数重载会将`src.mask`写入返回值的`mask`成员。
 - 寄存器数据搬运应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
 ## 调用示例

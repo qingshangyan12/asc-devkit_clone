@@ -47,10 +47,9 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src);
  *
  * @override_id te_experimental_move__reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
- * @return The destination register tensor after the copy.
+ * @return The destination register tensor after the copy. Its mask remains unchanged.
  * @note T must be one of uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t, or float.
- * @param [in,out] dst Destination register tensor. Inactive elements retain their original values. Its mask is
- * updated from src.mask.
+ * @param [in,out] dst Destination register tensor. Inactive elements and its mask retain their original values.
  * @param [in] src Source register tensor. Its mask selects the active elements to copy.
  */
 template <typename T>
