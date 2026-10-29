@@ -114,12 +114,9 @@ enum class DumpType : uint8_t {
     DUMP_BUFI,
     DUMP_BUFO,
     DUMP_SKIP,
-    DUMP_SUPER_TENSOR,
-    DUMP_SUPER_TENSOR_BODY
+    DUMP_SUPER_TENSOR = 12, // 11 is reserved for runtime DUMP_AICPU.
+    DUMP_SUPER_TENSOR_BODY = 13
 };
-
-static_assert(static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR) == 11U, "unexpected super tensor dump type");
-static_assert(static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY) == 12U, "unexpected super tensor body dump type");
 
 struct DebugBlockHeadInfo {
     uint32_t length = 0U;       // total size per block (include head and r/w info)
