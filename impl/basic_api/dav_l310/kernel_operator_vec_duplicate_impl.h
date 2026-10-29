@@ -66,6 +66,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
 
     Reg::Duplicate(dstVreg, scalarValue, maskFull);
+    const uint32_t countPerLogicalIter = count;
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
         if constexpr (isNormalMode) {
             count = countPerLogicalIter;
@@ -73,27 +74,28 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
         if constexpr (isNormalMode && isMaskBitMode && isSetMask) {
             {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
-                constexpor uint32_t blkBaseOfMicro = 0;
+                constexpr uint32_t blkBaseOfMicro = 0;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
-                    maskReg);
+                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, 
+                    dstVreg, dstBlockStride, maskReg);
             }
             if constexpr (MICRO_NUM_PER_ITER > 1) {
-                maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
-                constexpor uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
+                maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
+                constexpr uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
-                    maskReg);
+                    dst + (index * dstRepeatStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, 
+                    dstVreg, dstBlockStride, maskReg);
             }
         } else {
             for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
                 if constexpr ((!isNormalMode) || isSetMask) {
-                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
+                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(
+                        maskBuf, count);
                 }
-                constexpor uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
+                const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, dstVreg, dstBlockStride,
-                    maskReg);
+                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, 
+                    dstVreg, dstBlockStride, maskReg);
             }
         }
     }
