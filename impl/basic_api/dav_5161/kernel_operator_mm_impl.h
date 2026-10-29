@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_5161/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -24,6 +25,50 @@
 #include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 namespace AscendC {
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData A1 To A2 is not supported!"); });
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
+            float, int32_t, uint32_t>(),
+        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+         half, bfloat16_t, float, int32_t, uint32_t on current device!");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    if (loadDataParam.GetIfTranspose()) {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 1);
+    } else {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 0);
+    }
+#else
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb_s4(
+                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb_s4(
+                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
+#endif
+}
+
 /* **************************************************************************************************
  * LoadData 2dv1                                             *
  * ************************************************************************************************* */
@@ -184,6 +229,34 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 #endif
 }
 
+template <typename T, typename U>
+__aicore__ inline void LoadData2DGM2L1Cal(
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
+{
+    static_assert(
+        ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
+         (IsSameType<T, int4b_t>::value && IsSameType<U, int2b_t>::value) ||
+         (IsSameType<T, int8_t>::value && IsSameType<U, int2b_t>::value) ||
+         (IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value)),
+        "LoadData dst type or src type is not supported on current device!");
+    set_mte2_qtable0(nd2nzParams.lookupTable0);
+    set_mte2_src_para(uint64_t(loadDataParam.srcStride));
+    uint8_t decompressMode = 0;
+    if constexpr (IsSameType<T, int4b_t>::value && IsSameType<U, int2b_t>::value) {
+        decompressMode = 0b0111;
+    } else if constexpr (IsSameType<T, int8_t>::value && IsSameType<U, int2b_t>::value) {
+        decompressMode = 0b0001;
+    } else if constexpr (IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value) {
+        decompressMode = 0b0110;
+    } else if constexpr (IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) {
+        set_mte2_qtable1(nd2nzParams.lookupTable1);
+        decompressMode = 0b0011;
+    }
+    load_gm_to_cbuf_2dv2(
+        (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+        loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, 0, decompressMode, 0);
+}
+
 /* **************************************************************************************************
  * LoadDataWithTranspose                                        *
  * ************************************************************************************************* */
@@ -196,11 +269,25 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 
 template <typename T>
+__aicore__ inline void LoadData2DL12L0ATransposeCal(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData A1 To A2 is not supported!"); });
+}
+
+template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
 {
     // LoadData2dTransposeParams do not match hardware capabilities, not currently supported, will be added later
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData A1 To A2 is not supported!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData B1 To B2 is not supported!"); });
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BTransposeCal(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData B1 To B2 is not supported!"); });
 }
 
 /* **************************************************************************************************
@@ -381,6 +468,19 @@ __aicore__ inline void MmadCal(
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Mmad is not supported!"); });
 }
 
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Mmad is not supported!"); });
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(
+    __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Mmad is not supported!"); });
+}
+
 /* **************************************************************************************************
  * LoadData 3dv1                                             *
  * ************************************************************************************************* */
@@ -490,6 +590,13 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+#endif
+
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         half initValue = *(half*)(&tmpValue);
