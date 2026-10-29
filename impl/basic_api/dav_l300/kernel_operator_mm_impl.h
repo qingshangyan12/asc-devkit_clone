@@ -12,6 +12,7 @@
  * \file kernel_operator_mm_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l300/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -459,8 +460,7 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, 0, config);
     } else {
         mad(c, a, b, config);
@@ -489,8 +489,7 @@ __aicore__ inline void MmadCal(
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, bias, config);
     } else {
         mad(c, a, b, bias, config);
@@ -500,8 +499,7 @@ __aicore__ inline void MmadCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
     } else {
         mad(c, a, b, mmadParams.GetConfig0());
@@ -513,8 +511,7 @@ __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
     mmadParams.SetCmatrixInitVal(false);
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
     } else {
         mad(c, a, b, bias, mmadParams.GetConfig0());
@@ -558,15 +555,9 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     set_fmatrix_b(regFMatrix);
 }
 
-__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
-{
-    set_fmatrix(regFMatrix);
-}
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix) { set_fmatrix(regFMatrix); }
 
-__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
-{
-    set_fmatrix_b(regFMatrix);
-}
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix) { set_fmatrix_b(regFMatrix); }
 
 template <typename T>
 __aicore__ inline void Load3DSetPaddingCal(const T padValue)
@@ -652,7 +643,8 @@ template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
@@ -677,7 +669,8 @@ template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
@@ -702,7 +695,8 @@ template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {

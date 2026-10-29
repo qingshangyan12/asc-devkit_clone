@@ -12,6 +12,7 @@
  * \file kernel_operator_fixpipe_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l311/kernel_operator_fixpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
@@ -26,10 +27,7 @@
 
 namespace AscendC {
 
-__aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
-{
-    set_fix_clip_relu(config);
-}
+__aicore__ inline void SetFixPipeClipReluImpl(uint64_t config) { set_fix_clip_relu(config); }
 
 template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
@@ -42,10 +40,11 @@ __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, u
             false, "eleWise", "L1 Buffer(A1/B1/C1)", "SetFixPipeAddr",
             GetPositionDisplay(static_cast<TPosition>(eleWiseTensor.GetPosition())));
     }
-    
+
     uint64_t config = 0;
     config = config | c0ChStride; // ELT_SRC_PARA[15:0], C0 channel stride Size.
-    config = config | ((static_cast<uint64_t>(eleWiseTensor.GetPhyAddr()) >> 5) << 16); // L1 address, ELT_SRC_PARA[31:16], align with 32bit.
+    config = config | ((static_cast<uint64_t>(eleWiseTensor.GetPhyAddr()) >> 5)
+                       << 16); // L1 address, ELT_SRC_PARA[31:16], align with 32bit.
     set_elt_src_para(config);
 }
 
@@ -302,8 +301,8 @@ __aicore__ inline void FixpipeL0cToUB(
         (__ubuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
         intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
         static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
-        intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
-        false, false, false, false, false, nz2dnEn);
+        intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false,
+        false, false, false, false, nz2dnEn);
 }
 
 template <const FixpipeConfig& config>
@@ -544,9 +543,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(
         }
         return;
     }
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "Fixpipe with cbufWorkspace only supports vector quant mode");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe with cbufWorkspace only supports vector quant mode"); });
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>

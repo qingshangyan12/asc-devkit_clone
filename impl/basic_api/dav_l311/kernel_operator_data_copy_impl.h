@@ -12,6 +12,7 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l311 support data copy api.
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l311/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
@@ -361,18 +362,14 @@ template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImplBase(
     __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImpl(
     __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
 }
 
 template <typename T>
@@ -862,8 +859,7 @@ __aicore__ inline bool IsSupportQuantMode(QuantMode_t quantPre)
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     static_assert(
         (SupportType<
@@ -880,10 +876,10 @@ __aicore__ inline void DataCopyL0C2GMImpl(
             dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
         return copy_matrix_cc_to_gm(
-            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-            0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0,
-            false, false, false, false, false, false);
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
     } else {
         ASCENDC_ASSERT(false, {
             KERNEL_LOG(
@@ -913,10 +909,10 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
             dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
         return copy_matrix_cc_to_cbuf(
-            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-            0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0,
-            false, false, false, false, false, false);
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
     } else {
         ASCENDC_ASSERT(false, {
             KERNEL_LOG(
