@@ -44,6 +44,15 @@ template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
 
+**裸指针形：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParams& loadDataParams)
+```
+
+> 与 [LoadData（2D矩阵搬运）](LoadData_2D.md) 中的裸指针形是同一条重载，本页是它的 GM 源视角；`dst` 为 L1（`__cbuf__`）、`src` 为 GM（`__gm__`），元素类型由指针实参推导。
+
 ## 参数说明<a id="zh-cn_topic_0000002567745223_section16128134420472"></a>
 
 **表1** 通用参数说明

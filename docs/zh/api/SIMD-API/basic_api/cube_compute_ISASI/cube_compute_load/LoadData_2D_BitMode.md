@@ -44,6 +44,19 @@ template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,const Load2DBitModeParam& loadDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+<!-- npu="950" id11 -->
+- 仅 Ascend 950PR&950DT系列产品支持裸指针形。
+
+```cpp
+template <TPosition Dst, TPosition Src, typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const Load2DBitModeParam& loadDataParams)
+```
+<!-- end id11 -->
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a id="section622mcpsimp"></a>
 
 **表 1** 模板参数说明
@@ -61,6 +74,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32字节 / sizeof(T))。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为Load2DBitModeParam，具体参考[表3](#table10539223195311)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表 3** Load2DBitModeParam类参数说明<a id="table10539223195311"></a>
 
@@ -150,6 +165,7 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 <!-- npu="950" id10 -->
 - 针对Ascend 950PR&950DT系列产品，仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer数据通路。
 <!-- end id10 -->
+- 裸指针形下，`dst` 必须为 L0A（`__ca__`）或 L0B（`__cb__`）上的裸指针，`src` 必须为 L1（`__cbuf__`）上的裸指针。
 
 ## 调用示例<a id="section6461234123118"></a>
 

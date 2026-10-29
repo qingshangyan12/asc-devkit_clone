@@ -203,6 +203,19 @@ __aicore__ inline __in_pipe__(V)
 #endif
 }
 
+/*
+ * Definition of the raw-pointer InitOutput overload declared in the interface header.  The address
+ * is re-wrapped as the GlobalTensor view it denotes and handed to the Tensor overload above, so the
+ * fill and the MTE3 synchronization are exactly the Tensor path's.
+ */
+template <typename T>
+__aicore__ inline __in_pipe__(V) __out_pipe__(MTE3) void InitOutput(__gm__ T* gmWorkspaceAddr, uint32_t size, T value)
+{
+    GlobalTensor<T> tmp;
+    tmp.SetGlobalBuffer(gmWorkspaceAddr);
+    InitOutput<T>(tmp, size, value);
+}
+
 template <AtomicDtype type, AtomicOp op>
 __aicore__ inline void SetStoreAtomicConfig()
 {

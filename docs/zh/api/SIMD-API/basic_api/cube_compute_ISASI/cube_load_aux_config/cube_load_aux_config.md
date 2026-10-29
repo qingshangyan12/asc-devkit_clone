@@ -2,6 +2,8 @@
 
 - **[Fill](Fill.md)**
 
+- **[InitConstValue](InitConstValue.md)**
+
 - **[SetFmatrix](SetFmatrix.md)**
 
 - **[SetFmatrixBitMode](SetFmatrixBitMode.md)**
