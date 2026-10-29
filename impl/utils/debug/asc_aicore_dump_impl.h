@@ -408,6 +408,18 @@ __aicore__ static __attribute__((noinline)) void asc_dump(__ubuf__ T* input, uin
 }
 
 template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump(__ca__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_abuf(input, desc, dump_size);
+}
+
+template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump(__cb__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_bbuf(input, desc, dump_size);
+}
+
+template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size)
 {
     asc_dump_cbuf(input, desc, dump_size);
@@ -460,6 +472,18 @@ __aicore__ static __attribute__((noinline)) void asc_dump_l1buf(__cbuf__ T* inpu
 }
 
 template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump_abuf(__ca__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    assert(false && "asc_dump_abuf is not supported in cpu mode.");
+}
+
+template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump_bbuf(__cb__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    assert(false && "asc_dump_bbuf is not supported in cpu mode.");
+}
+
+template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_gm(
     __gm__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
 {
@@ -485,6 +509,20 @@ __aicore__ static __attribute__((noinline)) void asc_dump_l1buf(
     __cbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
 {
     assert(false && "asc_dump_l1buf is not supported in cpu mode.");
+}
+
+template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump_abuf(
+    __ca__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+{
+    assert(false && "asc_dump_abuf is not supported in cpu mode.");
+}
+
+template <typename T>
+__aicore__ static __attribute__((noinline)) void asc_dump_bbuf(
+    __cb__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+{
+    assert(false && "asc_dump_bbuf is not supported in cpu mode.");
 }
 
 template <typename T>

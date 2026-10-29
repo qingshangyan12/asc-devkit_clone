@@ -192,21 +192,13 @@ __aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* 
 template <typename T>
 __aicore__ inline uint32_t mem_copy_abuf_to_gm_impl(__gm__ T* dst, __ca__ T* src, const uint32_t alignDumpBytes)
 {
-#if defined(__DAV_CUBE__)
-    return debug_bus_copy_local_to_gm_impl<AscendC::Hardware::L0A>(dst, src, alignDumpBytes, get_debug_bus_addr_impl());
-#else
     return 1;
-#endif
 }
 
 template <typename T>
 __aicore__ inline uint32_t mem_copy_bbuf_to_gm_impl(__gm__ T* dst, __cb__ T* src, const uint32_t alignDumpBytes)
 {
-#if defined(__DAV_CUBE__)
-    return debug_bus_copy_local_to_gm_impl<AscendC::Hardware::L0B>(dst, src, alignDumpBytes, get_debug_bus_addr_impl());
-#else
     return 1;
-#endif
 }
 
 template <typename T>
