@@ -28,6 +28,7 @@
 #include "../../../include/basic_api/kernel_struct_macro.h"
 
 namespace AscendC {
+
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config) { set_m_clip_relu(config); }
 
 template <typename T1, typename T2>
@@ -73,19 +74,23 @@ template <typename T>
 __aicore__ inline void SetFixpipePreQuantFlagImpl(const FixPipePreQuantParams<T>& params)
 {
     uint64_t config = 0;
+    constexpr uint32_t POS_SHIFT_SCALE = 16;
+    constexpr uint32_t POS_MUL_SCALE = 21;
+    constexpr uint32_t POS_OFFSET_CFG = 37;
+    constexpr uint32_t POS_CLIP_MAX_VAL_PRE = 48;
 
-    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | (((params.offset0 >> 31) & 0x1) << 7));
+    config = ((((uint64_t)params.offset0 >> 0x9) & 0x7F) | (((params.offset0 >> 0x1f) & 0x1) << 0x7));
     if (params.isSft) {
-        config |= (((uint64_t)params.shiftScale & 0x1F) << 16);
-        config |= ((params.mulScale) * 0x7FF << 21);
+        config |= (((uint64_t)params.shiftScale & 0x1F) << POS_SHIFT_SCALE);
+        config |= ((params.mulScale) * 0x7FF << POS_MUL_SCALE);
     } else {
         config |= ((uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFFE000);
     }
     config |= (((uint64_t)params.offset0 & 0x1FF) |
-               (((uint64_t)params.offset1 & 0xF) | ((((uint64_t)params.offset1 >> 7) & 0x1) << 4)) |
-               (((uint64_t)params.offset2 & 0xFF) | ((((uint64_t)params.offset2 >> 15) & 0x1) << 8)))
-              << 37;
-    config |= ((uint64_t)GetScalarBitcodeValue(params.clipMaxValPre) & 0xFFFF) << 48;
+               (((uint64_t)params.offset1 & 0xF) | ((((uint64_t)params.offset1 >> 0x7) & 0x1) << 0x4)) |
+               (((uint64_t)params.offset2 & 0xFF) | ((((uint64_t)params.offset2 >> 0xf) & 0x1) << 0x8)))
+              << POS_OFFSET_CFG;
+    config |= ((uint64_t)GetScalarBitcodeValue(params.clipMaxValPre) & 0xFFFF) << POS_CLIP_MAX_VAL_PRE;
     set_m_quant_pre(config);
 }
 
@@ -132,13 +137,16 @@ __aicore__ inline void SetReluScalarOnMode(QuantMode_t mode, uint64_t reluScalar
 __aicore__ inline void SetFixpipePostQuantImpl(const FixPipePostQuantParams& params)
 {
     uint64_t config = 0;
+    constexpr uint32_t POS_OFFSET2_CFG = 32;
+    constexpr uint32_t POS_OSHIFT_SCALE_OFFSET = 40;
 
-    config |= (((uint64_t)params.offset0 & 0xF) | (((uint64_t)params.offset0 & 0x80) >> 3));
-    config |= (((uint64_t)params.offset1 & 0xFF) | (((uint64_t)params.offset1 & 0x8000) >> 7));
+    config |= (((uint64_t)params.offset0 & 0xF) | (((uint64_t)params.offset0 & 0x80) >> 0x3));
+    config |= (((uint64_t)params.offset1 & 0xFF) | (((uint64_t)params.offset1 & 0x8000) >> 0x7));
     config |= ((uint64_t)params.offset2 & 0x1FF);
     config |= ((uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFFE000);
-    config |= ((((uint64_t)params.offset2 >> 9) & 0x7F) | ((((uint64_t)params.offset2 >> 31) & 0x1) << 7)) << 32;
-    config |= ((uint64_t)params.shiftScale & 0x1F) << 40;
+    config |= ((((uint64_t)params.offset2 >> 0x9) & 0x7F) | ((((uint64_t)params.offset2 >> 0x1F) & 0x1) << 0x7))
+              << POS_OFFSET2_CFG;
+    config |= ((uint64_t)params.shiftScale & 0x1F) << POS_OSHIFT_SCALE_OFFSET;
     set_m_quant_post(config);
 }
 
@@ -146,18 +154,22 @@ template <typename T>
 __aicore__ inline void SetFixpipeEltAntiqImpl(const FixPipeEltAntiqParams<T>& params)
 {
     uint64_t config = 0;
+    constexpr uint32_t POS_MUL_SCALE = 5;
+    constexpr uint32_t POS_B8_ANTI_QUANT_OFFSET = 20;
+    constexpr uint32_t POS_S16_ANTI_QUANT_OFFSET = 28;
+    constexpr uint32_t POS_S16_ANTI_QUANT_CFG = 44;
 
-    config = ((((uint64_t)params.offset0 >> 9) & 0x7F) | (((params.offset0 >> 31) & 0x1) << 7));
+    config = ((((uint64_t)params.offset0 >> 0x9) & 0x7F) | (((params.offset0 >> 0x1f) & 0x1) << 0x7));
     if (params.isSft) {
         config |= ((params.shiftScale) & 0x1F);
-        config |= ((params.mulScale) * 0x7FF << 5);
+        config |= ((params.mulScale) * 0x7FF << POS_MUL_SCALE);
     } else {
         config |= (uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFF;
     }
-    config |= (((uint64_t)params.s4Offset & 8) | ((((uint64_t)params.s4Offset >> 7) & 0x1) << 3)) << 16;
-    config |= ((uint64_t)params.b8Offset & 0xFF) << 20;
-    config |= ((uint64_t)params.s16Offset & 0xFFFF) << 28;
-    config |= ((uint64_t)params.eltAntiqCfg & 0xF) << 44;
+    config |= (((uint64_t)params.s4Offset & 0x8) | ((((uint64_t)params.s4Offset >> 0x7) & 0x1) << 0x3)) << 0x10;
+    config |= ((uint64_t)params.b8Offset & 0xFF) << POS_B8_ANTI_QUANT_OFFSET;
+    config |= ((uint64_t)params.s16Offset & 0xFFFF) << POS_S16_ANTI_QUANT_OFFSET;
+    config |= ((uint64_t)params.eltAntiqCfg & 0xF) << POS_S16_ANTI_QUANT_CFG;
 
     set_m_elt_antiq_para(config);
 }
@@ -167,49 +179,64 @@ __aicore__ inline void SetFixpipeEltwiseAddrImpl(uint64_t config) { set_m_elt_sr
 __aicore__ inline void SetFixpipeEltwiseAddrImpl(const FixpipeEltwiseAddrParams& params)
 {
     uint64_t config = 0;
+    constexpr uint32_t POS_ELT_SRC_ADDR = 16;
+    constexpr uint32_t POS_SRC_STRIDE1 = 32;
+    constexpr uint32_t POS_SRC_STRIDE2 = 48;
 
     config |= ((uint64_t)params.c0Indicator & 0x1);
-    config |= ((uint64_t)params.eltSrcAddr & 0xFFFF) << 16;
-    config |= ((uint64_t)params.srcStride1 & 0xFFFF) << 32;
-    config |= ((uint64_t)params.srcStride2 & 0xFFFF) << 48;
+    config |= ((uint64_t)params.eltSrcAddr & 0xFFFF) << POS_ELT_SRC_ADDR;
+    config |= ((uint64_t)params.srcStride1 & 0xFFFF) << POS_SRC_STRIDE1;
+    config |= ((uint64_t)params.srcStride2 & 0xFFFF) << POS_SRC_STRIDE2;
     set_m_elt_src_para(config);
 }
 
 /* **************************************************************************************************
  * Fixpipe                                             *
  * ************************************************************************************************* */
+/* pack nd num and nd stride into FIXP_NZ_PARA for nd2nd/nd2dn trans */
+template <const FixpipeConfig& config>
+__aicore__ inline void SetFixpipeNzParaImpl(const FixpipeParamsV516& params)
+{
+    constexpr uint32_t POS_FIXP_NZ_ND_NUM = 0;
+    constexpr uint32_t POS_FIXP_NZ_SRC_ND_STRIDE = 16;
+    constexpr uint32_t POS_FIXP_NZ_DST_ND_STRIDE = 32;
+
+    if constexpr (config.format != CO2Layout::NZ) {
+        uint64_t nzPara = 0;
+        nzPara |= (((uint64_t)params.ndNum & 0xffff) << POS_FIXP_NZ_ND_NUM);
+        nzPara |= (((uint64_t)params.srcNdStride & 0xffff) << POS_FIXP_NZ_SRC_ND_STRIDE);
+        nzPara |= (((uint64_t)params.dstNdStride & 0xffff) << POS_FIXP_NZ_DST_ND_STRIDE);
+        set_fixp_nz_para(nzPara);
+    }
+}
+
+template <const FixpipeConfig& config>
+__aicore__ inline fixp_trans_mode_t GetFixpipeTransMode()
+{
+    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
+        return fixp_trans_mode_t::NZ2ND;
+    } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
+        return fixp_trans_mode_t::NZ2DN;
+    } else {
+        return fixp_trans_mode_t::NORMAL_DMA;
+    }
+}
+
 /* fix data L1 to L1 */
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL1ToL1(
     __cbuf__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, uint16_t nIterIndex = 0)
 {
-    uint64_t config1 = 0;
-
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_cbuf(
-            (__cbuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
-            0, transMode);
-    } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_cbuf(
-            (__cbuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
-            0, transMode);
-    } else {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
+    SetFixpipeNzParaImpl<config>(params);
+    if constexpr (config.format == CO2Layout::NZ) {
         fix_cbuf_to_cbuf(
             (__cbuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.mSize, params.nSize, params.dstStride,
-            params.srcStride, 0, transMode);
+            params.srcStride, 0, GetFixpipeTransMode<config>());
+    } else {
+        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
+        fix_cbuf_to_cbuf(
+            (__cbuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
+            0, GetFixpipeTransMode<config>());
     }
 }
 
@@ -218,33 +245,16 @@ template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL1ToUb(
     __ubuf__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, uint16_t nIterIndex = 0)
 {
-    uint64_t config1 = 0;
-
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_ubuf(
-            (__ubuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
-            0, transMode);
-    } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_ubuf(
-            (__ubuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
-            0, transMode);
-    } else {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
+    SetFixpipeNzParaImpl<config>(params);
+    if constexpr (config.format == CO2Layout::NZ) {
         fix_cbuf_to_ubuf(
             (__ubuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.mSize, params.nSize, params.dstStride,
-            params.srcStride, 0, transMode);
+            params.srcStride, 0, GetFixpipeTransMode<config>());
+    } else {
+        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
+        fix_cbuf_to_ubuf(
+            (__ubuf__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride,
+            0, GetFixpipeTransMode<config>());
     }
 }
 
@@ -254,33 +264,16 @@ __aicore__ inline void FixpipeL1ToOut(
     __gm__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, uint16_t nIterIndex = 0,
     const uint8_t sid = 4)
 {
-    uint64_t config1 = 0;
-
-    if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2ND;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_gm(
-            (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0,
-            transMode, sid);
-    } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
-        config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
-        config1 |= (((uint64_t)params.srcNdStride & 0xffff) << 16);
-        config1 |= (((uint64_t)params.dstNdStride & 0xffff) << 32);
-        set_fixp_nz_para(config1);
-        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
-        fix_cbuf_to_gm(
-            (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0,
-            transMode, sid);
-    } else {
-        fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
+    SetFixpipeNzParaImpl<config>(params);
+    if constexpr (config.format == CO2Layout::NZ) {
         fix_cbuf_to_gm(
             (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.mSize, params.nSize, params.dstStride, params.srcStride,
-            0, transMode, sid);
+            0, GetFixpipeTransMode<config>(), sid);
+    } else {
+        uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
+        fix_cbuf_to_gm(
+            (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0,
+            GetFixpipeTransMode<config>(), sid);
     }
 }
 
