@@ -56,6 +56,8 @@ struct KfcHalfAlltoAllVMesh1DContext : CcuKernelCtxBase {
     ccu::Variable missionIndex;
     // 构图期常量（与 kfcServerArgs 运行时值同源）：选本 mission 的通知位
     uint32_t hostMissionIndex = 0;
+    // 构图期常量：mission 总数（server 侧 GetKfcServerMissionNum），收尾栅栏的门控
+    uint32_t hostMissionNum = 1;
 };
 
 static CcuResult InitResource(KfcHalfAlltoAllVMesh1DContext& ctx)
@@ -283,12 +285,24 @@ static CcuResult DoHalfAlltoAllV(KfcHalfAlltoAllVMesh1DContext& ctx)
     ccu::LocalAddr localDst;
     CCU_CHK_RET(DoHalfAlltoAllVWrite(ctx, localSrc, localDst));
 
-    // 阶段 3-1：本地拷贝（GroupCopy）仅在 mission 0 执行
-    // 单 mission 模式（missionNum==1）时 missionIndex 必然为 0，保持现有行为
-    // 双 mission 模式（missionNum==2）时仅 missionIndex==0 执行本地拷贝
+    // 本地拷贝（GroupCopy）仅在 mission 0 执行（对应 hcomm 原版 missionId_==0 分支；
+    // 单 mission 时 missionIndex 必然为 0，行为不变）
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize)); }
 
     CCU_CHK_RET(DoHalfAlltoAllVWait(ctx));
+
+    // 收尾栅栏：对应 hcomm 原版 MissionSync(0)——两 mission 互等对方 writeDone 全清。
+    // bit 按 mission 错开（post/wait 各一次，与 PreSync 同一死锁约束），门控用构图期
+    // 常量（CCU_IF 是运行时分支，构图期两分支都会注册 tag）。
+    if (ctx.hostMissionNum == KFC_MAX_MISSION_NUM) {
+        if (ctx.hostMissionIndex == 0) {
+            CCU_CHK_RET(ccu::EventRecord("MiFin_m0", 1U << 0));
+            CCU_CHK_RET(ccu::EventWait("MiFin_m1", 1U << 1));
+        } else {
+            CCU_CHK_RET(ccu::EventRecord("MiFin_m1", 1U << 1));
+            CCU_CHK_RET(ccu::EventWait("MiFin_m0", 1U << 0));
+        }
+    }
     return CCU_SUCCESS;
 }
 
@@ -296,7 +310,8 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
     ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex, uint32_t hostMissionIndex)
+    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex, uint32_t hostMissionIndex,
+    uint32_t hostMissionNum)
 {
     KfcHalfAlltoAllVMesh1DContext ctx;
     ctx.channels = channels;
@@ -309,6 +324,7 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ctx.missionNum = missionNum;
     ctx.missionIndex = missionIndex;
     ctx.hostMissionIndex = hostMissionIndex;
+    ctx.hostMissionNum = hostMissionNum;
 
     CCU_CHK_RET(InitResource(ctx));
     ctx.localWinAddr = localWinAddr;
