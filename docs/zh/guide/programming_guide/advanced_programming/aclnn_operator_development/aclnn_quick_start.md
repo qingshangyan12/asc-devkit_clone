@@ -104,93 +104,89 @@ struct AddCustomTilingData {
 #include "kernel_operator.h"
 #include "add_custom_tiling.h"
 
-using namespace AscendC;
+constexpr int32_t BUFFER_NUM = 2;
+constexpr uint32_t STATIC_TILE_LENGTH = 128;
 
+template <uint32_t tileLength>
 class KernelAdd {
 public:
     __aicore__ inline KernelAdd() {}
-    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z,
-                                uint32_t totalLength, uint32_t tileNum)
+    __aicore__ inline void Init(
+        __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum)
     {
-        this->totalLength = totalLength;
+        ascendc_assert(tileNum != 0, "tileNum can not be zero.\n");
+        this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
-        xGlobal.SetGlobalBuffer((__gm__ float*)x);
-        yGlobal.SetGlobalBuffer((__gm__ float*)y);
-        zGlobal.SetGlobalBuffer((__gm__ float*)z);
+        uint32_t runtimeTileLength = this->blockLength / tileNum / BUFFER_NUM;
+        ascendc_assert(runtimeTileLength == tileLength, "runtime tileLength must match template tileLength.\n");
 
-        pipe.InitBuffer(xQueue, 1, totalLength / tileNum * sizeof(float));
-        pipe.InitBuffer(yQueue, 1, totalLength / tileNum * sizeof(float));
-        pipe.InitBuffer(zQueue, 1, totalLength / tileNum * sizeof(float));
+        xGm.SetGlobalBuffer((__gm__ DTYPE_X*)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+        yGm.SetGlobalBuffer((__gm__ DTYPE_Y*)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+        zGm.SetGlobalBuffer((__gm__ DTYPE_Z*)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     }
-
     __aicore__ inline void Process()
     {
-        uint32_t lengthPerBlock = totalLength / tileNum;
-        uint32_t lengthPerCore = totalLength / GetBlockNum();
-        uint32_t coreOffset = lengthPerCore * GetBlockIdx();
+        int32_t loopCount = this->tileNum * BUFFER_NUM;
 
-        for (uint32_t i = 0; i < lengthPerCore / lengthPerBlock; i++) {
-            uint32_t offset = coreOffset + i * lengthPerBlock;
-            CopyIn(offset, lengthPerBlock);
-            Compute(lengthPerBlock);
-            CopyOut(offset, lengthPerBlock);
+        AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+        AscendC::LocalTensor<DTYPE_X> xLocal = ubAllocator.Alloc<DTYPE_X, tileLength>();
+        AscendC::LocalTensor<DTYPE_Y> yLocal = ubAllocator.Alloc<DTYPE_Y, tileLength>();
+        AscendC::LocalTensor<DTYPE_Z> zLocal = ubAllocator.Alloc<DTYPE_Z, tileLength>();
+
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+
+        for (int32_t i = 0; i < loopCount; i++) {
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+
+            AscendC::DataCopy(xLocal, xGm[i * tileLength], tileLength);
+            AscendC::DataCopy(yLocal, yGm[i * tileLength], tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+
+            AscendC::Add(zLocal, xLocal, yLocal, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+
+            AscendC::DataCopy(zGm[i * tileLength], zLocal, tileLength);
+
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
         }
+
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
     }
 
 private:
-    __aicore__ inline void CopyIn(uint32_t offset, uint32_t length)
-    {
-        LocalTensor<float> xLocal = xQueue.AllocTensor<float>();
-        LocalTensor<float> yLocal = yQueue.AllocTensor<float>();
-        DataCopy(xLocal, xGlobal[offset], length);
-        DataCopy(yLocal, yGlobal[offset], length);
-        xQueue.EnQue(xLocal);
-        yQueue.EnQue(yLocal);
-    }
-
-    __aicore__ inline void Compute(uint32_t length)
-    {
-        LocalTensor<float> xLocal = xQueue.DeQue<float>();
-        LocalTensor<float> yLocal = yQueue.DeQue<float>();
-        LocalTensor<float> zLocal = zQueue.AllocTensor<float>();
-
-        Add(zLocal, xLocal, yLocal, length);
-
-        zQueue.EnQue(zLocal);
-        xQueue.FreeTensor(xLocal);
-        yQueue.FreeTensor(yLocal);
-    }
-
-    __aicore__ inline void CopyOut(uint32_t offset, uint32_t length)
-    {
-        LocalTensor<float> zLocal = zQueue.DeQue<float>();
-        DataCopy(zGlobal[offset], zLocal, length);
-        zQueue.FreeTensor(zLocal);
-    }
-
-    TPipe pipe;
-    TQue<TPosition::VECIN, 1> xQueue;
-    TQue<TPosition::VECIN, 1> yQueue;
-    TQue<TPosition::VECOUT, 1> zQueue;
-    GlobalTensor<float> xGlobal;
-    GlobalTensor<float> yGlobal;
-    GlobalTensor<float> zGlobal;
-    uint32_t totalLength;
+    AscendC::GlobalTensor<DTYPE_X> xGm;
+    AscendC::GlobalTensor<DTYPE_Y> yGm;
+    AscendC::GlobalTensor<DTYPE_Z> zGm;
+    uint32_t blockLength;
     uint32_t tileNum;
 };
 
-extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z,
-                                                   GM_ADDR workspace, GM_ADDR tiling)
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
+    AscendC::InitSocState();
+
     REGISTER_TILING_DEFAULT(AddCustomTilingData);  // 注册TilingData结构体类型
     GET_TILING_DATA(tilingData, tiling);           // 反序列化tiling参数为结构体实例
-    KernelAdd op;
+
+    KernelAdd<STATIC_TILE_LENGTH> op;
     op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
     op.Process();
+
+    AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
-> 以上代码展示了[核函数（Kernel）侧算子实现](./design_and_implementation/kernel_operator_implementation.md)的基本模式。
+以上代码按`BUFFER_NUM`（双缓冲数）和模板参数`STATIC_TILE_LENGTH`（编译期分块长度）手动管理UB内存和搬运/计算之间的流水同步（`SetFlag`/`WaitFlag`），`DTYPE_X`/`DTYPE_Y`/`DTYPE_Z`由构建时根据下文Host原型注册的输入输出数据类型生成。`Init`中的断言要求`totalLength`满足`totalLength / GetBlockNum() / tileNum / BUFFER_NUM == STATIC_TILE_LENGTH`，即数据总量需与Host侧Tiling的`NUM_BLOCKS`、`TILE_NUM`和此处的`BUFFER_NUM`、`STATIC_TILE_LENGTH`配套，调用算子时需按此关系设置数据规模，具体可参考[核函数（Kernel）侧算子实现](./design_and_implementation/kernel_operator_implementation.md)。
 
 ### 编写Host侧实现
 
@@ -244,9 +240,9 @@ class AddCustom : public OpDef {
 public:
     explicit AddCustom(const char *name) : OpDef(name)
     {
-        this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
-        this->Input("y").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
-        this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
+        this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT16}).Format({ge::FORMAT_ND});
+        this->Input("y").ParamType(REQUIRED).DataType({ge::DT_FLOAT16}).Format({ge::FORMAT_ND});
+        this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT16}).Format({ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
         this->AICore()
@@ -477,17 +473,20 @@ int main()
     aclrtStream stream = nullptr;
     CHECK_RTL(aclrtCreateStream(&stream));
 
-    // 2. 准备输入数据
-    const int count = 1024;
-    size_t bufferSize = count * sizeof(float);
+    // 2. 准备输入数据。shape需与Kernel侧的NUM_BLOCKS、TILE_NUM、BUFFER_NUM、
+    //    STATIC_TILE_LENGTH配套（本示例为8*8*2*128=16384），数据类型需与算子原型注册的
+    //    DT_FLOAT16一致
+    const std::vector<int64_t> shape = {8, 2048};
+    const int64_t count = shape[0] * shape[1];
+    size_t bufferSize = count * sizeof(aclFloat16);
 
-    std::vector<float> input0Host(count);
-    std::vector<float> input1Host(count);
-    std::vector<float> outputHost(count, 0.0f);
+    std::vector<aclFloat16> input0Host(count);
+    std::vector<aclFloat16> input1Host(count);
+    std::vector<aclFloat16> outputHost(count, aclFloatToFloat16(0.0f));
 
-    for (int i = 0; i < count; i++) {
-        input0Host[i] = static_cast<float>(i);
-        input1Host[i] = static_cast<float>(i);
+    for (int64_t i = 0; i < count; i++) {
+        input0Host[i] = aclFloatToFloat16(static_cast<float>(i % 100));
+        input1Host[i] = aclFloatToFloat16(static_cast<float>(i % 100));
     }
 
     // 3. 申请设备内存
@@ -506,17 +505,14 @@ int main()
                           bufferSize, ACL_MEMCPY_HOST_TO_DEVICE));
 
     // 5. 创建Tensor描述
-    int64_t shape[] = {count};
-    uint64_t shapeNum = 1;
-
     // aclCreateTensor参数：viewDims, viewDimsNum, dataType, stride(nullptr表示默认连续排布),
     //     offset, format, storageDims, storageDimsNum, tensorData
-    aclTensor *input0 = aclCreateTensor(shape, shapeNum, ACL_FLOAT, nullptr, 0,
-                                        ACL_FORMAT_ND, shape, shapeNum, input0DeviceMem);
-    aclTensor *input1 = aclCreateTensor(shape, shapeNum, ACL_FLOAT, nullptr, 0,
-                                        ACL_FORMAT_ND, shape, shapeNum, input1DeviceMem);
-    aclTensor *output = aclCreateTensor(shape, shapeNum, ACL_FLOAT, nullptr, 0,
-                                        ACL_FORMAT_ND, shape, shapeNum, outputDeviceMem);
+    aclTensor *input0 = aclCreateTensor(shape.data(), shape.size(), ACL_FLOAT16, nullptr, 0,
+                                        ACL_FORMAT_ND, shape.data(), shape.size(), input0DeviceMem);
+    aclTensor *input1 = aclCreateTensor(shape.data(), shape.size(), ACL_FLOAT16, nullptr, 0,
+                                        ACL_FORMAT_ND, shape.data(), shape.size(), input1DeviceMem);
+    aclTensor *output = aclCreateTensor(shape.data(), shape.size(), ACL_FLOAT16, nullptr, 0,
+                                        ACL_FORMAT_ND, shape.data(), shape.size(), outputDeviceMem);
 
     // 6. 计算workspace大小并申请内存
     uint64_t workspaceSize = 0;
@@ -542,11 +538,12 @@ int main()
 
     // 10. 验证结果
     bool pass = true;
-    for (int i = 0; i < count; i++) {
-        float expected = input0Host[i] + input1Host[i];
-        if (outputHost[i] != expected) {
-            printf("Error at index %d: expected %f, got %f\n",
-                   i, expected, outputHost[i]);
+    for (int64_t i = 0; i < count; i++) {
+        float expected = aclFloat16ToFloat(input0Host[i]) + aclFloat16ToFloat(input1Host[i]);
+        float actual = aclFloat16ToFloat(outputHost[i]);
+        if (actual != expected) {
+            printf("Error at index %lld: expected %f, got %f\n",
+                   static_cast<long long>(i), expected, actual);
             pass = false;
             break;
         }
