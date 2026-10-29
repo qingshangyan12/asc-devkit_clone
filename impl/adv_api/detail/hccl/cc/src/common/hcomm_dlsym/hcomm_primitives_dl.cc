@@ -20,6 +20,14 @@ using HcommAicpuTsTaskCacheEndFunc = int32_t (*)(const char*);
 using HcommAicpuTsTaskCacheExecuteFunc = int32_t (*)(const char*, void**, uint64_t*, uint64_t);
 using HcommAicpuTsTaskCacheClearFunc = int32_t (*)(const char*);
 
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+using Mc2DiagBindFunc = int32_t (*)(uint64_t*, uint32_t);
+static Mc2DiagBindFunc g_Mc2DiagBind = nullptr;
+extern "C" int32_t Mc2HcommDiagBindV1(uint64_t* buffer, uint32_t words)
+{
+    return g_Mc2DiagBind ? g_Mc2DiagBind(buffer, words) : HCCL_E_NOT_SUPPORT;
+}
+// MC2_CACHE_DETAIL_DIAG END
 using Mc2ReplayV1Func = int32_t (*)(uint32_t, void**, void**, uint64_t*, uint32_t, uint64_t*);
 static Mc2ReplayV1Func g_Mc2ReplayV1 = nullptr;
 extern "C" bool Mc2HcommHasReplayV1(void) { return g_Mc2ReplayV1 != nullptr; }
@@ -162,6 +170,9 @@ extern "C" int32_t Mc2HcommAicpuTsTaskCacheClear(const char* tag)
 
 extern "C" void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle)
 {
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    g_Mc2DiagBind = reinterpret_cast<Mc2DiagBindFunc>(dlsym(libHcommHandle, "HcommMc2DiagBindV1"));
+    // MC2_CACHE_DETAIL_DIAG END
     g_Mc2ReplayV1 = reinterpret_cast<Mc2ReplayV1Func>(dlsym(libHcommHandle, "HcommMc2ReplayV1"));
     g_HcommAicpuTsTaskCacheLookup =
         reinterpret_cast<HcommAicpuTsTaskCacheLookupFunc>(dlsym(libHcommHandle, "HcommAicpuTsTaskCacheLookup"));

@@ -762,6 +762,36 @@ Mc2ReplayScope::Mc2ReplayScope(std::shared_ptr<Mc2ReplayDomain> domain)
 Mc2ReplayScope::~Mc2ReplayScope() { currentReplayScope = previous_; }
 bool Mc2ReplayScope::Active() { return currentReplayScope != nullptr && currentReplayScope->domain_ != nullptr; }
 
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+namespace {
+// The bound buffer is owned by asc-devkit TLS. Never retained past this scope.
+class BackendScope {
+public:
+    explicit BackendScope(Mc2ServerStageTiming::BackendZone zone)
+    {
+        if (!Mc2ServerStageTiming::Enabled()) return;
+        auto& b = Mc2ServerStageTiming::BackendTotals();
+        bound_ = Mc2HcommDiagBindV1(b.words + zone * Mc2ServerStageTiming::BACKEND_WORDS,
+                                  Mc2ServerStageTiming::BACKEND_WORDS) == HCCL_SUCCESS;
+        if (bound_) ++b.bindings;
+        else ++b.unavailable;
+    }
+    ~BackendScope() { Stop(); }
+    BackendScope(const BackendScope&) = delete;
+    BackendScope& operator=(const BackendScope&) = delete;
+    void Stop()
+    {
+        if (bound_) {
+            if (Mc2HcommDiagBindV1(nullptr, 0) != HCCL_SUCCESS)
+                ++Mc2ServerStageTiming::BackendTotals().unavailable;
+            bound_ = false;
+        }
+    }
+private:
+    bool bound_ = false;
+};
+} // namespace
+// MC2_CACHE_DETAIL_DIAG END
 HcclResult RunMc2BoundReplay(
     const OpParam& param, const AlgResourceCtxSerializable& resources, const std::function<HcclResult()>& execute)
 {
@@ -776,6 +806,8 @@ HcclResult RunMc2BoundReplay(
     auto finish = [&](HcclResult result) {
         // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
         Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::BATCH_END);
+        Mc2ServerStageTiming::DetailScope finishTiming(Mc2ServerStageTiming::BATCH_FINISH);
+        BackendScope backend(Mc2ServerStageTiming::SEAL);
         // MC2_CACHE_DETAIL_DIAG END
         const auto end = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
         return result == HCCL_SUCCESS ? end : result;
@@ -855,10 +887,12 @@ HcclResult RunMc2BoundReplay(
         domain.recent = image;
         // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
         Mc2ServerStageTiming::DetailScope replayTiming(Mc2ServerStageTiming::HIT_REPLAY);
+        BackendScope replayBackend(Mc2ServerStageTiming::REPLAY);
         // MC2_CACHE_DETAIL_DIAG END
         const auto replayResult = static_cast<HcclResult>(
             Mc2HcommReplayV1(3, &image->handle, addressPlan.addrs.data(), addressPlan.sizes.data(), 2, nullptr));
         // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        replayBackend.Stop();
         replayTiming.Stop();
         // MC2_CACHE_DETAIL_DIAG END
         const auto result = finish(replayResult);
@@ -905,16 +939,22 @@ HcclResult RunMc2BoundReplay(
     Mc2ServerStageTiming::Cache(false);
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
     Mc2ServerStageTiming::DetailScope executeTiming(Mc2ServerStageTiming::MISS_EXECUTE);
+    BackendScope executeBackend(Mc2ServerStageTiming::EXECUTE);
     // MC2_CACHE_DETAIL_DIAG END
     ret = execute();
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    executeBackend.Stop();
     executeTiming.Stop();
     // MC2_CACHE_DETAIL_DIAG END
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
     Mc2ServerStageTiming::DetailScope flushTiming(Mc2ServerStageTiming::BATCH_END);
+    Mc2ServerStageTiming::DetailScope taskFlushTiming(Mc2ServerStageTiming::BATCH_FLUSH);
+    BackendScope flushBackend(Mc2ServerStageTiming::FLUSH);
     // MC2_CACHE_DETAIL_DIAG END
     const auto flush = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    flushBackend.Stop();
+    taskFlushTiming.Stop();
     flushTiming.Stop();
     // MC2_CACHE_DETAIL_DIAG END
     if (ret != HCCL_SUCCESS || flush != HCCL_SUCCESS) {
@@ -928,9 +968,11 @@ HcclResult RunMc2BoundReplay(
     }
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
     Mc2ServerStageTiming::DetailScope endTiming(Mc2ServerStageTiming::CAPTURE_END);
+    BackendScope sealBackend(Mc2ServerStageTiming::SEAL);
     // MC2_CACHE_DETAIL_DIAG END
     ret = static_cast<HcclResult>(Mc2HcommReplayV1(2, &captured->handle, nullptr, nullptr, 0, &captured->bytes));
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    sealBackend.Stop();
     endTiming.Stop();
     // MC2_CACHE_DETAIL_DIAG END
     ret = finish(ret);
