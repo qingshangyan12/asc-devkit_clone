@@ -17,7 +17,7 @@
 
 - 对于自定义算子工程的情况，开发者在CMakeLists.txt（或CMakePresets.json）中配置ASCEND\_SOC\_SERIES字段（存量工程使用的ASCEND\_COMPUTE\_UNIT仍然有效，两者不能同时配置）。开发者需要在进行算子原型定义时，通过[AddConfig](../../../../api/Utils-API/prototype_register_management/OpAICoreDef/AddConfig.md)接口注册算子支持的AI处理器型号以及相关的配置信息。
 
-    通过该接口注册AI处理器型号的样例如下，ascendxxx应填写构建目标标识（如ascend910b），取值不区分大小写，建议统一使用小写，可参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的soc_series。
+    通过该接口注册AI处理器型号的样例如下，ascendxxx应填写构建目标标识（如ascend910b），可参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的soc_series。
 
     ```
     ...
