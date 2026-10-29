@@ -2049,7 +2049,7 @@ static HcclResult RegisterCcuKernels(
                     kernelInfo.subKernelName != nullptr ? kernelInfo.subKernelName : kernelInfo.subKernelFuncName;
                 uint64_t subKernelPc = 0;
                 CcuResult getFuncRet = HcommCcuFunctionGet(subKernelHandles[i], funcName, &subKernelPc);
-                HCCL_INFO("[RegisterCcuKernels] Get CcuFunc for %s:[0x%llx].", subKernelPc);
+                HCCL_INFO("[RegisterCcuKernels] Get CcuFunc for %s:[0x%llx].", funcName, subKernelPc);
                 CHK_PRT_RET(
                     getFuncRet != CCU_SUCCESS,
                     HCCL_ERROR(
