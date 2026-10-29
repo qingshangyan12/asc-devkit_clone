@@ -227,7 +227,7 @@ template <typename T>
 __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
     copy_ubuf_to_cbuf(
-        (__cbuf__ void*)dst, (__ubuf__ void*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        (__cbuf__ void*)dst, (__ubuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
         intriParams.srcStride, intriParams.dstStride);
 }
 
