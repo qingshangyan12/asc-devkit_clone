@@ -40,6 +40,15 @@ template <bool isAIVOnly = true>
 __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <bool isAIVOnly = true, typename GmPtr, typename UbPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void IBSet(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
@@ -56,6 +65,8 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 | ubWorkspace | 输入 | 当前AIV的核内缓存，用于将`gmWorkspace`中的核间同步标志搬运到Unified Buffer后读取和修改，并将修改后的同步标志写回`gmWorkspace`。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的[TPosition](../../aux_data_structures/TPosition.md)为VECIN/VECCALC/VECOUT。 |
 | blockIdx | 输入 | 同步标志对应的逻辑AIV索引，即被等待核（生产者，调用IBSet的核）的逻辑AIV索引。取值范围由算子调用时设置的逻辑AI Core核数`numBlocks`和AIV配比决定，例如`__mix__(1, 2)`修饰核函数且`numBlocks`为4时，`blockIdx`取值范围为`[0, 7]`。 |
 | eventID | 输入 | 同步事件的逻辑编号，与`blockIdx`共同确定`gmWorkspace`中的同步标志，用于区分同一对生产者和消费者之间的不同软件同步事件。<br>该参数与[SetFlag/WaitFlag](../intra_core_sync/SetFlag_WaitFlag_ISASI.md)的入参名称相同，但含义不同：本接口的`eventID`用于定位软件同步标志，SetFlag/WaitFlag的`eventID`用于硬件指令中的核内流水同步事件。<br>因此，本接口的`eventID`不适用SetFlag/WaitFlag中0-7的取值限制。取值为非负整数，建议从0开始连续编号。 |
+
+裸指针形下，`gmWorkspace` / `ubWorkspace` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -85,6 +96,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
 - [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，该接口仅对AIV核生效。在AIC核中调用时，接口直接返回，不设置同步标志，也不执行核间同步。
+- 裸指针形下，`gmWorkspace` 须为 Global Memory 上的 `int32_t` 地址，`ubWorkspace` 须为 Unified Buffer 上的 `int32_t` 地址，行为与 tensor 形一致。
 
 ## 调用示例<a name="section177231425115410"></a>
 

@@ -36,6 +36,15 @@ template <typename T>
 __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void LoadImageToLocal(DstPtr dst, const LoadImageToLocalParams& loadDataParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1** 参数说明
@@ -44,6 +53,8 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 | --- | --- | --- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadImageToLocalParams。<br>具体定义请参考：`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明参考[表2](#table8955841508)。 |
+
+裸指针形的 `dst` 与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 <a name="table8955841508"></a>
 **表2** LoadImageToLocalParams结构体内参数说明
@@ -82,6 +93,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
     <!-- npu="950" id13 -->
     - 特别针对Ascend 950PR&950DT系列产品，支持物理存储位置为：VECIN、VECCALC、VECOUT。
     <!-- end id13 -->
+- 裸指针形下，`dst` 须与原 tensor 形的地址空间一致，为 `__cbuf__`（L1 Buffer）。元素类型由指针实参推导。
 
 ## 调用示例<a name="section22811728184217"></a>
 

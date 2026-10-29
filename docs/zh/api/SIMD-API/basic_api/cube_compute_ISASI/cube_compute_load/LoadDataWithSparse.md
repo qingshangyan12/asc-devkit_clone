@@ -52,6 +52,15 @@ template <typename T = int8_t, typename U = uint8_t, typename Std::enable_if<Std
 __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx, const LoadData2dParams& loadDataParam)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename IdxPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, IdxPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithSparse(DstPtr dst, SrcPtr src, IdxPtr idx, const LoadData2dParams& loadDataParam)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a name="zh-cn_topic_0000002512171654_section16128134420472"></a>
 
 **表1** 模板参数说明
@@ -72,6 +81,8 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 | idx | 输入 | 源操作数，类型为LocalTensor。<br>数据分形大小为128字节，每个数据分形shape为16 \* 32 \* 2bit。<br>起始地址对齐约束参考[对齐约束](cube_compute_input_move_constraint.md)。<br>支持的数据类型为uint8_t。<br>Atlas A2系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。<br>Atlas A3系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。 |
 | loadDataParam | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; LoadData2dParams，具体参考[LoadData2dParams结构体内参数说明](LoadData_2D.md#table_load2d_params)。<br>需要注意的是，本接口仅支持连续的数据分形搬运，不支持跳stride，因此仅支持配置loadDataParam中的startIndex和repeatTimes参数，其余参数未使用，无需配置。 |
 
+裸指针形的 `dst`、`src`、`idx` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
+
 ## 数据类型<a name="zh-cn_topic_0000002512171654_section4219135304818"></a>
 
 支持数据类型为：src和dst支持int8_t，idx支持uint8_t。
@@ -87,6 +98,7 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 - 存放索引矩阵的专用buffer空间大小为L0B Buffer大小的四分之一，开发者无需配置地址，MmadWithSparse接口会自动从该buffer中读取数据。
 - 仅支持L1 Buffer->L0B Buffer通路，且L1 Buffer上的分形为Zn。
 - 每次迭代中的startIndex不能小于零。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致：`dst` 为 `__cb__`（L0B Buffer），`src`、`idx` 为 `__cbuf__`（L1 Buffer）。元素类型由指针实参推导。
 
 ## 调用示例<a name="zh-cn_topic_0000002512171654_section088124295117"></a>
 

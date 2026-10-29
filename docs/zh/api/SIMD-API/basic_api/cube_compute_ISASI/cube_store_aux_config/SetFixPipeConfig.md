@@ -43,7 +43,15 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& reluPre, const Loc
 
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false)
+
+template <typename ReluPtr, typename QuantPtr, typename Std::enable_if<CubePtrOverload::AllPtr<ReluPtr, QuantPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(ReluPtr reluPre, QuantPtr quantPre, bool isUnitFlag = false)
+
+template <bool setRelu = false, typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag = false)
 ```
+
+> 后两个为裸指针形，参数含义与上面两个 tensor 形逐项对应，区别仅在于实参直接传地址而不是 LocalTensor。
 
 ## 参数说明<a name="zh-cn_topic_0000002547729135_section622mcpsimp"></a>
 
@@ -63,6 +71,8 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 | isUnitFlag | 输入 | unitFlag清空标志位，类型为bool。如果设为true，L0C Buffer中所有内存块的单元标志位都会设为0。旨在消除之前操作中unitFlag产生的多余影响。 |
 | preData | 输入 | 支持设置一个tensor，通过开关控制是ReLU tensor还是Quant tensor，支持的物理内存为Fixpipe Buffer（TPosition为C2PIPE2GM）。当前仅支持传入quant tensor。对于单独设置unitFlag清空标志位isUnitFlag的场景，支持的物理地址为L0C Buffer（TPosition设置为CO1）。 |
 
+裸指针形的 `reluPre` / `quantPre` / `preData` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
+
 ## 数据类型
 
 支持的数据类型为：uint64_t。
@@ -76,6 +86,8 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 量化参数不能为inf/nan和非规格化数。
 
 quantPre和reluPre必须是Fixpipe Buffer上的tensor。
+
+裸指针形下，量化表地址直接取指针值，不再经过GetPhyAddr；双操作数形的两个操作数都必须是裸指针，单操作数形的第二个实参只接受bool类型的isUnitFlag。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
