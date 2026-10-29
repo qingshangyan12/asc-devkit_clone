@@ -264,36 +264,9 @@ OP_ADD(AddCustom);
 
 本示例的CMake和Host原型均使用`ascend910b`。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准。
 
-`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量应在`find_package(ASC)`之前设置，便于ASC加载时完成校验。更多配置方式见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
+`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量应在`find_package(ASC)`之前设置，便于ASC加载时完成校验。更多配置方式及存量工程使用`ASCEND_COMPUTE_UNIT`的说明见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
 
-**存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，行为保持不变，存量工程无需迁移。两者不能同时配置，否则CMake配置阶段报错。与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`的取值不会自动转小写，需直接填写小写标识。
-
->[!NOTE]说明
->其中，设备型号`soc_version`请通过以下方式获取，再参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的soc_series选择对应的构建目标标识：
-><!-- npu="910b,910,310p,310b" id1 -->
->- 针对如下产品：在安装AI处理器的服务器执行`npu-smi info`命令进行查询，获取Name信息。设备型号为AscendName，例如Name取值为xxxyy，设备型号为Ascendxxxyy。<br><br>
->    <!-- npu="910b" id2 -->
->    Atlas A2系列产品<br>
->    <!-- end id2 -->
->
->    <!-- npu="310b" id3 -->
->    Atlas 200I/500 A2推理产品<br>
->    <!-- end id3 -->
->
->    <!-- npu="310p" id4 -->
->    Atlas推理系列产品<br>
->    <!-- end id4 -->
->
->    <!-- npu="910" id5 -->
->    Atlas训练系列产品<br><br>
->    <!-- end id5 -->
-><!-- end id1 -->
-><!-- npu="A3" id6 -->
->- 针对Atlas A3系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，设备型号为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，设备型号为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
-><!-- end id6 -->
-><!-- npu="950" id7 -->
->- 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，设备型号为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，设备型号为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
-><!-- end id7 -->
+设备型号`soc_version`的获取方式请参考[CMake函数参考](./appendix/cmake_function_reference.md#npu_op_kernel_options)。
 
 #### 编写顶层文件
 
