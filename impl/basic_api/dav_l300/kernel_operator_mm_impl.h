@@ -12,6 +12,7 @@
  * \file kernel_operator_mm_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l300/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -21,6 +22,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #include "../../../include/basic_api/kernel_struct_mm.h"
+#include "../../../include/basic_api/kernel_operator_mm_bitmode_intf.h"
 namespace AscendC {
 /* **************************************************************************************************
  * LoadData 2dv2                                             *
@@ -45,6 +47,17 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ATransposeCal(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "LoadDataWithTranspose from L1 Buffer(A1) to L0A Buffer(A2) is not supported on current device");
+    });
 }
 
 template <typename T>
@@ -180,6 +193,90 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
     }
 }
 
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
+            float, int32_t, uint32_t>(),
+        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+         half, bfloat16_t, float, int32_t, uint32_t on current device!");
+    if ASCEND_IS_AIC {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca(
+                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(), 1);
+        } else {
+            load_cbuf_to_ca(
+                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(), 0);
+        }
+#else
+        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+            if (loadDataParam.GetIfTranspose()) {
+                load_cbuf_to_ca_s4(
+                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+            } else {
+                load_cbuf_to_ca_s4(
+                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+            }
+        } else {
+            if (loadDataParam.GetIfTranspose()) {
+                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+            } else {
+                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+            }
+        }
+#endif
+    }
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
+            float, int32_t, uint32_t>(),
+        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+         half, bfloat16_t, float, int32_t, uint32_t on current device!");
+    if ASCEND_IS_AIC {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb(
+                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(), 1);
+        } else {
+            load_cbuf_to_cb(
+                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(), 0);
+        }
+#else
+        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+            if (loadDataParam.GetIfTranspose()) {
+                load_cbuf_to_cb_s4(
+                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+            } else {
+                load_cbuf_to_cb_s4(
+                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+            }
+        } else {
+            if (loadDataParam.GetIfTranspose()) {
+                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+            } else {
+                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+            }
+        }
+#endif
+    }
+}
+
 /* **************************************************************************************************
  * LoadData 2dv1                                             *
  * ************************************************************************************************* */
@@ -211,6 +308,13 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData 2dv2 is not supported!"); });
+}
+
+template <typename T, typename U>
+__aicore__ inline void LoadData2DGM2L1Cal(
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData 2dv2 with Nd2NzParamsV2 is not supported!"); });
 }
 
 /* **************************************************************************************************
@@ -356,7 +460,11 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    mad(c, a, b, config);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, config);
+    } else {
+        mad(c, a, b, config);
+    }
 }
 
 template <typename U, typename S>
@@ -381,7 +489,33 @@ __aicore__ inline void MmadCal(
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
-    mad(c, a, b, bias, config);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, config);
+    } else {
+        mad(c, a, b, bias, config);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
+{
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, mmadParams.GetConfig0());
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(
+    __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
+{
+    mmadParams.SetCmatrixInitVal(false);
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, bias, mmadParams.GetConfig0());
+    }
 }
 
 /* **************************************************************************************************
@@ -420,6 +554,10 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     }
     set_fmatrix_b(regFMatrix);
 }
+
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix) { set_fmatrix(regFMatrix); }
+
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix) { set_fmatrix_b(regFMatrix); }
 
 template <typename T>
 __aicore__ inline void Load3DSetPaddingCal(const T padValue)
@@ -504,6 +642,11 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -525,6 +668,11 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -546,6 +694,11 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half

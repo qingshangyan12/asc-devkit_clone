@@ -12,6 +12,7 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l300 support data copy api.
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l300/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
@@ -279,6 +280,20 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, const Nd2NzParams& intriParams)
 {
     DataCopyGM2L1ND2NZImplB8(dst, src, intriParams);
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImplBase(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImpl(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
 }
 
 template <typename T>
@@ -884,73 +899,66 @@ __aicore__ inline bool IsSupportQuantMode(QuantMode_t quantPre)
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams, uint8_t cacheMode)
+__aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
-    if ASCEND_IS_AIC {
-        static_assert(
-            (SupportType<
-                Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
-                Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
-                Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
-            "Failed to check dtype in "
-            "DataCopy from CO1 to GM, current api support dtype combination is "
-            "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
-            "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
-        if (IsSupportQuantMode(intriParams.quantPre)) {
-            uint32_t dstStride = intriParams.dstStride;
-            if (!intriParams.nz2ndEn) {
-                dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
-            }
-            return copy_matrix_cc_to_gm(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-                cacheMode, 0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
-        } else {
-            ASCENDC_ASSERT(false, {
-                KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
-                    "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
-            });
+    static_assert(
+        (SupportType<
+            Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
+            Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
+            Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
+        "Failed to check dtype in "
+        "DataCopy from CO1 to GM, current api support dtype combination is "
+        "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
+        "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
+    if (IsSupportQuantMode(intriParams.quantPre)) {
+        uint32_t dstStride = intriParams.dstStride;
+        if (!intriParams.nz2ndEn) {
+            dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
+        return copy_matrix_cc_to_gm(
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false);
+    } else {
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check quantPre value in DataCopy from CO1 "
+                "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
+                "VQF322B8_PRE / REQ8 / VREQ8.");
+        });
     }
 }
 
 template <typename T, typename U>
 __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
-    if ASCEND_IS_AIC {
-        static_assert(
-            (SupportType<
-                Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
-                Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
-                Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
-            "Failed to check dtype in "
-            "DataCopy from CO1 to A1 / B1, current api support dtype combination is "
-            "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
-            "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
-        if (IsSupportQuantMode(intriParams.quantPre)) {
-            uint32_t dstStride = intriParams.dstStride;
-            if (!intriParams.nz2ndEn) {
-                dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
-            }
-            return copy_matrix_cc_to_cbuf(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0, 0,
-                intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
-        } else {
-            ASCENDC_ASSERT(false, {
-                KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
-                    "to A1 / B1, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
-            });
+    static_assert(
+        (SupportType<
+            Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
+            Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
+            Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
+        "Failed to check dtype in "
+        "DataCopy from CO1 to A1 / B1, current api support dtype combination is "
+        "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
+        "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
+    if (IsSupportQuantMode(intriParams.quantPre)) {
+        uint32_t dstStride = intriParams.dstStride;
+        if (!intriParams.nz2ndEn) {
+            dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
+        return copy_matrix_cc_to_cbuf(
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false);
+    } else {
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check quantPre value in DataCopy from CO1 "
+                "to A1 / B1, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
+                "VQF322B8_PRE / REQ8 / VREQ8.");
+        });
     }
 }
 
