@@ -54,6 +54,9 @@ source /usr/local/Ascend/cann/set_env.sh
 
 自定义算子工程的目录结构和CMakeLists.txt由开发者直接编写；CANN软件包以CMake modules的形式提供`npu_op_*`系列接口，用于声明算子包、生成aclnn单算子调用代码并编译Host侧库和核函数（Kernel）侧库。
 
+>[!NOTE]说明
+>除了手写CMakeLists.txt外，也可以使用msopgen工具生成自定义算子工程骨架，具体用法请参考[msopgen快速入门](https://www.hiascend.com/document/detail/zh/mindstudio/latest/msOT/Operatordevelopmenttools/docs/zh/quick_start/msopgen_quick_start.md)。本文后续步骤均以手写CMakeLists.txt为例。
+
 先创建工程目录（建议放在全英文路径下）：
 
 ```bash
