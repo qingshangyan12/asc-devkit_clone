@@ -788,6 +788,9 @@ HcclResult ExtractNetLayerDetails(const HcclComm comm, TopoInfoWithNetLayerDetai
         CHK_RET(HcclRankGraphGetInstSizeListByLayer(comm, layerIdx, &instSizeListSingleLevel, &currLayerNetInstNum));
         for (uint32_t index = 0; index < currLayerNetInstNum; index++) {
             currLayerInstSizeList.push_back(instSizeListSingleLevel[index]);
+            HCCL_INFO(
+                "[PAIRWISE_TOPO_DIAG][Build] rank[%u], layer[%u], instance[%u], size[%u].",
+                topoInfo->userRank, layerIdx, index, instSizeListSingleLevel[index]);
         }
         u32 currLayerRankSize = std::accumulate(currLayerInstSizeList.begin(), currLayerInstSizeList.end(), 0);
         HCCL_INFO("[BaseSelector][ExtractNetLayerDetails] Net layer[%u] instNum[%u]", layerIdx, currLayerNetInstNum);

@@ -783,6 +783,11 @@ HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoI
     if (HcclEngineCtxGet(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size) != HCCL_SUCCESS) {
         // 初始化topoInfo
         CHK_RET(InitRankInfo(comm, topoInfo.get()));
+        if (param.opType == HCCL_CMD_ALLTOALLV) {
+            HCCL_INFO(
+                "[PAIRWISE_TOPO_DIAG][CacheMiss] tag[%s], rank[%u], symmetric[%u], levels[%u].",
+                param.tag, topoInfo->userRank, static_cast<u32>(topoInfo->level0Symmetric), topoInfo->topoLevelNums);
+        }
         // 序列化
         std::vector<char> seq = topoInfo->Serialize();
         size = seq.size();
@@ -796,6 +801,12 @@ HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoI
     TopoInfoWithNetLayerDetails topoInfoTemp;
     topoInfoTemp.DeSerialize(seq);
     topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>(std::move(topoInfoTemp));
+    if (param.opType == HCCL_CMD_ALLTOALLV) {
+        HCCL_INFO(
+            "[PAIRWISE_TOPO_DIAG][CacheHit] tag[%s], bytes[%llu], rank[%u], symmetric[%u], levels[%u].",
+            param.tag, static_cast<unsigned long long>(size), topoInfo->userRank,
+            static_cast<u32>(topoInfo->level0Symmetric), topoInfo->topoLevelNums);
+    }
     HCCL_INFO("[%s] HcclCalcTopoInfo end.", __func__);
     return HCCL_SUCCESS;
 }

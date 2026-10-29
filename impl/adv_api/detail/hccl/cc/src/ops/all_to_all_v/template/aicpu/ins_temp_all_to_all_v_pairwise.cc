@@ -102,6 +102,21 @@ HcclResult InsTempAllToAllVPairwise::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_PTR_NULL(topoInfo);
+    if (!topoInfo->level0Symmetric) {
+        const auto& layers = topoInfo->netLayerDetails.netLayers;
+        const auto& instanceSizes = topoInfo->netLayerDetails.instSizeListOfLayer;
+        HCCL_WARNING(
+            "[PAIRWISE_TOPO_DIAG][Reject] rank[%u], netLayerEntries[%zu], instanceLayerEntries[%zu].",
+            topoInfo->userRank, layers.size(), instanceSizes.size());
+        if (!layers.empty() && layers[0] < instanceSizes.size()) {
+            const auto& layer0Sizes = instanceSizes[layers[0]];
+            for (size_t index = 0; index < layer0Sizes.size(); ++index) {
+                HCCL_WARNING(
+                    "[PAIRWISE_TOPO_DIAG][Reject] layer[%u], instance[%zu], size[%u].",
+                    layers[0], index, layer0Sizes[index]);
+            }
+        }
+    }
     CHK_PRT_RET(
         !IsSupportedTopology(topoInfo),
         HCCL_WARNING(
