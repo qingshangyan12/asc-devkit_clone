@@ -54,9 +54,9 @@ constexpr char KFC_FUNC_REDUCE_SCATTER_NHR1D_MULTI_JETTY_MEM2MEM_NAME[] =
     "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem";
 constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_NAME[] = "CcuKernelAlltoAllMesh1D";
 constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuAllToAllMesh1DMultiJettyKernel";
+constexpr char KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_MISSION2_NAME[] = "CcuAllToAllMesh1DMultiJettyKernelMission2";
 constexpr char KFC_FUNC_ALL_TO_ALL_V_MESH1D_NAME[] = "CcuKernelAlltoAllVMesh1D";
 constexpr char KFC_FUNC_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME[] = "CcuKernelKfcAllToAllMesh1DMultiJetty";
-constexpr char KFC_FUNC_KFC_ALL_TO_ALL_CLOS1D_MULTI_JETTY_NAME[] = "CcuKfcAllToAllClos1DMultiJetty";
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 constexpr char KFC_PARALLEL_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherParallelMeshNHRMultiLink";

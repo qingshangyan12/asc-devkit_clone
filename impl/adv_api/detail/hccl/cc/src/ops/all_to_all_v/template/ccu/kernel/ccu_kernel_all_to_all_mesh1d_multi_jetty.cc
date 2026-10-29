@@ -83,6 +83,24 @@ CcuResult LoadArgs(AllToAllMesh1DMultiJettyContext& ctx, ccu::Array<ccu::Variabl
     return CCU_SUCCESS;
 }
 
+CcuResult LoadArgsMission2(AllToAllMesh1DMultiJettyContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    ctx.input = args[14];
+    ctx.output = args[15];
+    ctx.token = args[3];
+    ctx.sliceSize = args[16];
+    ctx.srcStride = args[17];
+    ctx.srcOffset = args[18];
+    ctx.dstOffset = args[19];
+    ctx.goSize.addrOffset = args[20];
+    ctx.goSize.loopParam = args[21];
+    ctx.goSize.parallelParam = args[22];
+    ctx.goSize.residual = args[23];
+    ctx.sliceSizePerJetty = args[24];
+    ctx.lastSliceSizePerJetty = args[25];
+    return CCU_SUCCESS;
+}
+
 CcuResult PreSync(AllToAllMesh1DMultiJettyContext& ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
@@ -200,6 +218,28 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
             PostSync(ctx);
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME);
+    return CCU_SUCCESS;
+}
+
+CcuResult CcuAllToAllMesh1DMultiJettyKernelMission2(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAllToAllMesh1DMultiJetty*>(arg);
+    AllToAllMesh1DMultiJettyContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->jettyNum;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    ccu::Func func(
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgsMission2(ctx, args);
+            PreSync(ctx);
+            DoAllToAll(ctx);
+            PostSync(ctx);
+        },
+        CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_MISSION2_NAME);
     return CCU_SUCCESS;
 }
 

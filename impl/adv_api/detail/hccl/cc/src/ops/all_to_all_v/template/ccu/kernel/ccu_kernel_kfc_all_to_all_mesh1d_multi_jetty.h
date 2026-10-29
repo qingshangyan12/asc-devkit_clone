@@ -17,7 +17,6 @@
 namespace mc2_ops_hccl {
 
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg);
-CcuResult CcuKfcAllToAllClos1DMultiJettyKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
