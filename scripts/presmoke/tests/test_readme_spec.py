@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import os
+import subprocess
 from pathlib import Path
 
 from presmoke.readme_spec import parse_readme, split_commands
@@ -47,6 +49,26 @@ README = """# sample
 
 
 class ReadmeSpecTest(unittest.TestCase):
+    def test_inline_assignment_preserves_shell_expansion(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "example.json").write_text("{}", encoding="utf-8")
+            commands = split_commands('FLAG=1 printf "%s\\n" "$TEST_PATH" *.json')
+            self.assertEqual(len(commands), 1)
+            self.assertEqual(commands[0].env["FLAG"], "1")
+            env = os.environ.copy()
+            env.update(commands[0].env)
+            env["TEST_PATH"] = "path with spaces"
+            bash = os.environ.get("PRESMOKE_TEST_BASH", "/bin/bash")
+            result = subprocess.run([bash, "-lc", commands[0].raw], cwd=root, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ["path with spaces", "example.json"])
+
+    def test_multiple_quoted_assignments_preserve_command(self) -> None:
+        commands = split_commands('A="hello world" B=2 printf "%s" "$A"')
+        self.assertEqual(commands[0].env, {"A": "hello world", "B": "2"})
+        self.assertEqual(commands[0].raw, 'printf "%s" "$A"')
+
     def test_split_commands_keeps_env_and_classifies(self) -> None:
         commands = split_commands("SCENARIO=0\ncmake ..; make -j && ./demo")
         self.assertEqual([c.kind for c in commands], ["cmake", "make", "run"])

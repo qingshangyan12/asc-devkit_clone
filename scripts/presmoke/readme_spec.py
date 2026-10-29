@@ -266,21 +266,21 @@ def _split_shell_line(line: str) -> List[str]:
 
 def _consume_assignments(command: str) -> Tuple[Dict[str, str], str]:
     assignments: Dict[str, str] = {}
+    lexer = shlex.shlex(command, posix=True)
+    lexer.whitespace_split = True
+    lexer.commenters = ""
     try:
-        parts = shlex.split(command, posix=True)
-    except ValueError:
-        return assignments, command
-    consumed = 0
-    for part in parts:
-        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=.*$", part):
+        while True:
+            start = lexer.instream.tell()
+            part = lexer.get_token()
+            if part is None:
+                return assignments, ""
+            if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=.*$", part):
+                return assignments, command[start:].lstrip() if assignments else command
             key, value = part.split("=", 1)
             assignments[key] = value
-            consumed += 1
-        else:
-            break
-    if consumed == 0:
-        return assignments, command
-    return assignments, " ".join(shlex.quote(x) for x in parts[consumed:])
+    except ValueError:
+        return {}, command
 
 
 def classify_command(command: str) -> str:
