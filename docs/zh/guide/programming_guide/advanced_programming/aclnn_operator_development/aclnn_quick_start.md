@@ -78,8 +78,6 @@ AddCustom
     └── CMakeLists.txt        // [待创建]
 ```
 
-保存源文件和三个CMakeLists.txt后，再执行CMake配置。
-
 ### 编写共享Tiling数据结构<a id="修改tiling与host侧实现"></a>
 
 Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给核函数（Kernel）侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和核函数（Kernel）共同引用。
