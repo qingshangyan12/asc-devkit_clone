@@ -66,8 +66,28 @@ inline bool& Enabled()
     static thread_local bool enabled;
     return enabled;
 }
+// Descending order; equal values represent distinct samples and must be retained.
+struct Top3 {
+    uint64_t first, second, third;
+};
+inline void UpdateTop3(Top3& top, uint64_t value)
+{
+    if (value <= top.third)
+        return;
+    if (value > top.first) {
+        top.third = top.second;
+        top.second = top.first;
+        top.first = value;
+    } else if (value > top.second) {
+        top.third = top.second;
+        top.second = value;
+    } else {
+        top.third = value;
+    }
+}
 struct Batch {
     uint64_t init, msg, sq, first, last;
+    Top3 initTop, msgTop, sqTop;
     uint32_t count;
     int32_t cache, status;
 };
@@ -173,16 +193,26 @@ inline void Finish(uint32_t status)
     b.init += init;
     b.msg += msg;
     b.sq += sq;
+    // Aggregate after all stage timestamps; no sorting or per-sample logging.
+    UpdateTop3(b.initTop, init);
+    UpdateTop3(b.msgTop, msg);
+    UpdateTop3(b.sqTop, sq);
     if (s.status)
         b.status = s.status;
     if (++b.count != SAMPLES_PER_BATCH)
         return;
     HCCL_RUN_INFO(
         "[MC2_SERVER_PERF] schema=%u first=%llu last=%llu count=%u init_mean_ns=%.6f msg_parse_mean_ns=%.6f "
-        "sq_expand_mean_ns=%.6f cache=%d status=%d",
+        "sq_expand_mean_ns=%.6f cache=%d status=%d "
+        "init_top3_ns=%llu,%llu,%llu msg_parse_top3_ns=%llu,%llu,%llu sq_expand_top3_ns=%llu,%llu,%llu",
         LOG_SCHEMA_VERSION, static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last), b.count,
         static_cast<double>(b.init) / SAMPLES_PER_BATCH, static_cast<double>(b.msg) / SAMPLES_PER_BATCH,
-        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status);
+        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status,
+        static_cast<unsigned long long>(b.initTop.first), static_cast<unsigned long long>(b.initTop.second),
+        static_cast<unsigned long long>(b.initTop.third), static_cast<unsigned long long>(b.msgTop.first),
+        static_cast<unsigned long long>(b.msgTop.second), static_cast<unsigned long long>(b.msgTop.third),
+        static_cast<unsigned long long>(b.sqTop.first), static_cast<unsigned long long>(b.sqTop.second),
+        static_cast<unsigned long long>(b.sqTop.third));
     b = {};
 }
 } // namespace Mc2ServerStageTiming
