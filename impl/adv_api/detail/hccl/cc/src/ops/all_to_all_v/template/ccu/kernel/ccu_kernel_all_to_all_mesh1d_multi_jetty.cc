@@ -147,7 +147,7 @@ CcuResult DoAllToAll(AllToAllMesh1DMultiJettyContext& ctx)
     localDst.token = ctx.token;
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize));
+        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize, GetCcuVersion()));
         CCU_CHK_RET(ccu::EventRecord(ctx.eventList[ctx.rankId], 1U));
         CCU_CHK_RET(ccu::EventWait(ctx.eventList[ctx.rankId], 1U));
     }

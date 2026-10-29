@@ -159,7 +159,7 @@ static CcuResult CcuAlltoAllVMesh1DKernelV1(
                     CCU_IF(loopNum != static_cast<uint64_t>(UINT64_MAX - 1U))
                     {
                         if (rankIdx == rankId) {
-                            CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], fullBlockGoSize));
+                            CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], fullBlockGoSize, GetCcuVersion()));
                             CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
                             localDst.addr += maxTransportSize;
                         } else {

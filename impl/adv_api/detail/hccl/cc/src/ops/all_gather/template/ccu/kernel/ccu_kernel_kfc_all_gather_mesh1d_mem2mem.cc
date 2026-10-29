@@ -211,7 +211,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
                 }
                 if (useGroupCopy) {
                     HCCL_INFO("[KFC][AllGather][Kernel]Run groupCopy for allgather.");
-                    CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
+                    CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize, GetCcuVersion()));
                 } else {
                     CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
                     CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));

@@ -208,7 +208,7 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
                 ctx.localDst.addr += ctx.outputRepeatStride;
                 ctx.srcMem.addr += ctx.inputRepeatStride;
             }
-            CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcMem, ctx.goSize));
+            CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcMem, ctx.goSize, GetCcuVersion()));
             ctx.repeatTimeflag = 1;
         }
     }

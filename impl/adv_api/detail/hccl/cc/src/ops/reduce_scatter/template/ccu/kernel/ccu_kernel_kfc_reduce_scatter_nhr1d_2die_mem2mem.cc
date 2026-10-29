@@ -322,7 +322,7 @@ CcuResult DoRepeatReduceScatterNHR(KfcReduceScatterNhr2DieContext& ctx)
                 ccu::LocalAddr localSrc;
                 localSrc.addr = ctx.localSrc_.addr;
                 localSrc.token = ctx.localSrc_.token;
-                CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, goSize));
+                CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, goSize, GetCcuVersion()));
             }
         }
         ctx.isRepeatIter = 1;
