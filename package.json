@@ -1,0 +1,17 @@
+{
+  "name": "@ascendc/asc-devkit-code-standards",
+  "version": "1.0.0",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "bin": {
+    "asc-code-dev-standards": "scripts/install-asc-code-dev-standards.js"
+  },
+  "files": [
+    "scripts/install-asc-code-dev-standards.js",
+    ".agent/skills/asc-code-dev-standards"
+  ],
+  "ascCodeStandardsSource": ".agent/skills/asc-code-dev-standards",
+  "engines": {
+    "node": ">=16.7"
+  }
+}

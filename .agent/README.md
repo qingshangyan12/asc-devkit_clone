@@ -15,6 +15,7 @@
 |------|------|------|
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-ar-dev` | AscendC 需求分析、实现方案、host/device 代码评审与验证规划 | `skills/asc-ar-dev/SKILL.md` |
+| `asc-code-dev-standards` | ASC 产品代码开发规范与交付检查 | `skills/asc-code-dev-standards/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
 | `asc-search` | OKF 用户侧：C API 文档索引建立与需求检索 | `skills/asc-search/SKILL.md` |
 | `public-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新公共远程 skill | `skills/public-skills/SKILL.md` |
@@ -46,7 +47,7 @@
 
 ### 默认使用
 
-仓内本地维护 `asc-api-ut-gen`、`asc-ar-dev`、`asc-npu-arch` 和 `public-skills`。`gitcode-pr` 等公共通用 skill
+仓内本地维护 `asc-api-ut-gen`、`asc-ar-dev`、`asc-code-dev-standards`、`asc-npu-arch` 和 `public-skills`。`gitcode-pr` 等公共通用 skill
 使用 `skills/public-skills/scripts/install-public-skills.sh` 从 `cann-agent/skills` 安装到
 `.agent/skills/_remote/`，并通过 `skills/gitcode-pr -> _remote/gitcode-pr` 这类一级软链暴露给客户端。
 
@@ -69,8 +70,17 @@ bash .agent/skills/public-skills/scripts/install-public-skills.sh
 ### 用户目录安装
 
 `asc-search` 提供用户目录安装命令，支持 Codex、Claude Code 和 OpenCode；用法见
-[asc-search 快速开始](skills/asc-search/README.md#快速开始)。安装入口以软链指向本仓 skill，
-`.agent/skills` 仍是唯一维护位置。其余 skill 的用户目录安装由客户端或用户环境管理。
+[asc-search 快速开始](skills/asc-search/README.md#快速开始)。安装入口以软链指向本仓 skill。
+
+`asc-code-dev-standards` 可通过 Git 安装到用户目录，需要 Git、Node.js 16.7 及以上和 npm：
+
+```bash
+npx git+https://gitcode.com/cann/asc-devkit.git
+```
+
+安装器优先检测 Codex，其次检测 Claude Code、OpenCode 和 Hermes；未检测到时安装至 `~/.agent/skills`。
+Codex 使用 `$CODEX_HOME/skills`，未设置时使用 `~/.codex/skills`。安装会默认覆盖同名 skill，包含其完整引用文件；
+其他 skill 不受影响。仓内使用仍以 `.agent/skills` 为事实源。
 
 兼容入口损坏时，恢复为“真实目录 + 内部软链”，不要把入口根目录恢复成指向 `.agent` 的软链：
 
