@@ -21,6 +21,27 @@
 
 namespace __asc_aicore {
 
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
+{
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_super_tensor_payload_alignment()
+{
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
+    }
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline bool is_super_tensor_hardware_supported()
+{
+    return false;
+}
+
 template <typename T>
 __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& dumpSize)
 {

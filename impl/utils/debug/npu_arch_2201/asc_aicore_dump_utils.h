@@ -18,15 +18,41 @@
 #include "impl/utils/debug/asc_debug_utils.h"
 namespace __asc_aicore {
 
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
+{
+    // L0C copies whole 16x16 B32 fractals, including the last partial fractal.
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
+    }
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_super_tensor_payload_alignment()
+{
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
+    }
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline bool is_super_tensor_hardware_supported()
+{
+    return hardware == AscendC::Hardware::GM || hardware == AscendC::Hardware::UB ||
+           hardware == AscendC::Hardware::L1 || hardware == AscendC::Hardware::L0C;
+}
+
 __aicore__ inline void get_matrix_copy_param(
-    uint32_t dumpSize, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
+    uint32_t dumpBytes, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
 {
     constexpr int32_t blockCube = 16;
-    constexpr int32_t defaultOneBlockSize = 256;
+    constexpr int32_t defaultOneBlockSize = 16 * 16 * sizeof(float);
     constexpr int32_t srcBurstLenSizeEle = 16;
 
-    uint16_t align = (dumpSize % defaultOneBlockSize == 0) ? 0 : 1;
-    uint16_t countBlks = align + dumpSize / defaultOneBlockSize;
+    uint16_t align = (dumpBytes % defaultOneBlockSize == 0) ? 0 : 1;
+    uint16_t countBlks = align + dumpBytes / defaultOneBlockSize;
     uint16_t burstLen =
         static_cast<uint16_t>(srcBurstLenSizeEle * srcBurstLenSizeEle * sizeof(float) / ASC_ONE_DATABLOCK_SIZE);
     n = countBlks * blockCube;
@@ -55,7 +81,8 @@ template <typename T>
 __aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
 {
 #if defined(__DAV_CUBE__)
-    copy_cbuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1, len, 0, 0);
+    copy_cbuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1,
+        len / ASC_ONE_DATABLOCK_SIZE, 0, 0);
     return 0;
 #else
     return 1;

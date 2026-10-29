@@ -23,19 +23,7 @@
 #include "kernel_tensor.h"
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
-#if __NPU_ARCH__ == 2201
-#include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 3510
-#include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 9201
-#include "impl/utils/debug/npu_arch_9201/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 9202
-#include "impl/utils/debug/npu_arch_9202/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 5102
-#include "impl/utils/debug/npu_arch_5102/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 5162
-#include "impl/utils/debug/npu_arch_5162/asc_aicore_dump_utils.h"
-#endif
+#include "impl/utils/debug/asc_aicore_dump_utils.h"
 
 namespace __asc_aicore {
 
@@ -110,23 +98,6 @@ __aicore__ inline uint32_t set_dump_tlv_data(U src, __gm__ Tlv* dumpTlv, uint32_
     }
     sync_all();
     return ret;
-}
-
-template <AscendC::Hardware hardware>
-__aicore__ constexpr inline bool is_super_tensor_hardware_supported()
-{
-    return hardware == AscendC::Hardware::GM || hardware == AscendC::Hardware::UB ||
-           hardware == AscendC::Hardware::L1 || hardware == AscendC::Hardware::L0C ||
-           hardware == AscendC::Hardware::BIAS || hardware == AscendC::Hardware::FIXBUF;
-}
-
-template <AscendC::Hardware hardware>
-__aicore__ constexpr inline uint32_t get_super_tensor_payload_alignment()
-{
-    if constexpr (hardware == AscendC::Hardware::L0C) {
-        return 16U * 16U * sizeof(uint32_t);
-    }
-    return ASC_ONE_DATABLOCK_SIZE;
 }
 
 template <AscendC::Hardware hardware>
@@ -233,17 +204,14 @@ __aicore__ inline void asc_dump_impl(
     if (dump_size <= 0 || blockInfo == nullptr) {
         return;
     }
-    constexpr uint32_t dataBlockSize = 32U;
+    constexpr uint32_t dataBlockSize = get_dump_tensor_payload_alignment<hardware>();
     const uint64_t tensorLength = static_cast<uint64_t>(dump_size) * sizeof(T);
     const uint64_t alignDumpLen64 = ((tensorLength + dataBlockSize - 1U) / dataBlockSize) * dataBlockSize;
     const uint64_t tlvLen64 = sizeof(DumpTensorTlv) + alignDumpLen64;
     if (tlvLen64 > blockInfo->ringBufLen) {
-#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
         if constexpr (is_super_tensor_hardware_supported<hardware>()) {
             asc_dump_super_tensor_impl<hardware, T>(src, desc, tensorLength, shape, shapeDim, blockInfo);
         }
-#endif
         return;
     }
     const uint32_t alignDumpLen = static_cast<uint32_t>(alignDumpLen64);

@@ -19,6 +19,30 @@
 #include "impl/utils/sys_macros_impl.h"
 
 namespace __asc_aicore {
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
+{
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_super_tensor_payload_alignment()
+{
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
+    }
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline bool is_super_tensor_hardware_supported()
+{
+    return hardware == AscendC::Hardware::GM || hardware == AscendC::Hardware::UB ||
+           hardware == AscendC::Hardware::L1 || hardware == AscendC::Hardware::L0C ||
+           hardware == AscendC::Hardware::BIAS || hardware == AscendC::Hardware::FIXBUF;
+}
+
 constexpr uint32_t ASC_DEBUG_BUS_UNLOCK_OFFSET = 0x078;
 constexpr uint32_t ASC_DEBUG_BUS_CTRL_OFFSET = 0x100;
 constexpr uint32_t ASC_DEBUG_BUS_ADDR_LOW_OFFSET = 0x108;
