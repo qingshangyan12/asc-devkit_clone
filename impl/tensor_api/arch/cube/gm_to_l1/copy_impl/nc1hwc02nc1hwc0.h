@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nc1hwc02nc1hwc0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -40,7 +40,7 @@ public:
         auto dst_layout = dst.layout();
 
         // (N, C1, H, W, C0): C1 axis stride = H*W*C0, H axis stride = W*C0.
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         uint32_t c1 = get<1>(dst_layout.shape());
         uint32_t row_elems = get<2>(dst_layout.stride()); // W*C0 (dst packed H stride)
 
@@ -57,8 +57,9 @@ public:
             if constexpr (is_b4_type<type>) {
                 block_len = block_len >> 1;
             }
-            copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), c1, block_len, 0, 0, cache_mode,
-                                                    src_stride, dst_stride, trait.pre_allocation);
+            copy_gm_to_l1_align_v2_instr::data_copy(
+                dst.data().get(), src.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+                trait.pre_allocation);
         } else {
             // W not fully loaded (sliced src): per-H loop, C1 bursts of W*C0 each.
             uint32_t h = get<2>(dst_layout.shape());
@@ -69,16 +70,19 @@ public:
             for (uint32_t i = 0; i < h; ++i) {
                 auto src_h = src(make_coord(0, 0, i, 0, 0));
                 auto dst_h = dst(make_coord(0, 0, i, 0, 0));
-                copy_gm_to_l1_align_v2_instr::data_copy(dst_h.data().get(), src_h.data().get(), c1, block_len, 0, 0,
-                                                        cache_mode, src_stride, dst_stride, trait.pre_allocation);
+                copy_gm_to_l1_align_v2_instr::data_copy(
+                    dst_h.data().get(), src_h.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+                    trait.pre_allocation);
             }
         }
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         using type = typename SrcTensor::element_type;
         auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
@@ -98,9 +102,10 @@ public:
             if constexpr (is_b4_type<type>) {
                 block_len >>= 1;
             }
-            copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, c1, block_len, 0, 0,
-                                                                 src.engine().get_cache_mode(), src_stride, dst_stride,
-                                                                 trait.pre_allocation);
+            copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
+                dst, src, dst_offset, src_offset, c1, block_len, 0, 0,
+                static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+                trait.pre_allocation);
         } else {
             uint32_t block_len = row_elems * sizeof(type);
             if constexpr (is_b4_type<type>) {
@@ -109,9 +114,10 @@ public:
             for (uint32_t i = 0; i < get<2>(src_shape); ++i) {
                 auto dst_h = dst(make_coord(0, 0, i, 0, 0));
                 auto row_offset = src_offset + i * get<2>(src.layout().stride());
-                copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst_h, src, dst_offset, row_offset, c1, block_len,
-                                                                     0, 0, src.engine().get_cache_mode(), src_stride,
-                                                                     dst_stride, trait.pre_allocation);
+                copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
+                    dst_h, src, dst_offset, row_offset, c1, block_len, 0, 0,
+                    static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+                    trait.pre_allocation);
             }
         }
     }

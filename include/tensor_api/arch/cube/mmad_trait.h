@@ -24,10 +24,14 @@ enum class mmad_type : uint8_t { normal = 0, mx = 1 };
 struct mmad_trait {
     __aicore__ constexpr mmad_trait(){};
 
-    __aicore__ constexpr mmad_trait(int32_t fm_offset, bool k_direction_align, bool init_with_btbuf,
-                                    bool disable_gemv, asc::te::mmad_type mmad_type) :
-        fm_offset(fm_offset), k_direction_align(k_direction_align), init_with_btbuf(init_with_btbuf),
-        disable_gemv(disable_gemv), mmad_type(mmad_type){};
+    __aicore__ constexpr mmad_trait(
+        int32_t fm_offset, bool k_direction_align, bool init_with_btbuf, bool disable_gemv,
+        asc::te::mmad_type mmad_type)
+        : fm_offset(fm_offset),
+          k_direction_align(k_direction_align),
+          init_with_btbuf(init_with_btbuf),
+          disable_gemv(disable_gemv),
+          mmad_type(mmad_type){};
 
     int32_t fm_offset = 0;
     bool k_direction_align = false;

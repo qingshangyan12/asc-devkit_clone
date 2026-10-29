@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
@@ -24,11 +24,9 @@ TEST_F(tensor_api_tensor_slice, test_local_tensor_slice_by_shape)
 {
     using namespace asc::te;
 
-    __gm__ float data[48] = {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-        36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
+    __gm__ float data[48] = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                             32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
     auto layout = make_frame_layout<scalea_nd_layout_ptn>(6, 8);
     auto tensor = make_tensor(make_mem_ptr<location::gm>(data), layout);
     auto sliced = slice(tensor, make_coord(1, 2), make_shape(3, 3));
@@ -42,11 +40,9 @@ TEST_F(tensor_api_tensor_slice, test_local_tensor_slice_by_layout)
 {
     using namespace asc::te;
 
-    __gm__ float data[48] = {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-        36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
+    __gm__ float data[48] = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                             32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47};
     auto layout = make_frame_layout<scalea_nd_layout_ptn>(6, 8);
     auto tensor = make_tensor(make_mem_ptr<location::gm>(data), layout);
     auto info_layout = make_frame_layout<scalea_nd_layout_ptn>(2, 4);
@@ -126,7 +122,8 @@ TEST_F(tensor_api_tensor_slice, test_local_tensor_slice_four_dim_layout_by_same_
     EXPECT_EQ((get<1, 0>(sliced.shape())), 2);
     EXPECT_EQ((get<1, 1>(sliced.shape())), 2);
     EXPECT_EQ(sliced[make_coord(make_coord(0, 0), make_coord(0, 0))], data[layout(coord)]);
-    EXPECT_EQ(sliced[make_coord(make_coord(0, 0), make_coord(1, 1))],
+    EXPECT_EQ(
+        sliced[make_coord(make_coord(0, 0), make_coord(1, 1))],
         data[layout(make_coord(make_coord(1, 2), make_coord(2, 4)))]);
 }
 
@@ -155,7 +152,8 @@ TEST_F(tensor_api_tensor_slice, test_local_tensor_slice_five_dim_layout_by_same_
     EXPECT_EQ((get<1, 1, 0>(sliced.shape())), 2);
     EXPECT_EQ((get<1, 1, 1>(sliced.shape())), 2);
     EXPECT_EQ(sliced[make_coord(0, make_coord(make_coord(0, 0), make_coord(0, 0)))], data[layout(coord)]);
-    EXPECT_EQ(sliced[make_coord(0, make_coord(make_coord(0, 0), make_coord(1, 1)))],
+    EXPECT_EQ(
+        sliced[make_coord(0, make_coord(make_coord(0, 0), make_coord(1, 1)))],
         data[layout(make_coord(1, make_coord(make_coord(1, 2), make_coord(2, 4))))]);
 }
 
@@ -186,8 +184,8 @@ TEST_F(tensor_api_tensor_slice, test_slice_flat_two_batch_layout_by_logical_shap
 
     using slice_layout = AscendC::Std::remove_cvref_t<decltype(sliced.layout())>;
     static_assert(slice_layout::rank_size == 3, "slice keeps the flat multi-batch rank");
-    static_assert(AscendC::Std::is_same_v<get_layout_pattern<slice_layout>, nz_layout_ptn>,
-        "Slice must preserve nz_layout_ptn");
+    static_assert(
+        AscendC::Std::is_same_v<get_layout_pattern<slice_layout>, nz_layout_ptn>, "Slice must preserve nz_layout_ptn");
 
     EXPECT_EQ(sliced.data(), tensor.data() + layout(coord));
 

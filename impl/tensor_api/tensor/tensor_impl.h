@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -40,8 +40,8 @@ __aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor()
 {}
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout) :
-    rep(layout, engine)
+__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
+    : rep(layout, engine)
 {}
 
 template <typename EngineT, typename LayoutT>
@@ -142,16 +142,16 @@ __aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::operator()(const
 
 template <typename EngineT, typename LayoutT>
 template <typename Coord0, typename Coord1, typename... Coords>
-__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::operator()(const Coord0& c0, const Coord1& c1,
-                                                                           const Coords&... cs)
+__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::operator()(
+    const Coord0& c0, const Coord1& c1, const Coords&... cs)
 {
     return operator()(make_coord(c0, c1, cs...));
 }
 
 template <typename EngineT, typename LayoutT>
 template <typename Coord0, typename Coord1, typename... Coords>
-__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::operator()(const Coord0& c0, const Coord1& c1,
-                                                                           const Coords&... cs) const
+__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::operator()(
+    const Coord0& c0, const Coord1& c1, const Coords&... cs) const
 {
     return operator()(make_coord(c0, c1, cs...));
 }
@@ -252,16 +252,13 @@ __aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::Slice(const Coor
 
 template <typename EngineT, typename LayoutT>
 template <typename SliceEngine, typename SliceLayout>
-__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::make_sub_tensor(const SliceEngine& slice_engine,
-                                                                                const SliceLayout& slice_layout)
+__aicore__ inline decltype(auto) base_tensor<EngineT, LayoutT>::make_sub_tensor(
+    const SliceEngine& slice_engine, const SliceLayout& slice_layout)
 {
     using location = get_mem_location<SliceEngine>;
     using result_tensor = typename make_tensor_result<location, SliceEngine, SliceLayout>::type;
     return result_tensor{slice_engine, slice_layout};
 }
-
-template <typename EngineT, typename LayoutT>
-__aicore__ inline constexpr local_tensor<EngineT, LayoutT>::local_tensor() = default;
 
 template <typename EngineT, typename LayoutT>
 __aicore__ inline constexpr global_tensor<EngineT, LayoutT>::global_tensor() = default;
@@ -286,8 +283,9 @@ __aicore__ inline constexpr void global_tensor<EngineT, LayoutT>::SetL2CacheHint
 
 template <typename LocationType, typename EngineT, typename LayoutT>
 struct make_tensor_result {
-    using type = typename Std::conditional<Std::is_same_v<LocationType, location::gm>, global_tensor<EngineT, LayoutT>,
-                                           local_tensor<EngineT, LayoutT>>::type;
+    using type = typename Std::conditional<
+        Std::is_same_v<LocationType, location::gm>, global_tensor<EngineT, LayoutT>,
+        local_tensor<EngineT, LayoutT>>::type;
 };
 
 template <typename Tensor>
@@ -329,8 +327,8 @@ struct make_tensor_builder {
 template <typename Iterator, typename... Args>
 __aicore__ inline auto make_tensor(const Iterator& iter, const Args&... args)
 {
-    static_assert(is_hardware_mem_ptr_v<Iterator>,
-                  "make_tensor expects the first argument to be a memory pointer or iterator");
+    static_assert(
+        is_hardware_mem_ptr_v<Iterator>, "make_tensor expects the first argument to be a memory pointer or iterator");
     TENSOR_API_DEBUG_CHECK(debug_check_make_tensor_shape, args...);
     return make_tensor_builder<Iterator>{}(iter, args...);
 }
@@ -342,8 +340,9 @@ template <typename Tensor>
 __aicore__ inline auto make_single_batch_sub_tensor(const Tensor& t, uint32_t batch_idx)
 {
     using layout_type = typename Tensor::layout_type;
-    static_assert(layout_type::depth == three_dim_data || layout_type::depth == five_dim_data,
-                  "make_single_batch_sub_tensor only supports batched layouts of depth 3 or 5.");
+    static_assert(
+        layout_type::depth == three_dim_data || layout_type::depth == five_dim_data,
+        "make_single_batch_sub_tensor only supports batched layouts of depth 3 or 5.");
     auto layout = t.layout();
     auto batch_stride = get<0>(layout.stride());
     auto sub_engine = t.engine() + batch_stride * batch_idx;
@@ -377,9 +376,10 @@ __aicore__ inline auto squeeze(const Tensor& x)
 
 // squeeze (mode 2): drop positions marked _1 in an isomorphic pattern tuple, when size is 1.
 // Accepts either a Layout or a Tensor.
-template <typename Pattern, typename Tensor,
-          typename = Std::enable_if_t<(is_layout_v<Tensor> || is_attr_tensor_v<Tensor>)
-                                      && Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
+template <
+    typename Pattern, typename Tensor,
+    typename = Std::enable_if_t<
+        (is_layout_v<Tensor> || is_attr_tensor_v<Tensor>) && Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
 __aicore__ inline auto squeeze(const Tensor& x, const Pattern& pattern)
 {
     if constexpr (is_attr_tensor_v<Tensor>) {

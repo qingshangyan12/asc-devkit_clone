@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/tensor_api/experimental/arch/vector/reg_index_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_index.h\"\" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/experimental/arch/vector/reg_index_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_index_compute.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_INDEX_IMPL_H
 #endif
@@ -28,7 +28,8 @@ template <iota_order order, typename T>
 __simd_callee__ inline reg_tensor<Std::remove_cvref_t<T>> iota(const T& start)
 {
     using data_type = Std::remove_cvref_t<T>;
-    static_assert(AscendC::Std::is_one_of_v<data_type, int8_t, int16_t, int32_t, half, float>,
+    static_assert(
+        AscendC::Std::is_one_of_v<data_type, int8_t, int16_t, int32_t, half, float>,
         "iota only supports int8_t, int16_t, int32_t, half, and float");
     static_assert(
         order == iota_order::increase || order == iota_order::decrease,

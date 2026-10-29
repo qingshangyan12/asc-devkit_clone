@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/mmad/mmad_impl/mmad_with_bias.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -29,10 +29,11 @@ namespace te {
 
 class mmad_with_bias {
 public:
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
-              typename Params>
-    __aicore__ inline static void run(const CTensor& dst, const ATensor& fm, const BTensor& filter,
-                                      const BiasTensor& bias, const Params& params)
+    template <
+        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        typename Params>
+    __aicore__ inline static void run(
+        const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)
     {
         mmad_impl<trait, CTensor, ATensor, BTensor, BiasTensor>(dst, fm, filter, bias, params);
     }
@@ -52,10 +53,11 @@ private:
         check_data_type::check_mx_mmad_bias_data_type<CTensor, ATensor, BTensor, BiasTensor>();
     }
 
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
-              typename Params>
-    __aicore__ inline static void mmad_impl(const CTensor& dst, const ATensor& fm, const BTensor& filter,
-                                            const BiasTensor& bias, const Params& params)
+    template <
+        const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
+        typename Params>
+    __aicore__ inline static void mmad_impl(
+        const CTensor& dst, const ATensor& fm, const BTensor& filter, const BiasTensor& bias, const Params& params)
     {
         if constexpr (trait.mmad_type == mmad_type::normal) {
             check_template_for_normal<trait, CTensor, ATensor, BTensor, BiasTensor>();
@@ -69,12 +71,13 @@ private:
         }
 
         if constexpr (trait.mmad_type == mmad_type::normal) {
-            mmad_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
-                                  static_cast<uint8_t>(params.unit_flag), trait.disable_gemv, init_with_btbuf, false);
+            mmad_bias_instr::mmad(
+                dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                trait.disable_gemv, init_with_btbuf, false);
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
-            mmad_mx_bias_instr::mmad(dst, fm, filter, bias, params.m, params.k, params.n,
-                                     static_cast<uint8_t>(params.unit_flag), trait.disable_gemv, init_with_btbuf,
-                                     false);
+            mmad_mx_bias_instr::mmad(
+                dst, fm, filter, bias, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                trait.disable_gemv, init_with_btbuf, false);
         }
     }
 };

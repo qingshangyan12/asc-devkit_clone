@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/atom/mmad_traits_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -39,8 +39,8 @@ template <typename MmadOperation, typename MmadTrait, typename MmadOperationWith
 template <
     const typename mmad_traits<MmadOperation, MmadTrait, MmadOperationWith, MmadTraitWith>::trait_type& trait,
     typename... Args>
-__aicore__ inline void
-mmad_traits<MmadOperation, MmadTrait, MmadOperationWith, MmadTraitWith>::mmad_unpack(const Args&... args) const
+__aicore__ inline void mmad_traits<MmadOperation, MmadTrait, MmadOperationWith, MmadTraitWith>::mmad_unpack(
+    const Args&... args) const
 {
     MmadOperation::template mmad<trait_type, trait, Args...>(args...);
 }

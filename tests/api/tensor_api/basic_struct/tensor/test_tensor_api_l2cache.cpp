@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
@@ -18,8 +18,7 @@ template <typename data_type>
 struct is_tensor_api_global_tensor : AscendC::Std::false_type {};
 
 template <typename engine_type, typename layout_type>
-struct is_tensor_api_global_tensor<asc::te::global_tensor<engine_type, layout_type>>
-    : AscendC::Std::true_type {};
+struct is_tensor_api_global_tensor<asc::te::global_tensor<engine_type, layout_type>> : AscendC::Std::true_type {};
 
 template <typename data_type>
 constexpr bool is_tensor_api_global_tensor_v =
@@ -29,8 +28,7 @@ template <typename data_type>
 struct is_tensor_api_local_tensor : AscendC::Std::false_type {};
 
 template <typename engine_type, typename layout_type>
-struct is_tensor_api_local_tensor<asc::te::local_tensor<engine_type, layout_type>>
-    : AscendC::Std::true_type {};
+struct is_tensor_api_local_tensor<asc::te::local_tensor<engine_type, layout_type>> : AscendC::Std::true_type {};
 
 template <typename data_type>
 constexpr bool is_tensor_api_local_tensor_v =
@@ -53,8 +51,7 @@ TEST_F(tensor_api_tensor_cache_mode, set_l2_cache_hint)
     constexpr uint32_t tile_length = 8;
     __gm__ float data[tile_length] = {0, 1, 2, 3, 4, 5, 6, 7};
     auto ptr = make_mem_ptr<location::gm>(data);
-    auto tensor = make_tensor(ptr, make_shape(_2{}, _2{}, _2{}),
-                             make_stride(_4{}, _2{}, _1{}));
+    auto tensor = make_tensor(ptr, make_shape(_2{}, _2{}, _2{}), make_stride(_4{}, _2{}, _1{}));
 
     tensor.set_l2_cache_hint(cache_mode::disable);
     EXPECT_EQ(tensor.get_cache_mode(), cache_mode::disable);

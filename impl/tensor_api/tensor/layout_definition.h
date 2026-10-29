@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/layout_definition.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -61,9 +61,9 @@ template <typename Layout>
 constexpr bool is_layout_v = is_layout<Std::remove_cvref_t<Layout>>::value;
 
 template <typename ShapeTuple, typename StrideTuple, typename Info>
-__aicore__ inline constexpr layout<ShapeTuple, StrideTuple, Info>::layout(const ShapeTuple& shape,
-                                                                          const StrideTuple& stride) :
-    Std::tuple<ShapeTuple, StrideTuple>(shape, stride)
+__aicore__ inline constexpr layout<ShapeTuple, StrideTuple, Info>::layout(
+    const ShapeTuple& shape, const StrideTuple& stride)
+    : Std::tuple<ShapeTuple, StrideTuple>(shape, stride)
 {
     static_assert(Std::is_tuple_v<ShapeTuple> && Std::is_tuple_v<StrideTuple>, "Shape or Stride is not tuple!");
 }
@@ -107,8 +107,9 @@ template <typename ShapeTuple, typename StrideTuple, typename Info>
 template <size_t... I>
 __aicore__ inline constexpr decltype(auto) layout<ShapeTuple, StrideTuple, Info>::rank() const
 {
-    static_assert(Std::tuple_size_v<ShapeTuple> == Std::tuple_size_v<StrideTuple>,
-                  "The dimensions of the Shape and Stride are not the same.");
+    static_assert(
+        Std::tuple_size_v<ShapeTuple> == Std::tuple_size_v<StrideTuple>,
+        "The dimensions of the Shape and Stride are not the same.");
     return asc::te::get_rank<I...>(shape());
 }
 

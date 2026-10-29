@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/layout_method.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -32,24 +32,24 @@ struct has_zero_integral_constant
     : Std::bool_constant<(... || Std::is_same_v<Std::remove_cvref_t<Values>, Std::Int<0>>)> {};
 
 template <typename FirstShape, typename... Shapes>
-__aicore__ inline constexpr shape<FirstShape, Shapes...> make_shape(const FirstShape& first_shape,
-                                                                    const Shapes&... shapes)
+__aicore__ inline constexpr shape<FirstShape, Shapes...> make_shape(
+    const FirstShape& first_shape, const Shapes&... shapes)
 {
-    static_assert(!has_zero_integral_constant<FirstShape, Shapes...>::value,
-                  "MakeShape does not accept Int<0> arguments.");
+    static_assert(
+        !has_zero_integral_constant<FirstShape, Shapes...>::value, "MakeShape does not accept Int<0> arguments.");
     return {first_shape, shapes...};
 }
 
 template <typename FirstStride, typename... Strides>
-__aicore__ inline constexpr stride<FirstStride, Strides...> make_stride(const FirstStride& first_stride,
-                                                                        const Strides&... strides)
+__aicore__ inline constexpr stride<FirstStride, Strides...> make_stride(
+    const FirstStride& first_stride, const Strides&... strides)
 {
     return {first_stride, strides...};
 }
 
 template <typename FirstCoord, typename... Coords>
-__aicore__ inline constexpr coord<FirstCoord, Coords...> make_coord(const FirstCoord& first_coord,
-                                                                    const Coords&... coords)
+__aicore__ inline constexpr coord<FirstCoord, Coords...> make_coord(
+    const FirstCoord& first_coord, const Coords&... coords)
 {
     return {first_coord, coords...};
 }
@@ -58,9 +58,9 @@ template <typename Shape, typename Stride>
 __aicore__ inline constexpr auto make_layout(const Shape& shape, const Stride& stride)
 {
     static_assert(Std::is_tuple_v<Shape> && Std::is_tuple_v<Stride>, "Shape or Stride is not tuple!");
-    static_assert(nesting_depth_v<Shape> == nesting_depth_v<Stride>
-                      && Std::tuple_size_v<Shape> == Std::tuple_size_v<Stride>,
-                  "Shape and Stride structure are not compatible.");
+    static_assert(
+        nesting_depth_v<Shape> == nesting_depth_v<Stride> && Std::tuple_size_v<Shape> == Std::tuple_size_v<Stride>,
+        "Shape and Stride structure are not compatible.");
     return layout<Shape, Stride>(shape, stride);
 }
 
@@ -101,13 +101,13 @@ __aicore__ inline constexpr auto build_stride_col_impl(const Row& row, const Col
 template <typename ShapeType>
 __aicore__ inline constexpr auto compute_stride(const ShapeType& shape)
 {
-    static_assert(Std::is_tuple_v<ShapeType> && Std::tuple_size_v<ShapeType> == 2,
-                  "ShapeType must be tuple of two tuples");
+    static_assert(
+        Std::is_tuple_v<ShapeType> && Std::tuple_size_v<ShapeType> == 2, "ShapeType must be tuple of two tuples");
     const auto& row = Std::get<0>(shape);
     const auto& col = Std::get<1>(shape);
-    static_assert(Std::tuple_size_v<Std::remove_cvref_t<decltype(row)>>
-                      == Std::tuple_size_v<Std::remove_cvref_t<decltype(col)>>,
-                  "ShapeType rows must have same length");
+    static_assert(
+        Std::tuple_size_v<Std::remove_cvref_t<decltype(row)>> == Std::tuple_size_v<Std::remove_cvref_t<decltype(col)>>,
+        "ShapeType rows must have same length");
     constexpr size_t n = Std::tuple_size_v<Std::remove_cvref_t<decltype(row)>>;
     using row_type = Std::remove_cvref_t<decltype(row)>;
     using col_type = Std::remove_cvref_t<decltype(col)>;
