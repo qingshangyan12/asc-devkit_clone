@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_5161/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -40,33 +41,31 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_cb(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 1);
-        } else {
-            load_cbuf_to_cb(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 0);
-        }
+    if (loadDataParam.GetIfTranspose()) {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 1);
+    } else {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 0);
+    }
 #else
-        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb_s4(
-                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_cb_s4(
-                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb_s4(
+                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
         } else {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
+            load_cbuf_to_cb_s4(
+                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
         }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
 #endif
 }
 
@@ -593,7 +592,8 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 #endif
 

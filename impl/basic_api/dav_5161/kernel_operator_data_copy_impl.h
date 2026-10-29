@@ -376,14 +376,11 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(
     uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
     uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
     // config0 -> Xm: [3:0]=sid [43:4]=loop1_src_stride(bytes) [47:44]=cacheMode [63:48]=N
-    uint64_t config0 = (uint64_t)(intriParams.sid) |
-                       (loop1SrcStride << 4) |
-                       ((uint64_t)(cacheMode) << 44) |
+    uint64_t config0 = (uint64_t)(intriParams.sid) | (loop1SrcStride << 4) | ((uint64_t)(cacheMode) << 44) |
                        ((uint64_t)(intriParams.nValue) << 48);
     // config1 -> Xt: [20:0]=D [60:21]=loop4_src_stride(bytes) [61]=SMALLC_EN [63:62]=reserved
-    uint64_t config1 = (uint64_t)(intriParams.dValue) |
-                       (loop4SrcStride << 21) |
-                       ((uint64_t)(enableSmallC0 ? 1 : 0) << 61);
+    uint64_t config1 =
+        (uint64_t)(intriParams.dValue) | (loop4SrcStride << 21) | ((uint64_t)(enableSmallC0 ? 1 : 0) << 61);
     if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_cbuf_multi_nd2nz((__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, config0, config1);
     }
@@ -806,8 +803,7 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy L0C to GM on current device"); });
 }
