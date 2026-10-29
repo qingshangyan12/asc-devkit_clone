@@ -204,9 +204,8 @@ SelectorStatus AlltoAllVAutoSelector::SelectCcuScheduleAlgo(
             return SelectorStatus::NOT_MATCH;
         }
         selectAlgName = "CcuSchedAllToAllVSoleMeshMultiJetty";
-        HCCL_WARNING(
-            "[AlltoAllVAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
-        return SelectorStatus::NOT_MATCH;
+        HCCL_INFO("[AlltoAllVAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
     }
     HCCL_DEBUG("[AlltoAllVAutoSelector] algo is not supported yet for ccu_schedule mode.");
     return SelectorStatus::NOT_MATCH;
