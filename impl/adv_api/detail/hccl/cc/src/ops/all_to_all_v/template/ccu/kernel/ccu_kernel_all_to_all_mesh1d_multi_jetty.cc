@@ -214,7 +214,7 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
         [&ctx](ccu::Array<ccu::Variable>& args) {
             LoadArgs(ctx, args);
             PreSync(ctx);
-            DoAllToAll(ctx);
+            //DoAllToAll(ctx);
             PostSync(ctx);
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME);
@@ -236,7 +236,7 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernelMission2(CcuKernelArg arg)
         [&ctx](ccu::Array<ccu::Variable>& args) {
             LoadArgsMission2(ctx, args);
             PreSync(ctx);
-            DoAllToAll(ctx);
+            //DoAllToAll(ctx);
             PostSync(ctx);
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_MISSION2_NAME);
