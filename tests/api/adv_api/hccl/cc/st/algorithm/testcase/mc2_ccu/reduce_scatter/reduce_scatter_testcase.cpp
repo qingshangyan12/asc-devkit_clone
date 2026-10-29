@@ -11,6 +11,8 @@
 #include "ccu_reduce_scatter.h"
 
 #include "alg_param.h"
+#include "sim_communicator.h"
+#include "sim_world.h"
 
 using namespace HcclSim::CcuSt;
 
@@ -319,4 +321,63 @@ TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16)
 TEST_F(CcuStReduceScatter, Selector_2LevelMesh_2Server8Rank_Fp16)
 {
     VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50));
+}
+
+// ============================================================================
+// 外部名 sole[mesh] 强制定名 true-path（SRS2 §19.1 #1 留档）：COND_PEER_ONLY 与模板
+// 资源期守卫同口径（TP2 且 CalcChannelRequestMesh1D 恰建 1 条对端通道）→ PeerOnly。
+// 走生产强制路径 TryForcedAlgAndPrepareEngine（解析→真 topo→三级漏斗→模板守卫 CalcRes），
+// 定名即断言面；kernel 执行行为由 peer_only_local_copy_testcase 单独覆盖
+// （本目标尚无 PeerOnly 的场景捕获适配器）。
+// ============================================================================
+
+namespace {
+
+HcclResult ResolveForcedSoleMeshOn950(const TopoMeta& topoMeta, bool& accepted, std::string& algName)
+{
+    HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
+    HcclComm comm = nullptr;
+    HcclResult ret = HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, 0U, &comm);
+    if (ret == HCCL_SUCCESS) {
+        EXPECT_EQ(aclrtSetDevice(0), ACL_SUCCESS); // topo 初始化经 hrtGetDeviceType 读当前设备（同 fixture）
+        const Mc2CcTilingInner tiling =
+            CcuStFixture::BuildTiling(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, HCCL_DATA_TYPE_FP16, "sole[mesh]");
+        mc2_ops_hccl::OpParam opParam{};
+        opParam.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        opParam.DataDes.dataType = HCCL_DATA_TYPE_FP16;
+        opParam.DataDes.count = 50U;
+        opParam.reduceType = HCCL_REDUCE_SUM;
+        opParam.engine = CommEngine::COMM_ENGINE_CCU;
+        opParam.opExecuteConfig = mc2_ops_hccl::OpExecuteConfig::CCU_SCHED;
+        opParam.commOpExpansionMode = HCCL_OP_EXPANSION_CCU_SCHED;
+        auto topoInfo = std::make_unique<mc2_ops_hccl::TopoInfoWithNetLayerDetails>();
+        ret = TryForcedAlgAndPrepareEngine(comm, &tiling, opParam, algName, topoInfo, accepted);
+        delete static_cast<HcclSim::SimCommunicator*>(comm);
+    }
+    HcclSim::SimWorld::Global()->Deinit();
+    return ret;
+}
+
+} // namespace
+
+TEST_F(CcuStReduceScatter, ForcedExternalSoleMeshTP2ResolvesPeerOnly)
+{
+    // TP2 单 server（950 MESH_1D）：L0 0↔1 恰 1 条 UBC_CTP → 同口径命中 → PeerOnly
+    bool accepted = false;
+    std::string algName;
+    ASSERT_EQ(ResolveForcedSoleMeshOn950(TopoMeta{{{{0, 1}}}}, accepted, algName), HCCL_SUCCESS);
+    EXPECT_TRUE(accepted);
+    EXPECT_EQ(algName, "CcuSchedReduceScatterSoleMeshPeerOnly");
+}
+
+TEST_F(CcuStReduceScatter, ForcedExternalSoleMeshTP2CrossServerResolvesPeerOnly)
+{
+    // D2 跨层窗口：同 pod 跨 server（2 server × 1 rank）→ L0 无链、L1 恰 1 条 UBC_CTP，
+    // 建链逐层+协议过滤后仍恰 1 通道 → PeerOnly；旧量纲（layer[0] raw 链数==1）
+    // 在此漏检 → 静默回落裸名 CcuSchedReduceScatterSoleMesh
+    bool accepted = false;
+    std::string algName;
+    ASSERT_EQ(ResolveForcedSoleMeshOn950(TopoMeta{{{{0}}, {{1}}}}, accepted, algName), HCCL_SUCCESS);
+    EXPECT_TRUE(accepted);
+    EXPECT_EQ(algName, "CcuSchedReduceScatterSoleMeshPeerOnly");
 }
