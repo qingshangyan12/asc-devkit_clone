@@ -55,7 +55,9 @@ void run_copy_call_paths(const dst_tensor_type& dst, const src_tensor_type& src)
     }
 }
 
-template <typename copy_operation, typename trait_type, typename param_type, typename dst_tensor_type, typename src_tensor_type>
+template <
+    typename copy_operation, typename trait_type, typename param_type, typename dst_tensor_type,
+    typename src_tensor_type>
 void run_copy_with_param_paths(const dst_tensor_type& dst, const src_tensor_type& src, const param_type& param)
 {
     using namespace asc::te;
@@ -88,8 +90,7 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_l1_nz_to_nz_float)
     run_copy_with_param_paths<copy_l0c_to_l1, l0c_to_l1_trait_default>(l1_tensor, l0c_tensor, l0c_to_l1_params{});
     auto atom = make_copy(copy_l0c_to_l1{}, l0c_to_l1_trait_default{});
     copy(atom, l1_tensor, l0c_tensor, make_coord(0, 0), zero_coord, make_shape(16, 16));
-    copy(atom.with(l0c_to_l1_params{}), l1_tensor, l0c_tensor,
-        zero_coord, make_coord(0, 0), make_shape(16, 16));
+    copy(atom.with(l0c_to_l1_params{}), l1_tensor, l0c_tensor, zero_coord, make_coord(0, 0), make_shape(16, 16));
 
     EXPECT_EQ(dst[0], 0);
 }
@@ -158,21 +159,21 @@ TEST_F(tensor_api_cube_copy_3510, copy_l0c_to_l1_batch_tensor_quant_coord_shape_
     __cbuf__ int8_t dst[batch * m * n] = {0};
     __cbuf__ uint64_t quant[batch * n] = {0};
 
-    auto src_tensor = make_tensor_at<location::l0c>(src,
-        make_frame_layout<nz_layout_ptn, layout_trait_default<int32_t, _16>>(batch, m, n));
-    auto dst_tensor = make_tensor_at<location::l1>(dst,
-        make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t, _16>>(batch, m, n));
-    auto quant_tensor = make_tensor_at<location::l1>(quant,
-        make_frame_layout<nd_ext_layout_ptn, layout_trait_default<uint64_t>>(batch, 1, n));
+    auto src_tensor = make_tensor_at<location::l0c>(
+        src, make_frame_layout<nz_layout_ptn, layout_trait_default<int32_t, _16>>(batch, m, n));
+    auto dst_tensor = make_tensor_at<location::l1>(
+        dst, make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t, _16>>(batch, m, n));
+    auto quant_tensor = make_tensor_at<location::l1>(
+        quant, make_frame_layout<nd_ext_layout_ptn, layout_trait_default<uint64_t>>(batch, 1, n));
     auto atom = make_copy(copy_l0c_to_l1{}, l0c_to_l1_trait_default{});
 
     if (false) {
-        copy(atom, dst_tensor, src_tensor, quant_tensor,
-            make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
-            make_shape(1, make_shape(m, n)));
+        copy(
+            atom, dst_tensor, src_tensor, quant_tensor, make_coord(1, make_coord(0, 0)),
+            make_coord(1, make_coord(0, 0)), make_shape(1, make_shape(m, n)));
         copy(dst_tensor, src_tensor, quant_tensor);
-        copy(dst_tensor, src_tensor, quant_tensor,
-            make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
+        copy(
+            dst_tensor, src_tensor, quant_tensor, make_coord(1, make_coord(0, 0)), make_coord(1, make_coord(0, 0)),
             make_shape(1, make_shape(m, n)));
     }
     SUCCEED();

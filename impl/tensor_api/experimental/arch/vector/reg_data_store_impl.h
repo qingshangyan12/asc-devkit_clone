@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -19,7 +19,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
-#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/tensor_interface.h"
 
 namespace asc {
 namespace te {
@@ -115,7 +115,8 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
         "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
@@ -130,7 +131,8 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
         "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src);
@@ -144,7 +146,8 @@ __simd_callee__ inline void store(
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
         "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
@@ -160,7 +163,8 @@ __simd_callee__ inline void store(
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
+    static_assert(
+        Std::is_same_v<detail::get_reg_data_type<data_type>, RegDataType>,
         "store requires matching tensor and register element types (int4b_t tensors require int4x2_t registers)");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);

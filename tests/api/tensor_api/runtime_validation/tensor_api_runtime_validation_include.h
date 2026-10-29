@@ -17,10 +17,7 @@ namespace tensor_api_runtime_validation {
 
 struct TrapException {};
 
-[[noreturn]] inline void throw_trap_exception()
-{
-    throw TrapException{};
-}
+[[noreturn]] inline void throw_trap_exception() { throw TrapException{}; }
 
 } // namespace tensor_api_runtime_validation
 

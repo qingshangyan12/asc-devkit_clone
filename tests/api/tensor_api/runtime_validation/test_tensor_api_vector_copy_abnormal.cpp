@@ -29,15 +29,9 @@ constexpr int MISALIGNED_STRIDE_ELEMENTS = 17;
 
 class TensorApiVectorCopyAbnormalValidation : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(2);
-    }
+    void SetUp() override { AscendC::SetGCoreType(2); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename LocationType, typename PointerType, typename LayoutType>
@@ -79,8 +73,9 @@ void copy_gm2ub_with_padding(int src_columns, int dst_columns, const asc::te::gm
     copy(make_copy(copy_gm_to_ub{}).with(params), dst, src);
 }
 
-template <typename CopyOperationType, typename SrcLocationType, typename DstLocationType, typename SrcLayoutType,
-          typename DstLayoutType>
+template <
+    typename CopyOperationType, typename SrcLocationType, typename DstLocationType, typename SrcLayoutType,
+    typename DstLayoutType>
 void expect_copy_trap(const SrcLayoutType& src_layout, const DstLayoutType& dst_layout)
 {
     alignas(512) half src_data[1] = {};
@@ -400,35 +395,23 @@ TEST_F(TensorApiCopyValidation, RegionCopyRejectsInvalidArgs)
     auto atom = make_copy(copy_gm_to_ub{});
     auto valid_shape = make_shape(VALID_ROWS, VALID_COLUMNS);
 
-    expect_region_copy_trap([&] {
-        copy(dst, src, make_coord(VALID_ROWS, 0), zero_coord, valid_shape);
-    });
-    expect_region_copy_trap([&] {
-        copy(atom, dst, src, zero_coord, make_coord(0, VALID_COLUMNS), valid_shape);
-    });
+    expect_region_copy_trap([&] { copy(dst, src, make_coord(VALID_ROWS, 0), zero_coord, valid_shape); });
+    expect_region_copy_trap([&] { copy(atom, dst, src, zero_coord, make_coord(0, VALID_COLUMNS), valid_shape); });
     EXPECT_NO_THROW((copy(dst, src, zero_coord, zero_coord, make_shape(0, VALID_COLUMNS))));
     EXPECT_NO_THROW((copy(atom, dst, src, zero_coord, zero_coord, make_shape(0, VALID_COLUMNS))));
-    expect_region_copy_trap([&] {
-        copy(dst, src, zero_coord, zero_coord, make_shape(-1, VALID_COLUMNS));
-    });
-    expect_region_copy_trap([&] {
-        copy(dst, src, zero_coord, make_coord(VALID_ROWS - 1, 0), make_shape(2, VALID_COLUMNS));
-    });
-    expect_region_copy_trap([&] {
-        copy(atom, dst, src, zero_coord, make_coord(VALID_ROWS - 1, 0), make_shape(2, VALID_COLUMNS));
-    });
-    expect_region_copy_trap([&] {
-        copy(dst, src, make_coord(VALID_ROWS - 1, 0), zero_coord, make_shape(2, VALID_COLUMNS));
-    });
-    expect_region_copy_trap([&] {
-        copy(atom, dst, src, make_coord(VALID_ROWS - 1, 0), zero_coord, make_shape(2, VALID_COLUMNS));
-    });
+    expect_region_copy_trap([&] { copy(dst, src, zero_coord, zero_coord, make_shape(-1, VALID_COLUMNS)); });
+    expect_region_copy_trap(
+        [&] { copy(dst, src, zero_coord, make_coord(VALID_ROWS - 1, 0), make_shape(2, VALID_COLUMNS)); });
+    expect_region_copy_trap(
+        [&] { copy(atom, dst, src, make_coord(VALID_ROWS - 1, 0), zero_coord, make_shape(2, VALID_COLUMNS)); });
+    expect_region_copy_trap(
+        [&] { copy(dst, src, make_coord(VALID_ROWS - 1, 0), zero_coord, make_shape(2, VALID_COLUMNS)); });
+    expect_region_copy_trap(
+        [&] { copy(atom, dst, src, zero_coord, make_coord(VALID_ROWS - 1, 0), make_shape(2, VALID_COLUMNS)); });
 
     auto small_dst_layout = make_frame_layout<nd_ext_layout_ptn, half>(8, VALID_COLUMNS);
     auto small_dst = make_tensor_at<location::ub>(dst_data, small_dst_layout);
-    expect_region_copy_trap([&] {
-        copy(small_dst, src, zero_coord, zero_coord, valid_shape);
-    });
+    expect_region_copy_trap([&] { copy(small_dst, src, zero_coord, zero_coord, valid_shape); });
 
     EXPECT_NO_THROW((copy(dst, src, zero_coord, zero_coord, valid_shape)));
     EXPECT_NO_THROW((copy(atom, dst, src, zero_coord, zero_coord, valid_shape)));

@@ -157,7 +157,7 @@ __aicore__ inline void TestSubCarry()
 {
     reg_type<T> src0{};
     reg_type<T> src1{};
-    reg_type<bool> borrow_src{};
+    reg_type<bool> carry_src{};
     src0.mask = all_mask<T>().reg;
 
     auto result_without_borrow = asc::te::experimental::sub_carry(src0, src1);
@@ -165,7 +165,7 @@ __aicore__ inline void TestSubCarry()
     EXPECT_EQ(result_without_borrow.first.mask, src0.mask);
     EXPECT_EQ(result_without_borrow.second.mask, src0.mask);
 
-    auto result = asc::te::experimental::sub_carry(src0, src1, borrow_src);
+    auto result = asc::te::experimental::sub_carry(src0, src1, carry_src);
     static_assert(AscendC::Std::is_same_v<decltype(result), reg_pair<T, bool>>);
     EXPECT_EQ(result.first.mask, src0.mask);
     EXPECT_EQ(result.second.mask, src0.mask);

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/utils/arch_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -30,9 +30,9 @@ namespace asc {
 namespace te {
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define SCALAR_QUANT_MODE                                                                                              \
-    QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8, QuantMode_t::QS322BF16_PRE,                      \
-        QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE, QuantMode_t::QF322HIF8_PRE,  \
+#define SCALAR_QUANT_MODE                                                                                             \
+    QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8, QuantMode_t::QS322BF16_PRE,                     \
+        QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE, QuantMode_t::QF322HIF8_PRE, \
         QuantMode_t::QF322HIF8_PRE_HYBRID, QuantMode_t::QF322F32_PRE
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8
@@ -44,9 +44,9 @@ template <QuantMode_t quant_pre>
 using is_scalar_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, SCALAR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                                             \
-    QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8, QuantMode_t::VQS322BF16_PRE,                  \
-        QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,                           \
+#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                            \
+    QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8, QuantMode_t::VQS322BF16_PRE, \
+        QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,          \
         QuantMode_t::VQF322HIF8_PRE, QuantMode_t::VQF322HIF8_PRE_HYBRID, QuantMode_t::VQF322F32_PRE
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8

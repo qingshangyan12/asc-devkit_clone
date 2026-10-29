@@ -19,17 +19,14 @@ namespace {
 template <typename T>
 __aicore__ inline void compile_iota_from_scalar()
 {
-    auto inc = asc::te::experimental::iota(T {});
-    auto dec = asc::te::experimental::iota<asc::te::experimental::iota_order::decrease>(T {});
+    auto inc = asc::te::experimental::iota(T{});
+    auto dec = asc::te::experimental::iota<asc::te::experimental::iota_order::decrease>(T{});
     static_assert(AscendC::Std::is_same_v<decltype(inc), asc::te::experimental::reg_tensor<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(dec), asc::te::experimental::reg_tensor<T>>);
 }
 
-#define TENSOR_API_IOTA_TEST(DataType)                            \
-    TEST(tensor_api_reg_index_3510, iota_##DataType)              \
-    {                                                             \
-        compile_iota_from_scalar<DataType>();                     \
-    }
+#define TENSOR_API_IOTA_TEST(DataType) \
+    TEST(tensor_api_reg_index_3510, iota_##DataType) { compile_iota_from_scalar<DataType>(); }
 
 TENSOR_API_IOTA_TEST(int8_t)
 TENSOR_API_IOTA_TEST(int16_t)

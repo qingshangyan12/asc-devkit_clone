@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nd2nd.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -43,10 +43,12 @@ public:
         }
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         check_template<trait, DstTensor, SrcTensor>();
 
@@ -64,9 +66,9 @@ public:
         uint32_t block_len = src_shape_columns * sizeof(type);
         uint64_t src_stride = src_stride_rows * sizeof(type);
         uint32_t dst_stride = dst_stride_rows * sizeof(type);
-        if ((src_shape_rows == 1) || (src_shape_columns == 1)
-            || (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns
-                && src_stride_rows == dst_stride_rows)) {
+        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
+            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
+             src_stride_rows == dst_stride_rows)) {
             block_count = 1;
             block_len = src_shape_rows * src_shape_columns * sizeof(type);
             src_stride = 0;
@@ -77,10 +79,10 @@ public:
             src_stride >>= 1;
             dst_stride >>= 1;
         }
-        uint8_t cache_mode = src.engine().get_cache_mode();
-        copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, block_count, block_len, 0,
-                                                            0, cache_mode, src_stride, dst_stride,
-                                                            trait.pre_allocation);
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
+        copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
 private:
@@ -124,7 +126,7 @@ private:
             dst_stride_rows = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
 
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // normal mode, dst_stride % c0_size should be 0
         // compact mode, block_len equals dst_stride
@@ -134,9 +136,9 @@ private:
         uint64_t src_stride = src_stride_rows * sizeof(type);
         uint32_t dst_stride = dst_stride_rows * sizeof(type);
 
-        if ((src_shape_rows == 1) || (src_shape_columns == 1)
-            || (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns
-                && src_stride_rows == dst_stride_rows)) {
+        if ((src_shape_rows == 1) || (src_shape_columns == 1) ||
+            (src_stride_rows == src_shape_columns && dst_stride_rows == dst_shape_columns &&
+             src_stride_rows == dst_stride_rows)) {
             // compact mode, one line
             block_count = 1;
             // must use srcShape, there is a scenario of small to large, using dstShape will cause src out of bound
@@ -150,8 +152,9 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0,
-                                                cache_mode, src_stride, dst_stride, trait.pre_allocation);
+        copy_gm_to_l1_align_v2_instr::data_copy(
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
     // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
@@ -190,7 +193,7 @@ private:
         }
 
         uint32_t matrix_elems = src_shape_rows * src_shape_columns;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
         uint32_t block_count = batch_size;
@@ -204,8 +207,9 @@ private:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, 0, 0,
-                                                cache_mode, src_stride, dst_stride, trait.pre_allocation);
+        copy_gm_to_l1_align_v2_instr::data_copy(
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 };
 } // namespace te

@@ -22,7 +22,7 @@
 
 #include "version/asc_devkit_version.h"
 #if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201))
-#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90300000)
 #include "utils/base/helpers.h"
 #endif
 #include "c_api/defs/defs.h"

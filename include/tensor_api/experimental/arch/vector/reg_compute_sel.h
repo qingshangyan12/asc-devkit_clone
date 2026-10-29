@@ -23,40 +23,55 @@ namespace asc {
 namespace te {
 namespace experimental {
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
  * @brief Packs a register tensor into the selected low or high half-width representation.
+ *
+ * @override_id te_experimental_pack__reg_tensor_T__template_part_T
+ * @archs 3510
  * @tparam part Destination half selected for the pack operation.
  * @tparam T Element type of the source register tensor.
- * @param src Source register tensor.
  * @return A register tensor containing the packed data. The result mask follows src.
+ * @param [in] src Source register tensor.
  */
 template <high_low_part part = high_low_part::low, typename T>
 __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
  * @brief Unpacks a register tensor from the selected low or high half-width representation.
+ *
+ * @override_id te_experimental_unpack__reg_tensor_T__template_part_T
+ * @archs 3510
  * @tparam part Source half selected for the unpack operation.
  * @tparam T Element type of the source register tensor.
- * @param src Source register tensor.
  * @return A register tensor containing the unpacked data. The result mask follows src.
+ * @param [in] src Source register tensor.
  */
 template <high_low_part part = high_low_part::low, typename T>
 __simd_callee__ inline decltype(auto) unpack(reg_tensor<T> src);
 
 /**
- * @brief Compresses the lanes selected by mask into contiguous low lanes.
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
+ * @brief Compresses the lanes selected by the source tensor mask into contiguous low lanes.
+ *
+ * @override_id te_experimental_compress__reg_tensor_T__template_T
+ * @archs 3510
  * @tparam T Element type of the source register tensor.
- * @param src Source register tensor.
- * @param mask Lane-selection mask.
  * @return A register tensor containing selected elements packed into low lanes.
+ * @param [in] src Source register tensor whose mask selects the lanes to compress.
  */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool> mask);
+__simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_compute_sel
  * @brief Generates exclusive prefix-count indexes from a mask.
+ *
+ * @override_id te_experimental_expand__reg_tensor_bool__template_T
+ * @archs 3510
  * @tparam T Element type of the generated index register tensor.
- * @param mask Lane-selection mask.
  * @return A register tensor containing prefix-count indexes. The result mask is mask.
+ * @param [in] mask Lane-selection mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> expand(reg_tensor<bool> mask);

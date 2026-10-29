@@ -18,15 +18,9 @@ using tensor_api_runtime_validation::TrapException;
 
 class TensorApiDataStructureValidationMatrix : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(2);
-    }
+    void SetUp() override { AscendC::SetGCoreType(2); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename LocationType, typename PointerType, typename LayoutType>
@@ -127,10 +121,10 @@ TEST_F(TensorApiDataStructureValidationMatrix, Crd2IdxShapeStrideRejectsAllCoord
 
     auto nested_shape = make_shape(make_shape(16, 2), make_shape(8, 4));
     auto nested_stride = make_stride(make_stride(8, 128), make_stride(1, 256));
-    EXPECT_THROW((void)crd2idx(make_coord(make_coord(-1, 0), make_coord(0, 0)), nested_shape, nested_stride),
-                 TrapException);
-    EXPECT_THROW((void)crd2idx(make_coord(make_coord(16, 0), make_coord(0, 0)), nested_shape, nested_stride),
-                 TrapException);
+    EXPECT_THROW(
+        (void)crd2idx(make_coord(make_coord(-1, 0), make_coord(0, 0)), nested_shape, nested_stride), TrapException);
+    EXPECT_THROW(
+        (void)crd2idx(make_coord(make_coord(16, 0), make_coord(0, 0)), nested_shape, nested_stride), TrapException);
     EXPECT_THROW((void)crd2idx(make_coord(-1, 0), nested_shape, nested_stride), TrapException);
 
     auto flat_batch_shape = make_shape(2, 4, 8);
@@ -139,8 +133,8 @@ TEST_F(TensorApiDataStructureValidationMatrix, Crd2IdxShapeStrideRejectsAllCoord
 
     auto nested_batch_shape = make_shape(2, nested_shape);
     auto nested_batch_stride = make_stride(1024, nested_stride);
-    EXPECT_THROW((void)crd2idx(make_coord(2, make_coord(0, 0)), nested_batch_shape, nested_batch_stride),
-                 TrapException);
+    EXPECT_THROW(
+        (void)crd2idx(make_coord(2, make_coord(0, 0)), nested_batch_shape, nested_batch_stride), TrapException);
 }
 
 TEST_F(TensorApiDataStructureValidationMatrix, Crd2IdxLayoutRejectsAllCoordinateTopologies)

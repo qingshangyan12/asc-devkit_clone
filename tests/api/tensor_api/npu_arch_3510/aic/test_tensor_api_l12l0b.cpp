@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
@@ -18,15 +18,9 @@ protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 
-    void SetUp() override 
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override 
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 namespace {
@@ -74,8 +68,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_routes_to_cube_arch_copy)
     __cbuf__ float src[m * n] = {0};
     __cb__ float dst[m * n] = {0};
 
-    auto l1_tensor = make_tensor_at<location::l1>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
-    auto l0b_tensor = make_tensor_at<location::l0b>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<float>>(m, n));
+    auto l1_tensor =
+        make_tensor_at<location::l1>(src, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
+    auto l0b_tensor =
+        make_tensor_at<location::l0b>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<float>>(m, n));
 
     run_copy_call_paths<copy_l1_to_l0b, l1_to_l0b_trait_default>(l0b_tensor, l1_tensor);
     run_copy_default_paths<copy_l1_to_l0b, l1_to_l0b_trait_default>(l0b_tensor, l1_tensor);
@@ -83,12 +79,11 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_routes_to_cube_arch_copy)
     EXPECT_EQ(dst[0], 0);
 }
 
-template<bool transpose, typename data_type, int expected_m_step, int expected_k_step>
-void load_cbuf_to_cb_stub(__cb__ data_type* dst, __cbuf__ data_type* src,
-                          uint16_t m_start_position, uint16_t k_start_position,
-                          uint8_t m_step, uint8_t k_step,
-                          int16_t src_stride, uint16_t dst_stride,
-                          bool transposed) {
+template <bool transpose, typename data_type, int expected_m_step, int expected_k_step>
+void load_cbuf_to_cb_stub(
+    __cb__ data_type* dst, __cbuf__ data_type* src, uint16_t m_start_position, uint16_t k_start_position,
+    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride, bool transposed)
+{
     EXPECT_EQ(m_step, expected_m_step);
     EXPECT_EQ(k_step, expected_k_step);
     EXPECT_EQ(transposed, transpose);
@@ -105,7 +100,8 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_steps)
     auto src_tensor = make_tensor_at<location::l1>(src, layout);
     auto dst_tensor = make_tensor_at<location::l0b>(dst, layout);
 
-    MOCKER_CPP(load_cbuf_to_cb,
+    MOCKER_CPP(
+        load_cbuf_to_cb,
         void(__cb__ half*, __cbuf__ half*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
         .times(1)
         .will(invoke(&load_cbuf_to_cb_stub<false, half, 1, 1>));
@@ -123,16 +119,18 @@ uint32_t g_batch_b4_l0b_dst_batch_stride = 0;
 uint32_t g_batch_b4_l0b_dst_split_stride = 0;
 uint32_t g_batch_b4_l0b_call_index = 0;
 
-template<typename data_type, int expected_m_step, int expected_k_step, int expected_src_stride, int expected_dst_stride, uint32_t expected_split_num>
-void load_cbuf_to_cb_batch_b4_split_stub(__cb__ data_type* dst, __cbuf__ data_type* src,
-                                         uint16_t m_start_position, uint16_t k_start_position,
-                                         uint8_t m_step, uint8_t k_step,
-                                         int16_t src_stride, uint16_t dst_stride,
-                                         bool transposed) {
+template <
+    typename data_type, int expected_m_step, int expected_k_step, int expected_src_stride, int expected_dst_stride,
+    uint32_t expected_split_num>
+void load_cbuf_to_cb_batch_b4_split_stub(
+    __cb__ data_type* dst, __cbuf__ data_type* src, uint16_t m_start_position, uint16_t k_start_position,
+    uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride, bool transposed)
+{
     const auto batch_idx = g_batch_b4_l0b_call_index / expected_split_num;
     const auto split_idx = g_batch_b4_l0b_call_index % expected_split_num;
-    EXPECT_EQ(dst, g_batch_b4_l0b_dst_base + batch_idx * g_batch_b4_l0b_dst_batch_stride +
-        split_idx * g_batch_b4_l0b_dst_split_stride);
+    EXPECT_EQ(
+        dst, g_batch_b4_l0b_dst_base + batch_idx * g_batch_b4_l0b_dst_batch_stride +
+                 split_idx * g_batch_b4_l0b_dst_split_stride);
     EXPECT_EQ(src, g_batch_b4_l0b_src_base + batch_idx * g_batch_b4_l0b_src_batch_stride);
     EXPECT_EQ(m_start_position, split_idx * expected_m_step);
     EXPECT_EQ(k_start_position, 0);
@@ -152,15 +150,22 @@ auto make_batch_zn_layout()
     using namespace asc::te;
     constexpr uint32_t c0_value = c0_element<data_type>;
 
-    auto shape = make_shape(AscendC::Std::Int<batch_value>{},
-        make_shape(make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
-            AscendC::Std::Int<c0_value>{})),
-        make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
-            AscendC::Std::Int<fractal_fixed>{}))));
-    auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
-        make_stride(make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<fractal_fixed>{})),
-        make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{})));
+    auto shape = make_shape(
+        AscendC::Std::Int<batch_value>{},
+        make_shape(
+            make_shape(
+                AscendC::Std::Int<c0_value>{},
+                AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<c0_value>{})),
+            make_shape(
+                AscendC::Std::Int<fractal_fixed>{},
+                AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<fractal_fixed>{}))));
+    auto stride = make_stride(
+        AscendC::Std::Int<m_value * n_value>{},
+        make_stride(
+            make_stride(
+                _1{}, AscendC::Std::Int<c0_value>{} *
+                          AscendC::Std::ceil_align(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<fractal_fixed>{})),
+            make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{})));
     return make_pattern_layout<zn_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 
@@ -170,15 +175,22 @@ auto make_batch_nz_layout()
     using namespace asc::te;
     constexpr uint32_t c0_value = c0_element<data_type>;
 
-    auto shape = make_shape(AscendC::Std::Int<batch_value>{},
-        make_shape(make_shape(AscendC::Std::Int<fractal_fixed>{}, AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{},
-            AscendC::Std::Int<fractal_fixed>{})),
-        make_shape(AscendC::Std::Int<c0_value>{}, AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{},
-            AscendC::Std::Int<c0_value>{}))));
-    auto stride = make_stride(AscendC::Std::Int<m_value * n_value>{},
-        make_stride(make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{}),
-        make_stride(_1{}, AscendC::Std::Int<c0_value>{} *
-            AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<fractal_fixed>{}))));
+    auto shape = make_shape(
+        AscendC::Std::Int<batch_value>{},
+        make_shape(
+            make_shape(
+                AscendC::Std::Int<fractal_fixed>{},
+                AscendC::Std::ceil_division(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<fractal_fixed>{})),
+            make_shape(
+                AscendC::Std::Int<c0_value>{},
+                AscendC::Std::ceil_division(AscendC::Std::Int<n_value>{}, AscendC::Std::Int<c0_value>{}))));
+    auto stride = make_stride(
+        AscendC::Std::Int<m_value * n_value>{},
+        make_stride(
+            make_stride(AscendC::Std::Int<c0_value>{}, AscendC::Std::Int<c0_value * fractal_fixed>{}),
+            make_stride(
+                _1{}, AscendC::Std::Int<c0_value>{} *
+                          AscendC::Std::ceil_align(AscendC::Std::Int<m_value>{}, AscendC::Std::Int<fractal_fixed>{}))));
     return make_pattern_layout<nz_layout_ptn, layout_trait_default<data_type>>(shape, stride);
 }
 
@@ -197,8 +209,9 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_zn_to_zn_batch_routes_to_single
     auto src_tensor = make_tensor(make_mem_ptr<location::l1>(src), src_layout);
     auto dst_tensor = make_tensor(make_mem_ptr<location::l0b>(dst), dst_layout);
 
-    MOCKER_CPP(load_cbuf_to_cb, void(__cb__ half*, __cbuf__ half*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t,
-        uint16_t, bool))
+    MOCKER_CPP(
+        load_cbuf_to_cb,
+        void(__cb__ half*, __cbuf__ half*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
         .expects(once())
         .will(invoke(&load_cbuf_to_cb_stub<false, half, 1, batch>));
 
@@ -222,8 +235,9 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_nz_to_zn_batch_routes_to_single
     auto src_tensor = make_tensor(make_mem_ptr<location::l1>(src), src_layout);
     auto dst_tensor = make_tensor(make_mem_ptr<location::l0b>(dst), dst_layout);
 
-    MOCKER_CPP(load_cbuf_to_cb, void(__cb__ half*, __cbuf__ half*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t,
-        uint16_t, bool))
+    MOCKER_CPP(
+        load_cbuf_to_cb,
+        void(__cb__ half*, __cbuf__ half*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
         .expects(exactly(batch))
         .will(invoke(&load_cbuf_to_cb_stub<true, half, 1, 1>));
 
@@ -262,9 +276,10 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_batch_nz_to_zn_b8_b4)
     g_batch_b4_l0b_src_batch_stride = second_src.data().get() - g_batch_b4_l0b_src_base;
     g_batch_b4_l0b_call_index = 0;
 
-    MOCKER_CPP(load_cbuf_to_cb_s4,
-        void(__cb__ fp4x2_e1m2_t*, __cbuf__ fp4x2_e1m2_t*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t,
-            uint16_t, bool))
+    MOCKER_CPP(
+        load_cbuf_to_cb_s4, void(
+                                __cb__ fp4x2_e1m2_t*, __cbuf__ fp4x2_e1m2_t*, uint16_t, uint16_t, uint8_t, uint8_t,
+                                int16_t, uint16_t, bool))
         .times(batch * split_num)
         .will(invoke(&load_cbuf_to_cb_batch_b4_split_stub<fp4x2_e1m2_t, 4, 1, 8, 1, split_num>));
 
@@ -281,46 +296,58 @@ TEST_F(tensor_api_cube_copy_3510, copy_l1_to_l0b_batch_nz_to_zn_b8_b4)
 #define TEST_L1_TO_L0B_CONCAT_IMPL_(name, line) name##line
 #define TEST_L1_TO_L0B_CONCAT_(name, line) TEST_L1_TO_L0B_CONCAT_IMPL_(name, line)
 
-#define TEST_TENSOR_API_LOAD_DATA(data_type, m_value, n_value, src_format, dst_format, src_pos, dst_pos, src_tag, dst_tag, expected_transpose) \
-TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0B_CONCAT_(test_load_data_l1_to_l0b_case_, __LINE__)) { \
-    using namespace asc::te; \
-    __##dst_tag##__ data_type dst[m_value * n_value] = {0}; \
-    auto dst_iterator = make_mem_ptr<location::l0b>(dst); \
-    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value); \
-    auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout); \
- \
-    __##src_tag##__ data_type src[m_value * n_value] = {0}; \
-    auto src_iterator = make_mem_ptr<location::l1>(src); \
-    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value); \
-    auto src_tensor = make_tensor(src_iterator, src_matrix_layout); \
- \
-    constexpr int expected_m_step = (sizeof(data_type) == 1 && expected_transpose) ? 2 : 1; \
-    constexpr int expected_k_step = (sizeof(data_type) == 4 && expected_transpose) ? 2 : 1; \
-    MOCKER_CPP(load_cbuf_to_##dst_tag, void(__##dst_tag##__ data_type*, __cbuf__ data_type*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool)) \
-        .times(1) \
-        .will(invoke(&load_cbuf_to_##dst_tag##_stub<expected_transpose, data_type, expected_m_step, expected_k_step>)); \
-    copy(copy_atom<copy_traits<copy_l1_to_l0b, l1_to_l0b_trait_default>>{}, dst_tensor, src_tensor); \
- \
-    mockcpp::GlobalMockObject::verify(); \
-}
+#define TEST_TENSOR_API_LOAD_DATA(                                                                                    \
+    data_type, m_value, n_value, src_format, dst_format, src_pos, dst_pos, src_tag, dst_tag, expected_transpose)      \
+    TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0B_CONCAT_(test_load_data_l1_to_l0b_case_, __LINE__))               \
+    {                                                                                                                 \
+        using namespace asc::te;                                                                                      \
+        __##dst_tag##__ data_type dst[m_value * n_value] = {0};                                                       \
+        auto dst_iterator = make_mem_ptr<location::l0b>(dst);                                                         \
+        auto dst_matrix_layout =                                                                                      \
+            make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value);       \
+        auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout);                                               \
+                                                                                                                      \
+        __##src_tag##__ data_type src[m_value * n_value] = {0};                                                       \
+        auto src_iterator = make_mem_ptr<location::l1>(src);                                                          \
+        auto src_matrix_layout =                                                                                      \
+            make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value);       \
+        auto src_tensor = make_tensor(src_iterator, src_matrix_layout);                                               \
+                                                                                                                      \
+        constexpr int expected_m_step = (sizeof(data_type) == 1 && expected_transpose) ? 2 : 1;                       \
+        constexpr int expected_k_step = (sizeof(data_type) == 4 && expected_transpose) ? 2 : 1;                       \
+        MOCKER_CPP(                                                                                                   \
+            load_cbuf_to_##dst_tag, void(                                                                             \
+                                        __##dst_tag##__ data_type*, __cbuf__ data_type*, uint16_t, uint16_t, uint8_t, \
+                                        uint8_t, int16_t, uint16_t, bool))                                            \
+            .times(1)                                                                                                 \
+            .will(invoke(                                                                                             \
+                &load_cbuf_to_##dst_tag##_stub<expected_transpose, data_type, expected_m_step, expected_k_step>));    \
+        copy(copy_atom<copy_traits<copy_l1_to_l0b, l1_to_l0b_trait_default>>{}, dst_tensor, src_tensor);              \
+                                                                                                                      \
+        mockcpp::GlobalMockObject::verify();                                                                          \
+    }
 
-#define TEST_TENSOR_API_LOAD_S4_DATA(data_type, m_value, n_value, src_format, dst_format, src_pos, dst_pos, src_tag, dst_tag, expected_transpose) \
-TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0B_CONCAT_(test_load_s4_data_l1_to_l0b_case_, __LINE__)) { \
-    using namespace asc::te; \
-    __##dst_tag##__ data_type dst[m_value * n_value]; \
-    auto dst_iterator = make_mem_ptr<location::l0b>(dst); \
-    auto dst_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value); \
-    auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout); \
- \
-    __##src_tag##__ data_type src[m_value * n_value]; \
-    auto src_iterator = make_mem_ptr<location::l1>(src); \
-    auto src_matrix_layout = make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value); \
-    auto src_tensor = make_tensor(src_iterator, src_matrix_layout); \
- \
-    copy(copy_atom<copy_traits<copy_l1_to_l0b, l1_to_l0b_trait_default>>{}, dst_tensor, src_tensor); \
- \
-    mockcpp::GlobalMockObject::verify(); \
-}
+#define TEST_TENSOR_API_LOAD_S4_DATA(                                                                            \
+    data_type, m_value, n_value, src_format, dst_format, src_pos, dst_pos, src_tag, dst_tag, expected_transpose) \
+    TEST_F(tensor_api_cube_copy_3510, TEST_L1_TO_L0B_CONCAT_(test_load_s4_data_l1_to_l0b_case_, __LINE__))       \
+    {                                                                                                            \
+        using namespace asc::te;                                                                                 \
+        __##dst_tag##__ data_type dst[m_value * n_value];                                                        \
+        auto dst_iterator = make_mem_ptr<location::l0b>(dst);                                                    \
+        auto dst_matrix_layout =                                                                                 \
+            make_frame_layout<MAKE_LAYOUT_TYPE(dst_format), layout_trait_default<data_type>>(m_value, n_value);  \
+        auto dst_tensor = make_tensor(dst_iterator, dst_matrix_layout);                                          \
+                                                                                                                 \
+        __##src_tag##__ data_type src[m_value * n_value];                                                        \
+        auto src_iterator = make_mem_ptr<location::l1>(src);                                                     \
+        auto src_matrix_layout =                                                                                 \
+            make_frame_layout<MAKE_LAYOUT_TYPE(src_format), layout_trait_default<data_type>>(m_value, n_value);  \
+        auto src_tensor = make_tensor(src_iterator, src_matrix_layout);                                          \
+                                                                                                                 \
+        copy(copy_atom<copy_traits<copy_l1_to_l0b, l1_to_l0b_trait_default>>{}, dst_tensor, src_tensor);         \
+                                                                                                                 \
+        mockcpp::GlobalMockObject::verify();                                                                     \
+    }
 
 // l1 -> l0b ZN2ZN非转置，覆盖所有data_type
 TEST_TENSOR_API_LOAD_S4_DATA(fp4x2_e1m2_t, 64, 16, ZN, ZN, L1, L0B, cbuf, cb, false);

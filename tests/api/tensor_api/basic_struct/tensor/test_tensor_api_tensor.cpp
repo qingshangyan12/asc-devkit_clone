@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
@@ -26,8 +26,7 @@ template <typename data_type>
 struct is_tensor_api_global_tensor : AscendC::Std::false_type {};
 
 template <typename engine_type, typename layout_type>
-struct is_tensor_api_global_tensor<asc::te::global_tensor<engine_type, layout_type>>
-    : AscendC::Std::true_type {};
+struct is_tensor_api_global_tensor<asc::te::global_tensor<engine_type, layout_type>> : AscendC::Std::true_type {};
 
 template <typename data_type>
 constexpr bool is_tensor_api_global_tensor_v =
@@ -37,16 +36,15 @@ template <typename data_type>
 struct is_tensor_api_local_tensor : AscendC::Std::false_type {};
 
 template <typename engine_type, typename layout_type>
-struct is_tensor_api_local_tensor<asc::te::local_tensor<engine_type, layout_type>>
-    : AscendC::Std::true_type {};
+struct is_tensor_api_local_tensor<asc::te::local_tensor<engine_type, layout_type>> : AscendC::Std::true_type {};
 
 template <typename data_type>
 constexpr bool is_tensor_api_local_tensor_v =
     is_tensor_api_local_tensor<AscendC::Std::remove_cvref_t<data_type>>::value;
 
 template <typename Dst, typename Src>
-using dispatched_copy_operation = typename asc::te::copy_operation_dispatch_map::template get<
-    AscendC::Std::tuple<Dst, Src>>;
+using dispatched_copy_operation =
+    typename asc::te::copy_operation_dispatch_map::template get<AscendC::Std::tuple<Dst, Src>>;
 
 template <typename tensor_type>
 void expect_tensor_basic_ability(const tensor_type& tensor, uint32_t size)
@@ -64,7 +62,8 @@ TEST_F(tensor_api_tensor_struct, test_local_tensor_struct)
     using namespace asc::te;
 
     __gm__ float data[6] = {0, 1, 2, 3, 4, 5};
-    auto tensor = make_tensor(make_mem_ptr<location::gm>(data), make_frame_layout<nd_layout_ptn, layout_trait_default<float>>(2, 3));
+    auto tensor = make_tensor(
+        make_mem_ptr<location::gm>(data), make_frame_layout<nd_layout_ptn, layout_trait_default<float>>(2, 3));
 
     EXPECT_EQ(tensor.tensor().data(), tensor.data());
     EXPECT_EQ(tensor.engine().begin(), tensor.data());
@@ -191,11 +190,16 @@ TEST_F(tensor_api_tensor_struct, format_traits_support_global_local_and_cv_ref_t
     static_assert(is_satisfied_ptn_format_v<decltype(ub_tensor), nd_ext_layout_ptn>);
     static_assert(is_satisfied_ptn_format_v<const decltype(ub_tensor)&, nd_ext_layout_ptn>);
 
-    using gm_shape_row0 = typename get_n_dim_type<const decltype(gm_tensor)&, attr_info::shape, attr_info::row, 0>::type;
-    using gm_shape_col0 = typename get_n_dim_type<const decltype(gm_tensor)&, attr_info::shape, attr_info::column, 0>::type;
-    using ub_stride_row0 = typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::row, 0>::type;
-    using ub_stride_col0 = typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::column, 0>::type;
-    using ub_stride_col1 = typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::column, 1>::type;
+    using gm_shape_row0 =
+        typename get_n_dim_type<const decltype(gm_tensor)&, attr_info::shape, attr_info::row, 0>::type;
+    using gm_shape_col0 =
+        typename get_n_dim_type<const decltype(gm_tensor)&, attr_info::shape, attr_info::column, 0>::type;
+    using ub_stride_row0 =
+        typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::row, 0>::type;
+    using ub_stride_col0 =
+        typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::column, 0>::type;
+    using ub_stride_col1 =
+        typename get_n_dim_type<const decltype(ub_tensor)&, attr_info::stride, attr_info::column, 1>::type;
 
     static_assert(AscendC::Std::is_same_v<gm_shape_row0, _1>);
     static_assert(AscendC::Std::is_same_v<gm_shape_col0, _1>);
@@ -223,14 +227,14 @@ TEST_F(tensor_api_tensor_struct, row_and_column_stride_support_batch_layouts)
     using namespace asc::te;
 
     auto plain_layout = make_frame_layout<nd_ext_layout_ptn, layout_trait_default<int8_t>>(32, 64);
-    auto plain_batch_layout = make_batch_pattern_layout<nd_ext_layout_ptn, get_layout_trait<decltype(plain_layout)>>(
-        3, plain_layout);
+    auto plain_batch_layout =
+        make_batch_pattern_layout<nd_ext_layout_ptn, get_layout_trait<decltype(plain_layout)>>(3, plain_layout);
     EXPECT_EQ(get_row_stride(plain_layout), get_row_stride(plain_batch_layout));
     EXPECT_EQ(get_column_stride(plain_layout), get_column_stride(plain_batch_layout));
 
     auto fractal_layout = make_frame_layout<nz_layout_ptn, layout_trait_default<int8_t>>(32, 64);
-    auto fractal_batch_layout = make_batch_pattern_layout<nz_layout_ptn, get_layout_trait<decltype(fractal_layout)>>(
-        3, fractal_layout);
+    auto fractal_batch_layout =
+        make_batch_pattern_layout<nz_layout_ptn, get_layout_trait<decltype(fractal_layout)>>(3, fractal_layout);
     EXPECT_EQ(get_row_stride(fractal_layout), get_row_stride(fractal_batch_layout));
     EXPECT_EQ(get_column_stride(fractal_layout), get_column_stride(fractal_batch_layout));
 }
