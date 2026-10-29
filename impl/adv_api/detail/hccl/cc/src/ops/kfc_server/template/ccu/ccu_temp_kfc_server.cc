@@ -13,6 +13,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
+#include "ccu_temp_kfc_all_reduce_nhr_1d_mem2mem.h"
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
@@ -50,6 +51,8 @@ HcclResult InheritKfcServerKernelArg(
         srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherSoleNhr =
         srcName == "CcuKernelKfcAllGatherNHR1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+    const bool isAllReduceSoleNhr =
+        srcName == "CcuKernelKfcAllReduceNHR1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
     const bool isAlltoAllKfcMultiJetty =
         srcName == "CcuKernelKfcAllToAllMesh1DMultiJetty" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAlltoAllMultiJetty =
@@ -101,6 +104,17 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->nhrRank2ChannelIdx = srcArg->rank2ChannelIdx;
     } else if (isAllGatherSoleNhr) {
         const auto* srcArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMem2Mem*>(srcKernel.kernelArg);
+        CHK_PTR_NULL(srcArg);
+        kfcArg->rankSize = srcArg->rankSize;
+        kfcArg->rankId = srcArg->rankId;
+        kfcArg->axisId = srcArg->axisId;
+        kfcArg->axisSize = srcArg->axisSize;
+        kfcArg->opParam = srcArg->opParam;
+        kfcArg->subCommRanks = srcArg->subCommRanks;
+        kfcArg->nhrStepInfoVector = srcArg->stepInfoVector;
+        kfcArg->nhrRank2ChannelIdx = srcArg->rank2ChannelIdx;
+    } else if (isAllReduceSoleNhr) {
+        const auto* srcArg = static_cast<const CcuKernelArgKfcAllReduceNHR1DMem2Mem*>(srcKernel.kernelArg);
         CHK_PTR_NULL(srcArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
@@ -194,10 +208,12 @@ HcclResult CcuTempKfcServer::CalcRes(
         param.algName != nullptr && std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0;
     const bool isAgSoleNhrDynDie =
         param.algName != nullptr && std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0;
+    const bool isArSoleNhrDynDie =
+        param.algName != nullptr && std::strcmp(param.algName, KFC_AR_SOLE_NHR_ALG_NAME) == 0;
     uint32_t soleNhr2DieMissionNum = missionNum;
-    if (isSoleNhr2Die || isAgSoleNhrDynDie) {
-        const char* dynMissionKernelName =
-            isSoleNhr2Die ? "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem" : "CcuKernelKfcAllGatherNHR1DMem2Mem";
+    if (isSoleNhr2Die || isAgSoleNhrDynDie || isArSoleNhrDynDie) {
+        const char* dynMissionKernelName = isSoleNhr2Die ? "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem" :
+            (isAgSoleNhrDynDie ? "CcuKernelKfcAllGatherNHR1DMem2Mem" : "CcuKernelKfcAllReduceNHR1DMem2Mem");
         uint32_t trailingCount = 0;
         for (auto it = resourceRequest.ccuKernelInfos.rbegin(); it != resourceRequest.ccuKernelInfos.rend(); ++it) {
             if (std::strcmp(it->kernelFuncName, dynMissionKernelName) != 0) {
@@ -213,7 +229,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             HCCL_E_PARA);
         soleNhr2DieMissionNum = std::min(trailingCount, KFC_MAX_MISSION_NUM);
     }
-    const uint32_t effectiveMissionNum = (isSoleNhr2Die || isAgSoleNhrDynDie) ? soleNhr2DieMissionNum : missionNum;
+    const uint32_t effectiveMissionNum =
+        (isSoleNhr2Die || isAgSoleNhrDynDie || isArSoleNhrDynDie) ? soleNhr2DieMissionNum : missionNum;
     CHK_PRT_RET(
         resourceRequest.ccuKernelInfos.size() < effectiveMissionNum,
         HCCL_ERROR(
@@ -238,6 +255,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isAllGatherSoleNhr =
             sourceName == "CcuKernelKfcAllGatherNHR1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isAllReduceSoleNhr =
+            sourceName == "CcuKernelKfcAllReduceNHR1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isReduceScatterPeerOnly = sourceName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME &&
@@ -263,7 +282,7 @@ HcclResult CcuTempKfcServer::CalcRes(
                                  isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die);
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
-             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr) ||
+             !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr && !isAllReduceSoleNhr) ||
             !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",

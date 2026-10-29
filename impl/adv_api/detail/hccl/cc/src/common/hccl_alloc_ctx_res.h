@@ -113,6 +113,8 @@ enum class AlgorithmType {
     // 与设备侧 hccl_ccu_v0_def.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
     CcuSchedReduceScatterSoleNHR = 158,
     CcuSchedAllGatherSoleNHR = 159,
+    // 与设备侧 hccl_ccu_v0_def.h 的 AlgorithmType 同值（160，两级拓扑 L1 NHR 中继 AR）
+    CcuSchedAllReduceSoleNHR = 160,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
@@ -132,7 +134,8 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuSchedAllGatherSoleNHR", AlgorithmType::CcuSchedAllGatherSoleNHR},
     {"CcuSchedReduceScatterConcurMeshNHRMultiLink", AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleNHRMultiLink", AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink},
-    {"CcuSchedReduceScatterSoleNHR", AlgorithmType::CcuSchedReduceScatterSoleNHR}};
+    {"CcuSchedReduceScatterSoleNHR", AlgorithmType::CcuSchedReduceScatterSoleNHR},
+    {"CcuSchedAllReduceSoleNHR", AlgorithmType::CcuSchedAllReduceSoleNHR}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);

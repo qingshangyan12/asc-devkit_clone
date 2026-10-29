@@ -222,6 +222,27 @@ enum KfcAllGatherSoleNhrParamIndex : uint32_t {
     KFC_AG_SOLE_NHR_PARAM_NUM = 13,
 };
 
+// SoleNHR（CcuSchedAllReduceSoleNHR）单帧 xnData 布局（9 槽）：
+//  [0]=INPUT 兼作轮次有效哨兵——server 仅检查 param[0] != INVALID_U64（真实地址必不等于）。
+//  token 走 dispatch 的 ctx.token，不占槽；其余 8 参数与 hccl 模板 BuildTaskArgs 布局一致
+//  （input/output/isInputOutputEqual/die0Size/die1Size/die0SliceSize/die1SliceSize/
+//   die0LastSliceSize/die1LastSliceSize）。
+//  D4 双 die：双 mission 共享同一区间（参数相同，kernelArg.axisId 区分实例）。
+// AIV prepare（CcuPrepareForAllReduceSoleNhrM2M）写入、KFC dispatch 逐槽转发、
+// kernel 形参三处索引必须一致。
+enum KfcAllReduceSoleNhrParamIndex : uint32_t {
+    KFC_AR_SOLE_NHR_INPUT = 0,
+    KFC_AR_SOLE_NHR_OUTPUT = 1,
+    KFC_AR_SOLE_NHR_IS_INPUT_OUTPUT_EQUAL = 2,
+    KFC_AR_SOLE_NHR_DIE0_SIZE = 3,
+    KFC_AR_SOLE_NHR_DIE1_SIZE = 4,
+    KFC_AR_SOLE_NHR_DIE0_SLICE_SIZE = 5,
+    KFC_AR_SOLE_NHR_DIE1_SLICE_SIZE = 6,
+    KFC_AR_SOLE_NHR_DIE0_LAST_SLICE_SIZE = 7,
+    KFC_AR_SOLE_NHR_DIE1_LAST_SLICE_SIZE = 8,
+    KFC_AR_SOLE_NHR_PARAM_NUM = 9,
+};
+
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
 enum KfcConcurrentReduceScatterParamIndex : uint32_t {
     KFC_CONCURRENT_RS_OP_ID = 0,
