@@ -32,10 +32,6 @@ constexpr int16_t HALF_MAX_EXP = 31;
 const float HALF_SUBNORMAL_THRESHOLD = std::pow(2, -14);
 } // namespace
 
-static half __hmax_nan(half x, half y) { return half(0); }
-
-static half __hmin_nan(half x, half y) { return half(0); }
-
 template <typename T>
 T __shfl(T var, int32_t src_lane, int32_t width)
 {
@@ -77,6 +73,48 @@ static inline int __popc(unsigned int x)
         x >>= 1;
     }
     return count;
+}
+
+static inline int __ffs(int x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    int lsb = x & (~x + 1);
+    return __builtin_ctz(lsb) + 1;
+}
+
+static inline int __clz(int x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    int lsb = x & (~x + 1);
+    return __builtin_ctz(lsb) + 1;
+}
+
+static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
+{
+    uint32_t a0 = (uint32_t)x;
+    uint32_t a1 = x >> 32;
+    uint32_t b0 = (uint32_t)y;
+    uint32_t b1 = y >> 32;
+
+    uint64_t lo0 = (uint64_t)a0 * b0;
+    uint64_t m1 = (uint64_t)a0 * b1;
+    uint64_t m2 = (uint64_t)a1 * b0;
+    uint64_t hi1 = (uint64_t)a1 * b1;
+
+    uint64_t mid = m1 + m2;
+    uint64_t carry = mid < m1; // mid加法进位
+
+    uint64_t mid_hi = mid >> 32;
+    uint64_t mid_lo = (uint32_t)mid;
+
+    uint64_t t = mid_lo + (lo0 >> 32);
+    uint64_t t_carry = t < mid_lo;
+
+    return hi1 + mid_hi + carry + t_carry;
 }
 
 template <typename T, typename U>

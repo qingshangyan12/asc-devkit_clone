@@ -249,6 +249,13 @@ half half::operator+(const half fp) const
     ret.val = retVal;
     return ret;
 }
+
+half half::operator-(const half fp) const { return half(static_cast<float>(*this) - static_cast<float>(fp)); }
+
+half half::operator*(const half fp) const { return half(static_cast<float>(*this) * static_cast<float>(fp)); }
+
+half half::operator/(const half fp) const { return half(static_cast<float>(*this) / static_cast<float>(fp)); }
+
 half half::operator+=(const half fp)
 {
     val = Fp16Add(val, fp.val);
