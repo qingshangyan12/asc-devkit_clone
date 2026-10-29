@@ -216,7 +216,7 @@ __simd_vf__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubu
                 __ubuf__ U *src1Micro =
                     src1 +
                     (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
-                __ubuf__ T *dstMicro =
+                __ubuf__ T* dstMicro =
                     dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> dstVreg;
                 Reg::RegTensor<U> srcVreg0, srcVreg1;
@@ -249,7 +249,7 @@ __simd_vf__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubu
                 __ubuf__ U *src1Micro =
                     src1 +
                     (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
-                __ubuf__ T *dstMicro =
+                __ubuf__ T* dstMicro =
                     dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> dstVreg;
                 Reg::RegTensor<U> srcVreg0, srcVreg1;
@@ -285,7 +285,7 @@ __simd_vf__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubu
                 __ubuf__ U *src1Micro =
                     src1 +
                     (index * repeatParams.src1RepStride + blkBaseOfMicro * repeatParams.src1BlkStride) * ElePerBlkU;
-                __ubuf__ T *dstMicro =
+                __ubuf__ T* dstMicro =
                     dst + (index * repeatParams.dstRepStride + blkBaseOfMicro * repeatParams.dstBlkStride) * ElePerBlkT;
                 Reg::RegTensor<T> dstVreg;
                 Reg::RegTensor<U> srcVreg0, srcVreg1;
