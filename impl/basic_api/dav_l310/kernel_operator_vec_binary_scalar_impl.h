@@ -217,7 +217,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
     const uint32_t countPerLogicalIter = count;
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
         if constexpr (isNormalMode) {
-           count = countPerLogicalIter;
+            count = countPerLogicalIter;
         }
         if constexpr (isNormalMode && isMaskBitMode && isSetMask) {
             {
@@ -255,8 +255,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
         } else {
             for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
                 if constexpr ((!isNormalMode) || isSetMask) {
-                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(
-                        maskBuf, count);
+                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
                 __ubuf__ T* srcMicro =
@@ -272,7 +271,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                     dstMicro, dstVreg, repeatParams.dstBlkStride, maskReg);
             }
-         }
+        }
     }
 }
 
@@ -402,8 +401,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
         } else {
             for (uint16_t micro = 0; micro < MICRO_NUM_PER_ITER; ++micro) {
                 if constexpr ((!isNormalMode) || isSetMask) {
-                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(
-                        maskBuf, count);
+                    maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 }
                 const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
                 __ubuf__ T* stridedMicro =
@@ -462,7 +460,7 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
             }
             if constexpr (isSetMask) {
-                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 8); 
+                maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 8);
                 ExpandBitMaskToUB<T>(maskArrayStruct.maskArray, maskBuf);
             }
         }
