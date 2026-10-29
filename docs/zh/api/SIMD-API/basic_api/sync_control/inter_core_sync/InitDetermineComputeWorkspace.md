@@ -37,6 +37,15 @@ InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初
 __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename GmPtr, typename UbPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void InitDetermineComputeWorkspace(GmPtr gmWorkspace, UbPtr ubWorkspace)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1** 接口参数说明
@@ -45,6 +54,8 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 | :--- | :--- | :--- |
 | gmWorkspace | 输入 | 多个AIV共享的全局内存，用于存储核间顺序执行的同步状态，位于Global Memory，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。本接口将其中的同步状态初始化为0。 |
 | ubWorkspace | 输入 | 当前AIV的核内缓存，用于在Unified Buffer中暂存待写入`gmWorkspace`的核间同步状态，并保存后续接口使用的同步轮次状态，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)。 |
+
+裸指针形下，`gmWorkspace` / `ubWorkspace` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -65,6 +76,7 @@ $$
 
 - [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，该接口仅对AIV核生效。在AIC核中调用时，接口直接返回，不初始化`gmWorkspace`和`ubWorkspace`。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
+- 裸指针形下，`gmWorkspace` 须为 Global Memory 上的 `int32_t` 地址，`ubWorkspace` 须为 Unified Buffer 上的 `int32_t` 地址，行为与 tensor 形一致。
 
 ## 调用示例<a name="section177231425115410"></a>
 
