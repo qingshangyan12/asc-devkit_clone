@@ -356,7 +356,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllGatherM2M(
-    __gm__ CommonPrepareParamCcu* commParam)
+    const CommonPrepareParamCcu* commParam)
 {
     constexpr uint64_t meshBandwidth = 11U;
     constexpr uint64_t totalBandwidth = 21U;
@@ -373,7 +373,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
-    xnData_[KFC_CONCURRENT_AG_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_CONCURRENT_AG_OP_ID] = GetOpIdLocal(commParam);
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT] = inputBase;
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] = outputBase;
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] = outputStride * ccuParam_.rankId;
@@ -604,7 +604,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentReduceScatterM2M(
-    __gm__ CommonPrepareParamCcu* commParam)
+    const CommonPrepareParamCcu* commParam)
 {
     // 将 hccl InsReduceScatterConcurrentExecutor::OrchestrateLoop 的 host 侧切分搬到 AIV：
     // CCU_SCHED 带宽比 MESH_BW_SCHED:CLOS_BW_SCHED = 10:12，meshSize 按 128B 对齐下取整。
@@ -622,7 +622,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
     // mission0：Mesh 流（紧凑布局 [1..15]，chunk 循环公式同 SoleMesh；NHR 流不占 scratch，全量给 Mesh 流）。
-    xnData_[KFC_CONCURRENT_RS_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_CONCURRENT_RS_OP_ID] = GetOpIdLocal(commParam);
     xnData_[KFC_CONCURRENT_RS_MESH_INPUT] = inputBase;
     xnData_[KFC_CONCURRENT_RS_MESH_OUTPUT] = outputBase;
     xnData_[KFC_CONCURRENT_RS_MESH_SCRATCH] = ccuParam_.scratchAddr;
@@ -670,7 +670,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 // memSlice=CCU_MEMSLICE_SIZE*LOCAL_COPY_MS_PER_LOOP=32K)。
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterSoleNhr2DieM2M(
-    __gm__ CommonPrepareParamCcu* commParam)
+    const CommonPrepareParamCcu* commParam)
 {
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t sliceSize = commParam->count * dataTypeSize; // 每 rank 输出份
@@ -696,7 +696,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t die0LastSliceSize = die0Size;
     const uint64_t die1LastSliceSize = die1Size;
 
-    xnData_[KFC_RS_SOLE_NHR_2DIE_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_RS_SOLE_NHR_2DIE_OP_ID] = GetOpIdLocal(commParam);
     xnData_[KFC_RS_SOLE_NHR_2DIE_INPUT] = inputBase;
     xnData_[KFC_RS_SOLE_NHR_2DIE_OUTPUT] = outputBase;
     xnData_[KFC_RS_SOLE_NHR_2DIE_DIE0_SIZE] = die0Size;

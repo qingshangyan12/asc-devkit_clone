@@ -144,14 +144,14 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
-    __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(const CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForConcurrentAllToAll(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForParallelAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
-    __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(const CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
-    __aicore__ inline void CcuPrepareForReduceScatterSoleNhr2DieM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterSoleNhr2DieM2M(const CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
@@ -183,6 +183,10 @@ private:
     uint8_t handleMissionNum_[HCCL_MAX_HANDLE_ID];
 
     __gm__ CommonPrepareParamCcu* handleParamGM_;
+
+    // concur AG/RS prepare 本地读路径：CommonPrepareImpl/InitCcuParam 与 GM 同步双写，
+    // 仅 CcuPrepareForOp 的两个 concur 分支消费，其余算法不受影响
+    CommonPrepareParamCcu handleParamLocal_[HCCL_MAX_HANDLE_ID];
 
     __gm__ AlltoAllVParamCcu* allToAllVParam_;
 

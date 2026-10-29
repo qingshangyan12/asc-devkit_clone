@@ -73,6 +73,34 @@ __aicore__ inline uint64_t GetOpId(__gm__ CommonPrepareParamCcu* commParam)
            (commType & COMM_TYPE_MASK);
 }
 
+// GetOpId 的本地指针版本：concur AG/RS prepare 影子读路径专用，位域口径须与 GetOpId 保持一致
+__aicore__ inline uint64_t GetOpIdLocal(const CommonPrepareParamCcu* commParam)
+{
+    if (commParam->commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE) {
+        return 0xffffffffffffffff;
+    }
+
+    uint64_t algoType = 0U;
+    uint64_t commType = static_cast<uint64_t>(commParam->commType.prepareType);
+    uint64_t dataType = static_cast<uint64_t>(commParam->dataType);
+    uint64_t outDataType = static_cast<uint64_t>(commParam->dstDataType);
+
+    bool isReduceType = (commParam->commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE) ||
+                        (commParam->commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+                        (commParam->commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+
+    uint64_t reduceType = isReduceType ? static_cast<uint64_t>(commParam->op) : 0U;
+
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient GetOpId algoType:%d outDataType:%d, reduceType:%d, dataType:%d, commType:%d", algoType,
+        outDataType, reduceType, dataType, commType);
+
+    return ((algoType & ALGO_TYPE_MASK) << ALGO_TYPE_SHIFT) |
+           ((outDataType & OUT_DATA_TYPE_MASK) << OUT_DATA_TYPE_SHIFT) |
+           ((reduceType & REDUCE_TYPE_MASK) << REDUCE_TYPE_SHIFT) | ((dataType & DATA_TYPE_MASK) << DATA_TYPE_SHIFT) |
+           (commType & COMM_TYPE_MASK);
+}
+
 __aicore__ inline void AssembleHcclMsgExtForCCU(
     CcuPrepareParam& ccuParam, __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam)
 {

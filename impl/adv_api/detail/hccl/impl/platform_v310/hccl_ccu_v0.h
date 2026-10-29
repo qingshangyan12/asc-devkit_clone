@@ -297,7 +297,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             CcuPrepareForAllGatherSoleNhrM2M(&handleParamGM_[handleId]);
         } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
-            CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
+            CcuPrepareForConcurrentAllGatherM2M(&handleParamLocal_[handleId]);
         } else {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_MESH_PARAM_NUM;
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
@@ -332,10 +332,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR)) {
             // 2die 判定先于 missionNum（其 mission 数为动态 dieNum，勿路由到并发 prepare）
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
-            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
+            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamLocal_[handleId]);
         } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
-            CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
+            CcuPrepareForConcurrentReduceScatterM2M(&handleParamLocal_[handleId]);
         } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
             ccuUsedXnNum_ = 9;
             CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
@@ -398,6 +398,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        // 影子镜像（concur AG/RS 读路径）：tiling 覆盖值须与 GM 一致
+        handleParamLocal_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
+        handleParamLocal_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
+        handleParamLocal_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
         if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
             handleParamGM_[handleId].skipLocalRankCopy = (tilingPtr->skipLocalRankCopy == 1U) ? 1U : 0U;
         }
@@ -474,6 +478,17 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     handleRepeatCnt_[handleId] = commonPrepareParam.repeat;
 
     if (workingFlag_) {
+        // concur AG/RS 影子同步写（与下方 GM 写同源同值，仅两个 concur 分支读）
+        CommonPrepareParamCcu& handleParamLocal = handleParamLocal_[handleId];
+        handleParamLocal.commType.prepareType = commonPrepareParam.commType.prepareType;
+        handleParamLocal.sendBuf = commonPrepareParam.sendBuf;
+        handleParamLocal.recvBuf = commonPrepareParam.recvBuf;
+        handleParamLocal.count = commonPrepareParam.count;
+        handleParamLocal.dataType = commonPrepareParam.dataType;
+        handleParamLocal.dstDataType = commonPrepareParam.dstDataType;
+        handleParamLocal.op = commonPrepareParam.op;
+        handleParamLocal.strideCount = commonPrepareParam.strideCount;
+
         handleParamGM_[handleId].commType.prepareType = commonPrepareParam.commType.prepareType;
         handleParamGM_[handleId].sendBuf = commonPrepareParam.sendBuf;
         handleParamGM_[handleId].recvBuf = commonPrepareParam.recvBuf;
