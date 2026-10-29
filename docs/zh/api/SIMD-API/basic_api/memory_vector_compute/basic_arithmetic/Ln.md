@@ -25,12 +25,6 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id1 -->
 
 ### 传入config的原型
@@ -56,12 +50,6 @@
 <!-- npu="910" id16 -->
 - Atlas训练系列产品：不支持
 <!-- end id16 -->
-<!-- npu="x90" id17 -->
-- Kirin X90处理器系列产品：不支持
-<!-- end id17 -->
-<!-- npu="9030" id18 -->
-- Kirin 9030处理器系列产品：不支持
-<!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln_res.md#id2 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>

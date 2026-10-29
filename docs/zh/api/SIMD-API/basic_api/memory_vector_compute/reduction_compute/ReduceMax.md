@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90处理器系列产品：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030处理器系列产品：支持
-<!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax_res.md#id1 -->
 
 ## 功能说明
@@ -112,12 +106,6 @@
 <!-- npu="910" id15 -->
 - Atlas训练系列产品，支持half。
 <!-- end id15 -->
-<!-- npu="x90" id16 -->
-- Kirin X90处理器系列产品，支持half、float。
-<!-- end id16 -->
-<!-- npu="9030" id17 -->
-- Kirin 9030处理器系列产品，支持half、float。
-<!-- end id17 -->
 
 ## 返回值说明
 
@@ -156,7 +144,7 @@
 - 对于Ascend 950PR&950DT系列产品，因接口内部算法实现不同，无需使用`sharedTmpBuffer`，可以直接传入`src`或者任意大小的`sharedTmpBuffer`。
 <!-- end id23 -->
 
-<!-- npu="A3,910b,910,310p,310b,x90,9030" id24 -->
+<!-- npu="A3,910b,910,310p,310b" id24 -->
 - 针对如下型号，需要使用`sharedTmpBuffer`。
   <!-- npu="A3" id25 -->
   - Atlas A3系列产品
@@ -173,12 +161,6 @@
   <!-- npu="910" id29 -->
   - Atlas训练系列产品
   <!-- end id29 -->
-  <!-- npu="x90" id30 -->
-  - Kirin X90处理器系列产品
-  <!-- end id30 -->
-  <!-- npu="9030" id31 -->
-  - Kirin 9030处理器系列产品
-  <!-- end id31 -->
 <!-- end id24 -->
 
 

@@ -21,12 +21,6 @@
 <!-- npu="910" id6 -->
 - Atlas训练系列产品：不支持
 <!-- end id6 -->
-<!-- npu="x90" id7 -->
-- Kirin X90处理器系列产品：不支持
-<!-- end id7 -->
-<!-- npu="9030" id8 -->
-- Kirin 9030处理器系列产品：不支持
-<!-- end id8 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/Utils-API/tuning_interface/__trap_res.md#id1 -->
 
 ## 功能说明
