@@ -40,6 +40,7 @@ constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME[] = "CcuKernelKfcReduceS
 constexpr char KFC_RS_SOLE_NHR_ALG_NAME[] = "CcuSchedReduceScatterSoleNHRMultiLink";
 constexpr char KFC_RS_SOLE_NHR_2DIE_ALG_NAME[] = "CcuSchedReduceScatterSoleNHR";
 constexpr char KFC_AG_SOLE_NHR_ALG_NAME[] = "CcuSchedAllGatherSoleNHR";
+constexpr char KFC_AR_SOLE_NHR_ALG_NAME[] = "CcuSchedAllReduceSoleNHR";
 
 struct KfcNhrStepInfo {
     uint32_t step = 0;
@@ -77,6 +78,7 @@ enum class KfcServerRole : uint32_t {
     ALL_TO_ALL_CLOS = 8,
     REDUCE_SCATTER_SOLE_NHR_2DIE = 9,
     ALL_GATHER_SOLE_NHR = 10,
+    ALL_REDUCE_SOLE_NHR = 11,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)
@@ -112,6 +114,9 @@ inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex
     }
     if (std::strcmp(algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0) {
         return KfcServerRole::ALL_GATHER_SOLE_NHR;
+    }
+    if (std::strcmp(algName, KFC_AR_SOLE_NHR_ALG_NAME) == 0) {
+        return KfcServerRole::ALL_REDUCE_SOLE_NHR;
     }
     return KfcServerRole::DEFAULT;
 }
