@@ -16,7 +16,6 @@
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "hcomm_primitives.h"
-#include "hcomm_primitives_dl.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
@@ -227,99 +226,6 @@ private:
 
 // 全局缓存管理器实例
 thread_local CommDomainCacheManager g_cacheManager;
-
-// 单层 UBX 方形判定（mesh 数 == clos 数），对齐 hccl all_gather.cc isUbxConcurrentTopo 的
-// CheckMeshNumEqualToClosNum 子条件；devkit 设备侧不链接 selector 库，此处就地实现。
-bool IsUbxConcurrentTopo(const TopoInfoWithNetLayerDetails* topoInfo)
-{
-    if (topoInfo->topoInstDetailsOfLayer.empty()) {
-        return false;
-    }
-    const auto& rankNumMap = topoInfo->topoInstDetailsOfLayer[0].rankNumForTopoType;
-    auto closItr = rankNumMap.find(CommTopo::COMM_TOPO_CLOS);
-    auto meshItr = rankNumMap.find(CommTopo::COMM_TOPO_1DMESH);
-    if (closItr == rankNumMap.end() || closItr->second.empty() || meshItr == rankNumMap.end()
-        || meshItr->second.empty()) {
-        return false;
-    }
-    return closItr->second[0] == meshItr->second[0];
-}
-
-// 对齐 hccl op_common.cc CheckAndSetSymmetricMemory：探测用户输入/输出对称窗口，
-// 全部成功才置 supportSymmetricMemory=true 并记录窗口句柄与偏移；任一失败保持 false。
-// 先无条件复位（host 侧诊断逻辑可能强置过），以设备侧真实探测结果为准。
-void CheckAndSetSymmetricMemory(OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo)
-{
-    param.symMemChecked = true;
-    param.supportSymmetricMemory = false;
-    param.inputSymWindow = nullptr;
-    param.outputSymWindow = nullptr;
-    size_t inputOffset = 0;
-    size_t outputOffset = 0;
-    const u64 dataTypeSize = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
-    const u64 inputSize = param.DataDes.count * dataTypeSize;
-    const u64 outputSize = (param.opType == HcclCMDType::HCCL_CMD_ALLGATHER) ?
-        inputSize * topoInfo->userRankSize : inputSize;
-
-    if (param.inputPtr != nullptr && inputSize > 0) {
-        HcclResult ret = HcclCommSymWinGet(
-            param.hcclComm, param.inputPtr, inputSize, &param.inputSymWindow, &inputOffset);
-        if (ret != HCCL_SUCCESS || param.inputSymWindow == nullptr) {
-            HCCL_INFO(
-                "[CheckAndSetSymmetricMemory] input[%p], size[%llu] does not support symmetric memory, ret[%d].",
-                param.inputPtr, inputSize, static_cast<int>(ret));
-            return;
-        }
-    }
-    if (param.outputPtr != nullptr && outputSize > 0) {
-        HcclResult ret = HcclCommSymWinGet(
-            param.hcclComm, param.outputPtr, outputSize, &param.outputSymWindow, &outputOffset);
-        if (ret != HCCL_SUCCESS || param.outputSymWindow == nullptr) {
-            HCCL_INFO(
-                "[CheckAndSetSymmetricMemory] output[%p], size[%llu] does not support symmetric memory, ret[%d].",
-                param.outputPtr, outputSize, static_cast<int>(ret));
-            return;
-        }
-    }
-    param.supportSymmetricMemory = true;
-    param.inputOffset = inputOffset;
-    param.outputOffset = outputOffset;
-    HCCL_INFO(
-        "[CheckAndSetSymmetricMemory] symmetric memory enabled, inputWindow[%p], outputWindow[%p], "
-        "inputOffset[%llu], outputOffset[%llu].",
-        param.inputSymWindow, param.outputSymWindow, static_cast<unsigned long long>(param.inputOffset),
-        static_cast<unsigned long long>(param.outputOffset));
-}
-
-// 对齐 hccl all_gather.cc 的使能入口条件块（OPBASE + AICPU_TS + 三选一拓扑条件 +
-// UBX 方形小数据让位）。hccl 另有 GetHcommVersion>=9.1.0 版本门，devkit 依赖 dlsym
-// 弱符号兜底（旧 hcomm 无 HcclCommSymWinGet 时探测失败即保持 false，语义等价）。
-void TryEnableAllGatherSymmetricMemory(OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo)
-{
-    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER || topoInfo == nullptr) {
-        return;
-    }
-    if (param.opMode != OpMode::OPBASE || param.engine != CommEngine::COMM_ENGINE_AICPU_TS) {
-        return;
-    }
-    const std::string algNameStr(param.algName);
-    const bool isTwoLevelMeshNhrOmni = algNameStr == "AicpuAllGatherPipeLineMeshNHR"
-        && topoInfo->topoLevelNums == 1 && topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS
-        && !topoInfo->level0PcieMix;
-    const bool isAllGatherConcurrent = algNameStr == "AicpuAllGatherConcurMeshNHR";
-    constexpr u32 UBX_CONCURRENT_MAX_RANK_SIZE = 4;
-    constexpr u64 UBX_ALLGATHER_SYM_DATA_SIZE = 4ULL * 1024 * 1024;
-    bool isUbxConcurrentTopo = false;
-    if (topoInfo->userRankSize <= UBX_CONCURRENT_MAX_RANK_SIZE && topoInfo->topoLevelNums == 1
-        && topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
-        isUbxConcurrentTopo = IsUbxConcurrentTopo(topoInfo);
-    }
-    const u64 inputSize = param.DataDes.count * DATATYPE_SIZE_TABLE[param.DataDes.dataType];
-    if ((!isUbxConcurrentTopo || inputSize >= UBX_ALLGATHER_SYM_DATA_SIZE)
-        && (topoInfo->level0Topo == Level0Shape::MESH_1D || isTwoLevelMeshNhrOmni || isAllGatherConcurrent)) {
-        CheckAndSetSymmetricMemory(param, topoInfo);
-    }
-}
 } // namespace
 
 extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam* param)
@@ -450,11 +356,6 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str());
             return 1;
         }
-
-        // 对称内存使能入口（对齐 hccl all_gather.cc 入口条件块 + op_common.cc CheckAndSetSymmetricMemory）。
-        // hccl 在 host 算子入口（持有用户指针）使能；devkit 用户指针在设备侧 launch 消息中解析
-        // （comm_kfc_open_kernel_adapter），故使能时点收敛到 Orchestrate 之前。
-        TryEnableAllGatherSymmetricMemory(*param, &resCtx.topoInfo);
 
         // 执行算法编排
         if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
