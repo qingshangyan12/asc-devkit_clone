@@ -205,6 +205,9 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
 - Global Memory -> L0A Buffer
     - GM -> A2
 
+针对Ascend 950PR&950DT系列产品，本接口不支持Global Memory到L0A/L0B Buffer的直达通路，需先搬运至L1 Buffer。
+
+
 搬运的数据用于[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)，接口具体介绍请参考：[LoadData（2D矩阵搬运）](../cube_compute_ISASI/cube_compute_load/LoadData_2D.md)。
 
 src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数。
@@ -222,6 +225,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 - Global Memory -> L0B Buffer
     - GM -> B2
+
+针对Ascend 950PR&950DT系列产品，本接口不支持Global Memory到L0A/L0B Buffer的直达通路，需先搬运至L1 Buffer。
+
 
 搬运的数据用于[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)，接口具体介绍请参考：[LoadData（2D矩阵搬运）](../cube_compute_ISASI/cube_compute_load/LoadData_2D.md)。
 

@@ -57,6 +57,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Fill](cube_compute_ISASI/cube_load_aux_config/Fill.md) | 将特定物理存储位置的LocalTensor初始化为某一具体数值。仅支持L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor初始化。 |
+| [InitConstValue（废弃）](cube_compute_ISASI/cube_load_aux_config/InitConstValue.md) | InitConstValue是Fill的旧接口名，行为一致，已不再演进，请改用Fill。 |
 | [SetFmatrix](cube_compute_ISASI/cube_load_aux_config/SetFmatrix.md) | 用于调用LoadData（卷积数据搬运）时设置FeatureMap的属性描述。LoadData（卷积数据搬运）的模板参数isSetFMatrix设置为false时，表示LoadData（卷积数据搬运）传入的FeatureMap的属性将不生效，开发者需要通过该接口进行设置。 |
 | [SetLoadDataBoundary](cube_compute_ISASI/cube_load_aux_config/SetLoadDataBoundary.md) | 设置LoadData（卷积数据搬运）接口所需的L1 Buffer（TPosition: A1/B1）边界值。 |
 | [SetLoadDataRepeat](cube_compute_ISASI/cube_load_aux_config/SetLoadDataRepeat.md) | 用于设置LoadData（卷积数据搬运）接口的repeat参数。设置repeat参数后，可以通过调用一次LoadData（卷积数据搬运）接口完成多个迭代的数据搬运。 |
@@ -566,6 +567,7 @@
 | --- | --- |
 | [Async](tool_interface/execution_mode/Async.md) | Async通过模板函数的方式对这种隔离模式进行了封装，提供了一个统一的接口，用于在不同执行单元（AIC或AIV）下执行特定函数，从而避免在代码中使用硬件条件分支。 |
 | [InitSocState](tool_interface/system_init/InitSocState.md) | 本接口对AI Core的全局状态进行初始化，包括AIC（Cube Core）与AIV（Vector Core）的公共状态及各自特有状态。由于不同产品的实现存在差异，实际执行的初始化项也有所不同。 |
+| [InitOutput（废弃）](tool_interface/system_init/InitOutput.md) | 将GM（Global Memory）上指定长度的数据初始化为指定数值。该接口已废弃，请使用Fill接口替代。 |
 | [Max](tool_interface/NumericLimits_utils/Max.md) | 返回指定数据类型的最大有限值。 |
 | [Lowest](tool_interface/NumericLimits_utils/Lowest.md) | 返回指定数据类型的最低有限值，即满足无其他有限值y符合y < x的有限值x。 |
 | [Min](tool_interface/NumericLimits_utils/Min.md) | 返回指定数据类型的最小有限值。 |

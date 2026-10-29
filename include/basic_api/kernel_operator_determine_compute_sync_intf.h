@@ -33,6 +33,7 @@
 #include "stub_def.h"
 #endif
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
 namespace AscendC {
 /*
  * @ingroup WaitPreBlock
@@ -54,6 +55,37 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
  * @param [in] global memory workspace
  */
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
+/*
+ * @ingroup InitDetermineComputeWorkspace, WaitPreBlock, NotifyNextBlock
+ * @brief Initialize, wait for, and notify the previous compute stage
+ * @param [in] gmWorkspace raw GM pointer to the synchronization workspace
+ * @param [in] ubWorkspace raw UB pointer to the current core's workspace
+ *
+ * These three are NOT a forwarding layer, for the same reason as IBSet / IBWait: their Tensor bodies
+ * drive the workspace through LocalTensor / GlobalTensor *operations* (`GetValue`, `SetValue`,
+ * `DataCopy`, `ubWorkspace[offset]`), which a raw pointer does not carry.  The pointer overloads
+ * re-express the same body on the pointer-level primitives those operations reach; the
+ * operation-by-operation mapping and the equivalence argument are in the definitions in
+ * impl/basic_api/kernel_operator_determine_compute_sync_intf_impl.h.
+ *
+ * The three Tensor declarations above take their workspaces by non-const reference; the pointer
+ * forms take the operands by value (a pointer is a value) and are constrained to at least one raw
+ * pointer operand, so no Tensor call site can become ambiguous.
+ */
+template <
+    typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void InitDetermineComputeWorkspace(GmPtr gmWorkspace, UbPtr ubWorkspace);
+
+template <
+    typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void WaitPreBlock(GmPtr gmWorkspace, UbPtr ubWorkspace);
+
+template <
+    typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void NotifyNextBlock(GmPtr gmWorkspace, UbPtr ubWorkspace);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
