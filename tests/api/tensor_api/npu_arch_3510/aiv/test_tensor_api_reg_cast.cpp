@@ -174,7 +174,7 @@ TEST_F(tensor_api_reg_cast_3510, converts_int16_to_float_without_rounding_or_sat
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg]{};
 
-    cast_one_register<float, int16_to_float_options>(0, dst_data);
+    cast_one_register<float, int16_to_float_options>(static_cast<int16_t>(0), dst_data);
 
     for (float value : dst_data) {
         EXPECT_EQ(value, 0.0F);
