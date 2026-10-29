@@ -50,6 +50,8 @@ __simd_callee__ inline void GatherImpl(RegT& dstReg, RegT& srcReg0, RegU& srcReg
         vselr((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1);
     } else if constexpr (sizeof(ActualT) == 2) {
         vselr((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg0, (RegTensor<uint16_t>&)srcReg1);
+    } else if constexpr (sizeof(ActualT) == 4) {
+        vselr((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1);
     }
 }
 

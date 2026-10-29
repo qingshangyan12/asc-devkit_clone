@@ -538,7 +538,7 @@ using complex64 = AscendC::Complex<float>;
 
 #if defined(__NPU_ARCH__) &&                                                                                     \
         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-         (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
+         (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101)) ||\
     defined(__ASC_NPU_HOST__)
 namespace AscendC {
 template <typename T>
@@ -589,7 +589,7 @@ __aicore__ inline void VF_CALL(Args&&... args)
 {
 #if (                                                                                                  \
     defined(__NPU_ARCH__) &&                                                                           \
-    (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) || \
+    (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101)) || \
     defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__ { funcPtr(args...); }
 #endif
