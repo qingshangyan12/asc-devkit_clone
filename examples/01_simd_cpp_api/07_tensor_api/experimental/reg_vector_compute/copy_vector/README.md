@@ -6,9 +6,11 @@
 以及`GM->UB`通路的左右常量填充场景。场景1至3使用shape为`[32, 32]`的`int8_t`tensor，场景4使用
 shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 32]` 输出。每个场景均做完整输出校验。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR&950DT系列产品
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 样例场景
 
@@ -18,9 +20,10 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 | 2 | UB->GM | DN | 四维 | `make_copy(..., trait)` 后调用 `atom.call(dst, src)` |
 | 3 | UB->UB | NZ | 四维 | 显式 atom 与坐标/shape 区域搬运重载 |
 | 4 | GM->UB | ND | 一维 | `make_shape(1024)`、`make_stride(1)`，走 one-dim copy 路由 |
-| 5 | GM->UB | ND | 四维 | 左填充3个、右填充5个元素，并使用 `asc_set_copy_pad_val` 配置填充值-9 |
+| 5 | GM->UB | ND | 四维 | 左填充3个、右填充5个元素，并通过 `set_copy_pad_val` 配置填充值-9 |
 
 五个场景的 Kernel 均声明为 `__global__ __vector__`。
+
 
 ## 目录结构
 
@@ -40,7 +43,7 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -66,7 +69,7 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
   ./demo
   ```
 
-  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
+  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至5之间的对应值。
 
   使用NPU仿真时，可分别增加以下编译选项：
 

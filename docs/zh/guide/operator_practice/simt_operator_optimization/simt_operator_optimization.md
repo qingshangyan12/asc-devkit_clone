@@ -7,6 +7,7 @@
   - [DCache访问优化](./memory_access/dcache_access.md)
   - [通过类型对齐提升搬运效率](./memory_access/type_alignment_transfer.md)
   - [使用短向量类型提升效率](./memory_access/short_vector_efficiency.md)
+  - [使用SoA布局提升哈希表查找效率](./memory_access/soa_layout_efficiency.md)
 - [执行配置](./execution_config/execution_config.md)
   - [线程块数量配置优化](./execution_config/thread_block_config.md)
   - [合理配置线程数避免寄存器溢出](./execution_config/thread_count_register_overflow.md)

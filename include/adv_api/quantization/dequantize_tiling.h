@@ -23,8 +23,8 @@ namespace AscendC {
  * \brief calculate max and min tmp buffer size for Dequantize interface.
  * \param [in] srcShape: input shape
  * \param [in] typeSize: data type size: sizeof(TYPE)
- * \param [out] maxValue: max size of tmp buffer
- * \param [out] minValue: min size of tmp buffer
+ * \param [out] maxValue: max size of tmp buffer, in bytes
+ * \param [out] minValue: min size of tmp buffer, in bytes
  */
 void GetDequantizeMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);

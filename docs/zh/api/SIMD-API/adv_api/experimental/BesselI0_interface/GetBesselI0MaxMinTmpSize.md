@@ -21,8 +21,8 @@ void GetBesselI0MaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32
 | srcShape | 输入 | 输入的shape信息，参数类型为[AscendC::TensorShape](../../data_structures/TensorShape.md)。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为float，此处应传入4。 |
 | isReuseSource | 输入 | 是否允许修改源操作数，与BesselI0接口的isReuseSource参数保持一致。 |
-| maxValue | 输出 | BesselI0接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。最大空间大小为0表示计算不需要临时空间。 |
-| minValue | 输出 | BesselI0接口能完成计算所需的最小临时空间大小。最小空间大小为0表示计算不需要临时空间。 |
+| maxValue | 输出 | BesselI0接口能完成计算所需的最大临时空间大小，单位为字节，超出该值的空间不会被该接口使用。最大空间大小为0表示计算不需要临时空间。 |
+| minValue | 输出 | BesselI0接口能完成计算所需的最小临时空间大小，单位为字节。最小空间大小为0表示计算不需要临时空间。 |
 
 ## 返回值说明
 

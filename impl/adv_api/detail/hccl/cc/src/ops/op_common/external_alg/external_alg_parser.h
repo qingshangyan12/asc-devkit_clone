@@ -67,7 +67,7 @@ struct ExternalAlgSpec {
     }
 };
 
-// tiling algConfig 四态识别（纯函数；tiling 侧与 mc2 侧共用）:
+// tiling algConfig 三态识别（纯函数；tiling 侧与 mc2 侧共用）:
 //   空串 -> NONE
 //   含 '=' -> LEGACY（HCCL_ALGO 老语法，保持现状拒绝语义，由调用方走默认 selector）
 //   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误，

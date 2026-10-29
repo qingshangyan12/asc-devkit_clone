@@ -21,6 +21,8 @@ if(NOT HCCL_CANN_COMPAT_850)
         ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_ubx.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_ubx_1d.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_pcie_mix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_base_v2.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_two_level.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/topo_match_concurrent_v2.cc
     )
 endif()

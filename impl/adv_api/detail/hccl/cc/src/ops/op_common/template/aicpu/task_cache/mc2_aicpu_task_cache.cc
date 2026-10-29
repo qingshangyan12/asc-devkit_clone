@@ -673,7 +673,7 @@ Mc2TaskCacheReserveResult Mc2AicpuTaskCacheManager::TryReserve(void* comm, const
     const bool bytesFull = tag.size() > maxTagBytes_ - std::min(trackedTagBytes_, maxTagBytes_);
     if (countFull || bytesFull) {
         if (!capacityWarningReported_) {
-            HCCL_RUN_INFO(
+            HCCL_INFO(
                 "[MC2_TASK_CACHE][Capacity] bypass new tags, trackedCount[%zu/%zu], trackedBytes[%zu/%zu].",
                 trackedTagCount_, maxTagCount_, trackedTagBytes_, maxTagBytes_);
             capacityWarningReported_ = true;

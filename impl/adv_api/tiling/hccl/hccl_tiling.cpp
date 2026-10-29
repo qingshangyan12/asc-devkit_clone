@@ -82,6 +82,7 @@ bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
     if (REGISTERED_CCU_ALGORITHMS.count(algConfig) != 0U) {
         return true;
     }
+
     if (algConfig.find('[') == std::string::npos) {
         return false;
     }

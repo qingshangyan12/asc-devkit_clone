@@ -57,14 +57,14 @@ unsigned int meta_group_size() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned int group_size = active.meta_group_size(); // 返回1
+            result[threadIdx.x] = active.meta_group_size(); // 返回1
+        } else {
+            result[threadIdx.x] = 0;
         }
-        ...
     }
     ```
 
@@ -74,13 +74,19 @@ unsigned int meta_group_size() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned int group_size = active.meta_group_size(); // 返回1
+            result[threadIdx.x] = active.meta_group_size(); // 返回1
+        } else {
+            result[threadIdx.x] = 0;
         }
-        ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+```

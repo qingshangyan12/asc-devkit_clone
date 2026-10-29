@@ -104,27 +104,43 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t INPUT_COUNT = 256;
+constexpr uint8_t MUTEX_ID = 0;
+
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t INPUT_COUNT = 300;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (INPUT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_INPUT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr uint32_t BIN_COUNT = 256;
-constexpr uint32_t INPUT_BYTES = INPUT_COUNT * sizeof(uint8_t);
+constexpr uint32_t PADDED_INPUT_BYTES = PADDED_INPUT_COUNT * sizeof(uint8_t);
 constexpr uint32_t OUTPUT_BYTES = BIN_COUNT * sizeof(uint16_t);
 
-__simd_vf__ inline void histogram_vf(__ubuf__ uint16_t* output, __ubuf__ uint8_t* input)
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = INPUT_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
+__simd_vf__ inline void histogram_vf(__ubuf__ uint16_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint8_t src;
     vector_uint16_t dst0;
     vector_uint16_t dst1;
-    vector_bool src_mask = asc_create_mask_b8(PAT_ALL);
     vector_bool dst_mask = asc_create_mask_b16(PAT_ALL);
 
     asc_duplicate_scalar(dst0, static_cast<uint16_t>(0));
     asc_duplicate_scalar(dst1, static_cast<uint16_t>(0));
-    asc_loadalign(src, input);
-    asc_frequency_histogram_bin0(dst0, src, src_mask);
-    asc_frequency_histogram_bin1(dst1, src, src_mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = INPUT_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool src_mask = asc_update_mask_b8(remaining_length);
+        asc_loadalign(src, input + offset);
+        asc_frequency_histogram_bin0(dst0, src, src_mask);
+        asc_frequency_histogram_bin1(dst1, src, src_mask);
+    }
     asc_storealign(output, dst0, dst_mask);
     asc_storealign(output + 128, dst1, dst_mask);
 }
@@ -133,22 +149,28 @@ __global__ __vector__ void asc_frequency_histogram_kernel(__gm__ uint16_t* outpu
                                                            __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t input_local[INPUT_COUNT];
+    __ubuf__ uint8_t input_local[PADDED_INPUT_COUNT];
     __ubuf__ uint16_t output_local[BIN_COUNT];
-    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    histogram_vf(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, PADDED_INPUT_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<histogram_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(INPUT_COUNT);
+    std::vector<uint8_t> input(PADDED_INPUT_COUNT, 0);
     std::vector<uint16_t> output(BIN_COUNT, 0);
     std::vector<uint16_t> expected(BIN_COUNT, 0);
     for (uint32_t i = 0; i < INPUT_COUNT; ++i) {
@@ -160,9 +182,9 @@ int main()
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
     uint16_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), PADDED_INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(input_device, PADDED_INPUT_BYTES, input.data(), PADDED_INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_frequency_histogram_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);

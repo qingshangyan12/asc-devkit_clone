@@ -25,8 +25,8 @@ namespace AscendC {
  * \param [in] srcTypeSize, size of the input data type, in bytes
  * \param [in] accTypeSize, size of the accType data type, in bytes.
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetMeanMaxMinTmpSize(
     const uint32_t n, const uint32_t srcTypeSize, const uint32_t accTypeSize, const bool isReuseSource,

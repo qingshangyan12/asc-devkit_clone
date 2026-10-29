@@ -45,7 +45,7 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | addr | 输入 | 预取指令的Global Memory起始地址。 |
-| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte。 |
+| prefetch_len | 输入 | 预加载指令的长度，单位为2K Byte。 |
 
 ## 返回值说明
 
@@ -177,7 +177,7 @@ __global__ __mix__(1, 2) void MatmulScaleKernel(
         asc_copy_ub2gm_align(output + aiv_index * ELEMENTS_PER_AIV, output_ub, FP32_BYTES_PER_AIV);
     }
 
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 bool CheckResult(const std::vector<float>& matmul_result, const std::vector<float>& output)

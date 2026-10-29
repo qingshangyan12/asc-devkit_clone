@@ -25,7 +25,7 @@ namespace AscendC {
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return min temporary local space size
+ * @return max temporary local space size, in bytes
  */
 uint32_t GetLogSoftMaxMaxTmpSize(
     const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
@@ -35,7 +35,7 @@ uint32_t GetLogSoftMaxMaxTmpSize(
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return min temporary local space size
+ * @return min temporary local space size, in bytes
  */
 uint32_t GetLogSoftMaxMinTmpSize(
     const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);

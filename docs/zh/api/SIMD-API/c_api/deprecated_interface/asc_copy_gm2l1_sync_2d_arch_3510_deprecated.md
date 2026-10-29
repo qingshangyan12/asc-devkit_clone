@@ -1,4 +1,4 @@
-# asc_copy_gm2l1_sync_2d_arch_3510（废弃）
+# asc_copy_gm2l1_sync（NPU架构版本3510，2D矩阵搬运模式，废弃）
 
 ## 产品支持情况
 
@@ -173,7 +173,7 @@ __global__ __cube__ void AscCopyGm2l1TwoDimNzKernel(
     asc_copy_l0c2gm(output, c_l0, N, M, M * CUBE, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 uint16_t ToHalfBits(int32_t value)

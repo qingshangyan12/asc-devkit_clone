@@ -80,6 +80,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_compile_options(ascendc_ut_tensor_api_${product_type} PRIVATE
         -fno-access-control
+        -UASCENDC_DEBUG
         -Werror
     )
 
