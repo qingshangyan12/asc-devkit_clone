@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/atom/cube/copy_l12ub.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -23,15 +23,14 @@
 #define IMPL_TENSOR_API_ATOM_CUBE_COPY_L12UB_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/arch/cube/l1_to_ub/copy.h"
+#include "impl/tensor_api/arch/cube/l1_to_ub/l1_to_ub_copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
 namespace asc {
 namespace te {
 
 template <typename Traits>
-struct copy_traits<copy_l1_to_ub, Traits> : public copy_traits<copy_l1_to_ub, Traits, copy_l1_to_ub, Traits> {
-};
+struct copy_traits<copy_l1_to_ub, Traits> : public copy_traits<copy_l1_to_ub, Traits, copy_l1_to_ub, Traits> {};
 
 template <>
 struct copy_traits<copy_l1_to_ub> : public copy_traits<copy_l1_to_ub, l1_to_ub_trait_default> {};

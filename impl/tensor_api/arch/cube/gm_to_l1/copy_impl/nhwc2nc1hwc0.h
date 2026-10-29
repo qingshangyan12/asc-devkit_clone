@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nhwc2nc1hwc0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -55,17 +55,19 @@ public:
             loop4_src_stride = loop4_src_stride >> 1;
             loop1_src_stride = loop1_src_stride >> 1;
         }
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
-        copy_gm_to_l1_multi_nd2nz_instr::data_copy(dst.data().get(), src.data().get(), nd_num, loop2_dst_stride,
-                                                   loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode,
-                                                   n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
+        copy_gm_to_l1_multi_nd2nz_instr::data_copy(
+            dst.data().get(), src.data().get(), nd_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
+            loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         using type = typename SrcTensor::element_type;
         auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
@@ -85,7 +87,8 @@ public:
         }
         copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, nd_num, 1, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
-            src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
+            static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), n_value, d_value, loop4_src_stride,
+            false, trait.pre_allocation);
     }
 };
 

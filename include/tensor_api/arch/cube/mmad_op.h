@@ -28,9 +28,8 @@ namespace te {
 struct mmad_params {
     __aicore__ constexpr mmad_params(){};
 
-    __aicore__ constexpr mmad_params(uint16_t m, uint16_t n, uint16_t k, unit_flag_mode unit_flag,
-                                      bool init_with_zero) :
-        m(m), n(n), k(k), unit_flag(unit_flag), init_with_zero(init_with_zero){};
+    __aicore__ constexpr mmad_params(uint16_t m, uint16_t n, uint16_t k, unit_flag_mode unit_flag, bool init_with_zero)
+        : m(m), n(n), k(k), unit_flag(unit_flag), init_with_zero(init_with_zero){};
 
     uint16_t m = 0;
     uint16_t n = 0;
@@ -46,19 +45,18 @@ public:
 
 private:
     template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor>
-    __aicore__ inline static void mmad_impl(const CTensor& c, const ATensor& a, const BTensor& b,
-                                            const mmad_params& params);
+    __aicore__ inline static void mmad_impl(
+        const CTensor& c, const ATensor& a, const BTensor& b, const mmad_params& params);
 
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor,
-              typename BiasTensor>
-    __aicore__ inline static void mmad_impl(const CTensor& c, const ATensor& a, const BTensor& b,
-                                            const BiasTensor& bias, const mmad_params& params);
+    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    __aicore__ inline static void mmad_impl(
+        const CTensor& c, const ATensor& a, const BTensor& b, const BiasTensor& bias, const mmad_params& params);
 };
 
 } // namespace te
 } // namespace asc
 
-#include "impl/tensor_api/arch/cube/mmad/mmad.h"
+#include "impl/tensor_api/arch/cube/mmad/mmad_impl.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_CUBE_MMAD_OP_H
 

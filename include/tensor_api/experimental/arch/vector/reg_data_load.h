@@ -28,57 +28,91 @@ namespace te {
 namespace experimental {
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Loads data from a UB tensor at the specified coordinate into one or two register tensors.
- * @param tensor Source tensor located in UB.
- * @param coord Coordinate of the first source element.
+ *
+ * @override_id te_experimental_load__const_Tensor_R_const_Coord_R__template_sideband_mode_Tensor_Coord
+ * @archs 3510
  * @return A register pair for deintlv mode; otherwise, a register tensor.
+ * @param [in] tensor Source tensor located in UB.
+ * @param [in] coord Coordinate of the first source element.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Loads data from the beginning of a UB tensor into one or two register tensors.
- * @param tensor Source tensor located in UB.
+ *
+ * @override_id te_experimental_load__const_Tensor_R__template_sideband_mode_Tensor
+ * @archs 3510
  * @return A register pair for deintlv mode; otherwise, a register tensor.
+ * @param [in] tensor Source tensor located in UB.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor>
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Loads and broadcasts data from a UB tensor at the specified coordinate.
- * @param tensor Source tensor located in UB.
- * @param coord Coordinate of the first source element.
+ *
+ * @override_id te_experimental_load_broadcast__const_Tensor_R_const_Coord_R__template_brc_mode_Tensor_Coord
+ * @archs 3510
  * @return A register tensor populated according to the selected broadcast mode.
+ * @param [in] tensor Source tensor located in UB.
+ * @param [in] coord Coordinate of the first source element.
  */
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const Coord& coord);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Loads and broadcasts data from the beginning of a UB tensor.
- * @param tensor Source tensor located in UB.
+ *
+ * @override_id te_experimental_load_broadcast__const_Tensor_R__template_brc_mode_Tensor
+ * @archs 3510
  * @return A register tensor populated according to the selected broadcast mode.
+ * @param [in] tensor Source tensor located in UB.
  */
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Gathers elements or data blocks from a UB tensor at the specified coordinate.
- * @param tensor Source tensor located in UB.
- * @param coord Coordinate used as the base source position.
- * @param index Register tensor containing the source offsets relative to the base position.
- * @param gather_mask Register mask that selects the values to gather.
+ *
+ * @override_id
+ * te_experimental_load_gather__const_Tensor_R_const_Coord_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Coord_Index
+ * @archs 3510
  * @return A register tensor containing the gathered data.
+ * @param [in] tensor Source tensor located in UB.
+ * @param [in] coord Coordinate used as the base source position.
+ * @param [in] index Register tensor containing the source offsets relative to the base position.
+ * @param [in] gather_mask Register mask that selects the values to gather.
+ * @note The active-lane mask is taken from gather_mask.reg. In element mode, a value of 1 selects the corresponding
+ * element; a value of 0 excludes it. Unselected elements are set to zero in element mode. In datablock mode, mask bits
+ * 0, 4, 8, 12, 16, 20, 24, and 28 select the eight data blocks. The result preserves gather_mask.reg as its active-lane
+ * mask.
  */
 template <gather_mode mode = gather_mode::element, typename Tensor, typename Coord, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(
     const Tensor& tensor, const Coord& coord, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Gathers elements or data blocks from the beginning of a UB tensor.
- * @param tensor Source tensor located in UB.
- * @param index Register tensor containing the source offsets.
- * @param gather_mask Register mask that selects the values to gather.
+ *
+ * @override_id
+ * te_experimental_load_gather__const_Tensor_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Index
+ * @archs 3510
  * @return A register tensor containing the gathered data.
+ * @param [in] tensor Source tensor located in UB.
+ * @param [in] index Register tensor containing the source offsets.
+ * @param [in] gather_mask Register mask that selects the values to gather.
+ * @note The active-lane mask is taken from gather_mask.reg. In element mode, a value of 1 selects the corresponding
+ * element; a value of 0 excludes it. Unselected elements are set to zero in element mode. In datablock mode, mask bits
+ * 0, 4, 8, 12, 16, 20, 24, and 28 select the eight data blocks. The result preserves gather_mask.reg as its active-lane
+ * mask.
  */
 template <gather_mode mode = gather_mode::element, typename Tensor, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
@@ -15,15 +15,9 @@
 
 class tensor_api_cube_copy_l1_to_l0scalea_3510 : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 namespace {
@@ -31,7 +25,8 @@ namespace {
 template <typename location_tag, typename pointer_type, typename layout_type>
 auto make_tensor_at(pointer_type ptr, const layout_type& layout)
 {
-    return asc::te::make_tensor(asc::te::make_mem_ptr<location_tag, fp8_e8m0_t>(reinterpret_cast<uint64_t>(ptr) / 16), layout);
+    return asc::te::make_tensor(
+        asc::te::make_mem_ptr<location_tag, fp8_e8m0_t>(reinterpret_cast<uint64_t>(ptr) / 16), layout);
 }
 
 template <typename copy_operation, typename trait_type, typename dst_tensor_type, typename src_tensor_type>
@@ -74,12 +69,14 @@ constexpr uint32_t k_scalean = 32;
 constexpr uint32_t k_scalea_batch_stride_elem = 512;
 uint32_t g_scalea_call_idx = 0;
 
-void load_cbuf_to_ca_mx_batch_stub(uint64_t dst, __cbuf__ void* src, uint16_t x_start_pos, uint16_t y_start_pos,
-    uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride)
+void load_cbuf_to_ca_mx_batch_stub(
+    uint64_t dst, __cbuf__ void* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
+    uint16_t src_stride, uint16_t dst_stride)
 {
     EXPECT_EQ(dst, g_expected_mx_dst_addr + g_scalea_call_idx * k_scalea_batch_stride_elem);
-    EXPECT_EQ(src, reinterpret_cast<__cbuf__ void*>(
-        reinterpret_cast<fp8_e8m0_t*>(g_expected_mx_src) + g_scalea_call_idx * k_scalea_batch_stride_elem));
+    EXPECT_EQ(
+        src, reinterpret_cast<__cbuf__ void*>(
+                 reinterpret_cast<fp8_e8m0_t*>(g_expected_mx_src) + g_scalea_call_idx * k_scalea_batch_stride_elem));
     EXPECT_EQ(x_start_pos, 0);
     EXPECT_EQ(y_start_pos, 0);
     EXPECT_EQ(x_step, 1);
@@ -89,8 +86,9 @@ void load_cbuf_to_ca_mx_batch_stub(uint64_t dst, __cbuf__ void* src, uint16_t x_
     ++g_scalea_call_idx;
 }
 
-void load_cbuf_to_ca_mx_stride_stub(uint64_t dst, __cbuf__ void* src, uint16_t x_start_pos,
-    uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride)
+void load_cbuf_to_ca_mx_stride_stub(
+    uint64_t dst, __cbuf__ void* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
+    uint16_t src_stride, uint16_t dst_stride)
 {
     EXPECT_EQ(dst, g_expected_mx_dst_addr);
     EXPECT_EQ(src, g_expected_mx_src);
@@ -113,7 +111,8 @@ TEST_F(tensor_api_cube_copy_l1_to_l0scalea_3510, copy_l1_to_l0scalea_routes_to_c
     __cbuf__ fp8_e8m0_t src[m * n] = {0};
     __ca__ fp8_e8m0_t dst[m * n] = {0};
 
-    auto l1_tensor = make_tensor(make_mem_ptr<location::l1>(src), make_frame_layout<zz_layout_ptn, AscendC::Std::Int<2>>(m, n));
+    auto l1_tensor =
+        make_tensor(make_mem_ptr<location::l1>(src), make_frame_layout<zz_layout_ptn, AscendC::Std::Int<2>>(m, n));
     auto dst_ptr = make_mem_ptr<location::l0scalea, fp8_e8m0_t>((reinterpret_cast<uint64_t>(dst)) / 16);
     auto l0a_tensor = make_tensor(dst_ptr, make_frame_layout<zz_layout_ptn, AscendC::Std::Int<2>>(m, n));
 
@@ -144,8 +143,8 @@ TEST_F(tensor_api_cube_copy_l1_to_l0scalea_3510, copy_l1_to_l0scalea_batch)
     g_expected_mx_src = reinterpret_cast<__cbuf__ void*>(src);
     g_scalea_call_idx = 0;
 
-    MOCKER_CPP(load_cbuf_to_ca_mx,
-        void(uint64_t, __cbuf__ void*, uint16_t, uint16_t, uint8_t, uint8_t, uint16_t, uint16_t))
+    MOCKER_CPP(
+        load_cbuf_to_ca_mx, void(uint64_t, __cbuf__ void*, uint16_t, uint16_t, uint8_t, uint8_t, uint16_t, uint16_t))
         .times(batch)
         .will(invoke(&load_cbuf_to_ca_mx_batch_stub));
 
@@ -170,8 +169,8 @@ TEST_F(tensor_api_cube_copy_l1_to_l0scalea_3510, copy_l1_to_l0scalea_stride)
 
     g_expected_mx_dst_addr = reinterpret_cast<uint64_t>(dst) / 16;
     g_expected_mx_src = reinterpret_cast<__cbuf__ void*>(src + layout(make_coord(0, 2)));
-    MOCKER_CPP(load_cbuf_to_ca_mx,
-        void(uint64_t, __cbuf__ void*, uint16_t, uint16_t, uint8_t, uint8_t, uint16_t, uint16_t))
+    MOCKER_CPP(
+        load_cbuf_to_ca_mx, void(uint64_t, __cbuf__ void*, uint16_t, uint16_t, uint8_t, uint8_t, uint16_t, uint16_t))
         .times(1)
         .will(invoke(&load_cbuf_to_ca_mx_stride_stub));
 

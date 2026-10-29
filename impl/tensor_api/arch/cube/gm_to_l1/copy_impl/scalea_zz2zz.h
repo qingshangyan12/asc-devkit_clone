@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/scalea_zz2zz.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -33,16 +33,18 @@ public:
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src)
     {
         if constexpr (SrcTensor::layout_type::depth == five_dim_data) {
-            TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()),
-                                   "copy_gm_to_l1 scalea_zz2zz path");
+            TENSOR_API_DEBUG_CHECK(
+                debug_check_batch_count, get<0>(src.layout().shape()), "copy_gm_to_l1 scalea_zz2zz path");
         }
         data_copy_impl<trait>(dst, src);
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         check_template<trait, DstTensor, SrcTensor>();
         using type = typename SrcTensor::element_type;
@@ -84,11 +86,12 @@ public:
                 auto dst_batch = make_single_batch_sub_tensor(dst, i);
                 copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
                     dst_batch, src, dst_offset, src_offset + i * src_batch_stride, src_shape_rows_b, block_len, 0, 0,
-                    src.engine().get_cache_mode(), src_stride, dst_stride);
+                    static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride);
             } else {
-                copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, src_shape_rows_b,
-                                                                    block_len, 0, 0, src.engine().get_cache_mode(),
-                                                                    src_stride, dst_stride, trait.pre_allocation);
+                copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
+                    dst, src, dst_offset, src_offset, src_shape_rows_b, block_len, 0, 0,
+                    static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+                    trait.pre_allocation);
             }
         }
     }
@@ -108,18 +111,19 @@ private:
         if constexpr (SrcTensor::layout_type::depth == five_dim_data) {
             auto src_layout = src.layout();
             auto dst_layout = dst.layout();
-            emit_copy<trait>(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout),
-                             get<0>(src_layout.shape()), get<0>(src_layout.stride()), get<0>(dst_layout.stride()));
+            emit_copy<trait>(
+                dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), get<0>(src_layout.shape()),
+                get<0>(src_layout.stride()), get<0>(dst_layout.stride()));
         } else {
             emit_copy<trait>(dst, src, src.layout(), dst.layout(), 1, 0, 0);
         }
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout,
-              typename DstLayout>
-    __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t batch_num,
-                                            uint64_t src_batch_stride, uint64_t dst_batch_stride)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout, const DstLayout& dst_layout,
+        uint16_t batch_num, uint64_t src_batch_stride, uint64_t dst_batch_stride)
     {
         using type = typename SrcTensor::element_type;
 
@@ -132,7 +136,7 @@ private:
         auto dst_shape_columns = get_element<attr_info::shape, attr_info::column, 1>(dst_layout);
         auto dst_stride_rows = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
 
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // lprp mode, dst_stride % c0_size should be 0
         // multi rows copy, dst non-contiguous case

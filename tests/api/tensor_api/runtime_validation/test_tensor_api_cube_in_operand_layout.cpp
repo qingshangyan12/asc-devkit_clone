@@ -42,15 +42,9 @@ private:
 
 class TensorApiCubeInputOperandLayoutValidation : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename IteratorType, typename LayoutType>
@@ -69,10 +63,12 @@ void copy_tensor(const DstTensorType& dst, const SrcTensorType& src)
     copy(make_copy(CopyOperationType{}, CopyTraitType{}), dst, src);
 }
 
-template <typename CopyOperationType, typename CopyTraitType, typename SrcIteratorType, typename SrcLayoutType,
-          typename DstIteratorType, typename DstLayoutType>
-void expect_invalid_src_layout(const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout,
-                               const DstIteratorType& dst_iterator, const DstLayoutType& dst_layout)
+template <
+    typename CopyOperationType, typename CopyTraitType, typename SrcIteratorType, typename SrcLayoutType,
+    typename DstIteratorType, typename DstLayoutType>
+void expect_invalid_src_layout(
+    const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout, const DstIteratorType& dst_iterator,
+    const DstLayoutType& dst_layout)
 {
     using namespace asc::te;
     auto src = make_tensor_directly(src_iterator, src_layout);
@@ -80,10 +76,12 @@ void expect_invalid_src_layout(const SrcIteratorType& src_iterator, const SrcLay
     EXPECT_THROW((copy_tensor<CopyOperationType, CopyTraitType>(dst, src)), TrapException);
 }
 
-template <typename CopyOperationType, typename CopyTraitType, typename SrcIteratorType, typename SrcLayoutType,
-          typename DstIteratorType, typename DstLayoutType>
-void expect_invalid_dst_layout(const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout,
-                               const DstIteratorType& dst_iterator, const DstLayoutType& dst_layout)
+template <
+    typename CopyOperationType, typename CopyTraitType, typename SrcIteratorType, typename SrcLayoutType,
+    typename DstIteratorType, typename DstLayoutType>
+void expect_invalid_dst_layout(
+    const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout, const DstIteratorType& dst_iterator,
+    const DstLayoutType& dst_layout)
 {
     using namespace asc::te;
     auto src = make_tensor(src_iterator, src_layout);
@@ -91,11 +89,12 @@ void expect_invalid_dst_layout(const SrcIteratorType& src_iterator, const SrcLay
     EXPECT_THROW((copy_tensor<CopyOperationType, CopyTraitType>(dst, src)), TrapException);
 }
 
-template <typename CopyOperationType, typename SrcIteratorType, typename SrcLayoutType, typename DstIteratorType,
-          typename DstLayoutType, typename ParamType>
-void expect_invalid_src_layout_with(const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout,
-                                    const DstIteratorType& dst_iterator, const DstLayoutType& dst_layout,
-                                    const ParamType& params)
+template <
+    typename CopyOperationType, typename SrcIteratorType, typename SrcLayoutType, typename DstIteratorType,
+    typename DstLayoutType, typename ParamType>
+void expect_invalid_src_layout_with(
+    const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout, const DstIteratorType& dst_iterator,
+    const DstLayoutType& dst_layout, const ParamType& params)
 {
     using namespace asc::te;
     auto src = make_tensor_directly(src_iterator, src_layout);
@@ -103,11 +102,12 @@ void expect_invalid_src_layout_with(const SrcIteratorType& src_iterator, const S
     EXPECT_THROW(copy(make_copy(CopyOperationType{}).with(params), dst, src), TrapException);
 }
 
-template <typename CopyOperationType, typename SrcIteratorType, typename SrcLayoutType, typename DstIteratorType,
-          typename DstLayoutType, typename ParamType>
-void expect_invalid_dst_layout_with(const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout,
-                                    const DstIteratorType& dst_iterator, const DstLayoutType& dst_layout,
-                                    const ParamType& params)
+template <
+    typename CopyOperationType, typename SrcIteratorType, typename SrcLayoutType, typename DstIteratorType,
+    typename DstLayoutType, typename ParamType>
+void expect_invalid_dst_layout_with(
+    const SrcIteratorType& src_iterator, const SrcLayoutType& src_layout, const DstIteratorType& dst_iterator,
+    const DstLayoutType& dst_layout, const ParamType& params)
 {
     using namespace asc::te;
     auto src = make_tensor(src_iterator, src_layout);
@@ -119,16 +119,16 @@ template <typename ElementType>
 auto make_nd_shape_error(int invalid_shape = 0)
 {
     using namespace asc::te;
-    return make_pattern_layout<nd_layout_ptn, layout_trait_default<ElementType>>(make_shape(invalid_shape, 16),
-                                                                                 make_stride(16, _1{}));
+    return make_pattern_layout<nd_layout_ptn, layout_trait_default<ElementType>>(
+        make_shape(invalid_shape, 16), make_stride(16, _1{}));
 }
 
 template <typename ElementType>
 auto make_nd_stride_error()
 {
     using namespace asc::te;
-    return make_pattern_layout<nd_layout_ptn, layout_trait_default<ElementType>>(make_shape(16, 16),
-                                                                                 make_stride(-16, _1{}));
+    return make_pattern_layout<nd_layout_ptn, layout_trait_default<ElementType>>(
+        make_shape(16, 16), make_stride(-16, _1{}));
 }
 
 template <typename ElementType>
@@ -183,16 +183,16 @@ auto make_nc1hwc0_shape_error(int invalid_shape = 0)
 {
     using namespace asc::te;
     using TraitType = get_layout_trait<decltype(make_frame_layout<nc1hwc0_layout_ptn>(1, 2, 5, 5, 16))>;
-    return make_pattern_layout<nc1hwc0_layout_ptn, TraitType>(make_shape(1, 2, invalid_shape, 5, 16),
-                                                              make_stride(800, 400, 80, 16, _1{}));
+    return make_pattern_layout<nc1hwc0_layout_ptn, TraitType>(
+        make_shape(1, 2, invalid_shape, 5, 16), make_stride(800, 400, 80, 16, _1{}));
 }
 
 auto make_nc1hwc0_stride_error()
 {
     using namespace asc::te;
     using TraitType = get_layout_trait<decltype(make_frame_layout<nc1hwc0_layout_ptn>(1, 2, 5, 5, 16))>;
-    return make_pattern_layout<nc1hwc0_layout_ptn, TraitType>(make_shape(1, 2, 5, 5, 16),
-                                                              make_stride(-800, 400, 80, 16, _1{}));
+    return make_pattern_layout<nc1hwc0_layout_ptn, TraitType>(
+        make_shape(1, 2, 5, 5, 16), make_stride(-800, 400, 80, 16, _1{}));
 }
 
 auto make_zz_shape_error(int invalid_shape = 0)
@@ -208,8 +208,9 @@ auto make_zz_stride_error()
 {
     using namespace asc::te;
     using TraitType = get_layout_trait<decltype(make_frame_layout<zz_layout_ptn, _2>(16, 16))>;
-    return make_pattern_layout<zz_layout_ptn, TraitType>(make_shape(make_shape(_16{}, 1), make_shape(_2{}, 8)),
-                                                         make_stride(make_stride(_2{}, -1), make_stride(_1{}, 32)));
+    return make_pattern_layout<zz_layout_ptn, TraitType>(
+        make_shape(make_shape(_16{}, 1), make_shape(_2{}, 8)),
+        make_stride(make_stride(_2{}, -1), make_stride(_1{}, 32)));
 }
 
 auto make_nn_shape_error(int invalid_shape = 0)
@@ -225,8 +226,9 @@ auto make_nn_stride_error()
 {
     using namespace asc::te;
     using TraitType = get_layout_trait<decltype(make_frame_layout<nn_layout_ptn, _2>(16, 16))>;
-    return make_pattern_layout<nn_layout_ptn, TraitType>(make_shape(make_shape(_2{}, 8), make_shape(_16{}, 1)),
-                                                         make_stride(make_stride(_1{}, _32{}), make_stride(_2{}, -1)));
+    return make_pattern_layout<nn_layout_ptn, TraitType>(
+        make_shape(make_shape(_2{}, 8), make_shape(_16{}, 1)),
+        make_stride(make_stride(_1{}, _32{}), make_stride(_2{}, -1)));
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyGM2L1RejectsInvalidSourceAndDestinationLayouts)
@@ -238,18 +240,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyGM2L1RejectsInvalidSourceA
     auto dst_iterator = make_mem_ptr<location::l1>(dst_buffer.data());
     auto valid_layout = make_frame_layout<nd_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, make_nd_shape_error<half>(),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, make_nd_shape_error<half>(-1),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, make_nd_stride_error<half>(),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_shape_error<half>());
-    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_stride_error<half>());
+    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, make_nd_shape_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, make_nd_shape_error<half>(-1), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, make_nd_stride_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_shape_error<half>());
+    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_shape_error<half>(-1));
+    expect_invalid_dst_layout<copy_gm_to_l1, gm_to_l1_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12UBRejectsInvalidSourceAndDestinationLayouts)
@@ -261,18 +263,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12UBRejectsInvalidSourceA
     auto dst_iterator = make_mem_ptr<location::ub>(dst_buffer.data());
     auto valid_layout = make_frame_layout<nd_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, make_nd_shape_error<half>(),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, make_nd_shape_error<half>(-1),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, make_nd_stride_error<half>(),
-                                                                          dst_iterator, valid_layout);
-    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_shape_error<half>());
-    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                          make_nd_stride_error<half>());
+    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, make_nd_shape_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, make_nd_shape_error<half>(-1), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, make_nd_stride_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_shape_error<half>());
+    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_shape_error<half>(-1));
+    expect_invalid_dst_layout<copy_l1_to_ub, l1_to_ub_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nd_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12BTRejectsInvalidSourceAndDestinationLayouts)
@@ -331,18 +333,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0ANormalRejectsInvalid
     auto dst_iterator = make_mem_ptr<location::l0a>(dst_buffer.data());
     auto valid_layout = make_frame_layout<nz_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_nz_shape_error<half>(),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_nz_shape_error<half>(-1),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_nz_stride_error<half>(),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_nz_shape_error<half>());
-    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_nz_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_nz_stride_error<half>());
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_nz_shape_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_nz_shape_error<half>(-1), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_nz_stride_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nz_shape_error<half>());
+    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nz_shape_error<half>(-1));
+    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_nz_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0ATransposeRejectsInvalidSourceAndDestinationLayouts)
@@ -355,18 +357,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0ATransposeRejectsInva
     auto valid_src_layout = make_frame_layout<zn_layout_ptn, half>(16, 16);
     auto valid_dst_layout = make_frame_layout<nz_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_zn_shape_error<half>(),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_zn_shape_error<half>(-1),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, make_zn_stride_error<half>(),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, valid_src_layout,
-                                                                            dst_iterator, make_nz_shape_error<half>());
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_zn_shape_error<half>(), dst_iterator, valid_dst_layout);
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_zn_shape_error<half>(-1), dst_iterator, valid_dst_layout);
+    expect_invalid_src_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, make_zn_stride_error<half>(), dst_iterator, valid_dst_layout);
+    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, valid_src_layout, dst_iterator, make_nz_shape_error<half>());
     expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
         src_iterator, valid_src_layout, dst_iterator, make_nz_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(src_iterator, valid_src_layout,
-                                                                            dst_iterator, make_nz_stride_error<half>());
+    expect_invalid_dst_layout<copy_l1_to_l0a, l1_to_l0a_trait_default>(
+        src_iterator, valid_src_layout, dst_iterator, make_nz_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0AImg2ColRejectsInvalidSourceAndDestinationLayouts)
@@ -382,18 +384,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0AImg2ColRejectsInvali
     params.m_extension = 32;
     params.k_extension = 32;
 
-    expect_invalid_src_layout_with<copy_l1_to_l0a>(src_iterator, make_nc1hwc0_shape_error(), dst_iterator,
-                                                   valid_dst_layout, params);
-    expect_invalid_src_layout_with<copy_l1_to_l0a>(src_iterator, make_nc1hwc0_shape_error(-1), dst_iterator,
-                                                   valid_dst_layout, params);
-    expect_invalid_src_layout_with<copy_l1_to_l0a>(src_iterator, make_nc1hwc0_stride_error(), dst_iterator,
-                                                   valid_dst_layout, params);
-    expect_invalid_dst_layout_with<copy_l1_to_l0a>(src_iterator, valid_src_layout, dst_iterator,
-                                                   make_nz_shape_error<int16_t>(), params);
-    expect_invalid_dst_layout_with<copy_l1_to_l0a>(src_iterator, valid_src_layout, dst_iterator,
-                                                   make_nz_shape_error<int16_t>(-1), params);
-    expect_invalid_dst_layout_with<copy_l1_to_l0a>(src_iterator, valid_src_layout, dst_iterator,
-                                                   make_nz_stride_error<int16_t>(), params);
+    expect_invalid_src_layout_with<copy_l1_to_l0a>(
+        src_iterator, make_nc1hwc0_shape_error(), dst_iterator, valid_dst_layout, params);
+    expect_invalid_src_layout_with<copy_l1_to_l0a>(
+        src_iterator, make_nc1hwc0_shape_error(-1), dst_iterator, valid_dst_layout, params);
+    expect_invalid_src_layout_with<copy_l1_to_l0a>(
+        src_iterator, make_nc1hwc0_stride_error(), dst_iterator, valid_dst_layout, params);
+    expect_invalid_dst_layout_with<copy_l1_to_l0a>(
+        src_iterator, valid_src_layout, dst_iterator, make_nz_shape_error<int16_t>(), params);
+    expect_invalid_dst_layout_with<copy_l1_to_l0a>(
+        src_iterator, valid_src_layout, dst_iterator, make_nz_shape_error<int16_t>(-1), params);
+    expect_invalid_dst_layout_with<copy_l1_to_l0a>(
+        src_iterator, valid_src_layout, dst_iterator, make_nz_stride_error<int16_t>(), params);
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0BNormalRejectsInvalidSourceAndDestinationLayouts)
@@ -405,18 +407,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0BNormalRejectsInvalid
     auto dst_iterator = make_mem_ptr<location::l0b>(dst_buffer.data());
     auto valid_layout = make_frame_layout<zn_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_zn_shape_error<half>(),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_zn_shape_error<half>(-1),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_zn_stride_error<half>(),
-                                                                            dst_iterator, valid_layout);
-    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_zn_shape_error<half>());
-    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_zn_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, valid_layout, dst_iterator,
-                                                                            make_zn_stride_error<half>());
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_zn_shape_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_zn_shape_error<half>(-1), dst_iterator, valid_layout);
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_zn_stride_error<half>(), dst_iterator, valid_layout);
+    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_zn_shape_error<half>());
+    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_zn_shape_error<half>(-1));
+    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, valid_layout, dst_iterator, make_zn_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0BTransposeRejectsInvalidSourceAndDestinationLayouts)
@@ -429,18 +431,18 @@ TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0BTransposeRejectsInva
     auto valid_src_layout = make_frame_layout<nz_layout_ptn, half>(16, 16);
     auto valid_dst_layout = make_frame_layout<zn_layout_ptn, half>(16, 16);
 
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_nz_shape_error<half>(),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_nz_shape_error<half>(-1),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, make_nz_stride_error<half>(),
-                                                                            dst_iterator, valid_dst_layout);
-    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, valid_src_layout,
-                                                                            dst_iterator, make_zn_shape_error<half>());
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_nz_shape_error<half>(), dst_iterator, valid_dst_layout);
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_nz_shape_error<half>(-1), dst_iterator, valid_dst_layout);
+    expect_invalid_src_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, make_nz_stride_error<half>(), dst_iterator, valid_dst_layout);
+    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, valid_src_layout, dst_iterator, make_zn_shape_error<half>());
     expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
         src_iterator, valid_src_layout, dst_iterator, make_zn_shape_error<half>(-1));
-    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(src_iterator, valid_src_layout,
-                                                                            dst_iterator, make_zn_stride_error<half>());
+    expect_invalid_dst_layout<copy_l1_to_l0b, l1_to_l0b_trait_default>(
+        src_iterator, valid_src_layout, dst_iterator, make_zn_stride_error<half>());
 }
 
 TEST_F(TensorApiCubeInputOperandLayoutValidation, CopyL12L0ScaleARejectsInvalidSourceAndDestinationLayouts)

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -54,9 +54,6 @@ inline constexpr bool is_b32_type_v = AscendC::Std::is_one_of_v<T, int32_t, uint
 template <typename T>
 inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t>;
 
-template <typename T>
-using get_reg_data_type = AscendC::Std::conditional_t<AscendC::Std::is_same_v<T, int4b_t>, int4x2_t, T>;
-
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)
 {
@@ -69,6 +66,9 @@ __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vect
         return dst;
     }
 }
+
+template <typename T>
+using get_reg_data_type = AscendC::Std::conditional_t<AscendC::Std::is_same_v<T, int4b_t>, int4x2_t, T>;
 
 template <typename T>
 inline constexpr bool supports_float_math_v = ::AscendC::Std::is_one_of_v<T, half, float>;

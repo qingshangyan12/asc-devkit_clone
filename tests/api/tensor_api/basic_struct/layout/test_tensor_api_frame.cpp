@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
@@ -131,11 +131,16 @@ TEST_F(tensor_api_frame_layout, batch_frame_layout_trait_forms)
     using nz_trait_with_default = get_layout_trait<decltype(nz_layout_with_trait)>;
     using nz_trait_with_data_type = get_layout_trait<decltype(nz_layout_with_data_type)>;
     using nz_compat_trait = get_layout_trait<decltype(nz_layout_with_compat_trait)>;
-    static_assert(nz_trait_with_default::c0_element == _8{}, "layout_trait_default<data_type> should only be used to infer c0_value.");
-    static_assert(nz_trait_with_data_type::c0_element == _8{}, "Data type argument should only be used to infer c0_value.");
-    static_assert(AscendC::Std::is_same_v<nz_compat_trait, layout_trait<float, _8>>,
+    static_assert(
+        nz_trait_with_default::c0_element == _8{},
+        "layout_trait_default<data_type> should only be used to infer c0_value.");
+    static_assert(
+        nz_trait_with_data_type::c0_element == _8{}, "Data type argument should only be used to infer c0_value.");
+    static_assert(
+        AscendC::Std::is_same_v<nz_compat_trait, layout_trait<float, _8>>,
         "layout_trait<data_type, c0_value> should remain source-compatible.");
-    static_assert(nz_compat_trait::c0_element == _8{}, "layout_trait<data_type, c0_value> should use c0_value as layout trait.");
+    static_assert(
+        nz_compat_trait::c0_element == _8{}, "layout_trait<data_type, c0_value> should use c0_value as layout trait.");
 
     EXPECT_EQ(AscendC::Std::get<0>(get_shape(nd_layout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(get_stride(nd_layout)), 128);
@@ -257,7 +262,6 @@ TEST_F(tensor_api_frame_layout, nd_and_dn_group_integral_constant_trait)
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(get_stride(dn_ext_layout))), 8);
 }
 
-
 TEST_F(tensor_api_frame_layout, scale_group_trait_with_type_and_c0_element)
 {
     using namespace asc::te;
@@ -362,7 +366,6 @@ TEST_F(tensor_api_frame_layout, other_group_trait_with_type)
     EXPECT_EQ(AscendC::Std::get<1>(get_shape<1>(nn_layout)), 2);
 }
 
-
 TEST_F(tensor_api_frame_layout, other_group_with_data_type)
 {
     using namespace asc::te;
@@ -392,7 +395,6 @@ TEST_F(tensor_api_frame_layout, other_group_with_data_type)
     EXPECT_EQ(AscendC::Std::get<0>(get_shape<1>(nn_layout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(get_shape<1>(nn_layout)), 2);
 }
-
 
 TEST_F(tensor_api_frame_layout, other_group_with_c0_element)
 {

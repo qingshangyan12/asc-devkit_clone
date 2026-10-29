@@ -18,15 +18,9 @@ using tensor_api_runtime_validation::TrapException;
 
 class TensorApiCubeRuntimeValidation : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename LocationType, typename PointerType, typename LayoutType>
@@ -108,8 +102,8 @@ TEST_F(TensorApiCubeRuntimeValidation, CopyL12BTRejectsDestinationSmallerThanCop
     auto src_tensor = make_tensor_at<location::l1>(src, make_frame_layout<nd_ext_layout_ptn, float>(16, 64));
     auto dst_tensor = make_tensor_at<location::bias>(dst, make_frame_layout<nd_ext_layout_ptn, float>(8, 64));
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW(
+        (copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 TEST_F(TensorApiCubeRuntimeValidation, CopyL12FBRejectsDestinationSmallerThanCopyData)
@@ -121,8 +115,7 @@ TEST_F(TensorApiCubeRuntimeValidation, CopyL12FBRejectsDestinationSmallerThanCop
     auto src_tensor = make_tensor_at<location::l1>(src, make_frame_layout<nd_ext_layout_ptn, uint64_t>(8, 64));
     auto dst_tensor = make_tensor_at<location::fixbuf>(dst, make_frame_layout<nd_ext_layout_ptn, uint64_t>(4, 64));
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW((copy_tensor<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 TEST_F(TensorApiCubeRuntimeValidation, CopyL12L0ARejectsDestinationSmallerThanCopyData)
@@ -159,8 +152,8 @@ TEST_F(TensorApiCubeRuntimeValidation, CopyL12L0ScaleARejectsDestinationSmallerT
     auto dst_pointer = make_mem_ptr<location::l0scalea, fp8_e8m0_t>(reinterpret_cast<uint64_t>(dst) / 16);
     auto dst_tensor = make_tensor(dst_pointer, make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(16, 32));
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW(
+        (copy_tensor<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 TEST_F(TensorApiCubeRuntimeValidation, CopyL12L0ScaleBRejectsDestinationSmallerThanCopyData)
@@ -173,8 +166,8 @@ TEST_F(TensorApiCubeRuntimeValidation, CopyL12L0ScaleBRejectsDestinationSmallerT
     auto dst_pointer = make_mem_ptr<location::l0scaleb, fp8_e8m0_t>(reinterpret_cast<uint64_t>(dst) / 16);
     auto dst_tensor = make_tensor(dst_pointer, make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(16, 32));
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW(
+        (copy_tensor<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 TEST_F(TensorApiCubeRuntimeValidation, CopyL0C2GMRejectsDestinationSmallerThanCopyData)
@@ -255,8 +248,8 @@ TEST_F(TensorApiCubeRuntimeValidation, CopyL12BTRejectsUnalignedBatchColumnSize)
     auto src_tensor = make_tensor_at<location::l1>(src, make_frame_layout<nd_layout_ptn, float>(batch, 1, columns));
     auto dst_tensor = make_tensor_at<location::bias>(dst, make_frame_layout<nd_layout_ptn, float>(batch, 1, columns));
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW(
+        (copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 TEST_F(TensorApiCubeRuntimeValidation, CopyL12L0ARejectsInvalidImg2ColStartPoint)
