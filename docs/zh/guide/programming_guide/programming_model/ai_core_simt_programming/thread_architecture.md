@@ -17,6 +17,7 @@ Thread Block由若干线程组成（最大2048个线程），使用内置变量[
 -   同一Thread Block内的线程可以访问共享内存实现数据交互；
 -   Thread Block内的线程可通过同步机制实现协作；
 
+
 **Grid（线程块网格）**
 
 Grid是SIMT线程层次结构的最顶层，由多个Thread Block组成。使用内置变量[gridDim](../../language_extension/simt_builtin_keywords.md#li20760123812911)来表示Grid在各维度上的线程块数量，并有以下特征：

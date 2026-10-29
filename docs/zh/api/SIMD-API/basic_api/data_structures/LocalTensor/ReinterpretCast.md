@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/ReinterpretCast_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 将当前Tensor重解释为用户指定的新类型，转换后的Tensor与原Tensor地址及内容完全相同，Tensor的大小（字节数）保持不变。
@@ -71,6 +72,7 @@ __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const
 for (int32_t i = 0; i < 16; ++i) {
     inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
 }
+
 
 // 调用ReinterpretCast将input_local重解释为int16_t类型
 AscendC::LocalTensor<int16_t> interpreTensor = inputLocal.ReinterpretCast<int16_t>();

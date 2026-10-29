@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/RpSort16_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals。

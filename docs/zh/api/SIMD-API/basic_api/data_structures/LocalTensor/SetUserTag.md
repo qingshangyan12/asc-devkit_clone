@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetUserTag_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 为Tensor添加用户自定义信息，用户可以根据需要设置对应的Tag。后续可通过[GetUserTag](GetUserTag.md)获取指定Tensor的Tag信息，并根据Tag信息对Tensor进行相应操作。

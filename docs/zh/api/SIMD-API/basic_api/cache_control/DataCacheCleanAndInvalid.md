@@ -79,6 +79,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 > 对于Atlas推理系列产品AI Core，仅支持不配置dcciDst参数的原型。
 <!-- end id14 -->
 
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明

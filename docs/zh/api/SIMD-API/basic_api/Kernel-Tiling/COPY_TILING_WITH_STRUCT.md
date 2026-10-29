@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/COPY_TILING_WITH_STRUCT_res.md#id1 -->
 
+
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
 拷贝Tiling结构体，并返回指向拷贝后的Tiling结构体的指针。该宏适用于嵌套结构体场景，可拷贝结构体的子结构体成员变量。该宏将指定结构体拷贝至栈上，适用于频繁访问Tiling数据的场景，能够加快数据访问速度。

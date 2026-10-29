@@ -105,6 +105,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 |动态库编译|bisheng **-shared** <source_file>.asc -o \<output_file\>**.so** --npu-arch=dav-\<npu architecture\> **-fPIC**| bisheng **-shared** <source_file>.asc -o <output_file>**.so** --npu-arch=dav-\<npu architecture\> **--enable-simt** **-fPIC**|
 |静态库编译|bisheng **-lib** <source_file>.asc -o \<output_file\>**.a** --npu-arch=dav-\<npu architecture\>| bisheng **-lib** <source_file>.asc -o <output_file>**.a** --npu-arch=dav-\<npu architecture\> **--enable-simt**|
 
+
 ## 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
 
 | 选项 | 是否必需 | 说明 |
@@ -187,6 +188,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 ><!-- npu="950" id7 -->
 >- 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
 ><!-- end id7 -->
+
 
 ## CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
 
@@ -323,6 +325,7 @@ add_executable(demo
      ```
      该选项仅在Ascend 950PR&950DT系列产品上支持，且用于保证CANN 9.2.0之前版本开发的算子在SIMT API实现变更后仍保持兼容；在CANN 9.2.0版本之后开发的算子不推荐使用该选项。
  <!-- end id20 -->
+
 
 ### 内置链接库<a name="section57020345148"></a>
 

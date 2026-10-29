@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/histogram_compute/Histograms_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_histograms_intf.h"`。

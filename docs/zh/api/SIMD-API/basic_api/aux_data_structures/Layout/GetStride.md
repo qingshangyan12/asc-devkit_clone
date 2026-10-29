@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/GetStride_res.md#id1 -->
 
+
 ## 功能说明<a name="zh-cn_topic_0000002042526794_zh-cn_topic_0000001602767550_zh-cn_topic_0000001600123102_section36583473819"></a>
 
 返回描述内存访问步长的Stride对象，与Shape的维度信息一一对应。

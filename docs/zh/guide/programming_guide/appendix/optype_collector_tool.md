@@ -52,6 +52,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 本文中的`{soc_version}`表示AI处理器的型号。
 
+
 -   配置说明如下：
 
     >[!NOTE]说明 

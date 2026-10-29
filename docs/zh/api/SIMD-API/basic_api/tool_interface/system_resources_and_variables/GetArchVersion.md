@@ -25,6 +25,7 @@
 <!-- end id4 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetArchVersion_res.md#id1 -->
 
+
 ## 功能说明
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。

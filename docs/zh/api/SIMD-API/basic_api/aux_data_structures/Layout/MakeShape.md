@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/MakeShape_res.md#id1 -->
 
+
 ## 功能说明<a name="section530317554214"></a>
 
 将传入的数据打包成Shape数据结构。

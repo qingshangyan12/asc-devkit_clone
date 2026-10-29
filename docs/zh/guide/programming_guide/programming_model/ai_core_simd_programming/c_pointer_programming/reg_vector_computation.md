@@ -79,6 +79,8 @@ AIV的内存层级如下：
 4. **搬入非对齐寄存器**：辅助Reg矢量搬运单元将UB数据搬入到矢量计算寄存器，用于临时存储包含源非对齐UB地址数据的，起始对齐UB地址的1个DataBlock长度的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将UB数据搬入非对齐寄存器。
 5. **搬出非对齐寄存器**：辅助Reg矢量搬运单元将矢量计算寄存器数据搬出到UB，用于临时存储包含需写出非对齐UB地址的对应的矢量寄存器的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将搬出非对齐寄存器数据搬出到UB。
 
+
+
 ## 编程模型<a name="section_part3"></a>
 
 ### 总体结构
@@ -119,6 +121,8 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，�
 
 - **外层`__aicore__`代码**：完成核外GM数据交互等准备工作，并通过`asc_vf_call`调用VF函数。
 - **内层`__simd_vf__`代码**：完成UB与寄存器之间的搬运以及寄存器上的矢量计算。
+
+
 
 调用VF函数的典型骨架如下：
 
@@ -164,6 +168,7 @@ for (i = 0; i < repeat_times; ++i) {
 
 在[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)中，矢量数据寄存器宽度为VL = 256B，按数据类型解释其中元素数量。
 
+
 | 位宽      | 矢量数据类型| 元素数 |
 | --------- | --------- | --------- |
 | b8        | vector_hifloat8_t/vector_fp8_e4m3fn_t/vector_fp8_e5m2_t/vector_fp8_e8m0_t/vector_fp4x2_e1m2_t | 256 |
@@ -173,6 +178,7 @@ for (i = 0; i < repeat_times; ++i) {
 | b64       | vector_int64_t/vector_uint64_t | 32 |
 
 在代码中矢量数据寄存器使用的方式如下：
+
 
 ```cpp
 // Allocate vector data register with float data type
@@ -188,6 +194,8 @@ asc_load(src0_reg, src_addr);
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
 
+
+
 #### 掩码寄存器
 
 `vector_bool`宽度为`VL/8`。最小对应关系为1bit掩码对应1Byte数据；当数据位宽大于1Byte时，由每个N bytes元素（例如float是4Bytes）对应Nbits位置中的LSB（最低位）bit生效。如下表格中对应矢量数据不同元素宽度时，元素生效索引对应`vector_bool`中bit关系。例如：b32的数据对应`vector_bool`的第0/4/8/12/... bit生效，对应矢量数据寄存器中的b32的第0/1/2/3/..个元素。
@@ -198,6 +206,8 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 | b16                 | 0       | -       | 1       | -       | 2       | -       | 3       | -       | 4       | -       | 5        | -        | 6        | ...  |
 | b32                 | 0       | -       | -       | -       | 1       | -       | -       | -       | 2       | -       | -        | -        | 3        | ...  |
 | b64                 | 0       | -       | -       | -       | -       | -       | -       | -       | -       | 1       | -        | -        | -        | ...  |
+
+
 
 `vector_bool`既可作为计算接口的掩码输入，也可作为bit级元素承载比较类运算的结果和参与移位、逻辑、交织等计算，还可以作为搬入/搬出接口的目的/源参数。
 
@@ -216,6 +226,8 @@ vector_bool mask = asc_update_mask_b32(remainCount);
 // Use vector_bool mask_reg as mask to control valid elements in computation
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
+
+
 
 当用作1bit元素参与运算时，支持vector_* 和vector_bool的混合计算以及vector_bool和vector_bool的计算
 
@@ -664,6 +676,8 @@ VF融合可以分成两个层级：
 如果计算链路过长，也可以适度拆分VF循环、必要时将阶段性结果写回UB，以换取更好的指令调度空间。同时需要控制VF内寄存器数量：一个VF中可同时使用的`vector_*`、`vector_bool`、`vector_load_unalign`、`vector_store_unalign`数量都受硬件规格限制，超出后编译器会插入换入换出和同步指令，反而降低性能。
 
 >📌 **提示**：优化手段可以参考[指令双发优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/dual_issue_optimization.md)。
+
+
 
 ## 小结<a name="section_part7"></a>
 

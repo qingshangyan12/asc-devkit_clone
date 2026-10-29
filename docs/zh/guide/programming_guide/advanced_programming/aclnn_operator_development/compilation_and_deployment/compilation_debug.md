@@ -22,6 +22,7 @@ build_out/autogen/
 └── ...
 ```
 
+
 ### 常见问题排查场景
 
 | 问题 | 查看什么 |
@@ -58,6 +59,7 @@ cmake --build build_out --target binary package --verbose -j$(nproc)
 [ 30%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_add_custom.cpp.o
 cd /data/asc-devkit/AddCustom/build_out/op_host && /usr/bin/c++ -D_FORTIFY_SOURCE=2 -D_GLIBCXX_USE_CXX11_ABI=0 -I/usr/local/Ascend/cann-9.1.0/include -fvisibility=hidden -fPIC -fvisibility-inlines-hidden -O2 -fstack-protector-strong -MD -MT op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_add_custom.cpp.o -MF CMakeFiles/cust_opapi.dir/__/autogen/aclnn_add_custom.cpp.o.d -o CMakeFiles/cust_opapi.dir/__/autogen/aclnn_add_custom.cpp.o -c /data/asc-devkit/AddCustom/build_out/autogen/aclnn_add_custom.cpp
 ```
+
 
 每行输出包含完整的编译器调用，可以看到：
 - 实际的编译器路径（如`/usr/bin/c++`）。
@@ -119,6 +121,7 @@ build_out/op_kernel/AddCustom_ascendxxyy/kernel_*/kernel_meta_<kernel_name>/kern
 - **目标文件**（`.o`）：链接前的目标文件，可用于确认符号是否正确导出。
 - **编译日志**（`.log`）：单个核函数（Kernel）的编译日志，可用于查看编译器调用和诊断信息。
 - **生成源码**（`*_kernel.cpp`、`*_tiling_data.h`等）：编译框架生成的核函数（Kernel）源码和Tiling数据结构文件。
+
 
 ### 常见问题排查场景
 

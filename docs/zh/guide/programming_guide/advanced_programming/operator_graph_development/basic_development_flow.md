@@ -61,6 +61,7 @@ static graphStatus InferDataType(gert::InferDataTypeContext *context)
 }
 } // namespace ge
 
+
 namespace ops {
 class AddCustom : public OpDef {
 public:

@@ -20,6 +20,7 @@ RTC是Ascend C运行时编译库，通过[aclrtc](../../../../api/Utils-API/RTC/
 
 如下样例演示了如何使用aclrtc接口编译并运行一个核函数（Kernel），该核函数（Kernel）中调用了printf进行打印。完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/05_aclrtc/rtc_hello_world/README.md)。
 
+
 ```c++
 #include <cstdio>
 #include <vector>

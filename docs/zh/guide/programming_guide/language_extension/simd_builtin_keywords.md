@@ -480,11 +480,14 @@ __ubuf__ int * __gm__ ptr;
 | sub_block_num | 组合中当前类型的核的数量。 | 非内置变量，通过[GetSubBlockNum](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockNum_ISASI.md)或[asc_get_sub_block_num](../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md)获取。 |
 | sub_block_idx | 当前核在组合内的位置。 | 非内置变量，通过[GetSubBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockIdx_ISASI.md)或[asc_get_sub_block_id](../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)获取。 |
 
+
+
 在多核切分场景中，需要得到每个核的真实逻辑位置（logic_idx），不同执行场景下，上述变量的取值不同，对应logic_idx的计算方式不同。Mix场景下，一个组合由1个Cube Core（AIC）和若干个Vector Core（AIV）组成，组合内每个AIV的block_idx相同，因此组合内有多个AIV核时，不能仅通过block_idx定位，还需结合sub_block_idx，计算公式如下：
 
 $$
 \text{logic\_idx} = \text{block\_idx} \times \text{sub\_block\_num} + \text{sub\_block\_idx}
 $$
+
 
 下表以$\text{block\_num} = 4$为例，介绍不同场景下各个变量的取值以及logic_idx的计算方式（使用基础API [GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)可以直接获取logic_idx）：
 

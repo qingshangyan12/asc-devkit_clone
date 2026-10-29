@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/aux_data_structures/ListTensorDesc_res.md#id1 -->
 
+
 ## 功能说明<a name="section195171847105215"></a>
 
 ListTensorDesc用来解析符合以下内存排布格式的数据，并在核函数（Kernel）侧根据索引获取储存对应数据的地址及shape信息。

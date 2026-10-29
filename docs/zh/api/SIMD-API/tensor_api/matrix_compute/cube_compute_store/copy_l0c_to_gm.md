@@ -166,6 +166,8 @@ L0C Buffer到Global Memory搬运支持不量化输出、`float`到`half`或`bflo
 | operation | 输入 | 搬运操作对象。L0C Buffer到Global Memory搬运采用`copy_l0c_to_gm{}`。 |
 | trait | 输入 | 搬运静态特性对象。L0C Buffer到Global Memory搬运默认采用`l0c_to_gm_trait_default{}`。 |
 
+
+
 ### copy_l0c_to_gm说明
 
 `copy_l0c_to_gm`用于标识L0C Buffer到Global Memory数据搬运通路，仅列出其public内容：

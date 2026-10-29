@@ -164,6 +164,7 @@ L0C Buffer到UB搬运支持不量化输出、`float`到`half`或`bfloat16_t`的�
 | operation | 输入 | 搬运操作对象。L0C Buffer到UB搬运取`copy_l0c_to_ub{}`。 |
 | trait | 输入 | 搬运trait对象。L0C Buffer到UB搬运默认取`l0c_to_ub_trait_default{}`。 |
 
+
 ### copy_l0c_to_ub说明
 
 `copy_l0c_to_ub`用于标识L0C Buffer到UB数据搬运通路，仅列出其public内容：

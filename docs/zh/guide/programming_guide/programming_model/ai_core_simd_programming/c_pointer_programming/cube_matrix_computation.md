@@ -68,6 +68,7 @@ Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对[NPU架构版�
 
 <img src="../../../../figures/nz_format.png" alt="Nz数据排布格式" width="400"/>
 
+
 Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Zz/Zn)之间，便于格式转换。大N排布（列主序Block）的设计通常是为了配合多核并行或后续算子（如Vector向量计算）在处理通道（Channel）维度数据时的便利性。
 
 > 📌 Nz格式在不同Buffer中的应用场景：
@@ -81,6 +82,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 <img src="../../../../figures/zz_half.png" alt="Zz 格式(以half类型为例)" width="400"/>
 
+
 在矩阵乘法中，A矩阵逐行读取数据。Zz格式的行主序特性使同一行元素物理地址连续，与计算访问模式匹配，便于Cube单元左侧通道通过DMA连续读取，避免跨步访问，提升数据搬运效率。
 
 #### Zn 格式
@@ -88,6 +90,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩阵数据直接为Zn格式，则在`Global Memory`和`L1 Buffer`上存储该格式。该格式采用大Z（外部行主序）+ 小n（内部列主序）。
 
 <img src="../../../../figures/zn_half.png" alt="Zn 格式(以half类型为例)" width="400"/>
+
 
 矩阵乘法需读取B矩阵列向量。普通行主序存储导致列数据地址跳跃。Zn格式在分形内部按列存储，使列数据在L0B中紧凑排列，便于Cube单元右侧通道线性读取完整列向量，避免跨步访问。
 
@@ -255,6 +258,7 @@ __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha)
 ```
 
 详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm.md)。
+
 
 ## 矩阵计算能力说明
 

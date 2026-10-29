@@ -92,6 +92,7 @@ ccache --show-stats -v
 
 分布式场景下，`ccache`以各机器本地缓存作为一级缓存，Redis作为共享二级缓存。机器A首次编译时会调用实际编译器并将结果写入本地缓存和Redis；机器B在相同源码、相同编译命令、相同编译器和相同构建目录路径下再次编译时，可直接从Redis命中共享缓存，减少编译动作的重复执行。若两台机器编译器路径不同但内容一致，建议设置`compiler_check=content`。
 
+
 组网要求：
 
 - 机器A：首次编译机器，将缓存写入Redis，IP为`<A_IP>`
@@ -147,6 +148,7 @@ ccache --show-stats -v
 ```
 
 对比两次`ccache --show-stats -v`结果，可看到在机器B上远程缓存命中率`Remote storage Hits`显著提升。
+
 
 ## 选择性编译<a id="选择性编译"></a>
 

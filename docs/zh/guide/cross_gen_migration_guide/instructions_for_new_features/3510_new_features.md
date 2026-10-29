@@ -76,6 +76,7 @@ CV融合算子场景，矩阵计算后的结果若需要在Vector核侧进行归
 - 基础API：[Fixpipe（L0C Buffer到UB数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md)。使用带有`FixpipeParamsArch3510`参数的Fixpipe接口实现L0C Buffer到UB搬出。
 - C API：[asc_copy_l0c2ub](../../../api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md)。
 
+
 #### 典型样例说明
 
 [fixpipe_l0c2ub样例](../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)：基于Fixpipe实现L0C Buffer到UB数据搬运，完整数据流为GM到L1 Buffer到L0A Buffer、L0B Buffer到Mmad到L0C Buffer到UB。
@@ -107,6 +108,7 @@ Vector算子场景，当需要将GM中的多段数据交替搬运至UB的不同�
 可参考以下资料：
 - 基础API：[SetLoopModePara](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/SetLoopModePara.md)、[ResetLoopModePara](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/ResetLoopModePara.md)。
 - C API：[asc_set_gm2l1_loop_size](../../../api/SIMD-API/c_api/cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop_size.md)、[asc_set_ub2gm_loop1_stride](../../../api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md)等。
+
 
 ### 新增MX矩阵搬运与计算<a name="section_mx"></a>
 
@@ -242,6 +244,7 @@ L0C Buffer中Mmad计算结果为NZ分形格式，部分算子输出需要列主�
 | [Ands](../../../api/SIMD-API/basic_api/memory_vector_compute/logical_compute/Ands.md) | 矢量内每个元素和标量做按位与操作，标量输入支持配置LocalTensor单点元素。 |
 | [Ors](../../../api/SIMD-API/basic_api/memory_vector_compute/logical_compute/Ors.md) | 矢量内每个元素和标量做按位或操作，标量输入支持配置LocalTensor单点元素。 |
 
+
 ### 新增Regbase矢量计算方式<a name="section_regbase"></a>
 
 #### 特性应用场景说明
@@ -319,6 +322,8 @@ Reg矢量计算相关接口的完整接口清单请参考[Reg矢量计算](../..
   - SSBuffer的初始内容不确定，读取结果不保证全为0。每次通信均应由生产者完整写入数据，消费者不得依赖SSBuffer中的历史内容。
   - 数据布局必须在通信双方（AIC与AIV）保持一致，且数据不得越过SSBuffer末端地址。
   - AIC和AIV启动不同任务时不能访问SSBuffer；当前任务未开启SSBuffer能力时不能访问。
+
+
 
 #### 典型样例说明
 

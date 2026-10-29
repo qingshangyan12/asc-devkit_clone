@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/GroupBarrier/Wait_res.md#id1 -->
 
+
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。

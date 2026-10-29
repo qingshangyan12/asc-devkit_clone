@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion_aux_config/SetDeqScale_res.md#id1 -->
 
+
 ## 功能说明<a name="zh-cn_topic_0000002563051145_section748346451"></a>
 
 头文件路径为：`"kernel_operator_vec_vconv_intf.h"`。

@@ -173,6 +173,7 @@ struct l1_to_l0b_trait_default {
 };
 ```
 
+
 ## 数据类型
 
 支持的数据类型包括：

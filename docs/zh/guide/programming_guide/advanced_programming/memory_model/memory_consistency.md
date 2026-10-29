@@ -139,6 +139,7 @@ SIMT流水的顺序保证需要区分线程间和线程内：
 
 NPU更接近弱一致性模型：普通内存访问默认只具备有限的局部顺序，跨流水、跨核、跨Stream以及Host-Device之间的顺序需要用户显式建立。
 
+
 ## 核内内存一致性
 
 ### 核内一致性问题
@@ -157,6 +158,7 @@ NPU更接近弱一致性模型：普通内存访问默认只具备有限的局�
 | RAW | 先写后读，读操作必须读取前序写入的数据。 | MTE2先写UB，Vector后读UB。 |
 | WAW | 先写后写，最终结果必须以后一次写为准。 | 两次MTE2搬运写入重叠UB地址。 |
 | WAR | 先读后写，写操作不能覆盖前序读还未使用完的数据。 | Vector还在读UB，MTE2准备复用同一UB空间。 |
+
 
 ### 跨流水内存一致性
 
@@ -313,6 +315,7 @@ T2        MTE2.STORE_UB(region1)
 ```
 
 这里的`WAIT MTE2`是软件同步点，由用户插入，用于保证后一次写入发生在前一次写入完成之后。
+
 
 ### 核内同步原语
 
@@ -473,6 +476,7 @@ T3        Scalar.STORE_GM_no_cache(addr) = 2
 
 反过来，如果不经过DCache的访问已经更新GM，而当前核DCache中已经缓存过同一地址所在Cache Line，后续要通过DCache路径读取该地址时，需要先处理DCache中的旧副本，处理方式请参考[缓存一致性](cache_coherence.md)中DCache与GM一致性的读端维护方法。如果当前核DCache中已有同一地址所在Cache Line的Dirty副本，应在不经过DCache写之前先按前一个流程执行DCCI和`Scalar.DSB`，避免旧Dirty副本覆盖不经过DCache的写入。
 
+
 #### Scalar和其他硬件单元的内存一致性
 
 当Scalar和其他硬件单元之间存在数据依赖时，需要用户自行插入同步保证内存一致性。例如Scalar先写GM，后续MTE2、Vector、Fixpipe<!-- npu="950" id10 -->或SIMT<!-- end id10 -->再读取该数据，不能只依赖代码书写顺序推断后续硬件单元一定能看到Scalar写入。
@@ -518,6 +522,7 @@ T2        STORE addr = 2
 T3        LOAD addr -> 2
 ```
 
+
 #### 单线程内不同地址访问
 
 SIMT的同一线程内访问不同地址时，硬件不保证不同地址访问的对外可见顺序与代码顺序一致。如果后续逻辑要求不同地址之间形成类似“先写数据、后写标志”这类发布顺序，需要用户使用内存栅栏（MEMBAR）建立可见性顺序。
@@ -553,6 +558,7 @@ T2        STORE ready = 1
 
 如果消费者访问GM时使用SIMT DCache，还需要同时结合SIMT DCache与GM的[缓存一致性](cache_coherence.md)要求处理旧副本。MEMBAR负责约束访问顺序，不负责自动失效消费者侧Cache副本。
 
+
 #### 线程间访问
 
 SIMT的不同线程之间，不论访问是否为同一地址，硬件不自动保证线程间内存一致性。一个线程写入的数据，如果要被另一个线程读取，需要用户自行插入同步。
@@ -581,6 +587,7 @@ T1        asc_syncthreads()                       asc_syncthreads()
 `asc_syncthreads`会阻塞当前Thread Block内所有Thread到达同步点，并保证同步点前的内存操作对块内线程可见。
 
 <!-- end id11 -->
+
 
 ## 核间内存一致性
 
@@ -711,6 +718,7 @@ T1        ARRIVE sync_point
 
 如果用户对程序运行结果有顺序要求，需要自行插入同步处理一致性问题。
 
+
 ## Host-Device内存一致性
 
 ### 异步下发语义
@@ -770,6 +778,7 @@ T1        RECORD event
 ```
 
 上例中的`RECORD event`可通过`aclrtRecordEvent(event, stream0)`实现，该接口会捕获`stream0`上已下发的任务；`WAIT event`可通过`aclrtStreamWaitEvent(stream1, event)`实现，该接口会在`stream1`上下发等待任务，使等待点之后的任务等待Event捕获的任务完成。`aclrtStreamWaitEvent`只约束指定Stream上的后续任务，因此适合表达跨Stream之间精确的生产者-消费者依赖。
+
 
 ## 常见一致性错误与调试
 

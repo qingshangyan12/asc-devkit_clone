@@ -48,6 +48,7 @@ __aicore__ inline void Init()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
+
 ```cpp
 // 实例化一个浮点型的自定义算子对象
 KernelTPipeInit<float> op;

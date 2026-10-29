@@ -157,6 +157,7 @@ struct l1_to_l0scaleb_trait_default {
 };
 ```
 
+
 ## 数据类型
 
 数据类型仅支持`fp8_e8m0_t`。

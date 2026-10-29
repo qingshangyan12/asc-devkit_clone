@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/operator_call_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 获取本LocalTensor的第offset个变量的引用。用于左值，相当于[SetValue](SetValue.md)接口，用于右值，相当于[GetValue](GetValue.md)接口。

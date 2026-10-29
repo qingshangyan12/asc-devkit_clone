@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 传入全局数据地址，初始化GlobalTensor。

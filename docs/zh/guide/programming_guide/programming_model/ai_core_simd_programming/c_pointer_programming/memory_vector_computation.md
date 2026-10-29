@@ -104,6 +104,7 @@ asc_copy_gm2ub(dst_ub, src_gm, size);
 
 **非连续搬运**: 若需将GM中多段非连续数据搬入同一段UB空间，可通过高维切分模式，配置数据块数量、单块长度、块间间隔等参数。以形状为256、数据类型为half的src_gm为例，对应搬运逻辑与代码实现如下：
 
+
 <img src="../../../../figures/discont_copy.png" alt="非连续搬运" width="800"/>
 
 ```c

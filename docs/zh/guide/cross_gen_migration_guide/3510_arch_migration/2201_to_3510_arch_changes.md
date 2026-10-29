@@ -52,6 +52,7 @@
     | 删除L1 Buffer空间的边界值设定。 | 3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口，具体请参考[基础API迁移指导](./2201_to_3510_guide/basic_api_migration.md)。 | SetLoadDataBoundary |
     | UB结构变化。2201架构的UB结构和3510架构的UB结构对比请参考[bank结构对比](../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/overview.md)。 | 2201架构上UB分为16个bank group，每个bank group包含3个bank，每个bank大小为4KB。3510架构上UB分为8个bank group，每个bank group包含2个bank，每个bank大小为16KB。若发生UB冲突，开发者可参考[避免UB的bank冲突](../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/overview.md)解决UB冲突。 | / |
 
+
 - 同步
 
     **表4**  同步变更

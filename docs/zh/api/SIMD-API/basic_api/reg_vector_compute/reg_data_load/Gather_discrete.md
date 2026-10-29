@@ -47,6 +47,7 @@
 
 ![图1 Gather功能说明](../../../../figures/reg_gather_ub2reg.png)  
 
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp

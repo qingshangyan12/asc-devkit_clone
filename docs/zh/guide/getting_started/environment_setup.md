@@ -2,6 +2,7 @@
 
 -   进行Ascend C算子开发之前，需要安装**驱动固件**和**CANN软件包**，请参考[《CANN快速安装》](https://www.hiascend.com/cann/download)完成环境准备。
 
+
     > [!NOTE]说明
     > 安装CANN软件包后，使用CANN运行用户进行编译、运行时，需要以CANN运行用户登录环境，执行`source ${INSTALL_DIR}/set_env.sh`命令设置环境变量。`${INSTALL_DIR}`请替换为CANN软件安装后的文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 

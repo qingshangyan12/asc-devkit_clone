@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/VectorPadding_ISASI_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。

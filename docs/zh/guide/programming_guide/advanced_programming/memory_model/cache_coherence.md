@@ -63,6 +63,7 @@ Cache写入策略决定写操作是否会形成Dirty副本，常见策略包括�
 - **直写（write-through）**：写操作更新Cache副本的同时，将数据写出到下一级存储。直写路径通常不会留下需要后续Clean回下一级存储的Dirty副本，但写操作是否已经完成仍需要通过DSB等同步机制确认；如果读端已经缓存旧副本，仍需要按读端路径执行Invalid。
 - **写回（write-back）**：写操作先更新Cache副本，并将Cache Line标记为Dirty；下一级存储要等到DCCI Clean、Cache Line替换等时机才会被更新。写回路径更容易产生“写端已经执行Store，但GM或Unified Buffer（UB）仍是旧值”的问题。
 
+
 ### 缓存一致性与内存一致性的区别
 
 缓存一致性关注的是同一地址或同一Cache Line在不同缓存副本之间的值是否一致。例如，某个核的DCache已经把`A`修改为新值，但GM中仍是旧值；或者GM已经被其他路径更新，但当前核DCache仍保留旧副本。此时问题的关键是是否需要写回Dirty副本、失效旧副本，或者绕过Cache访问。
@@ -601,6 +602,7 @@ C API中提供了[`asc_ub_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctr
 - 如果后续消费者以Scalar DCache模式直接读取UB，关注的是DCache与UB的一致性，应使用DCCI处理旧副本，并在读取前建立生产流水到Scalar流水的同步。
 - 如果Scalar读取UB时没有开启DCache模式，即`CTRL[49] = 1'b0`，Scalar直接从UB读取，此时通常只需要处理Scalar流水与Vector/MTE流水之间的执行顺序，不需要通过DCCI处理旧DCache副本。
 
+
 ## 原子操作与一致性
 
 原子操作用于多个执行单元、多个线程或多个核并发更新同一地址时，将一次读-改-写过程作为不可被其他更新打断的事件。原子操作可以避免同一地址上的更新丢失，但不等价于缓存一致性处理，也不等价于同步屏障。判断atomic操作下的缓存一致性，需要同时看两个问题：atomic操作实际更新的是GM还是UB，以及同一地址是否还被普通DCache<!-- npu="950" id5 -->、SIMT DCache<!-- end id5 -->或MTE等其他路径访问。
@@ -623,6 +625,7 @@ C API中提供了[`asc_ub_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctr
 - 开启随路原子前，如果GM目标地址此前被普通Scalar写过，需要先确保Scalar DCache中的Dirty数据已经写回GM，否则原子操作读取到的"GM已有内容"可能不是程序期望的初值。
 
 - 随路原子完成后，如果后续通过普通Scalar读取同一GM地址，需要处理读端DCache旧副本，并等待MTE3写GM完成。
+
 
 ### FixPipe随路原子操作与DCache一致性
 

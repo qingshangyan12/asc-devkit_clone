@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_constructor_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 GlobalTensor构造函数。

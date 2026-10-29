@@ -55,6 +55,7 @@ template <typename T, typename U>
 __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
 ```
 
+
 ## 参数说明<a id="section622mcpsimp"></a>
 
 **表 1** 模板参数说明<a name="table07381635103112"></a>

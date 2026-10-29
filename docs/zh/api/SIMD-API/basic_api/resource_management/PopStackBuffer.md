@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/resource_management/PopStackBuffer_res.md#id1 -->
 
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 在指定position（逻辑位置）申请临时空间，空间大小为指定position的全部剩余空间。
