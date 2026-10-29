@@ -2,7 +2,10 @@
 
 在通算融合类算子的实现中，通信操作使用[Hccl高阶API](../../../../../api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_usage.md)，矩阵乘计算操作使用[Matmul高阶API](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)。关于更多集合通信的内容和相关概念请参考[《HCCL集合通信库》](https://gitcode.com/cann/hccl/blob/master/docs/zh/user_guide/README.md)。通算融合算子的开发过程与一般算子相同，但请注意，当前通算融合算子暂不支持[核函数（Kernel）直调](../../../../programming_guide/appendix/kernel_direct_call_from_sample.md)和[入图（GE图）开发](../../../../programming_guide/advanced_programming/operator_graph_development/overview.md)，仅支持[单算子API调用](../../../../programming_guide/advanced_programming/aclnn_operator_development/invocation/single_operator_api_call.md)。
 
-下文将以AllGatherMatmulCustom算子（简称AllGatherMatmul）的实现为例，从算子分析、数据流分析、创建算子工程、原型定义、Tiling实现、核函数（Kernel）实现、编译与运行等方面介绍通算融合算子的设计和实现流程，本章节以Atlas A2系列产品（`ascend910b`）为例讲解。本样例中算子的完整代码及支持的产品范围请参见[AllGatherMatmul样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)的README。
+下文将以AllGatherMatmulCustom算子（简称AllGatherMatmul）的实现为例，从算子分析、数据流分析、创建算子工程、原型定义、Tiling实现、核函数（Kernel）实现、编译与运行等方面介绍通算融合算子的设计和实现流程，本章节以Atlas A2系列产品（`ascend910b`）为例讲解，仅支持`FLOAT16`数据类型。
+
+>[!NOTE]说明
+>[AllGatherMatmulV2样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)是另一个语义相近的通算融合算子，并非本章节教学示例的完整版，二者在算子名、输入输出参数命名（`a`/`b`对应`x1`/`x2`）、支持的数据类型和产品范围上均不相同，不能直接对照阅读。该样例面向生产场景交付，额外支持低精度量化数据类型等能力，并依赖内部公共库组织实现，可作为生产级通算融合算子的参考，具体用法以其自身README为准。
 
 ## 算子分析<a name="zh-cn_topic_0000002400208581_section59611034123213"></a>
 
@@ -139,7 +142,7 @@ AllGatherMatmul算子逻辑分析：
 
 创建通算融合算子的工程目录和CMakeLists.txt与一般算子相同，可按[创建算子工程](../../../../programming_guide/advanced_programming/aclnn_operator_development/aclnn_quick_start.md#create-project)逐步编写。将示例中的AddCustom原型和核函数替换为本章的AllGatherMatmulCustom实现，并在`npu_op_kernel_sources`中设置对应的`OP_TYPE`和实际核函数文件名。
 
-算子的输入、输出和属性直接通过下节的C++原型定义声明：输入为`a`、`b`，输出为`c`、`gather_out`，必选字符串属性`group`表示通信域名称。Host原型中的`AddConfig`与CMake中的构建目标均应配置为本样例支持的`ascend910b`。通算融合所需的其他编译配置和依赖，以[完整样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)自身的说明为准。
+算子的输入、输出和属性直接通过下节的C++原型定义声明：输入为`a`、`b`，输出为`c`、`gather_out`，必选字符串属性`group`表示通信域名称。Host原型中的`AddConfig`与CMake中的构建目标均应配置为本样例支持的`ascend910b`。通算融合所需的其他编译配置和依赖，可参考[AllGatherMatmulV2样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)（见本节开头说明，二者并非同一算子，仅编译组织方式可供参考）。
 
 ## 算子原型定义<a name="zh-cn_topic_0000002400208581_section7112164101213"></a>
 
@@ -591,13 +594,13 @@ extern "C" __global__ __aicore__ void all_gather_matmul_custom(__gm__ uint8_t* a
 
 ## 编译和运行<a name="zh-cn_topic_0000002400208581_section17516122912424"></a>
 
-下面从编译、安装、运行三个步骤对AllGatherMatmul样例作简要介绍。
+下面从编译、安装、运行三个步骤对本章节的AllGatherMatmulCustom教学示例作简要介绍。
 
 1.  **编译**
 
     对于按本章及快速入门手写的工程，先将通信、Tiling和核函数相关源文件与依赖加入CMake配置，再按[编译与部署基本流程](../../../../programming_guide/advanced_programming/aclnn_operator_development/compilation_and_deployment/basic_process.md)编译生成算子安装包。
 
-    若使用[AllGatherMatmul完整样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)，请按其README执行工程对应的构建命令。外部样例的构建入口、依赖、目录组织及产物位置以样例自身说明为准。
+    若参考[AllGatherMatmulV2样例](https://gitcode.com/cann/ops-transformer/tree/master/mc2/all_gather_matmul_v2)（见本节开头说明，与本章节教学示例并非同一算子），请按其README执行工程对应的构建命令，构建入口、依赖、目录组织及产物位置以其自身说明为准。
 
 2.  **安装**
 
