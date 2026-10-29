@@ -12,7 +12,6 @@
  * \file kernel_utils_ceil_oom_que.h
  * \brief
  */
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/utils/kernel_utils_ceil_oom_que.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")

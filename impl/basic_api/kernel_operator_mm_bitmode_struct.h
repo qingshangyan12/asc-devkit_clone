@@ -12,7 +12,6 @@
  * \file kernel_operator_mm_bitmode_struct.h
  * \brief
  */
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/kernel_operator_mm_bitmode_struct.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_mm_bitmode_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -37,7 +36,8 @@
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_mm_bitmode_impl.h"
 #endif
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
+#elif defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
 #include "dav_5161/kernel_operator_mm_bitmode_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
 #include "dav_5162/kernel_operator_mm_bitmode_impl.h"

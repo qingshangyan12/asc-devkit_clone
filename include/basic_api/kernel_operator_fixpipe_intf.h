@@ -12,7 +12,6 @@
  * \file kernel_operator_fixpipe_intf.h
  * \brief
  */
-
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "kernel_operator_fixpipe_intf.h cannot be used with compile flag --enable-simt enabled."
 #endif
