@@ -29,6 +29,10 @@ class Stream;
 
 enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
 
+namespace mc2_ops_hccl {
+class Mc2ReplayDomain;
+}
+
 struct ServerExecCtx {
     u64 offset;
     u64 opParamKey;
@@ -40,6 +44,7 @@ struct ServerExecCtx {
     hccl::Stream* mainStream{nullptr};
     ThreadHandle mainThread{0};
     mc2_open::OpenResCtxHolder resCtxHolder{};
+    std::shared_ptr<mc2_ops_hccl::Mc2ReplayDomain> replayDomain{};
 };
 
 struct ServerProgress {

@@ -46,6 +46,10 @@ HcclResult RunWithMc2TaskCache(
         return func();
     }
 
+    if (Mc2ReplayScope::Active()) {
+        return RunMc2BoundReplay(param, resCtx, func);
+    }
+
     HCCL_DEBUG(
         "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
         param.algTag);

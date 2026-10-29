@@ -11,6 +11,10 @@
 #define MC2_SERVER_STAGE_TIMING_H
 #include <cstdint>
 #include <ctime>
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+#include <cstdio>
+// MC2_CACHE_DETAIL_DIAG END
+
 #include "log.h"
 namespace Mc2ServerStageTiming {
 constexpr uint32_t LOG_SCHEMA_VERSION = 2;
@@ -66,6 +70,100 @@ inline bool& Enabled()
     static thread_local bool enabled;
     return enabled;
 }
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+// Diagnostic schema 1: fixed order shared with the benchmark parser. Durations are
+// inclusive; child phases must not be added to their parents. No per-call logging.
+enum DetailPhase : uint32_t {
+    DFX_REGISTER,
+    CCORE_WAIT,
+    KERNEL_DISPATCH,
+    CCORE_RECORD,
+    BATCH_START,
+    BATCH_END,
+    CACHE_POLICY,
+    CACHE_LOOKUP,
+    CAPTURE_CREATE,
+    CAPTURE_BEGIN,
+    MISS_EXECUTE,
+    CAPTURE_END,
+    CACHE_PUBLISH,
+    HIT_REPLAY,
+    VAR_RESTORE,
+    EXECUTOR_CREATE,
+    ALGORITHM_EXECUTE,
+    BATCH_FLUSH,
+    BATCH_FINISH,
+    DETAIL_PHASE_COUNT
+};
+// Native 64-bit integer arithmetic; no allocation, atomics or floating-point
+// work in the measured path. Accumulate directly into the 30-launch batch.
+struct DetailBatch {
+    uint64_t ns[DETAIL_PHASE_COUNT];
+    uint64_t calls[DETAIL_PHASE_COUNT];
+};
+inline DetailBatch& DetailTotals()
+{
+    static thread_local DetailBatch totals{};
+    return totals;
+}
+// Backend schema 1: four execution contexts, 36 uint64_t words per context.
+constexpr uint32_t BACKEND_WORDS = 36;
+constexpr uint32_t BACKEND_ZONES = 4;
+enum BackendZone : uint32_t { EXECUTE, FLUSH, SEAL, REPLAY };
+struct BackendBatch {
+    uint64_t words[BACKEND_WORDS * BACKEND_ZONES];
+    uint64_t bindings, unavailable;
+};
+inline BackendBatch& BackendTotals()
+{
+    static thread_local BackendBatch batch{};
+    return batch;
+}
+// Sparse hex serialization is performed only after the message loop exits.
+// Bounded buffer covers all 144 index:value pairs even at UINT64_MAX.
+inline bool FormatBackend(char* text, size_t capacity)
+{
+    size_t used = 0;
+    bool first = true;
+    for (uint32_t i = 0; i < BACKEND_WORDS * BACKEND_ZONES; ++i) {
+        if (BackendTotals().words[i] == 0) continue;
+        const int count = snprintf(text + used, capacity - used, "%s%x:%llx", first ? "" : ",", i,
+            static_cast<unsigned long long>(BackendTotals().words[i]));
+        if (count < 0 || static_cast<size_t>(count) >= capacity - used) return false;
+        used += static_cast<size_t>(count);
+        first = false;
+    }
+    if (first) {
+        if (capacity < 2) return false;
+        text[0] = '-'; text[1] = '\0';
+    }
+    return true;
+}
+class DetailScope {
+public:
+    explicit DetailScope(DetailPhase phase) : phase_(phase), start_(Enabled() ? Now() : 0) {}
+    ~DetailScope() { Stop(); }
+    DetailScope(const DetailScope&) = delete;
+    DetailScope& operator=(const DetailScope&) = delete;
+    void Stop()
+    {
+        if (start_ == 0)
+            return;
+        const uint64_t end = Now();
+        if (end >= start_) {
+            auto& totals = DetailTotals();
+            totals.ns[phase_] += end - start_;
+            ++totals.calls[phase_];
+        } else {
+            Get().status = STATUS_INVALID_TIMESTAMPS;
+        }
+        start_ = 0;
+    }
+private:
+    DetailPhase phase_;
+    uint64_t start_;
+};
+// MC2_CACHE_DETAIL_DIAG END
 struct Batch {
     uint64_t init, msg, sq, first, last;
     uint32_t count;
@@ -86,11 +184,19 @@ inline void Start(bool enabled, uintptr_t context = 0)
     Enabled() = enabled;
     if (!enabled) {
         Totals() = {};
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        DetailTotals() = {};
+        BackendTotals() = {};
+        // MC2_CACHE_DETAIL_DIAG END
         Context() = 0;
         return;
     }
     if (Context() != context) {
         Totals() = {};
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        DetailTotals() = {};
+        BackendTotals() = {};
+        // MC2_CACHE_DETAIL_DIAG END
         Context() = context;
     }
 
@@ -175,15 +281,60 @@ inline void Finish(uint32_t status)
     b.sq += sq;
     if (s.status)
         b.status = s.status;
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    auto& detail = DetailTotals();
+    // MC2_CACHE_DETAIL_DIAG END
     if (++b.count != SAMPLES_PER_BATCH)
         return;
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    char backendText[4096];
+    const bool backendValid = FormatBackend(backendText, sizeof(backendText));
+    if (!backendValid) { backendText[0] = '-'; backendText[1] = '\0'; }
+    // MC2_CACHE_DETAIL_DIAG END
+
     HCCL_RUN_INFO(
         "[MC2_SERVER_PERF] schema=%u first=%llu last=%llu count=%u init_mean_ns=%.6f msg_parse_mean_ns=%.6f "
-        "sq_expand_mean_ns=%.6f cache=%d status=%d",
+        "sq_expand_mean_ns=%.6f cache=%d status=%d"
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        " detail_schema=2 detail_ns=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu "
+        "detail_calls=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu "
+        "backend_schema=1 backend_bindings=%llu backend_unavailable=%llu backend_valid=%u backend=%s"
+        // MC2_CACHE_DETAIL_DIAG END
+        ,
         LOG_SCHEMA_VERSION, static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last), b.count,
         static_cast<double>(b.init) / SAMPLES_PER_BATCH, static_cast<double>(b.msg) / SAMPLES_PER_BATCH,
-        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status);
+        static_cast<double>(b.sq) / SAMPLES_PER_BATCH, b.cache, b.status
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        ,
+        static_cast<unsigned long long>(detail.ns[DFX_REGISTER]), static_cast<unsigned long long>(detail.ns[CCORE_WAIT]),
+        static_cast<unsigned long long>(detail.ns[KERNEL_DISPATCH]), static_cast<unsigned long long>(detail.ns[CCORE_RECORD]),
+        static_cast<unsigned long long>(detail.ns[BATCH_START]), static_cast<unsigned long long>(detail.ns[BATCH_END]),
+        static_cast<unsigned long long>(detail.ns[CACHE_POLICY]), static_cast<unsigned long long>(detail.ns[CACHE_LOOKUP]),
+        static_cast<unsigned long long>(detail.ns[CAPTURE_CREATE]), static_cast<unsigned long long>(detail.ns[CAPTURE_BEGIN]),
+        static_cast<unsigned long long>(detail.ns[MISS_EXECUTE]), static_cast<unsigned long long>(detail.ns[CAPTURE_END]),
+        static_cast<unsigned long long>(detail.ns[CACHE_PUBLISH]), static_cast<unsigned long long>(detail.ns[HIT_REPLAY]),
+        static_cast<unsigned long long>(detail.ns[VAR_RESTORE]), static_cast<unsigned long long>(detail.ns[EXECUTOR_CREATE]),
+        static_cast<unsigned long long>(detail.ns[ALGORITHM_EXECUTE]),
+        static_cast<unsigned long long>(detail.ns[BATCH_FLUSH]), static_cast<unsigned long long>(detail.ns[BATCH_FINISH]),
+        static_cast<unsigned long long>(detail.calls[DFX_REGISTER]), static_cast<unsigned long long>(detail.calls[CCORE_WAIT]),
+        static_cast<unsigned long long>(detail.calls[KERNEL_DISPATCH]), static_cast<unsigned long long>(detail.calls[CCORE_RECORD]),
+        static_cast<unsigned long long>(detail.calls[BATCH_START]), static_cast<unsigned long long>(detail.calls[BATCH_END]),
+        static_cast<unsigned long long>(detail.calls[CACHE_POLICY]), static_cast<unsigned long long>(detail.calls[CACHE_LOOKUP]),
+        static_cast<unsigned long long>(detail.calls[CAPTURE_CREATE]), static_cast<unsigned long long>(detail.calls[CAPTURE_BEGIN]),
+        static_cast<unsigned long long>(detail.calls[MISS_EXECUTE]), static_cast<unsigned long long>(detail.calls[CAPTURE_END]),
+        static_cast<unsigned long long>(detail.calls[CACHE_PUBLISH]), static_cast<unsigned long long>(detail.calls[HIT_REPLAY]),
+        static_cast<unsigned long long>(detail.calls[VAR_RESTORE]), static_cast<unsigned long long>(detail.calls[EXECUTOR_CREATE]),
+        static_cast<unsigned long long>(detail.calls[ALGORITHM_EXECUTE]),
+        static_cast<unsigned long long>(detail.calls[BATCH_FLUSH]), static_cast<unsigned long long>(detail.calls[BATCH_FINISH]),
+        static_cast<unsigned long long>(BackendTotals().bindings),
+        static_cast<unsigned long long>(BackendTotals().unavailable), static_cast<unsigned>(backendValid), backendText
+        // MC2_CACHE_DETAIL_DIAG END
+    );
     b = {};
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+    detail = {};
+    BackendTotals() = {};
+    // MC2_CACHE_DETAIL_DIAG END
 }
 } // namespace Mc2ServerStageTiming
 #endif
