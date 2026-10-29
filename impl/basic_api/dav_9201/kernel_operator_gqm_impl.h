@@ -45,9 +45,6 @@ __aicore__ inline uint64_t Gqm::Init(uint64_t addr, int msgCount)
     constexpr uint64_t gqmCmdBits = 6;        // Command field width in CmdData
     constexpr uint64_t cmd = 1 << gqmPayLoadOffset;
 
-    // Make prior memory accesses visible before Init writes the metadata
-    dsb(mem_dsb_t::DSB_DDR);
-
     auto ret = __gqm(addr, 0, (cmd + (msgCount << gqmCmdBits)));
 
     return ret & Internal::GQM_RETCODE_MASK;
@@ -62,9 +59,6 @@ __aicore__ inline uint64_t Gqm::EnQue(uint64_t data)
 
     constexpr uint64_t cmd = 0x1;
 
-    // Drain prior in-flight requests so this push advances the tail in issue order
-    dsb(mem_dsb_t::DSB_DDR);
-
     auto ret = __gqm(this->addr_, data, cmd);
     return ret & Internal::GQM_RETCODE_MASK;
 }
@@ -73,9 +67,6 @@ __aicore__ inline uint64_t Gqm::DeQue(uint64_t& retValue)
 {
     constexpr uint64_t popDataShift = 23; // PopData start bit in ReturnData
     constexpr uint64_t cmd = 0x5;
-
-    // Flush prior in-flight requests so this pop reads data already landed
-    dsb(mem_dsb_t::DSB_DDR);
 
     auto ret = __gqm(this->addr_, 0, cmd);
 
@@ -86,9 +77,6 @@ __aicore__ inline uint64_t Gqm::DeQue(uint64_t& retValue)
 __aicore__ inline uint64_t Gqm::GetFreeSpace()
 {
     constexpr uint64_t cmd = 0xF;
-
-    // Flush prior in-flight requests so the queried RmnCnt is up-to-date
-    dsb(mem_dsb_t::DSB_DDR);
 
     auto ret = __gqm(this->addr_, 0, cmd);
 
