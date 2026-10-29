@@ -315,8 +315,10 @@ void TryEnableAllGatherSymmetricMemory(OpParam& param, const TopoInfoWithNetLaye
         isUbxConcurrentTopo = IsUbxConcurrentTopo(topoInfo);
     }
     const u64 inputSize = param.DataDes.count * DATATYPE_SIZE_TABLE[param.DataDes.dataType];
-    if ((!isUbxConcurrentTopo || inputSize >= UBX_ALLGATHER_SYM_DATA_SIZE)
-        && (topoInfo->level0Topo == Level0Shape::MESH_1D || isTwoLevelMeshNhrOmni || isAllGatherConcurrent)) {
+    // 收紧：仅对 PipeLineMeshNHR + 单层 UBX 使能对称内存探测。
+    // MESH_1D / ConcurMeshNHR 场景不探测（supportSymmetricMemory 保持 false，走 scratch 路径），
+    // 待 symMem 数据面在板上验证通过后再逐算法放开。
+    if ((!isUbxConcurrentTopo || inputSize >= UBX_ALLGATHER_SYM_DATA_SIZE) && isTwoLevelMeshNhrOmni) {
         CheckAndSetSymmetricMemory(param, topoInfo);
     }
 }
