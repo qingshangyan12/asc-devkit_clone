@@ -17,7 +17,7 @@
 </div>
 
 ## 🔥Latest News
-[2026/05] v9.1.0-beta.2 版本关键特性
+[2026/05] v9.1.0-beta.2  版本关键特性
 ### 🚀 关键特性
 - Ascend C框架基础API支持NPU Check（[PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557) [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)），增强算子运行时校验能力。
 - SIMD VF内支持printf和reg dump打印（[PR#1605](https://gitcode.com/cann/asc-devkit/pull/1605)），提供调试打印和寄存器数据dump能力。
