@@ -44,7 +44,7 @@ TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
     }
 }
 
-// 四态识别与解析失败契约（fork 保留裸名态：--alg 直指注册名）
+// 四态识别与解析失败契约（含裸名态：--alg 直指注册名）
 TEST(ExtAlgForced, FourStateClassification)
 {
     std::string bareName;

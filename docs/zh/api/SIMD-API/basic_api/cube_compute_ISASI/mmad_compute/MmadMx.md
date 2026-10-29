@@ -186,7 +186,22 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 - 对于fp4场景A/B矩阵的起始地址需要按照512字节对齐，对于fp8场景A/B矩阵的起始地址需要按照1024字节对齐。
 - 左矩阵A/B对应的scale矩阵起始地址为：A/B矩阵起始对应地址/16。
 - 其他特殊场景约束可参考[Mmad接口约束说明](Mmad.md#约束说明)。
-- 边界值计算结果请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
+
+- **特殊值/边界值约束说明**
+
+  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL[48]比特位进行设置，控制MmadMx计算时的饱和模式。该配置适用于表3中的全部浮点输入组合，由CTRL[48]直接决定，不受CTRL[60]限制。
+
+  - 非饱和模式：CTRL[48]设置成1'b1，inf/nan保持原输出。
+  - 饱和模式：CTRL[48]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
+
+    ```cpp
+    // MmadMx的饱和模式由CTRL[48]直接决定，不受CTRL[60]限制。
+    AscendC::SetCtrlSpr<48, 48>(0);
+    ```
+
+   注：MmadMx指令应避免NaN输入，否则可能会产生执行报错。
+
+  - 边界值计算结果请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
 
 ## 调用示例
 

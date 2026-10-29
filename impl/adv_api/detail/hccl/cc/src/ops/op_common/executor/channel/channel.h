@@ -48,6 +48,13 @@ HcclResult CalcChannelRequestMesh2D(
 HcclResult CreateChannelRequestByRankId(
     HcclComm comm, const OpParam& param, u32 myRank, u32 remoteRank, std::vector<HcclChannelDesc>& channels,
     u32 channelRepeatNum = 1);
+// 大禹纯 CLOS 双 die：单 kernel 全 channel 须同 die（hcomm CheckChannelsDie），
+// CalcChannelRequestMesh1D 的 per peer 首条协议匹配链是 die 盲选，双 die 会混出跨 die 通道集。
+// 本变体在协议匹配的基础上追加 die 过滤：per peer 只取落在 expectedDieId 上的首条链路；
+// 若某 peer 在该 die 上无可达链路则报错（大禹 DIE0 对全部 peer 可达，DIE1 无此保证）。
+HcclResult CalcChannelRequestMesh1DOnDie(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, u32 expectedDieId);
 HcclResult CalcChannelRequestMesh1DWithPriorityTopo(
     HcclComm comm, const OpParam& param, const TopoInfo* topoInfo, const std::vector<std::vector<u32>>& subcommInfo,
     std::vector<HcclChannelDesc>& channels, CommTopo priorityTopo);

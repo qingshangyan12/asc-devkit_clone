@@ -16,17 +16,9 @@
 namespace mc2_ops_hccl {
 
 /*
- 面向 MC2 场景的变长 AllToAll。源实现拆为两个 context，每个搬运一半数据，以预留：
- 1. 扩展为 64P 双 die 通过 unions 全互联的算法；
- 2. 两个 context 可放在同一或不同 die 上执行。
-
- 阶段一实现：单 mission 承担全部数据。目标仓尚无跨 kernel 变量/信号交换原语
- （ExportVariable/ImportVariable/LocalCtxPost 等），KFC Server 的 MissionPreSync/
- MissionPostSync 仍是空桩，故先走源实现注释已认可的退化路径 —— 通过调整
- sendSize & sendOffset 让单 context 搬运全部数据，等同常规 1D Fullmesh 算法。
- A/B 双片内存布局保持不变，阶段二恢复双 mission 时无需改动 host 侧参数打包。
-
- 此外，后同步采用源端保序方式，当前最大支持 8P 通信域。
+ MC2 场景的变长 AllToAll。双 mission 并发：mission0 搬 A 切片、mission1 搬 B 切片，
+ 拆半设计为 64P 双 die unions 全互联算法预留扩展。后同步采用源端保序方式，
+ 当前最大支持 8P 通信域。
  */
 class CcuTempKfcHalfAlltoAllVMesh1D : public CcuTempKfcMesh1DMem2MemBase {
 public:

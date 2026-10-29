@@ -14,11 +14,9 @@
 
 namespace mc2_ops_hccl {
 
-// AllToAllvWrite（HCCL_CMD_HALF_ALLTOALLV）默认兜底选择器，对齐 hcomm
-// Mc2Selector::SelectDefaultCcuSchedAlgo 的语义：level0 为 1D mesh（MESH_1D /
-// MESH_1D_CLOS）即选 CcuHalfAll2AllVMesh1D，无数据量/dtype 附加门槛。
-// 该算子只有 CCU 一条执行路径（hcomm 兜底表中无 AICPU 项），AICPU 分支保持
-// 基类默认 NOT_MATCH。
+// AllToAllvWrite（HCCL_CMD_HALF_ALLTOALLV）默认兜底选择器：level0 为 1D mesh
+// （MESH_1D / MESH_1D_CLOS）即选 CcuHalfAll2AllVMesh1D。该算子只有 CCU 一条
+// 执行路径，AICPU 分支保持基类默认 NOT_MATCH。
 class HalfAlltoAllVAutoSelector : public AutoSelectorBase {
 private:
     SelectorStatus SelectCcuScheduleAlgo(

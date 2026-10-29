@@ -26,8 +26,8 @@ namespace AscendC {
  * \param [in] isReuseSource: indicate whether to reuse source tensor. Reserved parameter.
  * \param [in] isComputeRstd: indicate whether to calculate rstd. Only support true now.
  * \param [in] isOnlyOutput: indicate whether to only output normalized result y. Only support false now.
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  * \return flag for whether the tmp buffer size is calculated successfully
  */
 void GetNormalizeMaxMinTmpSize(

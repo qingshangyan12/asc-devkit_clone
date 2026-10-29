@@ -17,8 +17,7 @@
 
 namespace mc2_ops_hccl {
 
-// 变长区 varData 内含 4 段，每段 rankSize 个 u64：sendCounts/recvCounts/sdispls/rdispls。
-// 源实现按 [sizeA|sizeB] 与 [offsetA|offsetB] 各 2*rankSize 读取，二者段长一致。
+// varData 布局：[sizeA|sizeB] 与 [offsetA|offsetB] 各 2*rankSize 个 u64
 constexpr uint32_t HA2AV_SLICE_SEG_NUM = 2;
 
 CcuTempKfcHalfAlltoAllVMesh1D::CcuTempKfcHalfAlltoAllVMesh1D(
@@ -33,9 +32,7 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_RET(GetRes(resourceRequest));
-    // 双 mission（KFC_MAX_MISSION_NUM=2）：mission0 搬 A 切片、mission1 搬 B 切片（kernel 内按
-    // missionIndex 选段），由 CcuTempKfcServer::CalcRes 将两个源 kernel 各映射为一个 mission。
-    // 两个 kernel 同构（同名占位），channel 复用同一份 Mesh1D 描述。
+    // 双 mission：两个同构 kernel 各映射为一个 mission，channel 复用同一份 Mesh1D 描述
     resourceRequest.ccuKernelNum.push_back(KFC_MAX_MISSION_NUM);
 
     CcuKernelInfo kernelInfo;
@@ -60,21 +57,9 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     // CcuKernelKfcServer 在注册前替换该占位并复用这些 channel
     kernelInfo.channels = channelDescs;
 
-    // 本端 window 基址：设备侧 AlltoAllvWrite 契约不传 recvBuf，本 rank 自留分片的落点
-    // 需在建图期确定（对应源实现 CtxArg 里的 cclBufferAddr），由 KfcServer 继承。
-    //
-    // 取 cclBuffer，理由是它与 token 同源：kernel 里 localDst/dst 用的 token 来自
-    // kfcServerArgs[5]，由 HcclAllocAlgResourceCcu 用 GetTokenFromBuffInfo(cclBufferAddr,
-    // cclBufferSize) 算出。token 是"地址+长度"的访问凭证，addr 与 token 必须配对，
-    // 否则 CCU 侧访问校验不通过。
-    //
-    // 不能取 param.outputPtr（MC2 路径下 PrepareOpsCommParam 恒置 nullptr）。
-    // 也不能取 OpResCtx::res[0]（"_ccu_scratch"）——虽然设备侧 ccuParam_.scratchAddr
-    // 指向它，但 CcuPrepareForAllToAllVWrite 从不读该字段（只有 AllReduce/ReduceScatter
-    // 的 M2M prepare 用它），且它与上述 token 不同源。
-    //
-    // PreSync 会把该地址广播给所有对端当作 Write 目标，取错不只影响本 rank 的
-    // GroupCopy，而是全域写入落到错误地址。
+    // 本端 window 基址：AlltoAllvWrite 契约不传 recvBuf，自留分片落点需建图期确定。
+    // 必须取与 token 同源的 cclBuffer（token = GetTokenFromBuffInfo(cclBuffer)），
+    // addr 与 token 不配对时 CCU 侧访问校验不通过；该地址还会广播给对端作 Write 目标。
     void* cclBufferAddr = nullptr;
     uint64_t cclBufferSize = 0;
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
@@ -85,14 +70,9 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     kernelInfo.localWinAddr = PointerToAddr(cclBufferAddr);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
-    // mission1 与 mission0 同构：同名占位 kernel、同一份 channel、同一个 localWinAddr
-    // （window 基址是本端属性，与 mission 无关）；InheritKfcServerKernelArg 按 missionIndex
-    // 生成两份 kfcServerArgs（仅 missionIndex 字段不同），dispatch 侧由 kernel 的
-    // missionNum/missionIndex 分支选 A/B 切片。
     CcuKernelInfo kernelInfo1 = kernelInfo;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo1);
 
-    // localWinAddr 是跨端契约：设备侧回读结果必须用同一地址，故按 RUN_INFO 打出便于核对
     HCCL_RUN_INFO(
         "[CcuTempKfcHalfAlltoAllVMesh1D::CalcRes] localWinAddr[0x%llx], cclBufferSize[%llu]",
         static_cast<unsigned long long>(kernelInfo.localWinAddr), static_cast<unsigned long long>(cclBufferSize));
@@ -112,18 +92,14 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
     uint64_t token = 0;
     CHK_RET(GetToken(buffInfo_, token));
 
-    // TODO(阶段一待与 MC2 侧对齐)：变长区段序与设备可见性。
-    // 这里假设 varData 起始为 sendSize 段（2*rankSize 个 u64），紧随 sendOffset 段。
-    // 若 MC2 实际布局为 sendCounts/recvCounts/sdispls/rdispls 四段，需按段偏移调整。
+    // varData 起始为 sendSize 段（2*rankSize 个 u64），紧随 sendOffset 段
     const uint64_t varBaseAddr = PointerToAddr(const_cast<void*>(static_cast<const void*>(param.varData)));
     const uint64_t sliceSegBytes = static_cast<uint64_t>(templateRankSize_) * HA2AV_SLICE_SEG_NUM * sizeof(u64);
     const uint64_t sendSizeAddr = varBaseAddr;
     const uint64_t sendOffsetAddr = varBaseAddr + sliceSegBytes;
 
-    // 本端在对端 cclBuffer 中的落点：status*winSize/2 + rankId*GRID_SIZE 在 MC2 侧折算为 slice stride
     const uint64_t recvOffset = templateDataParams.outputSliceStride * mySubCommRank_;
 
-    // 本 rank 自己那片的大小，用于本地 GroupCopy
     uint64_t localSliceSize = templateDataParams.sliceSize;
     if (templateDataParams.tailSize != 0 && mySubCommRank_ == templateRankSize_ - 1) {
         localSliceSize = templateDataParams.tailSize;
@@ -138,14 +114,10 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(localSliceSize, config);
 
-    // 双 mission：各推 1 个 submitInfo（kernelHandle 不同；cachedArgs 相同——
-    // 两 mission 读同一份 xn 参数帧，A/B 切片由 kernel 内 missionIndex 分支选择）
+    // 双 mission 各推一个 submitInfo（kernelHandle 不同，xn 参数帧共用）
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    // 参数顺序与 CcuPrepareForAllToAllVWrite 的 xnData_ 布局对应：
-    // xn[0]=opId(签名+哨兵), xn[1]=sendBuf, xn[2]=sendSizes, xn[3]=sendOffsets,
-    // xn[4..7]=goSize, xn[8]=remoteWinOffset
-    // token 走 kfcServerArgs[5]，不占 xn 槽位，故此处不传
+    // xn 布局见 kernel 头注释；token 走 kfcServerArgs[5]，不占 xn 槽位
     (void)myBufferAddr;
     (void)token;  // token 由 KFC Server 从 ctx.token 获取
     CHK_RET(FillCachedArgs(

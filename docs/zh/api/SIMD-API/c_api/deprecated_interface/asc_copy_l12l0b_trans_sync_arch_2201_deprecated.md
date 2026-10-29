@@ -1,4 +1,4 @@
-# asc_copy_l12l0b_trans_sync_arch_2201（废弃）
+# asc_copy_l12l0b_trans_sync（NPU架构版本2201，废弃）
 
 ## 产品支持情况
 

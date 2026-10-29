@@ -58,8 +58,8 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-// 1D mesh 拓扑兜底：对齐 hcomm SelectDefaultCcuSchedAlgo —— 不指定算法名时
-// level0 为 MESH_1D/MESH_1D_CLOS 即选 CcuHalfAll2AllVMesh1D
+// 1D mesh 拓扑兜底：不指定算法名时 level0 为 MESH_1D/MESH_1D_CLOS 即选
+// CcuHalfAll2AllVMesh1D
 TEST_F(ST_HALF_ALLTOALLV_SELECTOR_TEST, mesh1d_topo_selects_half_alltoallv_fallback)
 {
     HalfAlltoAllVAutoSelector selector;

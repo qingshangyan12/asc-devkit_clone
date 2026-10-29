@@ -18,6 +18,7 @@
 
 #include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
@@ -388,13 +389,13 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, co
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
- * @param [in] borrow_src Input borrow register tensor.
+ * @param [in] carry_src Input carry register tensor. A value of 1 means no incoming borrow; 0 means an incoming borrow.
  * @note The active-lane mask is taken from src0.mask. A value of 1 selects the corresponding element; a value of 0
  * excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic
@@ -423,6 +424,22 @@ __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_ten
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic
+ * @brief Returns element-wise quotients with the selected precision mode.
+ *
+ * @override_id te_experimental_div__const_reg_tensor_T_R_const_reg_tensor_T_R__template_precisionMode_algo_T
+ * @archs 3510
+ * @param [in] src0 Dividend.
+ * @param [in] src1 Divisor.
+ * @note The supported configurations are the default intrinsic mode, the high-precision intrinsic mode, and the
+ * explicit 0-ULP FTZ mode. The high-precision configurations support float only.
+ * INTRINSIC follows --cce-ftz; PRECISION_0ULP_FTZ_TRUE always flushes subnormal values to zero.
+ * Only src0.mask selects active lanes. Unselected elements are zeroed and the result preserves src0.mask.
+ */
+template <bool precisionMode = false, div_algo algo = div_algo::INTRINSIC, typename T>
+__simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic

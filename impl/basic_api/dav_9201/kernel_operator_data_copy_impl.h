@@ -220,32 +220,15 @@ __aicore__ inline void CopyUbufToCbuf(
             (__cbuf__ void*)dst, (__ubuf__ void*)src, (uint8_t)0, blockCount, blockLen, srcStride, dstStride);
     }
 }
-
-// only support VecCore   PIPE_MTE3
-// UB -> L1: copy_ubuf_to_cbuf:  Note: burstLen + stride is unit of 32B
-template <typename T>
-__aicore__ inline void CopyUbufToCbuf(
-    __cbuf__ T* dst0, __cbuf__ T* dst1, __ubuf__ T* src, const uint16_t blockCount, const uint16_t blockLen,
-    const uint16_t srcStride, const uint16_t dstStride)
-{
-    if ASCEND_IS_AIV {
-        copy_ubuf_to_cbuf(
-            (__cbuf__ void*)dst0, (__cbuf__ void*)dst1, (__ubuf__ void*)src, blockCount, blockLen, srcStride,
-            dstStride);
-    }
-}
-
 // only support CubeCore   PIPE_MTE1
 // L1 -> UB: copy_cbuf_to_ubuf
-template <typename T, uint8_t subBlockId = 0>
+template <typename T>
 __aicore__ inline void CopyCbufToUbuf(
     __ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
     const uint16_t dstStride)
 {
     if ASCEND_IS_AIC {
-        copy_cbuf_to_ubuf(
-            (__ubuf__ void*)dst, (__cbuf__ void*)src, static_cast<bool>(subBlockId), blockCount, blockLen, srcStride,
-            dstStride);
+        copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
     }
 }
 
@@ -630,6 +613,48 @@ __aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
     set_loop2_stride_ubtoout(loop2StridePara);
 }
 
+__aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopParams)
+{
+    if ASCEND_IS_AIC {
+        ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^22");
+        });
+        ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 40)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^40");
+        });
+        ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 40)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^40");
+        });
+        uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21;
+        loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);
+
+        ASCENDC_ASSERT((loopParams.loop1DstStride % GetDataBlockSizeInBytes() == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "loop1DstStride must be 32B aligned");
+        });
+        uint64_t loop1StridePara = (loopParams.loop1DstStride) << 40;
+        loop1StridePara |= loopParams.loop1SrcStride;
+
+        ASCENDC_ASSERT((loopParams.loop2DstStride % GetDataBlockSizeInBytes() == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "loop2DstStride must be 32B aligned");
+        });
+        uint64_t loop2StridePara = (loopParams.loop2DstStride) << 40;
+        loop2StridePara |= loopParams.loop2SrcStride;
+
+        set_loop_size_outtol1(loopSizePara);
+        set_loop1_stride_outtol1(loop1StridePara);
+        set_loop2_stride_outtol1(loop2StridePara);
+    }
+}
+
 __aicore__ inline void ResetUBLoopModeParaImpl(void)
 {
     constexpr uint64_t loopSizePara = (1ul << 21) | 1ul; // 设置SPR寄存器，硬件约定置1为normal
@@ -642,6 +667,15 @@ __aicore__ inline void ResetOutLoopModeParaImpl(void)
     constexpr uint64_t loopSizePara = (1ul << 21) | 1ul; // 设置SPR寄存器，硬件约定置1为normal
 
     set_loop_size_outtoub(loopSizePara);
+}
+
+__aicore__ inline void ResetOutToL1LoopModeParaImpl(void)
+{
+    if ASCEND_IS_AIC {
+        constexpr uint64_t loopSizePara = (1ul << 21) | 1ul;
+
+        set_loop_size_outtol1(loopSizePara);
+    }
 }
 
 template <typename T>
@@ -685,59 +719,8 @@ template <typename T>
 __aicore__ inline __in_pipe__(MTE3)
     __out_pipe__(MTE3) void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
-#if KFC_C310_SSBUF == 1 || __MIX_CORE_AIC_RATION__ != 1
     CopyUbufToCbuf(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
-#else
-    // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-    ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
-    ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
-    if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
-        ASCENDC_DEBUG_ASSERT(
-            (TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src address should be 32B aligned \n"));
-        // 1.get GM addr
-        uint32_t tensorSize = intriParams.blockCount * intriParams.blockLen * 32;
-        int32_t ubAddr = -1;
-#if ASCENDC_CPU_DEBUG
-        uint64_t absSrc = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
-        ASCENDC_ASSERT((static_cast<uint64_t>(absSrc) >= 0 && static_cast<uint64_t>(absSrc) < TOTAL_UB_SIZE), {
-            KERNEL_LOG(KERNEL_ERROR, "abs src is 0x%lx, which should be in range of [0, %u)", absSrc, TOTAL_UB_SIZE);
-        });
-        GM_ADDR gmAddr = (GetKfcClient()->ubStart) + static_cast<uint64_t>(absSrc);
-#else
-        GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
-#endif
-        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
-        SetFlag<HardEvent::V_MTE3>(eventID);
-        WaitFlag<HardEvent::V_MTE3>(eventID);
-        // 2.copy ub->GM
-        if constexpr (g_gm_overflow_check) {
-            __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-            AscendCUtils::CheckGmMemOverflowNormal(gmAddr, workSpace, false, false, intriParams);
-        }
-        CopyUbufToGmAlignV2(
-            (__gm__ T*)gmAddr, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
-            intriParams.dstStride, false, 0);
-
-        // 3.send message, copy GM to L1
-#if ASCENDC_CPU_DEBUG
-        uint8_t* aicBaseTSCMAddr = GetTPipePtr()->GetBaseAddr(int8_t(TPosition::TSCM));
-        ASCENDC_ASSERT(
-            (aicBaseTSCMAddr != nullptr), { KERNEL_LOG(KERNEL_ERROR, "aicBaseTSCMAddr can not be nullptr"); });
-        uint64_t l1AddrDst = (uint8_t*)dst - (uint8_t*)aicBaseTSCMAddr;
-        ASCENDC_ASSERT((l1AddrDst < TOTAL_L1_SIZE), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "l1AddrDst is 0x%lx, which should be in range of [0, %u)", l1AddrDst, TOTAL_L1_SIZE);
-        });
-        ScmDataCopyMsg((__cbuf__ void*)l1AddrDst, (__gm__ void*)gmAddr, intriParams, ubAddr);
-#else
-        ScmDataCopyMsg((__cbuf__ void*)dst, (__gm__ void*)gmAddr, intriParams, ubAddr);
-#endif
-    }
-#endif
 }
 
 template <typename T>
@@ -940,20 +923,11 @@ __aicore__ inline void DataCopyUB2L0CImpl(
 }
 
 // SRC: L1
-template <typename T, uint8_t subBlockId = 0>
+template <typename T>
 __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-#if __MIX_CORE_AIC_RATION__ != 1
-    static_assert(subBlockId < 2, "subBlockId must be less than 2 when AIC:AIV ratio is 1:2");
-    CopyCbufToUbuf<T, subBlockId>(
+    CopyCbufToUbuf(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
-#else
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "unsupported data copy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT) on current device when "
-                          "AIC:AIV ratio is 1:1");
-    });
-#endif
 }
 
 template <typename T>
@@ -1615,9 +1589,6 @@ __aicore__ inline void DataCopyPadUB2L1Impl(
 __aicore__ inline void NdDmaDciImpl()
 {
 #if ((!defined(ASCENDC_CPU_DEBUG)) || ASCENDC_CPU_DEBUG == 0)
-    if ASCEND_IS_AIC {
-        return;
-    }
     nd_dma_dci();
 #endif
 }

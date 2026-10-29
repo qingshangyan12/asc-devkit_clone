@@ -44,19 +44,16 @@ struct KfcHalfAlltoAllVMesh1DContext : CcuKernelCtxBase {
     // peerBuffer[peerId] 为对端 cclBuffer 首地址；本 rank 槽位由 myBufferAddr 填入
     std::vector<ccu::Variable> peerBuffer;
     std::vector<ccu::Variable> token;
-    // 单 mission 模式：读取完整的 2*rankSize 数组（兼容源端双片填充）
     // 前 rankSize 个为 A 片参数，后 rankSize 个为 B 片参数
     std::unique_ptr<ccu::Array<ccu::Variable>> sendSize;
     std::unique_ptr<ccu::Array<ccu::Variable>> sendOffset;
     GroupOpSizeVars goSize;
     std::vector<ccu::Event> writeDoneEvents;
 
-    // 阶段 3-1：双 mission 参数
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
-    // 构图期常量（与 kfcServerArgs 运行时值同源）：选本 mission 的通知位
+    // 构图期常量（CCU_IF 为运行时分支，构图期两分支都会执行，tag/位选择必须用宿主常量）
     uint32_t hostMissionIndex = 0;
-    // 构图期常量：mission 总数（server 侧 GetKfcServerMissionNum），收尾栅栏的门控
     uint32_t hostMissionNum = 1;
 };
 
@@ -82,7 +79,6 @@ static CcuResult InitResource(KfcHalfAlltoAllVMesh1DContext& ctx)
         channelIdx++;
     }
 
-    // 单 mission：分配 2*rankSize 数组（兼容源端双片填充模式）
     const uint32_t sliceArgNum = ctx.rankSize * NUM_TWO;
     ctx.sendSize = std::make_unique<ccu::Array<ccu::Variable>>(sliceArgNum);
     ctx.sendOffset = std::make_unique<ccu::Array<ccu::Variable>>(sliceArgNum);
@@ -108,9 +104,6 @@ static CcuResult LoadArgsFromMem(
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
 
-    // 单 mission 模式：读取完整的 2*rankSize 数组（兼容源端双片填充）
-    // 前 rankSize 个为 A 片，后 rankSize 个为 B 片
-    // 如果样例按单片模式填充（A 片全量，B 片为 0），也能正确处理
     const uint32_t sliceArgNum = ctx.rankSize * NUM_TWO;
     CCU_CHK_RET(ccu::Load(sendSizeAddr, *ctx.sendSize, sliceArgNum));
     CCU_CHK_RET(ccu::Load(sendOffsetAddr, *ctx.sendOffset, sliceArgNum));
@@ -119,9 +112,7 @@ static CcuResult LoadArgsFromMem(
 
 static CcuResult PreSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 {
-    // 把本端 cclBuffer 地址与 token 广播给所有对端。
-    // 通知位按 missionIndex 错开（双 mission 共享 channel，同一位会死锁）：
-    // m0 用 bit1/bit2，m1 用 bit3/bit4（构图期常量选位，非运行时分支）。
+    // 广播本端 cclBuffer 地址与 token；通知位按 missionIndex 错开
     const uint16_t bufferBit = HA2AV_BUFFER_BITS[ctx.hostMissionIndex];
     const uint16_t tokenBit = HA2AV_TOKEN_BITS[ctx.hostMissionIndex];
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
@@ -140,10 +131,7 @@ static CcuResult PreSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 // 源端保序方案，当前最大支持 8P 通信域；通道保序方案明确后可放开
 static CcuResult PostSync(KfcHalfAlltoAllVMesh1DContext& ctx)
 {
-    // 远程 Post 同步仅在 mission 0 执行（与 hcomm 原版一致：Mi1 不做远程 Post）。
-    // 单 mission 时 missionIndex 必然为 0，保持现有行为。mission 0 的 post 位
-    // （bit0）当前无并发使用者：mission 1 不做 Post，preSync 位已按 mission 错开。
-    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
+    // 远程 Post 同步仅 mission 0 执行；CCU_IF 内不可提前 return
     CCU_IF(ctx.missionNum == 2)
     {
         // 双 mission 模式
@@ -179,12 +167,6 @@ static CcuResult DoHalfAlltoAllVWrite(
     ccu::Variable curOffset;
     uint32_t channelIdx = 0;
 
-    // 阶段 3-1：双 mission 支持
-    // missionNum==1 时为单 mission 模式（合并 A+B，兼容现有行为）
-    // missionNum==2 时为双 mission 模式：
-    //   - missionIndex==0 使用 A 切片（前 rankSize 个元素）
-    //   - missionIndex==1 使用 B 切片（后 rankSize 个元素），且接收地址需加 sizeA 偏移
-
     for (uint32_t peerId = 0; peerId < ctx.rankSize; peerId++) {
         const uint32_t eventIdx = peerId / HA2AV_BITS_PER_EVENT;
         const uint16_t peerBit = 1U << (peerId % HA2AV_BITS_PER_EVENT);
@@ -194,44 +176,37 @@ static CcuResult DoHalfAlltoAllVWrite(
         ccu::Variable offsetA = (*ctx.sendOffset)[peerId];
         ccu::Variable offsetB = (*ctx.sendOffset)[ctx.rankSize + peerId];
 
-        // 根据 mission 模式选择切片
         CCU_IF(ctx.missionNum == 1)
         {
-            // 单 mission 模式：合并 A+B 两片的数据量（兼容现有行为）
             curCount = sizeA + sizeB;
             curOffset = offsetA;
         }
         CCU_ELSE
         {
-            // 双 mission 模式：根据 missionIndex 选择 A 或 B 切片
             CCU_IF(ctx.missionIndex == 0)
             {
-                // mission 0: A 切片
                 curCount = sizeA;
                 curOffset = offsetA;
             }
             CCU_ELSE
             {
-                // mission 1: B 切片
                 curCount = sizeB;
                 curOffset = offsetB;
             }
         }
 
-        // 源地址：根据选择的 offset
         ccu::LocalAddr src;
         src.addr = ctx.userInAddr;
         src.addr += curOffset;
         src.token = ctx.token[ctx.rankId];
 
         if (peerId == ctx.rankId) {
-            // 本地拷贝：源和目标都在本地
             localSrc.addr = src.addr;
             localSrc.token = src.token;
             localDst.addr = ctx.peerBuffer[ctx.rankId];
             localDst.addr += ctx.recvOffset;
 
-            // 阶段 3-1：mission 1 的接收地址需跳过 mission 0 的数据段
+            // mission 1 的接收地址跳过 mission 0 的数据段
             CCU_IF(ctx.missionNum == 2)
             {
                 CCU_IF(ctx.missionIndex != 0) { localDst.addr += sizeA; }
@@ -246,7 +221,7 @@ static CcuResult DoHalfAlltoAllVWrite(
         dst.addr = ctx.peerBuffer[peerId];
         dst.addr += ctx.recvOffset;
 
-        // 阶段 3-1：mission 1 的接收地址需跳过 mission 0 的数据段
+        // mission 1 的接收地址跳过 mission 0 的数据段
         CCU_IF(ctx.missionNum == 2)
         {
             CCU_IF(ctx.missionIndex != 0) { dst.addr += sizeA; }
@@ -254,7 +229,7 @@ static CcuResult DoHalfAlltoAllVWrite(
 
         dst.token = ctx.token[peerId];
 
-        // 变长场景空分片是常态，count==0 时只置位不发数据
+        // 空分片只置位不发数据
         CCU_IF(curCount != 0)
         {
             CCU_CHK_RET(
@@ -285,15 +260,12 @@ static CcuResult DoHalfAlltoAllV(KfcHalfAlltoAllVMesh1DContext& ctx)
     ccu::LocalAddr localDst;
     CCU_CHK_RET(DoHalfAlltoAllVWrite(ctx, localSrc, localDst));
 
-    // 本地拷贝（GroupCopy）仅在 mission 0 执行（对应 hcomm 原版 missionId_==0 分支；
-    // 单 mission 时 missionIndex 必然为 0，行为不变）
+    // 本地拷贝仅 mission 0 执行
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize)); }
 
     CCU_CHK_RET(DoHalfAlltoAllVWait(ctx));
 
-    // 收尾栅栏：对应 hcomm 原版 MissionSync(0)——两 mission 互等对方 writeDone 全清。
-    // bit 按 mission 错开（post/wait 各一次，与 PreSync 同一死锁约束），门控用构图期
-    // 常量（CCU_IF 是运行时分支，构图期两分支都会注册 tag）。
+    // 收尾栅栏：两 mission 互等对方 writeDone 全清；bit 按 mission 错开
     if (ctx.hostMissionNum == KFC_MAX_MISSION_NUM) {
         if (ctx.hostMissionIndex == 0) {
             CCU_CHK_RET(ccu::EventRecord("MiFin_m0", 1U << 0));
@@ -320,7 +292,6 @@ CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ctx.rankId = rankId;
     InitCcuKernelCtxBase(ctx);
 
-    // 阶段 3-1：设置 mission 参数
     ctx.missionNum = missionNum;
     ctx.missionIndex = missionIndex;
     ctx.hostMissionIndex = hostMissionIndex;

@@ -222,24 +222,6 @@ __simd_callee__ inline void ReciprocalCastImpl(S& dstReg, V& srcReg, MaskReg& ma
         "current ReciprocalCast api only supported Mode ZEROING on current device!");
     ReciprocalCastImpl<ActualT, ActualU, trait.layoutMode, trait.mrgMode>(dstReg, srcReg, mask);
 }
-template <CMPMODE mode = CMPMODE::GE, typename T, typename U>
-__simd_callee__ inline void MulComparesImpl(MaskReg& dst, T& srcReg0, T& srcReg1, U scalarValue, MaskReg& mask)
-{
-    // NOT IMPLEMENTED
-}
-
-template <typename T, typename U, RegLayout layoutMode, MaskMergeMode mode, RoundMode roundMode>
-__simd_callee__ inline void MulCastImpl(
-    RegTensor<T>& dstReg, RegTensor<U>& srcReg0, RegTensor<U>& srcReg1, MaskReg& mask)
-{
-    // NOT IMPLEMENTED
-}
-
-template <const CastTrait& trait, typename T, typename U>
-__simd_callee__ inline void MulCastImpl(T& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    // NOT IMPLEMENTED
-}
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_IMPL_H

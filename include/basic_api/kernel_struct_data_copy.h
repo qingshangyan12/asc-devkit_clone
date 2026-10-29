@@ -106,6 +106,7 @@ struct DataCopyParams {
 enum class DataCopyMVType : uint8_t {
     UB_TO_OUT = 0,
     OUT_TO_UB = 1,
+    OUT_TO_L1 = 2,
 };
 
 struct NdDmaConfig {

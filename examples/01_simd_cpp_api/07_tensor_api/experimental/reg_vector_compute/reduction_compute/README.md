@@ -14,9 +14,11 @@ dst[128] = min(src[0:64])
 
 每个归约结果区只有首元素有效，其余元素不参与结果校验。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR&950DT系列产品
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -49,7 +51,7 @@ dst[128] = min(src[0:64])
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 layout 构造 GM、UB Tensor。
-    2. 使用 `asc_lock/asc_unlock` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将输入从 GM 搬运到 UB。
+    2. 使用 `asc::te::mutex` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将输入从 GM 搬运到 UB。
     3. 使用 `all_mask<float>` 和 `load` 将64个 `float` 数据加载为 Reg Tensor。
     4. 调用 `reduce_sum<reduce_scope::element, float>`、`reduce_max` 和 `reduce_min` 完成 element scope归约。
     5. 使用 `store` 写入三个 UB 结果区，再通过 `make_copy(copy_ub_to_gm{})` 和 `copy` 写回 GM。

@@ -1054,8 +1054,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    // 裸名识别为 BARE_NAME 并产出 algName（fork 裸名强制算法通路）。
-    // 本用例聚焦 GetCcuOpParamResCtx 流程，后续步骤直接消费该 algName。
+    // 裸名识别为 BARE_NAME 并产出 algName
     ASSERT_EQ(ClassifyForcedAlgConfig(ccTiling.algConfig, extBareName, extSpec, extParseErrMsg), ForcedAlgKind::BARE_NAME);
     algName = extBareName;
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam, topoInfo), HCCL_SUCCESS);

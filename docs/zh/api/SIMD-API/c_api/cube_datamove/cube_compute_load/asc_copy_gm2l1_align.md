@@ -160,7 +160,7 @@ PIPE_MTE2
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 ```cpp
@@ -244,7 +244,7 @@ __global__ __mix__(1, 2) void asc_copy_gm2l1_align_modes_kernel(  // __mix__：�
         asc_sync_pipe(PIPE_MTE1);
         asc_sync_intra_arrive(PIPE_MTE1, AIC_TO_AIV_SYNC_ID);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 std::vector<uint8_t> MakeInput()

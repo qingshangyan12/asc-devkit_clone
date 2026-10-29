@@ -65,12 +65,12 @@ L0C Buffer中存储的float类型数据来自矩阵乘计算的结果，当输�
 | fp8_e4m3fn_t | QF322FP8_PRE / VQF322FP8_PRE | +inf | 0x7E（448.0，MAX）  | 0x7F（nan）   |
 | fp8_e4m3fn_t | QF322FP8_PRE / VQF322FP8_PRE | -inf | 0xFE（-448.0，MIN） | 0x7F（nan）   |
 | fp8_e4m3fn_t | QF322FP8_PRE / VQF322FP8_PRE | nan | 0x00（0）          | 0x7F（nan）   |
-| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | +inf | 111（HiF8+inf）    | 111（HiF8+inf） |
-| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | -inf | 239（HiF8-inf）    | 239（HiF8-inf） |
-| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | nan | 0                | 128（HiF8NAN） |
-| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | +inf | 111（HiF8+inf）    | 111（HiF8+inf） |
-| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | -inf | 239（HiF8-inf）    | 239（HiF8-inf） |
-| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | nan | 0                | 128（HiF8NAN） |
+| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | +inf | 0x6E（32768.0，MAX） | 0x6F（HiF8+inf） |
+| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | -inf | 0xEE（-32768.0，MIN） | 0xEF（HiF8-inf） |
+| hifloat8_t | QF322HIF8_PRE / VQF322HIF8_PRE | nan | 0x00（0）        | 0x80（HiF8NAN） |
+| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | +inf | 0x6E（32768.0，MAX） | 0x6F（HiF8+inf） |
+| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | -inf | 0xEE（-32768.0，MIN） | 0xEF（HiF8-inf） |
+| hifloat8_t | QF322HIF8_PRE_HYBRID / VQF322HIF8_PRE_HYBRID | nan | 0x00（0）        | 0x80（HiF8NAN） |
 | int8_t | QF322B8_PRE / VQF322B8_PRE | +inf | 127（MAX）         | 127（MAX）    |
 | int8_t | QF322B8_PRE / VQF322B8_PRE | -inf | -128（MIN）        | -128（MIN）   |
 | int8_t | QF322B8_PRE / VQF322B8_PRE | nan | 0                | 0           |
@@ -85,10 +85,12 @@ L0C Buffer中存储的float类型数据来自矩阵乘计算的结果，当输�
 
 - float类型的inf/nan在饱和模式和非饱和模式下均保持原样输出，因为CTRL[48]不支持float数据类型。
 - fp8_e4m3fn_t类型没有inf的编码格式。非饱和模式下，若结果绝对值为inf或大于fp8_e4m3fn_t的最大规格化值（448），输出为nan（0x7F）。
-- hifloat8_t类型中，111（0b01101111）为HiF8+inf编码，239（0b11101111）为HiF8-inf编码，128（0b10000000）为HiF8NAN编码。饱和模式下，inf保持为对应的inf编码，nan被饱和为0。
-- hifloat8_t的溢出判断阈值为1.25×2^15=40960，当量化后的值绝对值大于等于40960时，输出inf编码（111/239），而非饱和为最大值240。
+- hifloat8_t类型中，0x6F为HiF8+inf编码，0xEF为HiF8-inf编码，0x80为HiF8NAN编码，0x6E和0xEE分别为HiF8的最大值和最小值（±32768）。饱和模式下，inf被饱和为对应符号的最值（0x6E/0xEE），nan被饱和为0x00；非饱和模式下，inf/nan保持对应编码（0x6F/0xEF/0x80）。
+- hifloat8_t的溢出行为与舍入模式有关：
+    - **Half to Away**（QF322HIF8_PRE/VQF322HIF8_PRE）：HiF8最大有限值为32768（编码0x6E），溢出判断阈值为40960（1.25×2^15）。绝对值在`[32768, 40960)`内时向下舍入到32768（编码0x6E）；大于等于40960时，非饱和输出inf编码（正数0x6F、负数0xEF），饱和输出最值编码（正数0x6E、负数0xEE）。
+    - **Hybrid**（QF322HIF8_PRE_HYBRID/VQF322HIF8_PRE_HYBRID）：`|exp|≥4`时使用SSR（Simplified Stochastic Rounding），无固定阈值，是否输出inf由输入位模式决定，小于40960也可能输出inf。以float输入、scale=1、CTRL[48]=1（非饱和）、`[32768, 65536)`（E=15）为例，记float位模式为`u`：`F14=(u&0x003FFFFF)>>8`、`T14=u&0x00003FFF`，`F14>=T14`时进位到inf（正数0x6F、负数0xEF），否则输出32768（编码0x6E）。
 - 整数类型只有饱和模式，饱和模式和非饱和模式下的输出结果一致。
-- VQF322HIF8_PRE使用Half to Away舍入模式，VQF322HIF8_PRE_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR（Stochastic Rounding）随机舍入）。两种模式对inf/nan的处理一致。
+- VQF322HIF8_PRE_HYBRID在`|exp|<4`时按Half to Away，`|exp|≥4`时按上述SSR；两种模式对inf/nan处理一致。
 - 同一输出类型的scalar模式（如QF322F16_PRE）与tensor模式（如VQF322F16_PRE）使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量vs每列张量），因此表中将scalar模式与tensor模式合并列出。
 
 ## int32_t类型L0C Buffer搬运至各输出类型

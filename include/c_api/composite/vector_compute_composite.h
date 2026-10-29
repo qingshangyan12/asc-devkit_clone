@@ -20,10 +20,11 @@
 #ifndef INCLUDE_C_API_COMPOSITE_VECTOR_COMPUTE_COMPOSITE_H
 #define INCLUDE_C_API_COMPOSITE_VECTOR_COMPUTE_COMPOSITE_H
 #include "c_api/defs/defs.h"
+#include "c_api/vector_compute/compute/vector_permute_sel.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/vector_compute_composite_intf_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/vector_compute_composite_intf_impl.h"
 #endif
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add and asc_sync)

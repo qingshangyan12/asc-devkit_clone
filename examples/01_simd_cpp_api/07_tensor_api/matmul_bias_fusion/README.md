@@ -150,7 +150,7 @@ $$
 
 ### Vector侧加法流程
 
-每个AIV通过`asc_get_sub_block_id()`确定自己负责的M半块。收到AIC对应slot的通知后，逐行、逐`vector_len`列处理：先将UB中的Cube结果复制到Vector临时Tensor，再把Residual从GM搬到UB，调用`compute_add`，最后将输出Tensor复制到Y的GM切片。两个AIV负责互不重叠的行区间。
+每个AIV通过`asc::te::get_sub_block_id()`确定自己负责的M半块。收到AIC对应slot的通知后，逐行、逐`vector_len`列处理：先将UB中的Cube结果复制到Vector临时Tensor，再把Residual从GM搬到UB，调用`compute_add`，最后将输出Tensor复制到Y的GM切片。两个AIV负责互不重叠的行区间。
 
 ### L0C到UB的双目标和同步
 

@@ -26,8 +26,8 @@ namespace AscendC {
  * \param [in] isReuseSource: indicate whether to reuse source tensor.
  *             When enable isReuseSource, src tensor will be used as tmp buffer for calculation.
  * \param [in] groupNum: number of groups to separate the channels into
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  * \return flag for whether the tmp buffer size is calculated successfully
  *         If src shape is illegal for basic block, it will return false.
  */

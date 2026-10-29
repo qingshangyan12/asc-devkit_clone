@@ -105,9 +105,12 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -120,31 +123,49 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 
-__simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src)
+__simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
     vector_float src_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_loadalign(src_reg, src);
-    asc_relu(dst_reg, src_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src_reg, src + offset);
+        asc_relu(dst_reg, src_reg, mask);
+        asc_storealign(dst + offset, dst_reg, mask);
+    }
 }
 
 __global__ __vector__ void asc_relu_kernel(__gm__ float* dst, __gm__ float* src)
 {
     asc_init();
-    __ubuf__ float dst_local[ELEMENT_COUNT];
-    __ubuf__ float src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(float));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    compute(dst_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
+    __ubuf__ float dst_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, TOTAL_LENGTH * sizeof(float));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<compute>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, TOTAL_LENGTH * sizeof(float));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 
@@ -152,10 +173,10 @@ __global__ __vector__ void asc_relu_kernel(__gm__ float* dst, __gm__ float* src)
 
 int main()
 {
-    std::vector<float> src(ELEMENT_COUNT);
-    std::vector<float> output(ELEMENT_COUNT, 0.0f);
-    std::vector<float> golden(ELEMENT_COUNT);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<float> src(TOTAL_LENGTH);
+    std::vector<float> output(TOTAL_LENGTH, 0.0f);
+    std::vector<float> golden(TOTAL_LENGTH);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         src[i] = (static_cast<int>(i) - 32) * 0.25f;
         golden[i] = std::max(src[i], 0.0f);
     }
@@ -163,10 +184,10 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     float* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(float),
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (TOTAL_LENGTH) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
