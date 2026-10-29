@@ -33,7 +33,7 @@
 将src0和src1中的元素解交织存入`result.first`和`result.second`中，本接口提供矢量数据解交织和掩码解交织两种功能模式：
 
 - **矢量数据解交织**：对两个源矢量数据寄存器中的有效元素逐对解交织。src0的偶数索引元素写入`result.first`前半部分，奇数索引元素写入`result.second`前半部分。src1的偶数索引元素写入`result.first`后半部分，奇数索引元素写入`result.second`后半部分。
-- **掩码解交织**：对两个源掩码寄存器中的比特位按指定位宽解交织。src0的偶数索引位写入`result.first`前半部分，奇数索引位写入`result.second`前半部分。src1的偶数索引位写入`result.first`后半部分，奇数索引位写入`result.second`后半部分。
+- **掩码解交织**：根据接口后缀指定的粒度，对两个源掩码寄存器中的比特位分组后进行解交织。`asc_deintlv_b8`以1bit为一组，`asc_deintlv_b16`以2bit为一组，`asc_deintlv_b32`以4bit为一组，组内比特位的顺序保持不变。分组从低位到高位按0开始编号。src0的偶数索引分组写入`result.first`前半部分，奇数索引分组写入`result.second`前半部分。src1的偶数索引分组写入`result.first`后半部分，奇数索引分组写入`result.second`后半部分。
 
 以int8_t数据类型为例，asc_deintlv的实现流程如图1所示：
 
@@ -52,7 +52,7 @@
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_deintlv(vector_<dtype> src0,
-                                                              vector_<dtype> src1)
+                                                            vector_<dtype> src1)
 ```
 
 #### dtype支持数据类型
@@ -64,7 +64,7 @@ __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_deintlv(vector_<dtype> src0,
 ```c
 // 通过函数返回值返回结果示例：对half矢量数据寄存器执行解交织。
 __simd_callee__ inline asc_half_half_pair asc_deintlv(vector_half src0,
-                                                           vector_half src1)
+                                                      vector_half src1)
 ```
 
 ### 掩码寄存器解交织模式
@@ -72,13 +72,13 @@ __simd_callee__ inline asc_half_half_pair asc_deintlv(vector_half src0,
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b8(vector_bool src0,
-                                                            vector_bool src1)
+                                                         vector_bool src1)
 
 __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b16(vector_bool src0,
-                                                              vector_bool src1)
+                                                          vector_bool src1)
 
 __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0,
-                                                              vector_bool src1)
+                                                          vector_bool src1)
 ```
 
 ## 参数说明
@@ -87,15 +87,15 @@ __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| src0 | 输入 | 源矢量数据寄存器，参与解交织的操作数。dtype须与dst0一致。其偶数索引元素写入dst0前半部分，奇数索引元素写入dst1前半部分。 |
-| src1 | 输入 | 源矢量数据寄存器，参与解交织的操作数。dtype须与dst0一致。其偶数索引元素写入dst0后半部分，奇数索引元素写入dst1后半部分。 |
+| src0 | 输入 | 源矢量数据寄存器，参与解交织的操作数。`dtype`须与`src1`一致。其偶数索引元素写入`result.first`前半部分，奇数索引元素写入`result.second`前半部分。 |
+| src1 | 输入 | 源矢量数据寄存器，参与解交织的操作数。`dtype`须与`src0`一致。其偶数索引元素写入`result.first`后半部分，奇数索引元素写入`result.second`后半部分。 |
 
 **表2** 参数说明（操作数为掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| src0 | 输入 | 源掩码寄存器，参与解交织的操作数。其偶数索引位写入dst0前半部分，奇数索引位写入dst1前半部分。 |
-| src1 | 输入 | 源掩码寄存器，参与解交织的操作数。其偶数索引位写入dst0后半部分，奇数索引位写入dst1后半部分。 |
+| src0 | 输入 | 源掩码寄存器，参与解交织的操作数。其偶数索引分组写入`result.first`前半部分，奇数索引分组写入`result.second`前半部分。 |
+| src1 | 输入 | 源掩码寄存器，参与解交织的操作数。其偶数索引分组写入`result.first`后半部分，奇数索引分组写入`result.second`后半部分。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
@@ -104,7 +104,7 @@ __simd_callee__ inline asc_bool_bool_pair asc_deintlv_b32(vector_bool src0,
 返回[双返回值结构体](pair.md)，使用变量`result`接收返回值。
 
 - 操作数为矢量数据寄存器时，返回类型为`asc_<dtype>_<dtype>_pair`，两个成员的类型均为`vector_<dtype>`。`result.first`保存解交织后的偶数下标元素集合，`result.second`保存奇数下标元素集合。
-- 操作数为掩码寄存器时，b8、b16和b32模式的返回类型均为`asc_bool_bool_pair`，两个成员的类型均为`vector_bool`，分别保存对应粒度下解交织后的偶数下标位集合和奇数下标位集合。
+- 操作数为掩码寄存器时，b8、b16和b32模式的返回类型均为`asc_bool_bool_pair`，两个成员的类型均为`vector_bool`，分别保存对应粒度下解交织后的偶数索引分组和奇数索引分组。
 
 ## 约束说明
 

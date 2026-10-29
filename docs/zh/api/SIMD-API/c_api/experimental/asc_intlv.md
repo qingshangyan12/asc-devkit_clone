@@ -50,7 +50,7 @@
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_intlv(vector_<dtype> src0,
-                                                       vector_<dtype> src1)
+                                                          vector_<dtype> src1)
 ```
 
 #### dtype支持数据类型
@@ -62,7 +62,7 @@ __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_intlv(vector_<dtype> src0,
 ```c
 // 通过函数返回值返回结果示例：对int8_t矢量数据寄存器执行交织。
 __simd_callee__ inline asc_int8_t_int8_t_pair asc_intlv(vector_int8_t src0,
-                                                         vector_int8_t src1)
+                                                        vector_int8_t src1)
 ```
 
 ### 掩码寄存器交织模式
@@ -70,11 +70,11 @@ __simd_callee__ inline asc_int8_t_int8_t_pair asc_intlv(vector_int8_t src0,
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline asc_bool_bool_pair asc_intlv_b8(vector_bool src0,
-                                                        vector_bool src1)
+                                                       vector_bool src1)
 __simd_callee__ inline asc_bool_bool_pair asc_intlv_b16(vector_bool src0,
-                                                          vector_bool src1)
+                                                        vector_bool src1)
 __simd_callee__ inline asc_bool_bool_pair asc_intlv_b32(vector_bool src0,
-                                                          vector_bool src1)
+                                                        vector_bool src1)
 ```
 
 ## 参数说明
@@ -115,7 +115,7 @@ __simd_callee__ inline asc_bool_bool_pair asc_intlv_b32(vector_bool src0,
 
 ### 寄存器约束
 
-- `src0`和`src1`可以为同一个矢量数据寄存器或掩码寄存器。
+`src0`和`src1`可以为同一个矢量数据寄存器或掩码寄存器。
 
 ## 调用示例
 
