@@ -260,7 +260,7 @@ OP_ADD(AddCustom);
 
 #### 配置构建目标<a id="target-configuration"></a>
 
-设备查询命令得到的`soc_version`与工程使用的构建目标标识（soc_series）不是同一个值，不能直接把查询结果填入`ASCEND_SOC_SERIES`或`AddConfig`。各产品对应的soc_series请以[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的表1为准。
+设备查询命令得到的`soc_version`与工程使用的构建目标标识（soc_series）不是同一个值，不能直接把查询结果填入`ASCEND_SOC_SERIES`或`AddConfig`，具体映射关系见下方说明。
 
 本示例的CMake和Host原型均使用`ascend910b`。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准。
 
