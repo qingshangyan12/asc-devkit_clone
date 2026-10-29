@@ -4,7 +4,7 @@
 
 ## 生成代码调试
 
-`npu_op_code_gen`在cmake configure阶段自动生成aclnn调用代码和算子原型定义代码。生成产物位于`ASCEND_AUTOGEN_PATH`目录，默认是`<CMAKE_BINARY_DIR>/autogen`；按本文示例使用`build_out`时，对应目录为`build_out/autogen`。当原型定义有误或生成结果与预期不符时，需要检查这些文件。
+`npu_op_code_gen`在CMake configure阶段自动生成aclnn调用代码和算子原型定义代码。生成产物位于`ASCEND_AUTOGEN_PATH`目录，默认是`<CMAKE_BINARY_DIR>/autogen`；按本文示例使用`build_out`时，对应目录为`build_out/autogen`。当原型定义有误或生成结果与预期不符时，需要检查这些文件。
 
 ### 生成产物目录
 
@@ -67,9 +67,9 @@ cd /data/asc-devkit/AddCustom/build_out/op_host && /usr/bin/c++ -D_FORTIFY_SOURC
 - 编译选项（如`-fvisibility=hidden`、`-g`、`-O2`）。
 - 链接库路径（`-L`）和链接库（`-l`）。
 
-### 方式二：cmake配置CMAKE_VERBOSE_MAKEFILE
+### 方式二：CMake配置CMAKE_VERBOSE_MAKEFILE
 
-在cmake configure阶段开启verbose，后续所有make调用都会自动打印完整命令：
+在CMake configure阶段开启verbose，后续所有make调用都会自动打印完整命令：
 
 ```bash
 cmake -S . -B build_out --preset=default -DCMAKE_VERBOSE_MAKEFILE=ON
@@ -146,7 +146,7 @@ build_out/op_kernel/AddCustom_ascendxxyy/kernel_*/kernel_meta_<kernel_name>/kern
 set(ASCEND_SKIP_FAILED_COMPUTE_UNIT TRUE)
 ```
 
-或在cmake命令行中传入：
+或在CMake命令行中传入：
 
 ```bash
 cmake -S . -B build_out --preset=default -DASCEND_SKIP_FAILED_COMPUTE_UNIT=TRUE

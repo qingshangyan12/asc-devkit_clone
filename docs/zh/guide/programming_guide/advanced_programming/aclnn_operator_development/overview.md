@@ -80,5 +80,5 @@
 以下为查阅型内容，可在开发过程中按需检索：
 
 - [命名转换规则对照表](./appendix/naming_conversion_table.md) — 算子类型名、文件名、核函数（Kernel）名的转换规则。
-- [cmake函数参考](./appendix/cmake_function_reference.md) — CMake函数的参数与用法详解。
+- [CMake函数参考](./appendix/cmake_function_reference.md) — CMake函数的参数与用法详解。
 - [外部样例链接汇总](./appendix/external_sample_links.md) — 文档中引用的外部样例与API链接汇总。

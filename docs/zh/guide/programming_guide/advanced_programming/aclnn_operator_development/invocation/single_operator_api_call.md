@@ -223,7 +223,7 @@ aclnnFinalize();
         mkdir -p build
         ```
 
-    2.  进入build目录，执行cmake编译命令，生成编译文件。
+    2.  进入build目录，执行CMake编译命令，生成编译文件。
 
         命令示例如下所示：
 

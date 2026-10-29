@@ -608,7 +608,7 @@ npu_op_package_add(${package_name}
 - `SRC_BASE`指向所有算子目录共同的源码根目录，`KERNEL_DIR`指向具体算子子目录。
 - 各算子的Host、核函数（Kernel）、Tiling文件集中在同一目录下。
 
-> 详细cmake函数参数请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
+> 详细CMake函数参数请参考[CMake函数参考](../appendix/cmake_function_reference.md)。
 
 完成编译组织之后，可按照[基本流程](#基本流程)的三个步骤完成算子编译与部署。
 
