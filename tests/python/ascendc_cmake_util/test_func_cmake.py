@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import sys
 import subprocess
 from pathlib import Path
 
@@ -237,3 +238,47 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-dir={root}/input" in arguments
+
+
+@pytest.mark.parametrize("ancestor", ["plain", "build-ascend910b-release", "ascend910b"])
+@pytest.mark.parametrize("relative_input", [False, True])
+def test_binary_metadata_paths_are_relative_to_selected_root(tmp_path, ancestor, relative_input):
+    soc = "ascend910b"
+    binary_base = tmp_path / ancestor / "binary"
+    root = binary_base / soc
+    descriptor = root / "add_custom" / "AddCustom_abcdef.json"
+    descriptor.parent.mkdir(parents=True)
+    metadata = {
+        "binFileName": "AddCustom_abcdef",
+        "binFileSuffix": ".o",
+        "coreType": "AiCore",
+        "supportInfo": {
+            "inputs": [{"name": "x", "index": 0, "paramType": "required"}],
+            "outputs": [{"name": "y", "index": 0, "paramType": "required"}],
+        },
+    }
+    descriptor.write_text(json.dumps(metadata), encoding="utf-8")
+    output = binary_base / "config" / soc
+    input_path = root.relative_to(tmp_path) if relative_input else root
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(FWK_MODULES_DIR / "util/ascendc_ops_config.py"),
+            "-p",
+            str(input_path),
+            "-s",
+            soc,
+            "-o",
+            str(output),
+        ],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    rewritten = json.loads(descriptor.read_text(encoding="utf-8"))
+    manifest = json.loads((output / "add_custom.json").read_text(encoding="utf-8"))
+    expected = (Path(soc) / "add_custom" / descriptor.name).as_posix()
+    assert rewritten["filePath"] == manifest["binList"][0]["binInfo"]["jsonFilePath"] == expected
+    assert (binary_base / rewritten["filePath"]).resolve() == descriptor.resolve()
+    assert {key: rewritten[key] for key in metadata} == metadata
