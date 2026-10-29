@@ -28,7 +28,7 @@
 
 头文件路径为：`"utils/debug/check_condition.h"`。
 
-用于检查Host侧条件是否成立。条件成立时，程序继续执行；条件不成立时，接口向标准错误流输出自定义错误信息、源文件名和行号，并触发C++标准`assert`断言。
+用于检查Host侧条件是否成立。条件成立时，程序继续执行；条件不成立时，接口向标准错误流输出自定义错误信息、源文件名和行号，并调用C++标准库`<cassert>`中的`assert`宏进行断言检查。未定义`NDEBUG`时，断言失败通常会导致程序异常终止。
 
 ## 函数原型
 
@@ -42,7 +42,7 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过；条件为`false`时输出诊断信息并触发C++标准`assert`。 |
+| condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过；条件为`false`时输出诊断信息，并调用C++标准库`<cassert>`中的`assert`宏。 |
 | violation_message | 输入 | 条件不成立时输出的自定义错误信息。传入`nullptr`时，输出默认信息`No violation message provided.`。 |
 
 ## 返回值说明
@@ -52,6 +52,7 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 ## 约束说明
 
 - 仅支持在Host侧代码中调用，不支持在Device侧代码中调用。
+- 在CMake工程的Release模式下，默认定义`NDEBUG`。此时`assert`不会检查条件，接口输出诊断信息后返回，调用方后续代码会继续执行。
 - 接口内部使用已经求值的条件触发断言，条件表达式只求值一次。
 
 ## 调用示例
