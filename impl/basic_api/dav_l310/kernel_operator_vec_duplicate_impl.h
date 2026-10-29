@@ -76,14 +76,14 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 0>(maskBuf, count);
                 constexpr uint32_t blkBaseOfMicro = 0;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, 
+                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlockStride) * ElePerBlkT,
                     dstVreg, dstBlockStride, maskReg);
             }
             if constexpr (MICRO_NUM_PER_ITER > 1) {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
                 constexpr uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepeatStride +blkBaseOfMicro * dstBlkStride) *ElePerBlkT, 
+                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlockStride) * ElePerBlkT,
                     dstVreg, dstBlockStride, maskReg);
             }
         } else {
@@ -94,7 +94,7 @@ __simd_vf__ inline void VecDupLevel0VFImpl(
                 }
                 const uint32_t blkBaseOfMicro = micro * BLK_NUM_PER_MICRO;
                 Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlkStride) * ElePerBlkT, 
+                    dst + (index * dstRepeatStride + blkBaseOfMicro * dstBlockStride) * ElePerBlkT,
                     dstVreg, dstBlockStride, maskReg);
             }
         }

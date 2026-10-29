@@ -217,7 +217,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
     const uint32_t countPerLogicalIter = count;
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
         if constexpr (isNormalMode) {
-            count = countPerLogicalIter;
+           count = countPerLogicalIter;
         }
         if constexpr (isNormalMode && isMaskBitMode && isSetMask) {
             {
@@ -238,7 +238,7 @@ __simd_vf__ inline void VecBinaryScalarLevel0VFImpl(
             }
             if constexpr (MICRO_NUM_PER_ITER > 1) {
                 maskReg = VecLogicalGetMicroMaskReg<T, isSetMask, isNormalMode, isMaskBitMode, 1>(maskBuf, count);
-                constexpor uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
+                constexpr uint32_t blkBaseOfMicro = BLK_NUM_PER_MICRO;
                 __ubuf__ T* srcMicro = src + (index * repeatParams.srcRepStride +
                     blkBaseOfMicro * repeatParams.srcBlkStride) * ElePerBlkT;
                 __ubuf__ T* dstMicro = dst + (index * repeatParams.dstRepStride +
@@ -465,10 +465,10 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
         }
         // when isSetMask is false, normal mode, maskBuf = nullptr, not support B8
         VecBinaryScalarLevel0VFImpl<func, isSetMask, isMaskBitMode, true, T, pattern, scalarIdx>(
-            dst, src0, src1, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf); 
-            if constexpr (isMaskBitMode && isSetMask) {
-                AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
-            }
+            dst, src0, src1, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+        if constexpr (isMaskBitMode && isSetMask) {
+            AscendC::AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
+        }
     }
 }
 } // namespace Internal

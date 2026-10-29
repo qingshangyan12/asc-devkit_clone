@@ -210,8 +210,8 @@ __simd_vf__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubu
                     Reg::MaskPack(maskRegSrc, maskReg);
                 }
                 constexpr uint32_t blkBaseOfMicro = 0;
-                __ubuf__ U *src0Micro = 
-                    src0 + 
+                __ubuf__ U *src0Micro =
+                    src0 +
                     (index * repeatParams.src0RepStride + blkBaseOfMicro * repeatParams.src0BlkStride) * ElePerBlkU;
                 __ubuf__ U *src1Micro =
                     src1 +
@@ -303,7 +303,6 @@ __simd_vf__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubu
                     dstMicro, dstVreg, repeatParams.dstBlkStride, maskRegDst);
             }
         }
-
     }
 }
 
@@ -311,7 +310,7 @@ template <auto func, bool isSetMask, bool isMaskBitMode, BinaryFuncMode funcMode
           typename U>
 __aicore__ inline void VecBinaryImplTemplate(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1,
                                              const uint64_t maskArray[], const uint64_t maskCount,
-                                             const uint8_t repeatTimes, const BinaryRepeatParams& repeatParams)
+                                             const uint8_t repeatTimes, const BinaryRepeatParams &repeatParams)
 {
     constexpr bool TUCompare = sizeof(T) > sizeof(U);
     using TT = typename Conditional<TUCompare, T, U>::type;
