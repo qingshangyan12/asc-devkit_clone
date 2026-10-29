@@ -482,6 +482,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "CcuSchedAllToAllSoleMeshConcurrent"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllToAllVSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllToAllVSoleMeshMultiJetty"},
         // ---- 8 处一对多 ----
         // AICPU·RS·sole[mesh]：小数据走裸名（大数据触发在下一用例）
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &twoLevel, CommEngine::COMM_ENGINE_AICPU_TS,
@@ -605,6 +607,13 @@ TEST(ExtAlgResolver, ErrorCasesCarryThreeElements)
     ASSERT_TRUE(ParseExternalAlg("sole[nhr]", spec, errMsg));
     EXPECT_EQ(ResolveExternalAlg(opRsCcu, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
     EXPECT_NE(errMsg.find("sole[nhr]"), std::string::npos);
+
+    // 规则全灭（A2AV sole[mesh.multi_channel]·CCU：唯一 CCU 候选 CcuSchedAllToAllVSoleMeshMultiJetty 带
+    // FLAG_UBX，单层 flat 拓扑不命中，无裸名兜底 -> 整键全灭回退）
+    OpParam opA2avCcu = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLTOALLV, CommEngine::COMM_ENGINE_CCU);
+    ASSERT_TRUE(ParseExternalAlg("sole[mesh.multi_channel]", spec, errMsg));
+    EXPECT_EQ(ResolveExternalAlg(opA2avCcu, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("sole[mesh.multi_channel]"), std::string::npos);
 }
 
 TEST(ExtAlgResolver, CandidateTableIsDeterministic)
