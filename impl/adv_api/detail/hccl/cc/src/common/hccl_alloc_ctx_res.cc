@@ -234,6 +234,19 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     // 注意：HalfAlltoAllV 的 window 基址不走 res[1]——master 上 res[1] 已固定为 dieSplitRatio
     // 千分比（GetCcuOpParamResCtx 会覆写，设备侧 hccl_ccu_v0.h 按比例语义读取）。
     // 本端 cclBuffer 落点由模板 CalcRes 经 CcuKernelInfo::localWinAddr → KfcServer kernelArg 传递。
+    // res[3]/res[4]：本端 cclBuffer 基址/大小（与 localWinAddr 同源同值）。KFC server 写入侧
+    // 用 kernelArg.localWinAddr；AIC 侧（MC2 op kernel 回读结果）无 kernelArg 通道，经 OpResCtx
+    // 下发（旧链路里该值由 AICPU server 填 legacy HcclCombineOpParam.windowsOut[0]，新链路无此填写方）。
+    {
+        void* cclBufferAddr = nullptr;
+        uint64_t cclBufferSize = 0;
+        CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
+        opResCtx.res[3] = reinterpret_cast<uint64_t>(cclBufferAddr);
+        opResCtx.res[4] = cclBufferSize;
+        HCCL_INFO(
+            "[AllocCcuOpResCtx] cclBuffer[0x%llx], cclBufferSize[%llu] via res[3]/res[4].",
+            static_cast<unsigned long long>(opResCtx.res[3]), static_cast<unsigned long long>(opResCtx.res[4]));
+    }
 
     HCCL_INFO(
         "[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "

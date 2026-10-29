@@ -524,6 +524,10 @@ HcclResult AllocComResourceByTilingCcu(
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
+    // 设备侧 InitV2 以 version==MC2_CCU_LAUNCH_VERSION 识别新版 context（否则按 legacy
+    // HcclCombineOpParam 解释，MC2 op kernel 会读错布局）。零值初始化会让设备侧
+    // 一直走 legacy 分支——builtin 路径（Mc2AcquireCcResCtx）有写，tiling 路径此前漏写。
+    resCtx.version = static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION);
     if (checkOnly) {
         resCtx.rankId = userRank;
         resCtx.rankSize = rankSize;
