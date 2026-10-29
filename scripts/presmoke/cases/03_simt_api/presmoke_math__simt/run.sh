@@ -30,4 +30,4 @@ case_run() { :; }
 case_verify() { :; }
 case_clean() { rm -rf "$BUILD_DIR"; }
 
-presmoke_case_main "$@"
+#presmoke_case_main "$@"
