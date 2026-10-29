@@ -13,14 +13,33 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
 import unittest
 from pathlib import Path
 
 from presmoke.model import Command, ExampleSpec
-from presmoke.planner import build_cells_with_skips, rewrite_cmake
+from presmoke.planner import build_cells_with_skips, rewrite_cmake, rewrite_command
+from presmoke.readme_spec import split_commands
 
 
 class PlannerTest(unittest.TestCase):
+    def test_rewrite_preserves_shell_quoting_and_expansion(self) -> None:
+        original = "FLAG=1 cmake -DROOT=\"$TEST_ROOT/path with spaces\" -DLITERAL='$TEST_ROOT' .."
+        command = split_commands(original)[0]
+        rewritten = rewrite_command(command, "dav-2201", "npu").raw
+        env = os.environ.copy()
+        env.update(command.env)
+        env["TEST_ROOT"] = "parent dir"
+        bash = env.get("PRESMOKE_TEST_BASH", "/bin/bash")
+        shell = 'cmake() { printf "%s\\n" "$@"; }; ' + rewritten
+        result = subprocess.run([bash, "-lc", shell], env=env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout.splitlines(),
+            ["-DROOT=parent dir/path with spaces", "-DLITERAL=$TEST_ROOT", "..", "-DCMAKE_ASC_ARCHITECTURES=dav-2201"],
+        )
+
     def test_rewrite_cmake_replaces_arch_and_mode(self) -> None:
         cmd = rewrite_cmake(
             "cmake -DSCENARIO_NUM=4 -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCMAKE_ASC_RUN_MODE=cpu ..", "dav-3510", "sim"
