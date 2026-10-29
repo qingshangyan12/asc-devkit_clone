@@ -130,7 +130,7 @@ __simd_callee__ inline void ShiftRightsImpl(S& dstReg, S& srcReg, U scalarValue,
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftRights api only supported Mode ZEROING on current device!");
-   
+
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vshrs(dstReg, srcReg, scalarValue, mask, modeValue);
 }
