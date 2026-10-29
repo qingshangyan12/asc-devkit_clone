@@ -58,7 +58,7 @@ struct cast_element_bits {
         {                                                                                           \
             constexpr uint32_t dst_bits = cast_element_bits<TO>::value;                             \
             constexpr uint32_t src_bits = cast_element_bits<FROM>::value;                           \
-            if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {                  \
+            if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {                 \
                 dst = FUNC(src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                \
             } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {          \
                 dst = FUNC(src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                \

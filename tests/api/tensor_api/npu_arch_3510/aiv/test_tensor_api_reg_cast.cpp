@@ -25,9 +25,10 @@ using asc::te::experimental::cast_round_mode;
 using asc::te::experimental::cast_sat_mode;
 
 constexpr cast_options value_initialized_options{};
-static_assert(value_initialized_options.layout == cast_layout::unknown &&
-              value_initialized_options.round == cast_round_mode::unknown &&
-              value_initialized_options.sat == cast_sat_mode::unknown);
+static_assert(
+    value_initialized_options.layout == cast_layout::unknown &&
+    value_initialized_options.round == cast_round_mode::unknown &&
+    value_initialized_options.sat == cast_sat_mode::unknown);
 constexpr cast_options float_to_half_options = {cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat};
 constexpr cast_options half_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
 constexpr cast_options int16_to_float_options = {cast_layout::zero, cast_round_mode::unknown, cast_sat_mode::unknown};
