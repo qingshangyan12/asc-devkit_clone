@@ -64,21 +64,21 @@ mkdir -p AddCustom/op_host AddCustom/op_kernel
 cd AddCustom
 ```
 
-完成以下步骤后，工程将包含这些文件：
+此时`op_host`和`op_kernel`均为空目录，下文将逐一创建并编写以下文件，完成后工程结构如下：
 
 ```
 AddCustom
-├── CMakeLists.txt            // 工程CMakeLists.txt
+├── CMakeLists.txt            // [待创建] 工程CMakeLists.txt
 ├── op_host                   // Host侧实现文件
-│   ├── add_custom.cpp        // 算子原型注册、Tiling实现
-│   └── CMakeLists.txt
+│   ├── add_custom.cpp        // [待创建] 算子原型注册、Tiling实现
+│   └── CMakeLists.txt        // [待创建]
 └── op_kernel                 // 核函数（Kernel）侧实现文件
-    ├── add_custom.cpp        // 算子代码实现
-    ├── add_custom_tiling.h   // Tiling数据结构定义
-    └── CMakeLists.txt
+    ├── add_custom.cpp        // [待创建] 算子代码实现
+    ├── add_custom_tiling.h   // [待创建] Tiling数据结构定义
+    └── CMakeLists.txt        // [待创建]
 ```
 
-下文逐一给出各文件的完整内容。保存源文件和三个CMakeLists.txt后，再执行CMake配置。
+保存源文件和三个CMakeLists.txt后，再执行CMake配置。
 
 ### 编写共享Tiling数据结构<a id="修改tiling与host侧实现"></a>
 
