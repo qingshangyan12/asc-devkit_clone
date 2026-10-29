@@ -865,7 +865,8 @@ __simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_te
     static_assert(!precisionMode || AscendC::Std::is_same_v<T, float>, "div precision modes only support float");
     static_assert(
         (algo != div_algo::DIFF_COMPENSATION && algo != div_algo::PRECISION_0ULP_FTZ_TRUE &&
-            algo != div_algo::PRECISION_0ULP_FTZ_FALSE) || AscendC::Std::is_same_v<T, float>,
+         algo != div_algo::PRECISION_0ULP_FTZ_FALSE) ||
+            AscendC::Std::is_same_v<T, float>,
         "div 0-ULP algorithms only support float");
     static_assert(
         algo != div_algo::PRECISION_1ULP_FTZ_FALSE || AscendC::Std::is_same_v<T, half> ||
@@ -873,12 +874,12 @@ __simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_te
         "div PRECISION_1ULP_FTZ_FALSE only supports half/float");
 
     constexpr bool usePrecision = precisionMode || algo == div_algo::DIFF_COMPENSATION ||
-        algo == div_algo::PRECISION_0ULP_FTZ_TRUE || algo == div_algo::PRECISION_0ULP_FTZ_FALSE;
-    constexpr bool preserveSubnormal = algo == div_algo::PRECISION_0ULP_FTZ_FALSE ||
-        (!precisionMode && algo == div_algo::PRECISION_1ULP_FTZ_FALSE)
+                                  algo == div_algo::PRECISION_0ULP_FTZ_TRUE ||
+                                  algo == div_algo::PRECISION_0ULP_FTZ_FALSE;
+    constexpr bool preserveSubnormal =
+        algo == div_algo::PRECISION_0ULP_FTZ_FALSE || (!precisionMode && algo == div_algo::PRECISION_1ULP_FTZ_FALSE)
 #if !defined(__ASC_FTZ__)
-        || (algo != div_algo::PRECISION_0ULP_FTZ_TRUE &&
-            (precisionMode || algo != div_algo::PRECISION_1ULP_FTZ_TRUE))
+        || (algo != div_algo::PRECISION_0ULP_FTZ_TRUE && (precisionMode || algo != div_algo::PRECISION_1ULP_FTZ_TRUE))
 #endif
         ;
 
