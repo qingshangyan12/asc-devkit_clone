@@ -1,4 +1,4 @@
-# asc_copy_l12bt
+# asc_copy_l12bt（NPU架构版本3510）
 
 ## 产品支持情况
 

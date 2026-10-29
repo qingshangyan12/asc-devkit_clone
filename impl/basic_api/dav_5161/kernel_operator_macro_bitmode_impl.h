@@ -35,6 +35,7 @@ struct ConvKernelBitModeConfig0 {
     uint64_t wDilation : 8;
     uint64_t hDilation : 8;
     uint64_t kernelNum : 12;
+    uint64_t reserved0 : 6;
 
     __aicore__ inline void Init(const ConvKernelParams& params)
     {
@@ -125,6 +126,7 @@ struct ConvFMatrixStepPosBitModeConfig0 {
 struct ConvFMatrixDual0BitModeConfig0 {
     uint64_t secondAddr : 32;
     uint64_t secondH : 16;
+    uint64_t reserved0 : 16;
 
     __aicore__ inline void Init(const ConvFMatrixDual0Params& params)
     {
@@ -142,6 +144,7 @@ struct ConvFMatrixDual0BitModeConfig0 {
 struct ConvFMatrixDual1BitModeConfig0 {
     uint64_t firstStride : 16;
     uint64_t secondStride : 16;
+    uint64_t reserved0 : 32;
 
     __aicore__ inline void Init(const ConvFMatrixDual1Params& params)
     {
@@ -162,6 +165,7 @@ struct ConvPaddingBitModeConfig0 {
     uint64_t reserved0 : 16;
     uint64_t paddingMode : 2;
     uint64_t paddingAddr : 16;
+    uint64_t reserved1 : 14;
 
     __aicore__ inline void Init(const ConvPaddingParams<T>& params)
     {
@@ -208,6 +212,7 @@ struct FixPipeConfigBitModeConfig0 {
     uint64_t postQuantAddr : 8;
     uint64_t antiquantAddr : 8;
     uint64_t shiftValue : 7;
+    uint64_t reserved1 : 16;
     uint64_t restorationCtrl : 1;
 
     __aicore__ inline void Init(const FixPipeConfigParams& params)
@@ -237,7 +242,10 @@ struct FixPipeConfigBitModeConfig0 {
 
 struct FixPipeReluAlphaBitModeConfig0 {
     uint64_t lut : 3;
+    uint64_t reserved0 : 10;
     uint64_t preValue : 19;
+    uint64_t reserved1 : 13;
+    uint64_t reserved2 : 19;
 
     __aicore__ inline void Init(const FixPipeReluAlphaParams& params)
     {
@@ -254,6 +262,7 @@ struct FixPipeReluAlphaBitModeConfig0 {
 
 struct FixPipeAddrBitModeConfig0 {
     uint64_t c0Indicator : 1;
+    uint64_t reserved0 : 15;
     uint64_t eltSrcAddr : 16;
     uint64_t srcStride1 : 16;
     uint64_t srcStride2 : 16;
@@ -280,6 +289,7 @@ struct FixPipeAddrBitModeConfig0 {
 struct ConvStrideBitModeConfig0 {
     uint64_t loop3DstStride : 16;
     uint64_t loop4DstStride : 16;
+    uint64_t reserved0 : 32;
 
     __aicore__ inline void Init(const ConvStrideParams& params)
     {
@@ -298,6 +308,7 @@ struct MatrixParaBitModeConfig0 {
     uint64_t m : 16;
     uint64_t k : 16;
     uint64_t groupK : 16;
+    uint64_t reserved0 : 16;
 
     __aicore__ inline void Init(const MatrixParaParams& params)
     {
@@ -318,6 +329,7 @@ struct MatrixParaBitModeConfig0 {
 struct MmadStrideParaBitModeConfig0 {
     uint64_t loop4SrcStride : 16;
     uint64_t loop4DstStride : 16;
+    uint64_t reserved0 : 32;
 
     __aicore__ inline void Init(const MmadStrideParaParams& params)
     {
@@ -382,16 +394,22 @@ struct ConvFixBitModeConfig0 {
     uint64_t postQuantMode : 5;
     uint64_t actPostMode : 3;
     uint64_t preClipReluMode : 1;
+    uint64_t reserved0 : 1;
     uint64_t eltwiseOp : 3;
     uint64_t eltwiseAntiqEnable : 1;
     uint64_t eltwiseBroadcastEnable : 1;
+    uint64_t reserved1 : 3;
     uint64_t lsbMask : 3;
+    uint64_t reserved2 : 1;
+    uint64_t reserved3 : 1;
+    uint64_t reserved4 : 1;
     uint64_t dualSrcEnable : 1;
     uint64_t compactEnable : 1;
     uint64_t dependEnable : 1;
     uint64_t instrId : 2;
     uint64_t postProcHalfEnable : 1;
     uint64_t nbrcBiasCtrl : 1;
+    uint64_t reserved5 : 7;
     uint64_t cin : 16;
 
     __aicore__ inline void Init(const ConvFixParams& params)
@@ -490,6 +508,7 @@ struct MmadFixBitModeConfig0 {
     uint64_t postQuantMode : 5;
     uint64_t actPostMode : 3;
     uint64_t preClipReluMode : 1;
+    uint64_t reserved0 : 1;
     uint64_t eltwiseOp : 3;
     uint64_t eltwiseAntiqEnable : 1;
     uint64_t eltwiseBroadcastEnable : 1;
@@ -499,10 +518,12 @@ struct MmadFixBitModeConfig0 {
     uint64_t lsbMask : 3;
     uint64_t gemvCtrl : 1;
     uint64_t groupMode : 3;
+    uint64_t reserved1 : 1;
     uint64_t dependEnable : 1;
     uint64_t instrId : 2;
     uint64_t postProcHalfEnable : 1;
     uint64_t layoutCtrl : 1;
+    uint64_t reserved2 : 7;
     uint64_t n : 16;
 
     __aicore__ inline void Init(const MmadFixParams& params)

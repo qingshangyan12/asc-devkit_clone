@@ -28,12 +28,12 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
-该接口根据src携带的mask，对源操作数按元素执行PReLU计算，并返回计算结果。计算公式如下：
+该接口根据`src`携带的mask，对源操作数按元素执行PReLU计算，并返回计算结果。该接口内部调用[asc_prelu](../../../c_api/reg_compute/reg_fused/asc_prelu.md)完成底层计算。`src`大于等于0时直接返回`src`，否则将`src`与`slope`相乘后返回。注：源操作数为浮点数正零（+0）时按正数处理并直接返回；为浮点数负零（-0）时按负数处理并与`slope`相乘。`src.mask`对应位置为1的元素参与计算，为0的元素在返回结果中置零。计算公式如下：
 
 $$
 dst_i = \begin{cases}
-src_i, & src_i > 0 \\
-src_i \times slope_i, & src_i \le 0
+src_i, & src_i >= 0 \\
+src_i \times slope_i, & src_i < 0
 \end{cases}
 $$
 
@@ -71,7 +71,7 @@ src、slope与返回值的数据类型保持一致。支持的数据类型为：
 ## 约束说明
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- 源操作数为负零（`-0`）时按负数处理，负数分支的乘法遵循 IEEE 754 浮点乘法规则。
+- 源操作数为浮点数正零（`+0`）时按正数处理并直接返回；为浮点数负零（`-0`）时按负数处理并与`slope`相乘，乘法遵循 IEEE 754 浮点乘法规则。
 
 ## 调用示例
 

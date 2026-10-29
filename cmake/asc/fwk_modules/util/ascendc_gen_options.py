@@ -55,6 +55,8 @@ def _handle_kernel_template_input(opts):
 
 
 def _parse_single_option(opts, opc_debug_config, opc_kernel_config):
+    if opts.partition("=")[0] in {"--kernel-spec", "--kernel-spec-dir"}:
+        raise RuntimeError("Configure Kernel Spec through npu_op_package KERNEL_SPEC_MODE")
     if "oom" in opts:
         _handle_oom_option(opts, opc_debug_config)
         return "debug_config", None

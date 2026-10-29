@@ -360,7 +360,7 @@ TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
     const std::string unit = JoinTestPath(root_, "collection/Large");
     const std::string resource = JoinTestPath(unit, "resources/kernel.cpp");
     WriteFile(resource, "");
-    ASSERT_EQ(truncate(resource.c_str(), 1U * 1024U * 1024U + 1U), 0);
+    ASSERT_EQ(truncate(resource.c_str(), 256U * 1024U * 1024U + 1U), 0);
     CreateManifest(unit, "Large");
     const BuildCollectedBundleRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");

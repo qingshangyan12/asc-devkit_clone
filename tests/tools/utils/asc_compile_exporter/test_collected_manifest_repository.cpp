@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <fstream>
 #include <vector>
 
 #include <sys/stat.h>
@@ -70,6 +71,68 @@ TEST_F(ModuleTest, RepositoryAddsSchemaVersionToManifestJson)
     const Json manifest = Json::parse(units[0].json);
     ASSERT_TRUE(manifest.contains("schema_version"));
     EXPECT_EQ(manifest.at("schema_version"), "1.0");
+}
+
+TEST_F(ModuleTest, RepositoryDeduplicatesEquivalentResourceIds)
+{
+    const std::string collection = FileUtils::JoinPath(root_, "duplicates");
+    const std::string first = FileUtils::JoinPath(collection, "a");
+    const std::string second = FileUtils::JoinPath(collection, "b");
+    // Different creation order and JSON formatting do not change the resource.
+    WriteTestFile(FileUtils::JoinPath(first, "resources/z.h"), "z");
+    WriteTestFile(FileUtils::JoinPath(first, "resources/a.h"), "a");
+    WriteTestFile(FileUtils::JoinPath(second, "resources/a.h"), "a");
+    WriteTestFile(FileUtils::JoinPath(second, "resources/z.h"), "z");
+    CreateManifest(first, "Same");
+    CreateManifest(second, "Same");
+    const std::string path = FileUtils::JoinPath(second, "Same_manifest.json");
+    WriteTestFile(path, Json::parse(ReadTestFile(path)).dump(4));
+
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
+    ASSERT_EQ(units.size(), 1U);
+    EXPECT_EQ(units[0].files.size(), 2U);
+}
+
+TEST_F(ModuleTest, RepositoryKeepsFirstDuplicateIdDespiteContentDifferences)
+{
+    for (const std::string difference : {"manifest", "bytes", "path", "empty-directory", "empty-file"}) {
+        SCOPED_TRACE(difference);
+        const std::string collection = FileUtils::JoinPath(root_, difference);
+        const std::string first = FileUtils::JoinPath(collection, "a");
+        const std::string second = FileUtils::JoinPath(collection, "b");
+        WriteTestFile(FileUtils::JoinPath(first, "resources/kernel.cpp"), "source");
+        WriteTestFile(FileUtils::JoinPath(second, "resources/kernel.cpp"), "source");
+        CreateManifest(first, "Same");
+        CreateManifest(second, "Same");
+        if (difference == "manifest") {
+            const std::string path = FileUtils::JoinPath(second, "Same_manifest.json");
+            Json manifest = Json::parse(ReadTestFile(path));
+            manifest["soc_version"] = "different";
+            WriteTestFile(path, manifest.dump());
+        } else if (difference == "bytes") {
+            WriteTestFile(FileUtils::JoinPath(second, "resources/kernel.cpp"), "changed");
+        } else if (difference == "path") {
+            ASSERT_EQ(
+                rename(
+                    FileUtils::JoinPath(second, "resources/kernel.cpp").c_str(),
+                    FileUtils::JoinPath(second, "resources/renamed.cpp").c_str()),
+                0);
+        } else if (difference == "empty-directory") {
+            ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(second, "resources/include")));
+        } else {
+            WriteTestFile(FileUtils::JoinPath(second, "resources/empty.h"), "");
+        }
+        const std::string third = FileUtils::JoinPath(collection, "c");
+        WriteTestFile(FileUtils::JoinPath(third, "resources/unique.cpp"), "unique");
+        CreateManifest(third, "Unique");
+        std::vector<ManifestUnit> units;
+        ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
+        ASSERT_EQ(units.size(), 2U);
+        ASSERT_EQ(units[0].files.size(), 1U);
+        EXPECT_EQ(units[0].files[0].filePath, "resources/kernel.cpp");
+        EXPECT_EQ(std::string(units[0].files[0].data.begin(), units[0].files[0].data.end()), "source");
+    }
 }
 
 TEST_F(ModuleTest, RepositoryRejectsManifestWithSchemaVersion)
@@ -200,6 +263,34 @@ TEST_F(ModuleTest, RepositoryReportsDirectoryOpenFailure)
 {
     std::vector<ManifestUnit> units;
     EXPECT_FALSE(CollectedManifestRepository("/dev/null").Load(units));
+}
+
+TEST_F(ModuleTest, RepositoryAcceptsResourceAboveLegacyOneMiBLimit)
+{
+    const std::string unit = FileUtils::JoinPath(root_, "large/Unit");
+    WriteTestFile(FileUtils::JoinPath(unit, "resources/large.h"), std::string(1024U * 1024U + 1U, 'x'));
+    CreateManifest(unit, "Unit");
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(FileUtils::JoinPath(root_, "large")).Load(units));
+    ASSERT_EQ(units.size(), 1U);
+    ASSERT_EQ(units[0].files.size(), 1U);
+    EXPECT_EQ(units[0].files[0].data.size(), 1024U * 1024U + 1U);
+}
+
+TEST_F(ModuleTest, RepositoryRejectsResourceAboveConsumerFileLimit)
+{
+    const std::string unit = FileUtils::JoinPath(root_, "oversized/Unit");
+    ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(unit, "resources")));
+    {
+        std::ofstream resource(FileUtils::JoinPath(unit, "resources/large.h"), std::ios::binary);
+        ASSERT_TRUE(resource.is_open());
+        resource.seekp(256U * 1024U * 1024U);
+        resource.put('x');
+        ASSERT_TRUE(resource.good());
+    }
+    CreateManifest(unit, "Unit");
+    std::vector<ManifestUnit> units;
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "oversized")).Load(units));
 }
 
 } // namespace

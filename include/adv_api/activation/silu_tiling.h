@@ -24,8 +24,8 @@ namespace AscendC {
  * @param [in] srcShape : input src Tensor shape
  * @param [in] typeSize : src tensor dtype size
  * @param [in] isReuseSource: whether to reuse the input space of the source operand
- * @param [out] maxValue: max temporary local space size
- * @param [out] minValue: min temporary local space size
+ * @param [out] maxValue: max temporary local space size, in bytes
+ * @param [out] minValue: min temporary local space size, in bytes
  */
 void GetSiluTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,

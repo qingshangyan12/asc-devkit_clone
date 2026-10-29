@@ -28,7 +28,8 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy does not support this element type");
-    asc_axpy(dst.reg, src.reg, scalar, dst.mask);
+    asc_axpy(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
     return dst;
 }
 

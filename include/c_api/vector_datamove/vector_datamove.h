@@ -609,40 +609,40 @@ __aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val);
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ==========asc_scatter_ub2gm===========
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num);
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num);
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num);
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num);
 
 // ==========asc_gather_gm2ub===========
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num);
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num);
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num);
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num);
 #endif
 

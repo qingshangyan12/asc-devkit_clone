@@ -37,9 +37,15 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
+// 寄存器移位
+template <typename T, typename ShiftType>
 __simd_callee__ inline reg_tensor<T> operator>>(
-    const reg_tensor<T>& src, const U& shift)
+    const reg_tensor<T>& src, const reg_tensor<ShiftType>& shift)
+
+// 标量移位
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator>>(
+    const reg_tensor<T>& src, const int16_t& shift)
 ```
 
 ## 参数说明
@@ -49,14 +55,14 @@ __simd_callee__ inline reg_tensor<T> operator>>(
 | 参数名 | 描述 |
 | --- | --- |
 | T | src和返回值的元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| U | 移位量类型，可以是与T位宽匹配的有符号reg_tensor，或int16_t标量。 |
+| ShiftType | 寄存器移位时的移位量元素类型，必须为与T位宽匹配的有符号整数类型。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `src` | 输入 | 待右移的源操作数。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `shift` | 输入 | 逐元素移位寄存器或`int16_t`标量。寄存器形式的`shift.mask`不用于本次计算。 |
+| `shift` | 输入 | 逐元素移位寄存器或`int16_t`标量。寄存器形式的`shift`类型为`reg_tensor<ShiftType>`，且`ShiftType`必须为与`T`位宽匹配的有符号整数类型；`shift.mask`不用于本次计算。 |
 
 ## 数据类型
 

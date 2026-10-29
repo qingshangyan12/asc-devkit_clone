@@ -12855,30 +12855,6 @@
     ]
   },
   {
-    "case": "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/01_add/c_api_sync_add/run.sh",
-    "source": "readme",
-    "confidence": "high",
-    "source_case": "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
-    "supported_archs": [
-      "dav-2201"
-    ],
-    "supported_modes": [
-      "npu"
-    ],
-    "target_runnable": true,
-    "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "skip_archs": [],
-    "reasons": [],
-    "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
-      "make -j",
-      "./c_api_add_example"
-    ]
-  },
-  {
     "case": "02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add/run.sh",
     "source": "readme",

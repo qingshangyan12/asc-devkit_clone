@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. Scenario 1 performs an unaligned copy, while scenario 2 performs unaligned loading, reduction, and storing. Neither scenario directly calls unaligned C APIs. GM/UB transfers use Tensor API `copy`, register zeroing and reduction use experimental Tensor APIs, and pipeline synchronization uses the C APIs `asc_lock/asc_unlock`.
+This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. Scenario 1 performs an unaligned copy, while scenario 2 performs unaligned loading, reduction, and storing. Neither scenario directly calls unaligned C APIs. GM/UB transfers use Tensor API `copy`, register zeroing and reduction use experimental Tensor APIs, and pipeline synchronization uses the Tensor API `asc::te::mutex`.
 
 Select a scenario with `SCENARIO_NUM`:
 
@@ -11,9 +11,11 @@ Select a scenario with `SCENARIO_NUM`:
 | 1 | `float [1024]` | `float [1024]` | Copy two registers (128 elements) starting at element 1. All other output elements remain zero. |
 | 2 | `uint16_t [14, 255]` | `uint16_t [14, 16]` | Four cores process up to four rows each; the last core processes two rows. Reduce every 16 elements by maximum, with 15 valid elements in the last datablock. |
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 The CANN installation must provide the experimental Tensor APIs `unalign_load/unalign_store` used by both scenarios. CMake loads the package headers, not the repository headers. If the package lacks these APIs, update the corresponding headers before building this sample.
 

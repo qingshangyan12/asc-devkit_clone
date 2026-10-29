@@ -118,7 +118,7 @@ struct gm_to_ub_params {
 | :--- | :---: | :--- |
 | left_padding_count | `0` | 每个搬运块左侧的Padding元素个数。 |
 | right_padding_count | `0` | 每个搬运块右侧的Padding元素个数。 |
-| enable_constant_pad | `true` | 控制非32字节对齐场景下的补齐方式。当`left_padding_count`和`right_padding_count`均为`0`时生效：设置为`true`时，使用[asc_set_copy_pad_val](../../../c_api/vector_datamove/asc_set_copy_pad_val.md)设置的值进行常量Padding；设置为`false`时，由硬件自动填充dummy数据，填充值为每个搬运块的第一个元素。当任一Padding计数非`0`时，该参数不生效，左右Padding均使用`asc_set_copy_pad_val`设置的值。 |
+| enable_constant_pad | `true` | 控制非32字节对齐场景下的补齐方式。当`left_padding_count`和`right_padding_count`均为`0`时生效：设置为`true`时，使用[set_copy_pad_val](../../data_move/set_copy_pad_val.md)设置的值进行常量Padding；设置为`false`时，由硬件自动填充dummy数据，填充值为每个搬运块的第一个元素。当任一Padding计数非`0`时，该参数不生效，左右Padding均使用`set_copy_pad_val`设置的值。 |
 
 通过以下方式绑定运行时搬运参数：
 
@@ -128,18 +128,18 @@ auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
 asc::te::copy(atom, dst, src);
 ```
 
-`enable_constant_pad`设置为`true`时，必须在搬运前调用[asc_set_copy_pad_val](../../../c_api/vector_datamove/asc_set_copy_pad_val.md)设置填充值。例如，以下代码将非32字节对齐场景下的补齐值设置为`0`：
+`enable_constant_pad`设置为`true`时，必须在搬运前调用[set_copy_pad_val](../../data_move/set_copy_pad_val.md)设置填充值。例如，以下代码将非32字节对齐场景下的补齐值设置为`0`：
 
 ```cpp
 #include "tensor_api/tensor.h"
 
-asc_set_copy_pad_val(static_cast<half>(0));
+asc::te::set_copy_pad_val<half>(static_cast<half>(0));
 asc::te::gm_to_ub_params params{0, 0, true};
 auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
 asc::te::copy(atom, dst, src);
 ```
 
-`asc_set_copy_pad_val`设置的值会对后续搬运持续生效，直到再次调用该接口覆盖配置。因此，如果`enable_constant_pad`为`true`但未设置填充值，接口会使用填充寄存器当前已有的值，不应依赖其初始值；不同搬运任务需要不同填充值时，应在每次搬运前显式设置。
+`set_copy_pad_val`设置的值会对后续搬运持续生效，直到再次调用该接口覆盖配置。因此，如果`enable_constant_pad`为`true`但未设置填充值，接口会使用填充寄存器当前已有的值，不应依赖其初始值；不同搬运任务需要不同填充值时，应在每次搬运前显式设置。
 
 如果不需要指定常量填充值，可将`enable_constant_pad`设置为`false`：
 
@@ -149,7 +149,7 @@ auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
 asc::te::copy(atom, dst, src);
 ```
 
-此时，非32字节对齐产生的补齐区域由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。具体补齐范围取决于搬运模式，详见[搬运模式与Padding](#搬运模式与padding)。若`left_padding_count`或`right_padding_count`非`0`，`enable_constant_pad`不会影响左右Padding的填充值，仍需在搬运前调用`asc_set_copy_pad_val`进行配置。
+此时，非32字节对齐产生的补齐区域由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。具体补齐范围取决于搬运模式，详见[搬运模式与Padding](#搬运模式与padding)。若`left_padding_count`或`right_padding_count`非`0`，`enable_constant_pad`不会影响左右Padding的填充值，仍需在搬运前调用`set_copy_pad_val`进行配置。
 
 ## 数据类型
 
@@ -200,7 +200,7 @@ ND通路沿行方向生成搬运块，DN通路沿列方向生成搬运块。NZ�
 
 非32字节对齐场景支持以下两种填充方式，通过`gm_to_ub_params`配置，并使用`copy_atom::with`绑定到搬运原子对象：
 
-- 手动填充：搬运前调用`asc_set_copy_pad_val`设置填充值，并将`enable_constant_pad`设置为`true`。
+- 手动填充：搬运前调用`set_copy_pad_val`设置填充值，并将`enable_constant_pad`设置为`true`。
 - 自动填充：将`enable_constant_pad`设置为`false`，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 数据搬运模式说明如下：
@@ -208,7 +208,7 @@ ND通路沿行方向生成搬运块，DN通路沿列方向生成搬运块。NZ�
 - Compact模式：目的Layout紧密排列，即相邻数据块首尾相接，不存在由Stride引入的块间空隙，且`left_padding_count`和`right_padding_count`均须为`0`。多个数据块在UB中紧密排列，在32字节补齐处理上被视为一个整体；若所有数据块的总长度非32字节对齐，则仅在整体末尾通过上述手动或自动填充方式补齐至32字节对齐。
 - Normal模式：目的Layout非紧密排列，步长Stride大于单块长度，相邻数据块之间预留块间空隙，数据在UB中非紧密排列，相邻目的数据块的首地址间隔为32字节的正整数倍。数据块之间可以预留间隔，无需紧密排列。
     - 当`left_padding_count`和`right_padding_count`均为`0`时，通过上述手动或自动填充方式将每个数据块分别补齐至32字节对齐。
-    - 当`left_padding_count`或`right_padding_count`非`0`时，`enable_constant_pad`不生效，必须在搬运前调用`asc_set_copy_pad_val`配置填充值。若单块长度与左右Padding的总字节数非32字节对齐，硬件会在右侧继续填充dummy假数据至32字节对齐，dummy假数据的值为`asc_set_copy_pad_val`配置的值。
+    - 当`left_padding_count`或`right_padding_count`非`0`时，`enable_constant_pad`不生效，必须在搬运前调用`set_copy_pad_val`配置填充值。若单块长度与左右Padding的总字节数非32字节对齐，硬件会在右侧继续填充dummy假数据至32字节对齐，dummy假数据的值为`set_copy_pad_val`配置的值。
 
 例如，元素类型为`half`，源Tensor的Layout为ND分形，Shape为`(3, 24)`，目的Tensor的Layout为ND分形，Shape为`(3, 24)`，若Stride为`(24, 1)`，Layout为紧凑排列；此时为Compact模式，若Stride为`(32, 1)`，Layout为紧凑排列，此时为Normal模式，分别对应下表两种情况。
 

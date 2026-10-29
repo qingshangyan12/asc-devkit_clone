@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_server_debug_config.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
@@ -350,6 +351,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_PTR_NULL(opResCtxPtr);
     OpResCtx resCtx{};
     const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
+    resCtx.res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] = initTiling->debugMode;
     const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
 
     for (uint32_t i = 0U; i < opParamVec.size(); ++i) {
