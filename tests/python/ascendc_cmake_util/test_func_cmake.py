@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import sys
 import subprocess
 from pathlib import Path
 
@@ -237,3 +238,79 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-dir={root}/input" in arguments
+
+
+@pytest.mark.parametrize(
+    "cache,expected,valid",
+    [
+        ({"SAMPLE_TEXT": "plain"}, "text=plain\nflag=OFF\n", True),
+        ({"SAMPLE_FLAG": True}, "text=<unset>\nflag=ON\n", True),
+        ({"SAMPLE_FLAG": False}, "text=<unset>\nflag=OFF\n", True),
+        ({"SAMPLE_TEXT": None}, "text=<unset>\nflag=OFF\n", True),
+        ({"SAMPLE_TEXT": ""}, "text=\nflag=OFF\n", True),
+        ({"SAMPLE_TEXT": {"type": "STRING", "value": "plain"}}, "text=plain\nflag=OFF\n", True),
+        ({"SAMPLE_FLAG": {"type": "BOOL", "value": True}}, "text=<unset>\nflag=ON\n", True),
+        ({"SAMPLE_FLAG": {"type": "BOOL", "value": False}}, "text=<unset>\nflag=OFF\n", True),
+        ({"SAMPLE_TEXT": {"type": "STRING", "value": "${sourceDir}"}}, "text=@SOURCE_DIR@\nflag=OFF\n", True),
+        ({"SAMPLE_TEXT": 17}, "", False),
+        ({"SAMPLE_TEXT": ["plain"]}, "", False),
+    ],
+)
+def test_preset_cache_value_forms_match_native_configuration(tmp_path, cache, expected, valid):
+    expected = expected.replace("@SOURCE_DIR@", tmp_path.as_posix())
+    (tmp_path / "CMakeLists.txt").write_text(
+        r"""cmake_minimum_required(VERSION 3.16)
+project(preset_values NONE)
+if(DEFINED SAMPLE_TEXT)
+  set(actual_text "${SAMPLE_TEXT}")
+else()
+  set(actual_text "<unset>")
+endif()
+if(SAMPLE_FLAG)
+  set(actual_flag ON)
+else()
+  set(actual_flag OFF)
+endif()
+file(WRITE "${CMAKE_BINARY_DIR}/values.txt" "text=${actual_text}\nflag=${actual_flag}\n")
+""",
+        encoding="utf-8",
+    )
+    preset = tmp_path / "CMakePresets.json"
+    preset.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "configurePresets": [
+                    {
+                        "name": "default",
+                        "generator": "Unix Makefiles",
+                        "binaryDir": "${sourceDir}/native",
+                        "cacheVariables": cache,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    version_line = subprocess.check_output(["cmake", "--version"], text=True).splitlines()[0]
+    version = tuple(int(part) for part in version_line.split()[2].split(".")[:2])
+    if version >= (3, 19):
+        native = subprocess.run(["cmake", "--preset", "default"], cwd=tmp_path, text=True, capture_output=True)
+        assert (native.returncode == 0) is valid, native.stdout + native.stderr
+        if valid:
+            assert (tmp_path / "native/values.txt").read_text(encoding="utf-8") == expected
+
+    tool = FWK_MODULES_DIR / "util/preset_parse.py"
+    parsed = subprocess.run([sys.executable, str(tool), str(preset)], text=True, capture_output=True)
+    if not valid:
+        assert parsed.returncode != 0
+        assert parsed.stdout == ""
+        return
+    assert parsed.returncode == 0, parsed.stdout + parsed.stderr
+    configured = subprocess.run(
+        ["cmake", "-S", str(tmp_path), "-B", str(tmp_path / "converted"), *parsed.stdout.split()],
+        text=True,
+        capture_output=True,
+    )
+    assert configured.returncode == 0, configured.stdout + configured.stderr
+    assert (tmp_path / "converted/values.txt").read_text(encoding="utf-8") == expected
