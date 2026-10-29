@@ -97,10 +97,14 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* nullList[] = {nullptr};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(nullList, 1U));
 
-    // 裸名归为 NONE（新语义：不强制 → 默认 selector / gate 拒绝）；空名/legacy 现状语义不变
+    // 裸名四态保留：已注册裸名过 gate（强制通路），未注册裸名 gate 拒后由
+    // TryForcedAlgAndPrepareEngine 回退默认 selector 兜底；空名/legacy 现状语义不变
     Mc2CcTilingInner bare = MakeTiling("CcuSchedAllGatherSoleMesh", 6U);
     const void* bareList[] = {&bare};
-    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(bareList, 1U));
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(bareList, 1U));
+    Mc2CcTilingInner bareUnknown = MakeTiling("CcuNoSuchAlgorithm", 6U);
+    const void* bareUnknownList[] = {&bareUnknown};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(bareUnknownList, 1U));
     Mc2CcTilingInner empty = MakeTiling("", 6U);
     const void* emptyList[] = {&empty};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(emptyList, 1U));
