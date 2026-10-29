@@ -122,6 +122,7 @@ $dst_i = |src_i|$
 <!-- npu="9030" id19 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id19 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Abs_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -156,6 +157,7 @@ $dst_i = |src_i|$
     - --cce-ftz=false时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
     - --cce-ftz=true时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id29 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Abs_res.md#id3 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 

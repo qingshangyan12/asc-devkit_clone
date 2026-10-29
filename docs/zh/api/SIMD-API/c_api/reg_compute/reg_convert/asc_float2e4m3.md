@@ -123,53 +123,74 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 #include "acl/acl.h"
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 
 namespace {
-constexpr uint32_t BUFFER_BYTES = 256;
+constexpr uint8_t MUTEX_ID = 0;
 
-__simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t DATA_BYTES = 260;
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_BUFFER_BYTES = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+
+__simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
-    vector_fp8_e4m3fn_t dst;
-    vector_float src;
-    asc_loadalign(dst, reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(output));
-    asc_loadalign(src, reinterpret_cast<__ubuf__ float*>(input));
-    asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
-    asc_storealign(reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(output), dst, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH / sizeof(uint32_t);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        vector_fp8_e4m3fn_t dst;
+        vector_float src;
+        asc_loadalign(dst, reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(output + offset));
+        asc_loadalign(src, reinterpret_cast<__ubuf__ float*>(input + offset));
+        asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
+        asc_storealign(reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(output + offset), dst, mask);
+    }
 }
 
 __global__ __vector__ void asc_float2e4m3_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_BYTES];
-    __ubuf__ uint8_t input_local[BUFFER_BYTES];
-    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    convert(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    __ubuf__ uint8_t output_local[PADDED_BUFFER_BYTES];
+    __ubuf__ uint8_t input_local[PADDED_BUFFER_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, PADDED_BUFFER_BYTES);
+    asc_copy_gm2ub_align(output_local, input, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<convert>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, output_local, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(BUFFER_BYTES, 0);
-    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
-    const std::vector<uint8_t> golden(BUFFER_BYTES, 0);
+    std::vector<uint8_t> input(PADDED_BUFFER_BYTES, 0);
+    std::vector<uint8_t> output(PADDED_BUFFER_BYTES, 0xff);
+    const std::vector<uint8_t> golden(PADDED_BUFFER_BYTES, 0);
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, PADDED_BUFFER_BYTES, input.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_float2e4m3_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output.data(), PADDED_BUFFER_BYTES, output_device, PADDED_BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_float2e4m3_rn passed." : "[Failed] asc_float2e4m3_rn failed.") << std::endl;
     aclrtFree(input_device);

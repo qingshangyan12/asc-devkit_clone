@@ -120,7 +120,7 @@
         <file value="basic_api" install_mod="550" entity="true"/>
         <file value="aicpu_api" install_softlink="$(TARGET_ENV)/ascendc/include/aicpu_api;$(TARGET_ENV)/include/ascendc/aicpu_api" install_mod="550" entity="true"/>
         <file value="simt_api" install_mod="550" entity="true"/>
-        <file value="c_api" install_mod="550" entity="true"/>
+        <file value="c_api" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/c_api" install_mod="550" entity="true"/>
         <file value="tensor_api" install_mod="550" entity="true"/>
         <file value="tiling" install_mod="550"/>
         <file value="adv_api" install_mod="550" entity="true"/>

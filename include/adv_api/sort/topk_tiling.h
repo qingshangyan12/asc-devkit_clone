@@ -33,8 +33,8 @@ namespace AscendC {
  * @param [in] mode: Normal mode or small mode.
  * @param [in] isLargest: Descending or ascending order.
  * @param [in] dataTypeSize: Input data dtype size.
- * @param [out] maxValue: TopK api calculate need max temporary local space size.
- * @param [out] minValue: TopK api calculate need min temporary local space size.
+ * @param [out] maxValue: TopK api calculate need max temporary local space size, in bytes.
+ * @param [out] minValue: TopK api calculate need min temporary local space size, in bytes.
  * @return true: Succeeded in obtaining the maximum and minimum temporary space sizes.
  * @return false: Failed to obtain maximum and minimum temporary space sizes.
  */
@@ -55,8 +55,8 @@ bool GetTopKMaxMinTmpSize(
  * @param [in] isLargest: Max or min k values.
  * @param [in] dataType: Input data dtype.
  * @param [in] config: Configurations of TopK.
- * @param [out] maxValue: TopK api calculate need max temporary local space size.
- * @param [out] minValue: TopK api calculate need min temporary local space size.
+ * @param [out] maxValue: TopK api calculate need max temporary local space size, in bytes.
+ * @param [out] minValue: TopK api calculate need min temporary local space size, in bytes.
  * @return true: Succeeded in obtaining the maximum and minimum temporary space sizes.
  * @return false: Failed to obtain maximum and minimum temporary space sizes.
  */

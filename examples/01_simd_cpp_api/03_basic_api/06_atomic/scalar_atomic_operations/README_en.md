@@ -2,7 +2,9 @@
 
 ## Overview
 
-This example introduces the implementation flow of scalar atomic addition and scalar atomic compare-and-swap on Global Memory (GM) addresses, based on the `AtomicAdd` and `AtomicCas` APIs. Atomic operations ensure data consistency when multiple cores access the same memory address in parallel, avoiding data race issues. Note that atomic operations involve the scalar computation unit. If there is a data dependency with the transfer unit (MTE2/MTE3), synchronization events must be manually inserted.
+This example introduces scalar atomic addition and scalar atomic compare-and-swap on Global Memory (GM) addresses through the [`AtomicAdd`](../../../../../docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicAdd.md) and [`AtomicCas`](../../../../../docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicCas.md) APIs. Atomic operations ensure consistency between concurrent atomic updates to the same address.
+
+Scalar atomic operations use the scalar pipeline (PIPE_S), while GM-to-UB [`DataCopy`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md) uses the transfer pipeline (PIPE_MTE2). When they access the same GM address with a data dependency, the compiler does not insert synchronization automatically. Scenario 3 demonstrates the required intra-core synchronization with [`SetFlag/WaitFlag`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) and [`PipeBarrier`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md).
 
 > **API tip:** In addition to the `AtomicAdd` and `AtomicCas` APIs used in this example, Ascend C also provides `AtomicExch`, `AtomicMax`, and `AtomicMin` APIs. The calling method is the same as `AtomicAdd`; simply replace the function name to switch.
 
@@ -35,11 +37,15 @@ This example switches between different scenarios through the build parameter `S
 **Scenario 2: AtomicCas Atomic Compare-and-Swap**
   Three cores execute in parallel, each checking whether the first element of GM equals the expected value 1. If equal, it is replaced with newValue 2; if not equal, no modification is made.
 
+**Scenario 3: Intra-Core Synchronization for Scalar Atomic Operation and Data Movement**
+  Only one core is launched to execute `AtomicAdd`. After the atomic operation, `SetFlag<HardEvent::S_MTE2>` and `WaitFlag<HardEvent::S_MTE2>` establish the dependency from the scalar pipeline to the GM-to-UB transfer pipeline. `DataCopy` then reads the GM data into UB, and `PipeBarrier<PIPE_ALL>` waits for previously issued pipeline operations to complete. This scenario demonstrates the intra-core synchronization constraint without introducing inter-core access competition.
+
 <table border="2">
 <caption>Table 1: Scenario Configuration Comparison</caption>
 <tr><th>scenarioNum</th><th>Atomic Operation API</th><th>Output Shape</th><th>Data Type</th><th>Description</th></tr>
-<tr><td>1</td><td>AtomicAdd</td><td>[1, 256]</td><td>int32</td><td>Three cores perform atomic addition of 1 on the first GM element in parallel</td></tr>
-<tr><td>2</td><td>AtomicCas</td><td>[1, 256]</td><td>uint32</td><td>Three cores perform atomic compare-and-swap on the first GM element in parallel (if value is 1, replace with 2)</td></tr>
+<tr><td>1</td><td><a href="../../../../../docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicAdd.md">AtomicAdd</a></td><td>[1, 256]</td><td>int32</td><td>Three cores perform atomic addition of 1 on the first GM element in parallel</td></tr>
+<tr><td>2</td><td><a href="../../../../../docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicCas.md">AtomicCas</a></td><td>[1, 256]</td><td>uint32</td><td>Three cores perform atomic compare-and-swap on the first GM element in parallel (if value is 1, replace with 2)</td></tr>
+<tr><td>3</td><td><a href="../../../../../docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicAdd.md">AtomicAdd</a>, <a href="../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md">DataCopy</a>, <a href="../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md">SetFlag/WaitFlag</a>, <a href="../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md">PipeBarrier</a></td><td>[1, 256]</td><td>int32</td><td>One core performs atomic addition and demonstrates intra-core synchronization with GM-to-UB data movement</td></tr>
 </table>
 
 ## Build and Run
@@ -57,7 +63,7 @@ Run the following steps in the root directory of this example to build and run i
 
   Run the following commands in the example directory.
   ```bash
-  SCENARIO_NUM=1  # Set the scenario number (values: 1, 2)
+  SCENARIO_NUM=1  # Set the scenario number (values: 1, 2, 3)
   mkdir -p build && cd build;      # Create and enter the build directory
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # Build the project
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM   # Generate test input data
@@ -82,7 +88,7 @@ Run the following steps in the root directory of this example to build and run i
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | NPU architecture: AtomicAdd and AtomicCas only support dav-3510 (corresponding to Ascend 950PR&950DT products) |
-  | `SCENARIO_NUM` | `1` (default), `2` | Scenario number: 1 (AtomicAdd atomic addition), 2 (AtomicCas atomic compare-and-swap) |
+  | `SCENARIO_NUM` | `1` (default), `2`, `3` | Scenario number: 1 (multi-core AtomicAdd), 2 (multi-core AtomicCas), 3 (single-core AtomicAdd with data-movement synchronization) |
 
 - Execution result
 

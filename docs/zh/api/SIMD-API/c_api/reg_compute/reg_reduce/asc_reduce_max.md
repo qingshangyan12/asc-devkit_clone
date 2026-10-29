@@ -114,55 +114,92 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-__simd_vf__ inline void reduce(__ubuf__ half* dst, __ubuf__ half* src)
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(half);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(half);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(half);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(half);
+
+__simd_vf__ inline void reduce(__ubuf__ half* dst, __ubuf__ half* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst_reg, src_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b16(count);
-    asc_loadalign(src_reg, src);
-    asc_reduce_max(dst_reg, src_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = 2;
+    vector_bool result_mask = asc_update_mask_b16(remaining_length);
+    uint32_t remaining_length_2 = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b16(remaining_length_2);
+        asc_loadalign(src_reg, src + offset);
+        asc_reduce_max(dst_reg, src_reg, mask);
+        asc_storealign(dst + offset, dst_reg, result_mask);
+    }
 }
 __global__ __vector__ void asc_reduce_max_kernel(__gm__ half* dst, __gm__ half* src)
 {
     asc_init();
-    __ubuf__ half dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(half));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    reduce(dst_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(half));
+    __ubuf__ half dst_local[PADDED_ELEMENT_COUNT], src_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(half));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<reduce>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<half> src(ELEMENT_COUNT), output(ELEMENT_COUNT, half(0));
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        src[i] = half(static_cast<float>(i) + 1.0f);  // 1, 2, ..., 64
+    std::vector<half> src(PADDED_ELEMENT_COUNT, half(-1000.0f));
+    std::vector<half> output(PADDED_ELEMENT_COUNT, half(0));
+    std::vector<half> golden_value(REPEAT_COUNT);
+    std::vector<uint16_t> golden_index(REPEAT_COUNT);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
+        src[i] = half(static_cast<float>(i) + 1.0f);
+    }
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        const uint32_t remaining_length_2 = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        golden_value[repeat] = src[offset + remaining_length_2 - 1];
+        golden_index[repeat] = static_cast<uint16_t>(remaining_length_2 - 1);
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
     half* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(half),
-        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     half* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(half),
-        ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(src_device, src.size() * sizeof(half), src.data(), src.size() * sizeof(half),
-        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, PADDED_BUFFER_BYTES, src.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_reduce_max_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), output.size() * sizeof(half), dst_device, output.size() * sizeof(half),
-        ACL_MEMCPY_DEVICE_TO_HOST);
-    half max_value = output[0];                                      // 提取最大值
-    uint16_t max_index = *reinterpret_cast<uint16_t*>(&output[1]);   // 提取最大值索引：索引按half类型存储，需强制转换到整数类型
-    const bool passed = (static_cast<float>(max_value) == 64.0f) && (max_index == ELEMENT_COUNT - 1);
+    aclrtMemcpy(output.data(), PADDED_BUFFER_BYTES, dst_device, PADDED_BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    bool passed = true;
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        half max_value = output[offset];  // 提取当前VL的最大值
+        uint16_t max_index = *reinterpret_cast<uint16_t*>(&output[offset + 1]);  // 提取当前VL的最大值索引
+        passed = passed && (static_cast<float>(max_value) == static_cast<float>(golden_value[repeat]))
+                 && (max_index == golden_index[repeat]);
+    }
     std::cout << (passed ? "[Success] asc_reduce_max passed." : "[Failed] asc_reduce_max failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

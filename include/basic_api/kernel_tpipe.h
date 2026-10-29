@@ -102,8 +102,8 @@ protected:
     static constexpr TPosition dstPosition = dst;
     static constexpr Hardware srcHardType = GetPhyType(src);
     static constexpr Hardware dstHardType = GetPhyType(dst);
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || \
+                              __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
     static constexpr HardEvent enQueEvt = GetQueEvt(srcPosition, dstPosition, true);
     static constexpr HardEvent freeBufEvt = GetQueEvt(srcPosition, dstPosition, false);
 #else

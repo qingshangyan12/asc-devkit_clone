@@ -26,7 +26,7 @@ namespace AscendC {
 
 __aicore__ inline int64_t GetSubBlockIdxImpl() { return 0; }
 
-__aicore__ inline int64_t GetTaskRationImpl() { return 0; }
+__aicore__ inline int64_t GetTaskRationImpl() { return 1; }
 
 __aicore__ inline int64_t TscmGetTaskRation() { return 0; }
 

@@ -97,56 +97,91 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t ACTIVE_COUNT = 4;
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t ACTIVE_COUNT = 16;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(float);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
 constexpr float INITIAL_VALUE = -1.0f;
 constexpr float FILL_VALUE = 1.0f;
 
-__simd_vf__ inline void duplicate_scalar_merge(__ubuf__ float* dst)
+__simd_vf__ inline void duplicate_scalar_merge(__ubuf__ float* dst, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
-    uint32_t active_count = ACTIVE_COUNT;
-    uint32_t full_count = ELEMENT_COUNT;
-    vector_bool active_mask = asc_update_mask_b32(active_count);
-    vector_bool full_mask = asc_update_mask_b32(full_count);
-
-    asc_loadalign(dst_reg, dst);
-    asc_duplicate_scalar_merge(dst_reg, FILL_VALUE, active_mask);
-    asc_storealign(dst, dst_reg, full_mask);
+    // 剩余有效元素数由asc_update_mask_b32逐轮更新，无需按offset重新计算。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        // active_mask控制本轮广播的生效位置：最多启用前ACTIVE_COUNT个元素，尾块不足时只启用有效元素。
+        // 例如133个元素按每轮64个处理，ACTIVE_COUNT为16时，三轮分别启用16、16、5个元素。
+        // remaining_length_active是本轮的独立计数；update_mask会将它扣减到0，因此每轮都要重新计算。
+        // 必须在生成store_mask之前计算，因为生成store_mask会更新跨轮使用的remaining_length。
+        uint32_t remaining_length_active = remaining_length < ACTIVE_COUNT ? remaining_length : ACTIVE_COUNT;
+        vector_bool active_mask = asc_update_mask_b32(remaining_length_active);
+        // store_mask控制写回范围，三轮分别写回64、64、5个有效元素，并自动更新剩余数量。
+        // 广播未生效的位置也可能需要写回，因此不能直接用active_mask代替store_mask。
+        vector_bool store_mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(dst_reg, dst + offset);
+        asc_duplicate_scalar_merge(dst_reg, FILL_VALUE, active_mask);
+        asc_storealign(dst + offset, dst_reg, store_mask);
+    }
 }
 
 __global__ __vector__ void asc_duplicate_scalar_merge_kernel(__gm__ float* dst)
 {
     asc_init();
-    __ubuf__ float dst_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(dst_local, dst, sizeof(dst_local));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    duplicate_scalar_merge(dst_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, sizeof(dst_local));
+    __ubuf__ float dst_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(dst_local, dst, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<duplicate_scalar_merge>(dst_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> output(ELEMENT_COUNT, INITIAL_VALUE);
-    std::vector<float> golden(ELEMENT_COUNT, INITIAL_VALUE);
-    for (uint32_t i = 0; i < ACTIVE_COUNT; ++i) golden[i] = FILL_VALUE;
+    std::vector<float> output(PADDED_ELEMENT_COUNT, INITIAL_VALUE);
+    std::vector<float> golden(TOTAL_LENGTH, INITIAL_VALUE);
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        // 保留剩余有效元素数，供更新掩码处理尾块。
+        const uint32_t remaining_length = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        const uint32_t remaining_length_active = remaining_length < ACTIVE_COUNT ? remaining_length : ACTIVE_COUNT;
+        for (uint32_t i = 0; i < remaining_length_active; ++i) golden[offset + i] = FILL_VALUE;
+    }
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(dst_device, output.size() * sizeof(float), output.data(), output.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(dst_device, PADDED_BUFFER_BYTES, output.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_duplicate_scalar_merge_kernel<<<1, 0>>>(dst_device);
     aclrtSynchronizeDevice();
+    output.resize(TOTAL_LENGTH);
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 

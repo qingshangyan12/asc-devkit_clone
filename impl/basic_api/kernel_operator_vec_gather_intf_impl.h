@@ -255,8 +255,8 @@ __aicore__ inline void Gather(
  */
 template <typename T, typename U>
 __aicore__ inline void GatherDataCopy(
-    LocalTensor<T> dstLocal, GlobalTensor<T> srcGlobal, LocalTensor<U> offsetLocal, GatherParams& gatherParam,
-    GatherPadParams<T>& gatherPadParam)
+    const LocalTensor<T>& dstLocal, const GlobalTensor<T>& srcGlobal, const LocalTensor<U>& offsetLocal,
+    const GatherParams& gatherParam, const GatherPadParams<T>& gatherPadParam)
 {
     ASCENDC_ASSERT(
         (SupportType<

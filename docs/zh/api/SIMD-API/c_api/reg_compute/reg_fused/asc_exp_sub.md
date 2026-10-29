@@ -120,6 +120,8 @@
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 -lm && ./main
 ```
+
+**注意：** 本示例主机侧golden计算会调用需由libm提供的数学函数：`std::exp`，编译命令需要保留`-lm`以链接数学库。
 <!-- end id8 -->
 
 ```cpp
@@ -129,9 +131,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 -lm && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -152,35 +158,48 @@ bool compare_data(const std::vector<float>& actual, const std::vector<float>& ex
     return true;
 }
 
-constexpr uint32_t FLOAT_COUNT = 64;
-constexpr uint32_t HALF_COUNT = 128;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t FLOAT_COUNT = 133;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (FLOAT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_FLOAT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t HALF_COUNT = FLOAT_COUNT * 2;
+constexpr uint32_t PADDED_HALF_COUNT = REPEAT_COUNT * 128;
 
+constexpr uint32_t DATA_BYTES = FLOAT_COUNT * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = FLOAT_COUNT;
 __simd_vf__ inline void compute(__ubuf__ float* float_dst, __ubuf__ float* half_even_dst,
     __ubuf__ float* half_odd_dst, __ubuf__ float* float_src0, __ubuf__ float* float_src1,
-    __ubuf__ half* half_src0, __ubuf__ half* half_src1)
+    __ubuf__ half* half_src0, __ubuf__ half* half_src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_float float_src0_reg;
-    vector_float float_src1_reg;
-    vector_half half_src0_reg;
-    vector_half half_src1_reg;
-    asc_loadalign(float_src0_reg, float_src0);
-    asc_loadalign(float_src1_reg, float_src1);
-    asc_loadalign(half_src0_reg, half_src0);
-    asc_loadalign(half_src1_reg, half_src1);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = FLOAT_COUNT;
+    uint32_t remaining_length_2 = HALF_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_float float_src0_reg;
+        vector_float float_src1_reg;
+        vector_half half_src0_reg;
+        vector_half half_src1_reg;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        vector_bool mask_b16 = asc_update_mask_b16(remaining_length_2);
+        asc_loadalign(float_src0_reg, float_src0 + offset);
+        asc_loadalign(float_src1_reg, float_src1 + offset);
+        asc_loadalign(half_src0_reg, half_src0 + offset * 2);
+        asc_loadalign(half_src1_reg, half_src1 + offset * 2);
 
-    uint32_t count = FLOAT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    vector_bool mask_b16 = asc_create_mask_b16(PAT_ALL);
-    vector_float float_result = asc_exp_sub(float_src0_reg, float_src1_reg, mask);
-    vector_float half_even_result;
-    asc_exp_sub_half2float(half_even_result, half_src0_reg, half_src1_reg, mask_b16,
-        ASC_POSITION_EVEN);
-    vector_float half_odd_result = asc_exp_sub_half2float(half_src0_reg, half_src1_reg,
-        mask_b16, ASC_POSITION_ODD);
+        vector_float float_result = asc_exp_sub(float_src0_reg, float_src1_reg, mask);
+        vector_float half_even_result;
+        asc_exp_sub_half2float(half_even_result, half_src0_reg, half_src1_reg, mask_b16,
+            ASC_POSITION_EVEN);
+        vector_float half_odd_result = asc_exp_sub_half2float(half_src0_reg, half_src1_reg,
+            mask_b16, ASC_POSITION_ODD);
 
-    asc_storealign(float_dst, float_result, mask);
-    asc_storealign(half_even_dst, half_even_result, mask);
-    asc_storealign(half_odd_dst, half_odd_result, mask);
+        asc_storealign(float_dst + offset, float_result, mask);
+        asc_storealign(half_even_dst + offset, half_even_result, mask);
+        asc_storealign(half_odd_dst + offset, half_odd_result, mask);
+    }
 }
 
 __global__ __vector__ void asc_exp_sub_kernel(__gm__ float* float_dst, __gm__ float* half_even_dst,
@@ -188,26 +207,32 @@ __global__ __vector__ void asc_exp_sub_kernel(__gm__ float* float_dst, __gm__ fl
     __gm__ half* half_src0, __gm__ half* half_src1)
 {
     asc_init();
-    __ubuf__ float float_dst_local[FLOAT_COUNT];
-    __ubuf__ float half_even_dst_local[FLOAT_COUNT];
-    __ubuf__ float half_odd_dst_local[FLOAT_COUNT];
-    __ubuf__ float float_src0_local[FLOAT_COUNT];
-    __ubuf__ float float_src1_local[FLOAT_COUNT];
-    __ubuf__ half half_src0_local[HALF_COUNT];
-    __ubuf__ half half_src1_local[HALF_COUNT];
+    __ubuf__ float float_dst_local[PADDED_FLOAT_COUNT];
+    __ubuf__ float half_even_dst_local[PADDED_FLOAT_COUNT];
+    __ubuf__ float half_odd_dst_local[PADDED_FLOAT_COUNT];
+    __ubuf__ float float_src0_local[PADDED_FLOAT_COUNT];
+    __ubuf__ float float_src1_local[PADDED_FLOAT_COUNT];
+    __ubuf__ half half_src0_local[PADDED_HALF_COUNT];
+    __ubuf__ half half_src1_local[PADDED_HALF_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(float_src0_local, float_src0, FLOAT_COUNT * sizeof(float));
     asc_copy_gm2ub_align(float_src1_local, float_src1, FLOAT_COUNT * sizeof(float));
     asc_copy_gm2ub_align(half_src0_local, half_src0, HALF_COUNT * sizeof(half));
     asc_copy_gm2ub_align(half_src1_local, half_src1, HALF_COUNT * sizeof(half));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    compute(float_dst_local, half_even_dst_local, half_odd_dst_local, float_src0_local,
-        float_src1_local, half_src0_local, half_src1_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<compute>(float_dst_local, half_even_dst_local, half_odd_dst_local, float_src0_local,
+        float_src1_local, half_src0_local, half_src1_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(float_dst, float_dst_local, FLOAT_COUNT * sizeof(float));
     asc_copy_ub2gm_align(half_even_dst, half_even_dst_local, FLOAT_COUNT * sizeof(float));
     asc_copy_ub2gm_align(half_odd_dst, half_odd_dst_local, FLOAT_COUNT * sizeof(float));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace

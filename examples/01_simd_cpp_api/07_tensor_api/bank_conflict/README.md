@@ -95,7 +95,7 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
     4. **寄存器搬运接口**：使用`asc_loadalign`读取一行128个half，使用`asc_storealign`的`block_stride`参数控制8个DataBlock的非连续写入。`block_stride`是本样例对比bank冲突的直接控制参数。
 
-    5. **流水接口**：使用`asc_lock`和`asc_unlock`保护MTE2、Vector和MTE3阶段，使用两组UB buffer交替处理tile。
+    5. **流水接口**：使用`mutex`保护MTE2、Vector和MTE3阶段，使用两组UB buffer交替处理tile。样例入口先调用`init_soc_state`初始化设备状态。
 
   - ND到NZ核心实现：
 

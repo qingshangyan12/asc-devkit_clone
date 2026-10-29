@@ -49,6 +49,7 @@ __aicore__ inline T GetReduceRepeatSumSpr()
 ## 数据类型
 
 操作数支持的数据类型为：`half`、`float`。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI_res.md#id2 -->
 
 ## 返回值说明
 
@@ -57,6 +58,7 @@ __aicore__ inline T GetReduceRepeatSumSpr()
 ## 约束说明
 
 仅支持配合`ReduceSum`的tensor前n个数据连续计算接口使用。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI_res.md#id3 -->
 
 ## 调用示例
 

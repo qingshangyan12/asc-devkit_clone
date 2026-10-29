@@ -29,26 +29,23 @@ constexpr uint8_t GQM_RETCODE_MASK = 0xFF; // Low 8 bits of ReturnData is the Er
 // ===================== public class Gqm =====================
 __aicore__ inline uint64_t Gqm::Init(uint64_t addr, int msgCount)
 {
-    constexpr uint64_t errNotAlign = 1;  // address not 64B-aligned
-    constexpr uint64_t errDepthZero = 4; // queue max depth must be > 0
+    constexpr uint64_t errNotAlign = 1;     // address not 64B-aligned
+    constexpr uint64_t errInvalidDepth = 4; // queue max depth must be > 0
 
     if (addr & 0x3F) {
         return errNotAlign;
     }
     if (msgCount <= 0) {
-        return errDepthZero;
+        return errInvalidDepth;
     }
 
     this->addr_ = addr;
 
-    constexpr uint64_t gqmPayLoadOffset = 21; // HasPayload flag bit
+    constexpr uint64_t gqmPayloadOffset = 21; // HasPayload flag bit
     constexpr uint64_t gqmCmdBits = 6;        // Command field width in CmdData
-    constexpr uint64_t cmd = 1 << gqmPayLoadOffset;
+    constexpr uint64_t cmd = 1ULL << gqmPayloadOffset;
 
-    // Make prior memory accesses visible before Init writes the metadata
-    dsb(mem_dsb_t::DSB_DDR);
-
-    auto ret = __gqm(addr, 0, (cmd + (msgCount << gqmCmdBits)));
+    auto ret = __gqm(addr, 0, cmd | (static_cast<uint64_t>(msgCount) << gqmCmdBits));
 
     return ret & Internal::GQM_RETCODE_MASK;
 }
@@ -62,9 +59,6 @@ __aicore__ inline uint64_t Gqm::EnQue(uint64_t data)
 
     constexpr uint64_t cmd = 0x1;
 
-    // Drain prior in-flight requests so this push advances the tail in issue order
-    dsb(mem_dsb_t::DSB_DDR);
-
     auto ret = __gqm(this->addr_, data, cmd);
     return ret & Internal::GQM_RETCODE_MASK;
 }
@@ -73,9 +67,6 @@ __aicore__ inline uint64_t Gqm::DeQue(uint64_t& retValue)
 {
     constexpr uint64_t popDataShift = 23; // PopData start bit in ReturnData
     constexpr uint64_t cmd = 0x5;
-
-    // Flush prior in-flight requests so this pop reads data already landed
-    dsb(mem_dsb_t::DSB_DDR);
 
     auto ret = __gqm(this->addr_, 0, cmd);
 
@@ -86,9 +77,6 @@ __aicore__ inline uint64_t Gqm::DeQue(uint64_t& retValue)
 __aicore__ inline uint64_t Gqm::GetFreeSpace()
 {
     constexpr uint64_t cmd = 0xF;
-
-    // Flush prior in-flight requests so the queried RmnCnt is up-to-date
-    dsb(mem_dsb_t::DSB_DDR);
 
     auto ret = __gqm(this->addr_, 0, cmd);
 
