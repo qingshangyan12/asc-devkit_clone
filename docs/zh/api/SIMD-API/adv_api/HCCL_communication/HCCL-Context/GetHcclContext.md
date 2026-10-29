@@ -40,7 +40,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 
 | 参数名 | 描述 |
 | --- | --- |
-| index | 模板参数，用来表示要设置的通信域ID，当前只支持2个通信域，index只能为0/1。 |
+| index | 模板参数，用来表示要获取的通信域ID，当前只支持2个通信域，index只能为0/1。 |
 
 ## 返回值说明
 
