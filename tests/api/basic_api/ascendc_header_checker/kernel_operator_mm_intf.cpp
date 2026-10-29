@@ -37,6 +37,37 @@ extern "C" __global__ __aicore__ void KernelTestLoadData2()
 }
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+/*
+ * Raw-pointer LoadData with a GM source, one case per destination address space.
+ *
+ * These compile only in the NPU build: the CPU build collapses __ca__ / __cb__ / __cbuf__ / __gm__
+ * into empty macros, so it cannot tell the three apart.  What each case asserts is that the pointer
+ * overload's dispatch has a branch for its destination -- the same three branches the Tensor form
+ * reaches in LoadDataImpl (kernel_operator_mm_load2d_impl.h:91-104).
+ *
+ * The GM -> L0A / L0B pipes are not usable on this architecture and their backends assert at run
+ * time; the Tensor cases above them are equally unsupported here.  This checks compilation only.
+ */
+extern "C" __global__ __aicore__ void KernelTestLoadDataPtrGM2L1()
+{
+    AscendC::LoadData2DParams loadDataParams;
+    AscendC::LoadData((__cbuf__ half*)0, (__gm__ half*)0, loadDataParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestLoadDataPtrGM2L0A()
+{
+    AscendC::LoadData2DParams loadDataParams;
+    AscendC::LoadData((__ca__ half*)0, (__gm__ half*)0, loadDataParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestLoadDataPtrGM2L0B()
+{
+    AscendC::LoadData2DParams loadDataParams;
+    AscendC::LoadData((__cb__ half*)0, (__gm__ half*)0, loadDataParams);
+}
+#endif
+
 // __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParamsV2&
 // loadDataParams);
 extern "C" __global__ __aicore__ void KernelTestLoadData3()
