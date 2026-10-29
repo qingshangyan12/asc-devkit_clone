@@ -197,11 +197,11 @@ this->AICore()
 
 ## 配置指定AI处理器的差异化配置
 
-`AddConfig`为指定AI处理器设置差异化编译配置。
+[`AddConfig`](../../../../../api/Utils-API/prototype_register_management/OpAICoreDef/AddConfig.md)为指定AI处理器设置差异化编译配置。
 
 ### 使用OpAICoreConfig注册差异化配置
 
-当某个AI处理器的输入输出原型或其他编译配置与通用配置不同时，在算子原型构造函数中创建`OpAICoreConfig`，并通过`AddConfig("ascendxxx", config)`注册。"ascendxxx"应填写[构建目标标识](../aclnn_quick_start.md#target-configuration)，与`ASCEND_COMPUTE_UNIT`或`ASCEND_SOC_SERIES`归一后的目标标识对应；配置多个目标时，需为各目标分别调用`AddConfig`。
+当某个AI处理器的输入输出原型或其他编译配置与通用配置不同时，在算子原型构造函数中创建`OpAICoreConfig`，并通过`AddConfig("ascendxxx", config)`注册。"ascendxxx"应填写[构建目标标识](../aclnn_quick_start.md#target-configuration)（如`ascend910b`），取值不区分大小写，建议统一使用小写，可参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的soc_series；配置多个目标时，需为各目标分别调用`AddConfig`。
 
 `OpAICoreConfig`中未配置的输入输出继承`OpDef`中的定义；重新配置的同名输入输出覆盖通用定义。以下示例为指定AI处理器增加`DT_BF16`支持：
 

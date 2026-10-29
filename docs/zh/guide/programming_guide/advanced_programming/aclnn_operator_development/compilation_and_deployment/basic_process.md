@@ -20,7 +20,7 @@
 
 算子工程的CMakeLists.txt由开发者自行编写，详细的编写方法请参考[编译组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，算子工程编译部署只需三步：
 
-1. 在CMakeLists.txt中设置`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`（二选一）以及`vendor_name`（厂商名称）等编译配置选项；
+1. 在CMakeLists.txt中设置`ASCEND_SOC_SERIES`（构建目标）以及`vendor_name`（厂商名称）等编译配置选项；
 2. 执行`cmake`和`make`命令，生成`custom_opp_*.run`安装包；
 3. 执行`./custom_opp_*.run`，安装到运行环境。
 
@@ -28,17 +28,16 @@
 
 ## 编译配置<a id="compile-configuration"></a>
 
-编译配置选项的必改参数有两个，其中芯片系列配置在`ASCEND_SOC_SERIES`和`ASCEND_COMPUTE_UNIT`中二选一：
+编译配置选项的必改参数有两个：
 
 | 参数名称 | 参数描述 | 默认值 |
 |---------|---------|--------|
-| ASCEND_SOC_SERIES | AI处理器系列，支持配置一个或多个值。输入不区分大小写，配置值会先归一为小写。 | 无 |
-| ASCEND_COMPUTE_UNIT | 构建目标的小写标识，如`ascend910b`，与Host原型中的`AddConfig`对应。 | `ascend910b` |
+| ASCEND_SOC_SERIES | 构建目标（AI处理器系列），支持配置一个或多个值，输入不区分大小写，取值需与Host原型中的`AddConfig`对应。 | `ascend910b` |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
 
-`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`不能同时配置，且`ASCEND_SOC_SERIES`不能为空。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。这些变量以及交叉编译相关变量应在`find_package(ASC)`前设置，由ASC加载时完成初始化。
+`ASCEND_SOC_SERIES`不能为空，且必须在`find_package(ASC)`前设置（交叉编译相关变量同理），由ASC加载时完成初始化。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。
 
-切换两种目标配置方式时，使用新的构建目录，避免旧`CMakeCache.txt`中的目标变量与新配置冲突。
+**存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，取值为构建目标的小写标识（如`ascend910b`），行为保持不变，存量工程无需迁移。两者不能同时配置；与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`不会自动转小写。切换两种配置方式时，请使用新的构建目录，避免旧`CMakeCache.txt`中残留的目标变量与新配置冲突而报错。
 
 除上述必改参数外，其他可选编译配置选项详情如下：
 
@@ -64,9 +63,9 @@
 cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
-# 在加载ASC前提供默认目标；外部配置ASCEND_SOC_SERIES时不再设置另一种目标变量。
-if(NOT DEFINED ASCEND_SOC_SERIES)
-    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+# 在加载ASC前提供默认目标；外部配置ASCEND_COMPUTE_UNIT时不再设置另一种目标变量。
+if(NOT DEFINED ASCEND_COMPUTE_UNIT)
+    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 endif()
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)
@@ -79,7 +78,7 @@ npu_op_package(${vendor_name}
 )
 ```
 
-以上为顶层文件的配置部分，还需按[快速入门](../aclnn_quick_start.md)或[编译组织](#编译组织)添加源文件和各类库的构建配置。`CACHE`设置提供默认值，允许命令行`-D`和preset传入的同名值生效；不要再用普通`set(...)`覆盖这些值。若要直接在文件中选择系列，可将默认目标设置替换为`set(ASCEND_SOC_SERIES "Ascend950" CACHE STRING "AI processor series")`，并使用新的构建目录。
+以上为顶层文件的配置部分，还需按[快速入门](../aclnn_quick_start.md)或[编译组织](#编译组织)添加源文件和各类库的构建配置。`CACHE`设置提供默认值，允许命令行`-D`和preset传入的同名值生效；不要再用普通`set(...)`覆盖这些值。要在文件中直接指定其他构建目标，修改该默认值即可，例如`set(ASCEND_SOC_SERIES "Ascend950" CACHE STRING "AI processor series")`；修改后请使用新的构建目录。
 
 其他配置（如动态库编译、交叉编译等）也可在CMakeLists.txt中通过变量或`npu_op_package` CONFIG参数设置。完整参数说明请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
 
@@ -107,7 +106,7 @@ npu_op_package(${vendor_name}
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "ASCEND_COMPUTE_UNIT": {
+                "ASCEND_SOC_SERIES": {
                     "type": "STRING",
                     "value": "ascend910b"
                 },
@@ -345,8 +344,8 @@ cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
 # 1. 在加载ASC前设置配置默认值，也可由命令行或preset传入。
-if(NOT DEFINED ASCEND_SOC_SERIES)
-    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+if(NOT DEFINED ASCEND_COMPUTE_UNIT)
+    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 endif()
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)
@@ -499,8 +498,8 @@ cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
 # 在加载ASC前设置默认配置，允许命令行或preset覆盖。
-if(NOT DEFINED ASCEND_SOC_SERIES)
-    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+if(NOT DEFINED ASCEND_COMPUTE_UNIT)
+    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 endif()
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)

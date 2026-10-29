@@ -263,23 +263,16 @@ OP_ADD(AddCustom);
 
 #### 配置构建目标<a id="target-configuration"></a>
 
-设备查询命令得到的`soc_version`与工程使用的构建目标标识不同，不能直接把查询结果填入`ASCEND_COMPUTE_UNIT`或`AddConfig`。常见对应关系如下：
-
-| 产品 | 设备型号示例（soc_version） | 构建目标标识 |
-|------|--------------------------|--------------|
-| Atlas A2系列产品 | `Ascend910B1`、`Ascend910B2` | `ascend910b` |
-| Atlas A3系列产品 | `Ascend910_9391`、`Ascend910_9381` | `ascend910_93` |
-| Ascend 950PR&950DT系列产品 | `Ascend950PR_9599`、`Ascend950DT_950X` | `ascend950` |
-| Atlas推理系列产品 | `Ascend310P1`、`Ascend310P3` | `ascend310p` |
-| Atlas 200I/500 A2推理产品 | `Ascend310B1` | `ascend310b` |
-| Atlas训练系列产品 | `Ascend910A`、`Ascend910ProA` | `ascend910` |
+设备查询命令得到的`soc_version`与工程使用的构建目标标识（soc_series）不是同一个值，不能直接把查询结果填入`ASCEND_SOC_SERIES`或`AddConfig`。各产品对应的soc_series请以[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的表1为准。
 
 本示例的CMake和Host原型均使用`ascend910b`。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准。
 
-`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`用于选择构建目标，二选一；前者接受系列标识并归一为小写，后者填写表中的小写标识。相关变量必须在`find_package(ASC)`之前设置，供ASC初始化时读取和校验。更多配置方式见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
+`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量必须在`find_package(ASC)`之前设置，供ASC初始化时读取和校验。更多配置方式见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
+
+**存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，行为保持不变，存量工程无需迁移。两者不能同时配置，否则CMake配置阶段报错。与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`的取值不会自动转小写，需直接填写小写标识。
 
 >[!NOTE]说明
->其中，设备型号`soc_version`请通过以下方式获取，再按上表选择对应的构建目标标识：
+>其中，设备型号`soc_version`请通过以下方式获取，再参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的soc_series选择对应的构建目标标识：
 ><!-- npu="910b,910,310p,310b" id1 -->
 >- 针对如下产品：在安装AI处理器的服务器执行`npu-smi info`命令进行查询，获取Name信息。设备型号为AscendName，例如Name取值为xxxyy，设备型号为Ascendxxxyy。<br><br>
 >    <!-- npu="910b" id2 -->
@@ -314,8 +307,8 @@ cmake_minimum_required(VERSION 3.19.0)
 project(AddCustom)
 
 # 在加载ASC前配置构建目标。CACHE默认值允许用cmake -D或preset覆盖。
-if(NOT DEFINED ASCEND_SOC_SERIES)
-    set(ASCEND_COMPUTE_UNIT "ascend910b" CACHE STRING "AI processor build target")
+if(NOT DEFINED ASCEND_COMPUTE_UNIT)
+    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 endif()
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 

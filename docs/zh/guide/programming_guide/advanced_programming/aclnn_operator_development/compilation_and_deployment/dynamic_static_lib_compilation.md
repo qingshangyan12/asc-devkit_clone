@@ -30,7 +30,7 @@
 - 已完成算子原型定义、Host侧Tiling实现和核函数（Kernel）侧实现；
 - 工程使用`find_package(ASC)`和`npu_op_package`组织编译；
 - 已配置CANN环境变量，例如执行`source ${install_path}/cann/set_env.sh`；
-- 已在`CMakePresets.json`或CMake命令中配置`vendor_name`、`ASCEND_COMPUTE_UNIT`、`CMAKE_INSTALL_PREFIX`等参数。
+- 已在`CMakePresets.json`或CMake命令中配置`vendor_name`、`ASCEND_SOC_SERIES`、`CMAKE_INSTALL_PREFIX`等参数。
 
 ## 编译动态库
 
