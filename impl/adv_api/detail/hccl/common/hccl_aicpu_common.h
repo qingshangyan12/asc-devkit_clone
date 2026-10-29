@@ -82,16 +82,14 @@ __aicore__ inline uint8_t FetchAndIncPrimitiveIdInControlMsg(__gm__ ControlHcclM
 }
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-__aicore__ inline void PublishHcclMsgA5(__gm__ ControlHcclMsg* controlMsgGM, __gm__ HcclMsg* dst)
+__aicore__ inline void PublishHcclMsgA5(__gm__ HcclMsg* dst)
 {
-    // Both objects are published under one barrier/DSB pair. The two DCCI operations still cover
-    // their respective cache lines, but the normal A5 Prepare avoids duplicate sync sequences.
+    // Publish only the server-visible message. A5 sequence state is derived from the Prepare handle,
+    // so the control-message cache line is not part of the hot path.
     AscendC::Barrier();
     GlobalTensor<int64_t> globalMsg;
-    globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(controlMsgGM));
-    __asm__("NOP");
-    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
     globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(dst));
+    __asm__("NOP");
     DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
     DataSyncBarrier<MemDsbT::ALL>();
 }
@@ -102,20 +100,7 @@ __aicore__ inline void AssembleHcclMsgV2A5(
 {
     HcclMsg tmp{};
     const bool isFinalize = (param.commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE);
-    uint8_t seqNum = 0U;
-    if (isFinalize) {
-        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 0U;
-        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 0U;
-        controlMsgGM->resetSeq = 0U;
-    } else {
-        if (controlMsgGM->resetSeq > 0U) {
-            controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 0U;
-            controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 1U;
-            controlMsgGM->resetSeq = 0U;
-        }
-        seqNum = controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX];
-        controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = static_cast<uint8_t>(seqNum + 1U);
-    }
+    (void)controlMsgGM;
 
     tmp.commType.msgType = param.commType.msgType;
     if (!isFinalize) {
@@ -128,22 +113,21 @@ __aicore__ inline void AssembleHcclMsgV2A5(
             tmp.addMsg.v0Msg.hcclDataType = param.dataType;
             tmp.addMsg.v0Msg.repeatCnt = param.repeat;
             tmp.addMsg.v0Msg.selfHandleID = handle;
-            tmp.addMsg.v0Msg.seqNum = seqNum;
+            tmp.addMsg.v0Msg.seqNum = static_cast<uint8_t>(handle);
             tmp.addMsg.v0Msg.version = ver;
         } else {
             tmp.addMsg.v1Msg.ccOpTilingData = tiling;
             tmp.addMsg.v1Msg.hcclDataType = param.dataType;
             tmp.addMsg.v1Msg.repeatCnt = param.repeat;
             tmp.addMsg.v1Msg.selfHandleID = handle;
-            tmp.addMsg.v1Msg.seqNum = seqNum;
+            tmp.addMsg.v1Msg.seqNum = static_cast<uint8_t>(handle);
             tmp.addMsg.v1Msg.version = ver;
         }
     }
     tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;
     CopyHcclMsg(reinterpret_cast<const uint8_t*>(&tmp), dst);
 
-    // Publish the control state and the complete message after all writes are done.
-    PublishHcclMsgA5(controlMsgGM, dst);
+    PublishHcclMsgA5(dst);
 }
 #endif
 
