@@ -32,6 +32,9 @@
 <!-- npu="9030" id11 -->
 - Kirin9030处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9050" id14 -->
+- Kirin9050处理器系列产品：支持
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/scatter_operations/Gather_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -75,6 +78,10 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 - Ascend 950PR&950DT系列产品，源操作数和目的操作数支持的数据类型为：b8、b16、b32。
 - Ascend 950PR&950DT系列产品，索引值支持的数据类型为：uint8_t、uint16_t、uint32_t。
 <!-- end id8 -->
+<!-- npu="9050" id13 -->
+- 针对Kirin9050处理器系列产品，源操作数和目的操作数支持的数据类型为：b8、b16、b32。
+- 针对Kirin9050处理器系列产品，索引值支持的数据类型为：uint8_t、uint16_t、uint32_t。
+<!-- end id13 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/scatter_operations/Gather_res.md#id2 -->
 
 ## 返回值说明

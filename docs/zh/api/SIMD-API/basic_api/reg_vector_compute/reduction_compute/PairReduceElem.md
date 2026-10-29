@@ -32,6 +32,9 @@
 <!-- npu="x90" id11 -->
 - KirinX90处理器系列产品：支持
 <!-- end id11 -->
+<!-- npu="9050" id15 -->
+- Kirin9050处理器系列产品：支持
+<!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/PairReduceElem_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -93,6 +96,9 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)
 <!-- npu="x90" id13 -->
 - 针对KirinX90处理器系列产品，支持数据类型为：half、float。
 <!-- end id13 -->
+<!-- npu="9050" id14 -->
+- 针对Kirin9050处理器系列产品，支持数据类型为：half、float。
+<!-- end id14 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

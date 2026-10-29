@@ -82,8 +82,8 @@ __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& 
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
 <!-- end id8 -->
-<!-- npu="x90,9020,9030" id15 -->
-- KirinX90处理器系列产品、Kirin9020处理器系列产品、Kirin9030处理器系列产品目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- npu="x90,9020,9030,9050" id15 -->
+- KirinX90处理器系列产品、Kirin9020处理器系列产品、Kirin9030处理器系列产品、Kirin9050处理器系列产品目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_reorder/DeInterleave_res.md#id2 -->
 

@@ -126,8 +126,8 @@ __simd_callee__ inline void Scatter(__ubuf__ T* baseAddr, S& srcReg, V& index, M
     | uint64_t | uint64_t |  RegTensor<uint64_t, RegTraitNumOne> | RegTensor<uint64_t, RegTraitNumOne> | - |
     | uint64_t | uint64_t | RegTensor<uint64_t, RegTraitNumOne> | RegTensor<uint64_t, RegTraitNumTwo> | index的前32个数有效 |
     | uint64_t | uint64_t | RegTensor<uint64_t, RegTraitNumTwo> | RegTensor<uint64_t, RegTraitNumTwo> | - |
-<!-- npu="x90,9020,9030" id15 -->
-- 针对KirinX90处理器系列产品、Kirin9020处理器系列产品和Kirin9030处理器系列产品,暂不支持bfloat16_t/uint64_t/int64_t数据类型。
+<!-- npu="x90,9020,9030,9050" id15 -->
+- 针对KirinX90处理器系列产品、Kirin9020处理器系列产品、Kirin9030处理器系列产品和Kirin9050处理器系列产品,暂不支持bfloat16_t/uint64_t/int64_t数据类型。
 <!-- end id15 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
