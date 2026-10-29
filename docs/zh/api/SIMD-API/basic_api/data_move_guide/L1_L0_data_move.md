@@ -114,12 +114,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 ```
 
 <!-- npu="950" id10 -->
-仅Ascend 950PR&950DT系列产品支持
-
-```cpp
-template <typename T>
-__aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
-```
+针对Ascend 950PR&950DT系列产品，本接口不支持L1 Buffer->L0A Buffer通路，仅支持L1 Buffer->L0B Buffer通路；`LoadData2dTransposeParamsV2` 形见下文“L1ToL0B”小节。
 <!-- end id10 -->
 
 ## L1ToL0A 3D格式分形矩阵搬运（LoadData（卷积数据搬运））<a name="ZH-CN_TOPIC_0000002574022819"></a>
@@ -135,7 +130,7 @@ LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map
 
 src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数。
 
-- LoadData（卷积数据搬运） v1接口
+- LoadData（卷积数据搬运）v1接口（仅Atlas推理系列产品AI Core与Atlas训练系列产品支持）
 
     ```cpp
     template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -149,16 +144,14 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
     __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
     ```
 
-<!-- npu="950" id3 -->
-- LoadData（卷积数据搬运）v2Pro接口（仅Ascend 950PR&950DT系列产品支持）
+- LoadData（卷积数据搬运）v2Pro接口（各产品支持情况见[LoadData（卷积数据搬运）](../cube_compute_ISASI/cube_compute_load/LoadData_3D.md#zh-cn_topic_0000002512171652_section796754519912)）
 
     ```cpp
     template <typename T>
     __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
     ```
-<!-- end id3 -->
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id13 -->
 
 ## L1ToL0A 3D格式分形矩阵搬运（LoadDataWithStride）<a name="ZH-CN_TOPIC_0000002573312819"></a>
 
@@ -179,7 +172,7 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
     template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
     __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
     ```
-<!-- end id1 -->
+<!-- end id13 -->
 
 ## L1ToL0B 2D格式分形矩阵搬运（LoadData（2D矩阵搬运））<a name="ZH-CN_TOPIC_0000002543262922"></a>
 
@@ -292,7 +285,7 @@ LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map
 
 src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数。
 
-- LoadData（卷积数据搬运） v1接口
+- LoadData（卷积数据搬运）v1接口（仅Atlas推理系列产品AI Core与Atlas训练系列产品支持）
 
     ```cpp
     template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
@@ -306,14 +299,12 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
     __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
     ```
 
-<!-- npu="950" id6 -->
-- LoadData（卷积数据搬运）v2Pro接口（仅Ascend 950PR&950DT系列产品支持）
+- LoadData（卷积数据搬运）v2Pro接口（各产品支持情况见[LoadData（卷积数据搬运）](../cube_compute_ISASI/cube_compute_load/LoadData_3D.md#zh-cn_topic_0000002512171652_section796754519912)）
 
     ```cpp
     template <typename T>
     __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
     ```
-<!-- end id6 -->
 
 <!-- npu="950" id12 -->
 
