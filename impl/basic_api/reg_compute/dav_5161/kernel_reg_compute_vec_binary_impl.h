@@ -889,7 +889,7 @@ __simd_callee__ inline void XorImpl(RegT& dstReg, RegT& srcReg0, RegT& srcReg1, 
     using ActualT = typename RegT::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, bool>(),
         "current data type is not supported on current device!");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
