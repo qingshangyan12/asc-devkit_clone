@@ -275,8 +275,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-    // 双mission适配预备，后续切为Server+Slave
-    KfcServerGenCircularQueue(ctx);
+    CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
