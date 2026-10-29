@@ -92,12 +92,22 @@ def is_cmake_configure(command: str) -> bool:
 def rewrite_cmake(command: str, arch: str, mode: str, werror: bool = False) -> str:
     if not is_cmake_configure(command):
         return command
+    lexer = shlex.shlex(command, posix=True)
+    lexer.whitespace_split = True
+    lexer.commenters = ""
+    parts = []
     try:
-        parts = shlex.split(command)
+        while True:
+            start = lexer.instream.tell()
+            part = lexer.get_token()
+            if part is None:
+                break
+            parts.append((part, command[start : lexer.instream.tell()].strip()))
     except ValueError:
-        parts = command.split()
+        return command
     out: List[str] = []
-    for part in parts:
+    original: List[str] = []
+    for part, raw in parts:
         if part.startswith("-DCMAKE_ASC_ARCHITECTURES="):
             continue
         if part.startswith("-DCMAKE_ASC_RUN_MODE="):
@@ -105,23 +115,21 @@ def rewrite_cmake(command: str, arch: str, mode: str, werror: bool = False) -> s
         if part.startswith("-DNPU_ARCH="):
             continue
         out.append(part)
+        original.append(raw)
     if not out:
         out = ["cmake"]
+        original = ["cmake"]
     if out[0] != "cmake":
         out.insert(0, "cmake")
-    out.append(f"-DCMAKE_ASC_ARCHITECTURES={arch}")
+        original.insert(0, "cmake")
+    additions = []
+    additions.append(f"-DCMAKE_ASC_ARCHITECTURES={arch}")
     if mode != "npu":
-        out.append(f"-DCMAKE_ASC_RUN_MODE={mode}")
-    out.extend(arg for arg in werror_cmake_args(werror) if not _has_cmake_cache_arg(out, arg))
-    return " ".join(_quote_cmake_part(x) for x in out)
+        additions.append(f"-DCMAKE_ASC_RUN_MODE={mode}")
+    additions.extend(arg for arg in werror_cmake_args(werror) if not _has_cmake_cache_arg(out, arg))
+    return " ".join(original + [shlex.quote(arg) for arg in additions])
 
 
 def _has_cmake_cache_arg(parts: Sequence[str], arg: str) -> bool:
     key = arg.split("=", 1)[0]
     return any(part.startswith(f"{key}=") for part in parts)
-
-
-def _quote_cmake_part(part: str) -> str:
-    if "$" in part:
-        return part
-    return shlex.quote(part)
