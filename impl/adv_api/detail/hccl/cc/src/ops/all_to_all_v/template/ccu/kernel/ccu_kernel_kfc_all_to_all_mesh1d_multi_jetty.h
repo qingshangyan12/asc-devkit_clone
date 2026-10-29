@@ -18,6 +18,9 @@ namespace mc2_ops_hccl {
 
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg);
 CcuResult CcuKfcAllToAllClos1DMultiJettyKernel(CcuKernelArg arg);
+CcuResult CcuKfcAllToAllClos1DMultiJettyInline(
+    const ChannelHandle* channels, uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    const std::vector<ccu::Variable>& args);
 
 } // namespace mc2_ops_hccl
 

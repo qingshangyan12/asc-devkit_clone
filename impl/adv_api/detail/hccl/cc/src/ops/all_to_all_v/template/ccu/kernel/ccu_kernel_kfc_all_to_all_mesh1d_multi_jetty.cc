@@ -81,7 +81,8 @@ CcuResult LoadArgs(KfcAllToAllContext& ctx, ccu::Array<ccu::Variable>& args)
     return CCU_SUCCESS;
 }
 
-CcuResult LoadArgs(KfcAllToAllClosContext& ctx, ccu::Array<ccu::Variable>& args)
+template <typename Args>
+CcuResult LoadArgs(KfcAllToAllClosContext& ctx, Args& args)
 {
     ctx.input = args[KfcFuncArgIndex(KFC_CONCURRENT_A2A_CLOS_INPUT)];
     ctx.output = args[KfcFuncArgIndex(KFC_CONCURRENT_A2A_CLOS_OUTPUT)];
@@ -177,6 +178,24 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     return CCU_SUCCESS;
 }
 } // namespace
+
+CcuResult CcuKfcAllToAllClos1DMultiJettyInline(
+    const ChannelHandle* channels, uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    const std::vector<ccu::Variable>& args)
+{
+    KfcAllToAllClosContext ctx;
+    ctx.channels = channels;
+    ctx.channelCount = channelCount;
+    ctx.rankSize = rankSize;
+    ctx.rankId = rankId;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    CCU_CHK_RET(PreSync(ctx));
+    CCU_CHK_RET(DoAllToAll(ctx));
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
 
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
 {

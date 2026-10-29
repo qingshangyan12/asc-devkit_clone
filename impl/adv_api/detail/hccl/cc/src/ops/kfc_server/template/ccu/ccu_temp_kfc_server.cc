@@ -12,6 +12,7 @@
 #include "ccu_assist_pub.h"
 #include "alg_data_trans_wrapper.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
 #include "ccu_launch_dl.h"
@@ -32,6 +33,11 @@ HcclResult InheritKfcServerKernelArg(
     kfcArg->opParam = param;
     kfcArg->algSubType = srcArg->algSubType;
     kfcArg->algArg = srcArg->algArg;
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL && role == KfcServerRole::ALL_TO_ALL_CLOS) {
+        const auto* allToAllArg = static_cast<const CcuKernelArgAllToAllMesh1DMultiJetty*>(srcArg);
+        kfcArg->rankSize = allToAllArg->rankSize;
+        kfcArg->rankId = allToAllArg->rankId;
+    }
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         CHK_PRT_RET(
             kfcArg->algSubType != KFC_PARALLEL_ALL_GATHER_SUB_TYPE || !kfcArg->algArg,

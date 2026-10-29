@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
 #include "mc2_type.h"
@@ -156,6 +157,13 @@ static CcuResult CallKfcSubKernel(
         args.emplace_back(param[i]);
     }
     args.emplace_back(turnEndAddr);
+    // Diagnostic probe: keep both missions parallel, but only Mesh uses the shared PC-call ABI.
+    if (ctx.arg->opType == HcclCMDType::HCCL_CMD_ALLTOALL && ctx.arg->role == KfcServerRole::ALL_TO_ALL_CLOS) {
+        HCCL_INFO("[ConcurrentAllToAllProbe] mission[%u] CLOS inline, Mesh uses PC", ctx.arg->missionIndex);
+        return CcuKfcAllToAllClos1DMultiJettyInline(
+            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+            args);
+    }
     return ccu::CallFunc(ctx.subKernelPc, args);
 }
 
