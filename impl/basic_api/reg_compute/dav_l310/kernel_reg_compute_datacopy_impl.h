@@ -701,7 +701,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstUbAddr, MaskReg& mask, A
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstUbAddr, MaskReg& mask)
 {
-    static_assert(SupportBytes < T, 1, 2, 4(), "StoreAlign only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
         "StoreAlign not support this dist on current device");
