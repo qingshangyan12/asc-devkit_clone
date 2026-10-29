@@ -97,8 +97,28 @@ DEFINE_WEAK_FUNC(int32_t, HcommChannelFenceOnThread, ThreadHandle thread, Channe
 DEFINE_WEAK_FUNC(HcclResult, HcommThreadJoin, ThreadHandle thread, uint32_t timeout);
 DEFINE_WEAK_FUNC(
     HcclResult, HcclSymWinGetPeerPointer, HcclCommSymWindow winHandle, size_t offset, uint32_t peerRank, void** ptr);
+using Mc2SymWinGetRemoteAddrFunc = HcclResult (*)(HcclCommSymWindow, size_t, uint32_t, void**);
+static Mc2SymWinGetRemoteAddrFunc g_mc2SymWinGetRemoteAddr = nullptr;
 DEFINE_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
+
+HcclResult Mc2GetSymWinRemoteMem(HcclCommSymWindow winHandle, size_t offset, uint32_t peerRank, void** ptr)
+{
+    CHK_PTR_NULL(ptr);
+    *ptr = nullptr;
+    CHK_PRT_RET(
+        winHandle == nullptr,
+        HCCL_ERROR(
+            "[AG_SYMM_DIAG] missing symmetric window, peerRank[%u], offset[%llu]. "
+            "Setting supportSymmetricMemory=true does not create a window.",
+            peerRank, static_cast<unsigned long long>(offset)),
+        HCCL_E_PTR);
+    // Match HCCL: prefer the newer remote-address API, retain the older fallback.
+    if (g_mc2SymWinGetRemoteAddr != nullptr) {
+        return g_mc2SymWinGetRemoteAddr(winHandle, offset, peerRank, ptr);
+    }
+    return HcclSymWinGetPeerPointer(winHandle, offset, peerRank, ptr);
+}
 extern "C" bool Mc2HcommIsSupportAicpuTsTaskCache(void)
 {
     return g_HcommAicpuTsTaskCacheLookup != nullptr && g_HcommAicpuTsTaskCacheStart != nullptr &&
@@ -189,6 +209,10 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommChannelFenceOnThread);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommThreadJoin);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclSymWinGetPeerPointer);
+    // Resolve the optional API directly: a local weak failure stub would itself
+    // appear present when the device loader searches libmc2_server.so.
+    g_mc2SymWinGetRemoteAddr =
+        reinterpret_cast<Mc2SymWinGetRemoteAddrFunc>(dlsym(libHcommHandle, "HcclSymWinGetRemoteAddr"));
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommSymWinGet);
 
     dlerror();
