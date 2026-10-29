@@ -81,6 +81,21 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
     __aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
     ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize)
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+template <TPosition position, typename T, typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void DumpTensor(DstPtr tensor, uint32_t desc, uint32_t dumpSize)
+template <TPosition position, typename T, typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void DumpTensor(DstPtr tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；`__gm__` 形用于 Global Memory 地址，带 `TPosition` 模板参数的形用于片上地址，并由该模板参数指定其物理位置。
+
 ## 参数说明<a name="section158061867342"></a>
 
 **表1**  模板参数说明
@@ -97,6 +112,8 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 | desc | 输入 | 用户自定义附加信息（行号或其他自定义数字）。<br>在使用DumpTensor功能时，用户可通过desc参数附加自定义信息，以便在不同场景下区分Dump内容的来源。此功能有助于精准定位具体DumpTensor的输出，提升调试与分析效率。|
 | dumpSize | 输入 | 需要dump的元素个数。|
 | shapeInfo | 输入 | 传入Tensor的shape信息，可按照shape信息进行打印。<br>•当Shape尺寸大于dumpSize元素个数时，按照ShapeInfo打印元素，不足的Dump数据用"-"展示。<br>•当Shape尺寸小于等于dumpSize元素个数时，按照ShapeInfo打印元素，多出的Dump数据不展示。|
+
+裸指针形下，`tensor` / `desc` / `dumpSize` / `shapeInfo` 分别与上表同名 tensor 形参语义一致，`tensor` 实参为裸指针。
 
 ## 数据类型
 
@@ -130,6 +147,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 <!-- end id113 --> 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。使用时应注意，如果超出这个限制，则数据不会被打印。
+- 裸指针形下，`__gm__` 形的 `tensor` 须为 Global Memory 地址；带 `TPosition` 模板参数的形，`tensor` 须位于该模板参数指定的 Unified Buffer、L1 Buffer 或 L0C Buffer 上。
 
 ## 调用示例<a name="section82241477610"></a>
 

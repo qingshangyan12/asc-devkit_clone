@@ -54,6 +54,18 @@ template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_sam
 __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams)
 ```
 
+**裸指针形（InitConstValue 接口，与上面的 Fill tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename U, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams)
+
+template <typename T, typename U = PrimT<T>, typename DstPtr, typename Std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams)
+```
+
+> 上述裸指针形仅由旧接口名 `InitConstValue` 提供（`InitConstValue` 为 Fill 的旧接口名，行为与 Fill 一致），`Fill` 本身没有裸指针形；参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor，元素的地址空间由指针实参本身区分。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1** 模板参数说明
@@ -69,6 +81,8 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 | --------- | ---------- | ------ |
 | dst | 输出 | 目的操作数，结果矩阵，类型为LocalTensor。 |
 | InitConstValueParams | 输入 | 初始化相关参数，类型为InitConstValueParams。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表3](#table3)。 |
+
+裸指针形的 `dst` 与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 <a name="table3"></a>
 **表3** InitConstValueParams结构体参数说明
@@ -120,6 +134,8 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
     <!-- end id20 -->
     - 如果物理存储位置为L1 Buffer（TPosition: A1/B1），起始地址需要满足32B对齐；
     - 如果物理存储位置为L0A Buffer（TPosition: A2）、L0B Buffer（TPosition: B2），起始地址需要满足512B对齐。
+
+- 裸指针形下，`dst` 的地址空间须与原 tensor 形一致（L1 为 `__cbuf__`、L0A 为 `__ca__`、L0B 为 `__cb__`），元素类型可由显式模板实参或指针实参推导。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

@@ -56,6 +56,17 @@ template <typename T>
 __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+template <TPosition position, typename T, typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void DumpAccChkPoint(DstPtr tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；`__gm__` 形用于 Global Memory 地址，带 `TPosition` 模板参数的形用于片上地址，并由该模板参数指定其物理位置。
+
 ## 参数说明<a name="section158061867342"></a>
 
 **表1**  模板参数说明
@@ -72,6 +83,8 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 | index | 输入 | 用户自定义附加信息（行号或其他自定义数字）。|
 | countOff | 输入 | 偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束。具体参考[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。|
 | dumpSize | 输入 | 需要dump的元素个数。|
+
+裸指针形下，`tensor` / `index` / `countOff` / `dumpSize` 分别与上表同名 tensor 形参语义一致，`tensor` 实参为裸指针。
 
 ## 数据类型
 
@@ -100,6 +113,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 <!-- end id100 -->
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - 单次调用DumpAccChkPoint打印的数据总量不可超过30KB（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。
+- 裸指针形下，`__gm__` 形的 `tensor` 须为 Global Memory 地址；带 `TPosition` 模板参数的形，`tensor` 须位于该模板参数指定的 Unified Buffer、L1 Buffer 或 L0C Buffer 上。
 
 ## 调用示例<a name="section82241477610"></a>
 

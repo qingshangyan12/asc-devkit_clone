@@ -53,6 +53,17 @@
     __aicore__ inline void ReadSpmBuffer(const LocalTensor<T>& readBuffer, const int32_t readSize, int32_t readOffset = 0)
     ```
 
+-   **裸指针形（与上面的 tensor 形逐项对应）：**
+
+    ```cpp
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(__ubuf__ T* readBuffer, const DataCopyParams& copyParams, int32_t readOffset = 0)
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(__ubuf__ T* readBuffer, const int32_t readSize, int32_t readOffset = 0)
+    ```
+
+    > 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 LocalTensor；裸指针形下 `readSize` 即实际读回的元素个数，不按 Tensor 的 shape 推导默认值。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
@@ -135,9 +146,11 @@
 </tbody>
 </table>
 
+裸指针形下，`readBuffer` / `copyParams` / `readSize` / `readOffset` 分别与上表同名 tensor 形参语义一致，`readBuffer` 实参为 Unified Buffer 上的裸指针。
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 裸指针形下，`readBuffer` 须为 Unified Buffer（`__ubuf__`）上的裸指针。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

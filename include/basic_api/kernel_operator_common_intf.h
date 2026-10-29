@@ -63,6 +63,20 @@ template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value = 0);
 
+/*
+ * @ingroup InitOutput
+ * @brief Initialize the workspace with a value
+ * @param [out] gmWorkspaceAddr raw GM pointer to the workspace to initialize
+ * @param [in] size number of elements to initialize
+ * @param [in] value value written into each element
+ *
+ * The workspace is GM by contract and the element type is the one the caller spells for `value`,
+ * so `__gm__ T*` identifies the buffer unambiguously and T is deduced from the operand pair.
+ */
+template <typename T>
+__aicore__ inline __in_pipe__(V)
+    __out_pipe__(MTE3) void InitOutput(__gm__ T* gmWorkspaceAddr, uint32_t size, T value = 0);
+
 enum class AtomicDtype { ATOMIC_NONE = 0, ATOMIC_F32, ATOMIC_F16, ATOMIC_S16, ATOMIC_S32, ATOMIC_S8, ATOMIC_BF16 };
 
 enum class AtomicOp { ATOMIC_SUM = 0 };
