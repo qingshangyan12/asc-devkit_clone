@@ -180,7 +180,9 @@ def _is_runnable_block(block: str) -> bool:
         return False
     if "set_env.sh" in text or text.startswith("pip3 install") or text.startswith("pip install"):
         return False
-    return bool(re.search(r"\b(cmake|make|python3|./|msprof)\b", text))
+    if re.search(r"\b(cmake|make|python3|msprof)\b", text):
+        return True
+    return any(command.raw.startswith("./") for command in split_commands(text))
 
 
 def split_commands(block: str) -> List[Command]:

@@ -155,6 +155,25 @@ cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
         self.assertNotIn("-lfoo", " ".join(c.raw for c in spec.commands))
         self.assertEqual([c.kind for c in spec.commands][-3:], ["cmake", "make", "run"])
 
+    def test_readme_with_only_executable_command_is_selected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "examples"
+            example = root / "sample"
+            example.mkdir(parents=True)
+            (example / "README.md").write_text(
+                "## 支持的产品\nAtlas A2\n\n## 编译运行\n- 样例执行\n```bash\n./run.sh\n```\n", encoding="utf-8"
+            )
+            (example / "run.sh").write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+            spec = parse_readme(example, root)
+            self.assertEqual(spec.source, "readme")
+            self.assertEqual([(command.raw, command.kind) for command in spec.commands], [("./run.sh", "run")])
+            from presmoke.planner import build_cells_with_skips
+
+            cells, _, skipped = build_cells_with_skips([spec], "dav-2201", ["npu"])
+            self.assertEqual(len(cells), 1)
+            self.assertEqual(cells[0].commands[0].raw, "./run.sh")
+            self.assertEqual(skipped, [])
+
     def test_split_commands_joins_shell_line_continuations(self) -> None:
         commands = split_commands("bisheng main.cpp -o demo -L./ \\\n  -lfoo\n./demo")
         self.assertEqual(len(commands), 2)

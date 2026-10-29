@@ -56,6 +56,16 @@ class PlannerTest(unittest.TestCase):
         self.assertEqual(rewritten.env["CFLAGS"], "-Werror")
         self.assertEqual(rewritten.env["CXXFLAGS"], "-O2 -Werror")
 
+    def test_empty_or_skipped_commands_do_not_create_passing_cells(self) -> None:
+        for commands in ([], [Command("mkdir build", "shell")]):
+            with self.subTest(commands=commands):
+                spec = ExampleSpec(Path("/tmp/example"), "example", commands, ["dav-2201"], ["npu"], "convention")
+                cells, _, skipped = build_cells_with_skips([spec], "dav-2201", ["npu"])
+                self.assertEqual(cells, [])
+                self.assertEqual(len(skipped), 1)
+                self.assertEqual(skipped[0].status, "SKIP")
+                self.assertIn("no runnable commands", skipped[0].reason)
+
     def test_unsupported_arch_is_excluded_not_counted_as_skip(self) -> None:
         spec = ExampleSpec(
             Path("/tmp/example"), "example", [Command("cmake ..", "cmake")], ["dav-3510"], ["npu"], "readme"
