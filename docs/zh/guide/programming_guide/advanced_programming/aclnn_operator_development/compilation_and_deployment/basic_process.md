@@ -35,7 +35,7 @@
 | ASCEND_SOC_SERIES | 构建目标（AI处理器系列），支持配置一个或多个值，输入不区分大小写，取值需与Host原型中的`AddConfig`对应。 | `ascend910b` |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
 
-`ASCEND_SOC_SERIES`不能为空，且必须在`find_package(ASC)`前设置（交叉编译相关变量同理），由ASC加载时完成初始化。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。
+`ASCEND_SOC_SERIES`不能为空，应在`find_package(ASC)`前设置，由ASC加载时完成校验；交叉编译相关变量则必须在`find_package(ASC)`前设置。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。
 
 **存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，取值为构建目标的小写标识（如`ascend910b`），行为保持不变，存量工程无需迁移。两者不能同时配置；与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`不会自动转小写。切换两种配置方式时，请使用新的构建目录，避免旧`CMakeCache.txt`中残留的目标变量与新配置冲突而报错。
 

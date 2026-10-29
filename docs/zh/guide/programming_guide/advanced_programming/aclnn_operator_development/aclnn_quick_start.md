@@ -267,7 +267,7 @@ OP_ADD(AddCustom);
 
 本示例的CMake和Host原型均使用`ascend910b`。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准。
 
-`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量必须在`find_package(ASC)`之前设置，供ASC初始化时读取和校验。更多配置方式见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
+`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量应在`find_package(ASC)`之前设置，便于ASC加载时完成校验。更多配置方式见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
 
 **存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，行为保持不变，存量工程无需迁移。两者不能同时配置，否则CMake配置阶段报错。与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`的取值不会自动转小写，需直接填写小写标识。
 
