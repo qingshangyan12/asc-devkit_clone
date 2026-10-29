@@ -73,6 +73,7 @@ constexpr uint32_t OP_ALG_LENGTH = 128;                                       //
 constexpr uint32_t ALG_TAG_LENGTH = TAG_LENGTH + OP_ALG_LENGTH;
 constexpr uint32_t MAX_TAG_LENGTH = 255;
 constexpr uint32_t AICPU_CONTROL_NOTIFY_NUM = 2;
+constexpr uint32_t UNFOLD_THREAD_NOTIFY_NUM = 3;
 constexpr uint32_t MAX_MEM_TAG_LENGTH = OP_ALG_LENGTH + 32;
 constexpr uint32_t RES_PACK_TAG_LENGTH = 255;
 constexpr uint32_t MAX_TEMP_NUM_IN_ALGO = 8; // 单个算法中最大template数量
@@ -98,7 +99,7 @@ constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 // Z axis detour 需要
 constexpr u32 MESH_CHANNELS_NUM = 1;
 
-constexpr uint64_t CCU_MAX_RANK_SIZE = 16;
+constexpr uint64_t CCU_MAX_RANK_SIZE = 64; // 与老树 A2A/A2AV CCU 上限对齐（hccl A2AV_CCU_MAX_RANK_SIZE=64）
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
@@ -505,11 +506,6 @@ struct AlgHierarchyInfoForAllLevel {
     std::vector<std::vector<std::vector<u32>>> infos; // 第一维表示有多少level，第二维是每个level的rankID
     std::vector<std::vector<PhysicalLevelIndex>> physicalIdxForAlgoLevels; // 每个算法层可对应多个物理层
 };
-
-// 阶段 3-2：双 mission 并发开关（编译期控制）
-// 为保持单 mission 路径零影响，默认 false；验证阶段手动改为 true 并重新编译出包
-constexpr bool ENABLE_DUAL_MISSION_CONCURRENT = true;
-constexpr uint32_t KFC_SERVER_MISSION_NUM = ENABLE_DUAL_MISSION_CONCURRENT ? 2 : 1;
 
 // 如果能够序列化那么就是下面的结构体
 // 先序列化，把东西考到device，然后把指针存到OpParam，在device侧反序列该指针执行的内存

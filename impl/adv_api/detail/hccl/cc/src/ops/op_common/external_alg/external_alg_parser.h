@@ -72,7 +72,7 @@ struct ExternalAlgSpec {
 //   含 '=' -> LEGACY（HCCL_ALGO 老语法，保持现状拒绝语义，由调用方走默认 selector）
 //   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误，
 //   spec 已复位为默认值——但默认值 canonical() 为 "sole[]" 并非失败标记，失败判据只能是 errMsg 非空）
-//   其余 -> BARE_NAME（裸注册名，现状语义逐字节保留）
+//   其余 -> BARE_NAME（裸注册名，fork 裸名强制算法通路）
 enum class ForcedAlgKind { NONE, LEGACY, EXTERNAL, BARE_NAME };
 
 namespace external_alg_internal {

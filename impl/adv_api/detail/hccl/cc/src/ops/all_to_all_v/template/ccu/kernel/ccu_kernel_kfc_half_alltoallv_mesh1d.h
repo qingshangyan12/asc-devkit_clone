@@ -11,39 +11,40 @@
 #define HCCL_CCU_KERNEL_KFC_HALF_ALL_TO_ALL_V_MESH_1D_H
 
 #include "ccu_kernel_alg_base.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
 // MC2 变长 AllToAll。sendSizes/sendOffsets 由 AIC 运行时写入设备内存，故此处只收地址，
 // 由 kernel 用 ccu::Load 批量读入，与 hcomm 源实现的 LoadArgsFromMem 语义一致。
 //
-// 单 mission 模式参数顺序（必须与 CcuPrepareForAllToAllVWrite 写入 xnData_ 的顺序严格一致）：
+// 参数顺序（必须与 CcuPrepareForAllToAllVWrite 写入 xnData_ 的顺序严格一致）：
 //   xn[0]=opId(签名)  xn[1]=sendBuf  xn[2]=sendSizes  xn[3]=sendOffsets
 //   xn[4..7]=goSize[0..3]  xn[8]=remoteWinOffset
 // 对应 AIC 侧 API：AlltoAllvWrite(usrIn, sendOffsets, sendSizes, remoteWinOffset, localDataSize)
-// 且 hccl_ccu_v0.h:270 的 ccuUsedXnNum_ = 9 与此处 9 个 xn 参数吻合。
+// 且 hccl_ccu_v0.h 的 ccuUsedXnNum_ = 9 与此处 9 个 xn 参数吻合。
 //
-// 单 mission：一次搬运全部数据，兼容两种样例填充模式：
-//   模式 1：A 片全量 + B 片为 0（单 mission 原生模式）
-//   模式 2：A 片半量 + B 片半量（源端双 mission 兼容模式）
-// Kernel 读取 2*rankSize 数组，合并 sendSizes[i] + sendSizes[rankSize+i] 作为总数据量。
-// localWinAddr 为建图期常量（本端 window 基址），非运行时 xn 参数。
+// 双 mission（默认）：mission0 搬 A 切片、mission1 搬 B 切片，一次通信拆两半并发：
+//   * missionIndex==0 使用 sendSize/sendOffset 的前 rankSize 个元素（A 切片）
+//   * missionIndex==1 使用后 rankSize 个元素（B 切片），且接收地址需加 sizeA 偏移
+// 退化为 missionNum==1 时合并 A+B 一次搬运（兼容 A 片全量 + B 片为 0 的单片填充）。
+// Kernel 读取 2*rankSize 数组。localWinAddr 为建图期常量（本端 window 基址），非运行时 xn 参数。
 //
 // 硬约束（迁移过程中发现）：
 //   - xn[0] 被 GetOpId 占用，且在 KFC 循环队列中作为哨兵（== INVALID_U64 退出循环）
 //   - token 通过 kfcServerArgs[5] 传递，不占用 xn 槽位
 //   - 轮次由 AIC 侧调用 AlltoAllvWrite 的次数决定，host 推 submitInfo 不影响轮次
-//
-// 阶段 3-1 修改：增加 missionNum 和 missionIndex 参数以支持双 mission 并发
-//   - missionNum==1 时为单 mission 模式（兼容现有行为）
-//   - missionNum==2 时为双 mission 模式：
-//      * missionIndex==0 使用 sendSize/sendOffset 的前 rankSize 个元素（A 切片）
-//      * missionIndex==1 使用后 rankSize 个元素（B 切片），且接收地址需加 sizeA 偏移
+//   - 两 mission 读同一份 xn 参数帧（AIC 只写一份），MissionPreSync 栅栏保证起跑时序
+//   - 双 mission 共享同一组 channel（CalcRes 两 kernel 同 channels）：PreSync 的 buffer/token
+//     通知位必须按 missionIndex 错开（m0 bit1/bit2，m1 bit3/bit4）——同一位会被两个 mission
+//     各 post 一次各 wait 一次，wait 消费位后第二个 wait 永远等不到（死锁）。
+//     hostMissionIndex 为构图期常量（与 kfcServerArgs 运行时值同源），用于计算本 mission 的位。
 CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
     ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex);
+    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex, uint32_t hostMissionIndex,
+    uint32_t hostMissionNum);
 
 } // namespace mc2_ops_hccl
 
