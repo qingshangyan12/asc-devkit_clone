@@ -31,6 +31,8 @@
 #include "../../impl/basic_api/kernel_tensor_base.h"
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -68,6 +70,31 @@ template <bool isAIVOnly = true>
 __aicore__ inline void IBWait(
     const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx,
     int32_t eventID);
+/* ------------------------------------------------------------------------------------------------
+ * IBSet / IBWait with raw pointer operands.
+ *
+ * These two are NOT a forwarding layer, and they are not the same kind of change as the overloads
+ * that only take an address and call the same backend.  Their Tensor bodies drive the transfer
+ * through LocalTensor / GlobalTensor *operations* -- `gmWorkspace[idx]`, `DataCopy`, `GetValue`,
+ * `SetValue` -- and a raw pointer is not an object that carries those operations.  The pointer
+ * overloads therefore re-express the same body on the pointer-level primitives those operations
+ * themselves reach; the operation-by-operation mapping and the equivalence argument are in the
+ * definitions in impl/basic_api/kernel_operator_block_sync_intf_impl.h.
+ *
+ * `isAIVOnly` keeps its default and stays the first template parameter, so a call written as
+ * IBSet(pg, pu, blockIdx, eventID) or IBSet<false>(pg, pu, blockIdx, eventID) resolves exactly as
+ * the Tensor form does.  The constraint requires at least one raw pointer operand, so no existing
+ * Tensor call site can become ambiguous.
+ * ---------------------------------------------------------------------------------------------- */
+template <
+    bool isAIVOnly = true, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void IBSet(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID);
+
+template <
+    bool isAIVOnly = true, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void IBWait(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID);
 /*
  * @ingroup：SyncALL
  * @brief：Set flag bits of all cores
@@ -77,6 +104,20 @@ __aicore__ inline void IBWait(
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(
     const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
+
+/*
+ * SyncAll with raw workspace pointers.
+ *
+ * Both workspaces are int32_t by contract, so the pointer operands need no element-type parameter;
+ * the operands are deduced and constrained to "at least one is a raw pointer", which keeps this
+ * overload invisible to the Tensor calls above.  It forwards to the same SoftSyncAllImpl the Tensor
+ * overload uses; the Tensor path's optional position check is omitted because a raw pointer carries
+ * no TPosition.
+ */
+template <
+    bool isAIVOnly = true, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int32_t usedCores = 0);
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))

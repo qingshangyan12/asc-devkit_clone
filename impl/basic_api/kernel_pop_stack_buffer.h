@@ -99,6 +99,66 @@ __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart)
 #endif
     return true;
 }
+/* **************************************************************************************************
+ * PopStackBuffer with a raw pointer out-parameter.
+ *
+ * CLASS OF CHANGE: isomorphic rewrite of the address arithmetic, with one field the Tensor form
+ * publishes and this one cannot.
+ *
+ * The Tensor form's whole job is to compute the two addresses that delimit the free region of `pos`
+ * -- `queEndAddress` (the end of the queue area) and `endAddress`, both from TPipe, after asserting
+ * that the former is 32B aligned and the latter is beyond it -- and to publish the region as a
+ * TBuffAddr.  Every statement above that computes or asserts an address is repeated verbatim below,
+ * over the same two TPipe queries and with the same assertions and the same messages, so the start
+ * address handed back is the same value in both forms.
+ *
+ * What a raw pointer cannot carry and this form therefore does not publish: the region's *length*
+ * and its TPosition.  TBuffAddr has fields for both; a bare pointer has neither.  A caller that
+ * needs the length must keep using the LocalTensor form.  Everything the Tensor form does that has
+ * a side effect outside the returned descriptor -- the two AscendCBufInit markers that fence the
+ * popped region and the reserved tail -- is reproduced unchanged, including the `ONE_BLK_SIZE << 1`
+ * tail reservation.
+ *
+ * Why the parameter is spelled `S *&`: the probe call this has to satisfy is
+ * `PopStackBuffer<float, TPosition::VECCALC>(p)` with `p` of type `__ubuf__ float*`, and the table's
+ * target spelling `T& popBuffer` cannot bind it -- T is the explicit first argument (float), so `T&`
+ * is `float&`.  `S *&` deduces S to the fully address-space-qualified pointee (`float __ubuf__`),
+ * which is also what makes the pointee carry the address space, and it is disjoint from the
+ * `LocalTensor<T>&` overload by deduction alone.
+ * ************************************************************************************************* */
+template <typename T, TPosition pos, typename S>
+__aicore__ inline bool PopStackBuffer(S*& popBuffer)
+{
+    uint64_t endAddress = GetEndAddress<pos>();
+    uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
+    ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0), {
+        KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress);
+    });
+    ASCENDC_ASSERT((endAddress > queEndAddress), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "PopStackBuffer failed, local memory has used %lu bytes, there is no enough memory to pop",
+            queEndAddress);
+    });
+    uint32_t dataLen = static_cast<uint32_t>(endAddress - queEndAddress);
+#ifdef ASCENDC_CPU_DEBUG
+    auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
+    AscendCBufInit(
+        static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1),
+        (uint64_t)(absAddr + queEndAddress), static_cast<uint64_t>(dataLen));
+    AscendCBufInit(
+        static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1), (uint64_t)(absAddr + endAddress),
+        static_cast<uint64_t>(ONE_BLK_SIZE << 1));
+    // The Tensor form publishes absAddr + queEndAddress as `addr.absAddr`; the pointer form publishes
+    // the same address, since in this build a raw UB pointer IS the absolute address.
+    popBuffer = reinterpret_cast<S*>(absAddr + queEndAddress);
+#else
+    // The Tensor form publishes queEndAddress as `addr.bufferAddr`; the pointer form publishes the
+    // same value as the pointer, which is what the callee of a GetPhyAddr()-derived pointer expects.
+    popBuffer = reinterpret_cast<S*>(queEndAddress);
+#endif
+    return true;
+}
+
 } // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_POP_STACK_BUFFER_H__)
