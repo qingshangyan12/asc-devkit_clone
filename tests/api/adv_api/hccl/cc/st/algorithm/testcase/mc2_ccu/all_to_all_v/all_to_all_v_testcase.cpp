@@ -36,6 +36,25 @@ CcuStScenario MakeScenario(const TopoMeta& topoMeta, HcclDataType dataType, uint
     return scenario;
 }
 
+// 单server内全部 phyId 携带 MESH_1D_CLOS_PHYID_MARK 时，TopoModel 按 MESH_1D_CLOS 建模
+// （单方向 1D Mesh 实例 + 覆盖 server 全部 rank 的 CLOS 实例）
+TopoMeta MakeMesh1dClosTopo(const std::vector<uint32_t>& phyIds)
+{
+    ServerMeta server;
+    for (auto phyId : phyIds) {
+        server.push_back(phyId | MESH_1D_CLOS_PHYID_MARK);
+    }
+    return TopoMeta{{server}};
+}
+
+// MultiJetty 与 SoleMesh 共用 CcuTempAlltoAllVMesh1D 模板与 CcuKernelAlltoAllVMesh1D 内核，
+// scenario 数据构造同款；经框架公开扩展点注册 variant（非 V 版在 ccu_all_to_all_mj_adapter.cc
+// 为 CcuSchedAllToAllMesh1DMultiJetty 做同款注册）
+const bool g_multiJettyVariantRegistered = []() {
+    CcuStAllToAllV::RegisterVariant("CcuSchedAllToAllVSoleMeshMultiJetty", BuildAllToAllVMesh1DScenario);
+    return true;
+}();
+
 } // namespace
 
 TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_2Rank_Fp16_100B)
@@ -198,4 +217,26 @@ TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMesh_LogLevel_Control)
     VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100));
     const std::string errorOnlyOutput = testing::internal::GetCapturedStdout();
     EXPECT_EQ(errorOnlyOutput.find("INFO"), std::string::npos);
+}
+
+// ===== MultiJetty（MESH_1D_CLOS 双实例：单方向 Mesh + CLOS）=====
+// selector 语义（alltoallv_auto_selector.cc SelectCcuScheduleAlgo）：
+// mesh==clos 且 rankSize<=4 → Concurrent（未注册，拒绝），否则 MultiJetty——
+// 与 alltoall 不同（无 dataSize 让位条件），4P 同组形态走 Concurrent，故 V 版 E2E 仅用 8P
+
+TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMeshMultiJetty_8Rank_Mesh1DClos_Fp16_64B)
+{
+    // rankSize=8 > CONCURRENT_RANK_LIMIT(4) → MultiJetty；sizes 为变长矩阵（V 语义）
+    TopoMeta topo = MakeMesh1dClosTopo({0, 1, 2, 3, 4, 5, 6, 7});
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 64);
+    scenario.expectedAlgName = "CcuSchedAllToAllVSoleMeshMultiJetty";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAllV, CcuSchedAllToAllVSoleMeshMultiJetty_8Rank_Mesh1DClos_Fp32_1KB)
+{
+    TopoMeta topo = MakeMesh1dClosTopo({0, 1, 2, 3, 4, 5, 6, 7});
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP32, 1024);
+    scenario.expectedAlgName = "CcuSchedAllToAllVSoleMeshMultiJetty";
+    VerifyScenario(scenario);
 }
