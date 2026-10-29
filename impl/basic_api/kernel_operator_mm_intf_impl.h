@@ -941,6 +941,18 @@ __aicore__ inline void Ld12L0(__cb__ D* dst, __cbuf__ S* src, const P& loadDataP
     LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 
+/*
+ * GM -> L1。上两条只覆盖「源在 L1」的两种目的地，源在 GM 时没有可用形参，因此
+ * LoadData((__cbuf__ half*)p, gmSrc, params) 会直接 no matching function，而不是派发错。
+ * 两个描述符版本各有对应后端：dav_3510/kernel_operator_mm_impl.h:47（V1）与 :430（V2），
+ * 这里与本节其余重载一样按描述符类型选择。
+ */
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0(__cbuf__ D* dst, __gm__ S* src, const P& loadDataParams)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 // L1 -> L0A / L0B together with the scale matrix (mx) operand.
 template <typename D, typename S>
@@ -1404,14 +1416,15 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias
  * BitMode forms of Mmad with raw pointer operands.
  *
  * Both land on the pointer-parameter BitMode backends in dav_3510/kernel_operator_mm_impl.h --
- * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, const MmadBitModeParams&) at :522 and
- * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, uint64_t, MmadBitModeParams&) at :556 --
+ * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, const MmadBitModeParams&) at :534 and
+ * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, uint64_t, MmadBitModeParams&) at :568 --
  * which take the same operands the pointer form receives, so these are pure forwarding layers:
  * no address is recomputed and no parameter is reinterpreted.
  *
- * The backend of the bias form takes the descriptor by non-const reference and writes it
- * (SetCmatrixInitVal(false)), which is why that parameter is non-const here too, exactly as in the
- * Tensor declaration it mirrors.
+ * 带 bias 的后端会对拿到的描述符执行 SetCmatrixInitVal(false)
+ * （dav_3510/kernel_operator_mm_impl.h:568 起，写入在 :572）。Tensor 路径与下面的指针形都在
+ * 本地拷贝后再传，调用方对象因此不会被改写——也正因为写入由副本承接，这里的形参可以收
+ * const 引用，const 对象与临时对象都能绑定。
  */
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
@@ -1426,9 +1439,12 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBi
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type>
-__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadBitModeParams& mmadParams)
 {
-    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+    // The bias backend calls mmadParams.SetCmatrixInitVal(false) on the object it is handed.  Pass a
+    // copy, as the Tensor path does, so the caller's descriptor is left untouched.
+    MmadBitModeParams bitModeParams = mmadParams;
+    MmadCal(dst, fm, filter, (uint64_t)bias, bitModeParams);
 }
 
 #endif
@@ -1451,15 +1467,15 @@ __aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bi
     MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams, true);
 }
 
-// BitMode 形：转发到 MmadMxCal 的对应后端（dav_3510/kernel_operator_mm_impl.h:654 与 :675），
-// 那两个形参是非 const 的 MmadBitModeParams&，与这里一致。
+// BitMode 形：转发到 MmadMxCal 的对应后端（dav_3510/kernel_operator_mm_impl.h:656 与 :677）。
+// 后端形参是非 const 的 MmadBitModeParams&，带 bias 的那条会写调用方对象
+// （:688 的 SetCmatrixInitVal(false)）；两条都在本地拷贝后再传，
+// 因此这里可以收 const 引用——调用方传 const 对象或临时对象都能绑定。
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
-__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, MmadBitModeParams& mmadParams)
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBitModeParams& mmadParams)
 {
-    // 后端这两个 BitMode 形取非 const 引用，且带 bias 的那条**会写调用方对象**
-    // （MmadMxCal 内有 SetCmatrixInitVal(false)）。拷贝后再传，使本臂与 Tensor 臂副作用一致。
     MmadBitModeParams bitModeParams = mmadParams;
     MmadMxCal(dst, fm, filter, bitModeParams);
 }
@@ -1467,10 +1483,9 @@ __aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, MmadBitMod
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type>
-__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams)
+__aicore__ inline void MmadMx(
+    DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadBitModeParams& mmadParams)
 {
-    // 后端这两个 BitMode 形取非 const 引用，且带 bias 的那条**会写调用方对象**
-    // （MmadMxCal 内有 SetCmatrixInitVal(false)）。拷贝后再传，使本臂与 Tensor 臂副作用一致。
     MmadBitModeParams bitModeParams = mmadParams;
     MmadMxCal(dst, fm, filter, (uint64_t)bias, bitModeParams);
 }

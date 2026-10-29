@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -43,6 +43,20 @@ template <typename T>
 struct AnyPtr<T> : public Std::is_pointer<T> {};
 template <typename T, typename... Rest>
 struct AnyPtr<T, Rest...> : public Std::integral_constant<bool, Std::is_pointer<T>::value || AnyPtr<Rest...>::value> {};
+
+/*
+ * 仅当全部操作数都是裸指针时为真。用于「操作数所处位置本身有意义」的场合——例如
+ * SetFixPipeConfig 的双操作数形，第二个实参写入的 FPC 字段与第一个不同。若该位置只用
+ * AnyPtr（至少一个是裸指针）约束，那么 bool / 整数会被当作非指针操作数接受下来，
+ * 随后在函数体内被转成 uint64_t 写进地址字段。
+ */
+template <typename... Ts>
+struct AllPtr;
+template <typename T>
+struct AllPtr<T> : public Std::is_pointer<T> {};
+template <typename T, typename... Rest>
+struct AllPtr<T, Rest...>
+    : public Std::integral_constant<bool, Std::is_pointer<T>::value && AllPtr<Rest...>::value> {};
 
 /*
  * The LocalTensor view a raw UB address denotes.

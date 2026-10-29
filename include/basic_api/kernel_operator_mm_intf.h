@@ -628,9 +628,10 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias
 /*
  * BitMode forms of Mmad with raw pointer operands.
  *
- * The bias form keeps the non-const `MmadBitModeParams&` of the Tensor declaration above, because
- * the backend it forwards to -- MmadCal(dav_3510/kernel_operator_mm_impl.h:556) -- calls
- * mmadParams.SetCmatrixInitVal(false) on it.  A const reference could not carry that write.
+ * Both take the descriptor by const reference, as the Tensor forms above do.  The bias backend
+ * (MmadCal with a uint64_t bias, dav_3510/kernel_operator_mm_impl.h:568) calls
+ * SetCmatrixInitVal(false) on the descriptor it is handed, so the definition forwards a local copy;
+ * that keeps a const argument, or a temporary, usable.
  */
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
@@ -642,7 +643,8 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBi
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
-__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams);
+__aicore__ inline void Mmad(
+    DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadBitModeParams& mmadParams);
 
 #endif
 
@@ -660,17 +662,19 @@ __aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bi
 // BitMode forms: same shape as the two declarations above, with the parameter struct replaced by
 // MmadBitModeParams.  The interface list this task is measured against counts MmadBitMode as a
 // group of four overloads in its own right.
-// Note the back end (MmadMxCal, dav_3510/kernel_operator_mm_impl.h:654 and :675) takes a
-// non-const MmadBitModeParams& -- these declarations match it.
+// The backend (MmadMxCal, dav_3510/kernel_operator_mm_impl.h:656 and :677) takes a non-const
+// MmadBitModeParams& and the bias form writes it; the definitions copy before forwarding, so these
+// take a const reference.
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
-__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, MmadBitModeParams& mmadParams);
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBitModeParams& mmadParams);
 
 template <
     typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
-__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams);
+__aicore__ inline void MmadMx(
+    DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadBitModeParams& mmadParams);
 #endif
 
 #if __NPU_ARCH__ == 2201

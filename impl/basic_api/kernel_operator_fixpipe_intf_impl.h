@@ -670,7 +670,7 @@ __aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspac
 }
 
 template <
-    typename T, bool setRelu, typename DstPtr,
+    bool setRelu, typename DstPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
 __aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag)
 {
@@ -696,10 +696,15 @@ __aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag)
  *
  * This mirrors the single-operand pointer overload directly above, which expresses its operand's
  * address the same way.
+ *
+ * 两个操作数都必须是裸指针（AllPtr）。若沿用「至少一个是裸指针」的约束，
+ * SetFixPipeConfig(ptr, true) 在这里同样可行：bool 会被当作第二个操作数接受，随后在函数体内
+ * 转成地址写入 quant 字段，而 unit-flag 位取默认值。要求两处都是指针，才能让该调用回到上面
+ * 的单操作数重载。
  */
 template <
     typename ReluPtr, typename QuantPtr,
-    typename Std::enable_if<CubePtrOverload::AnyPtr<ReluPtr, QuantPtr>::value, bool>::type>
+    typename Std::enable_if<CubePtrOverload::AllPtr<ReluPtr, QuantPtr>::value, bool>::type>
 __aicore__ inline void SetFixPipeConfig(ReluPtr reluPre, QuantPtr quantPre, bool isUnitFlag)
 {
     if ASCEND_IS_AIC {
