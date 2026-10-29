@@ -50,7 +50,7 @@ source /usr/local/Ascend/cann/set_env.sh
 | 步骤6 | 编译与部署 |
 | 步骤7 | 创建调用工程并验证算子 |
 
-### 创建工程<a id="create-project"></a>
+### 创建工程目录<a id="create-project"></a>
 
 自定义算子工程的目录结构和CMakeLists.txt由开发者直接编写；CANN软件包以CMake modules的形式提供`npu_op_*`系列接口，用于声明算子包、生成aclnn单算子调用代码并编译Host侧库和核函数（Kernel）侧库。
 
