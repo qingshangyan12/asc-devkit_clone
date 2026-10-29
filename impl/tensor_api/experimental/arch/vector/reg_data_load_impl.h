@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -19,7 +19,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_LOAD_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
-#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/tensor_interface.h"
 
 namespace asc {
 namespace te {

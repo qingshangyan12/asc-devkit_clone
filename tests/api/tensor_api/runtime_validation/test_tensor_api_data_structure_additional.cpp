@@ -18,15 +18,9 @@ using tensor_api_runtime_validation::TrapException;
 
 class TensorApiDataStructureAdditionalValidation : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(2);
-    }
+    void SetUp() override { AscendC::SetGCoreType(2); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename LocationType, typename PointerType, typename LayoutType>

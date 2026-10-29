@@ -234,8 +234,9 @@ TEST_F(tensor_api_layout_squeeze, test_squeeze_inner_ones_probe)
     EXPECT_EQ(AscendC::Std::get<1>(shape).value, 5);
 }
 
-// squeeze must preserve the original layout's Pattern/trait_type. A batch NZ layout (batch_value, ((16,m_value),(16,n_value)))
-// with batch_value=1, squeezed on the batch axis, must keep nz_layout_ptn on the result (mode 1 by index).
+// squeeze must preserve the original layout's Pattern/trait_type. A batch NZ layout (batch_value,
+// ((16,m_value),(16,n_value))) with batch_value=1, squeezed on the batch axis, must keep nz_layout_ptn on the result
+// (mode 1 by index).
 TEST_F(tensor_api_layout_squeeze, test_squeeze_preserves_pattern_dims)
 {
     using namespace asc::te;
@@ -450,8 +451,8 @@ TEST_F(tensor_api_layout_squeeze, test_squeeze_nn_two_batch_after_slice)
     // Strides of the base block survive the slice + squeeze unchanged.
     auto stride = squeezed.stride();
     EXPECT_EQ((asc::te::get<0, 0>(stride)), 1);
-    EXPECT_EQ((asc::te::get<0, 1>(stride)), 32); // c0_value * fractal_fixed = 2 * 16
-    EXPECT_EQ((asc::te::get<1, 0>(stride)), 2);  // c0_value
+    EXPECT_EQ((asc::te::get<0, 1>(stride)), 32);  // c0_value * fractal_fixed = 2 * 16
+    EXPECT_EQ((asc::te::get<1, 0>(stride)), 2);   // c0_value
     EXPECT_EQ((asc::te::get<1, 1>(stride)), 256); // row * fractal_fixed = 16 * 16
 
     // Mode 2 (isomorphic pattern) on the same sliced layout gives the same result.

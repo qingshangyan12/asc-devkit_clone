@@ -1,17 +1,16 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
-
 
 class tensor_api_layout_struct : public testing::Test {
 protected:
@@ -69,98 +68,61 @@ TEST_F(tensor_api_layout_struct, test_get_layout_pattern_from_make_layout_fracta
     using namespace asc::te;
 
     auto nz_layout = make_layout(
-        make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{})),
-        make_stride(make_stride(_16{}, _256{}),
-            make_stride(_1{}, _512{})));
+        make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{})),
+        make_stride(make_stride(_16{}, _256{}), make_stride(_1{}, _512{})));
     auto zn_layout = make_layout(
-        make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{})),
-        make_stride(make_stride(_1{}, _512{}),
-            make_stride(_16{}, _256{})));
+        make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{})),
+        make_stride(make_stride(_1{}, _512{}), make_stride(_16{}, _256{})));
     auto zz_layout = make_layout(
-        make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{})),
-        make_stride(make_stride(_16{}, _512{}),
-            make_stride(_1{}, _256{})));
+        make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{})),
+        make_stride(make_stride(_16{}, _512{}), make_stride(_1{}, _256{})));
     auto nn_layout = make_layout(
-        make_shape(make_shape(_2{}, _4{}),
-            make_shape(_16{}, _3{})),
-        make_stride(make_stride(_1{}, _32{}),
-            make_stride(_2{}, _128{})));
+        make_shape(make_shape(_2{}, _4{}), make_shape(_16{}, _3{})),
+        make_stride(make_stride(_1{}, _32{}), make_stride(_2{}, _128{})));
     auto nd_ext_layout = make_layout(
-        make_shape(make_shape(_1{}, _4{}),
-            make_shape(_1{}, _5{})),
-        make_stride(make_stride(_0{}, _5{}),
-            make_stride(_0{}, _1{})));
+        make_shape(make_shape(_1{}, _4{}), make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _5{}), make_stride(_0{}, _1{})));
     auto dn_ext_layout = make_layout(
-        make_shape(make_shape(_1{}, _4{}),
-            make_shape(_1{}, _5{})),
-        make_stride(make_stride(_0{}, _1{}),
-            make_stride(_0{}, _4{})));
-    auto nd_layout = make_layout(make_shape(_4{}, _5{}),
-        make_stride(_5{}, _1{}));
-    auto dn_layout = make_layout(make_shape(_4{}, _5{}),
-        make_stride(_1{}, _4{}));
+        make_shape(make_shape(_1{}, _4{}), make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _1{}), make_stride(_0{}, _4{})));
+    auto nd_layout = make_layout(make_shape(_4{}, _5{}), make_stride(_5{}, _1{}));
+    auto dn_layout = make_layout(make_shape(_4{}, _5{}), make_stride(_1{}, _4{}));
     auto batched_nz_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{}))),
-        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _256{}),
-            make_stride(_1{}, _512{}))));
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _256{}), make_stride(_1{}, _512{}))));
     auto batched_zn_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{}))),
-        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_1{}, _512{}),
-            make_stride(_16{}, _256{}))));
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_1{}, _512{}), make_stride(_16{}, _256{}))));
     auto batched_zz_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}),
-            make_shape(_16{}, _3{}))),
-        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _512{}),
-            make_stride(_1{}, _256{}))));
+        make_shape(_2{}, make_shape(make_shape(_16{}, _2{}), make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<1536>{}, make_stride(make_stride(_16{}, _512{}), make_stride(_1{}, _256{}))));
     auto batched_nn_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_2{}, _4{}),
-            make_shape(_16{}, _3{}))),
-        make_stride(AscendC::Std::Int<384>{}, make_stride(make_stride(_1{}, _32{}),
-            make_stride(_2{}, _128{}))));
+        make_shape(_2{}, make_shape(make_shape(_2{}, _4{}), make_shape(_16{}, _3{}))),
+        make_stride(AscendC::Std::Int<384>{}, make_stride(make_stride(_1{}, _32{}), make_stride(_2{}, _128{}))));
     auto batched_nd_ext_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}),
-            make_shape(_1{}, _5{}))),
-        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _5{}),
-            make_stride(_0{}, _1{}))));
+        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}), make_shape(_1{}, _5{}))),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _5{}), make_stride(_0{}, _1{}))));
     auto batched_dn_ext_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}),
-            make_shape(_1{}, _5{}))),
-        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _1{}),
-            make_stride(_0{}, _4{}))));
+        make_shape(_2{}, make_shape(make_shape(_1{}, _4{}), make_shape(_1{}, _5{}))),
+        make_stride(AscendC::Std::Int<20>{}, make_stride(make_stride(_0{}, _1{}), make_stride(_0{}, _4{}))));
     auto batched_nd_layout = make_layout(
-        make_shape(_2{}, make_shape(_4{}, _5{})),
-        make_stride(AscendC::Std::Int<20>{}, make_stride(_5{}, _1{})));
+        make_shape(_2{}, make_shape(_4{}, _5{})), make_stride(AscendC::Std::Int<20>{}, make_stride(_5{}, _1{})));
     auto batched_dn_layout = make_layout(
-        make_shape(_2{}, make_shape(_4{}, _5{})),
-        make_stride(AscendC::Std::Int<20>{}, make_stride(_1{}, _4{})));
+        make_shape(_2{}, make_shape(_4{}, _5{})), make_stride(AscendC::Std::Int<20>{}, make_stride(_1{}, _4{})));
     auto batch_nd_un_continuous_layout = make_layout(
-        make_shape(_3{}, make_shape(_4{}, _5{})),
-        make_stride(_5{}, make_stride(AscendC::Std::Int<15>{}, _1{})));
+        make_shape(_3{}, make_shape(_4{}, _5{})), make_stride(_5{}, make_stride(AscendC::Std::Int<15>{}, _1{})));
     auto batch_dn_un_continuous_layout = make_layout(
-        make_shape(_3{}, make_shape(_4{}, _5{})),
-        make_stride(_4{}, make_stride(_1{}, AscendC::Std::Int<12>{})));
-    auto invalid_flat_layout = make_layout(make_shape(_4{}, _5{}),
-        make_stride(_4{}, _5{}));
+        make_shape(_3{}, make_shape(_4{}, _5{})), make_stride(_4{}, make_stride(_1{}, AscendC::Std::Int<12>{})));
+    auto invalid_flat_layout = make_layout(make_shape(_4{}, _5{}), make_stride(_4{}, _5{}));
     auto invalid_fractal_layout = make_layout(
-        make_shape(make_shape(_4{}, _5{}),
-            make_shape(_8{}, _9{})),
-        make_stride(make_stride(_2{}, _3{}),
-            make_stride(_4{}, _5{})));
+        make_shape(make_shape(_4{}, _5{}), make_shape(_8{}, _9{})),
+        make_stride(make_stride(_2{}, _3{}), make_stride(_4{}, _5{})));
     auto invalid_scaleadn_layout = make_layout(
-        make_shape(make_shape(_1{}, _4{}),
-            make_shape(_1{}, _5{})),
-        make_stride(make_stride(_0{}, _2{}),
-            make_stride(_1{}, _8{})));
+        make_shape(make_shape(_1{}, _4{}), make_shape(_1{}, _5{})),
+        make_stride(make_stride(_0{}, _2{}), make_stride(_1{}, _8{})));
     auto invalid_batched_fractal_layout = make_layout(
-        make_shape(_2{}, make_shape(make_shape(_4{}, _5{}),
-            make_shape(_8{}, _9{}))),
-        make_stride(AscendC::Std::Int<180>{}, make_stride(make_stride(_2{}, _3{}),
-            make_stride(_4{}, _5{}))));
+        make_shape(_2{}, make_shape(make_shape(_4{}, _5{}), make_shape(_8{}, _9{}))),
+        make_stride(AscendC::Std::Int<180>{}, make_stride(make_stride(_2{}, _3{}), make_stride(_4{}, _5{}))));
 
     static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(nz_layout)>, nz_layout_ptn>);
     static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(zn_layout)>, zn_layout_ptn>);
@@ -181,10 +143,12 @@ TEST_F(tensor_api_layout_struct, test_get_layout_pattern_from_make_layout_fracta
     static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(batch_nd_un_continuous_layout)>, nd_layout_ptn>);
     static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(batch_dn_un_continuous_layout)>, dn_layout_ptn>);
     static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_flat_layout)>, AscendC::Std::ignore_t>);
-    static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_fractal_layout)>, AscendC::Std::ignore_t>);
-    static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_scaleadn_layout)>, AscendC::Std::ignore_t>);
-    static_assert(AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_batched_fractal_layout)>,
-        AscendC::Std::ignore_t>);
+    static_assert(
+        AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_fractal_layout)>, AscendC::Std::ignore_t>);
+    static_assert(
+        AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_scaleadn_layout)>, AscendC::Std::ignore_t>);
+    static_assert(
+        AscendC::Std::is_same_v<get_layout_pattern<decltype(invalid_batched_fractal_layout)>, AscendC::Std::ignore_t>);
 }
 
 TEST_F(tensor_api_layout_struct, test_remove_batch_dim_from_three_dim_layout)

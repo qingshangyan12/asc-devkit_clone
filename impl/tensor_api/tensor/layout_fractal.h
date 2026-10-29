@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/layout_fractal.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -28,8 +28,8 @@ namespace asc {
 namespace te {
 
 template <typename OriginShape, typename InnerShape, size_t... Is>
-__aicore__ inline constexpr decltype(auto) make_fractal_shape(OriginShape origin_shape, InnerShape inner_shape,
-                                                              Std::index_sequence<Is...>)
+__aicore__ inline constexpr decltype(auto) make_fractal_shape(
+    OriginShape origin_shape, InnerShape inner_shape, Std::index_sequence<Is...>)
 {
     auto outer_shape = Std::make_tuple(Std::ceil_division(Std::get<Is>(origin_shape), Std::get<Is>(inner_shape))...);
     return make_shape(make_shape(Std::get<Is>(inner_shape), Std::get<Is>(outer_shape))...);
@@ -38,8 +38,8 @@ __aicore__ inline constexpr decltype(auto) make_fractal_shape(OriginShape origin
 template <typename OriginShape, typename InnerShape>
 __aicore__ inline constexpr decltype(auto) make_fractal_shape(OriginShape origin_shape, InnerShape inner_shape)
 {
-    static_assert(Std::tuple_size_v<OriginShape> == Std::tuple_size_v<InnerShape>,
-                  "OriginShape and InnerShape must match");
+    static_assert(
+        Std::tuple_size_v<OriginShape> == Std::tuple_size_v<InnerShape>, "OriginShape and InnerShape must match");
     return make_fractal_shape(origin_shape, inner_shape, Std::make_index_sequence<Std::tuple_size_v<InnerShape>>{});
 }
 

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nz2nz.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -35,10 +35,12 @@ public:
         run_gm_to_l1_batched<trait, copy_gm_to_l1_nz2nz, DstTensor, SrcTensor>(dst, src);
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         check_template<trait, DstTensor, SrcTensor>();
         using type = typename SrcTensor::element_type;
@@ -54,9 +56,10 @@ public:
             src_stride >>= 1;
             dst_stride >>= 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, block_count, block_len, 0,
-                                                            0, src.engine().get_cache_mode(), src_stride, dst_stride,
-                                                            trait.pre_allocation);
+        copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0,
+            static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
@@ -73,23 +76,23 @@ public:
     // big_fractal_size big-fractals each become matrix_num * big_fractal_size contiguous blocks that
     // share the same per-big-fractal stride. src_nd_matrix_stride/dst_nz_matrix_stride are unused here
     // because that contiguity makes the single src_stride/dst_stride describe the whole sequence.
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout,
-              typename DstLayout>
-    __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t matrix_num,
-                                            uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout, const DstLayout& dst_layout,
+        uint16_t matrix_num, uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
     {
         using type = typename SrcTensor::element_type;
 
-        auto small_fractal_size = get_element<attr_info::shape, attr_info::row, 0>(src_layout)
-                                  * get_element<attr_info::shape, attr_info::row, 1>(src_layout);
+        auto small_fractal_size = get_element<attr_info::shape, attr_info::row, 0>(src_layout) *
+                                  get_element<attr_info::shape, attr_info::row, 1>(src_layout);
         auto big_fractal_size = get_element<attr_info::shape, attr_info::column, 1>(src_layout);
         auto src_stride_size = get_element<attr_info::stride, attr_info::column, 1>(src_layout);
         auto dst_stride_size = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
 
         uint8_t left_padding_cnt = 0;
         uint8_t right_padding_cnt = 0;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         auto block_count = big_fractal_size * matrix_num;
         auto block_len = small_fractal_size * c0_size<>;
@@ -100,9 +103,9 @@ public:
             src_stride = src_stride >> 1;
             dst_stride = dst_stride >> 1;
         }
-        copy_gm_to_l1_align_v2_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len,
-                                                left_padding_cnt, right_padding_cnt, cache_mode, src_stride,
-                                                dst_stride, trait.pre_allocation);
+        copy_gm_to_l1_align_v2_instr::data_copy(
+            dst.data().get(), src.data().get(), block_count, block_len, left_padding_cnt, right_padding_cnt, cache_mode,
+            src_stride, dst_stride, trait.pre_allocation);
     }
 };
 } // namespace te

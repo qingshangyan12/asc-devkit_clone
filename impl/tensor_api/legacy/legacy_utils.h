@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/legacy/legacy_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LEGACY_UTILS_H
@@ -19,7 +19,7 @@
 #define IMPL_TENSOR_API_LEGACY_LEGACY_UTILS_H
 
 #include "include/tensor_api/utils/utils.h"
-#include "tensor_api/arch/cube/copy_trait.h"
+#include "tensor_api/arch/cube/cube_copy_trait.h"
 #include "tensor_api/arch/cube/mmad_trait.h"
 #include "impl/tensor_api/utils/extra_impl.h"
 #include "impl/tensor_api/utils/location_impl.h"
@@ -53,8 +53,8 @@ enum DualDstMode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DS
 struct CopyL0C2GMTrait {
     __aicore__ constexpr CopyL0C2GMTrait() {}
 
-    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundMode, bool enableRelu, bool enableChannelSplit) :
-        roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit)
+    __aicore__ constexpr CopyL0C2GMTrait(RoundMode roundMode, bool enableRelu, bool enableChannelSplit)
+        : roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit)
     {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
@@ -65,9 +65,9 @@ struct CopyL0C2GMTrait {
 struct CopyL0C2UBTrait {
     __aicore__ constexpr CopyL0C2UBTrait() {}
 
-    __aicore__ constexpr CopyL0C2UBTrait(RoundMode roundMode, bool enableRelu, bool enableChannelSplit,
-                                         DualDstMode dualDstCtl) :
-        roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit), dualDstCtl(dualDstCtl)
+    __aicore__ constexpr CopyL0C2UBTrait(
+        RoundMode roundMode, bool enableRelu, bool enableChannelSplit, DualDstMode dualDstCtl)
+        : roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit), dualDstCtl(dualDstCtl)
     {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
@@ -79,8 +79,8 @@ struct CopyL0C2UBTrait {
 struct CopyL0C2L1Trait {
     __aicore__ constexpr CopyL0C2L1Trait() {}
 
-    __aicore__ constexpr CopyL0C2L1Trait(RoundMode roundMode, bool enableRelu, bool enableChannelSplit) :
-        roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit)
+    __aicore__ constexpr CopyL0C2L1Trait(RoundMode roundMode, bool enableRelu, bool enableChannelSplit)
+        : roundMode(roundMode), enableRelu(enableRelu), enableChannelSplit(enableChannelSplit)
     {}
 
     RoundMode roundMode = RoundMode::DEFAULT;
@@ -91,10 +91,13 @@ struct CopyL0C2L1Trait {
 struct MmadTrait {
     __aicore__ constexpr MmadTrait(){};
 
-    __aicore__ constexpr MmadTrait(int32_t fmOffset, bool kDirectionAlign, bool cmatrixSource, bool disableGemv,
-                                   MmadType mmadType) :
-        fmOffset(fmOffset), kDirectionAlign(kDirectionAlign), cmatrixSource(cmatrixSource), disableGemv(disableGemv),
-        mmadType(mmadType)
+    __aicore__ constexpr MmadTrait(
+        int32_t fmOffset, bool kDirectionAlign, bool cmatrixSource, bool disableGemv, MmadType mmadType)
+        : fmOffset(fmOffset),
+          kDirectionAlign(kDirectionAlign),
+          cmatrixSource(cmatrixSource),
+          disableGemv(disableGemv),
+          mmadType(mmadType)
     {}
 
     int32_t fmOffset = 0;
@@ -107,8 +110,8 @@ struct MmadTrait {
 struct MmadParams {
     __aicore__ constexpr MmadParams(){};
 
-    __aicore__ constexpr MmadParams(uint16_t m, uint16_t n, uint16_t k, uint8_t unitFlag, bool cmatrixInitVal) :
-        m(m), n(n), k(k), unitFlag(unitFlag), cmatrixInitVal(cmatrixInitVal)
+    __aicore__ constexpr MmadParams(uint16_t m, uint16_t n, uint16_t k, uint8_t unitFlag, bool cmatrixInitVal)
+        : m(m), n(n), k(k), unitFlag(unitFlag), cmatrixInitVal(cmatrixInitVal)
     {}
 
     uint16_t m = 0;
@@ -121,8 +124,8 @@ struct MmadParams {
 struct FixpipeParams {
     __aicore__ constexpr FixpipeParams(){};
 
-    __aicore__ constexpr FixpipeParams(uint8_t unitFlag, bool subBlockId = false) :
-        unitFlag(unitFlag), subBlockId(subBlockId)
+    __aicore__ constexpr FixpipeParams(uint8_t unitFlag, bool subBlockId = false)
+        : unitFlag(unitFlag), subBlockId(subBlockId)
     {}
 
     uint8_t unitFlag = 0;
@@ -132,9 +135,9 @@ struct FixpipeParams {
 struct CopyGM2UBParams {
     __aicore__ constexpr CopyGM2UBParams() {}
 
-    __aicore__ constexpr CopyGM2UBParams(uint8_t leftPaddingCount, uint8_t rightPaddingCount,
-                                         bool enableConstantPad = true) :
-        leftPaddingCount(leftPaddingCount), rightPaddingCount(rightPaddingCount), enableConstantPad(enableConstantPad)
+    __aicore__ constexpr CopyGM2UBParams(
+        uint8_t leftPaddingCount, uint8_t rightPaddingCount, bool enableConstantPad = true)
+        : leftPaddingCount(leftPaddingCount), rightPaddingCount(rightPaddingCount), enableConstantPad(enableConstantPad)
     {}
 
     uint8_t leftPaddingCount = 0;
@@ -163,73 +166,61 @@ struct Img2ColParams {
 };
 
 // normalize 函数: PascalCase → snake_case 类型转换
-__aicore__ inline constexpr cache_mode normalize_cache_mode(cache_mode mode)
-{
-    return mode;
-}
+__aicore__ inline constexpr cache_mode normalize_cache_mode(cache_mode mode) { return mode; }
 
 __aicore__ inline constexpr cache_mode normalize_cache_mode(CacheMode mode)
 {
     switch (mode) {
-    case CacheMode::CACHE_MODE_DISABLE:
-        return cache_mode::disable;
-    case CacheMode::CACHE_MODE_LAST:
-        return cache_mode::last;
-    case CacheMode::CACHE_MODE_PERSISTENT:
-        return cache_mode::persistent;
-    case CacheMode::CACHE_MODE_NORMAL:
-    default:
-        return cache_mode::normal;
+        case CacheMode::CACHE_MODE_DISABLE:
+            return cache_mode::disable;
+        case CacheMode::CACHE_MODE_LAST:
+            return cache_mode::last;
+        case CacheMode::CACHE_MODE_PERSISTENT:
+            return cache_mode::persistent;
+        case CacheMode::CACHE_MODE_NORMAL:
+        default:
+            return cache_mode::normal;
     }
 }
 
-__aicore__ inline constexpr mmad_type normalize_mmad_type(mmad_type type)
-{
-    return type;
-}
+__aicore__ inline constexpr mmad_type normalize_mmad_type(mmad_type type) { return type; }
 
 __aicore__ inline constexpr mmad_type normalize_mmad_type(MmadType type)
 {
     switch (type) {
-    case MmadType::MX:
-        return mmad_type::mx;
-    case MmadType::NORMAL:
-    default:
-        return mmad_type::normal;
+        case MmadType::MX:
+            return mmad_type::mx;
+        case MmadType::NORMAL:
+        default:
+            return mmad_type::normal;
     }
 }
 
-__aicore__ inline constexpr round_mode normalize_round_mode(round_mode mode)
-{
-    return mode;
-}
+__aicore__ inline constexpr round_mode normalize_round_mode(round_mode mode) { return mode; }
 
 __aicore__ inline constexpr round_mode normalize_round_mode(RoundMode mode)
 {
     switch (mode) {
-    case RoundMode::HYBRID:
-        return round_mode::hybrid;
-    case RoundMode::DEFAULT:
-    default:
-        return round_mode::default_round;
+        case RoundMode::HYBRID:
+            return round_mode::hybrid;
+        case RoundMode::DEFAULT:
+        default:
+            return round_mode::default_round;
     }
 }
 
-__aicore__ inline constexpr dual_dst_mode normalize_dual_dst_mode(dual_dst_mode mode)
-{
-    return mode;
-}
+__aicore__ inline constexpr dual_dst_mode normalize_dual_dst_mode(dual_dst_mode mode) { return mode; }
 
 __aicore__ inline constexpr dual_dst_mode normalize_dual_dst_mode(DualDstMode mode)
 {
     switch (mode) {
-    case DUAL_DST_SPLIT_M:
-        return dual_dst_mode::split_m;
-    case DUAL_DST_SPLIT_N:
-        return dual_dst_mode::split_n;
-    case DUAL_DST_DISABLE:
-    default:
-        return dual_dst_mode::disable;
+        case DUAL_DST_SPLIT_M:
+            return dual_dst_mode::split_m;
+        case DUAL_DST_SPLIT_N:
+            return dual_dst_mode::split_n;
+        case DUAL_DST_DISABLE:
+        default:
+            return dual_dst_mode::disable;
     }
 }
 
@@ -241,8 +232,9 @@ __aicore__ inline constexpr mmad_trait normalize_mmad_trait(const Trait& trait)
         return trait;
     } else {
         static_assert(Std::is_same_v<trait_type, MmadTrait>, "Trait must be mmad_trait or MmadTrait.");
-        return mmad_trait{trait.fmOffset, trait.kDirectionAlign, trait.cmatrixSource, trait.disableGemv,
-                          normalize_mmad_type(trait.mmadType)};
+        return mmad_trait{
+            trait.fmOffset, trait.kDirectionAlign, trait.cmatrixSource, trait.disableGemv,
+            normalize_mmad_type(trait.mmadType)};
     }
 }
 

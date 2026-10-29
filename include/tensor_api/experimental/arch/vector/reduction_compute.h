@@ -28,34 +28,46 @@ namespace te {
 namespace experimental {
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reduction_compute
  * @brief Reduces register elements by summation according to the selected reduction scope.
- * @param src Source register tensor.
+ *
+ * @override_id te_experimental_reduce_sum__const_reg_tensor_SrcType_R__template_scope_DstType_SrcType
+ * @archs 3510
  * @return The reduced register tensor with the source mask preserved.
  * @note DstType must be specified explicitly after scope because it cannot be deduced from src.
- * @note Element and datablock reduction support int16_t to int32_t, int32_t, uint16_t to uint32_t, uint32_t,
- * half, and float. Pair reduction supports matching half or float types.
+ * @note Element and datablock reduction support int16_t to int32_t, int32_t, uint16_t to uint32_t, uint32_t, half, and
+ * float. Pair reduction supports matching half or float types.
+ * @param [in] src Source register tensor.
  */
 template <reduce_scope scope = reduce_scope::element, typename DstType, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>& src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reduction_compute
  * @brief Reduces register elements by maximum according to the selected reduction scope.
- * @param src Source register tensor.
+ *
+ * @override_id te_experimental_reduce_max__const_reg_tensor_DataType_R__template_scope_DataType
+ * @archs 3510
  * @return The reduced register tensor with the source mask preserved.
  * @note DataType is deduced from src. Specify scope explicitly only when selecting a non-default scope.
- * @note Supported scopes are element and datablock. DataType must be one of
- * int16_t, uint16_t, half, int32_t, uint32_t, or float.
+ * @note Supported scopes are element and datablock. DataType must be one of int16_t, uint16_t, half, int32_t, uint32_t,
+ * or float.
+ * @param [in] src Source register tensor.
  */
 template <reduce_scope scope = reduce_scope::element, typename DataType>
 __simd_callee__ inline reg_tensor<DataType> reduce_max(const reg_tensor<DataType>& src);
 
 /**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reduction_compute
  * @brief Reduces register elements by minimum according to the selected reduction scope.
- * @param src Source register tensor.
+ *
+ * @override_id te_experimental_reduce_min__const_reg_tensor_DataType_R__template_scope_DataType
+ * @archs 3510
  * @return The reduced register tensor with the source mask preserved.
  * @note DataType is deduced from src. Specify scope explicitly only when selecting a non-default scope.
- * @note Supported scopes are element and datablock. DataType must be one of
- * int16_t, uint16_t, half, int32_t, uint32_t, or float.
+ * @note Supported scopes are element and datablock. DataType must be one of int16_t, uint16_t, half, int32_t, uint32_t,
+ * or float.
+ * @param [in] src Source register tensor.
  */
 template <reduce_scope scope = reduce_scope::element, typename DataType>
 __simd_callee__ inline reg_tensor<DataType> reduce_min(const reg_tensor<DataType>& src);

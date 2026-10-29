@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/copy_common.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -49,17 +49,20 @@ __aicore__ inline void run_gm_to_l1_batched(const DstTensor& dst, const SrcTenso
         uint16_t matrix_num = get<0>(src_layout.shape());
         uint64_t src_matrix_stride = get<0>(src_layout.stride());
         uint32_t dst_matrix_stride = get<0>(dst_layout.stride());
-        CopyOp::template emit_copy<trait>(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout),
-                                          matrix_num, src_matrix_stride, dst_matrix_stride);
+        CopyOp::template emit_copy<trait>(
+            dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num, src_matrix_stride,
+            dst_matrix_stride);
     } else {
         CopyOp::template emit_copy<trait>(dst, src, src.layout(), dst.layout(), 1, 0, 0);
     }
 }
 
-template <const gm_to_l1_trait& trait, typename CopyOp, typename DstTensor, typename SrcTensor, typename DstCoord,
-          typename SrcCoord, typename CopyShape>
-__aicore__ inline void run_gm_to_l1_batched(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                            const SrcCoord& src_coord, const CopyShape& copy_shape)
+template <
+    const gm_to_l1_trait& trait, typename CopyOp, typename DstTensor, typename SrcTensor, typename DstCoord,
+    typename SrcCoord, typename CopyShape>
+__aicore__ inline void run_gm_to_l1_batched(
+    const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+    const CopyShape& copy_shape)
 {
     CopyOp::template check_template<trait, DstTensor, SrcTensor>();
     auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);

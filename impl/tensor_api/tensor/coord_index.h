@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/coord_index.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -32,27 +32,27 @@ template <typename Coord, typename Shape, typename Stride>
 __aicore__ inline constexpr auto crd2idx(const Coord& coord, const Shape& shape, const Stride& stride);
 
 template <typename Coord, typename Shape, typename Stride, size_t... Is>
-__aicore__ inline constexpr auto crd2idx_ttt(const Coord& coord, const Shape& shape, const Stride& stride,
-                                             Std::index_sequence<Is...>)
+__aicore__ inline constexpr auto crd2idx_ttt(
+    const Coord& coord, const Shape& shape, const Stride& stride, Std::index_sequence<Is...>)
 {
     return (... + crd2idx(Std::get<Is>(coord), Std::get<Is>(shape), Std::get<Is>(stride)));
 }
 
 template <typename Coord, typename Shape, typename Stride, size_t I0, size_t... Is>
-__aicore__ inline constexpr auto crd2idx_itt(const Coord& coord, const Shape& shape, const Stride& stride,
-                                             Std::index_sequence<I0, Is...>)
+__aicore__ inline constexpr auto crd2idx_itt(
+    const Coord& coord, const Shape& shape, const Stride& stride, Std::index_sequence<I0, Is...>)
 {
     if constexpr (sizeof...(Is) == 0) { // Avoid recursion and mod on single/last iter
         return crd2idx(coord, Std::get<I0>(shape), Std::get<I0>(stride));
     } else if constexpr (Std::is_constant<0, Coord>::value) {
-        return crd2idx(_0{}, Std::get<I0>(shape), Std::get<I0>(stride))
-               + (_0{} + ... + crd2idx(_0{}, Std::get<Is>(shape), Std::get<Is>(stride)));
+        return crd2idx(_0{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
+               (_0{} + ... + crd2idx(_0{}, Std::get<Is>(shape), Std::get<Is>(stride)));
     } else { // General case
         auto prod = product{}(Std::get<I0>(shape));
         auto div = coord / prod;
         auto mod = coord % prod;
-        return crd2idx(mod, Std::get<I0>(shape), Std::get<I0>(stride))
-               + crd2idx_itt(div, shape, stride, Std::index_sequence<Is...>{});
+        return crd2idx(mod, Std::get<I0>(shape), Std::get<I0>(stride)) +
+               crd2idx_itt(div, shape, stride, Std::index_sequence<Is...>{});
     }
 }
 

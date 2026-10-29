@@ -25,8 +25,8 @@ constexpr std::size_t BACKING_BUFFER_ALIGNMENT = 512;
 template <typename ElementType>
 class aligned_backing_buffer {
 public:
-    explicit aligned_backing_buffer(std::size_t element_count) :
-        storage_(element_count + BACKING_BUFFER_ALIGNMENT / sizeof(ElementType))
+    explicit aligned_backing_buffer(std::size_t element_count)
+        : storage_(element_count + BACKING_BUFFER_ALIGNMENT / sizeof(ElementType))
     {}
 
     ElementType* data()
@@ -51,15 +51,9 @@ std::size_t backing_buffer_elements(const LayoutType& layout)
 
 class TensorApiCubeInputAdditionalValidation : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(1);
-    }
+    void SetUp() override { AscendC::SetGCoreType(1); }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 template <typename LocationType, typename PointerType, typename LayoutType>
@@ -103,8 +97,8 @@ void expect_l12bt_trap(const SrcLayoutType& src_layout, const DstLayoutType& dst
     auto src_tensor = make_tensor_at<location::l1>(src.data(), src_layout);
     auto dst_tensor = make_tensor_at<location::bias>(dst.data(), dst_layout);
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW(
+        (copy_tensor<copy_l1_to_biastable, l1_to_biastable_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 template <typename ElementType, typename SrcLayoutType, typename DstLayoutType>
@@ -128,8 +122,7 @@ void expect_l12fb_trap(const SrcLayoutType& src_layout, const DstLayoutType& dst
     auto src_tensor = make_tensor_at<location::l1>(src.data(), src_layout);
     auto dst_tensor = make_tensor_at<location::fixbuf>(dst.data(), dst_layout);
 
-    EXPECT_THROW((copy_tensor<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default>(dst_tensor, src_tensor)),
-                 TrapException);
+    EXPECT_THROW((copy_tensor<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default>(dst_tensor, src_tensor)), TrapException);
 }
 
 template <typename ElementType, typename SrcLayoutType, typename DstLayoutType>
@@ -203,8 +196,8 @@ auto make_batch_layout(const LayoutType& layout, const BatchType& batch, const S
 {
     using namespace asc::te;
     using LayoutTraitType = get_layout_trait<LayoutType>;
-    return make_pattern_layout<LayoutPattern, LayoutTraitType>(make_shape(batch, layout.shape()),
-                                                               make_stride(batch_stride, layout.stride()));
+    return make_pattern_layout<LayoutPattern, LayoutTraitType>(
+        make_shape(batch, layout.shape()), make_stride(batch_stride, layout.stride()));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1RejectsBatchAboveLimitForAllRemainingFormats)
@@ -214,27 +207,37 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1RejectsBatchAboveLimitFo
     int rows = 64;
     int columns = 32;
 
-    expect_gm2l1_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(batch, rows, columns),
-                            make_frame_layout<nz_layout_ptn, half>(batch, rows, columns));
-    expect_gm2l1_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(batch, rows, columns),
-                            make_frame_layout<nz_layout_ptn, half>(batch, rows, columns));
-    expect_gm2l1_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(batch, rows, columns),
-                            make_frame_layout<zn_layout_ptn, half>(batch, rows, columns));
-    expect_gm2l1_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(batch, rows, columns),
-                            make_frame_layout<zn_layout_ptn, half>(batch, rows, columns));
+    expect_gm2l1_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(batch, rows, columns),
+        make_frame_layout<nz_layout_ptn, half>(batch, rows, columns));
+    expect_gm2l1_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(batch, rows, columns),
+        make_frame_layout<nz_layout_ptn, half>(batch, rows, columns));
+    expect_gm2l1_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(batch, rows, columns),
+        make_frame_layout<zn_layout_ptn, half>(batch, rows, columns));
+    expect_gm2l1_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(batch, rows, columns),
+        make_frame_layout<zn_layout_ptn, half>(batch, rows, columns));
 
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<scalea_nd_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<scalea_dn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<scaleb_nd_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<scaleb_dn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
-    expect_gm2l1_trap<fp8_e8m0_t>(make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
-                                  make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<scalea_nd_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<scalea_dn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<scaleb_nd_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<scaleb_dn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
+    expect_gm2l1_trap<fp8_e8m0_t>(
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(batch, rows, columns));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1RejectsSmallerDestinationForRemainingPublicFormats)
@@ -244,38 +247,50 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1RejectsSmallerDestinatio
     constexpr int DST_ROWS = 16;
     constexpr int COLUMNS = 32;
 
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nz_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<zn_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
 
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<scalea_nd_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<scalea_dn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<scaleb_nd_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<scaleb_dn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<fp8_e8m0_t>(make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
-                                       make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<scalea_nd_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<scalea_dn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<scaleb_nd_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<scaleb_dn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<fp8_e8m0_t>(
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(DST_ROWS, COLUMNS));
 
-    expect_gm2l1_size_trap<half>(make_frame_layout<nc1hwc0_layout_ptn>(1, 2, 4, 4, 16),
-                                 make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nhwc_layout_ptn>(1, 4, 4, 16),
-                                 make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nchw_layout_ptn>(1, 16, 4, 4),
-                                 make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nc1hwc0_layout_ptn>(1, 2, 4, 4, 16), make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nhwc_layout_ptn>(1, 4, 4, 16), make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nchw_layout_ptn>(1, 16, 4, 4), make_frame_layout<nc1hwc0_layout_ptn>(1, 1, 2, 4, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1FlatNDAndDNRoutesRejectSmallerDestination)
@@ -285,16 +300,21 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1FlatNDAndDNRoutesRejectS
     constexpr int DST_ROWS = 16;
     constexpr int COLUMNS = 32;
 
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nd_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nd_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(DST_ROWS, COLUMNS));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1BatchRoutesRejectSmallerDestination)
@@ -305,16 +325,21 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyGM2L1BatchRoutesRejectSmaller
     constexpr int DST_ROWS = 16;
     constexpr int COLUMNS = 32;
 
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nd_ext_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
-    expect_gm2l1_size_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
-                                 make_frame_layout<zn_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
+        make_frame_layout<nd_ext_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
+    expect_gm2l1_size_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(BATCH, SRC_ROWS, COLUMNS),
+        make_frame_layout<zn_layout_ptn, half>(BATCH, DST_ROWS, COLUMNS));
 
     expect_gm2l1_size_trap<fp8_e8m0_t>(
         make_frame_layout<scalea_nd_layout_ptn, asc::te::Std::Int<2>>(BATCH, SRC_ROWS, COLUMNS),
@@ -343,36 +368,41 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12UBRejectsSmallerDestinatio
     constexpr int DST_ROWS = 16;
     constexpr int COLUMNS = 32;
 
-    expect_l12ub_size_trap<half>(make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nd_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_l12ub_size_trap<half>(make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nd_ext_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_l12ub_size_trap<half>(make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<dn_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_l12ub_size_trap<half>(make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<dn_ext_layout_ptn, half>(DST_ROWS, COLUMNS));
-    expect_l12ub_size_trap<half>(make_frame_layout<nz_layout_ptn, half>(SRC_ROWS, COLUMNS),
-                                 make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_l12ub_size_trap<half>(
+        make_frame_layout<nd_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nd_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_l12ub_size_trap<half>(
+        make_frame_layout<nd_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nd_ext_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_l12ub_size_trap<half>(
+        make_frame_layout<dn_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<dn_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_l12ub_size_trap<half>(
+        make_frame_layout<dn_ext_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<dn_ext_layout_ptn, half>(DST_ROWS, COLUMNS));
+    expect_l12ub_size_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(SRC_ROWS, COLUMNS),
+        make_frame_layout<nz_layout_ptn, half>(DST_ROWS, COLUMNS));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTRejectsInvalidBatchInputs)
 {
     using namespace asc::te;
     int columns = 16;
-    expect_l12bt_trap<half, float>(make_frame_layout<nd_ext_layout_ptn>(1, 1, columns),
-                                   make_frame_layout<nd_ext_layout_ptn>(2, 1, columns));
-    expect_l12bt_trap<half, float>(make_frame_layout<nd_ext_layout_ptn>(4096, 1, columns),
-                                   make_frame_layout<nd_ext_layout_ptn>(4096, 1, columns));
+    expect_l12bt_trap<half, float>(
+        make_frame_layout<nd_ext_layout_ptn>(1, 1, columns), make_frame_layout<nd_ext_layout_ptn>(2, 1, columns));
+    expect_l12bt_trap<half, float>(
+        make_frame_layout<nd_ext_layout_ptn>(4096, 1, columns), make_frame_layout<nd_ext_layout_ptn>(4096, 1, columns));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTRejectsEachUnalignedBatchColumn)
 {
     using namespace asc::te;
     int batch = 2;
-    expect_l12bt_trap<half, float>(make_frame_layout<nd_ext_layout_ptn>(batch, 1, 17),
-                                   make_frame_layout<nd_ext_layout_ptn>(batch, 1, 32));
-    expect_l12bt_trap<half, float>(make_frame_layout<nd_ext_layout_ptn>(batch, 1, 16),
-                                   make_frame_layout<nd_ext_layout_ptn>(batch, 1, 17));
+    expect_l12bt_trap<half, float>(
+        make_frame_layout<nd_ext_layout_ptn>(batch, 1, 17), make_frame_layout<nd_ext_layout_ptn>(batch, 1, 32));
+    expect_l12bt_trap<half, float>(
+        make_frame_layout<nd_ext_layout_ptn>(batch, 1, 16), make_frame_layout<nd_ext_layout_ptn>(batch, 1, 17));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTRejectsBlockCountAboveLimitForEachNDLayout)
@@ -380,26 +410,26 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTRejectsBlockCountAboveLi
     using namespace asc::te;
     int rows = 4096;
     int columns = 16;
-    expect_l12bt_trap<float, float>(make_frame_layout<nd_layout_ptn>(rows, columns),
-                                    make_frame_layout<nd_layout_ptn>(rows, columns));
-    expect_l12bt_trap<float, float>(make_frame_layout<nd_ext_layout_ptn>(rows, columns),
-                                    make_frame_layout<nd_ext_layout_ptn>(rows, columns));
+    expect_l12bt_trap<float, float>(
+        make_frame_layout<nd_layout_ptn>(rows, columns), make_frame_layout<nd_layout_ptn>(rows, columns));
+    expect_l12bt_trap<float, float>(
+        make_frame_layout<nd_ext_layout_ptn>(rows, columns), make_frame_layout<nd_ext_layout_ptn>(rows, columns));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTRejectsSmallerDestinationForNDLayout)
 {
     using namespace asc::te;
-    expect_l12bt_size_trap<float, float>(make_frame_layout<nd_layout_ptn, float>(16, 64),
-                                         make_frame_layout<nd_layout_ptn, float>(8, 64));
+    expect_l12bt_size_trap<float, float>(
+        make_frame_layout<nd_layout_ptn, float>(16, 64), make_frame_layout<nd_layout_ptn, float>(8, 64));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12BTBatchRejectsSmallerDestination)
 {
     using namespace asc::te;
-    expect_l12bt_size_trap<half, float>(make_frame_layout<nd_layout_ptn, half>(2, 2, 16),
-                                        make_frame_layout<nd_layout_ptn, float>(2, 1, 16));
-    expect_l12bt_size_trap<half, float>(make_frame_layout<nd_ext_layout_ptn, half>(2, 2, 16),
-                                        make_frame_layout<nd_ext_layout_ptn, float>(2, 1, 16));
+    expect_l12bt_size_trap<half, float>(
+        make_frame_layout<nd_layout_ptn, half>(2, 2, 16), make_frame_layout<nd_layout_ptn, float>(2, 1, 16));
+    expect_l12bt_size_trap<half, float>(
+        make_frame_layout<nd_ext_layout_ptn, half>(2, 2, 16), make_frame_layout<nd_ext_layout_ptn, float>(2, 1, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12FBRejectsBlockCountAboveLimitForEachNDLayout)
@@ -408,31 +438,31 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12FBRejectsBlockCountAboveLi
     int rows = 4096;
     int columns = 16;
     expect_l12fb_trap(make_frame_layout<nd_layout_ptn>(rows, columns), make_frame_layout<nd_layout_ptn>(rows, columns));
-    expect_l12fb_trap(make_frame_layout<nd_ext_layout_ptn>(rows, columns),
-                      make_frame_layout<nd_ext_layout_ptn>(rows, columns));
+    expect_l12fb_trap(
+        make_frame_layout<nd_ext_layout_ptn>(rows, columns), make_frame_layout<nd_ext_layout_ptn>(rows, columns));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12FBRejectsSmallerDestinationForNDLayout)
 {
     using namespace asc::te;
-    expect_l12fb_size_trap(make_frame_layout<nd_layout_ptn, uint64_t>(8, 64),
-                           make_frame_layout<nd_layout_ptn, uint64_t>(4, 64));
+    expect_l12fb_size_trap(
+        make_frame_layout<nd_layout_ptn, uint64_t>(8, 64), make_frame_layout<nd_layout_ptn, uint64_t>(4, 64));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsSmallerDestinationForTransposeRoute)
 {
     using namespace asc::te;
-    expect_l12l0a_size_trap<half>(make_frame_layout<zn_layout_ptn, half>(32, 32),
-                                  make_frame_layout<nz_layout_ptn, half>(16, 32));
+    expect_l12l0a_size_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(32, 32), make_frame_layout<nz_layout_ptn, half>(16, 32));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsSmallerDestinationForB8B4TransposeRoutes)
 {
     using namespace asc::te;
-    expect_l12l0a_size_trap<int8_t>(make_frame_layout<zn_layout_ptn, int8_t>(32, 32),
-                                    make_frame_layout<nz_layout_ptn, int8_t>(16, 32));
-    expect_l12l0a_size_trap<fp4x2_e1m2_t>(make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 64),
-                                          make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(16, 64));
+    expect_l12l0a_size_trap<int8_t>(
+        make_frame_layout<zn_layout_ptn, int8_t>(32, 32), make_frame_layout<nz_layout_ptn, int8_t>(16, 32));
+    expect_l12l0a_size_trap<fp4x2_e1m2_t>(
+        make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 64), make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(16, 64));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0AImg2ColRejectsSmallerDestination)
@@ -456,141 +486,145 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0AImg2ColRejectsSmallerDe
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsSmallerDestinationForNormalRoute)
 {
     using namespace asc::te;
-    expect_l12l0b_size_trap<float>(make_frame_layout<zn_layout_ptn, float>(32, 32),
-                                   make_frame_layout<zn_layout_ptn, float>(16, 32));
+    expect_l12l0b_size_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(32, 32), make_frame_layout<zn_layout_ptn, float>(16, 32));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsSmallerDestinationForB8B4TransposeRoutes)
 {
     using namespace asc::te;
-    expect_l12l0b_size_trap<int8_t>(make_frame_layout<nz_layout_ptn, int8_t>(32, 32),
-                                    make_frame_layout<zn_layout_ptn, int8_t>(32, 16));
-    expect_l12l0b_size_trap<fp4x2_e1m2_t>(make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 64),
-                                          make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 16));
+    expect_l12l0b_size_trap<int8_t>(
+        make_frame_layout<nz_layout_ptn, int8_t>(32, 32), make_frame_layout<zn_layout_ptn, int8_t>(32, 16));
+    expect_l12l0b_size_trap<fp4x2_e1m2_t>(
+        make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 64), make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ABatchRoutesRejectSmallerDestination)
 {
     using namespace asc::te;
-    expect_l12l0a_size_trap<float>(make_frame_layout<nz_layout_ptn, float>(2, 32, 32),
-                                   make_frame_layout<nz_layout_ptn, float>(2, 16, 32));
-    expect_l12l0a_size_trap<half>(make_frame_layout<zn_layout_ptn, half>(2, 32, 32),
-                                  make_frame_layout<nz_layout_ptn, half>(2, 16, 32));
+    expect_l12l0a_size_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(2, 32, 32), make_frame_layout<nz_layout_ptn, float>(2, 16, 32));
+    expect_l12l0a_size_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(2, 32, 32), make_frame_layout<nz_layout_ptn, half>(2, 16, 32));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BBatchRoutesRejectSmallerDestination)
 {
     using namespace asc::te;
-    expect_l12l0b_size_trap<float>(make_frame_layout<zn_layout_ptn, float>(2, 32, 32),
-                                   make_frame_layout<zn_layout_ptn, float>(2, 16, 32));
-    expect_l12l0b_size_trap<half>(make_frame_layout<nz_layout_ptn, half>(2, 32, 32),
-                                  make_frame_layout<zn_layout_ptn, half>(2, 16, 32));
+    expect_l12l0b_size_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(2, 32, 32), make_frame_layout<zn_layout_ptn, float>(2, 16, 32));
+    expect_l12l0b_size_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(2, 32, 32), make_frame_layout<zn_layout_ptn, half>(2, 16, 32));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsNormalRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0a_trap<float>(make_frame_layout<nz_layout_ptn, float>(4096, 8),
-                              make_frame_layout<nz_layout_ptn, float>(4096, 8));
-    expect_l12l0a_trap<float>(make_frame_layout<nz_layout_ptn, float>(16, 2041),
-                              make_frame_layout<nz_layout_ptn, float>(16, 2041));
+    expect_l12l0a_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(4096, 8), make_frame_layout<nz_layout_ptn, float>(4096, 8));
+    expect_l12l0a_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(16, 2041), make_frame_layout<nz_layout_ptn, float>(16, 2041));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsTransposeRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0a_trap<half>(make_frame_layout<zn_layout_ptn, half>(16, 4096),
-                             make_frame_layout<nz_layout_ptn, half>(16, 4096));
-    expect_l12l0a_trap<half>(make_frame_layout<zn_layout_ptn, half>(4096, 16),
-                             make_frame_layout<nz_layout_ptn, half>(4096, 16));
+    expect_l12l0a_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(16, 4096), make_frame_layout<nz_layout_ptn, half>(16, 4096));
+    expect_l12l0a_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(4096, 16), make_frame_layout<nz_layout_ptn, half>(4096, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsB8B4TransposeStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0a_trap<int8_t>(make_frame_layout<zn_layout_ptn, int8_t>(32, 4096),
-                               make_frame_layout<nz_layout_ptn, int8_t>(32, 4096));
-    expect_l12l0a_trap<fp4x2_e1m2_t>(make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 4096),
-                                     make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 4096));
-    expect_l12l0a_trap<int8_t>(make_frame_layout<zn_layout_ptn, int8_t>(8192, 32),
-                               make_frame_layout<nz_layout_ptn, int8_t>(8192, 32));
-    expect_l12l0a_trap<fp4x2_e1m2_t>(make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(16384, 64),
-                                     make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(16384, 64));
+    expect_l12l0a_trap<int8_t>(
+        make_frame_layout<zn_layout_ptn, int8_t>(32, 4096), make_frame_layout<nz_layout_ptn, int8_t>(32, 4096));
+    expect_l12l0a_trap<fp4x2_e1m2_t>(
+        make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 4096),
+        make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 4096));
+    expect_l12l0a_trap<int8_t>(
+        make_frame_layout<zn_layout_ptn, int8_t>(8192, 32), make_frame_layout<nz_layout_ptn, int8_t>(8192, 32));
+    expect_l12l0a_trap<fp4x2_e1m2_t>(
+        make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(16384, 64),
+        make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(16384, 64));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsBatchRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0a_trap<float>(make_frame_layout<nz_layout_ptn, float>(2, 4096, 8),
-                              make_frame_layout<nz_layout_ptn, float>(2, 4096, 8));
-    expect_l12l0a_trap<float>(make_frame_layout<nz_layout_ptn, float>(256, 16, 8),
-                              make_frame_layout<nz_layout_ptn, float>(256, 16, 8));
-    expect_l12l0a_trap<half>(make_frame_layout<zn_layout_ptn, half>(2, 16, 4096),
-                             make_frame_layout<nz_layout_ptn, half>(2, 16, 4096));
-    expect_l12l0a_trap<half>(make_frame_layout<zn_layout_ptn, half>(2, 4096, 16),
-                             make_frame_layout<nz_layout_ptn, half>(2, 4096, 16));
+    expect_l12l0a_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(2, 4096, 8), make_frame_layout<nz_layout_ptn, float>(2, 4096, 8));
+    expect_l12l0a_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(256, 16, 8), make_frame_layout<nz_layout_ptn, float>(256, 16, 8));
+    expect_l12l0a_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(2, 16, 4096), make_frame_layout<nz_layout_ptn, half>(2, 16, 4096));
+    expect_l12l0a_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(2, 4096, 16), make_frame_layout<nz_layout_ptn, half>(2, 4096, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsNormalRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0b_trap<float>(make_frame_layout<zn_layout_ptn, float>(8, 4096),
-                              make_frame_layout<zn_layout_ptn, float>(8, 4096));
-    expect_l12l0b_trap<float>(make_frame_layout<zn_layout_ptn, float>(2041, 16),
-                              make_frame_layout<zn_layout_ptn, float>(2041, 16));
+    expect_l12l0b_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(8, 4096), make_frame_layout<zn_layout_ptn, float>(8, 4096));
+    expect_l12l0b_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(2041, 16), make_frame_layout<zn_layout_ptn, float>(2041, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsTransposeRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0b_trap<half>(make_frame_layout<nz_layout_ptn, half>(4096, 16),
-                             make_frame_layout<zn_layout_ptn, half>(4096, 16));
-    expect_l12l0b_trap<half>(make_frame_layout<nz_layout_ptn, half>(16, 4096),
-                             make_frame_layout<zn_layout_ptn, half>(16, 4096));
+    expect_l12l0b_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(4096, 16), make_frame_layout<zn_layout_ptn, half>(4096, 16));
+    expect_l12l0b_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(16, 4096), make_frame_layout<zn_layout_ptn, half>(16, 4096));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsB8B4TransposeStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0b_trap<int8_t>(make_frame_layout<nz_layout_ptn, int8_t>(4096, 32),
-                               make_frame_layout<zn_layout_ptn, int8_t>(4096, 32));
-    expect_l12l0b_trap<fp4x2_e1m2_t>(make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(4096, 64),
-                                     make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(4096, 64));
-    expect_l12l0b_trap<int8_t>(make_frame_layout<nz_layout_ptn, int8_t>(32, 8192),
-                               make_frame_layout<zn_layout_ptn, int8_t>(32, 8192));
-    expect_l12l0b_trap<fp4x2_e1m2_t>(make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 16384),
-                                     make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 16384));
+    expect_l12l0b_trap<int8_t>(
+        make_frame_layout<nz_layout_ptn, int8_t>(4096, 32), make_frame_layout<zn_layout_ptn, int8_t>(4096, 32));
+    expect_l12l0b_trap<fp4x2_e1m2_t>(
+        make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(4096, 64),
+        make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(4096, 64));
+    expect_l12l0b_trap<int8_t>(
+        make_frame_layout<nz_layout_ptn, int8_t>(32, 8192), make_frame_layout<zn_layout_ptn, int8_t>(32, 8192));
+    expect_l12l0b_trap<fp4x2_e1m2_t>(
+        make_frame_layout<nz_layout_ptn, fp4x2_e1m2_t>(64, 16384),
+        make_frame_layout<zn_layout_ptn, fp4x2_e1m2_t>(64, 16384));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsBatchRouteStepAboveLimit)
 {
     using namespace asc::te;
-    expect_l12l0b_trap<float>(make_frame_layout<zn_layout_ptn, float>(2, 8, 4096),
-                              make_frame_layout<zn_layout_ptn, float>(2, 8, 4096));
-    expect_l12l0b_trap<float>(make_frame_layout<zn_layout_ptn, float>(256, 8, 16),
-                              make_frame_layout<zn_layout_ptn, float>(256, 8, 16));
-    expect_l12l0b_trap<half>(make_frame_layout<nz_layout_ptn, half>(2, 4096, 16),
-                             make_frame_layout<zn_layout_ptn, half>(2, 4096, 16));
-    expect_l12l0b_trap<half>(make_frame_layout<nz_layout_ptn, half>(2, 16, 4096),
-                             make_frame_layout<zn_layout_ptn, half>(2, 16, 4096));
+    expect_l12l0b_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(2, 8, 4096), make_frame_layout<zn_layout_ptn, float>(2, 8, 4096));
+    expect_l12l0b_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(256, 8, 16), make_frame_layout<zn_layout_ptn, float>(256, 8, 16));
+    expect_l12l0b_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(2, 4096, 16), make_frame_layout<zn_layout_ptn, half>(2, 4096, 16));
+    expect_l12l0b_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(2, 16, 4096), make_frame_layout<zn_layout_ptn, half>(2, 16, 4096));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsBatchMismatchForBothRoutes)
 {
     using namespace asc::te;
-    expect_l12l0a_trap<float>(make_frame_layout<nz_layout_ptn, float>(1, 16, 8),
-                              make_frame_layout<nz_layout_ptn, float>(2, 16, 8));
-    expect_l12l0a_trap<half>(make_frame_layout<zn_layout_ptn, half>(1, 16, 16),
-                             make_frame_layout<nz_layout_ptn, half>(2, 16, 16));
+    expect_l12l0a_trap<float>(
+        make_frame_layout<nz_layout_ptn, float>(1, 16, 8), make_frame_layout<nz_layout_ptn, float>(2, 16, 8));
+    expect_l12l0a_trap<half>(
+        make_frame_layout<zn_layout_ptn, half>(1, 16, 16), make_frame_layout<nz_layout_ptn, half>(2, 16, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0BRejectsBatchMismatchForBothRoutes)
 {
     using namespace asc::te;
-    expect_l12l0b_trap<float>(make_frame_layout<zn_layout_ptn, float>(1, 8, 16),
-                              make_frame_layout<zn_layout_ptn, float>(2, 8, 16));
-    expect_l12l0b_trap<half>(make_frame_layout<nz_layout_ptn, half>(1, 16, 16),
-                             make_frame_layout<zn_layout_ptn, half>(2, 16, 16));
+    expect_l12l0b_trap<float>(
+        make_frame_layout<zn_layout_ptn, float>(1, 8, 16), make_frame_layout<zn_layout_ptn, float>(2, 8, 16));
+    expect_l12l0b_trap<half>(
+        make_frame_layout<nz_layout_ptn, half>(1, 16, 16), make_frame_layout<zn_layout_ptn, half>(2, 16, 16));
 }
 
 TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ARejectsNonContinuousBatchLayouts)
@@ -646,8 +680,8 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ScaleARejectsEachStepAbo
         auto src_tensor = make_tensor_at<location::l1>(src.data(), layout);
         auto dst_pointer = make_mem_ptr<location::l0scalea, fp8_e8m0_t>(reinterpret_cast<uint64_t>(dst.data()) / 16);
         auto dst_tensor = make_tensor(dst_pointer, layout);
-        EXPECT_THROW((copy_tensor<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default>(dst_tensor, src_tensor)),
-                     TrapException);
+        EXPECT_THROW(
+            (copy_tensor<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default>(dst_tensor, src_tensor)), TrapException);
     };
 
     expect_trap(make_frame_layout<zz_layout_ptn, asc::te::Std::Int<2>>(4096, 2));
@@ -663,8 +697,8 @@ TEST_F(TensorApiCubeInputAdditionalValidation, CopyL12L0ScaleBRejectsEachStepAbo
         auto src_tensor = make_tensor_at<location::l1>(src.data(), layout);
         auto dst_pointer = make_mem_ptr<location::l0scaleb, fp8_e8m0_t>(reinterpret_cast<uint64_t>(dst.data()) / 16);
         auto dst_tensor = make_tensor(dst_pointer, layout);
-        EXPECT_THROW((copy_tensor<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default>(dst_tensor, src_tensor)),
-                     TrapException);
+        EXPECT_THROW(
+            (copy_tensor<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default>(dst_tensor, src_tensor)), TrapException);
     };
 
     expect_trap(make_frame_layout<nn_layout_ptn, asc::te::Std::Int<2>>(2, 4096));

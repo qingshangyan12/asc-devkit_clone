@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/nd2nz.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -32,20 +32,22 @@ public:
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src)
     {
-        if constexpr (SrcTensor::layout_type::depth == three_dim_data
-                      || SrcTensor::layout_type::depth == five_dim_data) {
+        if constexpr (
+            SrcTensor::layout_type::depth == three_dim_data || SrcTensor::layout_type::depth == five_dim_data) {
             TENSOR_API_DEBUG_CHECK(debug_check_batch_count, get<0>(src.layout().shape()), "copy_gm_to_l1 nd2nz path");
         }
         run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, DstTensor, SrcTensor>(dst, src);
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
-        run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, DstTensor, SrcTensor>(dst, src, dst_coord, src_coord,
-                                                                               copy_shape);
+        run_gm_to_l1_batched<trait, copy_gm_to_l1_nd2nz, DstTensor, SrcTensor>(
+            dst, src, dst_coord, src_coord, copy_shape);
     }
 
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
@@ -58,11 +60,11 @@ public:
     // Extracts single-matrix parameters from the (batch-stripped) src/dst layouts and emits the
     // instruction. nd_num/src_nd_matrix_stride/dst_nz_matrix_stride carry the batch dimension (1/0/0 when
     // there is no batch). The src/dst pattern is read from the original tensor type SrcTensor/DstTensor.
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout,
-              typename DstLayout>
-    __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
-                                            const DstLayout& dst_layout, uint16_t nd_num,
-                                            uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout, const DstLayout& dst_layout,
+        uint16_t nd_num, uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride)
     {
         using type = typename SrcTensor::element_type;
 
@@ -97,19 +99,20 @@ public:
         uint16_t loop3_dst_stride = dst_nz_c0_stride; // loop3_dst_stride = dst_nz_c0_Stride
         // loop4_dst_stride: dst_nz_matrix_stride * size_of_dst_type / C0_size
         uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
-        copy_gm_to_l1_multi_nd2nz_instr::data_copy(dst.data().get(), src.data().get(), nd_num, loop2_dst_stride,
-                                                   loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode,
-                                                   n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
+        copy_gm_to_l1_multi_nd2nz_instr::data_copy(
+            dst.data().get(), src.data().get(), nd_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
+            loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename CopyShape,
-              typename DstOffset, typename SrcOffset>
-    __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const CopyShape& copy_shape,
-                                            uint16_t nd_num, uint64_t src_nd_matrix_stride,
-                                            uint32_t dst_nz_matrix_stride, const DstOffset& dst_offset,
-                                            const SrcOffset& src_offset)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename CopyShape, typename DstOffset,
+        typename SrcOffset>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, const CopyShape& copy_shape, uint16_t nd_num,
+        uint64_t src_nd_matrix_stride, uint32_t dst_nz_matrix_stride, const DstOffset& dst_offset,
+        const SrcOffset& src_offset)
     {
         using type = typename SrcTensor::element_type;
         uint16_t n_value = get_shape_rows(copy_shape);
@@ -125,11 +128,10 @@ public:
         uint64_t loop4_src_stride = src_nd_matrix_stride * sizeof(type);
         uint16_t loop3_dst_stride = dst_column_stride / c0_element<type>;
         uint16_t loop4_dst_stride = static_cast<uint16_t>(dst_nz_matrix_stride / c0_element<type>);
-        uint8_t cache_mode = src.engine().get_cache_mode();
-        copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(dst, src, dst_offset, src_offset, nd_num, 1,
-                                                               loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
-                                                               cache_mode, n_value, d_value, loop4_src_stride, false,
-                                                               trait.pre_allocation);
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
+        copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(
+            dst, src, dst_offset, src_offset, nd_num, 1, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
+            cache_mode, n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 };
 

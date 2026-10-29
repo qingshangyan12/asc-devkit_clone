@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/utils/is_format.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -67,11 +67,12 @@ struct select_row_col_tuples<ShapeRows, ShapeCols, StrideRows, StrideCols, true>
 template <typename Tensor>
 struct get_type_from_n_dim_trait;
 
-template <template <typename, typename> class TensorType, typename HPos, typename Pointer, typename ShapeRows,
-          typename ShapeCols, typename StrideRows, typename StrideCols, typename LayoutPattern>
-struct get_type_from_n_dim_trait<
-    TensorType<view_engine<hardware_mem_ptr<HPos, Pointer>>,
-               layout<shape<ShapeRows, ShapeCols>, stride<StrideRows, StrideCols>, LayoutPattern>>> {
+template <
+    template <typename, typename> class TensorType, typename HPos, typename Pointer, typename ShapeRows,
+    typename ShapeCols, typename StrideRows, typename StrideCols, typename LayoutPattern>
+struct get_type_from_n_dim_trait<TensorType<
+    view_engine<hardware_mem_ptr<HPos, Pointer>>,
+    layout<shape<ShapeRows, ShapeCols>, stride<StrideRows, StrideCols>, LayoutPattern>>> {
     // A batched layout has a scalar Batch axis as rowPart and the matrix tuple as colPart.
     static constexpr bool is_batched = !Std::is_tuple_v<ShapeRows> && Std::is_tuple_v<ShapeCols>;
     using selector = select_row_col_tuples<ShapeRows, ShapeCols, StrideRows, StrideCols, is_batched>;
