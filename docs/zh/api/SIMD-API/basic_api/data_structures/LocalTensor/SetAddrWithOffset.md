@@ -37,6 +37,15 @@ template <typename S>
 __aicore__ inline void SetAddrWithOffset(LocalTensor<S> &src, uint32_t offset)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename S>
+__aicore__ inline void SetAddrWithOffset(S*& src, uint32_t offset)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 LocalTensor。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  参数说明
@@ -67,13 +76,15 @@ __aicore__ inline void SetAddrWithOffset(LocalTensor<S> &src, uint32_t offset)
 </tbody>
 </table>
 
+裸指针形下，`src` / `offset` 分别与上表同名 tensor 形参语义一致，`src` 实参为裸指针。
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 裸指针形下，`src` 所在地址空间由实参指针决定。
 
 ## 调用示例<a name="section17531157161314"></a>
 

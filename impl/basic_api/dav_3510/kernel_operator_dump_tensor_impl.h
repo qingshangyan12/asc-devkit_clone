@@ -21,6 +21,18 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
+// btfp/bias address-space qualifiers: the device toolchain defines them, the CPU-debug host does
+// not.  Same empty fallback as tests/api/c_api/stub/cce_stub.h:89, guarded to the host build and
+// placed after the header guard so the device path never sees it.
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#ifndef __biasbuf__
+#define __biasbuf__
+#endif
+#ifndef __fbuf__
+#define __fbuf__
+#endif
+#endif
+
 #include "../kernel_tpipe_impl.h"
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"

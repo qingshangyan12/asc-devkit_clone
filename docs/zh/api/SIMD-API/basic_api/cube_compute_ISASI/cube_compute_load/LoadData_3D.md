@@ -103,6 +103,21 @@ template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename U, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV1<U>& loadDataParams)
+
+template <typename DstPtr, typename SrcPtr, typename U, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2Pro& loadDataParams)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a id="zh-cn_topic_0000002512171652_section16128134420472"></a>
 
 **表1** 模板参数说明
@@ -121,6 +136,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定：<br>&nbsp;&nbsp;&bull; L1 Buffer（TPosition: A1/B1）：NC1HWC0格式。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表3** LoadData3DParamsV1结构体内参数说明<a id="zh-cn_topic_0000002512171652_table679014222918"></a>
 
@@ -300,6 +316,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     <!-- npu="950" id39 -->
     - 针对Ascend 950PR&950DT系列产品：在目的操作数的物理存储位置为L0A Buffer（TPosition: A2），且源操作数为b8/b16/b32类型时有效。
     <!-- end id39 -->
+
+- 裸指针形下，`dst` 必须为 L0A（`__ca__`）或 L0B（`__cb__`）上的裸指针，`src` 必须为 L1（`__cbuf__`）上的裸指针。
 
 ## 关键特性说明<a id="zh-cn_topic_0000002512171652_section102629572045"></a>
 
