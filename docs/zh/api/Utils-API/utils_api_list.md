@@ -83,7 +83,7 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [ASC\_HOST\_CHECK\_CONDITION](tuning_interface/ASC_HOST_CHECK_CONDITION.md) | 用于检查Host侧条件是否成立。条件不成立时，接口输出自定义错误信息并终止当前进程。 |
+| [ASC\_HOST\_CHECK\_CONDITION](tuning_interface/ASC_HOST_CHECK_CONDITION.md) | 用于检查Host侧条件是否成立。条件不成立时，接口输出诊断信息，并调用C++标准库`<cassert>`中的`assert`宏。 |
 | [printf](tuning_interface/printf.md) | 在算子核函数（Kernel）侧的实现代码中，需要输出日志信息时，调用printf接口打印相关内容。 |
 | [assert/ascendc_assert](tuning_interface/assert.md) | 用于在算子核函数（Kernel）中检查指定条件。条件不成立时，接口打印断言失败信息并触发异常。 |
 | [__trap](tuning_interface/__trap.md) | 在SIMT VF实现代码中调用此接口会中断算子的运行。 |
