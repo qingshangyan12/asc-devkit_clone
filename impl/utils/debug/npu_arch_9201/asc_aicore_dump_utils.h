@@ -19,13 +19,6 @@
 #include "impl/utils/sys_macros_impl.h"
 
 namespace __asc_aicore {
-
-template <AscendC::Hardware hardware>
-__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
-{
-    return ASC_ONE_DATABLOCK_SIZE;
-}
-
 constexpr uint32_t ASC_DEBUG_BUS_UNLOCK_OFFSET = 0x078;
 constexpr uint32_t ASC_DEBUG_BUS_CTRL_OFFSET = 0x100;
 constexpr uint32_t ASC_DEBUG_BUS_ADDR_LOW_OFFSET = 0x108;

@@ -28,6 +28,11 @@ def section(text, start, end):
 def test_2201_sender():
     debug = ROOT / "impl/utils/debug"
     types = section((debug / "asc_debug_types.h").read_text(), "enum class DumpType", "struct TimeStampTlv")
+    alignment = section(
+        (debug / "asc_debug_utils.h").read_text(),
+        "template <AscendC::Hardware hardware>\n__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()",
+        "__aicore__ inline void sync_all()",
+    )
     copies = section(
         (debug / "npu_arch_2201/asc_aicore_dump_utils.h").read_text(),
         "namespace __asc_aicore {",
@@ -38,7 +43,7 @@ def test_2201_sender():
         "template <AscendC::Hardware hardware, typename T, typename U>\n__aicore__ inline void set_dump_tlv_info(",
         "__aicore__ inline void asc_dump_shape_impl(",
     )
-    code = PRELUDE + types + STUBS + copies + "namespace __asc_aicore {\n" + sender + "}\n" + MAIN
+    code = PRELUDE + types + alignment + STUBS + copies + "namespace __asc_aicore {\n" + sender + "}\n" + MAIN
     failures = []
     with tempfile.TemporaryDirectory(prefix="dump-2201-") as directory:
         cpp = Path(directory) / "sender.cpp"

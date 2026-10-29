@@ -114,6 +114,12 @@ __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 
 __aicore__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
 
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
+{
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
 __aicore__ inline void sync_all() { sync_all_impl(); }
 
 __aicore__ inline uint32_t mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
