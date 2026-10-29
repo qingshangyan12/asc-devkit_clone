@@ -101,7 +101,7 @@ __aicore__ inline void CopyGmToCbufAlignV2(
 }
 
 // only support CubeCore   PIPE_MTE3
-// L1 -> GM: copy_cbuf_to_gm_align_v2
+// L1 -> GM: copy_cbuf_to_gm_align
 template <typename T>
 __aicore__ inline void CopyCbufToGmAlignV2(
     __gm__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint32_t srcStride,
@@ -111,7 +111,7 @@ __aicore__ inline void CopyCbufToGmAlignV2(
     uint32_t burstLength = blockLen * BYTE_32_ALIGN;
     uint64_t actSrcStride = srcStride;
     uint32_t actDstStride = dstStride * BYTE_32_ALIGN;
-    copy_cbuf_to_gm_align_v2(
+    copy_cbuf_to_gm_align(
         (__gm__ uint8_t*)dst, (__cbuf__ uint8_t*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
 }
 
@@ -654,13 +654,12 @@ __aicore__ inline void DataCopyPadGm2UBInternal(
 
 __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams& intriParams)
 {
-    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>(1ul << 40 - 1)), {
+    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>((1ul << 40) - 1)), {
         KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no more than 2^40-1", intriParams.srcStride);
     });
-    ASCENDC_ASSERT((intriParams.srcStride >= (-static_cast<int64_t>(intriParams.blockLen))), {
+    ASCENDC_ASSERT((intriParams.srcStride >= static_cast<int64_t>(0)), {
         KERNEL_LOG(
-            KERNEL_ERROR, "srcStride is %ld, which should be no less than %d", intriParams.srcStride,
-            -intriParams.blockLen);
+            KERNEL_ERROR, "srcStride is %ld, which should be no less than 0", intriParams.srcStride);
     });
     ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(65535)), {
         KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no more than 65535", intriParams.dstStride);
@@ -798,7 +797,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 
     copy_cbuf_to_gm_align(
         (__gm__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
-        intriParams.dstStride, intriParams.srcStride);
+        intriParams.srcStride, intriParams.dstStride);
 }
 
 template <typename T>
@@ -811,7 +810,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 
     copy_cbuf_to_gm_align(
         (__gm__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, intriParams.blockLen,
-        intriParams.dstStride, intriParams.srcStride);
+        intriParams.srcStride, intriParams.dstStride);
 }
 
 template <typename T>

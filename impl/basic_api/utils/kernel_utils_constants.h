@@ -808,7 +808,7 @@ struct SizeOfBits<int4b_t> {
     static int const value = INT4_BIT_NUM;
 };
 
-#if (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 template <>
 struct SizeOfBits<int2b_t> {
     static constexpr uint32_t value = INT2_BIT_NUM;
@@ -820,7 +820,7 @@ struct SizeOfBits<uint1b_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || _NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 template <>
 struct SizeOfBits<uint4b_t> {
