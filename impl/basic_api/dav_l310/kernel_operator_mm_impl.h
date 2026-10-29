@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
  * \file kernel_operator_mm_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l310/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -83,13 +84,11 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
-    static_assert(
-        SupportType<T, uint8_t, int8_t, half>(),
-        "LoadDataWithTranspose only support uint8_t, int8_t, half \
+    static_assert(SupportType<T, uint8_t, int8_t, half>(), "LoadDataWithTranspose only support uint8_t, int8_t, half \
          on current device!");
     load_cbuf_to_cb_transpose(
-            dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
-            loadDataParam.dstGap, inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
+        dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap,
+        inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
 }
 
 template <typename T>
@@ -176,18 +175,18 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
     if constexpr (1 == sizeof(T)) {
         load_gm_to_cbuf_2dv2(
             (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.srcStride,
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid);
+            loadDataParam.srcStride, loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep,
+            loadDataParam.sid);
     } else if constexpr (2 == sizeof(T)) {
         load_gm_to_cbuf_2dv2(
             (__cbuf__ half*)dst, (__gm__ half*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.srcStride,
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid);
+            loadDataParam.srcStride, loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep,
+            loadDataParam.sid);
     } else if constexpr (4 == sizeof(T)) {
         load_gm_to_cbuf_2dv2(
             (__cbuf__ float*)dst, (__gm__ float*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.srcStride,
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid);
+            loadDataParam.srcStride, loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep,
+            loadDataParam.sid);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
@@ -203,33 +202,31 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 1);
-        } else {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 0);
-        }
+    if (loadDataParam.GetIfTranspose()) {
+        load_cbuf_to_ca(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 1);
+    } else {
+        load_cbuf_to_ca(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 0);
+    }
 #else
-        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca_s4(
+                (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
         } else {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
+            load_cbuf_to_ca_s4(
+                (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
         }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
 #endif
 }
 
@@ -473,8 +470,7 @@ __aicore__ inline void MmadCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
     } else {
         mad(c, a, b, mmadParams.GetConfig0());
@@ -486,8 +482,7 @@ __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
     mmadParams.SetCmatrixInitVal(false);
-    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() &&
-                  SupportType<Src1T, int4b_t>()) {
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
     } else {
         mad(c, a, b, bias, mmadParams.GetConfig0());
@@ -531,15 +526,9 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     set_fmatrix_b(regFMatrix);
 }
 
-__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
-{
-    set_fmatrix(regFMatrix);
-}
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix) { set_fmatrix(regFMatrix); }
 
-__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
-{
-    set_fmatrix_b(regFMatrix);
-}
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix) { set_fmatrix_b(regFMatrix); }
 
 template <typename T>
 __aicore__ inline void Load3DSetPaddingCal(const T padValue)
@@ -625,7 +614,8 @@ template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (2 == sizeof(T)) {
@@ -650,7 +640,8 @@ template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (2 == sizeof(T)) {
@@ -675,7 +666,8 @@ template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
     if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
     }
 
     if constexpr (2 == sizeof(T)) {

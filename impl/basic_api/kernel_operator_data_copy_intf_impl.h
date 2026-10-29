@@ -12,6 +12,7 @@
  * \file kernel_operator_data_copy_intf_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -578,8 +579,8 @@ __aicore__ inline void DataCopy(
                 Std::is_same<PrimDstType, PrimSrcType>::value ||
                 (Std::is_same<PrimSrcType, bfloat16_t>::value && Std::is_same<PrimDstType, float>::value)) {
 #else
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
             if constexpr (
                 Std::is_same<PrimDstType, int32_t>::value &&
                 (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
@@ -633,7 +634,8 @@ __aicore__ inline void DataCopyL1ToUB(
     DataCopyL12UBImpl<PrimType, subBlockId>(
 #endif
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
-#elif (defined(__NPU_ARCH__) && \
+#elif (                      \
+    defined(__NPU_ARCH__) && \
     ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101)))
     using PrimType = PrimT<T>;
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, repeatParams));
@@ -1118,9 +1120,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 template <typename T, uint8_t subBlockId>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
-#if (defined(__NPU_ARCH__) && \
+#if (                                                                                                        \
+    defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
-        (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)))
+     (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)))
     using PrimType = PrimT<T>;
     ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), {
         KERNEL_LOG(

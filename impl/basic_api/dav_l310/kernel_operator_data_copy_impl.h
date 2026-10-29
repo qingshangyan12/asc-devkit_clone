@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l310 support data copy api.
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/dav_l310/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
@@ -232,36 +233,36 @@ __aicore__ inline void CopyGmToCbufAlignV1(
     uint32_t dstGap = dstStride;
     uint64_t actSrcStride = static_cast<uint64_t>(srcGap) + burstLength;
     uint32_t actDstStride = AlignUp(dstStride * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
-    constexpr uint32_t V1_MAX_NBURST = 4095; //Xm[15:4], 12bit
+    constexpr uint32_t V1_MAX_NBURST = 4095; // Xm[15:4], 12bit
     uint32_t burstLeft = blockCount;
     __cbuf__ uint8_t* tmpDst = reinterpret_cast<__cbuf__ uint8_t*>(dst);
     __gm__ uint8_t* tmpSrc = reinterpret_cast<__gm__ uint8_t*>(src);
     while (burstLeft > 0) {
         uint32_t nb = (burstLeft > V1_MAX_NBURST) ? V1_MAX_NBURST : burstLeft;
         if constexpr (sizeof(T) == B64_BYTE_SIZE) {
-            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), 
-                reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp * 2, rp *2,
-                srcGap, dstGap);
+            copy_gm_to_cbuf_align(
+                reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid,
+                (uint16_t)nb, burstLength, lp * 2, rp * 2, srcGap, dstGap);
         } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), 
-                reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
-                srcGap, dstGap);
+            copy_gm_to_cbuf_align(
+                reinterpret_cast<__cbuf__ uint32_t*>(tmpDst), reinterpret_cast<__gm__ uint32_t*>(tmpSrc), (uint8_t)sid,
+                (uint16_t)nb, burstLength, lp, rp, srcGap, dstGap);
         } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint16_t*>(tmpDst), 
-                reinterpret_cast<__gm__ uint16_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
-                srcGap, dstGap);
+            copy_gm_to_cbuf_align(
+                reinterpret_cast<__cbuf__ uint16_t*>(tmpDst), reinterpret_cast<__gm__ uint16_t*>(tmpSrc), (uint8_t)sid,
+                (uint16_t)nb, burstLength, lp, rp, srcGap, dstGap);
         } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-            copy_gm_to_cbuf_align(reinterpret_cast<__cbuf__ uint8_t*>(tmpDst), 
-                reinterpret_cast<__gm__ uint8_t*>(tmpSrc), (uint8_t)sid, (uint16_t)nb, burstLength, lp, rp,
-                srcGap, dstGap);
+            copy_gm_to_cbuf_align(
+                reinterpret_cast<__cbuf__ uint8_t*>(tmpDst), reinterpret_cast<__gm__ uint8_t*>(tmpSrc), (uint8_t)sid,
+                (uint16_t)nb, burstLength, lp, rp, srcGap, dstGap);
         } else {
-            ASCENDC_ASSERT(
-                false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data type of copy from gm to cbuf on current device"); });
+            ASCENDC_ASSERT(false, {
+                KERNEL_LOG(KERNEL_ERROR, "unsupported data type of copy from gm to cbuf on current device");
+            });
         }
         burstLeft -= nb;
         tmpSrc += static_cast<uint64_t>(nb) * actSrcStride;
         tmpDst += static_cast<uint64_t>(nb) * actDstStride;
-
     }
 }
 
@@ -276,7 +277,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
     const uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;
     const uint16_t dstNzNStride = intriParams.dstNzNStride;
     const uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride;
-    if (ndNum == 0 || nValue ==0 || dValue == 0) {
+    if (ndNum == 0 || nValue == 0 || dValue == 0) {
         return;
     }
     if constexpr (g_gm_overflow_check) {
@@ -284,11 +285,11 @@ __aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src
         AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
     }
 
-    ASCENDC_DEBUG_ASSERT(((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
-        "srcNdMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(
+        ((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "srcNdMatrixStride should be 32B aligned \n");
     ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
-    ASCENDC_DEBUG_ASSERT(((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
-        "dstNzMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(
+        ((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "dstNzMatrixStride should be 32B aligned \n");
     ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0), "dstNzC0Stride should be greater than 0 \n");
     ASCENDC_DEBUG_ASSERT((dstNzNStride > 0), "dstNzNStride should be greater than 0 \n");
 
@@ -386,18 +387,14 @@ template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImplBase(
     __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1DN2NZImpl(
     __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
 }
 
 template <typename T>
@@ -658,8 +655,7 @@ __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams&
         KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no more than 2^40-1", intriParams.srcStride);
     });
     ASCENDC_ASSERT((intriParams.srcStride >= static_cast<int64_t>(0)), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "srcStride is %ld, which should be no less than 0", intriParams.srcStride);
+        KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no less than 0", intriParams.srcStride);
     });
     ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(65535)), {
         KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no more than 65535", intriParams.dstStride);
@@ -884,8 +880,7 @@ __aicore__ inline bool IsSupportQuantMode(QuantMode_t quantPre)
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     static_assert(
         (SupportType<
@@ -902,10 +897,10 @@ __aicore__ inline void DataCopyL0C2GMImpl(
             dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
         return copy_matrix_cc_to_gm(
-            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-            0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0,
-            false, false, false, false, false, false);
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
     } else {
         ASCENDC_ASSERT(false, {
             KERNEL_LOG(
@@ -935,10 +930,10 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
             dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
         return copy_matrix_cc_to_cbuf(
-            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-            0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0,
-            false, false, false, false, false, false);
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
     } else {
         ASCENDC_ASSERT(false, {
             KERNEL_LOG(

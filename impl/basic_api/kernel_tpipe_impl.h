@@ -12,6 +12,7 @@
  * \file kernel_tpipe_impl.h
  * \brief
  */
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/kernel_tpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
@@ -280,8 +281,9 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
             KERNEL_ERROR, "buffer length is %u, which should be larger than 0, and at least less than or equal to %u",
             len, currentPoolSize));
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 5101 || \
+     __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     if constexpr (T::dstPosition == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
@@ -371,8 +373,9 @@ __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf, uint32_t len)
 #endif
 
     len = (len + ONE_BLK_SIZE - MIN_BLOCK_LEN) / ONE_BLK_SIZE * ONE_BLK_SIZE;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 5101 || \
+     __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     if constexpr (pos == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
