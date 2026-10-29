@@ -18,6 +18,16 @@
 #include "impl/utils/debug/asc_debug_utils.h"
 namespace __asc_aicore {
 
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_dump_tensor_payload_alignment()
+{
+    // L0C copies whole 16x16 B32 fractals, including the last partial fractal.
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
+    }
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
 __aicore__ inline void get_matrix_copy_param(
     uint32_t dumpBytes, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
 {
