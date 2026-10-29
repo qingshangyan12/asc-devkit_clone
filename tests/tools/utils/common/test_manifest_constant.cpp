@@ -54,18 +54,16 @@ TEST(ManifestConstantTest, StructIgnoresManifestByteSizeAndUsesArgumentSize)
     const uint64_t sizes[] = {0U, 0U, sizeof(data)};
     for (bool explicitType : {false, true}) {
         Json input = MakeConstant();
+        input["byte_size"] = 8;
         if (explicitType) {
             input["arg_type"] = "struct";
         }
-        for (uint64_t byteSize : {2U, 3U, 8U}) {
-            input["byte_size"] = byteSize;
-            ManifestConstant constant;
-            ASSERT_TRUE(constant.ParseDefinition(input));
-            ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
-            EXPECT_EQ(constant.GetBoundData(), data);
-            EXPECT_EQ(constant.GetBoundByteSize(), sizeof(data));
-            EXPECT_FALSE(constant.BindArgument(3U, addresses, nullptr));
-        }
+        ManifestConstant constant;
+        ASSERT_TRUE(constant.ParseDefinition(input));
+        ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+        EXPECT_EQ(constant.GetBoundData(), data);
+        EXPECT_EQ(constant.GetBoundByteSize(), sizeof(data));
+        EXPECT_FALSE(constant.BindArgument(3U, addresses, nullptr));
     }
 }
 

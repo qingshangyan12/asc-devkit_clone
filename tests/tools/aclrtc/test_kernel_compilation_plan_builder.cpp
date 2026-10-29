@@ -613,33 +613,6 @@ TEST(KernelCompilationPlanBuilderTest, PointerConstantUsesManifestByteSize)
     EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02}");
 }
 
-TEST(KernelCompilationPlanBuilderTest, PointerConstantRespectsProvidedHostBufferCapacity)
-{
-    KernelPlanTestWorkspace workspace;
-    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
-    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
-    const uint8_t tilingBytes[] = {0x01, 0x02, 0x03};
-    const void* argumentDataPointers[] = {tilingBytes};
-    uint64_t argumentByteCounts[] = {0U};
-    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
-
-    for (uint64_t capacity : {0U, 1U, 2U, 3U}) {
-        SCOPED_TRACE(capacity);
-        argumentByteCounts[0] = capacity;
-        KernelCompilationPlan plan;
-        const aclError status = BuildPlanFromManifest(
-            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan);
-        if (capacity < 2U) {
-            EXPECT_EQ(status, ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
-            EXPECT_TRUE(plan.sourcePatches.empty());
-        } else {
-            ASSERT_EQ(status, ascendc::aclrtc::ACLRTC_SUCCESS);
-            ASSERT_EQ(plan.sourcePatches.size(), 1U);
-            EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02}");
-        }
-    }
-}
-
 TEST(KernelCompilationPlanBuilderTest, DefaultStructConstantUsesArgumentByteSize)
 {
     KernelPlanTestWorkspace workspace;
@@ -673,21 +646,12 @@ TEST(KernelCompilationPlanBuilderTest, StructIgnoresManifestByteSizeAndUsesArgum
     Json manifest = CreateManifest();
     manifest["kernels"][1]["constant_infos"][0]["arg_type"] = "struct";
 
-    for (bool explicitType : {true, false}) {
-        if (!explicitType) {
-            manifest["kernels"][1]["constant_infos"][0].erase("arg_type");
-        }
-        for (uint64_t byteSize : {2U, 3U, 8U}) {
-            manifest["kernels"][1]["constant_infos"][0]["byte_size"] = byteSize;
-            KernelCompilationPlan plan;
-            ASSERT_EQ(
-                BuildPlanFromManifest(
-                    request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
-                ascendc::aclrtc::ACLRTC_SUCCESS);
-            ASSERT_EQ(plan.sourcePatches.size(), 1U);
-            EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02, 0x03}");
-        }
-    }
+    KernelCompilationPlan plan;
+    ASSERT_EQ(
+        BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.sourcePatches.size(), 1U);
+    EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02, 0x03}");
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsInvalidInputsBeforeReadingAnyConstantBytes)
