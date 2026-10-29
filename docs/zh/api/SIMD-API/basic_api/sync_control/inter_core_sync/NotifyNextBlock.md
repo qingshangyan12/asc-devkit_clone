@@ -39,6 +39,15 @@
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename GmPtr, typename UbPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void NotifyNextBlock(GmPtr gmWorkspace, UbPtr ubWorkspace)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  接口参数说明
@@ -47,6 +56,8 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 | --- | --- | --- |
 | gmWorkspace | 输入 | 多个AIV共享的全局内存，用于存储核间顺序执行的同步状态，位于Global Memory，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。本接口通过写入该内存通知后序AIV核继续执行。 |
 | ubWorkspace | 输入 | 当前AIV的核内缓存，用于在Unified Buffer中生成和暂存待写入`gmWorkspace`的核间同步状态，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)。 |
+
+裸指针形下，`gmWorkspace` / `ubWorkspace` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -70,6 +81,7 @@ $$
 - [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，WaitPreBlock和NotifyNextBlock仅对AIV核生效。在AIC核中调用任一接口时，接口直接返回，不执行等待、通知或核间同步。
 - WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
+- 裸指针形下，`gmWorkspace` 须为 Global Memory 上的 `int32_t` 地址，`ubWorkspace` 须为 Unified Buffer 上的 `int32_t` 地址，行为与 tensor 形一致。
 
 ## 调用示例<a name="section177231425115410"></a>
 

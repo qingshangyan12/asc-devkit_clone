@@ -152,6 +152,18 @@ Atlas A2系列产品
     __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
     ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；元素的地址空间由指针实参本身区分。
+
 ## 参数说明
 
 **表3** 参数说明
@@ -163,6 +175,8 @@ Atlas A2系列产品
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition: B2）。<br>LocalTensor的起始地址需要按照512字节对齐。 |
 | bias | 输入 | 源操作数，Bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br>LocalTensor的起始地址需要按照64字节对齐。 |
 | mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[表4](#zh_cn_topic_mmad_section4_table4)。 |
+
+裸指针形的 `dst`、`fm`、`filter`、`bias` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表4** MmadParams结构体内参数说明<a id="zh_cn_topic_mmad_section4_table4"></a>
 
@@ -291,6 +305,7 @@ Atlas A2系列产品
 ## 约束说明
 
 - 结果矩阵C只支持位于L0C Buffer（CO1），左矩阵A只支持位于L0A Buffer（A2），右矩阵B只支持位于L0B Buffer（B2）。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致（`dst` 为 L0C 的 `__cc__`、`fm` 为 L0A 的 `__ca__`、`filter` 为 L0B 的 `__cb__`，`bias` 为偏置表对应的裸指针），元素类型可由显式模板实参或指针实参推导。
 - 当M、K、N中的任意一个值为0时，表示指令不会执行，该接口将被视为NOP（空操作）。
 - 当M = 1时，会默认开启GEMV（General Matrix-Vector Multiplication）功能。在这种情况下，Mmad API从L0A Buffer读取数据时，会以ND格式进行读取，而不会将其视为ZZ或NZ格式。所以此时左矩阵需要直接按照ND格式进行排布（[GEMV特性说明](../mmad_compute_key_features/GEMV.md#ZH-CN_TOPIC_0000002538231187)）。要注意的是，开启GEMV的情况下，A矩阵的起始地址仍要求512字节对齐。<!-- npu="950" id29 -->针对Ascend 950PR&950DT系列产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭。<!-- end id29 -->
 - 一般来说，一次Mmad计算至少完成一次A(16\*16\*half) \* B(16\*16\*half)数据块计算。但实际计算时M、K、N有效值可能不是16的倍数，从而有部分数据为无效数据。以M=30，K=70，N=40为例来介绍无效数据与有效数据的排布方式。

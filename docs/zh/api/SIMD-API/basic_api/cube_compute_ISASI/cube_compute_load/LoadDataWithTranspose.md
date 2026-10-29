@@ -61,6 +61,18 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 ```
 <!-- end id11 -->
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadData2dTransposeParams& loadDataParams)
+
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadData2dTransposeParamsV2& loadDataParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a id="zh-cn_topic_0000002543851571_section16128134420472"></a>
 
 **表1** 模板参数说明
@@ -76,6 +88,8 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 | dst | 输出 | 目的操作数，结果矩阵，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)。<br>起始地址对齐约束参考[对齐约束](cube_compute_input_move_constraint.md)。<br>LocalTensor的起始地址需要保证512字节对齐。<br>数据类型和src的数据类型保持一致。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)。<br>起始地址对齐约束参考[对齐约束](cube_compute_input_move_constraint.md)。<br>LocalTensor的起始地址需要保证32字节对齐。<br>数据类型和dst的数据类型保持一致。 |
 | loadDataParams | 输入 | LoadDataWithTranspose相关参数。不同型号该参数的类型不同，请参考[loadDataParams参数类型说明](#loaddataparams参数类型说明)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ### loadDataParams参数类型说明
 
@@ -156,6 +170,7 @@ Kirin X90处理器系列产品，支持数据类型：int8_t、half。
 <!-- npu="950" id19 -->
 - 针对Ascend 950PR&950DT系列产品，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
 <!-- end id19 -->
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致：`dst` 为 `__ca__`（L0A Buffer）或 `__cb__`（L0B Buffer），`src` 为 `__cbuf__`（L1 Buffer）。元素类型由指针实参推导。
 
 ## 关键特性说明<a id="zh-cn_topic_0000002543851571_section1891111310132"></a>
 

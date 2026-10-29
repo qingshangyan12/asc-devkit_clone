@@ -21,6 +21,24 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
+// `__biasbuf__` / `__fbuf__` are btfp/bias address-space qualifiers: the device toolchain provides
+// them, the CPU-debug host build does not.  The repository defines `__biasbuf__` in exactly one
+// place -- tests/api/c_api/stub/cce_stub.h:89 -- which the basic_api unit-test build does not
+// include, so on the host this file fails with '__biasbuf__' was not declared in this scope.
+// Provide the same empty fallback here, in the same #ifndef form the stub uses but **guarded to
+// the CPU-debug build** so the device path can never see it, placed AFTER
+// the header guard so it is not swallowed by the multi-line #pragma message above.
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#ifndef __biasbuf__
+#define __biasbuf__
+#endif
+// 注：__fbuf__ 那半其实是冗余的 —— 上游宿主 stub（tools/cpudebug/include/stub_def.h:50-53）
+// 已定义它；保留只为与 __biasbuf__ 同形，且 #ifndef 保证不会重复定义。
+#ifndef __fbuf__
+#define __fbuf__
+#endif
+#endif
+
 #include "../kernel_tpipe_impl.h"
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"

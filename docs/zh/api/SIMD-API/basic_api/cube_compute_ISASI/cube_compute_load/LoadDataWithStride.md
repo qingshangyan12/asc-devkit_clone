@@ -46,6 +46,18 @@ template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename U, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+
+template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a id="section19594184564415"></a>
 
 **表1** 模板参数说明
@@ -63,6 +75,8 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 | dst | 输出 | 目的操作数，类型为LocalTensor。数据连续排列顺序由目的操作数所在物理存储位置决定，具体约束如下：<br>&nbsp;&nbsp;&bull; L0A Buffer(TPosition: A2)：NZ格式。<br>&nbsp;&nbsp;&bull; L0B Buffer(TPosition: B2)：ZN格式。 |
 | src | 输入 | 源操作数，类型为LocalTensor。数据连续排列顺序由目的操作数所在物理存储位置决定：L1 Buffer(TPosition: A1/B1)：NC1HWC0格式。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData3DParamsV2，具体参考[表3](#table193501032193419)。 |
+
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表3** LoadData3DParamsV2结构体内参数说明<a id="table193501032193419"></a>  
 
@@ -104,6 +118,7 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 - 非转置场景下，L1 Buffer-\>L0B Buffer通路不支持。L1 Buffer-\>L0B Buffer通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
 - 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。当源地址位于L1 Buffer时，地址必须32字节对齐。
 - 必须使用辅助配置接口[SetLoadDataRepeatWithStride](../cube_load_aux_config/SetLoadDataRepeatWithStride.md)配置dstStride参数。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致：`dst` 为 `__ca__`（L0A Buffer）或 `__cb__`（L0B Buffer），`src` 为 `__cbuf__`（L1 Buffer）。元素类型可省略并由指针实参推导，也可在第二个形中通过显式模板实参 T 指定（此时 U 需与 PrimT<T> 一致）。
 
 ## 调用示例<a id="section14867162784812"></a>
 

@@ -36,6 +36,15 @@ template <typename T>
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_t c0ChStride)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeAddr(DstPtr eleWiseData, uint16_t c0ChStride)
+```
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 LocalTensor；元素类型由指针实参推导。本接口只有一个 tensor 形，不涉及 FixpipeParams 形。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1** 参数说明
@@ -44,6 +53,8 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_
 | ---------- | ---------- | ---------- |
 | eleWiseData | 输入 | L1 Buffer上的源操作数。类型为LocalTensor。<br>支持的物理位置为L1 Buffer（TPosition为A1/B1/C1）。起始地址需要保证32字节对齐，仅支持half数据类型。 |
 | c0ChStride | 输入 | 在L1 Buffer上的C0 channel stride，单位是C0_SIZE（32字节）。<br>eleWiseData沿N方向以C0为单位切分得到的数据块称为C0 channel，两块C0 channel的间隔称为C0 channel stride。 |
+
+裸指针形的 `eleWiseData` 与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 数据类型
 
@@ -55,7 +66,7 @@ LocalTensor支持的数据类型为：half。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 裸指针形下，`eleWiseData` 必须为 L1（`__cbuf__`）或 UB（`__ubuf__`）上的裸指针，元素类型由指针实参推导。
 
 ## 调用示例<a name="section6461234123118"></a>
 

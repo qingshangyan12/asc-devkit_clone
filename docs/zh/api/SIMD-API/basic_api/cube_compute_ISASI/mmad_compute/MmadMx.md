@@ -142,6 +142,18 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
   __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
   ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；元素的地址空间由指针实参本身区分。
+
 ## 参数说明
 
 **表2** 参数说明
@@ -153,6 +165,8 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition:B2）。<br>右矩阵B对应的scale矩阵起始地址为：B矩阵起始对应地址/16。<br>对于fp4场景LocalTensor的起始地址需要按照512字节对齐。对于fp8场景LocalTensor的起始地址需要按照1024字节对齐。 |
 | bias | 输入 | 源操作数，Bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br>LocalTensor的起始地址需要按照64字节对齐。 |
 | mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[MmadParams结构体内参数说明](Mmad.md#zh_cn_topic_mmad_section4_table4)。 |
+
+裸指针形的 `dst`、`fm`、`filter`、`bias` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 数据类型<a id="zh_cn_topic_mmadmx_section_datatype"></a>
 
@@ -181,6 +195,7 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
   - 右矩阵B只支持位于物理存储位置为L0B Buffer（TPosition:B2），大小64KB。
   - Bias矩阵只支持位于物理存储位置为BT Buffer（TPosition:C2），大小4KB。
 - 地址约束说明请参考表2。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致（`dst` 为 L0C 的 `__cc__`、`fm` 为 L0A 的 `__ca__`、`filter` 为 L0B 的 `__cb__`，`bias` 为偏置表对应的裸指针），元素类型可由显式模板实参或指针实参推导。
 - 当M、K、N中的任意一个值为0时，表示指令不会执行，该接口将被视为NOP（空操作）。
 - K需要是64的倍数。
 - 对于fp4场景A/B矩阵的起始地址需要按照512字节对齐，对于fp8场景A/B矩阵的起始地址需要按照1024字节对齐。

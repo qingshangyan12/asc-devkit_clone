@@ -36,6 +36,15 @@ template <typename T>
 __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTensor<T>& src)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataUnzip(DstPtr dst, SrcPtr src)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1** 参数说明
@@ -44,6 +53,8 @@ __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTens
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为A1/B1/B2。<br>LocalTensor的起始地址需要保证：<br>&nbsp;&nbsp;&bull; TPosition为A1/B1时，32字节对齐。<br>&nbsp;&nbsp;&bull; TPosition为B2时，512B对齐。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。数据类型需要与dst保持一致。 |
+
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 ## 数据类型
 
@@ -56,6 +67,7 @@ __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTens
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致：`dst` 为 `__cbuf__`（A1/B1）、`__ca__`（L0A Buffer）或 `__cb__`（L0B Buffer），`src` 为 `__gm__`（GM）。元素类型由指针实参推导。
 
 ## 调用示例<a name="section6461234123118"></a>
 

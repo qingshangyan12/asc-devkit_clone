@@ -53,6 +53,15 @@ template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParamsV2& loadDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParamsV2& loadDataParams)
+```
+
+> 上述为裸指针形，参数含义与上面同名的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
+
 ## 参数说明
 
 **表1** 模板参数说明
@@ -68,6 +77,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)。<br>起始地址对齐约束参考[对齐约束](cube_compute_input_move_constraint.md)。<br>数据类型和src的数据类型保持一致。<br>支持的物理存储位置为L0A Buffer（TPosition: A2）/L0B Buffer（TPosition: B2）。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)。<br>起始地址对齐约束参考[对齐约束](cube_compute_input_move_constraint.md)。<br>数据类型和dst的数据类型保持一致。<br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。|
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#table_load2dv2_params)。 |
+
+裸指针形的 `dst`、`src` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表3** LoadData2DParamsV2结构体内参数说明<a id="table_load2dv2_params"></a>
 
@@ -110,6 +121,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 - mStep和kStep为0时，表示不执行搬运，该接口将被视为NOP（空操作）。
 - 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐；当源地址或目的地址位于L1 Buffer时，地址必须32字节对齐。
 - 对于矩阵转置操作，不同的数据类型需要满足不同的mStep和kStep约束：b4数据类型时，mStep必须是4的倍数；b8数据类型时，mStep必须是2的倍数；b16数据类型时，mStep必须是1的倍数；b32数据类型时，kStep必须是2的倍数。
+- 裸指针形下，各操作数的地址空间须与原 tensor 形一致：`dst` 为 `__ca__`（L0A Buffer）或 `__cb__`（L0B Buffer），`src` 为 `__cbuf__`（L1 Buffer）。元素类型由指针实参推导。
 
 ## 关键特性说明
 
