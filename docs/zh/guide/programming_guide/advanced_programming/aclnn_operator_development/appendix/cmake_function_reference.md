@@ -10,16 +10,16 @@
 
 ## 函数一览
 
-| 分类 | 函数 | 功能 |
-|------|------|------|
-| Package | `npu_op_package` | 创建一个package。 |
-| Package | `npu_op_package_add` | 将目标或文件添加到package中。 |
-| Library | `npu_op_library` | 创建Host侧库。 |
-| Library | `npu_op_kernel_library` | 创建核函数（Kernel）侧库。 |
-| Library | `npu_op_kernel_options` | 添加核函数（Kernel）目标编译选项。 |
-| Library | `npu_op_kernel_sources` | 描述核函数（Kernel）目标的源码信息。 |
-| Library | `npu_op_device_tiling_library` | 创建Device侧Tiling库。 |
-| 其他 | `npu_op_code_gen` | 执行代码生成过程，生成aclnn单算子调用代码和入图所需的原型定义代码。 |
+| 分类    | 函数                             | 功能                                                                |
+| ------- | -------------------------------- | ------------------------------------------------------------------- |
+| Package | `npu_op_package`               | 创建一个package。                                                   |
+| Package | `npu_op_package_add`           | 将目标或文件添加到package中。                                       |
+| Library | `npu_op_library`               | 创建Host侧库。                                                      |
+| Library | `npu_op_kernel_library`        | 创建核函数（Kernel）侧库。                                          |
+| Library | `npu_op_kernel_options`        | 添加核函数（Kernel）目标编译选项。                                  |
+| Library | `npu_op_kernel_sources`        | 描述核函数（Kernel）目标的源码信息。                                |
+| Library | `npu_op_device_tiling_library` | 创建Device侧Tiling库。                                              |
+| 其他    | `npu_op_code_gen`              | 执行代码生成过程，生成aclnn单算子调用代码和入图所需的原型定义代码。 |
 
 ---
 
@@ -181,32 +181,52 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 - `<op_type>`（必选）：定义配置生效的范围，取值为`ALL`、`OP_TYPE`。`ALL`表示对所有算子生效，`OP_TYPE`表示对特定算子生效。
 - `[COMPUTE_UNIT <soc_version>...]`（可选）：用于设置算子在具体AI处理器型号上的编译选项，不填写该选项时默认对所有型号生效。与`SOC_SERIES`不能同时使用。
 - `[SOC_SERIES <series>...]`（可选）：用于按AI处理器系列设置编译选项。输入不区分大小写；与`COMPUTE_UNIT`不能同时使用。`SOC_SERIES`关键字后必须提供至少一个值；同一次调用同时提供`SOC_SERIES`和`COMPUTE_UNIT`，或只提供`SOC_SERIES`关键字不提供值，CMake配置阶段会报错。
->[!NOTE]说明 
->其中，AI处理器型号`soc_version`请通过以下方式获取：
-><!-- npu="910b,910,310p,310b" id1 -->
->- 针对如下产品：在安装AI处理器的服务器执行`npu-smi info`命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
->    <!-- npu="910b" id2 -->
->    Atlas A2系列产品  
->    <!-- end id2 -->
+
+> [!NOTE] ✏️ 说明
+> 其中，AI处理器型号`soc_version`请通过以下方式获取：
 >
->    <!-- npu="310b" id3 -->
->    Atlas 200I/500 A2推理产品  
->    <!-- end id3 -->
+> <!-- npu="910b,910,310p,310b" id1 -->
 >
->    <!-- npu="310p" id4 -->
->    Atlas推理系列产品  
->    <!-- end id4 -->
+> - 针对如下产品：在安装AI处理器的服务器执行`npu-smi info`命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。
 >
->    <!-- npu="910" id5 -->
->    Atlas训练系列产品<br><br> 
->    <!-- end id5 -->
-><!-- end id1 -->
-><!-- npu="A3" id6 -->
->- 针对Atlas A3系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
-><!-- end id6 -->
-><!-- npu="950" id7 -->
->- 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
-><!-- end id7 -->
+>   <!-- npu="910b" id2 -->
+>
+>   Atlas A2系列产品
+>
+>   <!-- end id2 -->
+>
+>   <!-- npu="310b" id3 -->
+>
+>   Atlas 200I/500 A2推理产品
+>
+>   <!-- end id3 -->
+>
+>   <!-- npu="310p" id4 -->
+>
+>   Atlas推理系列产品
+>
+>   <!-- end id4 -->
+>
+>   <!-- npu="910" id5 -->
+>
+>   Atlas训练系列产品
+>
+>   <!-- end id5 -->
+>
+> <!-- end id1 -->
+>
+> <!-- npu="A3" id6 -->
+>
+> - 针对Atlas A3系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。
+>
+> <!-- end id6 -->
+>
+> <!-- npu="950" id7 -->
+>
+> - 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
+>
+> <!-- end id7 -->
+
 - `OPTIONS …`（必选）：传递给编译器的编译选项。
 
 **示例：**

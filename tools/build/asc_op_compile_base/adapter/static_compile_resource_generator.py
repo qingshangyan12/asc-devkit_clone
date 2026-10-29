@@ -415,7 +415,7 @@ def gen_sk_bind_source(pairs, basic_attribute, sk_attribute):
         "#else",
         "#define __ASCENDC_SK_CAP_SET_FLAG__ 0b0ULL",
         "#endif",
-        "#ifdef __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__",
+        "#ifndef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__",
         "#define __ASCENDC_SK_CAP_DISABLE_DCCI__ 0b100ULL",
         "#else",
         "#define __ASCENDC_SK_CAP_DISABLE_DCCI__ 0b0ULL",
