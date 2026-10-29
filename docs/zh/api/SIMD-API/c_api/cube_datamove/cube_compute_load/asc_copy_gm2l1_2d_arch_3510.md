@@ -1,4 +1,4 @@
-# asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
+# asc_copy_gm2l1（NPU架构版本3510，2D矩阵搬运模式）
 
 ## 产品支持情况
 

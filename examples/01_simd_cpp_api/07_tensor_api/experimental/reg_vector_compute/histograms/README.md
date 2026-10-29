@@ -4,9 +4,11 @@
 
 本样例介绍如何使用实验性 Tensor API `asc::te::experimental::histograms`，对256个 `uint8_t` 元素统计高半区 `[128, 255]` 的累计直方图，输出128个 `uint16_t` 元素。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR&950DT系列产品
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 

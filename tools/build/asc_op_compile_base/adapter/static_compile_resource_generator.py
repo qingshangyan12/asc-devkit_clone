@@ -14,6 +14,7 @@
 import copy
 import fcntl
 import json
+import logging
 import os
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -380,9 +381,6 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
                 source_include_added = True
             index += option_size
             continue
-        if os.path.isabs(include_path) and not os.path.exists(include_path):
-            index += option_size
-            continue
         normalized.extend(argv[index : index + option_size])
         index += option_size
     if replacement is not None and not source_include_added:
@@ -511,6 +509,70 @@ def _publish_directory(stage_dir, target_dir):
         shutil.rmtree(backup_dir)
 
 
+class ManifestSourcePaths:
+    """Resolve recorded include paths without changing the commands used for compilation."""
+
+    _FLAGS = ("-isystem", "-iquote", "-idirafter", "-include", "-I")
+    _MARKER = "${source_file_path}"
+
+    def __init__(self, source_file):
+        source = Path(os.path.abspath(source_file))
+        self._source_dir = source.parent
+        self.warned = set()
+        self.maps = [(source.parent, self._MARKER)]
+
+    def _mapped(self, path):
+        for parent in (path, *path.parents):
+            if parent.name == "common" and parent.parent.name == "ascendc":
+                relative = Path(os.path.relpath(parent, self._source_dir)).as_posix()
+                if "src" in self._source_dir.parts:
+                    relative = relative.replace("/ascendc/common", "/common")
+                marker = self._MARKER if relative == "." else self._MARKER + "/" + relative
+                entry = (parent, marker)
+                if entry not in self.maps:
+                    self.maps.append(entry)
+                break
+        for root, marker in self.maps:
+            try:
+                tail = path.relative_to(root)
+            except ValueError:
+                continue
+            return marker if not tail.parts else marker + "/" + tail.as_posix()
+        return None
+
+    def _path(self, value, forced_include=False):
+        if not os.path.isabs(value):
+            return value
+        path = Path(os.path.abspath(value))
+        mapped = self._mapped(path)
+        if mapped is not None:
+            return mapped
+        directory = path.parent if forced_include else path
+        if directory not in self.warned:
+            logging.warning(
+                "Kernel Spec: external include directory '%s' has no installation mapping. "
+                "Skipping manifest generation; place the dependency under the source directory or its "
+                "ascendc/common directory.",
+                directory,
+            )
+            self.warned.add(directory)
+        return value
+
+    def rewrite(self, argv):
+        result = []
+        tokens = iter(argv)
+        for token in tokens:
+            flag = next((flag for flag in self._FLAGS if token.startswith(flag)), None)
+            if token == flag:
+                result.append(token)
+                path = next(tokens, None)
+                if path is not None:
+                    result.append(self._path(path, flag == "-include"))
+            else:
+                result.append(flag + self._path(token[len(flag) :], flag == "-include") if flag else token)
+        return result
+
+
 class ManifestPackageWriter:
     """Collect packaged Manifest resources and publish the Manifest."""
 
@@ -547,6 +609,7 @@ class ManifestPackageWriter:
         self._wrapper_paths = {}
         self._constant_info_logicals = {}
         self._wrapper_commands = []
+        self._source_paths = ManifestSourcePaths(self._source_file_path)
 
     @staticmethod
     def _append_sk_objcopy_commands(commands, rename_specs, split_specs):
@@ -586,7 +649,7 @@ class ManifestPackageWriter:
             specs.append((static_symbol, final_output, split_index, split_name))
         return tuple(specs)
 
-    def write(self) -> str:
+    def write(self) -> Optional[str]:
         os.makedirs(self._parent_dir, exist_ok=True)
         lock_path = os.path.join(self._parent_dir, f".{self._kernel_name}.manifest.lock")
         with open(lock_path, "a+", encoding="utf-8") as lock_file:
@@ -596,16 +659,22 @@ class ManifestPackageWriter:
                 self._stage_dir = tempfile.mkdtemp(prefix=f".{self._kernel_name}.stage.", dir=self._parent_dir)
                 self._collect_resources()
                 manifest = self._build_manifest()
-                _write_resources(self._stage_dir, self._resource_path, self._resources)
-                manifest_path = os.path.join(self._stage_dir, self._manifest_name)
-                with open(manifest_path, "w", encoding="utf-8") as file_obj:
-                    json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
-                    file_obj.write("\n")
+                if self._source_paths.warned:
+                    # Replace any previous package so a skipped variant cannot reuse stale resources.
+                    Path(self._stage_dir, ".manifest-skipped").write_text(
+                        "Unmapped external include directories\n", encoding="utf-8"
+                    )
+                else:
+                    _write_resources(self._stage_dir, self._resource_path, self._resources)
+                    manifest_path = os.path.join(self._stage_dir, self._manifest_name)
+                    with open(manifest_path, "w", encoding="utf-8") as file_obj:
+                        json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
+                        file_obj.write("\n")
                 # Persist the package before exposing it through the final rename.
                 _fsync_tree(self._stage_dir)
                 _publish_directory(self._stage_dir, self._target_dir)
                 self._stage_dir = ""
-                return os.path.join(self._target_dir, self._manifest_name)
+                return None if self._source_paths.warned else os.path.join(self._target_dir, self._manifest_name)
             finally:
                 if self._stage_dir and os.path.isdir(self._stage_dir):
                     shutil.rmtree(self._stage_dir)
@@ -828,7 +897,7 @@ class ManifestPackageWriter:
                 normalized[index] = source_reference
             if value.startswith("-include") and record.source_path in value:
                 normalized[index] = value.replace(record.source_path, source_reference)
-        return normalized
+        return self._source_paths.rewrite(normalized)
 
     def _rewrite_static_sk_symbols(self, argv, target_symbol, tiling_key):
         if target_symbol is None:
@@ -868,7 +937,7 @@ class ManifestPackageWriter:
             if cann_root and cann_root in value:
                 value = value.replace(cann_root, "${env:ASCEND_HOME_PATH}")
             normalized.append(value)
-        return normalized
+        return self._source_paths.rewrite(normalized)
 
 
 class KernelSpecCompilation:
@@ -906,16 +975,21 @@ class KernelSpecCompilation:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if not self.record_sk_commands:
-            return False
-        global_var_storage = storage_module.global_var_storage
-        try:
-            self.cleanup()
-        finally:
-            # Restore the entry state even when replay or cleanup fails.
-            for name, value in self._global_state.items():
-                global_var_storage.set_variable(name, value)
+        if self.record_sk_commands:
+            try:
+                self.cleanup()
+            finally:
+                # Restore the entry state even when publication or cleanup fails.
+                for name, value in self._global_state.items():
+                    storage_module.global_var_storage.set_variable(name, value)
         return False
+
+    def _manifest_error(self, reason):
+        utility_module.CommonUtility.ascendc_raise_python_err(
+            error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+            f"Kernel Spec manifest generation failed: kernel={self.compile_info.kernel_name}, "
+            f"mode={self._kernel_spec_mode}, output_dir={self.kernel_spec_dir}; {reason}",
+        )
 
     @classmethod
     def create(cls, compile_info, compile_option_tuple, tiling_info):
@@ -959,7 +1033,7 @@ class KernelSpecCompilation:
     def publish_manifest(self, tiling_info, workspace_idx):
         if not self.enabled:
             return
-        # Publish after the Resource ID and all requested commands are available.
+        # The writer validates and publishes the complete package atomically.
         try:
             ManifestPackageWriter(
                 ManifestInputSnapshot(
@@ -973,10 +1047,8 @@ class KernelSpecCompilation:
                     sk_compile_info=self.sk_compile_info,
                 )
             ).write()
-        except ManifestGenerationError as error:
-            utility_module.CommonUtility.ascendc_raise_python_err(
-                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE, f"generate Manifest failed, reason is: {error}"
-            )
+        except (ManifestGenerationError, OSError) as error:
+            self._manifest_error(str(error))
 
     def cleanup(self):
         if self._cleaned:

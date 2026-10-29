@@ -1,4 +1,4 @@
-# asc_copy_gm2ub
+# asc_copy_gm2ub（NPU架构版本3510）
 
 ## 产品支持情况
 

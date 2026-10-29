@@ -121,4 +121,86 @@ TEST_F(PeerOnlyPrepareTest, WorkspaceLayoutUnchanged)
     EXPECT_EQ(offsetof(CommonPrepareParamCcu, skipLocalRankCopy), offsetof(CommonPrepareParamCcu, repeat) + 1);
     EXPECT_EQ(sizeof(CommonPrepareParamCcu) % 64, 0U);
 }
+
+// Covers the CommonPrepareImpl param checks in hccl_ccu_v0.h L453-467:
+// dataTypeSize == 0, count > CCU_MAX_COMM_DATA / dataTypeSize and handleId >= HCCL_MAX_HANDLE_ID
+// must all be rejected with INVALID_HANDLE_ID, without consuming a handle slot.
+class CommonPrepareCheckTest : public ::testing::Test {
+protected:
+    using Impl = HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, DEFAULT_CFG>;
+    Impl impl;
+    CommonPrepareParamCcu handles[HCCL_MAX_HANDLE_ID]{};
+    HcclCombineOpParam context{};
+
+    CommonPrepareParam MakeParam(
+        uint64_t count, HcclDataType dataType, HcclCMDType prepareType = HcclCMDType::HCCL_CMD_ALLREDUCE)
+    {
+        CommonPrepareParam param{};
+        param.commType.prepareType = prepareType;
+        param.sendBuf = reinterpret_cast<GM_ADDR>(0x100000);
+        param.recvBuf = reinterpret_cast<GM_ADDR>(0x200000);
+        param.count = count;
+        param.dataType = dataType;
+        param.dstDataType = dataType;
+        param.op = HCCL_REDUCE_MAX;
+        param.strideCount = 0;
+        param.repeat = 1;
+        return param;
+    }
+
+    void SetUp() override
+    {
+        context.rankNum = 2;
+        context.rankId = 1;
+        impl.isInited_ = true;
+        impl.curHandleId_ = 0;
+        impl.workingFlag_ = false;
+        impl.hcclContext_ = &context;
+        impl.handleParamGM_ = handles;
+    }
+};
+
+// Payload of count * dataTypeSize beyond CCU_MAX_COMM_DATA is rejected and does not consume a handle.
+TEST_F(CommonPrepareCheckTest, PrepareRejectsCountBeyondCcuMaxCommData)
+{
+    const uint64_t int8MaxCount = CCU_MAX_COMM_DATA / GetHcclDataTypeSize(HCCL_DATA_TYPE_INT8);
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(int8MaxCount + 1, HCCL_DATA_TYPE_INT8)), INVALID_HANDLE_ID);
+    EXPECT_EQ(impl.curHandleId_, 0);
+    // Multi-byte dtype shrinks the element budget by its size.
+    const uint64_t fp32MaxCount = CCU_MAX_COMM_DATA / GetHcclDataTypeSize(HCCL_DATA_TYPE_FP32);
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(fp32MaxCount + 1, HCCL_DATA_TYPE_FP32)), INVALID_HANDLE_ID);
+    EXPECT_EQ(impl.curHandleId_, 0);
+}
+
+// count exactly at CCU_MAX_COMM_DATA / dataTypeSize still passes the check and gets a valid handle.
+TEST_F(CommonPrepareCheckTest, PrepareAcceptsCountAtCcuMaxCommDataBoundary)
+{
+    const uint64_t int8MaxCount = CCU_MAX_COMM_DATA / GetHcclDataTypeSize(HCCL_DATA_TYPE_INT8);
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(int8MaxCount, HCCL_DATA_TYPE_INT8)), 0);
+    EXPECT_EQ(impl.curHandleId_, 1);
+    const uint64_t fp32MaxCount = CCU_MAX_COMM_DATA / GetHcclDataTypeSize(HCCL_DATA_TYPE_FP32);
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(fp32MaxCount, HCCL_DATA_TYPE_FP32)), 1);
+    EXPECT_EQ(impl.curHandleId_, 2);
+}
+
+// Once curHandleId_ reaches HCCL_MAX_HANDLE_ID, any further Prepare is rejected; the last valid slot
+// below the limit still succeeds.
+TEST_F(CommonPrepareCheckTest, PrepareRejectsWhenHandleIdReachesMax)
+{
+    impl.curHandleId_ = HCCL_MAX_HANDLE_ID;
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(1, HCCL_DATA_TYPE_INT8)), INVALID_HANDLE_ID);
+    EXPECT_EQ(impl.curHandleId_, HCCL_MAX_HANDLE_ID);
+    impl.curHandleId_ = HCCL_MAX_HANDLE_ID - 1;
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(MakeParam(1, HCCL_DATA_TYPE_INT8)), HCCL_MAX_HANDLE_ID - 1);
+    EXPECT_EQ(impl.curHandleId_, HCCL_MAX_HANDLE_ID);
+}
+
+// BATCH_WRITE is the only prepareType whose zero-sized dtype reaches the dataTypeSize == 0 branch of
+// the check (other types are filtered out earlier in CommonPrepareImpl).
+TEST_F(CommonPrepareCheckTest, PrepareRejectsBatchWriteWithZeroSizedDtype)
+{
+    const CommonPrepareParam param = MakeParam(1, HCCL_DATA_TYPE_RESERVED, HcclCMDType::HCCL_CMD_BATCH_WRITE);
+    EXPECT_EQ(impl.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+    EXPECT_EQ(impl.curHandleId_, 0);
+}
 } // namespace

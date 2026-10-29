@@ -163,7 +163,7 @@ __simd_vf__ inline void sub_carry_vf(
 #include "tensor_api/experimental/vector_ops.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void sub_carry_with_borrow_vf(
+__simd_vf__ inline void sub_carry_with_carry_vf(
     const InputTensor input0, const InputTensor input1, OutputTensor output, uint16_t repeat_times,
     uint32_t total, uint32_t one_repeat_size)
 {

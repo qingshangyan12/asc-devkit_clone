@@ -22,6 +22,9 @@
 | [make_mem_ptr](tensor/make_mem_ptr.md) | 根据指针和存储位置构造Tensor API内存指针对象。 |
 | [make_tensor](tensor/make_tensor.md) | 将内存指针和Layout绑定，构造global_tensor或local_tensor。 |
 | [slice](tensor/slice.md) | 根据起始坐标和Shape或Layout描述创建原Tensor的子Tensor。 |
+| [mutex_id](sync/mutex.md) | 流水锁硬件ID类型别名。 |
+| [mutex](sync/mutex.md) | 对象式流水锁，通过编译期流水参数和运行期锁ID控制核内异步流水资源交接。 |
+| [lock_guard](sync/lock_guard.md) | 作用域锁保护对象，析构时自动释放引用的mutex。 |
 
 ## Layout操作
 
@@ -70,6 +73,7 @@
 | [L0C Buffer到Unified Buffer](matrix_compute/cube_compute_store/copy_l0c_to_ub.md) | 使用`copy`将L0C Buffer中的矩阵结果搬运到UB，支持格式转换和量化输出。 |
 | [L0C Buffer到L1 Buffer](matrix_compute/cube_compute_store/copy_l0c_to_l1.md) | 使用`copy`将L0C Buffer中的矩阵结果搬运到L1 Buffer。 |
 | [Unified Buffer内部搬运](reg_vector_compute/vector_compute_load/copy_ub_to_ub.md) | 使用`copy`完成UB内部Tensor之间的数据搬运。 |
+| [fill](matrix_compute/cube_data_fill/fill.md) | 按32字节物理块单位将标量填充值写入L1 Buffer。 |
 
 ## 矩阵计算
 
@@ -101,6 +105,10 @@
 
 | 接口或类型名 | 功能描述 |
 | --- | --- |
+| [cast_layout](reg_vector_compute/aux_data_types/cast_layout.md) | 指定寄存器类型转换中的数据排布位置。 |
+| [cast_round_mode](reg_vector_compute/aux_data_types/cast_round_mode.md) | 指定寄存器类型转换的舍入方式。 |
+| [cast_sat_mode](reg_vector_compute/aux_data_types/cast_sat_mode.md) | 指定寄存器类型转换是否采用饱和模式。 |
+| [merge_mode](reg_vector_compute/aux_data_types/merge_mode.md) | 指定带Mask的寄存器写入操作中，目的寄存器未被选中元素的处理方式。 |
 | [reg_tensor](reg_vector_compute/reg_tensor/reg_tensor.md) | 封装矢量数据寄存器及其掩码寄存器，用于寄存器数据计算。 |
 | [reg_pair](reg_vector_compute/reg_tensor/reg_pair.md) | 保存两个元素类型相同的`reg_tensor`，用于具有双结果的寄存器接口。 |
 | [all_mask](reg_vector_compute/mask_reg_compute/all_mask.md) | 创建与指定元素类型位宽匹配的全有效Mask寄存器。 |
@@ -136,6 +144,7 @@
 | [-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对两个源操作数逐元素执行减法计算。 |
 | [*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
 | [/](reg_vector_compute/basic_arithmetic/div.md) | 对两个源操作数逐元素执行除法计算。 |
+| [div](reg_vector_compute/basic_arithmetic/div_software.md) | 对两个源操作数逐元素执行除法计算，支持通过模板参数配置除法精度和算法。 |
 | [prelu](reg_vector_compute/basic_arithmetic/prelu.md) | 对源操作数逐元素执行PReLU计算。 |
 | [relu](reg_vector_compute/basic_arithmetic/relu.md) | 对源操作数逐元素执行ReLU计算。 |
 | [sqrt](reg_vector_compute/basic_arithmetic/sqrt.md) | 对源操作数逐元素计算平方根。 |
@@ -190,10 +199,53 @@
 | [get_layout_pattern](utils/get_layout_pattern.md) | 从Layout类型中提取Layout Pattern类型信息。 |
 | [类型判断与提取工具](utils/type_traits.md) | 提供Layout、Tensor、Coord、Shape、量化参数等类型判断工具。 |
 | [print打印接口](utils/print.md) | 提供Tensor API调试场景下的格式化、Layout表格和Tensor元素打印能力。 |
+| [init_soc_state](utils/init_soc_state.md) | 将当前AI Core的全局控制状态恢复为初始状态。 |
+| [get_sub_block_id](utils/get_sub_block_id.md) | 获取当前逻辑AI Core上AIC或AIV的逻辑索引。 |
+| [get_sub_block_num](utils/get_sub_block_num.md) | 获取当前AI Core上AIC或AIV的数量。 |
+| [get_vf_len](utils/get_vf_len.md) | 获取矢量寄存器长度，单位为字节。 |
+| [get_phy_buf_addr](utils/get_phy_buf_addr.md) | 根据偏移量获取片上实际物理地址。 |
+
+## 搬运配置
+
+**表8** 搬运配置接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [set_copy_pad_val](data_move/set_copy_pad_val.md) | 设置GM到UB对齐搬运使用的常量填充值。 |
+
+## 同步控制
+
+**表9** 同步控制接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [block、intra、inter和subblock同步](sync/block_sync.md) | 提供block、intra、inter和subblock四类到达/等待同步接口。 |
+| [sync_data_barrier](sync/data_barrier.md) | 等待前序内存访问指令执行完成。 |
+| [sync_pipe](sync/sync_pipe.md) | 等待指定流水或全部流水的前序指令执行完成。 |
+
+## 原子操作
+
+**表10** 原子操作接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [set_atomic_add](atomic/set_atomic_add.md) | 对后续受支持的目的地址为GM的搬运开启原子累加。 |
+| [set_atomic_max](atomic/set_atomic_max.md) | 对后续受支持的目的地址为GM的搬运开启原子取大。 |
+| [set_atomic_min](atomic/set_atomic_min.md) | 对后续受支持的目的地址为GM的搬运开启原子取小。 |
+| [disable_dma_atomic](atomic/disable_dma_atomic.md) | 关闭DMA原子模式。 |
+
+## 缓存控制
+
+**表11** 缓存控制接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [datacache_clean_and_invalid](cache_control/datacache_clean_and_invalid.md) | 按目标域清理并失效Data Cache中的缓存行。 |
+| [datacache_clean](cache_control/datacache_clean.md) | 将整个Data Cache标记为无效，不回写脏数据。 |
 
 ## 废弃接口
 
-**表8**  废弃接口列表
+**表12**  废弃接口列表
 
 | 接口名 | 功能描述 |
 | --- | --- |

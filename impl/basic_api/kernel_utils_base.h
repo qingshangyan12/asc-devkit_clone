@@ -32,11 +32,6 @@
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
-#include "c_api/utils/sys_init.h"
-#endif
-
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
@@ -70,7 +65,35 @@ public:
     __aicore__ static inline void InitSocStateImpl()
     {
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
-        ::asc_init();
+#if !defined(__BISHENG_ENABLE_ASC_INIT)
+        set_atomic_none();
+        set_mask_norm();
+#if __NPU_ARCH__ == 2201
+        if ASCEND_IS_AIC {
+            set_l1_3d_size(static_cast<uint64_t>(0));
+            set_padding(static_cast<uint64_t>(0));
+        } else {
+            set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
+        }
+#else
+        uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
+        uint64_t val = 0x1000000000000008 | prevCtrl;
+        set_ctrl(val);
+        if ASCEND_IS_AIC {
+            set_padding(static_cast<uint64_t>(0));
+            uint64_t loopSizePara = (1uL << 21) | 1uL;
+            set_loop_size_outtol1(loopSizePara);
+        } else {
+            set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
+            uint64_t loopSizePara = (1uL << 21) | 1uL;
+            set_loop_size_ubtoout(loopSizePara);
+            set_loop_size_outtoub(loopSizePara);
+        }
+#if __NPU_ARCH__ == 3510
+        set_st_atomic_cfg(0b00100100);
+#endif
+#endif
+#endif
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         Internal::g_deqValue = static_cast<half>(1);
 #endif
