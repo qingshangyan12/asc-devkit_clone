@@ -27,7 +27,11 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
 #include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
 #include "kernel_struct_unary.h"
 #include "kernel_struct_binary.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"

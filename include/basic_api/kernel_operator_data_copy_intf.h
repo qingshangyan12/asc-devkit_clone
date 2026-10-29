@@ -30,7 +30,11 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
 #include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
