@@ -44,7 +44,7 @@ std::string CfgGenerator::GetParamTypeName(uint32_t paramType) const
 {
     std::vector<std::string> ptstrs = {"ignore", "optional", "required", "dynamic", "optional"};
     if (paramType >= ptstrs.size()) {
-        return std::string("unknow");
+        return std::string("unknown");
     }
     return ptstrs[paramType];
 }
@@ -117,9 +117,9 @@ void GenSingleInitValueTypeAndValue(std::ofstream& outfile, const ScalarVar& sca
             outfile << "\"type\": \"float16\", \"value\": " << std::to_string(scalar.scalar_num.value_f32);
             break;
         default:
-            ASCENDLOGE("InitValue(ScalarVar) use unsupport type, please check!");
+            ASCENDLOGE("InitValue(ScalarVar) use unsupported type, please check!");
             Generator::SetErrorMessage(
-                "GenSingleInitValueTypeAndValue: InitValue(ScalarVar) use unsupport type, View plog for details");
+                "GenSingleInitValueTypeAndValue: InitValue(ScalarVar) use unsupported type, View plog for details");
             break;
     }
     return;

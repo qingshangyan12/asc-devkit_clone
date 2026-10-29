@@ -470,7 +470,7 @@ __aicore__ inline void QuantizePerGroupForKCol(
         QuantizePerGroupForKColFp4<config, DstT, SrcT, ScaleT>(dstTensor, srcTensor, scale, params);
 #endif
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for Quantize!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for Quantize!"); });
     }
 }
 
@@ -694,7 +694,7 @@ __aicore__ inline void QuantizePerGroupForKRow(
         QuantizePerGroupForKRowFp4<config, DstT, SrcT, ScaleT>(dstTensor, srcTensor, scale, params);
 #endif
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport dstT for Quantize!"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported dstT for Quantize!"); });
     }
 }
 
@@ -959,8 +959,8 @@ __aicore__ inline void QuantizePerTensor(
     const QuantizeParams& params)
 {
     static_assert(TypeUtils::IsInnerDefaultType<ScaleT>(), "Quantize PerTensor ScaleT should be Scalar");
-    static_assert(TypeUtils::IsInnerDefaultType<OffsetT>(), "Quantize PerTensor OffsetT should be Scalar");
-    static_assert(IsSameType<ScaleT, OffsetT>::value, "ScaleT and OffsetT should be the same type");
+    static_assert(TypeUtils::IsInnerDefaultType<OffsetT>(), "Quantize PerTensor offset should be Scalar");
+    static_assert(IsSameType<ScaleT, OffsetT>::value, "ScaleT and offset should be the same type");
     QuantizeUtils::CheckApiDtypeValid<DstT, SrcT, ScaleT>();
     QuantizePerTensorCommon<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
 }

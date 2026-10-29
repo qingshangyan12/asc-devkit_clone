@@ -98,7 +98,7 @@ __aicore__ inline void TPipe::Init()
     g_lastTpipeInitPos = get_pc();
 #endif
     ResetPool();
-    // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
+    // for matmul macro, set flag M_MTE1 at the beginning of operator, and also wait flag at the end.
     // matmul macro only use M_MTE1 event id 0 1 currently.
 #if __NPU_ARCH__ == 2201
     if ASCEND_IS_AIC {
@@ -229,7 +229,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "buffer number is %u, which should be the same as TQueConfig::bufferNumber(%u)", num,
             que.config.bufferNumber));
-    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Postion L1 Buffer(TSCM)");
+    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Position L1 Buffer(TSCM)");
     Hardware pool = GetBufferPos(T::srcPosition, T::dstPosition);
     que.bufStart = this->g_tpipeImpl.buf_ + this->g_tpipeImpl.curBufSize_;
     que.value = num;

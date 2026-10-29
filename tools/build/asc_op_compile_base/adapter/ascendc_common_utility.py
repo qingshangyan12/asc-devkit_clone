@@ -986,7 +986,7 @@ def gen_func_align_attribute(align_size):
 def add_compile_options(tiling_so_path, compile_options: list):
     if not os.path.exists(tiling_so_path):
         CommonUtility.print_compile_log(
-            "", "Not found tiling so file, use default api soc verison", AscendCLogLevel.LOG_WARNING
+            "", "Not found tiling so file, use default api soc version", AscendCLogLevel.LOG_WARNING
         )
         compile_options.append("-DASCENDC_API_VERSION=20250330")
         return
@@ -1009,7 +1009,7 @@ def add_compile_options(tiling_so_path, compile_options: list):
         if line_content == "":
             compile_options.append("-DASCENDC_API_VERSION=20250330")
             CommonUtility.print_compile_log(
-                "", "not found api version, use default api soc verison", AscendCLogLevel.LOG_INFO
+                "", "not found api version, use default api soc version", AscendCLogLevel.LOG_INFO
             )
             return
         hex_num = line_content.split(" ")[2:4]
@@ -1017,7 +1017,7 @@ def add_compile_options(tiling_so_path, compile_options: list):
         bytes_data = bytes.fromhex(hex_num_str)
         dec_data = struct.unpack(">Q", bytes_data)[0]
         compile_options.append(f"-DASCENDC_API_VERSION={dec_data}")
-        CommonUtility.print_compile_log("", f"set api soc verison: {dec_data}", AscendCLogLevel.LOG_INFO)
+        CommonUtility.print_compile_log("", f"set api soc version: {dec_data}", AscendCLogLevel.LOG_INFO)
     else:
         compile_options.append("-DASCENDC_API_VERSION=20250330")
         CommonUtility.print_compile_log(
@@ -1028,7 +1028,7 @@ def add_compile_options(tiling_so_path, compile_options: list):
 def process_ascendc_api_version(cce_file: str, compile_options: list, extend_options):
     for sub_option in compile_options:
         if "-DASCENDC_API_VERSION" in sub_option:
-            CommonUtility.print_compile_log("", "Api soc verison has been set", AscendCLogLevel.LOG_INFO)
+            CommonUtility.print_compile_log("", "Api soc version has been set", AscendCLogLevel.LOG_INFO)
             return
 
     pyf_path = ""

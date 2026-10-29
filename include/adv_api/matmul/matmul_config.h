@@ -271,7 +271,7 @@ struct MatmulFuncParams {
     uint32_t doMTE2Preload;    // enable the preload function for M/N direction to reduce the MTE2 gap
     IterateOrder iterateOrder; // the loop iterate order of M or N direction
     ScheduleType scheduleType; // the type of Matmul data copy
-    bool enableReuse = true;   // enable directly pass the calculate data for the dataPtr in the callback funtion
+    bool enableReuse = true;   // enable directly pass the calculate data for the dataPtr in the callback function
                                //   set by the SetSelfDefineData function
     bool enableUBReuse;        // enable reuse of UB buffer to cache double data for two iterate
     bool isPartialOutput = false;       // enable K axis does not atomic add

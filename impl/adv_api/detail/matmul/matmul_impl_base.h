@@ -675,7 +675,7 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     const LocalTensor<DstT>& co2Local, uint8_t enAtomic, bool enSequentialWrite)
 {
     if constexpr (!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB()) {
-        static_assert(!ToMatmulConfig(MM_CFG).isPartialOutput, "PartialOutput not support local postion output");
+        static_assert(!ToMatmulConfig(MM_CFG).isPartialOutput, "PartialOutput not support local position output");
     }
     if constexpr (PhyPosIsL0C(C_TYPE::pos)) {
         return;

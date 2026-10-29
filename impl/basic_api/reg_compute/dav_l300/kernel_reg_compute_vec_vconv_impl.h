@@ -179,7 +179,7 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, int32_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<RegU, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     RegTensor<int32_t> tmpReg0;
     RegTensor<int32_t> tmpReg1;
@@ -204,7 +204,7 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, int64_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<RegT, RegTraitNumOne>(), "RegTensor dstReg can only be RegTraitNumOne");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto satModeValue =
@@ -230,7 +230,7 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<int64_t, float>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<RegU, RegTraitNumOne>(), "RegTensor srcReg can only be RegTraitNumOne");
     RegTensor<float> tmpReg0;
     RegTensor<float> tmpReg1;
@@ -257,7 +257,7 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Cast api only supported Mode ZEROING on current device!");
     static_assert(
         SupportType<Tuple<ActualT, ActualU>, Tuple<float, int64_t>>(),
-        "CastImpl unsupport this datatype on current device");
+        "CastImpl unsupported this datatype on current device");
     static_assert(CheckRegTrait<RegT, RegTraitNumOne>(), "RegTensor dstReg can only be RegTraitNumOne");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     const auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(RegLayout::ZERO)>();

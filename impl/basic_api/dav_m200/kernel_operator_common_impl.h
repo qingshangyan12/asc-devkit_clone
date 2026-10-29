@@ -95,7 +95,7 @@ __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& che
     } else if (checkParams.enableBit == SET_DATA_EXP_THREE) {
         set_data_exp_3(config);
     } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupport this enableBit on current device"); });
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported this enableBit on current device"); });
     }
 }
 

@@ -93,7 +93,7 @@ private:
             CopyOutNZ2NZ<enSequentialWrite>(
                 dst, co1Local, curRow, curCol, baseHeight, baseWidth, baseBlockHeight, baseBlockWidth);
         } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Copy: unsupport Matmul format type."); });
+            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Copy: unsupported Matmul format type."); });
         }
     }
 
@@ -109,7 +109,7 @@ private:
             CopyOutNZ2NZ<enSequentialWrite>(
                 dst, co2Local, co1Local, curRow, curCol, baseHeight, baseWidth, baseBlockHeight, baseBlockWidth);
         } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Copy: unsupport Matmul format type."); });
+            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Copy: unsupported Matmul format type."); });
         }
     }
 

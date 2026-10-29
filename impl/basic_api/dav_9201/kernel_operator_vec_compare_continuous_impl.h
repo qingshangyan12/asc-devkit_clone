@@ -130,7 +130,7 @@ __simd_callee__ inline void CompareLessDouble(
     Reg::Copy(high0, (Reg::RegTensor<uint32_t>&)tmpSrcReg0.reg[1], mask);
     Reg::Copy(high1, (Reg::RegTensor<uint32_t>&)tmpSrcReg1.reg[1], mask);
 
-    // handle nan: any comparision (except for NE) with nan is false
+    // handle nan: any comparison (except for NE) with nan is false
     IsNanFull(cmpMask0, low0, high0, scalar0, scalar1, scalar2, cmpMask, cmpMask2, dstMask, mask);
     IsNanFull(cmpMask1, low1, high1, scalar0, scalar1, scalar2, cmpMask, cmpMask2, dstMask, mask);
 

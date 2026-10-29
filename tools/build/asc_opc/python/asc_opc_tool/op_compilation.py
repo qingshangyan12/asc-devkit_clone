@@ -243,7 +243,7 @@ class OpCompilation:
         """
         # if op func not contain param "imple_mode", set impl_mode in opc_compile_args to None
         # else if user not set imple_mode, use op func param default value
-        # otherwise use user configed value
+        # otherwise use user configured value
         op_func = op_info.get(OpcOptions.OP_FUNC_ATTR)
         impl_mode_default = inspect.signature(op_func).parameters.get(OpcOptions.IMPL_MODE, None)
         if impl_mode_default is None:
@@ -343,7 +343,7 @@ class OpCompilation:
 
             self.__compile_res = True
         except Exception as e:
-            logger.error("Exception occured, %s", str(e))
+            logger.error("Exception occurred, %s", str(e))
             self.record_compile_error_info(op_info, idx, op, str(e))
             self.__compile_res = False
         finally:
