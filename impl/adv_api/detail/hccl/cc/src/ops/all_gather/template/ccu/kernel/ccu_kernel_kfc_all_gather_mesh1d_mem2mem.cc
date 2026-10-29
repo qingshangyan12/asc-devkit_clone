@@ -308,7 +308,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
     // 按芯片版本选择本卡数据拷贝方式：Ascend950(CCU_V1)与Ascend960(CCU_V2)均使用 GroupCopy，
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
