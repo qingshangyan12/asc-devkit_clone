@@ -106,8 +106,8 @@ inline DetailBatch& DetailTotals()
     static thread_local DetailBatch totals{};
     return totals;
 }
-// Backend schema 1: four execution contexts, 36 uint64_t words per context.
-constexpr uint32_t BACKEND_WORDS = 36;
+// Backend schema 2: four execution contexts, 50 uint64_t words per context.
+constexpr uint32_t BACKEND_WORDS = 50;
 constexpr uint32_t BACKEND_ZONES = 4;
 enum BackendZone : uint32_t { EXECUTE, FLUSH, SEAL, REPLAY };
 struct BackendBatch {
@@ -120,7 +120,7 @@ inline BackendBatch& BackendTotals()
     return batch;
 }
 // Sparse hex serialization is performed only after the message loop exits.
-// Bounded buffer covers all 144 index:value pairs even at UINT64_MAX.
+// Bounded buffer covers all 200 index:value pairs even at UINT64_MAX.
 inline bool FormatBackend(char* text, size_t capacity)
 {
     size_t used = 0;
@@ -287,7 +287,7 @@ inline void Finish(uint32_t status)
     if (++b.count != SAMPLES_PER_BATCH)
         return;
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
-    char backendText[4096];
+    char backendText[6144];
     const bool backendValid = FormatBackend(backendText, sizeof(backendText));
     if (!backendValid) { backendText[0] = '-'; backendText[1] = '\0'; }
     // MC2_CACHE_DETAIL_DIAG END
@@ -298,7 +298,7 @@ inline void Finish(uint32_t status)
         // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
         " detail_schema=2 detail_ns=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu "
         "detail_calls=%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu "
-        "backend_schema=1 backend_bindings=%llu backend_unavailable=%llu backend_valid=%u backend=%s"
+        "backend_schema=2 backend_bindings=%llu backend_unavailable=%llu backend_valid=%u backend=%s"
         // MC2_CACHE_DETAIL_DIAG END
         ,
         LOG_SCHEMA_VERSION, static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last), b.count,
