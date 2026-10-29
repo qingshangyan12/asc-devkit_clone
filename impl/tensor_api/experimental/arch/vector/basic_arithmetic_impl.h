@@ -858,18 +858,39 @@ __simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_te
 {
     static_assert(detail::supports_div_v<T>, "div does not support this element type");
     static_assert(
-        algo == div_algo::INTRINSIC || algo == div_algo::PRECISION_0ULP_FTZ_TRUE,
+        algo == div_algo::INTRINSIC || algo == div_algo::DIFF_COMPENSATION ||
+            algo == div_algo::PRECISION_1ULP_FTZ_TRUE || algo == div_algo::PRECISION_0ULP_FTZ_TRUE ||
+            algo == div_algo::PRECISION_0ULP_FTZ_FALSE || algo == div_algo::PRECISION_1ULP_FTZ_FALSE,
         "div does not support this algorithm");
     static_assert(!precisionMode || AscendC::Std::is_same_v<T, float>, "div precision modes only support float");
     static_assert(
-        precisionMode || algo == div_algo::INTRINSIC, "div_algo::PRECISION_0ULP_FTZ_TRUE requires precisionMode=true");
+        (algo != div_algo::DIFF_COMPENSATION && algo != div_algo::PRECISION_0ULP_FTZ_TRUE &&
+            algo != div_algo::PRECISION_0ULP_FTZ_FALSE) || AscendC::Std::is_same_v<T, float>,
+        "div 0-ULP algorithms only support float");
+    static_assert(
+        algo != div_algo::PRECISION_1ULP_FTZ_FALSE || AscendC::Std::is_same_v<T, half> ||
+            AscendC::Std::is_same_v<T, float>,
+        "div PRECISION_1ULP_FTZ_FALSE only supports half/float");
+
+    constexpr bool usePrecision = precisionMode || algo == div_algo::DIFF_COMPENSATION ||
+        algo == div_algo::PRECISION_0ULP_FTZ_TRUE || algo == div_algo::PRECISION_0ULP_FTZ_FALSE;
+    constexpr bool preserveSubnormal = algo == div_algo::PRECISION_0ULP_FTZ_FALSE ||
+        (!precisionMode && algo == div_algo::PRECISION_1ULP_FTZ_FALSE)
+#if !defined(__ASC_FTZ__)
+        || (algo != div_algo::PRECISION_0ULP_FTZ_TRUE &&
+            (precisionMode || algo != div_algo::PRECISION_1ULP_FTZ_TRUE))
+#endif
+        ;
 
     auto mask = src0.mask;
     reg_tensor<T> dst;
-    if constexpr (!precisionMode) {
-#if defined(__ASC_FTZ__)
-        asc_div(dst.reg, src0.reg, src1.reg, mask);
-#else
+    if constexpr (usePrecision) {
+        if constexpr (preserveSubnormal) {
+            detail::div_subnormal<true>(dst.reg, src0.reg, src1.reg, mask);
+        } else {
+            detail::div_precision(dst.reg, src0.reg, src1.reg, mask, false);
+        }
+    } else if constexpr (preserveSubnormal) {
         if constexpr (AscendC::Std::is_same_v<T, float>) {
             detail::div_subnormal<false>(dst.reg, src0.reg, src1.reg, mask);
         } else if constexpr (AscendC::Std::is_same_v<T, half>) {
@@ -877,17 +898,8 @@ __simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_te
         } else {
             asc_div(dst.reg, src0.reg, src1.reg, mask);
         }
-#endif
     } else {
-        if constexpr (algo == div_algo::PRECISION_0ULP_FTZ_TRUE) {
-            detail::div_precision(dst.reg, src0.reg, src1.reg, mask, false);
-        } else {
-#if defined(__ASC_FTZ__)
-            detail::div_precision(dst.reg, src0.reg, src1.reg, mask, false);
-#else
-            detail::div_subnormal<true>(dst.reg, src0.reg, src1.reg, mask);
-#endif
-        }
+        asc_div(dst.reg, src0.reg, src1.reg, mask);
     }
     dst.mask = src0.mask;
     return dst;
