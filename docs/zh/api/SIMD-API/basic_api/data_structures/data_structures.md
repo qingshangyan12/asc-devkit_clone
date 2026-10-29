@@ -7,3 +7,5 @@
 - **[LocalTensor](LocalTensor/LocalTensor.md)**
 
 - **[GlobalTensor](GlobalTensor/GlobalTensor.md)**
+
+- **[GetUnderlyingPtr](GetUnderlyingPtr.md)**
