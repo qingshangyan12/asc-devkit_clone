@@ -93,10 +93,10 @@ def build_l0a_golden():
 
 def build_l0b_golden():
     golden = []
-    for _ in range(32 // 16):
-        for n in range(MMAD_N):
-            value = HIFLOAT8_ONE_VALUE if n < 16 else 0.0
-            golden.extend([value] * 16)
+    for n1 in range(MMAD_N // 16):
+        value = HIFLOAT8_ONE_VALUE if n1 == 0 else 0.0
+        for _ in range(16):
+            golden.extend([value] * 32)
     return golden
 
 
