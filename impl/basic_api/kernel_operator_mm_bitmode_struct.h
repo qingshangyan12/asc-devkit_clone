@@ -33,9 +33,6 @@
 #if (__NPU_ARCH__ == 3103)
 #include "dav_l310/kernel_operator_mm_bitmode_impl.h"
 #endif
-#elif defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-#include "dav_5161/kernel_operator_mm_bitmode_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
 #include "dav_5162/kernel_operator_mm_bitmode_impl.h"
 #endif
