@@ -4,7 +4,7 @@
 
 For direct Python CLI experiments, use `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`.
 
-Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter` or `--dry-run` do not clean `opp/vendors`.
+Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--exact-filter`, `--exclude`, or `--dry-run` do not clean `opp/vendors`.
 
 ## Quick Start
 

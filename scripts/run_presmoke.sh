@@ -170,7 +170,7 @@ should_clean_cann_vendors() {
     local arg
     for arg in "$@"; do
         case "$arg" in
-            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*) return 1 ;;
+            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*) return 1 ;;
         esac
     done
     return 0
