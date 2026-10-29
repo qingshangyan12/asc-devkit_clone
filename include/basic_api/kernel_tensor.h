@@ -167,6 +167,20 @@ public:
 
     template <typename S>
     void SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
+    /*
+     * @ingroup SetAddrWithOffset
+     * @brief Reset the tensor address from a raw pointer and an element offset
+     * @param [in] src raw pointer whose address seeds the tensor
+     * @param [in] offset element offset added to that address
+     *
+     * Raw pointer form of SetAddrWithOffset (isomorphic rewrite of the pure address arithmetic in
+     * the Tensor form).  In this build the pointer IS the absolute address, so absAddr is what is
+     * written; logicPos / dataLen / bufferHandle stay as `*this` had them, because a bare pointer
+     * has nowhere to carry them.  The device-branch declaration below carries the full rationale.
+     */
+    template <typename S>
+    void SetAddrWithOffset(S*& src, uint32_t offset);
+
     inline void Print();
     inline void Print(uint32_t len);
     int32_t ToFile(const std::string& fileName) const;
@@ -185,6 +199,50 @@ public:
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
+    /*
+     * @ingroup SetAddrWithOffset
+     * @brief Reset the tensor address from a raw pointer and an element offset
+     * @param [in] src raw pointer whose address seeds the tensor
+     * @param [in] offset element offset added to that address
+     *
+     * Raw-pointer form of SetAddrWithOffset.
+     *
+     * CLASS OF CHANGE: isomorphic rewrite.  The Tensor form above is pure address arithmetic -- it
+     * re-seats `*this` on `src`'s address and adds an element offset scaled by the element size -- so
+     * the pointer form performs the same arithmetic on the address the caller supplies.  Nothing about
+     * the computation is reinterpreted.
+     *
+     * Why the parameter is spelled `S *&` and not `S &`: the table's target form is `S& src` with S
+     * deduced, but an unconstrained `S&` is ambiguous with the Tensor overload above (for a LocalTensor
+     * argument both deduce, giving two equally good candidates), so it would need a `Std::is_pointer`
+     * constraint -- and kernel_tensor.h does not have that trait in scope, while adding the type_traits
+     * header to it would move the point at which this header is first pulled into a translation unit.
+     * `S *&` accepts exactly the same calls (a raw pointer lvalue) and is disjoint from
+     * `LocalTensor<S>&` by deduction alone, with no trait and no new include.
+     *
+     * What a raw pointer cannot carry, and therefore does not reproduce: `src`'s `logicPos`, `dataLen`
+     * and `bufferHandle`.  The Tensor form copies the whole TBuffAddr and so re-seats all of them from
+     * `src`; a bare pointer has only an address.  The pointer form therefore writes the one address
+     * field that the pointer denotes and leaves the rest of `*this` alone:
+     *   * device build    -- `GetPhyAddr()` returns `bufferAddr + index * sizeof(PrimType)`
+     *                        (kernel_tensor_impl.h:592-604), so the pointer's numeric value IS the
+     *                        buffer address; `bufferAddr` is what is written.
+     *   * CPU-debug build -- `GetPhyAddr()` returns `absAddr + ...` as a host pointer
+     *                        (kernel_tensor_impl.h:99-120), so the pointer IS the absolute address;
+     *                        `absAddr` is what is written.
+     * In each build the field written is exactly the field that build's GetPhyAddr reads, so a
+     * subsequent GetPhyAddr() on the result yields the same address the Tensor form would yield.
+     *
+     * The element size is taken as `sizeof(S)` rather than `sizeof(PrimT<S>)` because for a raw pointer
+     * the pointee already IS the primitive -- a caller obtains these pointers as `(PrimType*)t.GetPhyAddr()`.
+     * The two agree for every U the Tensor form accepts, since PrimT rewrites only the half-byte and
+     * 2-bit storage classes to themselves.
+     */
+    template <typename S>
+    [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+                 "Please do not use it!")]]
+    __aicore__ inline void SetAddrWithOffset(S*& src, uint32_t offset);
+
 #endif
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
