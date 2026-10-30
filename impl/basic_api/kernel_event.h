@@ -303,7 +303,8 @@ __aicore__ inline void PipeBarrierInternal()
 #endif
 }
 
-#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__) && !defined(ASCENDC_SUPER_KERNEL_FLAG_COUNT_DEFINED)
+#define ASCENDC_SUPER_KERNEL_FLAG_COUNT_DEFINED
 __BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
 #endif
 

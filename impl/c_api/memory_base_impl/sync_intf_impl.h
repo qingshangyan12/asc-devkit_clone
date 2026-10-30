@@ -19,6 +19,14 @@
 #define IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
 
 #include "impl/c_api/memory_base_impl/utils_impl.h"
+#include "impl/basic_api/kernel_macros.h"
+
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__) && !defined(ASCENDC_SUPER_KERNEL_FLAG_COUNT_DEFINED)
+#define ASCENDC_SUPER_KERNEL_FLAG_COUNT_DEFINED
+namespace AscendC {
+__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
+}
+#endif
 
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
@@ -240,6 +248,9 @@ __aicore__ inline void asc_sync_vec() { pipe_barrier(pipe_t::PIPE_ALL); }
 
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+    AscendC::g_superKernelSetWaitFlagCountDifference += 1;
+#endif
     if ASC_IS_AIC {
         asc_sync_notify_impl_aic(pipe, tpipe, id);
     } else if ASC_IS_AIV {
@@ -249,6 +260,9 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 
 __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)
 {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+    AscendC::g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
     if ASC_IS_AIC {
         asc_sync_wait_impl_aic(pipe, tpipe, id);
     } else if ASC_IS_AIV {

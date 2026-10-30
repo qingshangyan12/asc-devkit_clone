@@ -18,11 +18,36 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_VAR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_VAR_INTF_IMPL_H
 
+#include "impl/basic_api/kernel_macros.h"
+
+#if defined(__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__) && !defined(ASCENDC_SUPER_KERNEL_DYNAMIC_BLOCK_NUM_DEFINED)
+#define ASCENDC_SUPER_KERNEL_DYNAMIC_BLOCK_NUM_DEFINED
+__BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
+#endif
+
 ASC_DEPRECATED(9.2.0, "2027/09/07", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)
-__aicore__ inline int64_t asc_get_block_idx() { return get_block_idx(); }
+__aicore__ inline int64_t asc_get_block_idx()
+{
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__) && defined(ASCENDC_C_API_SK_LOGICAL_BLOCK_IDX) && \
+    ASCENDC_C_API_SK_LOGICAL_BLOCK_IDX
+    if ASC_IS_AIV {
+        return get_block_idx() * get_subblockdim() + get_subblockid();
+    }
+#endif
+    return get_block_idx();
+}
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", block_num)
-__aicore__ inline int64_t asc_get_block_num() { return get_block_num(); }
+__aicore__ inline int64_t asc_get_block_num()
+{
+#ifdef __SUPER_KERNEL_STATIC_BLOCK_NUM__
+    return __SUPER_KERNEL_STATIC_BLOCK_NUM__;
+#elif defined(__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__)
+    return g_super_kernel_dynamic_block_num;
+#else
+    return get_block_num();
+#endif
+}
 
 #endif
 
