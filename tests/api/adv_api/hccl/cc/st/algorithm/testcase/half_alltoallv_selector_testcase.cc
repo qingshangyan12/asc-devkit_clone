@@ -2,7 +2,7 @@
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You should not use this file except in compliance with the License.
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
@@ -58,8 +58,8 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-// 1D mesh 拓扑兜底：对齐 hcomm SelectDefaultCcuSchedAlgo —— 不指定算法名时
-// level0 为 MESH_1D/MESH_1D_CLOS 即选 CcuHalfAll2AllVMesh1D
+// 1D mesh 拓扑兜底：不指定算法名时 level0 为 MESH_1D/MESH_1D_CLOS 即选
+// CcuHalfAll2AllVMesh1D
 TEST_F(ST_HALF_ALLTOALLV_SELECTOR_TEST, mesh1d_topo_selects_half_alltoallv_fallback)
 {
     HalfAlltoAllVAutoSelector selector;

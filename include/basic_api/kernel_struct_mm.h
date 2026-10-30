@@ -33,7 +33,7 @@
 #endif
 
 #if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
-    (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
 #define CANN_ASC_ENABLE_FIX_SHIFT
 #endif
 

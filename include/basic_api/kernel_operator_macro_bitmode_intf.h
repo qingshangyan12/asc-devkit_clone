@@ -462,6 +462,44 @@ private:
         struct MmadFixBitModeConfig0 config0BitMode;
     };
 };
+
+class PostProcBitModeParams {
+public:
+    __aicore__ inline PostProcBitModeParams();
+    __aicore__ inline PostProcBitModeParams(const PostProcParams& postProcParams);
+
+    __aicore__ inline void SetPreQuantMode(pre_quant_t preQuantMode_);
+    __aicore__ inline void SetActPreMode(uint8_t actPreMode_);
+    __aicore__ inline void SetPostQuantMode(post_quant_t postQuantMode_);
+    __aicore__ inline void SetPreClipReluMode(uint8_t preClipReluMode_);
+    __aicore__ inline void SetEltwiseOp(eltwise_op_t eltwiseOp_);
+    __aicore__ inline void SetEltwiseAntiqEnable(bool eltwiseAntiqEnable_);
+    __aicore__ inline void SetEltwiseBroadcastEnable(bool eltwiseBroadcastEnable_);
+    __aicore__ inline void SetLsbMask(lsb_mask_t lsbMask_);
+    __aicore__ inline void SetDependEnable(bool dependEnable_);
+    __aicore__ inline void SetInstrId(instr_id_t instrId_);
+    __aicore__ inline void SetN(uint16_t n_);
+    __aicore__ inline void SetConfig0(uint64_t config0_);
+
+    __aicore__ inline pre_quant_t GetPreQuantMode() const;
+    __aicore__ inline uint8_t GetActPreMode() const;
+    __aicore__ inline post_quant_t GetPostQuantMode() const;
+    __aicore__ inline uint8_t GetPreClipReluMode() const;
+    __aicore__ inline eltwise_op_t GetEltwiseOp() const;
+    __aicore__ inline bool GetEltwiseAntiqEnable() const;
+    __aicore__ inline bool GetEltwiseBroadcastEnable() const;
+    __aicore__ inline lsb_mask_t GetLsbMask() const;
+    __aicore__ inline bool GetDependEnable() const;
+    __aicore__ inline instr_id_t GetInstrId() const;
+    __aicore__ inline uint16_t GetN() const;
+    __aicore__ inline uint64_t GetConfig0() const;
+
+private:
+    union {
+        uint64_t config0;
+        struct PostProcBitModeConfig0 config0BitMode;
+    };
+};
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

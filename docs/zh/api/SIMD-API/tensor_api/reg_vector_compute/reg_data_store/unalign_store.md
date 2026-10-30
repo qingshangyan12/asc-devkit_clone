@@ -114,7 +114,7 @@ template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void CopyUnaligned(
     SrcTensor src, DstTensor dst, uint32_t total_elements)
 {
-    constexpr uint32_t elements_per_register = asc_get_vf_len() / sizeof(uint8_t);
+    constexpr uint32_t elements_per_register = asc::te::get_vf_len() / sizeof(uint8_t);
     asc::te::experimental::unalign_load loader;
     asc::te::experimental::unalign_store storer;
     loader.prepare(src);

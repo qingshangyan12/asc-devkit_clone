@@ -209,6 +209,19 @@ __aicore__ inline void MmadMxFix(
 {
     MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
 }
+
+template <typename T, typename U>
+__aicore__ inline void PostProc(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params)
+{
+    PostProcImpl(dst, src, params);
+}
+
+template <typename T, typename U>
+__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params)
+{
+    PostProcImpl(dst, src, params);
+}
 } // namespace AscendC
 
 #endif // __NPU_ARCH__

@@ -21,8 +21,8 @@ namespace AscendC {
  *             When enable isReuseSource, src tensor will be used as tmp buffer for calculation.
  * \param [in] isBasicBlock: indicate whether enable basicBlock.
  *             When enable basicBlock, better performance will be achived and more tmp buffer will be needed
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  * \return flag for whether the tmp buffer size is calculated successfully
  *         If src shape is illegal for basic block, it will return false.
  */

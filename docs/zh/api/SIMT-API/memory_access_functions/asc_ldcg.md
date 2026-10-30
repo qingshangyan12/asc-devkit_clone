@@ -222,3 +222,10 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
         dst[idx] = asc_ldcg(src + idx);
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: -12.5, 0, 23.5, -7.25
+dst: -12.5, 0, 23.5, -7.25
+```

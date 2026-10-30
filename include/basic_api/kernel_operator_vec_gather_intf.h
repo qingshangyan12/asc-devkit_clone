@@ -110,8 +110,8 @@ __aicore__ inline void Gather(
  */
 template <typename T, typename U>
 __aicore__ inline void GatherDataCopy(
-    LocalTensor<T> dst, GlobalTensor<T> src, LocalTensor<U> offset, GatherParams& gatherParam,
-    GatherPadParams<T>& gatherPadParam);
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offset,
+    const GatherParams& gatherParam, const GatherPadParams<T>& gatherPadParam);
 #endif
 } // namespace AscendC
 #pragma end_pipe

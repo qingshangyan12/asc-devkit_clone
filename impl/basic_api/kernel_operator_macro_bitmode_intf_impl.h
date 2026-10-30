@@ -653,6 +653,75 @@ __aicore__ inline bool MmadFixBitModeParams::GetPostProcHalfEnable() const
 __aicore__ inline bool MmadFixBitModeParams::GetLayoutCtrl() const { return config0BitMode.GetLayoutCtrl(); }
 __aicore__ inline uint16_t MmadFixBitModeParams::GetN() const { return config0BitMode.GetN(); }
 __aicore__ inline uint64_t MmadFixBitModeParams::GetConfig0() const { return config0; };
+
+__aicore__ inline PostProcBitModeParams::PostProcBitModeParams() { config0 = 0; }
+__aicore__ inline PostProcBitModeParams::PostProcBitModeParams(const PostProcParams& postProcParams)
+{
+    config0BitMode.Init(postProcParams);
+}
+__aicore__ inline void PostProcBitModeParams::SetPreQuantMode(pre_quant_t preQuantMode_)
+{
+    config0BitMode.SetPreQuantMode(preQuantMode_);
+}
+__aicore__ inline void PostProcBitModeParams::SetActPreMode(uint8_t actPreMode_)
+{
+    config0BitMode.SetActPreMode(actPreMode_);
+}
+__aicore__ inline void PostProcBitModeParams::SetPostQuantMode(post_quant_t postQuantMode_)
+{
+    config0BitMode.SetPostQuantMode(postQuantMode_);
+}
+__aicore__ inline void PostProcBitModeParams::SetPreClipReluMode(uint8_t preClipReluMode_)
+{
+    config0BitMode.SetPreClipReluMode(preClipReluMode_);
+}
+__aicore__ inline void PostProcBitModeParams::SetEltwiseOp(eltwise_op_t eltwiseOp_)
+{
+    config0BitMode.SetEltwiseOp(eltwiseOp_);
+}
+__aicore__ inline void PostProcBitModeParams::SetEltwiseAntiqEnable(bool eltwiseAntiqEnable_)
+{
+    config0BitMode.SetEltwiseAntiqEnable(eltwiseAntiqEnable_);
+}
+__aicore__ inline void PostProcBitModeParams::SetEltwiseBroadcastEnable(bool eltwiseBroadcastEnable_)
+{
+    config0BitMode.SetEltwiseBroadcastEnable(eltwiseBroadcastEnable_);
+}
+__aicore__ inline void PostProcBitModeParams::SetLsbMask(lsb_mask_t lsbMask_) { config0BitMode.SetLsbMask(lsbMask_); }
+__aicore__ inline void PostProcBitModeParams::SetDependEnable(bool dependEnable_)
+{
+    config0BitMode.SetDependEnable(dependEnable_);
+}
+__aicore__ inline void PostProcBitModeParams::SetInstrId(instr_id_t instrId_) { config0BitMode.SetInstrId(instrId_); }
+__aicore__ inline void PostProcBitModeParams::SetN(uint16_t n_) { config0BitMode.SetN(n_); }
+__aicore__ inline void PostProcBitModeParams::SetConfig0(uint64_t config0_) { config0 = config0_; };
+__aicore__ inline pre_quant_t PostProcBitModeParams::GetPreQuantMode() const
+{
+    return config0BitMode.GetPreQuantMode();
+}
+__aicore__ inline uint8_t PostProcBitModeParams::GetActPreMode() const { return config0BitMode.GetActPreMode(); }
+__aicore__ inline post_quant_t PostProcBitModeParams::GetPostQuantMode() const
+{
+    return config0BitMode.GetPostQuantMode();
+}
+__aicore__ inline uint8_t PostProcBitModeParams::GetPreClipReluMode() const
+{
+    return config0BitMode.GetPreClipReluMode();
+}
+__aicore__ inline eltwise_op_t PostProcBitModeParams::GetEltwiseOp() const { return config0BitMode.GetEltwiseOp(); }
+__aicore__ inline bool PostProcBitModeParams::GetEltwiseAntiqEnable() const
+{
+    return config0BitMode.GetEltwiseAntiqEnable();
+}
+__aicore__ inline bool PostProcBitModeParams::GetEltwiseBroadcastEnable() const
+{
+    return config0BitMode.GetEltwiseBroadcastEnable();
+}
+__aicore__ inline lsb_mask_t PostProcBitModeParams::GetLsbMask() const { return config0BitMode.GetLsbMask(); }
+__aicore__ inline bool PostProcBitModeParams::GetDependEnable() const { return config0BitMode.GetDependEnable(); }
+__aicore__ inline instr_id_t PostProcBitModeParams::GetInstrId() const { return config0BitMode.GetInstrId(); }
+__aicore__ inline uint16_t PostProcBitModeParams::GetN() const { return config0BitMode.GetN(); }
+__aicore__ inline uint64_t PostProcBitModeParams::GetConfig0() const { return config0; };
 } // namespace AscendC
 
 #endif // __NPU_ARCH__

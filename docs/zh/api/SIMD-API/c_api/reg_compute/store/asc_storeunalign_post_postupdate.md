@@ -102,56 +102,79 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 256;
-constexpr uint32_t START_OFFSET = 8;
-constexpr uint32_t OUTPUT_BYTES = START_OFFSET + ELEMENT_COUNT;
+constexpr uint8_t MUTEX_ID = 0;
 
-__simd_vf__ inline void post_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t DATA_BYTES = 260 * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t START_OFFSET = 8;
+constexpr uint32_t OUTPUT_BYTES = START_OFFSET + TOTAL_LENGTH;
+constexpr uint32_t PADDED_OUTPUT_BYTES = START_OFFSET + PADDED_ELEMENT_COUNT + 32;
+
+__simd_vf__ inline void post_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_uint8_t data;
-    vector_store_unalign src;
+    vector_store_unalign unalign_reg;
     __ubuf__ uint8_t* dst = output + START_OFFSET;
-    asc_loadalign(data, input);
-    asc_storeunalign_postupdate(dst, src, data, ELEMENT_COUNT);
-    asc_storeunalign_post_postupdate(dst, src, 0);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        const uint32_t valid_count = (offset + ELEMENTS_PER_REGISTER < TOTAL_LENGTH) ?
+            ELEMENTS_PER_REGISTER : TOTAL_LENGTH - offset;
+        vector_uint8_t src;
+        asc_loadalign(src, input + offset);
+        asc_storeunalign_postupdate(dst, unalign_reg, src, valid_count);
+    }
+    asc_storeunalign_post_postupdate(dst, unalign_reg, 0);
 }
 
 __global__ __vector__ void post_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[288];
-    __ubuf__ uint8_t input_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(input_local, input, ELEMENT_COUNT);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    post_postupdate_vf(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    __ubuf__ uint8_t output_local[PADDED_OUTPUT_BYTES];
+    __ubuf__ uint8_t input_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, PADDED_ELEMENT_COUNT);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<post_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(ELEMENT_COUNT);
+    std::vector<uint8_t> input(PADDED_ELEMENT_COUNT, 0);
     std::vector<uint8_t> output(OUTPUT_BYTES, 0);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = static_cast<uint8_t>(i);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) input[i] = static_cast<uint8_t>(i);
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), ELEMENT_COUNT, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), PADDED_ELEMENT_COUNT, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, ELEMENT_COUNT, input.data(), ELEMENT_COUNT, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(input_device, PADDED_ELEMENT_COUNT, input.data(), PADDED_ELEMENT_COUNT, ACL_MEMCPY_HOST_TO_DEVICE);
     post_postupdate_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) passed = passed && output[START_OFFSET + i] == input[i];
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) passed = passed && output[START_OFFSET + i] == input[i];
     std::cout << (passed ? "[Success] asc_storeunalign_post_postupdate completed."
                          : "[Failed] asc_storeunalign_post_postupdate output mismatch.") << std::endl;
     aclrtFree(input_device);
