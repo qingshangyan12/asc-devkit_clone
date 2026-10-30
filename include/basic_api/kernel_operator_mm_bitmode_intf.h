@@ -126,7 +126,7 @@ private:
 class SetFMatrixBitModeParams {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 public:
     __aicore__ inline SetFMatrixBitModeParams();
     template <typename T>
@@ -148,7 +148,6 @@ private:
 class MmadBitModeParams {
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
-     (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
      (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 public:
     __aicore__ inline MmadBitModeParams();

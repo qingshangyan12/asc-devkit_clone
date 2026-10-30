@@ -63,67 +63,6 @@ struct Load2DBitModeConfig1 {
     __aicore__ inline uint16_t GetDstStride() const { return dstStride; };
 };
 
-struct SetFMatrixBitModeConfig0 {
-    uint64_t l1H : 16;
-    uint64_t l1W : 16;
-    uint64_t padList0 : 8;
-    uint64_t padList1 : 8;
-    uint64_t padList2 : 8;
-    uint64_t padList3 : 8;
-
-    template <typename T>
-    __aicore__ inline void Init(const LoadData3DParamsV2<T>& loadData3DParams_)
-    {
-        l1H = loadData3DParams_.l1H;
-        l1W = loadData3DParams_.l1W;
-    }
-    __aicore__ inline void SetL1H(uint16_t l1H_) { l1H = l1H_; };
-    __aicore__ inline void SetL1W(uint16_t l1W_) { l1W = l1W_; };
-    __aicore__ inline void SetPadList(const uint8_t padList_[4])
-    {
-        padList0 = padList_[0];
-        padList1 = padList_[1];
-        padList2 = padList_[PADLIST2];
-        padList3 = padList_[PADLIST3];
-    };
-};
-
-struct MmadBitModeConfig0 {
-    uint64_t m : 12;
-    uint64_t k : 12;
-    uint64_t n : 12;
-    uint64_t : 20;
-    uint64_t unitFlag : 2;
-    uint64_t : 4;
-    uint64_t disableGemv : 1;
-    uint64_t cmatrixSource : 1;
-    uint64_t cmatrixInitVal : 1;
-
-    __aicore__ inline void Init(const MmadParams& mmadParams_)
-    {
-        m = mmadParams_.m;
-        k = mmadParams_.k;
-        n = mmadParams_.n;
-        unitFlag = mmadParams_.unitFlag;
-        disableGemv = false;
-        cmatrixSource = mmadParams_.cmatrixSource;
-        cmatrixInitVal = mmadParams_.cmatrixInitVal;
-    }
-    __aicore__ inline void SetM(uint16_t m_) { m = m_; };
-    __aicore__ inline void SetK(uint16_t k_) { k = k_; };
-    __aicore__ inline void SetN(uint16_t n_) { n = n_; };
-    __aicore__ inline void SetUnitFlag(uint8_t unitFlag_) { unitFlag = unitFlag_; };
-    __aicore__ inline void SetDisableGemv(bool disableGemv_) { disableGemv = disableGemv_; };
-    __aicore__ inline void SetCmatrixSource(bool cmatrixSource_) { cmatrixSource = cmatrixSource_; };
-    __aicore__ inline void SetCmatrixInitVal(bool cmatrixInitVal_) { cmatrixInitVal = cmatrixInitVal_; };
-    __aicore__ inline uint16_t GetM() const { return m; };
-    __aicore__ inline uint16_t GetK() const { return k; };
-    __aicore__ inline uint16_t GetN() const { return n; };
-    __aicore__ inline uint8_t GetUnitFlag() const { return unitFlag; };
-    __aicore__ inline bool GetDisableGemv() const { return disableGemv; };
-    __aicore__ inline bool GetCmatrixSource() const { return cmatrixSource; };
-    __aicore__ inline bool GetCmatrixInitVal() const { return cmatrixInitVal; };
-};
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_MM_BITMODE_IMPL_H
