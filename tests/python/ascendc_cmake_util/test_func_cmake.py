@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import sys
 import subprocess
 from pathlib import Path
 
@@ -237,3 +238,65 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
     arguments = recorded["args"]
     assert "--kernel-spec-mode=SK" in arguments
     assert f"--kernel-spec-dir={root}/input" in arguments
+
+
+@pytest.mark.parametrize(
+    "member_name", ["kernel.o", "kernel entry.o", "generated kernel entry.o", "long_kernel_entry_name.o"]
+)
+def test_runtime_archive_import_preserves_member_names(tmp_path, member_name):
+    first_source = tmp_path / "first.c"
+    second_source = tmp_path / "second.c"
+    first_source.write_text("int first(void) { return 17; }\n", encoding="utf-8")
+    second_source.write_text("int second(void) { return 25; }\n", encoding="utf-8")
+    first_object = tmp_path / member_name
+    second_object = tmp_path / "second.o"
+    archive = tmp_path / "libruntime.a"
+    for command in (
+        ["gcc", "-c", str(first_source), "-o", str(first_object)],
+        ["gcc", "-c", str(second_source), "-o", str(second_object)],
+        ["ar", "rcs", str(archive), str(first_object), str(second_object)],
+    ):
+        result = subprocess.run(command, text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+    listed_members = subprocess.check_output(["ar", "-t", str(archive)], text=True).splitlines()
+    assert listed_members == [member_name, "second.o"]
+
+    extracted = tmp_path / "objects"
+    tool = REPO_ROOT / "cmake/asc/legacy_modules/util/extract_static_library.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(tool),
+            "-a",
+            str(archive),
+            "-t",
+            "runtime_objects",
+            "-d",
+            str(extracted),
+            "-o",
+            "runtime.cmake",
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (extracted / member_name).is_file()
+    (tmp_path / "main.c").write_text(
+        "int first(void); int second(void); int main(void) { return first()+second()==42 ? 0 : 1; }\n", encoding="utf-8"
+    )
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(runtime_archive_import C)
+include("{extracted / "runtime.cmake"}")
+add_executable(check_members main.c $<TARGET_OBJECTS:runtime_objects>)
+''',
+        encoding="utf-8",
+    )
+    build = tmp_path / "build"
+    for command in (
+        ["cmake", "-S", str(tmp_path), "-B", str(build)],
+        ["cmake", "--build", str(build), "--parallel", "4"],
+        [str(build / "check_members")],
+    ):
+        result = subprocess.run(command, text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
