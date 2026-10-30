@@ -54,7 +54,8 @@
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
-#ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
+#if defined(__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__) && !defined(ASCENDC_SUPER_KERNEL_DYNAMIC_BLOCK_NUM_DEFINED)
+#define ASCENDC_SUPER_KERNEL_DYNAMIC_BLOCK_NUM_DEFINED
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
 #endif
