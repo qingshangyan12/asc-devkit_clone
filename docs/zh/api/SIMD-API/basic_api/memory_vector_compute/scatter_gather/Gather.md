@@ -29,17 +29,17 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_gather_intf.h"`。
 
-Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseAddr），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。
+Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseOffset），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。
 
 接口支持使用前n个数据计算和高维切分计算的方式，前n个数据计算原理和参考伪代码如下：
 
 ```python
 import numpy as np
 
-def Gather(dst, src, count, srcOffset, srcBaseAddr):
+def Gather(dst, src, srcOffset, srcBaseOffset, count):
     inputType = np.dtype("uint16")
     for i in range(count):
-        dst[i] = src[(srcBaseAddr + srcOffset[i]) // inputType.itemsize]
+        dst[i] = src[(srcBaseOffset + srcOffset[i]) // inputType.itemsize]
 ```
 
 完整示例请参考：[Gather真值计算](../../../../../../../examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)。
@@ -50,7 +50,7 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 
   ```cpp
   template <typename T> 
-  __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint32_t count) 
+  __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseOffset, const uint32_t count) 
   ```
 
 - tensor高维切分计算。
@@ -58,14 +58,14 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 
     ```cpp
     template <typename T> 
-    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride) 
+    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride) 
     ```
 
   - mask连续模式。
 
     ```cpp
     template <typename T> 
-    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride) 
+    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride) 
     ```
 
 ## 参数说明<a name="section1619484392111"></a>
@@ -82,8 +82,8 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 | :------- | :-------- | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>数据类型和dst保持一致。 |
-| srcOffset | 输入 | 每个元素在src中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>该偏移量是相对于src的起始基地址srcBaseAddr而言的。单位为字节。取值要求见[约束说明](#约束说明)。 |
-| srcBaseAddr | 输入 | 用于指定Gather操作中源操作数的起始位置，单位为字节。取值应保证src元素类型位宽对齐，否则会导致非预期行为。 |
+| srcOffset | 输入 | 每个元素在src中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>该偏移量是相对于src的起始基地址srcBaseOffset而言的。单位为字节。取值要求见[约束说明](#约束说明)。 |
+| srcBaseOffset | 输入 | 用于指定Gather操作中源操作数的起始位置，单位为字节。取值应保证src元素类型位宽对齐，否则会导致非预期行为。 |
 | count | 输入 | 参与计算的元素个数。<br><br>参数取值范围和操作数的数据类型有关，数据类型不同，能够处理的元素个数最大值不同，最大处理的数据量不能超过Unified Buffer（UB）大小限制。 |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br><br>设置详见[掩码操作](../mask_operations/mask_operations.md)。 |
 | repeatTime | 输入 | 指令迭代次数。针对不同的型号，每个迭代处理的DataBlock可能存在差异，详见[约束说明](#约束说明)。|
@@ -141,7 +141,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
     - Atlas推理系列产品AI Core
     <!-- end id19 -->
   <!-- end id16 -->
-- srcBaseAddr的取值应保证src元素类型位宽对齐，否则会导致非预期行为，程序没有崩溃报错，但数据发生错位，导致结果张量不符合预期。
+- srcBaseOffset的取值应保证src元素类型位宽对齐，否则会导致非预期行为，程序没有崩溃报错，但数据发生错位，导致结果张量不符合预期。
 - repeatTime取值范围：repeatTime∈[0,255]。
 
 <!-- npu="950,A3,910b" id20 -->
@@ -195,7 +195,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   ```cpp
   // repeatTime = 4, mask = 128, 128 elements one repeat, 512 elements total
   // srcLocal数据类型为half，srcOffsetLocal数据类型为uint32_t，dstLocal数据类型为half
-  // srcBaseAddr = 0, srcLocal的起始基地址为0
+  // srcBaseOffset = 0, srcLocal的起始基地址为0
   // dstRepStride = 8, no gap between repeats 
   AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, (uint32_t)0, 128, 4, 8);
   ```
@@ -206,7 +206,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
   // repeatTime = 4, 128 elements one repeat, 512 elements total
   // srcLocal数据类型为half，srcOffsetLocal数据类型为uint32_t，dstLocal数据类型为half
-  // srcBaseAddr = 0, srcLocal的起始基地址为0
+  // srcBaseOffset = 0, srcLocal的起始基地址为0
   // dstRepStride = 8, no gap between repeats 
   AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, (uint32_t)0, mask, 4, 8);
   ```
@@ -216,7 +216,7 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   ```cpp
   uint32_t count = 512;    // 参与计算的元素个数
   // srcLocal数据类型为half，srcOffsetLocal数据类型为uint32_t，dstLocal数据类型为half
-  // srcBaseAddr = 0, srcLocal的起始基地址为0
+  // srcBaseOffset = 0, srcLocal的起始基地址为0
   AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, (uint32_t)0, count);
   ```
 

@@ -166,22 +166,6 @@ __aicore__ inline void DataCopy(
 
 /*
  * @ingroup DataCopy Level 0
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] repeatParams.blockCount number of blocks
- * @param [in] repeatParams.blockLen Length of blocks
- * @param [in] repeatParams.srcGap src block gap
- * @param [in] repeatParams.dstGap dst block gap
- */
-
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
-    const DataCopyParams& repeatParams);
-
-/*
- * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -313,17 +297,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  */
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
-
-/*
- * @ingroup DataCopy Level 2
- * @brief datacopy from src to dst0 and dst1, applicable to vector data
- * @param [out] dst0 and dst1 output LocalTensor
- * @param [in] src input LocalTensor
- * @param [in] count Number of operands
- */
-template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count);
 
 /*
  * @ingroup DataCopy Level 2

@@ -1,4 +1,4 @@
-# asc_copy_gm2ub_align
+# asc_copy_gm2ub_align（NPU架构版本3510）
 
 ## 产品支持情况
 
@@ -56,11 +56,11 @@
 
     **图1**  Compact模式32字节补齐示意图
 
-    ![](../../figures/asc_copy_gm2ub_align_compact_padding.png "Compact模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_gm2ub_align_compact_padding.png "Compact模式32字节补齐示意图")
 
     **图2**  Normal模式32字节补齐示意图
 
-    ![](../../figures/asc_copy_gm2ub_align_normal_padding.png "Normal模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_gm2ub_align_normal_padding.png "Normal模式32字节补齐示意图")
 
     当只搬运1个数据块，或`burst_len`已经32字节对齐且无左右Padding时，两种模式的搬运结果相同。
 
@@ -212,12 +212,13 @@ __global__ __vector__ void asc_copy_gm2ub_align_arch3510_kernel(__gm__ uint8_t* 
 {
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
-    // Copy INPUT_BYTES from GM to UB, then wait only for PIPE_MTE2.
+    // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对对齐搬运结果。
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

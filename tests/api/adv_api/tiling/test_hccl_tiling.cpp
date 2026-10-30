@@ -187,25 +187,25 @@ protected:
     }
 };
 
-TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
+// 新契约：裸名（不含'['）不再触发 CCU 新版本，与 UnregisteredAlgorithmUsesDefaultVersion
+// 行为一致；CCU 新版本仅由外部名触发（见下方外部名用例）。
+TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllMesh1DMultiJetty", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
@@ -220,60 +220,57 @@ TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U,
-        INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 5U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterConcurMeshNHRMultiLink", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMeshPeerOnly", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedBareNameKeepsDefaultVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleNHRMultiLink", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
+        INIT_TILING_VERSION);
 }
 
 // 外部名 + CCU 引擎 → CCU 新版本
@@ -281,6 +278,13 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "sole[mesh]", 6U, INIT_TILING_CCU_NEW_VERSION);
+}
+
+// 外部名 + CCU MS 引擎（5）同样设 101，覆盖引擎 5 的正路径
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuMsUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "sole[mesh]", 5U, INIT_TILING_CCU_NEW_VERSION);
 }
 
 // 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，精确判断在

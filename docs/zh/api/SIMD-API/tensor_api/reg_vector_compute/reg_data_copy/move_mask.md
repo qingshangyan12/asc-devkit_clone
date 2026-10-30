@@ -75,13 +75,13 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src)
 
 **图1** uint16_t矢量数据寄存器生成掩码寄存器<a id="fig-move-mask-b16"></a>
 
-![uint16_t矢量数据寄存器生成掩码寄存器](../../../c_api/figures/capi_copy_reg2mask_b16.png)
+![uint16_t矢量数据寄存器生成掩码寄存器](../../../../figures/capi_copy_reg2mask_b16.png)
 
 `T`为`uint32_t`时，每个元素对应掩码寄存器中的4bit，且仅4bit中的最低位有效。选中的8B数据块包含64bit，每个bit扩展为4bit后生成一个32B掩码寄存器。一个256B源寄存器包含32个数据块，因此`Offset`取值范围为[0, 31]。
 
 **图2** uint32_t矢量数据寄存器生成掩码寄存器<a id="fig-move-mask-b32"></a>
 
-![uint32_t矢量数据寄存器生成掩码寄存器](../../../c_api/figures/capi_copy_reg2mask_b32.png)
+![uint32_t矢量数据寄存器生成掩码寄存器](../../../../figures/capi_copy_reg2mask_b32.png)
 
 ## 调用示例
 

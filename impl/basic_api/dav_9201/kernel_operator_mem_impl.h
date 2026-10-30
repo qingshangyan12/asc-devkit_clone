@@ -104,7 +104,7 @@ enum class UnitShiftOffset {
     BMU_SHIFT_16KB = 14,
 };
 
-constexpr int BMUOffsetMax = 24;
+constexpr int BMUOffsetMax = 4;
 
 constexpr int BMUOffsetShiftByte = 8;
 template <MemoryType hardType>
@@ -224,7 +224,7 @@ __aicore__ inline void BmuSegmentFree(uint64_t addr, const uint32_t bufLen)
 template <int offset, MemoryType hardType, class Argc, class... Args>
 __aicore__ inline void InitSegmentConfig(uint64_t config, Argc argc, Args... args)
 {
-    static_assert(offset <= BMUOffsetMax, "Bum only support less than 4 Seg Pool");
+    static_assert(offset < BMUOffsetMax, "BMU only support less than 4 Seg Pool");
     auto sliceConfig = TraitsSliceConfig(argc);
     auto newConfig = BmuSegmentLen2Uint<hardType>(sliceConfig);
     union {
@@ -285,7 +285,7 @@ __aicore__ inline auto InitSeg(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3)
 template <MemoryType hardType, class Arg0, class... Args>
 __aicore__ inline auto InitSeg(Arg0 arg0, Args... args)
 {
-    static_assert("Bum only support less than 4 Seg Pool");
+    static_assert("BMU only support less than 4 Seg Pool");
     return nullptr;
 }
 
@@ -380,7 +380,9 @@ __aicore__ inline void LocalMemPool::MemPool<hardType, offset, srcPipe_, dstPipe
 {
     auto addr = __BmuAux::GetCurrentBulkAddr<hardType, offset, pipe>(bulkNumber, loopQueue);
     TBuffAddr bufAddr{
-        .dataLen = __BmuAux::BmuSegmentUint2Len<hardType>(bulkNumber), .bufferAddr = addr, .bufferHandle = 0};
+        .dataLen = static_cast<uint32_t>(__BmuAux::BmuSegmentUint2Len<hardType>(bulkNumber)),
+        .bufferAddr = static_cast<uint32_t>(addr),
+        .bufferHandle = 0};
     tensor.SetAddr(bufAddr);
 }
 template <MemoryType hardType, int offset, pipe_t srcPipe_, pipe_t dstPipe_>

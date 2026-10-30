@@ -1,4 +1,4 @@
-# asc_copy_ub2gm
+# asc_copy_ub2gm（NPU架构版本3510）
 
 ## 产品支持情况
 
@@ -35,10 +35,10 @@
 有效长度非32字节对齐时，硬件会补齐读取UB至32字节边界，但仅把有效数据写入GM。连续搬运仅在整体末尾补齐读取；高维切分搬运中，`src_stride`等于`burst_len`时仅在所有数据块的整体末尾补齐读取，否则每个数据块分别补齐读取。源UB必须为实际读取范围预留合法空间。
 
 **图1**  连续搬运示意图
-![](../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_continuous.png "连续搬运示意图")
 
 **图2**  高维切分搬运示意图
-![](../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
+![](../../../../figures/asc_copy_ub2gm_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 
@@ -158,10 +158,12 @@ __global__ __vector__ void asc_copy_ub2gm_arch_3510_kernel(__gm__ uint8_t* outpu
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
-    // Copy INPUT_BYTES from UB to GM, then wait only for PIPE_MTE3.
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对搬出结果。
     asc_copy_ub2gm(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

@@ -99,7 +99,7 @@ inline void asc_dcci_entire(void *dst)
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (*(volatile uint32_t *)flag != 1) {
+            while (*(volatile __gm__ uint32_t *)flag != 1) {
                 asc_nop(); // 15个cycle后再发送下一个load指令
             }
             asc_dcci_entire((__gm__ void*)(data)); // 刷新核内的整个Data Cache

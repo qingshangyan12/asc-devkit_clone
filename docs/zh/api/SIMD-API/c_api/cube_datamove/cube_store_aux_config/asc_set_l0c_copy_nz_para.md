@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
 本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_compute_store/asc_copy_l0c2ub.md)启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。
 
@@ -49,7 +49,7 @@ __aicore__ inline void asc_set_l0c_copy_nz_para(uint16_t matrix_num,
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | matrix_num | 输入 | ND/DN矩阵的数量，取值范围为[1, 65535]。 |
-| src_nz_matrix_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`int32_t`和`float`）。 |
+| src_nz_matrix_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当matrix_num配置为1时，src_nz_matrix_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`int32_t`和`float`）。 |
 | dst_matrix_stride | 输入 | 目的相邻ND/DN矩阵之间的偏移（相邻ND/DN矩阵头与头的间隔）。当matrix_num配置为1时，dst_matrix_stride不生效，配置为0即可。取值范围为[0, 2^32-1]，单位为元素。 |
 
 ## 返回值说明
@@ -114,7 +114,7 @@ __global__ __cube__ void asc_set_l0c_copy_nz_para_kernel(
     asc_set_l0c_copy_nz_para(1, 0, 0);
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
         asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* label, const std::vector<float>& data)

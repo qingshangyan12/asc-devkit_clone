@@ -16,6 +16,7 @@ constexpr u64 AR_M2M_1D_MAX_DATA_SIZE = 8 * 1024 * 1024;
 namespace {
 constexpr u64 AR_AICPU_1D_SMALL_DATA_SIZE = 8 * 1024 * 1024;
 constexpr u64 AR_AICPU_1D_MAX_DATA_SIZE = 32 * 1024 * 1024;
+constexpr u64 AR_AICPU_1D_CROSS_SMALL_DATA_SIZE = 32 * 1024 * 1024;
 constexpr u64 AR_AICPU_1D_64DATATYPE_DATA_SIZE = 8 * 1024 * 1024;
 constexpr u64 AR_AICPU_SEQUENCE_DATA_SIZE = 4ULL * 1024 * 1024 * 1024;
 constexpr u64 AR_2P_DETOUR_DATA_SIZE = 8 * 1024 * 1024;
@@ -31,6 +32,13 @@ constexpr u64 AR_CCU_SEQ_MAX_DATA_SIZE = 64 * 1024 * 1024;
 constexpr u64 AR_CCU_CLOS_1D_SMALL_DATA_SIZE = 8 * 1024 * 1024;
 constexpr u64 OMNI_UBX_AR_SCHED_DATA_SIZE = 64 * 1024 * 1024;
 constexpr u64 CCU_PARALLEL_MAX_DATA_SIZE = 64 * 1024 * 1024;
+constexpr u64 OMNI_PCIE_AR_DATA_SIZE = 32 * 1024 * 1024;
+constexpr u64 OMNI_UBX_AR_LARGE_SIZE = 128 * 1024 * 1024;
+constexpr u64 OMNI_UBX_AR_16P_LARGE_SIZE = 256 * 1024 * 1024;
+constexpr u32 OMNI_UBX_AR_RANK_SIZE = 16;
+constexpr u32 DEVICE_NUM_PER_MODULE_8 = 8;
+constexpr u32 TOPO_LEVEL_NUM_2 = 2;
+constexpr u32 MIN_STRICT_RANK_NUM_ORDER_PRESERVED = 2;
 
 // hccl AutoSelectorBase 的同名 helper（asc-devkit base 未同步，按文件内联等价实现）
 bool Is8BitDataType(const HcclDataType dataType) { return dataType == HcclDataType::HCCL_DATA_TYPE_INT8; }
@@ -53,62 +61,245 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     if (topoInfo == nullptr) {
         return SelectorStatus::NOT_MATCH;
     }
-    const u64 dataTypeSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
-    const u64 dataSize = opParam.DataDes.count * dataTypeSize; // count 与 dtypeSize 受上层参数校验约束
-    const bool specialDataOrReduce =
-        Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    HCCL_DEBUG("[AllReduceAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
+    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    u64 dataSize = opParam.DataDes.count * perDataSize;
 
-    const double rankRatio =
-        topoInfo->userRankSize == 0 ? 1.0 : DEFAULT_RANK_SIZE / topoInfo->userRankSize / topoInfo->userRankSize;
-    const bool overMaxDataSize = dataSize * rankRatio > AR_AICPU_1D_MAX_DATA_SIZE;
-    const bool overSequenceDataSize = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
+    // 当前调用路径（MC2 tiling 无 count 字段）不下发 DataDes.count，dataSize 恒为 0，无法按真实
+    // 数据量选路。约定 dataSize==0 时统一按小数据量算法选路：0 小于全部阈值，本函数及
+    // SelectMeshAlgoAicpu/SelectMeshAlgoAicpuUBX 中所有依赖 dataSize 的分支均命中小数据侧
+    // （MESH_1D/PCIe 全连通/UBX 4P 选 SoleMeshOneShot，多层 MESH_1D 选 SoleNHR，
+    // PCIe 非全连通选 ParallelMeshNHRPcie，UBX 矩形场景选 SoleNHR），
+    // TwoShot/ChunkTwoShot/PipeLinePcie 等大数据量算法不会被选中。
+    if (dataSize == 0) {
+        HCCL_WARNING(
+            "[AllReduceAutoSelector][%s] dataSize is 0 (DataDes.count not delivered), treat as small data, all "
+            "dataSize-based branches select small-data algorithms.",
+            __func__);
+    }
+
+    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+                                         opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+
+    if (topoInfo->topoLevelNums > 1) {
+        bool level0AndLevel1Symetric = topoInfo->level0Symmetric && topoInfo->level1Symmetric;
+        if (isDataTypeOrReduceTypeSpecial) {
+            selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
+        } else if (
+            level0AndLevel1Symetric && topoInfo->deviceNumPerModule == DEVICE_NUM_PER_MODULE_8 &&
+            topoInfo->topLevelUboe) {
+            // hccl：topoLevelNums==2 选 AicpuAllReducePipeLineMeshNHR，否则选 AicpuAllReducePipeLineMeshNHRNHR。
+            // devkit 均未迁移这两个算法，保留选路逻辑，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algos[AicpuAllReducePipeLineMeshNHR/AicpuAllReducePipeLineMeshNHRNHR]"
+                " are not migrated to devkit, levelNum[%u].",
+                topoInfo->topoLevelNums);
+            return SelectorStatus::NOT_MATCH;
+        } else if (level0AndLevel1Symetric && topoInfo->topoLevelNums == TOPO_LEVEL_NUM_3 && topoInfo->topLevelUboe) {
+            selectAlgName = "AicpuAllReduceParallelMeshNHR";
+        } else if (topoInfo->Level1Nhr) {
+            // Level1Nhr 已在 CalcTopoShape 中设置（GCD==1 时为 true）
+            selectAlgName = "AicpuAllReduceSoleNHR";
+            HCCL_INFO("[AllReduceAutoSelector] Level1Nhr=true, select [%s]", selectAlgName.c_str());
+        } else if (topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1) {
+            selectAlgName = "AicpuAllReduceSoleNHR";
+        } else if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
+            if (topoInfo->topoLevelNums == TOPO_LEVEL_NUM_3) {
+                if (level0AndLevel1Symetric) {
+                    // hccl：AicpuAllReduceSequenceMeshConcurNHRNHR；devkit 未迁移，返回 NOT_MATCH。
+                    HCCL_WARNING(
+                        "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSequenceMeshConcurNHRNHR] is not migrated to "
+                        "devkit.");
+                    return SelectorStatus::NOT_MATCH;
+                }
+                selectAlgName = "AicpuAllReduceSoleNHR";
+            } else if (topoInfo->topoLevelNums == TOPO_LEVEL_NUM_2) {
+                if (dataSize > AR_AICPU_1D_CROSS_SMALL_DATA_SIZE) {
+                    if (dataSize > AR_AICPU_SEQUENCE_DATA_SIZE) {
+                        // hccl：AicpuAllReduceSequenceMeshConcurNHR；devkit 未迁移，返回 NOT_MATCH。
+                        HCCL_WARNING(
+                            "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSequenceMeshConcurNHR] is not migrated to "
+                            "devkit, dataSize[%llu].",
+                            dataSize);
+                        return SelectorStatus::NOT_MATCH;
+                    }
+                    selectAlgName = "AicpuAllReduceParallelMeshNHR";
+                } else {
+                    selectAlgName = "AicpuAllReduceSoleNHR";
+                }
+            } else {
+                selectAlgName = "AicpuAllReduceSoleNHR";
+            }
+        } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
+            // hccl：AicpuAllReduceSoleNHRMultiLink；devkit 未迁移，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
+            return SelectorStatus::NOT_MATCH;
+        } else {
+            return SelectorStatus::NOT_MATCH;
+        }
+    } else {
+        return SelectMeshAlgoAicpu(topoInfo, opParam, selectAlgName);
+    }
+
+    HCCL_DEBUG("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
+}
+
+SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpuUBX(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, const u64 dataSize, std::string& selectAlgName,
+    bool isDataTypeOrReduceTypeSpecial) const
+{
+    // UBX机型
+    bool isMeshNumEqualToClosNum = false;
+    bool isClosNumMultipleOfMeshNum = false;
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
+        HCCL_ERROR("[Algo][AllReduceAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
+    CHK_PRT_RET(
+        CheckClosNumMultipleOfMeshNum(topoInfo, isClosNumMultipleOfMeshNum) != HCCL_SUCCESS,
+        HCCL_ERROR("[Algo][AllReduceAutoSelector] CheckClosNumMultipleOfMeshNum failed."), SelectorStatus::NOT_MATCH);
+    if (isMeshNumEqualToClosNum && topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO) {
+        if (isDataTypeOrReduceTypeSpecial) {
+            selectAlgName = dataSize <= AR_AICPU_1D_64DATATYPE_DATA_SIZE ? "AicpuAllReduceSoleMeshOneShot" :
+                                                                           "AicpuAllReduceSoleMeshTwoShot";
+        } else if (dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE) {
+            selectAlgName = "AicpuAllReduceSoleMeshOneShot";
+        } else {
+            // 大数据量，用mesh+clos并行算法
+            // hccl：AicpuAllReduceConcurMeshTwoShotNHR；devkit 未迁移，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceConcurMeshTwoShotNHR] is not migrated to devkit, "
+                "dataSize[%llu].",
+                dataSize);
+            return SelectorStatus::NOT_MATCH;
+        }
+    } else if (isDataTypeOrReduceTypeSpecial) {
+        selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
+    } else if (isClosNumMultipleOfMeshNum && IsLargeData(dataSize)) {
+        if (opParam.supportSymmetricMemory &&
+            ((dataSize >= OMNI_UBX_AR_LARGE_SIZE && topoInfo->userRankSize < OMNI_UBX_AR_RANK_SIZE) ||
+             dataSize >= OMNI_UBX_AR_16P_LARGE_SIZE)) {
+            // hccl：AicpuAllReducePipeLineMeshNHR；devkit 未迁移，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReducePipeLineMeshNHR] is not migrated to devkit, "
+                "dataSize[%llu].",
+                dataSize);
+            return SelectorStatus::NOT_MATCH;
+        }
+        // 矩形场景大数据量，用Parallel并行算法
+        // hccl：AicpuAllReduceParallelMeshNHRMultiJetty；devkit 未迁移，返回 NOT_MATCH。
+        HCCL_WARNING(
+            "[AllReduceAutoSelector] hccl algo[AicpuAllReduceParallelMeshNHRMultiJetty] is not migrated to devkit, "
+            "dataSize[%llu].",
+            dataSize);
+        return SelectorStatus::NOT_MATCH;
+    } else {
+        // 其他场景，用1d NHR算法
+        selectAlgName = "AicpuAllReduceSoleNHR";
+    }
+
+    HCCL_DEBUG("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
+}
+
+SelectorStatus AllReduceAutoSelector::SelectMeshAlgoAicpu(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
+{
+    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    // dataSize==0 时统一按小数据量算法选路（0 小于全部阈值，各分支命中小数据侧），约定见
+    // SelectAicpuAlgo 入口说明
+    u64 dataSize = opParam.DataDes.count * perDataSize;
+
+    bool isDataTypeOrReduceTypeSpecial = opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+                                         opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+                                         opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+
+    double ratio;
+    if (topoInfo->userRankSize == 0) {
+        HCCL_WARNING("[AllReduceAutoSelector] the selector userRankSize not set");
+        ratio = 1;
+    } else {
+        ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize / topoInfo->userRankSize;
+    }
+    // devkit 的 IsTwoLevelNetLayer 无 opParam 入参（无 hostDPUOnly 前置检查），其余判定与 hccl 一致
+    bool isTwoLevelFlag = IsTwoLevelNetLayer(topoInfo);
+    bool overSequenceDataThreshold = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-        const bool twoLevel = IsTwoLevelNetLayer(topoInfo);
-        const bool matchChunkTwoShot = overMaxDataSize && !(twoLevel && overSequenceDataSize) &&
-                                       !(twoLevel && topoInfo->userRankSize == 2 && dataSize >= AR_2P_DETOUR_DATA_SIZE);
-        if (specialDataOrReduce) {
+        if (isDataTypeOrReduceTypeSpecial) {
             selectAlgName = dataSize <= AR_AICPU_1D_64DATATYPE_DATA_SIZE ? "AicpuAllReduceSoleMeshOneShot" :
                                                                            "AicpuAllReduceSoleMeshTwoShot";
-        } else if (matchChunkTwoShot) {
-            selectAlgName = "AicpuAllReduceSoleMeshChunkTwoShot";
+        } else if (isTwoLevelFlag && topoInfo->userRankSize == 2 && dataSize >= AR_2P_DETOUR_DATA_SIZE) {
+            // 两p条件下生效
+            // hccl：AicpuAllReduceSoleMeshConcur；devkit 未迁移，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleMeshConcur] is not migrated to devkit, "
+                "dataSize[%llu].",
+                dataSize);
+            return SelectorStatus::NOT_MATCH;
         } else if (dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE) {
             selectAlgName = "AicpuAllReduceSoleMeshOneShot";
+        } else if (dataSize * ratio > AR_AICPU_1D_MAX_DATA_SIZE) {
+            if (isTwoLevelFlag && overSequenceDataThreshold) {
+                // hccl：AicpuAllReduceSoleMeshConcur；devkit 未迁移，返回 NOT_MATCH。
+                HCCL_WARNING(
+                    "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleMeshConcur] is not migrated to devkit, "
+                    "dataSize[%llu].",
+                    dataSize);
+                return SelectorStatus::NOT_MATCH;
+            }
+            selectAlgName = "AicpuAllReduceSoleMeshChunkTwoShot";
         } else {
             selectAlgName = "AicpuAllReduceSoleMeshTwoShot";
         }
-        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-        return SelectorStatus::MATCH;
-    }
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix &&
-        IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
-        if (specialDataOrReduce) {
-            selectAlgName = dataSize <= AR_AICPU_1D_64DATATYPE_DATA_SIZE ? "AicpuAllReduceSoleMeshOneShot" :
-                                                                           "AicpuAllReduceSoleMeshTwoShot";
-        } else if (overMaxDataSize) {
-            selectAlgName = "AicpuAllReduceSoleMeshChunkTwoShot";
-        } else if (dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE) {
-            selectAlgName = "AicpuAllReduceSoleMeshOneShot";
+    } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
+        if (isDataTypeOrReduceTypeSpecial) {
+            selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
         } else {
-            selectAlgName = "AicpuAllReduceSoleMeshTwoShot";
+            // hccl：AicpuAllReduceSoleNHRMultiLink；devkit 未迁移，返回 NOT_MATCH。
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] hccl algo[AicpuAllReduceSoleNHRMultiLink] is not migrated to devkit.");
+            return SelectorStatus::NOT_MATCH;
         }
-        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-        return SelectorStatus::MATCH;
+    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        if (topoInfo->level0PcieMix) {
+            if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+                if (isDataTypeOrReduceTypeSpecial) {
+                    selectAlgName = dataSize <= AR_AICPU_1D_64DATATYPE_DATA_SIZE ? "AicpuAllReduceSoleMeshOneShot" :
+                                                                                   "AicpuAllReduceSoleMeshTwoShot";
+                } else if (dataSize <= AR_AICPU_1D_SMALL_DATA_SIZE) {
+                    selectAlgName = "AicpuAllReduceSoleMeshOneShot";
+                } else if (dataSize * ratio > AR_AICPU_1D_MAX_DATA_SIZE) {
+                    selectAlgName = "AicpuAllReduceSoleMeshChunkTwoShot";
+                } else {
+                    selectAlgName = "AicpuAllReduceSoleMeshTwoShot";
+                }
+            } else {
+                if (isDataTypeOrReduceTypeSpecial) {
+                    // hccl：AicpuAllReduceSequenceMeshNHRAicpuReduce；devkit 未迁移，返回 NOT_MATCH。
+                    HCCL_WARNING("[AllReduceAutoSelector] hccl algo[AicpuAllReduceSequenceMeshNHRAicpuReduce] is not "
+                                 "migrated to devkit.");
+                    return SelectorStatus::NOT_MATCH;
+                }
+                // hccl：< 32M 选 AicpuAllReduceParallelMeshNHR，>= 32M 选 AicpuAllReducePipeLineMeshNHR。
+                // devkit 的 Parallel/PipeLine executor 注册在 TopoMatchPcieMix 上，对应 PCIe 机型实现为
+                // AicpuAllreduceParallelMeshNHRPcie / AicpuAllReducePipeLinePcie。
+                selectAlgName = (dataSize < OMNI_PCIE_AR_DATA_SIZE) ? "AicpuAllreduceParallelMeshNHRPcie" :
+                                                                      "AicpuAllReducePipeLinePcie";
+            }
+        } else {
+            return SelectMeshAlgoAicpuUBX(topoInfo, opParam, dataSize, selectAlgName, isDataTypeOrReduceTypeSpecial);
+        }
+    } else {
+        HCCL_ERROR("[AllReduceAutoSelector] topo not match");
+        return SelectorStatus::NOT_MATCH;
     }
 
-    // PCIe 定制机型：Mesh 无法全连通时，普通类型且 < 32MB 走 Parallel 四模板流水。
-    // 大数据量和特殊类型仍保持既有 Pipeline/Sequence/兜底选择语义。
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix &&
-        !IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) && !specialDataOrReduce &&
-        dataSize < AR_PCIE_PARALLEL_MAX_DATA_SIZE) {
-        selectAlgName = "AicpuAllreduceParallelMeshNHRPcie";
-        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-        return SelectorStatus::MATCH;
-    }
-
-    HCCL_WARNING(
-        "[AllReduceAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU AllReduce.",
-        topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
-    return SelectorStatus::NOT_MATCH;
+    HCCL_DEBUG("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
 }
 
 // 对齐 hccl AllReduceAutoSelector::SelectCcuScheduleAlgo 分支框架：已注册算法（当前仅

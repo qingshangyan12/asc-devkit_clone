@@ -1208,9 +1208,27 @@ def compile_op_common_part(
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
 
+    context = get_context()
+    kernel_template_input = context.get_addition("kernel-template-input") if context is not None else None
+    if kernel_template_input:
+        CommonUtility.print_compile_log(
+            "",
+            f'Parameter "kernel-template-input" has been set to "{kernel_template_input}" '
+            f"while kernel_name={op_info.kernel_name}.",
+            AscendCLogLevel.LOG_INFO,
+        )
+        filtered_keys = ", ".join(str(key) for key in sorted(compile_info.tiling_key_list, key=int))
+        CommonUtility.print_compile_log(
+            "",
+            f"Filtered tilingkey list is {{{filtered_keys}}} while kernel_name={op_info.kernel_name}.",
+            AscendCLogLevel.LOG_INFO,
+        )
+
     kernel_spec = KernelSpecCompilation.create(compile_info, compile_option_tuple, tiling_info)
 
     with kernel_spec:
+        if kernel_spec.record_sk_commands:
+            DFXSectionGenerator().update_is_support(op_info)
         # generate tiling struct size, dfx section
         if global_var_storage.get_variable("ascendc_tiling_no_register"):
             file_name_tag = distinct_tag + "_meta_info.cpp"

@@ -379,6 +379,11 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
     EXPECT_EQ(firstResource.externalSourceDirectoryPath, sourceDirectoryPath);
     EXPECT_TRUE(fs::is_regular_file(firstResource.ownedResourceDirectoryPath / "payload.bin"));
 
+    MaterializedKernelCompilationResource missingResource;
+    EXPECT_EQ(
+        KernelSpecializationSession::LoadAndMaterializeCompilationResource("missing-resource", missingResource),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
     MaterializedKernelCompilationResource secondResource;
     ASSERT_EQ(
         KernelSpecializationSession::LoadAndMaterializeCompilationResource(resourceId, secondResource),

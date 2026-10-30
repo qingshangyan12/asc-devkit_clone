@@ -158,7 +158,7 @@ __global__ __mix__(1, 2) void asc_sync_inter_kernel(
             asc_copy_ub2gm_align(output, snapshot, total_bytes);
         }
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

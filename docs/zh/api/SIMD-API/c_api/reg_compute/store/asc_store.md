@@ -135,11 +135,16 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 #include "acl/acl.h"
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 constexpr uint32_t ELEMENT_COUNT = 128;
 constexpr uint32_t PARTIAL_COUNT = 16;
 constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t TOTAL_STORE_COUNT = ELEMENT_COUNT + PARTIAL_COUNT;
 constexpr uint32_t FULL_BASE = 1;
 constexpr uint32_t FULL_STRIDE = 144;
 constexpr uint32_t PARTIAL_BASE = 288;
@@ -150,14 +155,24 @@ constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
-__simd_vf__ inline void store_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input)
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = TOTAL_STORE_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
+__simd_vf__ inline void store_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
-    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
-        asc_store(output + FULL_BASE + repeat * FULL_STRIDE, src);
-        asc_store(output + PARTIAL_BASE + PARTIAL_OFFSET + repeat * PARTIAL_STRIDE,
-                  src, PARTIAL_COUNT);
+    uint32_t remaining = TOTAL_STORE_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t valid_count = remaining > ELEMENT_COUNT ? ELEMENT_COUNT : remaining;
+        if (valid_count == ELEMENT_COUNT) {
+            asc_store(output + FULL_BASE + i * FULL_STRIDE, src);
+        } else {
+            asc_store(output + FULL_BASE + i * FULL_STRIDE, src, valid_count);
+        }
+        asc_store(output + PARTIAL_BASE + PARTIAL_OFFSET + i * PARTIAL_STRIDE,
+                  src, valid_count > PARTIAL_COUNT ? PARTIAL_COUNT : valid_count);
+        remaining -= valid_count;
     }
 }
 
@@ -166,15 +181,21 @@ __global__ __vector__ void store_kernel(__gm__ uint16_t* output, __gm__ uint16_t
     asc_init();
     __ubuf__ uint16_t input_local[ELEMENT_COUNT];
     __ubuf__ uint16_t output_local[OUTPUT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(input_local, input, INPUT_BYTES);
     asc_copy_gm2ub(output_local, output, OUTPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<store_vf>(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<store_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, OUTPUT_BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
+    asc_sync();
 }
 } // namespace
 
@@ -209,13 +230,16 @@ int main()
     CHECK_ACL(aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST));
 
     std::vector<uint16_t> expected(OUTPUT_COUNT, SENTINEL);
+    uint32_t remaining = TOTAL_STORE_COUNT;
     for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
-        for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        const uint32_t valid_count = remaining > ELEMENT_COUNT ? ELEMENT_COUNT : remaining;
+        for (uint32_t i = 0; i < valid_count; ++i) {
             expected[FULL_BASE + repeat * FULL_STRIDE + i] = input[i];
         }
-        for (uint32_t i = 0; i < PARTIAL_COUNT; ++i) {
+        for (uint32_t i = 0; i < valid_count && i < PARTIAL_COUNT; ++i) {
             expected[PARTIAL_BASE + PARTIAL_OFFSET + repeat * PARTIAL_STRIDE + i] = input[i];
         }
+        remaining -= valid_count;
     }
 
     bool passed = true;

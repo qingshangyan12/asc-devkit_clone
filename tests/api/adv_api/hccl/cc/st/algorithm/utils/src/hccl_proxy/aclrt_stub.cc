@@ -33,6 +33,7 @@ thread_local uint32_t curr_dev_id = UINT32_MAX;
 namespace mc2_ops_hccl {
 bool g_rejectDirectAclrtMemcpy = false;
 uint32_t g_aclrtMemcpyCallCount = 0;
+thread_local bool g_bypassDirectAclrtMemcpyRejection = false;
 } // namespace mc2_ops_hccl
 
 namespace {
@@ -94,7 +95,7 @@ aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)
 aclError aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind)
 {
     ++mc2_ops_hccl::g_aclrtMemcpyCallCount;
-    if (mc2_ops_hccl::g_rejectDirectAclrtMemcpy) {
+    if (mc2_ops_hccl::g_rejectDirectAclrtMemcpy && !mc2_ops_hccl::g_bypassDirectAclrtMemcpyRejection) {
         return ACL_ERROR_INTERNAL_ERROR;
     }
     if (dst == nullptr || src == nullptr) {

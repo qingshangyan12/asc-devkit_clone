@@ -40,6 +40,41 @@ TopoMeta MakeMesh1dClosTopo(const std::vector<uint32_t>& phyIds)
 
 } // namespace
 
+// ===== 大禹纯 CLOS（DIE0-only 建链）=====
+// scenario.pureClosTopo=true 时 TopoModel 把 L0 建模为单 CLOS 实例全互联（UBC_CTP 链路），
+// selector 走纯 CLOS 分支选 CcuSchedAllToAllSoleMesh，模板 CalcChannelRequestMesh1DOnDie
+// 在 devPhyId 4/4 翻转 die 的双 die 链路中只取 DIE0（stub：devPhyId>=4 → die1）。
+// phyId {0..3} 落 DIE0、{4..7} 落 DIE1，8 rank 即双 die 混布场景。
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_2Rank_PureClos_Fp16_100B)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_8Rank_PureClos_Fp16_64B)
+{
+    // 8 rank 双 die 混布（phyId 0-3 = die0，4-7 = die1）：盲选建链会混出跨 die 通道集，
+    // DIE0-only 过滤后 7 条通道全部落在 die0
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 64);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_8Rank_PureClos_Fp32_1KB)
+{
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP32, 1024);
+    scenario.pureClosTopo = true;
+    scenario.expectedAlgName = "CcuSchedAllToAllSoleMesh";
+    VerifyScenario(scenario);
+}
+
 // ===== 拓扑泛化（FP16, CcuSchedAllToAllSoleMesh）=====
 TEST_F(CcuStAllToAll, CcuSchedAllToAllSoleMesh_2Rank_SingleDie_Fp16_100B)
 {

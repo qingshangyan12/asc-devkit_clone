@@ -144,18 +144,6 @@ __simd_callee__ inline void ReciprocalCast(S& dstReg, V& srcReg, MaskReg& mask)
 }
 
 #endif
-#if __NPU_ARCH__ == 9202
-template <CMPMODE mode = CMPMODE::GE, typename T, typename U>
-__simd_callee__ inline void MulCompares(MaskReg& dst, T& srcReg0, T& srcReg1, U scalarValue, MaskReg& mask)
-{
-    MulComparesImpl<mode, T, U>(dst, srcReg0, srcReg1, scalarValue, mask);
-}
-template <const CastTrait& trait, typename T, typename U>
-__simd_callee__ inline void MulCast(T& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    MulCastImpl<trait, T, U>(dstReg, srcReg0, srcReg1, mask);
-}
-#endif
 
 } // namespace Reg
 } // namespace AscendC

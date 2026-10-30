@@ -34,7 +34,7 @@
 - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
 
 **图1**  `asc_sync_notify`和`asc_sync_wait`接口功能示意图    
-![](../../figures/asc_sync_notify.png)
+![](../../../../figures/asc_sync_notify.png)
 
 ## 函数原型
 
@@ -136,13 +136,14 @@ __global__ __vector__ void asc_sync_notify_kernel(__gm__ float* output, __gm__ f
     __ubuf__ float x[ELEMENTS], y[ELEMENTS], z[ELEMENTS];
     asc_copy_gm2ub_align(x, src0, BYTES);
     asc_copy_gm2ub_align(y, src1, BYTES);
+    // 计算读取搬入结果，必须等待MTE2完成，避免PIPE_V读取未完成的数据。
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     add_vf(z, x, y);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, z, BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 } // namespace

@@ -33,10 +33,10 @@
 本接口支持连续数据搬运和高维切分数据搬运。连续数据搬运按`size`指定的字节数在UB内连续搬运，如图1所示；高维切分数据搬运按`burst_count`指定搬运的数据块个数，每个数据块按`burst_len`指定的DataBlock个数搬运，并通过`src_gap`和`dst_gap`指定源操作数和目的操作数相邻数据块之间的间隔，如图2所示。
 
 **图1**  连续搬运示意图
-![](../figures/asc_copy_ub2ub_continuous.png "连续搬运示意图")
+![](../../../figures/asc_copy_ub2ub_continuous.png "连续搬运示意图")
 
 **图2**  高维切分搬运示意图
-![](../figures/asc_copy_ub2ub_highdim_split.png "高维切分搬运示意图")
+![](../../../figures/asc_copy_ub2ub_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 
@@ -136,13 +136,15 @@ __global__ __vector__ void asc_copy_ub2ub_kernel(__gm__ uint8_t* output, __gm__ 
     asc_init();
     __ubuf__ uint8_t source[INPUT_BYTES], copied[INPUT_BYTES];
     asc_copy_gm2ub_align(source, input, INPUT_BYTES);
-    asc_sync_mte2(0);
-    // Copy INPUT_BYTES within UB on PIPE_V before the MTE3 consumer starts.
+    // UB内搬运使用PIPE_V，需等待PIPE_MTE2搬入完成。
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    // 先在UB内生成独立副本，再搬出该副本，以验证源数据和目的数据没有发生混淆。
     asc_copy_ub2ub(copied, source, INPUT_BYTES);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, copied, INPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

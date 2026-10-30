@@ -45,7 +45,7 @@ AIC 0中在执行asc_sync_intra_wait后，此时AIC 0 sync_id=0的计数器为0�
 - AIV 0-1的PIPE_MTE3指令全部执行完毕后，asc_sync_intra_arrive生效。此时调度模块感知1个AIV已执行完asc_sync_intra_arrive，因此将AIC 0 sync_id=0的计数器值增加为1。AIC 0检测到对应的sync_id=0的计数器变为1，则AIC 0核解除阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
 
 **图1**  block内同步时序图（AIV进行asc_sync_intra_arrive）
-![](../../figures/single_ai_core_aic_single_aiv_sync.png "block内同步时序图（AIV进行asc_sync_intra_arrive）")
+![](../../../../figures/single_ai_core_aic_single_aiv_sync_c_api.png "block内同步时序图（AIV进行asc_sync_intra_arrive）")
 
 核间同步具体使用方法，请参考[调用示例](#调用示例)。
 
@@ -168,7 +168,7 @@ __global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ half* input, __gm__ f
                         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
                         asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

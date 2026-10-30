@@ -18,21 +18,23 @@ namespace mc2_ops_hccl {
 class InsTempAllGatherOmniPipeNHR : public InsTempAllGatherNHR {
 public:
     explicit InsTempAllGatherOmniPipeNHR(
-        const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
+        const OpParam& param, const u32 rankId, // 传通信域的rankId，userRank
+        const std::vector<std::vector<u32>>& subCommRanks);
     ~InsTempAllGatherOmniPipeNHR() override;
     std::string Describe() const override
     {
-        std::string info = "Template of all gather nhr (omniPipe) with tempRankSize ";
+        std::string info = "Template of all gather nhr (OmniPipe) with tempRankSize ";
         info += std::to_string(templateRankSize_);
         return info;
     }
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& tempAlgParams,
         const TemplateResource& templateResource) override;
-    HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels) override;
 
 private:
-    HcclResult RunAllGatherNHRChannel(
+    void InitKernelParams(const OpParam& param, const TemplateDataParams& tempAlgParams);
+    HcclResult SyncInterThreads(const std::vector<ThreadHandle>& threads, bool mainToSub);
+    HcclResult RunAllGatherNHR(
         const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
         const u32& channelIdx);
 
@@ -45,8 +47,11 @@ private:
     std::vector<std::vector<std::vector<u64>>> dataOffsetVec_;
     bool omniLastStepRead_ = false;
     bool lastStepNhrCopy_ = false;
+    // KernelRun 缓存对称窗口及窗口内偏移；NHR 数据面通过 output 窗口访问对端输出。
+    u64 inputOffset_{0};
+    u64 outputOffset_{0};
+    void* inputSymWindow_{nullptr};
+    void* outputSymWindow_{nullptr};
 };
-
 } // namespace mc2_ops_hccl
-
 #endif // INS_TEMP_ALL_GATHER_OMNIPIPE_NHR_H

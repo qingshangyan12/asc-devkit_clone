@@ -284,6 +284,219 @@ HcclResult CalcChannelRequestMesh1D(
     return HCCL_SUCCESS;
 }
 
+HcclResult CalcChannelRequestMesh1DOnDie(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, u32 expectedDieId)
+{
+#ifndef AICPU_COMPILE
+    (void)param;
+    channels.clear();
+    auto it = std::find(subcommInfo[COMM_LEVEL0].begin(), subcommInfo[COMM_LEVEL0].end(), topoInfo->userRank);
+    CHK_PRT_RET(
+        (it == subcommInfo[COMM_LEVEL0].end()),
+        HCCL_ERROR("[CalcChannelRequestMesh1DOnDie] Rank [%u] is not in commInfo.", topoInfo->userRank),
+        HcclResult::HCCL_E_PARA);
+
+    u32 myRank = topoInfo->userRank;
+    std::vector<CommProtocol> expectedProtocols;
+    CHK_RET(GetProtocolByEngine(param, expectedProtocols));
+
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank == topoInfo->userRank) {
+            continue;
+        }
+        size_t channelCountBefore = channels.size();
+        uint32_t* netLayers;
+        uint32_t netLayerNum;
+        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+        std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
+
+        for (auto netLayer : netLayersVector) {
+            // die 过滤仅在 NetLayer0 有意义（die 是设备侧端点属性，L0 是设备直连层）；
+            // L1/L2 的链路（如跨 server 出框链路）不经由本 die 的设备端口，不做 die 比较。
+            if (netLayer != 0U) {
+                continue;
+            }
+            CommLink* linkList = nullptr;
+            u32 listSize;
+            CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, rank, &linkList, &listSize));
+            if (listSize == 0) {
+                continue;
+            }
+            std::vector<CommLink> links(linkList, linkList + listSize);
+            for (auto expectedProtocol : expectedProtocols) {
+                for (u32 idx = 0; idx < links.size(); idx++) {
+                    if (links[idx].linkAttr.linkProtocol != expectedProtocol) {
+                        continue;
+                    }
+                    const u32 dieIdTypeSize = sizeof(uint32_t);
+                    uint32_t linkDieId = 0;
+                    EndpointDesc localEndpoint = links[idx].srcEndpointDesc;
+                    CHK_RET(HcclRankGraphGetEndpointInfo(
+                        comm, myRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, dieIdTypeSize,
+                        static_cast<void*>(&linkDieId)));
+                    HCCL_INFO(
+                        "[CalcChannelRequestMesh1DOnDie] link between myRank=%u and rank=%u, netLayer=%u, "
+                        "protocol=%u, dieId=%u (expect %u).",
+                        myRank, rank, netLayer, static_cast<u32>(expectedProtocol), linkDieId, expectedDieId);
+                    if (linkDieId != expectedDieId) {
+                        continue;
+                    }
+                    CHK_RET(CreateChannelFromLink(
+                        comm, myRank, rank, netLayer, idx, links[idx], std::string("[CalcChannelRequestMesh1DOnDie]"),
+                        channels));
+                    break;
+                }
+                if (channels.size() > channelCountBefore) {
+                    break;
+                }
+            }
+            if (channels.size() > channelCountBefore) {
+                break;
+            }
+        }
+
+        CHK_PRT_RET(
+            channels.size() == channelCountBefore,
+            HCCL_ERROR(
+                "[CalcChannelRequestMesh1DOnDie] Failed to create channel between myRank=%u and rank=%u on "
+                "dieId[%u], there is no link.",
+                myRank, rank, expectedDieId),
+            HcclResult::HCCL_E_INTERNAL);
+    }
+#endif
+    return HCCL_SUCCESS;
+}
+
+// 同一协议下每 die 取首条链路（对齐 hccl ProcessLinkForProtocol）
+static HcclResult ProcessLinkForProtocolWithDieDedup(
+    HcclComm comm, const std::vector<CommProtocol>& expectedProtocols, const std::vector<CommLink>& linkList,
+    u32 myRank, u32 remoteRank, uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool& protocolFound,
+    const std::string& funcName)
+{
+    protocolFound = false;
+    std::set<uint32_t> seenDie;
+    for (auto expectedProtocol : expectedProtocols) {
+        for (u32 idx = 0; idx < linkList.size(); idx++) {
+            if (linkList[idx].linkAttr.linkProtocol != expectedProtocol) {
+                continue;
+            }
+            uint32_t dieId = 0;
+            HcclResult dieRet = HcclRankGraphGetEndpointInfo(
+                comm, myRank, &linkList[idx].srcEndpointDesc, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
+            bool shouldAdd = true;
+            if (dieRet == HCCL_SUCCESS) {
+                shouldAdd = seenDie.insert(dieId).second;
+            }
+            if (shouldAdd) {
+                CHK_RET(
+                    CreateChannelFromLink(comm, myRank, remoteRank, netLayer, idx, linkList[idx], funcName, channels));
+                protocolFound = true;
+            }
+        }
+        if (protocolFound) {
+            break;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
+// 取 level0 每个对端均有链路的首个网络层（对齐 hccl GetRankFullMeshLayers）
+static HcclResult GetRankFullMeshLayers(
+    HcclComm comm, const std::vector<std::vector<u32>>& subcommInfo, std::vector<uint32_t> netLayersVector, u32 myRank,
+    u32& curNetLayer)
+{
+#ifndef AICPU_COMPILE
+    for (auto netLayer : netLayersVector) {
+        bool isStainPath = true;
+        HCCL_INFO("netlayer=%d", netLayer);
+        CommLink* linkList = nullptr;
+        u32 listSize = 0;
+        for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+            if (rank == myRank) {
+                continue;
+            }
+            CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, rank, &linkList, &listSize));
+            HCCL_INFO("dstrank = %d,listsize = %d", rank, listSize);
+            if (listSize == 0) {
+                isStainPath = false;
+                break;
+            }
+        }
+        if (isStainPath) {
+            curNetLayer = netLayer;
+            HCCL_INFO("curNetLayer=%d", curNetLayer);
+            break;
+        }
+        CHK_PRT_RET(
+            (curNetLayer == 0) && (netLayer != 0),
+            HCCL_ERROR("[GetRankFullMeshLayers] Failed to get cur netlayer myRank=%u .", myRank),
+            HcclResult::HCCL_E_INTERNAL);
+    }
+    return HCCL_SUCCESS;
+#else
+    (void)comm;
+    (void)subcommInfo;
+    (void)netLayersVector;
+    (void)myRank;
+    (void)curNetLayer;
+    HCCL_ERROR("[GetRankFullMeshLayers] This function is not supported in AICPU mode, myRank[%u].", myRank);
+    return HcclResult::HCCL_E_NOT_SUPPORT;
+#endif
+}
+
+HcclResult CalcChannelRequestMesh1DFullMesh(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
+{
+#ifndef AICPU_COMPILE
+    channels.clear();
+    (void)param;
+    auto it = std::find(subcommInfo[COMM_LEVEL0].begin(), subcommInfo[COMM_LEVEL0].end(), topoInfo->userRank);
+    CHK_PRT_RET(
+        (it == subcommInfo[COMM_LEVEL0].end()),
+        HCCL_ERROR("[CalcChannelRequestMesh1DFullMesh] Rank [%u] is not in commInfo.", topoInfo->userRank),
+        HcclResult::HCCL_E_PARA);
+    std::vector<CommProtocol> expectedProtocols;
+    u32 myRank = topoInfo->userRank;
+    CHK_RET(GetProtocolByEngine(param, expectedProtocols));
+
+    uint32_t* netLayers = nullptr;
+    uint32_t netLayerNum = 0;
+    uint32_t curNetLayer = 0;
+    CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+    std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
+    CHK_RET(GetRankFullMeshLayers(comm, subcommInfo, netLayersVector, myRank, curNetLayer));
+
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank == topoInfo->userRank) {
+            continue;
+        }
+        CommLink* linkList = nullptr;
+        u32 listSize;
+        CHK_RET(HcclRankGraphGetLinks(comm, curNetLayer, myRank, rank, &linkList, &listSize));
+        CHK_PRT_RET(
+            (listSize == 0),
+            HCCL_ERROR(
+                "[CalcChannelRequestMesh1DFullMesh] These is no link between myRank=%u, dstRank=%u.", myRank, rank),
+            HcclResult::HCCL_E_INTERNAL);
+        std::vector<CommLink> links(linkList, linkList + listSize);
+        bool protocolFound = false;
+        CHK_RET(ProcessLinkForProtocolWithDieDedup(
+            comm, expectedProtocols, links, myRank, rank, curNetLayer, channels, protocolFound,
+            std::string("[CalcChannelRequestMesh1DFullMesh]")));
+    }
+    return HCCL_SUCCESS;
+#else
+    (void)comm;
+    (void)param;
+    (void)topoInfo;
+    (void)subcommInfo;
+    (void)channels;
+    return HcclResult::HCCL_E_INTERNAL;
+#endif
+}
+
 static HcclResult CheckNetLayerExists(HcclComm comm, u32 netLayer, const std::string& tag, bool linkRequired)
 {
 #ifndef AICPU_COMPILE

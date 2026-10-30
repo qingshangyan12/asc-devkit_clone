@@ -1,4 +1,4 @@
-# asc_copy_l0c2l1
+# asc_copy_l0c2l1（NPU架构版本3510）
 
 ## 产品支持情况
 
@@ -238,7 +238,7 @@ __global__ __mix__(1, 2) void CopyL0c2l1Kernel(
         if (asc_get_sub_block_id() == 0)
             asc_copy_ub2gm_align(output, output_ub, ELEMENTS * sizeof(int32_t));
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 } // namespace
 

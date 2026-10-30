@@ -139,7 +139,7 @@ __global__ __mix__(1, 2) void asc_set_gm2l1_padding_kernel(  // __mix__：AIC配
         asc_sync_pipe(PIPE_MTE1);
         asc_sync_intra_arrive(PIPE_MTE1, AIC_TO_AIV_SYNC_ID);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 } // namespace
 

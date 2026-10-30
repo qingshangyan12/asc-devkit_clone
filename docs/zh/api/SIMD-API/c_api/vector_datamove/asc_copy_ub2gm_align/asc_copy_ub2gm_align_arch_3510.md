@@ -1,4 +1,4 @@
-# asc_copy_ub2gm_align
+# asc_copy_ub2gm_align（NPU架构版本3510）
 
 ## 产品支持情况
 
@@ -50,10 +50,10 @@
     - Normal模式下将`src_stride`设置为64，各数据块在UB中的起始偏移依次为0、64、128，每个数据块分别补充16字节dummy假数据。
 
     **图1**  Compact模式32字节对齐读数示意图
-    ![](../../figures/asc_copy_ub2gm_align_compact_padding.png "Compact模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_ub2gm_align_compact_padding.png "Compact模式32字节补齐示意图")
 
     **图2**  Normal模式32字节对齐读数示意图
-    ![](../../figures/asc_copy_ub2gm_align_normal_padding.png "Normal模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_ub2gm_align_normal_padding.png "Normal模式32字节补齐示意图")
 
     两种模式下，dummy假数据均不会写入GM。当只搬运1个数据块，或`burst_len`已经32字节对齐时，两种模式的搬运结果相同。
 
@@ -221,11 +221,12 @@ __global__ __vector__ void asc_copy_ub2gm_align_arch3510_kernel(__gm__ uint8_t* 
     asc_init();
     __ubuf__ uint8_t local[INPUT_BYTES];
     asc_copy_gm2ub_align(local, input, INPUT_BYTES);
-    asc_sync_mte2(0);
-    // Copy INPUT_BYTES from UB to GM, then wait only for PIPE_MTE3.
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    // 选择256字节覆盖一个完整寄存器的数据量，便于逐字节核对对齐搬出结果。
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
-    asc_sync_mte3(0);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

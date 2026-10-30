@@ -134,6 +134,20 @@ enum class mem_type {
     vec_all,
     scalar_all,
 };
+
+enum class div_algo {
+    INTRINSIC,
+    PRECISION_0ULP_FTZ_TRUE,
+    DIFF_COMPENSATION,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_FALSE,
+    PRECISION_1ULP_FTZ_FALSE
+};
+
+enum class merge_mode {
+    zeroing,
+    merging,
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc

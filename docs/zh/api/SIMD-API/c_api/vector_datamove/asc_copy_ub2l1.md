@@ -37,14 +37,14 @@
     将一段连续数据从UB搬运到L1 Buffer，如图1所示。
 
     **图1**  连续搬运示意图
-    ![](../figures/asc_copy_ub2l1_continuous.png "连续搬运示意图")
+    ![](../../../figures/asc_copy_ub2l1_continuous.png "连续搬运示意图")
 
 - 高维切分数据搬运
 
     将多个连续传输数据块从UB搬运到L1 Buffer。每个数据块的长度以及相邻数据块之间的间隔均以DataBlock（32字节）为单位指定，如图2所示。
 
     **图2**  高维切分搬运示意图
-    ![](../figures/asc_copy_ub2l1_highdim_split.png "高维切分搬运示意图")
+    ![](../../../figures/asc_copy_ub2l1_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 
@@ -107,6 +107,7 @@ PIPE_MTE3
 ### 通用约束
 
 - 本接口在非AIV上调用直接返回。
+- 本接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为1：2的配置。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 
@@ -177,7 +178,7 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
             asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
         asc_sync_pipe(PIPE_FIX);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 void print_row(const char* name, const std::vector<float>& data)

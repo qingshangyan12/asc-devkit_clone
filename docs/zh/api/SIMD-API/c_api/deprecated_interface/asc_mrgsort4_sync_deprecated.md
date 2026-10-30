@@ -35,11 +35,11 @@
 asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，也就是asc_bitsort指令的输出，队列的结构Region Proposal如下所示：
 - 数据类型为float，每个结构占据8 Bytes。
 
-![ ](../figures/mrgsort4_01.png)
+![ ](../../../figures/mrgsort4_01.png)
 
 - 数据类型为half，每个结构也占据8 Bytes，中间有2 Bytes保留。
 
-![ ](../figures/mrgsort4_02.png)
+![ ](../../../figures/mrgsort4_02.png)
 
 ## 函数原型
 
