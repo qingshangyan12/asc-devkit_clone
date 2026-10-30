@@ -1722,6 +1722,7 @@
             -   [寄存器同步控制](SIMD-API/tensor_api/reg_vector_compute/reg_sync_control/reg_sync_control.md)
                 - [mem_bar](SIMD-API/tensor_api/reg_vector_compute/reg_sync_control/mem_bar.md)
             -   [类型转换](SIMD-API/tensor_api/reg_vector_compute/type_conversion/type_conversion.md)
+                -   [舍入模式与饱和模式](SIMD-API/tensor_api/reg_vector_compute/type_conversion/rounding_mode.md)
                 -   [cast](SIMD-API/tensor_api/reg_vector_compute/type_conversion/cast.md)
                 -   [trunc](SIMD-API/tensor_api/reg_vector_compute/type_conversion/trunc.md)
             -   [基础算术](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/basic_arithmetic.md)
