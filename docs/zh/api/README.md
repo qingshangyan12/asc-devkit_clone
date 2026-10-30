@@ -3488,6 +3488,7 @@
         -   [aclrtcGetLoweredName](Utils-API/RTC/aclrtcGetLoweredName.md)
         -   [aclrtcGetCompileLogSize](Utils-API/RTC/aclrtcGetCompileLogSize.md)
         -   [aclrtcGetCompileLog](Utils-API/RTC/aclrtcGetCompileLog.md)
+        -   [aclrtcKernelSpecialization](Utils-API/RTC/aclrtcKernelSpecialization.md)
         -   [RTC错误码](Utils-API/RTC/RTC_error_code.md)
 
     -   [log](Utils-API/log/log.md)
