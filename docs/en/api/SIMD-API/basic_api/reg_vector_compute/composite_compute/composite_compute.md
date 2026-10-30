@@ -1,0 +1,17 @@
+# Composite Computation<a name="ZH-CN_TOPIC_0000002008668586"></a>
+
+<!-- md-trans-meta sourceCommit=7f211052f814e6d340cc6bf2dfc44c8393b5424f translatedAt=2026-09-23T16:05:28.237Z pushedAt=2026-10-26T07:41:44.493Z nl=2 -->
+
+- **[Overview](overview.md)**
+
+- **[Axpy](Axpy.md)**  
+
+- **[AbsSub](AbsSub.md)**  
+
+- **[ExpSub](ExpSub.md)**  
+
+- **[MulDstAdd](MulDstAdd.md)**  
+
+- **[MulAddDst](MulAddDst.md)**  
+
+- **[MulsCast](MulsCast.md)**  
