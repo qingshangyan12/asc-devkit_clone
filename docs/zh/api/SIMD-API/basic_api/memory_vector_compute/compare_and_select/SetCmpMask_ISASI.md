@@ -67,6 +67,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 ## 数据类型
 
 支持数据类型为：b8、b16、b32、b64。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/SetCmpMask_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -75,6 +76,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 无
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/SetCmpMask_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

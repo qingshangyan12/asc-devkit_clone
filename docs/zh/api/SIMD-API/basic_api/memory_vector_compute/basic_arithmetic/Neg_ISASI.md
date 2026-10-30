@@ -61,6 +61,7 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为int8_t、int16_t、half、int32_t、float、int64_t。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Neg_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section14483414194"></a>
 
@@ -70,6 +71,7 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Neg_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 

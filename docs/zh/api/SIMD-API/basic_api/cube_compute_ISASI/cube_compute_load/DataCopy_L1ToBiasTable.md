@@ -95,6 +95,7 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 | blockLen   | 待搬运的每个连续传输数据块长度，uint16_t类型，取值范围：blockLen∈[0, 65535]。<br>不同产品型号的blockLen单位不同，具体请参考[约束说明](#zh-cn_topic_0000002566886667_section2045914466492)。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）**。                                                                                                                                                      |
 | srcGap     | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，srcGap∈[0, 2^16-1]。<br>&nbsp;&nbsp;&bull; blockCount = 1时，srcGap无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; blockCount ≠ 1时，当srcGap=0时，表示重复搬出源操作数的第一个数据块。 |
 | dstGap     | 目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），uint16_t类型，dstGap∈[0, 2^16-1]。<br>不同产品型号的dstGap单位不同，具体请参考[约束说明](#zh-cn_topic_0000002566886667_section2045914466492)。<br>&nbsp;&nbsp;&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。 |
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToBiasTable_res.md#id3 -->
 
 ## 数据类型<a id="zh-cn_topic_0000002566886667_section4219135304818"></a>
 
@@ -141,11 +142,13 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
   <!-- npu="910b" id18 -->
   - 针对Atlas A2系列产品，单位为64字节。
   <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToBiasTable_res.md#id4 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002566886667_section088124295117"></a>
 
 L1 Buffer->BiasTable Buffer，搬运Bias参数。
 
+<!-- npu="950,A3,910b" id21 -->
 ```cpp
 // c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32, 0, 0}，否则为 {1, 16, 0, 0}。
 AscendC::LocalTensor<outputType> bias1Local(AscendC::TPosition::C1, c1Addr, biasSizeAlign);
@@ -168,5 +171,7 @@ __aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
     AscendC::DataCopy(bias2Local, bias1Local, c12c2Params);
 }
 ```
+<!-- end id21 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToBiasTable_res.md#id5 -->
 
 完整示例请参考[data_copy_gm2l1样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。

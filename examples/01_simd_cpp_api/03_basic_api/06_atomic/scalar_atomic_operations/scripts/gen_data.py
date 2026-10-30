@@ -29,11 +29,11 @@ def gen_golden_data(scenario_num=1):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    if scenario_num == 1:
+    if scenario_num == 1 or scenario_num == 3:
         input_y = np.ones([block_length], dtype=np.int32)
         input_y.tofile("./input/input_y.bin")
         golden = input_y.copy()
-        golden[0] = golden[0] + use_core_num * 1
+        golden[0] = golden[0] + (1 if scenario_num == 3 else use_core_num) * 1
         golden.tofile("./output/golden.bin")
     elif scenario_num == 2:
         input_y = np.ones([block_length], dtype=np.int32)
@@ -45,6 +45,6 @@ def gen_golden_data(scenario_num=1):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=[1, 2])
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=[1, 2, 3])
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

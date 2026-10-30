@@ -214,7 +214,7 @@ __aicore__ inline void Scatter(
 template <typename T, typename U>
 __aicore__ inline void ScatterDataCopy(
     const GlobalTensor<T>& dstGlobal, const LocalTensor<T>& srcLocal, const LocalTensor<U>& offsetLocal,
-    ScatterParams& scatterParams)
+    const ScatterParams& scatterParams)
 {
     ASCENDC_ASSERT(
         (SupportType<

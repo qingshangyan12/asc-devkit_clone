@@ -191,7 +191,7 @@ class NormClassifyFusion:
             self.assemble_extra_params(input_desc_vec, extra_params)
 
         input_desc_vec.append(self.axes)
-        self.ins_list = classify(inputs_desc_list, self.mode, extra_params)
+        self.ins_list = classify(input_desc_vec, self.mode, extra_params)
 
     def init(self):
         norm_op_type = None

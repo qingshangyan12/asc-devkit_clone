@@ -115,6 +115,7 @@ $dst_i = src0_i \& src1_i$
 <!-- npu="9030" id17 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id17 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/And_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -165,6 +166,7 @@ $dst_i = src0_i \& src1_i$
   - 针对Ascend 950PR&950DT系列产品，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id30 -->
 <!-- end id26 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/And_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

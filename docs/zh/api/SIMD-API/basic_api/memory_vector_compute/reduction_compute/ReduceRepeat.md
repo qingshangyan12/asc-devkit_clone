@@ -154,6 +154,7 @@
 - Kirin 9030处理器系列产品
 <!-- end id26 -->
 <!-- end id19 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceRepeat_res.md#id2 -->
 
 ## 返回值说明
 
@@ -236,6 +237,7 @@
     <!-- npu="9030" id40 -->
     - Kirin 9030处理器系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
     <!-- end id40 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceRepeat_res.md#id3 -->
 
 ## 关键特性说明
 

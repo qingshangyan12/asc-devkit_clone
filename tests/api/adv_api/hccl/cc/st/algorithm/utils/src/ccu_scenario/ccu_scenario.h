@@ -62,6 +62,10 @@ struct CcuStScenario {
     // 双 die L1 链路 opt-in：两级拓扑下同 pod 跨 server 的每对 rank 生成 die0/die1 各一条链路，
     // 触发 SoleNHR2die 的 dieNum=2 探测（双 mission）。默认关闭（单链路 → dieNum=1）。
     bool twoDieLink = false;
+    // 大禹纯 CLOS 拓扑模式：L0 建模为单实例覆盖全部 rank 的 CLOS（无 mesh 实例），
+    // L0 链路协议给 UBC_CTP，供 CCU SoleMesh 的 DIE 过滤建链（CalcChannelRequestMesh1DOnDie）
+    // 与 selector 纯 CLOS 分支在 sim 下可端到端验证。默认关闭。
+    bool pureClosTopo = false;
 };
 
 } // namespace CcuSt

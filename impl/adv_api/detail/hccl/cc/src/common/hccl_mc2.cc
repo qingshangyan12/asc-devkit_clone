@@ -444,9 +444,7 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     }
     if (kind == ForcedAlgKind::BARE_NAME) {
         if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
-            // 未注册裸名不在此处拒绝：与 TryForcedAlgAndPrepareEngine 的既有回退语义
-            // 对齐（未注册 → WARNING + 回退默认 selector 兜底），保持"算法名指定错误
-            // 回退兜底算法"的行为；若 selector 也无法兜底才向上报不支持
+            // 未注册裸名回退默认 selector 兜底，selector 无法兜底才向上报不支持
             HCCL_WARNING(
                 "[MC2_EXT_ALG] algorithm[%s] is not registered in mc2_client for opType[%u], fallback to default "
                 "selector.",
@@ -528,9 +526,6 @@ HcclResult AllocComResourceByTilingCcu(
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
-    // 设备侧 InitV2 以 version==MC2_CCU_LAUNCH_VERSION 识别新版 context（否则按 legacy
-    // HcclCombineOpParam 解释，MC2 op kernel 会读错布局）。零值初始化会让设备侧
-    // 一直走 legacy 分支——builtin 路径（Mc2AcquireCcResCtx）有写，tiling 路径此前漏写。
     resCtx.version = static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION);
     if (checkOnly) {
         resCtx.rankId = userRank;

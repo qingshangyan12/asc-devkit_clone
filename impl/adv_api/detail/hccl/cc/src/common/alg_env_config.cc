@@ -1006,6 +1006,8 @@ const bool& GetExternalInputHcclAicpuUnfold()
 
 const uint8_t& GetExternalInputHcclAicpuCacheEnable() { return g_algEnvConfig.aicpuCacheEnable; }
 
+const u8& GetExternalInputHcclDeterministic() { return g_algEnvConfig.hcclDeterministic; }
+
 const bool& GetExternalInputHcclAivMode() { return g_algEnvConfig.aivMode; }
 
 const bool& GetExternalInputHcclAivOnlyMode() { return g_algEnvConfig.aivOnlyMode; }

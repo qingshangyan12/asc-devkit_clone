@@ -55,11 +55,11 @@ unsigned long long num_threads() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned long long* result)
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
         unsigned long long thread_num = tile.num_threads(); // 返回16
-        ...
+        result[threadIdx.x] = thread_num;
     }
     ```
 
@@ -69,10 +69,16 @@ unsigned long long num_threads() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ unsigned long long* result)
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
         unsigned long long thread_num = tile.num_threads(); // 返回16
-        ...
+        result[threadIdx.x] = thread_num;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+```

@@ -47,6 +47,7 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 | sync_instruction | 展示同步与内存栅栏接口的使用方法，适用于混合编程中SIMT线程协作和跨阶段数据可见性控制。样例链接：[sync_instruction](../03_simt_api/02_features/01_api_features/01_sync_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 | atomic_operation | 展示原子操作接口的使用方法，适用于混合编程中多线程累加、计数或冲突写入处理。样例链接：[atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 | warp_instruction | 展示Warp级数据交换能力，可用于了解Warp内线程协作和数据传递方式。样例链接：[warp_instruction](../03_simt_api/02_features/01_api_features/03_warp_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| lambda_operator_hybrid | 以LeakyReLU-Affine融合与Clamp算子为载体，展示混合编程各执行上下文（SIMT VF/SIMD VF/核函数体）中Lambda捕获外部参数的实际编程作用与callee标记规则。样例链接：[lambda_operator_hybrid](./03_features/lambda_operator_hybrid)。 | 混合编程语言特性样例，SIMT编程对照版见[lambda_operator_capture](../03_simt_api/02_features/02_language_features/00_lambda_operator_capture)。 |
 
 ## trouble_shooting
 
