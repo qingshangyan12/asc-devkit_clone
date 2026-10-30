@@ -211,7 +211,7 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            CCU_IF (ctx.missionIndex == 0) {
+            CCU_IF (ctx.missionIndex == 1) {
                 CCU_CHK_RET(CallKfcSubKernel(param, ctx, recordAddr));
             }
             MissionPostSync(ctx);
