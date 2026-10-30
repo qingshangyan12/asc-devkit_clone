@@ -33,11 +33,11 @@ ccache -Cz         #同时清空缓存内容和统计
 开发调试时，推荐在CMake配置阶段通过命令行启用ccache，不需要修改工程文件：
 
 ```bash
-cmake -S . -B build_out --preset=default \
+cmake -S . -B build \
     -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
 ```
 
-该命令会把ccache配置写入`build_out/CMakeCache.txt`。后续继续使用同一个`build_out`构建目录时，会沿用这个配置。
+该命令会把ccache配置写入`build/CMakeCache.txt`。后续继续使用同一个`build`构建目录时，会沿用这个配置。
 
 **写入顶层CMakeLists.txt**
 
@@ -60,8 +60,8 @@ set(CMAKE_CXX_COMPILER_LAUNCHER /usr/bin/ccache)
 
 ```bash
 ccache -Cz
-cmake -S . -B build_out --preset=default -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
+cmake --build build --target binary package -j$(nproc)
 ccache --show-stats -v
 ```
 
@@ -73,15 +73,15 @@ ccache --show-stats -v
 
 ```bash
 ccache -z
-cmake --build build_out --target clean
-cmake --build build_out --target binary package -j$(nproc)
+cmake --build build --target clean
+cmake --build build --target binary package -j$(nproc)
 ccache --show-stats -v
 ```
 
 第二次构建后，`Hits`或`Primary storage`中的`Hits`应明显提升。如果仍然没有命中，优先检查：
 
 - configure阶段是否传入了`-DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)`。
-- 构建目录中的编译命令是否包含ccache，可搜索`build_out`下的`build.make`。
+- 构建目录中的编译命令是否包含ccache，可搜索`build`下的`build.make`。
 - 两次编译的源码、编译器和编译选项是否一致。
 
 更多`ccache`配置和缓存行为说明请参考[ccache官方文档](https://ccache.dev/documentation.html)。
@@ -133,8 +133,8 @@ ccache --set-config=compiler_check=content
 
 ```bash
 ccache -Cz
-cmake -S . -B build_out --preset=default -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
+cmake --build build --target binary package -j$(nproc)
 ccache --show-stats -v
 ```
 
@@ -142,8 +142,8 @@ ccache --show-stats -v
 
 ```bash
 ccache -z
-cmake --build build_out --target clean
-cmake --build build_out --target binary package -j$(nproc)
+cmake --build build --target clean
+cmake --build build --target binary package -j$(nproc)
 ccache --show-stats -v
 ```
 
@@ -245,7 +245,7 @@ npu_op_kernel_options(ascendc_kernels AddCustomTemplate COMPUTE_UNIT Ascendxxyy 
 `ASCEND_SOC_SERIES`配置了多少个芯片型号，核函数（Kernel）侧通常就会按芯片型号分别编译。开发阶段如果只在当前机器上验证，可修改CMakeLists.txt中的配置保留当前SOC，或者在CMake配置阶段临时只构建某个SOC。以下示例只构建ascendxxx SOC：
 
 ```bash
-cmake -S . -B build_out --preset=default -DASCEND_SOC_SERIES=ascendxxx
+cmake -S . -B build -DASCEND_SOC_SERIES=ascendxxx
 ```
 
 **存量工程说明**：存量工程也可以使用参数`-DASCEND_COMPUTE_UNIT=ascendxxx`达到同样效果；两个参数不能同时传入。
@@ -267,8 +267,8 @@ npu_op_package(${package_name}
 然后在configure阶段关闭二进制编译：
 
 ```bash
-cmake -S . -B build_out --preset=default -DENABLE_BINARY_PACKAGE=False
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build -DENABLE_BINARY_PACKAGE=False
+cmake --build build --target binary package -j$(nproc)
 ```
 
 该模式下仍会执行Host侧库、Tiling库和配置文件生成，但传给核函数（Kernel）编译脚本的`--enable-binary`为`False`，不会生成核函数（Kernel） `.o`二进制文件；`op_kernel/ascendc_kernels/binary/dynamic/`下会保留核函数（Kernel）源码等文件。
@@ -287,47 +287,47 @@ cmake --build build_out --target binary package -j$(nproc)
 - 如果机器内存较小，或核函数（Kernel）编译阶段出现明显卡顿、系统负载过高，可改为`nproc / 2`或固定较小值。
 
 ```bash
-cmake --build build_out --target binary package -j$(nproc)
-cmake --build build_out --target binary package -j8
+cmake --build build --target binary package -j$(nproc)
+cmake --build build --target binary package -j8
 ```
 
 ## 增量编译
 
-增量编译指不删除`build_out`，继续使用同一个构建目录，CMake复用上一次configure生成的构建规则、中间文件和部分已编译产物。避免每次构建都从零开始，加快构建编译速度。
+增量编译指不删除`build`，继续使用同一个构建目录，CMake复用上一次configure生成的构建规则、中间文件和部分已编译产物。避免每次构建都从零开始，加快构建编译速度。
 
 第一次构建时，需要先执行configure，再执行build：
 
 ```bash
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build
+cmake --build build --target binary package -j$(nproc)
 ```
 
 **增量编译**：之后如果只是修改已有源码文件，通常只需要重新执行build。Host侧C++文件、Tiling实现等CMake可追踪依赖的目标，一般可以根据文件变更按需触发对应目标重新编译。
 
 ```bash
-cmake --build build_out --target binary package -j$(nproc)
+cmake --build build --target binary package -j$(nproc)
 ```
 
 **全量编译**：但是如果修改了工程结构、CMake配置或会影响代码生成的内容，例如修改算子原型、修改CMakeLists.txt配置或者新增/删除算子文件等，需要先重新执行configure，再build：
 
 ```bash
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build
+cmake --build build --target binary package -j$(nproc)
 ```
 
-大多数源码小改动都不需要清空`build_out`。只有在怀疑构建目录里残留了错误状态时，才需要重新创建干净的build目录：
+大多数源码小改动都不需要清空`build`。只有在怀疑构建目录里残留了错误状态时，才需要重新创建干净的build目录：
 
 ```bash
-rm -rf build_out
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary package -j$(nproc)
+rm -rf build
+cmake -S . -B build
+cmake --build build --target binary package -j$(nproc)
 ```
 
 **增量编译和ccache**可以配合使用。增量编译减少需要重新处理的目标；当某些文件仍被触发重编时，ccache可以在源码、编译命令和编译器一致的情况下复用缓存：
 
 ```bash
-cmake -S . -B build_out --preset=default -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
-cmake --build build_out --target binary package -j$(nproc)
+cmake -S . -B build -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache)
+cmake --build build --target binary package -j$(nproc)
 ```
 
-后续继续使用同一个`build_out`时，`CMAKE_CXX_COMPILER_LAUNCHER`会保存在`build_out/CMakeCache.txt`中，不需要每次build都重新传入。
+后续继续使用同一个`build`时，`CMAKE_CXX_COMPILER_LAUNCHER`会保存在`build/CMakeCache.txt`中，不需要每次build都重新传入。

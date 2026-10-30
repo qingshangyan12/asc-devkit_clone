@@ -48,8 +48,8 @@ npu_op_package(${package_name}
 执行编译和安装：
 
 ```bash
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary install -j$(nproc)
+cmake -S . -B build
+cmake --build build --target binary install -j$(nproc)
 ```
 
 > [!NOTE]说明
@@ -86,8 +86,8 @@ npu_op_package(${package_name}
 执行编译和安装：
 
 ```bash
-cmake -S . -B build_out --preset=default
-cmake --build build_out --target binary install -j$(nproc)
+cmake -S . -B build
+cmake --build build --target binary install -j$(nproc)
 ```
 
 编译成功后，主要产物位于`${CMAKE_INSTALL_PREFIX}`：
