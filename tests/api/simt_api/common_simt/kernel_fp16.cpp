@@ -254,6 +254,13 @@ half half::operator+=(const half fp)
     val = Fp16Add(val, fp.val);
     return *this;
 }
+
+half half::operator-(const half fp) const { return half(Fp16ToFloat(val) - Fp16ToFloat(fp.val)); }
+
+half half::operator*(const half fp) const { return half(Fp16ToFloat(val) * Fp16ToFloat(fp.val)); }
+
+half half::operator/(const half fp) const { return half(Fp16ToFloat(val) / Fp16ToFloat(fp.val)); }
+
 // compare
 bool half::operator==(const half& fp) const
 {
