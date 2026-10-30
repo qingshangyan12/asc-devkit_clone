@@ -53,94 +53,94 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint
 
 // ==========asc_scatter_ub2gm===========
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
 {
     if ASC_IS_AIV {
         scatter_ubuf_to_gm(
-            dst, src, 0, offset_type, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
+            dst, src, 0, offset_type, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
             offset_num);
     }
 }
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
 {
     if ASC_IS_AIV {
         scatter_ubuf_to_gm(
-            dst, src, 0, offset_type, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
+            dst, src, 0, offset_type, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
             offset_num);
     }
 }
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
 {
     if ASC_IS_AIV {
         scatter_ubuf_to_gm(
-            dst, src, 0, offset_type, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
+            dst, src, 0, offset_type, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
             offset_num);
     }
 }
 
 __aicore__ inline void asc_scatter_ub2gm(
-    __gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint8_t offset_type, __ubuf__ void* offset_src,
+    __gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint8_t offset_type, __ubuf__ void* offset_addr,
     asc_store_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
 {
     if ASC_IS_AIV {
         scatter_ubuf_to_gm(
-            dst, src, 0, offset_type, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
+            dst, src, 0, offset_type, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len, src_stride,
             offset_num);
     }
 }
 
 // ==========asc_gather_gm2ub===========
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }
 
 __aicore__ inline void asc_gather_gm2ub(
-    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool constant_padding_ctl,
-    __ubuf__ void* offset_src, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
+    __ubuf__ uint64_t* dst, __gm__ uint64_t* src, uint8_t offset_type, bool enable_constant_pad,
+    __ubuf__ void* offset_addr, asc_load_l2_cache_mode l2_cache_mode, uint32_t burst_len, uint32_t dst_stride,
     uint32_t offset_num)
 {
     if ASC_IS_AIV {
         gather_gm_to_ubuf(
-            dst, src, 0, offset_type, constant_padding_ctl, offset_src, static_cast<uint8_t>(l2_cache_mode), burst_len,
+            dst, src, 0, offset_type, enable_constant_pad, offset_addr, static_cast<uint8_t>(l2_cache_mode), burst_len,
             dst_stride, offset_num);
     }
 }

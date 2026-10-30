@@ -654,17 +654,17 @@ FixPipe常用于`L0C Buffer -> GM`或相关矩阵搬出路径。对一致性分�
 
 预取用于提前把后续可能访问的数据或指令放入Cache，目的是降低访问延迟。相关说明见[系统缓存概述](../../../../api/SIMD-API/basic_api/cache_control/system_cache_overview.md)。从一致性角度看，预取会改变数据或指令进入Cache的时机，可能会导致一致性问题。
 
-#### L2 Cache预取
+### L2 Cache预取
 
 L2 Cache和GM之间没有一致性问题，因此L2 Cache的预取不会导致多核间数据不一致问题。但这不表示L2 Cache预取获得的数据就是期望的：如果生产者写入的新值还停留在DCache中、MTE3写GM尚未完成，或者消费者读取顺序早于生产者写入完成，那么L2 Cache中提前加载到的仍可能是GM可见的旧值。此时仍应回到对应章节处理生产者写回、访问完成等待和读端旧副本失效。
 
-#### DCache预取
+### DCache预取
 
 [asc_datacache_preload](../../../../api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md)用于从指定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。它的作用是让后续Scalar读取更可能命中DCache，而不是建立新的同步或一致性关系。
 
 DCache是每个核内独立的缓存，因此DCache预取会在当前核DCache中提前形成GM数据副本。如果预取之后，同一GM地址被其他核、MTE、原子操作或SIMT路径更新，当前核后续普通Scalar读可能继续命中预取形成的旧副本。需要读取最新GM数据时，仍要按[DCache缓存一致性](#DCache与GM的缓存一致性)执行DCCI失效旧副本，或使用绕过DCache的读接口。
 
-#### ICache预取
+### ICache预取
 
 [asc_icache_preload](../../../../api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md)用于从指令所在GM地址预加载指令到ICache中。ICache预取主要影响取指性能，不参与普通数据的生产者-消费者可见性判断，也没有一致性问题。
 

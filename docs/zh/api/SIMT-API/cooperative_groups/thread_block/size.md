@@ -55,12 +55,11 @@ static unsigned int size()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned int* result)
     {
-        ...
         thread_block g = this_thread_block();
-        unsigned int thread_num = g.size();
-        ...
+        unsigned int size = g.size();
+        result[threadIdx.x] = size;
     }
     ```
 
@@ -70,11 +69,16 @@ static unsigned int size()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ unsigned int* result)
     {
-        ...
         thread_block g = this_thread_block();
-        unsigned int thread_num = g.size();
-        ...
+        unsigned int size = g.size();
+        result[threadIdx.x] = size;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
+```

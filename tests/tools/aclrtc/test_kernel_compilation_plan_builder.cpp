@@ -258,11 +258,11 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
     NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentAddresses, argumentByteCounts);
     request.compilerOptions.basicOptions = {"-g", "-DVALUE=1"};
 
+    Json manifest = CreateManifest();
+    manifest["options"]["common_compile"].push_back("-I${source_file_path}/../../common");
     KernelCompilationPlan plan;
     EXPECT_EQ(
-        BuildPlanFromManifest(
-            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
-        0);
+        BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan), 0);
 
     ASSERT_EQ(plan.sourcePatches.size(), 1U);
     EXPECT_EQ(plan.sourcePatches[0].targetFilePath, workspace.ResourcePath() / "resources/include/constants.h");
@@ -276,6 +276,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
         compileCommand.arguments,
         (std::vector<std::string>{
             "-I", workspace.SourceDirectoryPath().string(), "-I" + (workspace.ToolchainPath() / "include").string(),
+            "-I" + workspace.SourceDirectoryPath().string() + "/../../common",
             (workspace.ResourcePath() / "resources/src/basic.cpp").string(), "-g", "-DVALUE=1", "-o",
             (workspace.ResourcePath() / ".aclrtc_session_1/outputs/basic.o").string()}));
     EXPECT_EQ(plan.compilationCommands[1].commandKind, CompilationCommandKind::Link);

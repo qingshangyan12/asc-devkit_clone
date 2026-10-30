@@ -41,8 +41,6 @@ struct AlltoAllMesh1DContext : CcuKernelCtxBase {
     ccu::Variable srcOffset;
     ccu::Variable dstOffset;
     GroupOpSizeVars goSize;
-
-    ccu::Event event;
 };
 
 CcuResult CcuAlltoAllMesh1DKernel(

@@ -150,6 +150,7 @@ $$
 | float              | half        |
 
 <!-- end id12 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/SubReluCast_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -180,6 +181,7 @@ $$
   - tensor高维切分计算接口占用8KB UB临时空间。
   - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/SubReluCast_res.md#id3 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

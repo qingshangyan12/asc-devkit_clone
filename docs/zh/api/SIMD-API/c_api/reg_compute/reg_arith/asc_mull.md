@@ -118,27 +118,43 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint32_t);
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(uint32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint32_t);
 
 __simd_vf__ inline void mull_vf(__ubuf__ uint32_t* output_low,
                                 __ubuf__ uint32_t* output_high,
                                 __ubuf__ uint32_t* input0,
-                                __ubuf__ uint32_t* input1)
+                                __ubuf__ uint32_t* input1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint32_t src0;
     vector_uint32_t src1;
     vector_uint32_t dst0;
     vector_uint32_t dst1;
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
-    asc_loadalign(src0, input0);
-    asc_loadalign(src1, input1);
-    asc_mull(dst0, dst1, src0, src1, mask);
-    asc_storealign(output_low, dst0, mask);
-    asc_storealign(output_high, dst1, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src0, input0 + offset);
+        asc_loadalign(src1, input1 + offset);
+        asc_mull(dst0, dst1, src0, src1, mask);
+        asc_storealign(output_low + offset, dst0, mask);
+        asc_storealign(output_high + offset, dst1, mask);
+    }
 }
 
 __global__ __vector__ void asc_mull_kernel(__gm__ uint32_t* output_low,
@@ -147,30 +163,36 @@ __global__ __vector__ void asc_mull_kernel(__gm__ uint32_t* output_low,
                                            __gm__ uint32_t* input1)
 {
     asc_init();
-    __ubuf__ uint32_t output_low_local[ELEMENT_COUNT];
-    __ubuf__ uint32_t output_high_local[ELEMENT_COUNT];
-    __ubuf__ uint32_t input0_local[ELEMENT_COUNT];
-    __ubuf__ uint32_t input1_local[ELEMENT_COUNT];
+    __ubuf__ uint32_t output_low_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint32_t output_high_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint32_t input0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint32_t input1_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input0_local, input0, BUFFER_BYTES);
     asc_copy_gm2ub_align(input1_local, input1, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    mull_vf(output_low_local, output_high_local, input0_local, input1_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<mull_vf>(output_low_local, output_high_local, input0_local, input1_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output_low, output_low_local, BUFFER_BYTES);
     asc_copy_ub2gm_align(output_high, output_high_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint32_t> input0(ELEMENT_COUNT);
-    std::vector<uint32_t> input1(ELEMENT_COUNT);
-    std::vector<uint32_t> output_low(ELEMENT_COUNT, 0);
-    std::vector<uint32_t> output_high(ELEMENT_COUNT, 0);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<uint32_t> input0(TOTAL_LENGTH);
+    std::vector<uint32_t> input1(TOTAL_LENGTH);
+    std::vector<uint32_t> output_low(TOTAL_LENGTH, 0);
+    std::vector<uint32_t> output_high(TOTAL_LENGTH, 0);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         input0[i] = i + 1;
         input1[i] = 0x10000000U + i;
     }
@@ -193,7 +215,7 @@ int main()
     aclrtMemcpy(output_high.data(), BUFFER_BYTES, output_high_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
     bool passed = true;
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         const uint64_t expected = static_cast<uint64_t>(input0[i]) * input1[i];
         if (output_low[i] != static_cast<uint32_t>(expected) ||
             output_high[i] != static_cast<uint32_t>(expected >> 32)) {

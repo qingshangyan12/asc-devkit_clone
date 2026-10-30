@@ -157,7 +157,7 @@ __aicore__ inline void TestSubCarry()
 {
     reg_type<T> src0{};
     reg_type<T> src1{};
-    reg_type<bool> borrow_src{};
+    reg_type<bool> carry_src{};
     src0.mask = all_mask<T>().reg;
 
     auto result_without_borrow = asc::te::experimental::sub_carry(src0, src1);
@@ -165,7 +165,7 @@ __aicore__ inline void TestSubCarry()
     EXPECT_EQ(result_without_borrow.first.mask, src0.mask);
     EXPECT_EQ(result_without_borrow.second.mask, src0.mask);
 
-    auto result = asc::te::experimental::sub_carry(src0, src1, borrow_src);
+    auto result = asc::te::experimental::sub_carry(src0, src1, carry_src);
     static_assert(AscendC::Std::is_same_v<decltype(result), reg_pair<T, bool>>);
     EXPECT_EQ(result.first.mask, src0.mask);
     EXPECT_EQ(result.second.mask, src0.mask);
@@ -196,6 +196,37 @@ __aicore__ inline void TestDiv()
     auto dst = src0 / src1;
     static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
     EXPECT_EQ(dst.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestSoftwareDivDefault()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::div(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+__aicore__ inline void TestSoftwareDivModes()
+{
+    reg_type<float> src0{};
+    reg_type<float> src1{};
+    src0.mask = all_mask<float>().reg;
+    src1.mask = none_mask<float>().reg;
+
+    auto default_dst = asc::te::experimental::div(src0, src1);
+    auto precise_dst = asc::te::experimental::div<true>(src0, src1);
+    auto ftz_dst =
+        asc::te::experimental::div<true, asc::te::experimental::div_algo::PRECISION_0ULP_FTZ_TRUE>(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(default_dst), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(precise_dst), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(ftz_dst), reg_type<float>>);
+    EXPECT_EQ(default_dst.mask, src0.mask);
+    EXPECT_EQ(precise_dst.mask, src0.mask);
+    EXPECT_EQ(ftz_dst.mask, src0.mask);
 }
 
 template <typename T>
@@ -263,6 +294,17 @@ BASIC_ARITHMETIC_TEST(Div, half)
 BASIC_ARITHMETIC_TEST(Div, int32_t)
 BASIC_ARITHMETIC_TEST(Div, uint32_t)
 BASIC_ARITHMETIC_TEST(Div, float)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, int16_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, uint16_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, half)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, int32_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, uint32_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, float)
+TEST(test_tensor_api_basic_arithmetic, SoftwareDivModes_float)
+{
+    TestSoftwareDivModes();
+    SUCCEED();
+}
 BASIC_ARITHMETIC_TEST(Min, int8_t)
 BASIC_ARITHMETIC_TEST(Min, uint8_t)
 BASIC_ARITHMETIC_TEST(Min, int16_t)

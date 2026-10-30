@@ -1,4 +1,4 @@
-# asc_copy_l12fb_sync_arch_3510（废弃）
+# asc_copy_l12fb_sync（NPU架构版本3510，废弃）
 
 ## 产品支持情况
 

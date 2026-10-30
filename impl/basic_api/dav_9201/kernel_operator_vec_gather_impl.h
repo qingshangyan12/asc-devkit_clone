@@ -584,8 +584,8 @@ struct GatherOffsetDTypeEncoding {
 
 template <typename T, typename U>
 __aicore__ inline void GatherFromGlobalImpl(
-    __ubuf__ T* dst, __gm__ T* src, __ubuf__ U* offsetSrc, GatherParams& gatherParam,
-    GatherPadParams<T>& gatherPadParam, const uint8_t cacheMode)
+    __ubuf__ T* dst, __gm__ T* src, __ubuf__ U* offsetSrc, const GatherParams& gatherParam,
+    const GatherPadParams<T>& gatherPadParam, const uint8_t cacheMode)
 {
     if ASCEND_IS_AIV {
         const bool constPaddingCtrl = gatherPadParam.padSel == GatherPaddingMode::CONSTANT_PADDING_MODE;

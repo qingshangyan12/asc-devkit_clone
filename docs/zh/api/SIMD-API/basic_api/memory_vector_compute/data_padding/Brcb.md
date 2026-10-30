@@ -112,6 +112,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 <!-- npu="9030" id15 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：uint16_t、half、uint32_t、float。
 <!-- end id15 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Brcb_res.md#id2 -->
 
 ## 返回值说明<a name="section459672612511"></a>
 
@@ -140,6 +141,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
   - 针对Ascend 950PR&950DT系列产品，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id21 -->
 <!-- end id17 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Brcb_res.md#id3 -->
 
 ## 关键特性说明
 

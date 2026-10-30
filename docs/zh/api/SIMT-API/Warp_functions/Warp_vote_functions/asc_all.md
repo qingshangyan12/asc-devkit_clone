@@ -102,3 +102,11 @@ inline int32_t asc_all(int32_t predicate)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+input: 0, 1, 2, 3, 14, 15, 16, 17
+input2: 0, 1, 2, 3, 14, 15, 16, 17
+equal_flags: 1
+```

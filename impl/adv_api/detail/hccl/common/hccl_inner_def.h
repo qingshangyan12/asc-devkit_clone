@@ -187,6 +187,16 @@ enum class CcuProtocolVersion : uint8_t {
     INVALID = 2U,
 };
 
+// Arch-based CCU protocol version: A6 (9201/9202) uses V2, others (A5/3510) use V1.
+__aicore__ inline constexpr CcuProtocolVersion GetArchCcuProtocolVersion()
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    return CcuProtocolVersion::CCU_V2;
+#else
+    return CcuProtocolVersion::CCU_V1;
+#endif
+}
+
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
     GM_ADDR xnAddr;

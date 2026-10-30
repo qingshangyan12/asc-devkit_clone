@@ -49,7 +49,11 @@ struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
     ccu::LocalAddr myDst;
     std::vector<ccu::RemoteAddr> dst;
     std::vector<ccu::LocalAddr> src;
-    ccu::Event event;
+    // rankSize>16 时 uint16_t event mask 不够：按 16 rank 一组拆多个 event，
+    // 每 rank 预计算 (event 序号, 组内 mask)，避免 kernel 主循环里重复除法/移位
+    std::vector<ccu::Event> events;
+    std::vector<uint16_t> eventMaskOfRank;
+    std::vector<uint32_t> eventIdxOfRank;
     ccu::Variable flag; // 用以判断是否是第一次重复
     ccu::Variable xnConst1;
 };
