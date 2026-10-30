@@ -75,7 +75,7 @@ npu_op_package_add(${vendor_name}
 )
 ```
 
-接口参数见[CMake函数参考](../aclnn_operator_development/appendix/cmake_function_reference.md#npu_op_library)。框架调用还需要入图原型库，请按[编译入图原型库](../operator_graph_development/overview.md#graph-library)在`op_host/CMakeLists.txt`中补充GRAPH库配置，然后重新编译安装算子包。
+接口参数见[CMake函数参考](../aclnn_operator_development/appendix/cmake_function_reference.md#npu_op_library)。框架调用还需要入图原型库，请按[编译与部署基本流程](../aclnn_operator_development/compilation_and_deployment/basic_process.md#graph-library)在`op_host/CMakeLists.txt`中补充GRAPH库配置，然后重新编译安装算子包。
 
 当TensorFlow算子与CANN算子原型定义一致时，TensorFlow框架适配插件实现代码如下：
 
@@ -245,7 +245,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
       explicit AddCustomOp(OpKernelConstruction* context) : OpKernel(context) {}
     
       void Compute(OpKernelContext* context) override {
-        OP_REQUIRES_OK(context, errors::Unimplemented("AddCustomOp is not supported on CPU")); 
+        OP_REQUIRES(context, false, errors::Unimplemented("AddCustomOp is not supported on CPU")); 
       }
     };
     
