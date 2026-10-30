@@ -20,6 +20,10 @@
 #include "external_alg_resolver.h"
 #include "external_alg_rules.h"
 #include "gtest/gtest.h"
+#include "sim_communicator.h"
+#include "sim_world.h"
+
+#include "acl/acl_rt.h"
 
 using namespace mc2_ops_hccl;
 
@@ -350,6 +354,120 @@ TEST(ExtAlgRules, CondPeerOnlySemantics)
     OpParam op = MakeOpParam();                 // hcclComm 为空 -> 查询前提不满足，保守不命中
     EXPECT_FALSE(CondPeerOnly(&eightRank, op)); // rankSize!=2 直接 false
     EXPECT_FALSE(CondPeerOnly(&twoRank, op));   // 无 comm 环境保守 false（真实链路走 ST）
+}
+
+// ---- COND_PEER_ONLY 与建链同口径（sim 链路世界）----
+// 本目标链接的 hccl_stub 将 HcclRankGraphGetLayers/GetLinks 委托给 sim 世界
+// （SimCommunicator.topoModel_，TopoMeta+DevType 决定层序与链路协议），可构造谓词的
+// 关键判定形态；"raw 链数"与"协议过滤后通道数"的差异即量纲修正的判定面。
+namespace {
+// Init/Deinit 成对（同 all_reduce/reduce_scatter 等 sim 用例范式）；comm 初始化失败路径
+// 自清理，防止脏 SimWorld 单例（残留 TopoMeta/DevType 拓扑）影响同二进制内后续用例。
+// aclrtSetDevice：桩内 curr_dev_id 默认 UINT32_MAX，谓词路径一旦引入设备类查询
+// （GetCcuVersion/hrtGetDeviceType，见 parallel_migration_testcase 判例）会在 CommDomain
+// 查询抛 InvalidParamsException——显式落 rank0 设备，异常失败防御。
+HcclComm MakeSimComm(const TopoMeta& topoMeta, DevType devType)
+{
+    HcclSim::SimWorld::Global()->Init(topoMeta, devType);
+    (void)aclrtSetDevice(0U);
+    HcclComm comm = nullptr;
+    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, 0U, &comm) != HCCL_SUCCESS) {
+        HcclSim::SimWorld::Global()->Deinit();
+        return nullptr;
+    }
+    return comm;
+}
+
+void DestroySimComm(HcclComm& comm)
+{
+    if (comm != nullptr) {
+        delete static_cast<HcclSim::SimCommunicator*>(comm);
+        comm = nullptr;
+    }
+    HcclSim::SimWorld::Global()->Deinit();
+}
+
+// 旧实现消费 topo->netLayerDetails.netLayers[0]，镜像 sim 世界层序（HcclRankGraphGetLayers）
+TopoInfoWithNetLayerDetails MakeTwoRankTopo(const std::vector<u32>& netLayers)
+{
+    TopoInfoWithNetLayerDetails topo = MakeFlatMesh1DTopo(2U);
+    topo.netLayerDetails.netLayerNum = static_cast<u32>(netLayers.size());
+    topo.netLayerDetails.netLayers = netLayers;
+    return topo;
+}
+
+OpParam MakeCcuOpParam(HcclComm comm)
+{
+    OpParam op = MakeOpParam();
+    op.engine = CommEngine::COMM_ENGINE_CCU;
+    op.hcclComm = comm;
+    return op;
+}
+} // namespace
+
+TEST(ExtAlgRules, CondPeerOnlySingleCtpChannelHits)
+{
+    // TP2 单 server 950（MESH_1D）：L0 0↔1 恰 1 条 UBC_CTP（同行设备直连）→ 恰 1 通道，命中
+    HcclComm comm = MakeSimComm(TopoMeta{{{{0, 1}}}}, DevType::DEV_TYPE_950);
+    ASSERT_NE(comm, nullptr);
+    TopoInfoWithNetLayerDetails topo = MakeTwoRankTopo({0U});
+    EXPECT_TRUE(CondPeerOnly(&topo, MakeCcuOpParam(comm)));
+    DestroySimComm(comm);
+}
+
+TEST(ExtAlgRules, CondPeerOnlyCrossLayerSingleCtpChannelHits)
+{
+    // D2 跨层窗口：同 pod 跨 server（2 server × 1 rank）→ L0 无链、L1 恰 1 条 UBC_CTP，
+    // 建链按层序落至 L1 产出 1 通道 → 命中；旧量纲只数 layer[0] raw 链（0 条）→ 漏检回落裸名
+    HcclComm comm = MakeSimComm(TopoMeta{{{{0}}, {{1}}}}, DevType::DEV_TYPE_950);
+    ASSERT_NE(comm, nullptr);
+    TopoInfoWithNetLayerDetails topo = MakeTwoRankTopo({0U, 1U});
+    OpParam op = MakeCcuOpParam(comm);
+    EXPECT_TRUE(CondPeerOnly(&topo, op));
+    op.hcclComm = nullptr; // 同一拓扑下无 comm 仍保守不命中
+    EXPECT_FALSE(CondPeerOnly(&topo, op));
+    DestroySimComm(comm);
+}
+
+TEST(ExtAlgRules, CondPeerOnlyRejectsNonCcuProtocolRawLink)
+{
+    // 量纲修正（误命中方向）：910B 同 server phyIds{0,9} → L0 恰 1 条 RESERVED 原始链。
+    // raw 链数==1 是量纲错误：CCU 引擎协议集 [UBC_CTP, UBC_TP] 过滤后 0 通道
+    // （模板守卫 channelCount==1 必拒，谓词须同口径不命中）
+    HcclComm comm = MakeSimComm(TopoMeta{{{{0, 9}}}}, DevType::DEV_TYPE_910B);
+    ASSERT_NE(comm, nullptr);
+    TopoInfoWithNetLayerDetails topo = MakeTwoRankTopo({0U});
+    OpParam op = MakeCcuOpParam(comm);
+    EXPECT_FALSE(CondPeerOnly(&topo, op));
+    op.engine = CommEngine::COMM_ENGINE_RESERVED; // 引擎协议集为空：查询前提不满足，保守不命中
+    EXPECT_FALSE(CondPeerOnly(&topo, op));
+    DestroySimComm(comm);
+}
+
+TEST(ExtAlgRules, CondPeerOnlyRequiresExactlyOneChannel)
+{
+    // 精确计数守卫：大禹纯 CLOS（既有 opt-in 旋钮）下 TP2 L0 有 die0/die1 两条 UBC_CTP
+    // → 通道数 2 != 1 → 不命中（区分"恰 1 条"与"存在 CCU 协议链"两种实现）
+    setenv("ENABLE_PURE_CLOS_TOPO_FOR_LLT", "1", 1); // TopoModel 构造期读取，须先于 comm 创建
+    HcclComm comm = MakeSimComm(TopoMeta{{{{0, 1}}}}, DevType::DEV_TYPE_950);
+    unsetenv("ENABLE_PURE_CLOS_TOPO_FOR_LLT");
+    ASSERT_NE(comm, nullptr);
+    TopoInfoWithNetLayerDetails topo = MakeTwoRankTopo({0U});
+    EXPECT_FALSE(CondPeerOnly(&topo, MakeCcuOpParam(comm)));
+    DestroySimComm(comm);
+}
+
+TEST(ExtAlgRules, CondPeerOnlyNoCcuChannelOnAnyLayerMisses)
+{
+    // 全层无 CCU 协议通道：910B 跨 server → L0 无链、L1 恰 1 条 ROCE（非 CCU 协议集）→ 不命中
+    // （覆盖"该层有链但无引擎协议命中 → 下一层"分支）
+    HcclComm comm = MakeSimComm(TopoMeta{{{{0}}, {{1}}}}, DevType::DEV_TYPE_910B);
+    ASSERT_NE(comm, nullptr);
+    TopoInfoWithNetLayerDetails topo = MakeTwoRankTopo({0U, 1U});
+    EXPECT_FALSE(CondPeerOnly(&topo, MakeCcuOpParam(comm)));
+    TopoInfoWithNetLayerDetails eightRank = MakeFlatMesh1DTopo(8U); // rankSize!=2：真实 comm 下仍不命中
+    EXPECT_FALSE(CondPeerOnly(&eightRank, MakeCcuOpParam(comm)));
+    DestroySimComm(comm);
 }
 
 TEST(ExtAlgRules, MachineFlagsAreMutuallyExclusive)

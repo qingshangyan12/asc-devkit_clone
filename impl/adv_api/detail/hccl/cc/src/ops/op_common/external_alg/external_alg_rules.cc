@@ -10,6 +10,7 @@
 #include "external_alg_rules.h"
 
 #include "auto_selector_base.h"
+#include "channel.h"
 #include "hccl_rank_graph.h"
 #include "log.h"
 
@@ -39,27 +40,62 @@ bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
     return dataSize * topo->userRankSize > RS_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD;
 }
 
-// 查询前提不满足或查询失败时保守不命中，裸名候选兜底
+// COND_PEER_ONLY：与模板资源期守卫同口径的选名期预判。
+// 语义目标 = CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly::CalcRes
+// "TP2 且 CalcChannelRequestMesh1D 恰建 1 条对端通道"（peer_only.cc "expected one peer
+// channel"；kernel channelCount==1 硬约束）。预判 = 复刻建链查询（同层序
+// HcclRankGraphGetLayers + 同引擎协议优先级 GetProtocolByEngine，channel.cc）：
+// 首个命中层×协议的链数 == 1 ⇔ 模板守卫通过。查询失败/前提不满足保守不命中（裸名兜底）。
 bool CondPeerOnly(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
 {
     if (topo == nullptr || topo->userRankSize != 2U) {
         return false;
     }
-    if (opParam.hcclComm == nullptr || topo->netLayerDetails.netLayers.empty()) {
+    if (opParam.hcclComm == nullptr) {
         return false;
     }
-    CommLink* links = nullptr;
-    uint32_t linkNum = 0;
     const uint32_t peerRank = (topo->userRank == 0U) ? 1U : 0U;
-    const HcclResult ret = HcclRankGraphGetLinks(
-        opParam.hcclComm, topo->netLayerDetails.netLayers[0], topo->userRank, peerRank, &links, &linkNum);
-    if (ret != HCCL_SUCCESS) {
-        HCCL_INFO(
-            "[MC2_EXT_ALG] COND_PEER_ONLY query links failed, ret[%d], fallback to bare candidate.",
-            static_cast<int>(ret));
+
+    // 引擎协议优先级与建链同源（漏斗① EngineMatch 先于②，谓词求值时 param.engine 即候选行引擎）
+    std::vector<CommProtocol> expectedProtocols;
+    if (GetProtocolByEngine(opParam, expectedProtocols) != HCCL_SUCCESS || expectedProtocols.empty()) {
         return false;
     }
-    return linkNum == 1U;
+    // 层序与建链同源（HcclRankGraphGetLayers，勿用 netLayerDetails 快照——保序一致）
+    uint32_t* netLayers = nullptr;
+    uint32_t netLayerNum = 0;
+    if (HcclRankGraphGetLayers(opParam.hcclComm, &netLayers, &netLayerNum) != HCCL_SUCCESS || netLayers == nullptr ||
+        netLayerNum == 0U) { // 指针与计数双查，同 auto_selector_base 口径
+        return false;
+    }
+    const std::vector<uint32_t> layerVec(netLayers, netLayers + netLayerNum);
+
+    for (uint32_t netLayer : layerVec) {
+        CommLink* links = nullptr;
+        uint32_t linkNum = 0;
+        if (HcclRankGraphGetLinks(opParam.hcclComm, netLayer, topo->userRank, peerRank, &links, &linkNum) !=
+            HCCL_SUCCESS) {
+            // 建链此处 CHK_RET 硬错 → 两候选终态一致，谓词保守不命中
+            HCCL_INFO("[MC2_EXT_ALG] COND_PEER_ONLY query links failed, fallback to bare candidate.");
+            return false;
+        }
+        if (linkNum == 0U) {
+            continue; // 该层无链 → 下一层（与建链一致）
+        }
+        for (CommProtocol protocol : expectedProtocols) { // ProcessLinkForProtocol 同口径
+            uint32_t channelCount = 0;
+            for (uint32_t i = 0; i < linkNum; ++i) {
+                if (links[i].linkAttr.linkProtocol == protocol) {
+                    ++channelCount;
+                }
+            }
+            if (channelCount > 0U) {
+                return channelCount == 1U; // 首个命中层×协议的链数 = 通道数
+            }
+        }
+        // 该层有链但无引擎协议命中 → 下一层（与建链一致）
+    }
+    return false; // 无层产出通道：模板 HCCL_E_INTERNAL，裸名同构失败，终态一致
 }
 
 // soft_reduce 优先级语义由"特化候选在前 + 裸名兜底"的排序自动成立
