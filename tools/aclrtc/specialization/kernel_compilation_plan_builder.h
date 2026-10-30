@@ -32,6 +32,7 @@ private:
         const std::string& text, const std::string& location, std::string& resolvedText) const;
     aclError BuildConstantSourcePatches(KernelCompilationPlan& plan) const;
     aclError BindManifestCommand(const ManifestCommand& spec, CompilationCommand& compilationCommand) const;
+    aclError BuildSpecializationFlagCommand(KernelCompilationPlan& plan) const;
     aclError BindLinkCommand(const CompilationManifest& manifest, KernelCompilationPlan& plan) const;
 
     const NormalizedKernelSpecializationRequest& specializationRequest_;

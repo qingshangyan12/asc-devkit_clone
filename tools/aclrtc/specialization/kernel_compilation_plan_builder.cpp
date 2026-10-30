@@ -25,6 +25,11 @@ namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
 constexpr char ENVIRONMENT_REFERENCE_PREFIX[] = "${env:";
+constexpr char SPECIALIZATION_FLAG_SOURCE[] =
+    "#include \"basic_api/kernel_tensor.h\"\n"
+    "__attribute__((used, section(\".ascend.meta\")))\n"
+    "static const BinaryMetaSpecializationFlag g_ascend_specialization_flag = "
+    "{{B_TYPE_SPECIALIZATION_FLAG, sizeof(uint32_t)}, 0};\n";
 
 void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText, const std::string& replacementText)
 {
@@ -205,6 +210,46 @@ aclError KernelCompilationPlanBuilder::BindManifestCommand(
     return ACLRTC_SUCCESS;
 }
 
+aclError KernelCompilationPlanBuilder::BuildSpecializationFlagCommand(KernelCompilationPlan& plan) const
+{
+    std::string ascendHome;
+    if (!ExpandPathAndEnvironmentReferences("${env:ASCEND_HOME_PATH}", "specialization flag compiler", ascendHome)) {
+        return ACLRTC_ERROR_FAILURE;
+    }
+    CompilationCommand command;
+    command.commandKind = CompilationCommandKind::Compile;
+    command.diagnosticLabel = "specialization_flag/compile";
+    command.executablePath = fs::path(ascendHome) / "bin/bisheng";
+    if (!IsAbsoluteExecutableRegularFile(command.executablePath)) {
+        ASCENDLOGE(
+            "Specialization flag compiler is not an executable regular file: %s", command.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    const fs::path sourcePath = outputDirectoryPath_ / "specialization_flag.cpp";
+    const fs::path objectPath = outputDirectoryPath_ / "specialization_flag.o";
+    const fs::path ascPath = fs::path(ascendHome) / "asc";
+    command.arguments = {
+        "-c", "-O3", "-xcce", sourcePath.string(), "-I" + ascPath.string(), "-I" + (ascPath / "include").string()};
+    // Match the first kernel compilation target without inheriting kernel-specific macros or sources.
+    for (const CompilationCommand& kernelCommand : plan.compilationCommands) {
+        if (kernelCommand.commandKind != CompilationCommandKind::Compile) {
+            continue;
+        }
+        for (const std::string& argument : kernelCommand.arguments) {
+            if (argument.rfind("--cce-aicore-arch=", 0) == 0 || argument.rfind("--npu-arch=", 0) == 0) {
+                command.arguments.emplace_back(argument);
+            }
+        }
+        break;
+    }
+    // This metadata-only object must not define the kernel's g_tilingKey variable.
+    command.arguments.insert(
+        command.arguments.end(), {"--cce-aicore-only", "-std=c++17", "-DTILING_KEY_VAR=0", "-o", objectPath.string()});
+    plan.generatedSources.push_back({sourcePath, SPECIALIZATION_FLAG_SOURCE});
+    plan.compilationCommands.emplace_back(std::move(command));
+    return ACLRTC_SUCCESS;
+}
+
 aclError KernelCompilationPlanBuilder::BindLinkCommand(
     const CompilationManifest& manifest, KernelCompilationPlan& plan) const
 {
@@ -234,6 +279,7 @@ aclError KernelCompilationPlanBuilder::BindLinkCommand(
         requiredOutputDirectories.emplace(fs::path(resolvedInput).parent_path());
         linkCommand.arguments.emplace_back(std::move(resolvedInput));
     }
+    linkCommand.arguments.emplace_back((outputDirectoryPath_ / "specialization_flag.o").string());
     plan.linkedKernelElfPath = outputDirectoryPath_ / "linked_kernel.elf";
     linkCommand.arguments.emplace_back("-o");
     linkCommand.arguments.emplace_back(plan.linkedKernelElfPath.string());
@@ -300,6 +346,10 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
             return result;
         }
         plan.compilationCommands.emplace_back(std::move(command));
+    }
+    result = BuildSpecializationFlagCommand(plan);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
     }
     result = BindLinkCommand(borrowedManifest_, plan);
     if (result != ACLRTC_SUCCESS) {

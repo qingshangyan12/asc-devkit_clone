@@ -83,6 +83,11 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
             return ACLRTC_ERROR_FAILURE;
         }
     }
+    for (const KernelGeneratedSource& source : compilationPlan.generatedSources) {
+        if (!FileUtils::WriteTextFileAtomically(source.filePath.string(), source.contents)) {
+            return ACLRTC_ERROR_FAILURE;
+        }
+    }
 
     std::map<fs::path, std::vector<const KernelSourcePatch*>> patchesByFile;
     for (const KernelSourcePatch& sourcePatch : compilationPlan.sourcePatches) {

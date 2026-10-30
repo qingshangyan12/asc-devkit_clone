@@ -268,7 +268,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
     EXPECT_EQ(plan.sourcePatches[0].targetFilePath, workspace.ResourcePath() / "resources/include/constants.h");
     EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0xfe}");
 
-    ASSERT_EQ(plan.compilationCommands.size(), 2U);
+    ASSERT_EQ(plan.compilationCommands.size(), 3U);
     const auto& compileCommand = plan.compilationCommands[0];
     EXPECT_EQ(compileCommand.commandKind, CompilationCommandKind::Compile);
     EXPECT_EQ(compileCommand.executablePath, workspace.ToolchainPath() / "bin/bisheng");
@@ -279,9 +279,45 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
             "-I" + workspace.SourceDirectoryPath().string() + "/../../common",
             (workspace.ResourcePath() / "resources/src/basic.cpp").string(), "-g", "-DVALUE=1", "-o",
             (workspace.ResourcePath() / ".aclrtc_session_1/outputs/basic.o").string()}));
-    EXPECT_EQ(plan.compilationCommands[1].commandKind, CompilationCommandKind::Link);
-    EXPECT_EQ(plan.compilationCommands[1].executablePath, workspace.ToolchainPath() / "bin/ld.lld");
+    EXPECT_EQ(plan.compilationCommands.back().commandKind, CompilationCommandKind::Link);
+    EXPECT_EQ(plan.compilationCommands.back().executablePath, workspace.ToolchainPath() / "bin/ld.lld");
     EXPECT_EQ(plan.linkedKernelElfPath, workspace.ResourcePath() / ".aclrtc_session_1/outputs/linked_kernel.elf");
+}
+
+TEST(KernelCompilationPlanBuilderTest, CompilesSpecializationFlagForNormalAndSuperKernel)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchain("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable skToolchain("ACLRTC_TEST_SK_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHome("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t bytes[] = {1, 2};
+    const void* addresses[] = {bytes};
+    auto request = CreateRequest(workspace, addresses, nullptr);
+    Json manifest = CreateManifest();
+    manifest["options"]["common_compile"].push_back("--cce-aicore-arch=dav-c220-cube");
+    for (const bool enableSuperKernel : {false, true}) {
+        SCOPED_TRACE(enableSuperKernel);
+        request.enableSuperKernel = enableSuperKernel;
+        KernelCompilationPlan plan;
+        ASSERT_EQ(
+            BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
+            ascendc::aclrtc::ACLRTC_SUCCESS);
+        ASSERT_EQ(plan.compilationCommands.size(), enableSuperKernel ? 5U : 3U);
+        const auto& command = plan.compilationCommands[plan.compilationCommands.size() - 2U];
+        EXPECT_EQ(command.commandKind, CompilationCommandKind::Compile);
+        EXPECT_EQ(command.diagnosticLabel, "specialization_flag/compile");
+        EXPECT_EQ(command.executablePath, workspace.ToolchainPath() / "bin/bisheng");
+        EXPECT_NE(
+            std::find(command.arguments.begin(), command.arguments.end(), "-DTILING_KEY_VAR=0"),
+            command.arguments.end());
+        EXPECT_NE(
+            std::find(command.arguments.begin(), command.arguments.end(), "--cce-aicore-arch=dav-c220-cube"),
+            command.arguments.end());
+        const std::string objectPath = (plan.linkedKernelElfPath.parent_path() / "specialization_flag.o").string();
+        EXPECT_EQ(command.arguments.back(), objectPath);
+        const auto& linkArguments = plan.compilationCommands.back().arguments;
+        EXPECT_EQ(std::count(linkArguments.begin(), linkArguments.end(), objectPath), 1);
+    }
 }
 
 TEST(KernelCompilationPlanBuilderTest, BuildsPlanWithoutOptionalExternalSourceFile)
@@ -354,11 +390,11 @@ TEST(KernelCompilationPlanBuilderTest, AcceptsCommandWithoutStageAndPreservesMan
     KernelCompilationPlan plan;
     ASSERT_EQ(
         BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan), 0);
-    ASSERT_EQ(plan.compilationCommands.size(), 2U);
+    ASSERT_EQ(plan.compilationCommands.size(), 3U);
     EXPECT_EQ(plan.compilationCommands[0].diagnosticLabel, "basic/compile[0]");
     EXPECT_FALSE(plan.compilationCommands[0].parallelStage.has_value());
-    EXPECT_EQ(plan.compilationCommands[1].commandKind, CompilationCommandKind::Link);
-    EXPECT_FALSE(plan.compilationCommands[1].parallelStage.has_value());
+    EXPECT_EQ(plan.compilationCommands.back().commandKind, CompilationCommandKind::Link);
+    EXPECT_FALSE(plan.compilationCommands.back().parallelStage.has_value());
 }
 
 TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommandOrder)
@@ -379,15 +415,15 @@ TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommand
         BuildPlanFromManifest(
             request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         0);
-    ASSERT_EQ(plan.compilationCommands.size(), 4U);
+    ASSERT_EQ(plan.compilationCommands.size(), 5U);
     EXPECT_EQ(plan.compilationCommands[0].diagnosticLabel, "basic/compile[0]");
     EXPECT_EQ(plan.compilationCommands[1].diagnosticLabel, "sk/compile[0]");
     EXPECT_EQ(plan.compilationCommands[2].diagnosticLabel, "sk/objcopy[1]");
-    EXPECT_EQ(plan.compilationCommands[3].diagnosticLabel, "link");
+    EXPECT_EQ(plan.compilationCommands.back().diagnosticLabel, "link");
     EXPECT_EQ(plan.compilationCommands[0].parallelStage, 0U);
     EXPECT_EQ(plan.compilationCommands[1].parallelStage, 0U);
     EXPECT_EQ(plan.compilationCommands[2].parallelStage, 1U);
-    EXPECT_FALSE(plan.compilationCommands[3].parallelStage.has_value());
+    EXPECT_FALSE(plan.compilationCommands.back().parallelStage.has_value());
     EXPECT_NE(
         std::find(plan.compilationCommands[1].arguments.begin(), plan.compilationCommands[1].arguments.end(), "-g"),
         plan.compilationCommands[1].arguments.end());
@@ -424,14 +460,14 @@ TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder
     ASSERT_EQ(
         BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan), 0);
 
-    ASSERT_EQ(plan.compilationCommands.size(), 7U);
+    ASSERT_EQ(plan.compilationCommands.size(), 8U);
     EXPECT_EQ(plan.compilationCommands[0].diagnosticLabel, "basic/compile[0]");
     EXPECT_EQ(plan.compilationCommands[1].diagnosticLabel, "sk/compile[0]");
     EXPECT_EQ(plan.compilationCommands[2].diagnosticLabel, "sk/objcopy[1]");
     EXPECT_EQ(plan.compilationCommands[3].diagnosticLabel, "basic_aux/compile[0]");
     EXPECT_EQ(plan.compilationCommands[4].diagnosticLabel, "sk_aux/compile[0]");
     EXPECT_EQ(plan.compilationCommands[5].diagnosticLabel, "sk_aux/objcopy[1]");
-    EXPECT_EQ(plan.compilationCommands[6].diagnosticLabel, "link");
+    EXPECT_EQ(plan.compilationCommands.back().diagnosticLabel, "link");
 
     const std::vector<std::string>& linkArguments = plan.compilationCommands.back().arguments;
     EXPECT_NE(
@@ -554,7 +590,7 @@ TEST(KernelCompilationPlanBuilderTest, AcceptsKernelWithoutLinkOptions)
     EXPECT_EQ(
         BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan), 0);
     EXPECT_EQ(plan.sourcePatches.size(), 1U);
-    ASSERT_EQ(plan.compilationCommands.size(), 2U);
+    ASSERT_EQ(plan.compilationCommands.size(), 3U);
     EXPECT_EQ(plan.compilationCommands.back().commandKind, CompilationCommandKind::Link);
 }
 
