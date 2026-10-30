@@ -65,7 +65,7 @@ def copy_dir(src_dir, dst_dir, exclude_dir=None):
                 src_item = os.path.abspath(os.path.join(dir_path, item))
                 dst_item = os.path.abspath(os.path.join(dst_dir, dir_path.replace(src_dir, "."), item))
                 if os.path.islink(src_item):
-                    raise ValueError(f"unsupport soft link file, please check it. {os.path.abspath(src_item)}")
+                    raise ValueError(f"unsupported soft link file, please check it. {os.path.abspath(src_item)}")
                 elif os.path.isdir(src_item):
                     continue
                 if not check_file_extension(src_item, ["", ".txt", ".h", ".hpp", ".cpp", ".c"]):
@@ -86,7 +86,7 @@ def copy_file(src_file, dst_file):
         os.makedirs(os.path.dirname(dst_file), exist_ok=True)
         if (not src_file.endswith(".txt")) and (not os.path.exists(dst_file)):
             if os.path.islink(src_file):
-                raise ValueError(f"unsupport soft link file, please check it. {os.path.abspath(src_file)}")
+                raise ValueError(f"unsupported soft link file, please check it. {os.path.abspath(src_file)}")
             elif os.path.isfile(src_file):
                 shutil.copy2(src_file, dst_file)
             else:

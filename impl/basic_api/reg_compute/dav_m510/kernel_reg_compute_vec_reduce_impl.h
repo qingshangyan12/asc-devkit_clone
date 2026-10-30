@@ -45,7 +45,7 @@ __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
             Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
             Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>,
             Tuple<uint64_t, uint64_t>, Tuple<int64_t, int64_t>>()),
-        "ReduceSum unsupport this datatype on current device");
+        "ReduceSum unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceSum api only supported Mode ZEROING on current device!");
@@ -105,7 +105,7 @@ __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-        "ReduceMax unsupport this datatype on current device");
+        "ReduceMax unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceMax api only supported Mode ZEROING on current device!");
@@ -176,7 +176,7 @@ __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-        "ReduceMin unsupport this datatype on current device");
+        "ReduceMin unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceMin api only supported Mode ZEROING on current device!");
@@ -253,7 +253,7 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(S& dstReg, V srcReg, Mask
         (SupportType<
             Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
             Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>>()),
-        "ReduceSumWithDataBlock unsupport this datatype on current device");
+        "ReduceSumWithDataBlock unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceSumWithDataBlock api only supported Mode ZEROING on current device!");
@@ -268,7 +268,7 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceSumWithDataBlock unsupport this datatype on current device");
+        "ReduceSumWithDataBlock unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceSumWithDataBlock api only supported Mode ZEROING on current device!");
@@ -283,7 +283,7 @@ __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMaxWithDataBlock unsupport this datatype on current device");
+        "ReduceMaxWithDataBlock unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceMaxWithDataBlock api only supported Mode ZEROING on current device!");
@@ -298,7 +298,7 @@ __simd_callee__ inline void ReduceMinWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMinWithDataBlock unsupport this datatype on current device");
+        "ReduceMinWithDataBlock unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ReduceMinWithDataBlock api only supported Mode ZEROING on current device!");
@@ -311,7 +311,7 @@ __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupport this datatype on current device");
+    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupported this datatype on current device");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current PairReduceSum api only supported Mode ZEROING on current device!");

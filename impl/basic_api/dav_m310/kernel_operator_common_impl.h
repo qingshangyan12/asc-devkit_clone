@@ -117,7 +117,7 @@ __aicore__ inline void SetSyncBaseAddr(uint64_t config)
 
 __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& checkParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupport this enableBit on current device"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported this enableBit on current device"); });
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H

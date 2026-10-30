@@ -20,7 +20,7 @@ constexpr int32_t USE_CORE_NUM = 8;                                   // num of 
 constexpr int32_t BLOCK_LENGTH = TOTAL_LENGTH / USE_CORE_NUM;         // length computed of each core
 constexpr int32_t TILE_NUM = 8;                                       // split data into 8 tiles for each core
 constexpr int32_t BUFFER_NUM = 2;                                     // tensor num for each queue
-constexpr int32_t TILE_LENGTH = BLOCK_LENGTH / TILE_NUM / BUFFER_NUM; // seperate to 2 parts, due to double buffer
+constexpr int32_t TILE_LENGTH = BLOCK_LENGTH / TILE_NUM / BUFFER_NUM; // separate to 2 parts, due to double buffer
 
 class KernelAdd {
 public:
