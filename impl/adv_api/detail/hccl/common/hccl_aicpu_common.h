@@ -87,12 +87,11 @@ __aicore__ inline void PublishHcclMsgA5(__gm__ ControlHcclMsg* controlMsgGM, __g
     // Both objects are published under one barrier/DSB pair. The two DCCI operations still cover
     // their respective cache lines, but the normal A5 Prepare avoids duplicate sync sequences.
     AscendC::Barrier();
-    GlobalTensor<int64_t> globalMsg;
-    globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(controlMsgGM));
     __asm__("NOP");
-    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
-    globalMsg.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(dst));
-    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalMsg);
+    dcci(static_cast<__gm__ void*>(controlMsgGM), static_cast<uint64_t>(cache_line_t::SINGLE_CACHE_LINE),
+          static_cast<uint64_t>(dcci_dst_t::CACHELINE_OUT));
+    dcci(static_cast<__gm__ void*>(dst), static_cast<uint64_t>(cache_line_t::SINGLE_CACHE_LINE),
+          static_cast<uint64_t>(dcci_dst_t::CACHELINE_OUT));
     DataSyncBarrier<MemDsbT::ALL>();
 }
 

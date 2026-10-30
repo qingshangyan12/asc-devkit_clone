@@ -159,7 +159,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     __gm__ HcclMsg* hcclSendMsg = hcclMsgArea_->commMsg.singleMsg.sendMsgs + curMsgPosition_[0U];
     do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        FlushDataCacheRaw(hcclSendMsg);
+#else
         FlushDataCache(hcclSendMsg);
+#endif
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[0U]);
     AssembleHcclMsgV2A5(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
