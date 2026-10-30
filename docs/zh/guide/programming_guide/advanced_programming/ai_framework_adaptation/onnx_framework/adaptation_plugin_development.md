@@ -61,14 +61,14 @@ npu_op_package_add(${vendor_name}
 )
 ```
 
-接口参数见[CMake函数参考](../../aclnn_operator_development/appendix/cmake_function_reference.md#npu_op_library)。框架调用还需要入图原型库，请按[编译入图原型库](../../operator_graph_development/overview.md#graph-library)在`op_host/CMakeLists.txt`中补充GRAPH库配置，然后重新编译安装算子包。
+接口参数见[CMake函数参考](../../aclnn_operator_development/appendix/cmake_function_reference.md#npu_op_library)。框架调用还需要入图原型库，请按[编译与部署基本流程](../../aclnn_operator_development/compilation_and_deployment/basic_process.md#graph-library)在`op_host/CMakeLists.txt`中补充GRAPH库配置，然后重新编译安装算子包。
 
 下文主要讲解ONNX框架适配插件实现文件（leaky\_relu\_custom\_plugin.cc ）的开发流程。
 
 ```
 #include "register/register.h"
 #include "graph/operator.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 namespace domi {
     Status ParseParamByOpFunc(const ge::Operator& op_src, ge::Operator& op_dest) {
         //...
@@ -84,7 +84,7 @@ namespace domi {
 1.  包含所需头文件。
     -   register.h，存储在CANN软件安装后文件存储路径的“include/register/”目录下，包含该头文件，可使用算子注册相关类，调用算子注册相关的接口。
     -   operator.h（可选），存储在CANN软件安装后文件存储路径的“include/graph/”目录下，包含该头文件，可以使用Operator类相关接口，获取算子输入输出及属性等算子信息。
-    -   json.hpp，用于进行ONNX数据定义的解析，将String类型的算子参数定义转换为json格式。若工程中未提供“json.hpp”文件，可自行下载并放在`framework/onnx_plugin`目录下，与插件源码中的`#include "json.hpp"`对应，下载路径可参见[json.hpp](https://github.com/nlohmann/json/blob/develop/include/nlohmann/json.hpp)。
+    -   json.hpp，用于进行ONNX数据定义的解析，将String类型的算子参数定义转换为json格式。涉及json解析时，获取方式和CMake配置可参考[LeakyReluCustom样例](../../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/framework/onnx_plugin/leaky_relu_custom_plugin.cc)。
 
 2.  使用REGISTER\_CUSTOM\_OP宏，完成CANN算子和ONNX框架的算子映射关系注册。使用方法如下：
     -   REGISTER\_CUSTOM\_OP：注册自定义算子，OpType为算子类型名称，需要与[算子原型注册](../../aclnn_operator_development/design_and_implementation/operator_prototype_definition.md)中的OpType保持一致。
