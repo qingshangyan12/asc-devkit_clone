@@ -51,7 +51,7 @@ src[i] <  0：dst[i] = ceil(src[i])
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
+__simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src)
 ```
 
 ## 参数说明

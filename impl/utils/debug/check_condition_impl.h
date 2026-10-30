@@ -15,8 +15,8 @@
 #ifndef IMPL_UTILS_DEBUG_CHECK_CONDITION_IMPL_H
 #define IMPL_UTILS_DEBUG_CHECK_CONDITION_IMPL_H
 
+#include <cassert>
 #include <cstdio>
-#include <cstdlib>
 
 namespace AscendC {
 
@@ -27,7 +27,7 @@ inline void check_condition(bool condition, const char* violation_message, const
     }
     const char* message = violation_message != nullptr ? violation_message : "No violation message provided.";
     std::fprintf(stderr, "[ERROR] ASC_HOST_CHECK_CONDITION failed: %s, file=%s, line=%d\n", message, file, line);
-    std::exit(EXIT_FAILURE);
+    assert(condition);
 }
 
 } // namespace AscendC

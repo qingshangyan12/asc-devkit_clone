@@ -28,7 +28,7 @@
 
 头文件路径为：`"utils/debug/check_condition.h"`。
 
-用于检查Host侧条件是否成立。条件成立时，程序继续执行；条件不成立时，接口向标准错误流输出自定义错误信息、源文件名和行号，并调用`std::exit(EXIT_FAILURE)`终止当前进程。
+用于检查Host侧条件是否成立。条件成立时，程序继续执行；条件不成立时，接口向标准错误流输出自定义错误信息、源文件名和行号，并调用C++标准库`<cassert>`中的`assert`宏进行断言检查。未定义`NDEBUG`时，断言失败通常会导致程序异常终止。
 
 ## 函数原型
 
@@ -42,7 +42,7 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过，条件为`false`时终止当前进程。 |
+| condition | 输入 | 待检查的Host侧条件。条件为`true`时检查通过；条件为`false`时输出诊断信息，并调用C++标准库`<cassert>`中的`assert`宏。 |
 | violation_message | 输入 | 条件不成立时输出的自定义错误信息。传入`nullptr`时，输出默认信息`No violation message provided.`。 |
 
 ## 返回值说明
@@ -52,7 +52,8 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 ## 约束说明
 
 - 仅支持在Host侧代码中调用，不支持在Device侧代码中调用。
-- 条件不成立时，接口终止当前进程。
+- 在CMake工程的Release模式下，默认定义`NDEBUG`。此时`assert`不会检查条件，接口输出诊断信息后返回，调用方后续代码会继续执行。
+- 接口内部使用已经求值的条件触发断言，条件表达式只求值一次。
 
 ## 调用示例
 
@@ -132,7 +133,7 @@ int main()
 }
 ```
 
-以`src0_device`为空为例，输出格式如下：
+以`src0_device`为空为例，接口输出的错误诊断格式如下：
 
 ```text
 [ERROR] ASC_HOST_CHECK_CONDITION failed: src0_device is nullptr., file=example.asc, line=46
@@ -142,5 +143,5 @@ int main()
 
 - `[ERROR] ASC_HOST_CHECK_CONDITION failed:`：接口固定输出的错误前缀，无需调用方提供。
 - `src0_device is nullptr.`：由宏参数`violation_message`得到，即调用方传入的自定义错误信息。
-- `example.asc`：由预定义宏`__FILE__`得到，即包含`ASC_HOST_CHECK_CONDITION`调用的源文件名。实际输出可能是文件名、相对路径或绝对路径，取决于编译命令。
-- `46`：由预定义宏`__LINE__`得到，即`ASC_HOST_CHECK_CONDITION`在源文件中的调用行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。
+- `example.asc`：发生条件检查的源文件。
+- `46`：调用`ASC_HOST_CHECK_CONDITION`的源代码行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。

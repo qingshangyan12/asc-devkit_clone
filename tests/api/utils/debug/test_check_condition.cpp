@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <cstdlib>
 #include <type_traits>
 
 #include <gtest/gtest.h>
@@ -44,20 +43,20 @@ TEST(CheckConditionTest, EvaluatesConditionOnce)
     EXPECT_EQ(g_evaluationCount, 1);
 }
 
-TEST(CheckConditionTest, ExitsWhenConditionIsFalse)
+TEST(CheckConditionTest, AssertsWhenConditionIsFalse)
 {
     int* nullPtr = nullptr;
 
-    EXPECT_EXIT(
-        ASC_HOST_CHECK_CONDITION(nullPtr != nullptr, "nullPtr is nullptr."), ::testing::ExitedWithCode(EXIT_FAILURE),
+    EXPECT_DEATH(
+        ASC_HOST_CHECK_CONDITION(nullPtr != nullptr, "nullPtr is nullptr."),
         "\\[ERROR\\] ASC_HOST_CHECK_CONDITION failed: nullPtr is nullptr\\., file=.*test_check_condition.cpp, "
         "line=[0-9]+");
 }
 
-TEST(CheckConditionTest, ExitsWithDefaultMessageWhenMessageIsNull)
+TEST(CheckConditionTest, AssertsWithDefaultMessageWhenMessageIsNull)
 {
-    EXPECT_EXIT(
-        ASC_HOST_CHECK_CONDITION(false, nullptr), ::testing::ExitedWithCode(EXIT_FAILURE),
+    EXPECT_DEATH(
+        ASC_HOST_CHECK_CONDITION(false, nullptr),
         "\\[ERROR\\] ASC_HOST_CHECK_CONDITION failed: No violation message provided\\., "
         "file=.*test_check_condition.cpp, "
         "line=[0-9]+");

@@ -634,7 +634,7 @@ TEST(KernelCompilationPlanBuilderTest, DefaultStructConstantUsesArgumentByteSize
     EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02, 0x03}");
 }
 
-TEST(KernelCompilationPlanBuilderTest, RejectsStructConstantWithManifestByteSize)
+TEST(KernelCompilationPlanBuilderTest, StructIgnoresManifestByteSizeAndUsesArgumentSize)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
@@ -647,14 +647,11 @@ TEST(KernelCompilationPlanBuilderTest, RejectsStructConstantWithManifestByteSize
     manifest["kernels"][1]["constant_infos"][0]["arg_type"] = "struct";
 
     KernelCompilationPlan plan;
-    EXPECT_EQ(
+    ASSERT_EQ(
         BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
-        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    manifest["kernels"][1]["constant_infos"][0].erase("arg_type");
-    EXPECT_EQ(
-        BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
-        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(plan.sourcePatches.empty());
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.sourcePatches.size(), 1U);
+    EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02, 0x03}");
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsInvalidInputsBeforeReadingAnyConstantBytes)

@@ -1,4 +1,4 @@
-# asc_copy_gm2l1_sync_2d_arch_3510（废弃）
+# asc_copy_gm2l1_sync（NPU架构版本3510，2D矩阵搬运模式，废弃）
 
 ## 产品支持情况
 

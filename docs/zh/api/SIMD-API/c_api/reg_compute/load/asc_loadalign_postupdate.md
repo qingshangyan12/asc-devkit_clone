@@ -35,7 +35,7 @@
 
 **图1** 立即数偏移搬入模式
 
-![](../../figures/capi_loadalign_norm.png)
+![](../../../../figures/capi_loadalign_norm.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 

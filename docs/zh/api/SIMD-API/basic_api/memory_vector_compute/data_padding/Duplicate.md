@@ -29,6 +29,18 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
+<!-- npu="9050" id27 -->
+- Kirin9050处理器系列产品：仅支持接口1
+<!-- end id27 -->
+<!-- npu="kirin1" id28 -->
+- KirinDev0001处理器系列产品：仅支持接口1
+<!-- end id28 -->
+<!-- npu="kirin2" id29 -->
+- KirinDev0002处理器系列产品：仅支持接口1
+<!-- end id29 -->
+<!-- npu="kirin3" id30 -->
+- KirinDev0003处理器系列产品：仅支持接口1
+<!-- end id30 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -133,6 +145,18 @@ def Duplicate(scalarValue, dst, count):
 <!-- npu="9030" id19 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half。
 <!-- end id19 -->
+<!-- npu="9050" id31 -->
+Kirin9050处理器系列产品，T支持的数据类型为：bool, int8_t, uint8_t, half, int16_t, uint16_t, int32_t, uint32_t, float。
+<!-- end id31 -->
+<!-- npu="kirin1" id32 -->
+KirinDev0001处理器系列产品，T支持的数据类型为：bool, int8_t, uint8_t, half, int16_t, uint16_t, int32_t, uint32_t, float。
+<!-- end id32 -->
+<!-- npu="kirin2" id33 -->
+KirinDev0002处理器系列产品，T支持的数据类型为：bool, int8_t, uint8_t, half, int16_t, uint16_t, int32_t, uint32_t, float。
+<!-- end id33 -->
+<!-- npu="kirin3" id34 -->
+KirinDev0003处理器系列产品，T支持的数据类型为：bool, int8_t, uint8_t, half, int16_t, uint16_t, int32_t, uint32_t, float。
+<!-- end id34 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>	 

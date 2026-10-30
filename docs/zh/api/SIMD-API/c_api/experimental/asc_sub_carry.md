@@ -53,14 +53,14 @@ $$
 ```c
 // 通过函数返回值返回结果（占位符形式），不带输入进位。
 __simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
-                                                              vector_<dtype> src1,
-                                                              vector_bool mask)
+                                                           vector_<dtype> src1,
+                                                           vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式），带输入进位。
 __simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
-                                                              vector_<dtype> src1,
-                                                              vector_bool carry_src,
-                                                              vector_bool mask)
+                                                           vector_<dtype> src1,
+                                                           vector_bool carry_src,
+                                                           vector_bool mask)
 ```
 
 ### dtype支持数据类型

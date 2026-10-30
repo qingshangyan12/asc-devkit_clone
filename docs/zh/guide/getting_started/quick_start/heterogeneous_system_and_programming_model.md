@@ -56,7 +56,7 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 - **标量处理单元**：处理控制流（如分支、循环）和地址计算，类似传统CPU核心，是AI Core的“控制核心”。
 - **向量处理单元**：执行向量运算，是SIMD/SIMT两种并行模型的主要载体。不同昇腾芯片架构对两种模式的支持有所差异。
 - **矩阵运算单元**：专门优化矩阵乘加运算，仅兼容SIMD模式，是深度学习卷积、全连接层等算子的“性能加速核心”。
-- **本地存储**：用于缓存计算所需的数据，有效降低对全局Device Memory的访问延迟，提升计算效率。
+- **Device侧本地存储**：指AI Core片内Local Memory（如Unified Buffer），用于缓存计算所需的数据，有效降低对全局Device Memory的访问延迟，提升计算效率。
 
 <!-- npu="950" id1 -->
 
@@ -81,9 +81,9 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 > **SIMD的SPMD模型（Single Program, Multiple Data）**：将每个AI Core抽象成一个Block，通过内置变量[block_idx](../../programming_guide/language_extension/simd_builtin_keywords.md)作为Block索引。每个Block执行同一份算子核函数（Kernel）代码，基于block_idx划分每个Block的数据处理范围，实现多核负载均衡与并行调度。
 
 1. **Tiling（分块）**：将数据划分为均匀的块，每个AI Core负责一块，实现负载均衡。
-2. **数据搬入**：需要**显式调用数据搬运API**将数据从Device Memory搬到本地存储。
+2. **数据搬入**：需要**显式调用数据搬运API**将数据从Device Memory搬到Device侧本地存储。
 3. **数据计算**：调用**SIMD指令对应的API**完成计算。注意数据搬运与计算异步，需插入同步指令。
-4. **数据搬出**：需要**显式调用数据搬运API**将本地存储中的结果写回Device Memory。
+4. **数据搬出**：需要**显式调用数据搬运API**将Device侧本地存储中的结果写回Device Memory。
 
 ### SIMT核函数（Kernel）编程基本步骤（遵循SPMD模型）
 

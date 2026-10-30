@@ -68,7 +68,7 @@ NPU架构版本3510各存储单元的架构基线对齐如下表所示。
 
 **图1** 搬运目的地址重叠
 
-![搬运目的地址重叠](../../figures/datacopy_address_overlap_sync_diagram.png "搬运目的地址重叠")
+![搬运目的地址重叠](../../../../figures/datacopy_address_overlap_sync_diagram_c_api.png "搬运目的地址重叠")
 
 以下代码展示PIPE_MTE2上两次GM到UB搬运的目的区域重叠时的同步方式：
 

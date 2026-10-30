@@ -68,8 +68,7 @@ bool ManifestConstant::ParseDefinition(const Json& constantJson)
         result.manifestByteSize_ = byteCount;
     } else if (argumentType == "struct") {
         if (hasByteSize) {
-            ASCENDLOGE("struct constant must omit byte_size; size comes from argsBytes");
-            return false;
+            ASCENDLOGW("Ignoring byte_size for struct constant; size comes from argsBytes");
         }
     } else {
         ASCENDLOGE("arg_type must be pointer or struct");
@@ -116,6 +115,14 @@ bool ManifestConstant::BindArgument(uint64_t argsCount, const void* const* argsA
             return false;
         }
         byteSize = argsBytes[parameterIndex_];
+    }
+    // Pointer constants use the Manifest length, bounded by the supplied readable Host buffer when available.
+    if (argsBytes != nullptr && byteSize > argsBytes[parameterIndex_]) {
+        ASCENDLOGE(
+            "Constant %s requires %llu bytes but argsBytes[%llu] provides only %llu", name_.c_str(),
+            static_cast<unsigned long long>(byteSize), static_cast<unsigned long long>(parameterIndex_),
+            static_cast<unsigned long long>(argsBytes[parameterIndex_]));
+        return false;
     }
     borrowedData_ = argsAddr[parameterIndex_];
     boundByteSize_ = byteSize;

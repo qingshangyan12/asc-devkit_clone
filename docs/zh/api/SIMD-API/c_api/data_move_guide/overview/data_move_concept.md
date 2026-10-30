@@ -24,7 +24,7 @@
 
 **图1** 连续数据搬运示意图
 
-![连续数据搬运示意图](../../figures/continuous_data_copy_diagram.png "连续数据搬运示意图")
+![连续数据搬运示意图](../../../../figures/continuous_data_copy_diagram_c_api.png "连续数据搬运示意图")
 
 ## 高维切分数据搬运
 
@@ -41,11 +41,11 @@
 
 **图2** 高维切分连续搬运示意图
 
-![高维切分连续搬运示意图](../../figures/continuous_data_copy_diagram.png "高维切分连续搬运示意图")
+![高维切分连续搬运示意图](../../../../figures/continuous_data_copy_diagram_c_api.png "高维切分连续搬运示意图")
 
 **图3** 高维切分非连续搬运示意图
 
-![高维切分非连续搬运示意图](../../figures/discontinuous_data_copy_diagram.png "高维切分非连续搬运示意图")
+![高维切分非连续搬运示意图](../../../../figures/discontinuous_data_copy_diagram.png "高维切分非连续搬运示意图")
 
 ## 多维切片数据搬运
 
@@ -65,7 +65,7 @@
 
 **图4** ND2Nz格式转换示意图
 
-![ND2Nz格式转换示意图](../../figures/nd2nz_conversion_half.png "ND2Nz格式转换示意图")
+![ND2Nz格式转换示意图](../../../../figures/nd2nz_conversion_half.png "ND2Nz格式转换示意图")
 
 ## 随路量化激活搬运
 
