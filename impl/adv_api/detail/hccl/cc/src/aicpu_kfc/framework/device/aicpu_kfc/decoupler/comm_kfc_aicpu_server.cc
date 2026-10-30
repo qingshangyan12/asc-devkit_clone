@@ -353,6 +353,13 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
                 HCCL_E_PARA);
             execCtx.resourceType = ServerExecResourceType::NEXT_AICPU;
             execCtx.mainThread = execCtx.resCtxHolder->threads[0];
+            HCCL_INFO(
+                "[MC2_SQ_DIAG][ServerRes] group %u commName[%s] opParamKey[%#llx] threadNum[%zu] mainThread[%llu] "
+                "unfoldThread[%llu].",
+                groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
+                execCtx.resCtxHolder->threads.size(),
+                static_cast<unsigned long long>(execCtx.mainThread),
+                static_cast<unsigned long long>(execCtx.resCtxHolder->unfoldThread));
         } else {
 #ifdef MC2_SERVER_ONLY
             HCCL_ERROR(
