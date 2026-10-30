@@ -16,6 +16,7 @@
 - **[neg](neg.md)**
 - **[operator*](operator_mul.md)**
 - **[operator/](div.md)**
+- **[div](div_software.md)**
 - **[prelu](prelu.md)**
 - **[relu](relu.md)**
 - **[sqrt](sqrt.md)**

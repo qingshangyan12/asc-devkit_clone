@@ -142,21 +142,15 @@ CcuResult MissionPreSync(const ccu::Variable& func, KfcServerContext& ctx)
 {
     (void)func;
 
-    // 单 mission 时短路，零影响现有路径。missionNum 用宿主常量（GetKfcServerMissionNum）
-    // 而非 ctx.missionNum（Variable 是运行时值，CCU_IF 两分支都会在构图期执行）。
+    // 单 mission 时短路；门控必须用宿主常量（CCU_IF 两分支构图期都会执行）
     const uint32_t hostMissionNum = GetKfcServerMissionNum(ctx.arg->opParam.algName);
     if (hostMissionNum == 1) {
         return CCU_SUCCESS;
     }
 
-    // 双 mission 栅障同步：tag-based local notify 实现 mission 间互斥等待
-    // （对应 hcomm 原版 Mc2ContextBase 的 ExportMaskSignal/LocalWait 语义）。
-    // 分支必须用构图期宿主常量（kfcServerArgs 同值的 hostMissionIndex），
-    // 且 tag 按发出方 mission 命名：每个 kernel 只 export 一个 tag，
-    // 避免两 kernel 的 exported sharedNotifies 同名（ProcessInterCtxRes 合并冲突）。
-    // LocalNotifyRecord(tag) 注册到 imported（发信号侧），LocalNotifyWait(tag) 注册到
-    // exported（等信号侧）：m0 record MiSync_m0 / wait MiSync_m1，m1 record MiSync_m1 /
-    // wait MiSync_m0 —— m0 的 record 绑定 m1 的导出，信号配对正确。
+    // tag 栅栏实现 mission 间互斥等待。tag 按发出方 mission 命名，每个 kernel 只
+    // export 一个 tag（同名 tag 会在 ProcessInterCtxRes 合并时冲突）；record 注册到
+    // imported（发信号侧）、wait 注册到 exported（等信号侧），跨 mission 配对。
     if (ctx.arg->hostMissionIndex == 0) {
         // mission 0: post bit 0, wait bit 1
         CCU_CHK_RET(ccu::EventRecord("MiSync_m0", 1 << 0));
@@ -171,8 +165,7 @@ CcuResult MissionPreSync(const ccu::Variable& func, KfcServerContext& ctx)
 
 CcuResult MissionPostSync(KfcServerContext& ctx)
 {
-    // 单 mission 时短路（宿主常量，理由同 MissionPreSync）；双 mission 下此 hook
-    // 不产生指令（mission 0 的远程 Post 由具体算子 kernel 的 PostSync 实现），无需分支。
+    // 单 mission 时短路；双 mission 下远程 Post 由算子 kernel 的 PostSync 实现
     const uint32_t hostMissionNum = GetKfcServerMissionNum(ctx.arg->opParam.algName);
     if (hostMissionNum == 1) {
         return CCU_SUCCESS;
@@ -531,7 +524,7 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
     ccu::Variable paramAddr;
     paramAddr = ctx.xnAddr;
 
-    // 阶段 3-2：添加wraparound所需的游标和常量（与master对齐）
+    // 参数循环队列 wraparound 游标
     ccu::Variable paramSize;
     paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
     ccu::Variable queueIdx;
@@ -543,8 +536,7 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
-        // 阶段 3-2：先加载参数，检查哨兵，仅在非哨兵轮次才进入 barrier
-        // 保持 slave 与 master 的 barrier 对称，避免在 sentinel 轮次卡死在 MissionPreSync
+        // 哨兵轮次不进 barrier，保持 slave 与 master 的 barrier 对称
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
@@ -554,7 +546,7 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
             DispatchKfcSubKernel(param, ctx, ctx.recordAddr);
             CCU_CHK_RET(MissionPostSync(ctx));
         }
-        // 阶段 3-2：推进参数地址游标，wraparound at CCU_TASK_NUM_MAX
+        // 推进参数地址游标，wraparound at CCU_TASK_NUM_MAX
         paramAddr += paramSize;
         queueIdx += one;
         CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))

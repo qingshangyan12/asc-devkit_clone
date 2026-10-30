@@ -1,5 +1,7 @@
 # 调测接口
 
+-   **[ASC\_HOST\_CHECK\_CONDITION](ASC_HOST_CHECK_CONDITION.md)**
+
 -   **[printf](printf.md)**
 
 -   **[assert/ascendc\_assert](assert.md)**

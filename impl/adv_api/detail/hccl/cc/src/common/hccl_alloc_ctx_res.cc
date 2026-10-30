@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_server_debug_config.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
@@ -231,12 +232,8 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
     // ReduceScatter KFC follows pr_4523 and partitions this fixed 16 MiB buffer as rankSize * sliceSize.
     opResCtx.res[0] = reinterpret_cast<uint64_t>(scratchPtr);
-    // 注意：HalfAlltoAllV 的 window 基址不走 res[1]——master 上 res[1] 已固定为 dieSplitRatio
-    // 千分比（GetCcuOpParamResCtx 会覆写，设备侧 hccl_ccu_v0.h 按比例语义读取）。
-    // 本端 cclBuffer 落点由模板 CalcRes 经 CcuKernelInfo::localWinAddr → KfcServer kernelArg 传递。
-    // res[3]/res[4]：本端 cclBuffer 基址/大小（与 localWinAddr 同源同值）。KFC server 写入侧
-    // 用 kernelArg.localWinAddr；AIC 侧（MC2 op kernel 回读结果）无 kernelArg 通道，经 OpResCtx
-    // 下发（旧链路里该值由 AICPU server 填 legacy HcclCombineOpParam.windowsOut[0]，新链路无此填写方）。
+    // res[1] 已固定为 dieSplitRatio 千分比，HalfAlltoAllV 的 window 基址不走该槽位；
+    // res[3]/res[4] 为本端 cclBuffer 基址/大小，供 AIC 侧回读结果（无 kernelArg 通道）
     {
         void* cclBufferAddr = nullptr;
         uint64_t cclBufferSize = 0;
@@ -369,6 +366,7 @@ HcclResult HcclAllocOpResCtx(
     CHK_PTR_NULL(opResCtxPtr);
     OpResCtx resCtx{};
     const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
+    resCtx.res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] = initTiling->debugMode;
     const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
 
     for (uint32_t i = 0U; i < opParamVec.size(); ++i) {
@@ -618,10 +616,7 @@ HcclResult PrepareParamForHalfAlltoAllV(
 
     param.varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
     param.opType = HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
-    // KFC Server 的 DispatchKfcSubKernel 用 CCU_IF 分支包含所有 opType 的子 kernel。
-    // CCU_IF 在 host 侧 DSL 翻译时会执行所有分支体以记录 rep，ReduceScatter 分支的
-    // LocalReduce 需要有效 reduceOp 才能通过 GetUBReduceType 检查。HalfAlltoAllv 本身
-    // 不做 reduce，此处填 SUM 仅满足翻译期约束，运行时 dispatch 不会走 ReduceScatter 分支。
+    // CCU_IF 构图期会执行所有分支体，ReduceScatter 分支要求 reduceType 有效，运行时不走该分支
     param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
     param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);

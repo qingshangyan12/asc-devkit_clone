@@ -118,6 +118,17 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
     value.with_mask(asc::te::experimental::all_mask<float>());
 }
 
+template <typename DataType, typename IndexDataType>
+__simd_vf__ inline void compile_reg_register_gather(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<DataType> src{};
+    asc::te::experimental::reg_tensor<IndexDataType> index{};
+    index.mask = mask;
+    auto value = asc::te::experimental::gather(src, index);
+    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DataType>>);
+    EXPECT_EQ(value.mask, index.mask);
+}
+
 template <asc::te::experimental::store_sideband_mode sideband_mode>
 __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* dst, vector_bool mask)
 {
@@ -332,5 +343,28 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_reg_mask_data_reorder_b16;
     (void)compile_reg_mask_data_reorder_b32;
 }
+
+#define TENSOR_API_REG_GATHER_TEST(DataType, IndexType)             \
+    TEST(tensor_api_reg_tensor_3510, gather_register_##DataType)    \
+    {                                                               \
+        auto mask = asc::te::experimental::all_mask<IndexType>();   \
+        compile_reg_register_gather<DataType, IndexType>(mask.reg); \
+    }
+
+TENSOR_API_REG_GATHER_TEST(int8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(uint8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e4m3fn_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e5m2_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e8m0_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(hifloat8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(int16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(uint16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(half, uint16_t)
+TENSOR_API_REG_GATHER_TEST(bfloat16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(int32_t, uint32_t)
+TENSOR_API_REG_GATHER_TEST(uint32_t, uint32_t)
+TENSOR_API_REG_GATHER_TEST(float, uint32_t)
+
+#undef TENSOR_API_REG_GATHER_TEST
 
 } // namespace

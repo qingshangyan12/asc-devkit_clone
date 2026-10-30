@@ -116,6 +116,7 @@
 <!-- npu="9030" id17 -->
 - Kirin 9030处理器系列产品，支持half、float。
 <!-- end id17 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum_res.md#id2 -->
 
 ## 返回值说明
 
@@ -167,6 +168,7 @@
   - Kirin 9030处理器系列产品
   <!-- end id29 -->
 <!-- end id23 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum_res.md#id3 -->
 
 ## 关键特性说明
 

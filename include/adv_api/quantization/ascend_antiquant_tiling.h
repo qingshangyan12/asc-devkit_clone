@@ -24,7 +24,7 @@ namespace AscendC {
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * \return maximum temporary space required
+ * \return maximum temporary space required, in bytes
  */
 uint32_t GetAscendAntiQuantMaxTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& scaleShape, bool isTranspose,
@@ -37,7 +37,7 @@ uint32_t GetAscendAntiQuantMaxTmpSize(
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * \return minimum temporary space required
+ * \return minimum temporary space required, in bytes
  */
 uint32_t GetAscendAntiQuantMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& scaleShape, bool isTranspose,
@@ -51,8 +51,8 @@ uint32_t GetAscendAntiQuantMinTmpSize(
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetAscendAntiQuantMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& scaleShape, bool isTranspose,

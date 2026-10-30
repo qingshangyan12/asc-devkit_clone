@@ -61,6 +61,7 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
 <!-- npu="950" id8 -->
 - 针对Ascend 950PR&950DT系列产品，T支持的数据类型为：half、float、bfloat16_t。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Truncate_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -72,6 +73,7 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
 <!-- npu="950" id9 -->
 -   针对Ascend 950PR&950DT系列产品，该接口通过VF调用[Reg矢量计算](../../reg_vector_compute/reg_vector_compute.md)API实现兼容，当参数count取值为0时，不保证该接口被视为NOP（空操作）。
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Truncate_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

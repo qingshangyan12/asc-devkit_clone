@@ -257,6 +257,8 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/utils/common_types.h \$ENV{D
 # 3 tikcpp/tikcfw
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/impl \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/impl SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../asc/include/interface \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/interface SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../asc/include/c_api \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/c_api SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../../../asc/impl/c_api \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/c_api SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/op_frame \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/op_frame SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/kernel_operator.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/kernel_operator.h SYMBOLIC)" COMPONENT asc-devkit)
 

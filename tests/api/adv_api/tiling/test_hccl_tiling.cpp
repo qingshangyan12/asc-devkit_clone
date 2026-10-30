@@ -187,8 +187,7 @@ protected:
     }
 };
 
-// fork 保留白名单：白名单内裸名（--alg 直指算法）仍触发 CCU 新版本；
-// 白名单外裸名与 UnregisteredAlgorithmUsesDefaultVersion 行为一致。
+// 白名单内裸名（--alg 直指算法）触发 CCU 新版本；白名单外保持默认版本
 TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(

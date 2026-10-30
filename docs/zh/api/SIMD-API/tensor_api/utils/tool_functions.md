@@ -7,3 +7,8 @@
 - **[print打印接口](print.md)**
 - **[编译期整型别名](compile_time_integer_aliases.md)**
 - **[维度保留标记](dimension_keep_mark.md)**
+- **[init_soc_state](init_soc_state.md)**
+- **[get_sub_block_id](get_sub_block_id.md)**
+- **[get_sub_block_num](get_sub_block_num.md)**
+- **[get_vf_len](get_vf_len.md)**
+- **[get_phy_buf_addr](get_phy_buf_addr.md)**

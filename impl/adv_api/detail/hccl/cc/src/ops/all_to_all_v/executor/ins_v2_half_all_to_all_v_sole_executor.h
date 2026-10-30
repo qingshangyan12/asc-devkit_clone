@@ -15,14 +15,9 @@
 namespace mc2_ops_hccl {
 
 /*
- HALF_ALLTOALLV 专用执行器。
- 不复用 InsV2AlltoAllVSoleExecutor 的原因：后者 ValidateAndInit 对
- all2AllVDataDes.sendCounts/recvCounts/sdispls/rdispls 做 CHK_PTR_NULL 校验，并在
- OrchestrateLoop 里 host 侧解引用这些指针来切 loop。而 MC2 路径下
- PrepareParamForHalfAlltoAllV 会把四个指针置空（分片大小/偏移由 AIC 运行时写入 varData
- 变长区），host 侧既拿不到也不该解引用，故单独实现，避免改动 ALLTOALLV 既有路径。
-
- 分片尺寸运行时才确定，因此不按 dataCount 切 loop，单次调用 KernelRun。
+ HALF_ALLTOALLV 专用执行器。分片大小/偏移由 AIC 运行时写入 varData 变长区（四个
+ 指针为空），不能复用会对它们做非空校验并解引用切 loop 的 InsV2AlltoAllVSoleExecutor。
+ 分片尺寸运行时才确定，单次调用 KernelRun。
  */
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 class InsV2HalfAlltoAllVSoleExecutor : public InsCollAlgBase {

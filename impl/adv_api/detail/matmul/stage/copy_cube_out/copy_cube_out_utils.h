@@ -35,7 +35,8 @@ template <class A_TYPE, class C_TYPE, const auto& MM_CFG, FixpipeParamsType vers
 struct FixpipeParamsUtil {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 9202)
     using TYPE = typename AscendC::Conditional<
         C_TYPE::format == CubeFormat::NZ, FixpipeParamsArch3510<CO2Layout::NZ>,
         typename AscendC::Conditional<

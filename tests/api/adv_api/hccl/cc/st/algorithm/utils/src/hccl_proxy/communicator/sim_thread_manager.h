@@ -27,6 +27,8 @@ public:
         CommEngine engine, uint32_t threadNum, uint32_t notifyNumPerThread, ThreadHandle* threads);
     HcclResult HcclThreadAcquireWithStream(
         CommEngine engine, rtStream_t stream, uint32_t notifyNum, ThreadHandle* thread);
+    HcclResult HcclDedicatedThreadAcquire(
+        HcclDedicatedThreadType useType, uint32_t notifyNumPerThread, ThreadHandle* thread);
     HcclResult CommGetNotifyNumInThread(ThreadHandle thread, uint32_t* notifyNum);
 
 private:
@@ -40,6 +42,9 @@ private:
 
     std::mutex mainThreadMutex_;
     std::map<rtStream_t, std::unique_ptr<SimHcclThread>> mainThread_;
+
+    std::mutex dedicatedThreadMutex_;
+    std::map<HcclDedicatedThreadType, ThreadHandle> dedicatedThreadMap_;
 }; // class SimThreadMgr
 
 }; // namespace HcclSim

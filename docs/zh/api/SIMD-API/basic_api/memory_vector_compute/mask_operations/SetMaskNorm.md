@@ -58,6 +58,7 @@ __aicore__ inline void SetMaskNorm()
 <!-- npu="950" id10 -->
 - 针对Ascend 950PR&950DT系列产品，Mask为软仿实现，Tensor前n个数据计算接口内部不会将Mask模式切换为Normal模式。若当前场景已通过[SetMaskCount](SetMaskCount.md)设置为Counter模式，接口调用后仍为Counter模式；后续计算需要使用Normal模式时，需手动调用本接口进行设置。
 <!-- end id10 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskNorm_res.md#id2 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

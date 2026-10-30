@@ -1,6 +1,6 @@
 # 编程示例<a name="ZH-CN_TOPIC_0000002523571814"></a>
 
-基于SIMT进行算子开发需要使用的内置关键字和API请参见[SIMT BuiltIn关键字](../../language_extension/simt_builtin_keywords.md)、[SIMT语言扩展层C API](../../language_extension/simt_language_extension_c_api.md)。当前SIMT编程暂不支持部分语法结构，相关限制请参考[语法限制](../../../technical_appendix/cpp_standard_support/syntax_restrictions/syntax_restrictions.md)。
+基于SIMT进行算子开发需要使用的内置关键字和API请参见[SIMT BuiltIn关键字](../../language_extension/simt_builtin_keywords.md)、[SIMT语言扩展层C API](../../language_extension/simt_language_extension_c_api.md)。当前SIMT编程暂不支持部分语法结构，相关限制请参考[通用语法限制](../../../technical_appendix/cpp_standard_support/cpp_language_restrictions/general_restrictions.md)。
 
 考虑如下计算场景：从形状为100000 \* 128的二维向量中获取指定索引所对应的12288行数据。算子输出output第i行数据的计算公式为：
 

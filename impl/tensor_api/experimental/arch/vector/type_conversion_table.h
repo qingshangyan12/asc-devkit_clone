@@ -111,6 +111,10 @@ ASC_REG_CAST_OP(half, float, zero, trunc, not_sat, asc_float2half_rz);
 ASC_REG_CAST_OP(half, float, zero, trunc, sat, asc_float2half_rz_sat);
 ASC_REG_CAST_OP(half, float, one, trunc, not_sat, asc_float2half_rz);
 ASC_REG_CAST_OP(half, float, one, trunc, sat, asc_float2half_rz_sat);
+ASC_REG_CAST_OP(half, float, zero, odd, not_sat, asc_float2half_ro);
+ASC_REG_CAST_OP(half, float, zero, odd, sat, asc_float2half_ro_sat);
+ASC_REG_CAST_OP(half, float, one, odd, not_sat, asc_float2half_ro);
+ASC_REG_CAST_OP(half, float, one, odd, sat, asc_float2half_ro_sat);
 
 // half -> float
 ASC_REG_CAST_OP(float, half, zero, rint, not_sat, asc_half2float);
@@ -387,6 +391,14 @@ ASC_REG_CAST_OP(hifloat8_t, float, two, round, not_sat, asc_float2hif8_rna);
 ASC_REG_CAST_OP(hifloat8_t, float, two, round, sat, asc_float2hif8_rna_sat);
 ASC_REG_CAST_OP(hifloat8_t, float, three, round, not_sat, asc_float2hif8_rna);
 ASC_REG_CAST_OP(hifloat8_t, float, three, round, sat, asc_float2hif8_rna_sat);
+ASC_REG_CAST_OP(hifloat8_t, float, zero, hybrid, not_sat, asc_float2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, float, zero, hybrid, sat, asc_float2hif8_rh_sat);
+ASC_REG_CAST_OP(hifloat8_t, float, one, hybrid, not_sat, asc_float2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, float, one, hybrid, sat, asc_float2hif8_rh_sat);
+ASC_REG_CAST_OP(hifloat8_t, float, two, hybrid, not_sat, asc_float2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, float, two, hybrid, sat, asc_float2hif8_rh_sat);
+ASC_REG_CAST_OP(hifloat8_t, float, three, hybrid, not_sat, asc_float2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, float, three, hybrid, sat, asc_float2hif8_rh_sat);
 
 // hifloat8_t -> float
 ASC_REG_CAST_OP(float, hifloat8_t, zero, rint, not_sat, asc_hif82float);
@@ -399,28 +411,68 @@ ASC_REG_CAST_OP(hifloat8_t, half, zero, round, not_sat, asc_half2hif8_rna);
 ASC_REG_CAST_OP(hifloat8_t, half, zero, round, sat, asc_half2hif8_rna_sat);
 ASC_REG_CAST_OP(hifloat8_t, half, one, round, not_sat, asc_half2hif8_rna);
 ASC_REG_CAST_OP(hifloat8_t, half, one, round, sat, asc_half2hif8_rna_sat);
+ASC_REG_CAST_OP(hifloat8_t, half, zero, hybrid, not_sat, asc_half2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, half, zero, hybrid, sat, asc_half2hif8_rh_sat);
+ASC_REG_CAST_OP(hifloat8_t, half, one, hybrid, not_sat, asc_half2hif8_rh);
+ASC_REG_CAST_OP(hifloat8_t, half, one, hybrid, sat, asc_half2hif8_rh_sat);
 
 // hifloat8_t -> half
 ASC_REG_CAST_OP(half, hifloat8_t, zero, rint, not_sat, asc_hif82half);
 ASC_REG_CAST_OP(half, hifloat8_t, one, rint, not_sat, asc_hif82half);
 
 // half -> int4x2_t
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, floor, not_sat, asc_half2int4x2_rd);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, floor, sat, asc_half2int4x2_rd_sat);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, rint, not_sat, asc_half2int4x2_rn);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, rint, sat, asc_half2int4x2_rn_sat);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, round, not_sat, asc_half2int4x2_rna);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, round, sat, asc_half2int4x2_rna_sat);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, ceil, not_sat, asc_half2int4x2_ru);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, ceil, sat, asc_half2int4x2_ru_sat);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, trunc, not_sat, asc_half2int4x2_rz);
-ASC_REG_CAST_OP_NO_POSITION(int4x2_t, half, zero, trunc, sat, asc_half2int4x2_rz_sat);
+ASC_REG_CAST_OP(int4x2_t, half, zero, floor, not_sat, asc_half2int4x2_rd);
+ASC_REG_CAST_OP(int4x2_t, half, one, floor, not_sat, asc_half2int4x2_rd);
+ASC_REG_CAST_OP(int4x2_t, half, two, floor, not_sat, asc_half2int4x2_rd);
+ASC_REG_CAST_OP(int4x2_t, half, three, floor, not_sat, asc_half2int4x2_rd);
+ASC_REG_CAST_OP(int4x2_t, half, zero, floor, sat, asc_half2int4x2_rd_sat);
+ASC_REG_CAST_OP(int4x2_t, half, one, floor, sat, asc_half2int4x2_rd_sat);
+ASC_REG_CAST_OP(int4x2_t, half, two, floor, sat, asc_half2int4x2_rd_sat);
+ASC_REG_CAST_OP(int4x2_t, half, three, floor, sat, asc_half2int4x2_rd_sat);
+ASC_REG_CAST_OP(int4x2_t, half, zero, rint, not_sat, asc_half2int4x2_rn);
+ASC_REG_CAST_OP(int4x2_t, half, one, rint, not_sat, asc_half2int4x2_rn);
+ASC_REG_CAST_OP(int4x2_t, half, two, rint, not_sat, asc_half2int4x2_rn);
+ASC_REG_CAST_OP(int4x2_t, half, three, rint, not_sat, asc_half2int4x2_rn);
+ASC_REG_CAST_OP(int4x2_t, half, zero, rint, sat, asc_half2int4x2_rn_sat);
+ASC_REG_CAST_OP(int4x2_t, half, one, rint, sat, asc_half2int4x2_rn_sat);
+ASC_REG_CAST_OP(int4x2_t, half, two, rint, sat, asc_half2int4x2_rn_sat);
+ASC_REG_CAST_OP(int4x2_t, half, three, rint, sat, asc_half2int4x2_rn_sat);
+ASC_REG_CAST_OP(int4x2_t, half, zero, round, not_sat, asc_half2int4x2_rna);
+ASC_REG_CAST_OP(int4x2_t, half, one, round, not_sat, asc_half2int4x2_rna);
+ASC_REG_CAST_OP(int4x2_t, half, two, round, not_sat, asc_half2int4x2_rna);
+ASC_REG_CAST_OP(int4x2_t, half, three, round, not_sat, asc_half2int4x2_rna);
+ASC_REG_CAST_OP(int4x2_t, half, zero, round, sat, asc_half2int4x2_rna_sat);
+ASC_REG_CAST_OP(int4x2_t, half, one, round, sat, asc_half2int4x2_rna_sat);
+ASC_REG_CAST_OP(int4x2_t, half, two, round, sat, asc_half2int4x2_rna_sat);
+ASC_REG_CAST_OP(int4x2_t, half, three, round, sat, asc_half2int4x2_rna_sat);
+ASC_REG_CAST_OP(int4x2_t, half, zero, ceil, not_sat, asc_half2int4x2_ru);
+ASC_REG_CAST_OP(int4x2_t, half, one, ceil, not_sat, asc_half2int4x2_ru);
+ASC_REG_CAST_OP(int4x2_t, half, two, ceil, not_sat, asc_half2int4x2_ru);
+ASC_REG_CAST_OP(int4x2_t, half, three, ceil, not_sat, asc_half2int4x2_ru);
+ASC_REG_CAST_OP(int4x2_t, half, zero, ceil, sat, asc_half2int4x2_ru_sat);
+ASC_REG_CAST_OP(int4x2_t, half, one, ceil, sat, asc_half2int4x2_ru_sat);
+ASC_REG_CAST_OP(int4x2_t, half, two, ceil, sat, asc_half2int4x2_ru_sat);
+ASC_REG_CAST_OP(int4x2_t, half, three, ceil, sat, asc_half2int4x2_ru_sat);
+ASC_REG_CAST_OP(int4x2_t, half, zero, trunc, not_sat, asc_half2int4x2_rz);
+ASC_REG_CAST_OP(int4x2_t, half, one, trunc, not_sat, asc_half2int4x2_rz);
+ASC_REG_CAST_OP(int4x2_t, half, two, trunc, not_sat, asc_half2int4x2_rz);
+ASC_REG_CAST_OP(int4x2_t, half, three, trunc, not_sat, asc_half2int4x2_rz);
+ASC_REG_CAST_OP(int4x2_t, half, zero, trunc, sat, asc_half2int4x2_rz_sat);
+ASC_REG_CAST_OP(int4x2_t, half, one, trunc, sat, asc_half2int4x2_rz_sat);
+ASC_REG_CAST_OP(int4x2_t, half, two, trunc, sat, asc_half2int4x2_rz_sat);
+ASC_REG_CAST_OP(int4x2_t, half, three, trunc, sat, asc_half2int4x2_rz_sat);
 
 // int4x2_t -> half
-ASC_REG_CAST_OP_NO_POSITION(half, int4x2_t, zero, rint, not_sat, asc_int4x22half);
+ASC_REG_CAST_OP(half, int4x2_t, zero, rint, not_sat, asc_int4x22half);
+ASC_REG_CAST_OP(half, int4x2_t, one, rint, not_sat, asc_int4x22half);
+ASC_REG_CAST_OP(half, int4x2_t, two, rint, not_sat, asc_int4x22half);
+ASC_REG_CAST_OP(half, int4x2_t, three, rint, not_sat, asc_int4x22half);
 
 // int4x2_t -> int16_t
-ASC_REG_CAST_OP_NO_POSITION(int16_t, int4x2_t, zero, rint, not_sat, asc_int4x22int16);
+ASC_REG_CAST_OP(int16_t, int4x2_t, zero, rint, not_sat, asc_int4x22int16);
+ASC_REG_CAST_OP(int16_t, int4x2_t, one, rint, not_sat, asc_int4x22int16);
+ASC_REG_CAST_OP(int16_t, int4x2_t, two, rint, not_sat, asc_int4x22int16);
+ASC_REG_CAST_OP(int16_t, int4x2_t, three, rint, not_sat, asc_int4x22int16);
 
 // fp4x2_e1m2_t -> bfloat16_t
 ASC_REG_CAST_OP(bfloat16_t, fp4x2_e1m2_t, zero, rint, not_sat, asc_e1m2x22bfloat16);
@@ -435,7 +487,10 @@ ASC_REG_CAST_OP(bfloat16_t, fp4x2_e2m1_t, two, rint, not_sat, asc_e2m1x22bfloat1
 ASC_REG_CAST_OP(bfloat16_t, fp4x2_e2m1_t, three, rint, not_sat, asc_e2m1x22bfloat16);
 
 // int4x2_t -> bfloat16_t
-ASC_REG_CAST_OP_NO_POSITION(bfloat16_t, int4x2_t, zero, rint, not_sat, asc_int4x22bfloat16);
+ASC_REG_CAST_OP(bfloat16_t, int4x2_t, zero, rint, not_sat, asc_int4x22bfloat16);
+ASC_REG_CAST_OP(bfloat16_t, int4x2_t, one, rint, not_sat, asc_int4x22bfloat16);
+ASC_REG_CAST_OP(bfloat16_t, int4x2_t, two, rint, not_sat, asc_int4x22bfloat16);
+ASC_REG_CAST_OP(bfloat16_t, int4x2_t, three, rint, not_sat, asc_int4x22bfloat16);
 
 // float -> fp8_e4m3fn_t
 ASC_REG_CAST_OP(fp8_e4m3fn_t, float, zero, rint, not_sat, asc_float2e4m3_rn);

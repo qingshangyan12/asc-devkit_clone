@@ -233,3 +233,10 @@ inline void asc_stcg(half2* address, half2 val)
         asc_stcg(dst + idx, val[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+val: -12.5, 0, 23.5, -7.25
+dst: -12.5, 0, 23.5, -7.25
+```

@@ -132,9 +132,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -148,43 +152,53 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 }
 
 constexpr uint16_t ONE_REPEAT_SIZE = 256;
-constexpr uint16_t REPEAT_COUNT = 4;
+constexpr uint32_t DATA_BYTES = 523;
+constexpr uint16_t REPEAT_COUNT = (DATA_BYTES + ONE_REPEAT_SIZE - 1) / ONE_REPEAT_SIZE;
 constexpr uint32_t TOTAL_BYTES = ONE_REPEAT_SIZE * REPEAT_COUNT;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
 __simd_vf__ inline void exercise(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input,
-                                uint16_t oneRepeatSize, uint16_t repeatTimes)
+                                uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_uint8_t value;
     addr_reg offset_reg;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        offset_reg = asc_update_addr_reg_b8(oneRepeatSize);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = DATA_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool mask = asc_update_mask_b8(remaining_length);
+        offset_reg = asc_update_addr_reg_b8(one_repeat_size);
         asc_loadalign(value, input, offset_reg);
         asc_storealign(output, value, offset_reg, mask);
     }
 }
 
-__global__ __vector__ void asc_update_addr_reg_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input,
-                                                      uint16_t oneRepeatSize, uint16_t repeatTimes)
+__global__ __vector__ void asc_update_addr_reg_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
     __ubuf__ uint8_t output_local[TOTAL_BYTES];
     __ubuf__ uint8_t input_local[TOTAL_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, TOTAL_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    exercise(output_local, input_local, oneRepeatSize, repeatTimes);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<exercise>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, TOTAL_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(TOTAL_BYTES), output(TOTAL_BYTES, 0xff), golden(TOTAL_BYTES);
-    for (uint32_t i = 0; i < TOTAL_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
+    std::vector<uint8_t> input(TOTAL_BYTES, 0), output(TOTAL_BYTES, 0xff), golden(TOTAL_BYTES, 0xff);
+    for (uint32_t i = 0; i < DATA_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
     golden = input;
     aclInit(nullptr);
     aclrtSetDevice(0);
@@ -196,11 +210,12 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_update_addr_reg_kernel<<<1, 0>>>(output_device, input_device, ONE_REPEAT_SIZE, REPEAT_COUNT);
+    asc_update_addr_reg_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    const bool passed = compare_data(output, golden);
+    bool passed = true;
+    for (uint32_t i = 0; i < DATA_BYTES; ++i) passed = passed && output[i] == golden[i];
     std::cout << (passed ? "[Success] asc_update_addr_reg_b8 passed." : "[Failed] asc_update_addr_reg_b8 failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

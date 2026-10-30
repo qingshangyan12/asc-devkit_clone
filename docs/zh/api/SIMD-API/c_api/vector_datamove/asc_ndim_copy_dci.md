@@ -89,6 +89,7 @@ __global__ __vector__ void asc_ndim_copy_dci_kernel(__gm__ uint8_t* output, __gm
 {
     asc_init();
     __ubuf__ uint8_t local[64];
+    // 输入每行4字节，左右分别填充2字节和3字节，因此输出每行扩展为9字节。
     asc_set_ndim_loop0_stride(1, 1);
     asc_set_ndim_loop1_stride(6, 3);
     asc_set_ndim_loop2_stride(0, 0);
@@ -101,9 +102,11 @@ __global__ __vector__ void asc_ndim_copy_dci_kernel(__gm__ uint8_t* output, __gm
     asc_set_ndim_pad_count(config);
     asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 2, 1, true,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

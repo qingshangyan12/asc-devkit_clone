@@ -93,6 +93,9 @@ TEST_F(TEST_ASC_PLATFORM_API, test_ASCInitSocSpec)
     char b_l1_fusion_flag[16] = "";
 
     EXPECT_EQ(ASCInitSocSpec("Ascend310P1", "AiCore", "", "false"), 0);
+    EXPECT_EQ(ASCInitSocSpec("MC32DM11AA", "AiCore", "", "false"), 0);
+    EXPECT_EQ(ASCInitSocSpec("MC32DM11AB", "AiCore", "", "false"), 0);
+    EXPECT_EQ(ASCInitSocSpec("MC32DM11AC", "AiCore", "", "false"), 0);
     int result = ASCInitSocSpec("Ascend910", b_core_type, b_aicore_num, b_l1_fusion_flag);
     result = ASCInitSocSpec(b_soc_version, b_core_type, b_aicore_num, b_l1_fusion_flag);
     EXPECT_EQ(result, 0);

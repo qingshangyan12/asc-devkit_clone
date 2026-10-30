@@ -69,13 +69,11 @@ T shfl(T var, int src_rank) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl(threadIdx.x + 100, 2);
-        ...
+        result[threadIdx.x] = tile4.shfl(threadIdx.x + 100, 2);
     }
     ```
 
@@ -85,12 +83,16 @@ T shfl(T var, int src_rank) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl(threadIdx.x + 100, 2);
-        ...
+        result[threadIdx.x] = tile4.shfl(threadIdx.x + 100, 2);
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 102, 102, 102, 102, 106, 106, 106, 106, 110, 110, 110, 110, 114, 114, 114, 114
+```

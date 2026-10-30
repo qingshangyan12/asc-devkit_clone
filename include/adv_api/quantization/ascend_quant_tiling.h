@@ -24,8 +24,8 @@ namespace AscendC {
  *  The developer selects a proper space size based on this range as the tiling parameter.
  * @param [in] srcShape : input src Tensor shape
  * @param [in] typeSize : src tensor dtype size
- * @param [out] maxValue: max temporary local space size
- * @param [out] minValue: min temporary local space size
+ * @param [out] maxValue: max temporary local space size, in bytes
+ * @param [out] minValue: min temporary local space size, in bytes
  */
 void GetAscendQuantMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);

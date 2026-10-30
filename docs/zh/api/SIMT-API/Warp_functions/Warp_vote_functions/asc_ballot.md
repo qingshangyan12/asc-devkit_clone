@@ -89,7 +89,6 @@ inline uint32_t asc_ballot(int32_t predicate)
     __simt_vf__ __launch_bounds__(1024) inline void KernelBallot(
         __gm__ const float* input, __gm__ uint32_t* selected_mask, uint64_t total_length, float threshold)
     {
-        // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         if (idx >= total_length) {
             return;
@@ -103,3 +102,12 @@ inline uint32_t asc_ballot(int32_t predicate)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 
+threshold: 3.5
+total_length: 32
+selected_mask: 0xFFFFFFF0
+```
