@@ -59,6 +59,11 @@ struct KernelSourcePatch {
     std::string replacementText;
 };
 
+struct KernelGeneratedSource {
+    boost::filesystem::path filePath;
+    std::string contents;
+};
+
 struct CompilationCommand {
     CompilationCommandKind commandKind;
     std::optional<uint32_t> parallelStage;
@@ -69,6 +74,7 @@ struct CompilationCommand {
 
 struct KernelCompilationPlan {
     std::vector<KernelSourcePatch> sourcePatches;
+    std::vector<KernelGeneratedSource> generatedSources;
     std::vector<CompilationCommand> compilationCommands;
     std::vector<boost::filesystem::path> requiredOutputDirectoryPaths;
     boost::filesystem::path linkedKernelElfPath;

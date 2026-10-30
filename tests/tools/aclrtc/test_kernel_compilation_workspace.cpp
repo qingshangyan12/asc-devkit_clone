@@ -61,7 +61,7 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
     };
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), 0);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), 0);
     EXPECT_TRUE(fs::is_directory(worktreePath / "outputs/nested"));
     EXPECT_EQ(ReadFile(sourcePath), "A={0x01}; B={0x02};\n");
 
@@ -78,7 +78,7 @@ TEST(KernelCompilationWorkspaceTest, ReplacesEveryOccurrenceOfTheSameSourceTempl
     plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
     EXPECT_EQ(ReadFile(sourcePath), "FIRST={0x01}; SECOND={0x01};\n");
 
     boost::system::error_code ignoredError;
@@ -94,7 +94,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchTemplateIsMissing)
     plan.sourcePatches = {{sourcePath, "@@MISSING@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_EQ(ReadFile(sourcePath), "unchanged\n");
 
     boost::system::error_code ignoredError;
@@ -109,7 +109,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchFileIsMissing)
     plan.sourcePatches = {{missingSourcePath, "@@MISSING@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);
@@ -124,7 +124,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchSourceCannotBeRead)
     plan.sourcePatches = {{directoryUsedAsSource, "@@VALUE@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(fs::is_directory(directoryUsedAsSource));
 
     boost::system::error_code ignoredError;
@@ -137,7 +137,7 @@ TEST(KernelCompilationWorkspaceTest, ReportsSourceReadFailureAfterFileOpen)
     plan.sourcePatches = {{"/proc/self/mem", "@@VALUE@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace({}, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
 TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushFails)
@@ -160,7 +160,7 @@ TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushF
     ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    const aclError patchResult = workspace.CreateOutputDirectoriesAndApplySourcePatches(plan);
+    const aclError patchResult = workspace.PrepareCompilationFiles(plan);
 
     const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
     const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
@@ -193,7 +193,7 @@ TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenLargePatchWriteF
     ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    const aclError patchResult = workspace.CreateOutputDirectoriesAndApplySourcePatches(plan);
+    const aclError patchResult = workspace.PrepareCompilationFiles(plan);
 
     const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
     const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
@@ -240,7 +240,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenOutputDirectoryConflictsWithExisti
     plan.requiredOutputDirectoryPaths = {conflictingOutputPath / "nested"};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(fs::is_regular_file(conflictingOutputPath));
 
     boost::system::error_code ignoredError;
@@ -256,7 +256,7 @@ TEST(KernelCompilationWorkspaceTest, PreservesSourceWhenTemporaryPatchFilenameIs
     plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.PrepareCompilationFiles(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_EQ(ReadFile(sourcePath), "VALUE=@@VALUE@@;\n");
 
     boost::system::error_code ignoredError;

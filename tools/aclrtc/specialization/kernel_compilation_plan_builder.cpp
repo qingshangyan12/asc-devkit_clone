@@ -25,6 +25,13 @@ namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
 constexpr char ENVIRONMENT_REFERENCE_PREFIX[] = "${env:";
+constexpr char SPECIALIZATION_FLAG_SOURCE_FILE_NAME[] = "specialization_flag.cpp";
+constexpr char SPECIALIZATION_FLAG_OBJECT_FILE_NAME[] = "specialization_flag.o";
+constexpr char SPECIALIZATION_FLAG_SOURCE[] =
+    "#include \"basic_api/kernel_tensor.h\"\n"
+    "__attribute__((used, section(\".ascend.meta\")))\n"
+    "static const BinaryMetaSpecializationFlag g_ascend_specialization_flag = "
+    "{{B_TYPE_SPECIALIZATION_FLAG, sizeof(uint32_t)}, 0};\n";
 
 void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText, const std::string& replacementText)
 {
@@ -122,6 +129,22 @@ std::string FormatBytesAsCppInitializerList(const void* constantAddress, uint64_
     return encodedBytes.str();
 }
 
+bool AppendCompilerTargetOptions(const std::vector<std::string>& arguments, std::vector<std::string>& targetArguments)
+{
+    bool foundTarget = false;
+    for (const std::string& argument : arguments) {
+        if (argument.compare(0, sizeof("--cce-aicore-arch=") - 1U, "--cce-aicore-arch=") == 0 ||
+            argument.compare(0, sizeof("--npu-arch=") - 1U, "--npu-arch=") == 0) {
+            if (argument.back() == '=') {
+                return false;
+            }
+            targetArguments.emplace_back(argument);
+            foundTarget = true;
+        }
+    }
+    return foundTarget;
+}
+
 } // namespace
 
 bool KernelCompilationPlanBuilder::ExpandPathAndEnvironmentReferences(
@@ -132,6 +155,18 @@ bool KernelCompilationPlanBuilder::ExpandPathAndEnvironmentReferences(
     ReplaceAllLiteralOccurrences(pathResolvedText, "${output}", outputDirectoryPath_.string());
     ReplaceAllLiteralOccurrences(pathResolvedText, "${source_file_path}", externalSourceDirectoryPath_.string());
     return ExpandEnvironmentVariablePlaceholders(pathResolvedText, location, resolvedText);
+}
+
+bool KernelCompilationPlanBuilder::CheckSpecializationMetadataPath(
+    const std::string& path, const std::string& location) const
+{
+    const fs::path normalizedPath = fs::absolute(fs::path(path)).lexically_normal();
+    if (normalizedPath == (outputDirectoryPath_ / SPECIALIZATION_FLAG_SOURCE_FILE_NAME).lexically_normal() ||
+        normalizedPath == (outputDirectoryPath_ / SPECIALIZATION_FLAG_OBJECT_FILE_NAME).lexically_normal()) {
+        ASCENDLOGE("Manifest %s uses a reserved specialization metadata path: %s", location.c_str(), path.c_str());
+        return false;
+    }
+    return true;
 }
 
 aclError KernelCompilationPlanBuilder::BuildConstantSourcePatches(KernelCompilationPlan& plan) const
@@ -146,6 +181,9 @@ aclError KernelCompilationPlanBuilder::BuildConstantSourcePatches(KernelCompilat
         }
         std::string targetFile;
         if (!ExpandPathAndEnvironmentReferences(constant.GetTargetFile(), constant.GetName(), targetFile)) {
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (!CheckSpecializationMetadataPath(targetFile, constant.GetName())) {
             return ACLRTC_ERROR_FAILURE;
         }
         patches.push_back({targetFile, constant.GetTemplateText(), {}});
@@ -183,6 +221,9 @@ aclError KernelCompilationPlanBuilder::BindManifestCommand(
         if (!ExpandPathAndEnvironmentReferences(argument, spec.diagnosticLabel, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
+        if (!CheckSpecializationMetadataPath(resolvedArgument, spec.diagnosticLabel)) {
+            return ACLRTC_ERROR_FAILURE;
+        }
         compilationCommand.arguments.emplace_back(std::move(resolvedArgument));
     }
 
@@ -202,6 +243,44 @@ aclError KernelCompilationPlanBuilder::BindManifestCommand(
             compilationCommand.arguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition), options.begin(),
             options.end());
     }
+    return ACLRTC_SUCCESS;
+}
+
+aclError KernelCompilationPlanBuilder::BuildSpecializationMetadata(
+    const CompilationCommand& basicCompileCommand, KernelCompilationPlan& plan) const
+{
+    std::string ascendHome;
+    if (!ExpandPathAndEnvironmentReferences("${env:ASCEND_HOME_PATH}", "specialization flag compiler", ascendHome)) {
+        return ACLRTC_ERROR_FAILURE;
+    }
+    CompilationCommand command;
+    command.commandKind = CompilationCommandKind::Compile;
+    command.diagnosticLabel = "specialization_flag/compile";
+    command.executablePath = fs::path(ascendHome) / "bin/bisheng";
+    if (!IsAbsoluteExecutableRegularFile(command.executablePath)) {
+        ASCENDLOGE(
+            "Specialization flag compiler is not an executable regular file: %s", command.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    const fs::path sourcePath = outputDirectoryPath_ / SPECIALIZATION_FLAG_SOURCE_FILE_NAME;
+    const fs::path objectPath = outputDirectoryPath_ / SPECIALIZATION_FLAG_OBJECT_FILE_NAME;
+    const fs::path ascPath = fs::path(ascendHome) / "asc";
+    command.arguments = {
+        "-c", "-O3", "-xcce", sourcePath.string(), "-I" + ascPath.string(), "-I" + (ascPath / "include").string()};
+    // SuperKernel auxiliary commands can precede basic commands and use a different target.
+    if (!AppendCompilerTargetOptions(basicCompileCommand.arguments, command.arguments)) {
+        ASCENDLOGE(
+            "Basic compile command %s requires a nonempty explicit --cce-aicore-arch=<arch> or --npu-arch=<arch> "
+            "option "
+            "for specialization metadata",
+            basicCompileCommand.diagnosticLabel.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    // This metadata-only object must not define the kernel's g_tilingKey variable.
+    command.arguments.insert(
+        command.arguments.end(), {"--cce-aicore-only", "-std=c++17", "-DTILING_KEY_VAR=0", "-o", objectPath.string()});
+    plan.generatedSources.push_back({sourcePath, SPECIALIZATION_FLAG_SOURCE});
+    plan.compilationCommands.emplace_back(std::move(command));
     return ACLRTC_SUCCESS;
 }
 
@@ -231,9 +310,13 @@ aclError KernelCompilationPlanBuilder::BindLinkCommand(
         if (!ExpandPathAndEnvironmentReferences(input, "link_inputs", resolvedInput)) {
             return ACLRTC_ERROR_FAILURE;
         }
+        if (!CheckSpecializationMetadataPath(resolvedInput, "link_inputs")) {
+            return ACLRTC_ERROR_FAILURE;
+        }
         requiredOutputDirectories.emplace(fs::path(resolvedInput).parent_path());
         linkCommand.arguments.emplace_back(std::move(resolvedInput));
     }
+    linkCommand.arguments.emplace_back((outputDirectoryPath_ / SPECIALIZATION_FLAG_OBJECT_FILE_NAME).string());
     plan.linkedKernelElfPath = outputDirectoryPath_ / "linked_kernel.elf";
     linkCommand.arguments.emplace_back("-o");
     linkCommand.arguments.emplace_back(plan.linkedKernelElfPath.string());
@@ -293,13 +376,26 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         return result;
     }
     KernelCompilationPlan plan;
+    std::optional<size_t> basicCompileCommandIndex;
     for (const ManifestCommand& spec : borrowedManifest_.commands) {
         CompilationCommand command;
         result = BindManifestCommand(spec, command);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
+        if (!basicCompileCommandIndex.has_value() && spec.objectKind == ManifestObjectKind::Basic &&
+            spec.commandKind == CompilationCommandKind::Compile) {
+            basicCompileCommandIndex = plan.compilationCommands.size();
+        }
         plan.compilationCommands.emplace_back(std::move(command));
+    }
+    if (!basicCompileCommandIndex.has_value()) {
+        ASCENDLOGE("Specialization metadata requires a basic compile command in the selected manifest");
+        return ACLRTC_ERROR_FAILURE;
+    }
+    result = BuildSpecializationMetadata(plan.compilationCommands[*basicCompileCommandIndex], plan);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
     }
     result = BindLinkCommand(borrowedManifest_, plan);
     if (result != ACLRTC_SUCCESS) {

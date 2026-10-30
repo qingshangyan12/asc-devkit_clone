@@ -134,7 +134,7 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
     if (specializationStatus != ACLRTC_SUCCESS) {
         return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }
-    specializationStatus = compilationWorkspace.CreateOutputDirectoriesAndApplySourcePatches(compilationPlan);
+    specializationStatus = compilationWorkspace.PrepareCompilationFiles(compilationPlan);
     if (specializationStatus != ACLRTC_SUCCESS) {
         return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }

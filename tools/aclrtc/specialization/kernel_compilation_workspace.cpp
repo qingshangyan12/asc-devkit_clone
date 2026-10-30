@@ -75,11 +75,15 @@ fs::path KernelCompilationWorkspace::GetWorktreePath() const
     return fs::path(worktreeCleanupGuard_.GetDirectoryPath());
 }
 
-aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
-    const KernelCompilationPlan& compilationPlan) const
+aclError KernelCompilationWorkspace::PrepareCompilationFiles(const KernelCompilationPlan& compilationPlan) const
 {
     for (const fs::path& outputDirectoryPath : compilationPlan.requiredOutputDirectoryPaths) {
         if (!FileUtils::CreateDirectories(outputDirectoryPath.string())) {
+            return ACLRTC_ERROR_FAILURE;
+        }
+    }
+    for (const KernelGeneratedSource& source : compilationPlan.generatedSources) {
+        if (!FileUtils::WriteTextFileAtomically(source.filePath.string(), source.contents)) {
             return ACLRTC_ERROR_FAILURE;
         }
     }
