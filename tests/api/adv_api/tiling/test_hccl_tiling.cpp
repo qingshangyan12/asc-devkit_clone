@@ -187,25 +187,27 @@ protected:
     }
 };
 
-// 新契约：裸名（不含'['）不再触发 CCU 新版本，与 UnregisteredAlgorithmUsesDefaultVersion
-// 行为一致；CCU 新版本仅由外部名触发（见下方外部名用例）。
-TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedBareNameKeepsDefaultVersion)
+// 新契约：裸名（不含'['）与外部名一视同仁，CCU 新版本仅由 commEngine（5/6）+ 设备型号（A5/A6）决定；
+// 裸名进入新流程后由 mc2 侧 selector 定名并回退默认算法，不再报 1042。
+TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllMesh1DMultiJetty", 6U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
@@ -214,63 +216,67 @@ TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 4U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 5U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterConcurMeshNHRMultiLink", 6U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMeshPeerOnly", 6U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedBareNameKeepsDefaultVersion)
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedBareNameUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleNHRMultiLink", 6U,
-        INIT_TILING_VERSION);
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
 // 外部名 + CCU 引擎 → CCU 新版本
@@ -287,20 +293,20 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuMsUsesCcuNewVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "sole[mesh]", 5U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，精确判断在
-// mc2 侧 CheckCcuAlgorithmsRegistered（报错含原文与原因）。此用例钉住 AICPU-only 外部名同样设 101。
+// 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，候选是否可用由 mc2 侧
+// selector 定名与 algorithmMap 命中校验决定。此用例钉住 AICPU-only 外部名同样设 101。
 TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 语法错的外部名 + CCU 引擎：不设 101——version 影响 CCU 链后续流程，坏输入不带新版本标记；
-// 词法错误明细由 mc2 侧 CheckCcuAlgorithmsRegistered 报出。
-TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameBadSyntaxKeepsCcuOldVersion)
+// 语法错的外部名 + CCU 引擎：同样设 101——新契约下 version 仅由 commEngine+devType 决定，
+// algConfig 内容（含语法错）不影响 version，词法错误明细由 mc2 侧 selector 报出。
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameBadSyntaxAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_BROADCAST), "sole[ring", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_BROADCAST), "sole[ring", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
 // ============================================================================
