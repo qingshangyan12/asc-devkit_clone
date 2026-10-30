@@ -302,7 +302,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
             currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
             isInputOutputEqual));
         HCCL_INFO(
-            "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], repeatBatch[%u], "
+            "[KFC][AllGather][Kernel][asccomm] rankId[%u], rankSize[%u], channelCount[%u], repeatBatch[%u], "
             "localCopy[groupCopy]",
             rankId, rankSize, channelCount, AG_M2M_UNROLL_NUM);
 

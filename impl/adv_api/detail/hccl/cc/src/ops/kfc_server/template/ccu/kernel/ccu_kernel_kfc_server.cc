@@ -299,7 +299,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     try {
         auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
         KfcServerContext ctx;
-        HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
+        HCCL_INFO("[CcuKernelKfcServer][asccomm] KfcServer run (dataplane primitives from libasccomm_ccu)");
         CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
         HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
         CCU_CHK_RET(InitResource(ctx));

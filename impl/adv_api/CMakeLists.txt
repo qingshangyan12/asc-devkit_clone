@@ -98,8 +98,10 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
 endif()
 
 if (BUILD_OPEN_PROJECT)
-    add_subdirectory(detail/hccl/cc)
+    # 先引入 asc-comm 三方目标（asccomm_ccu / asccomm_ccu_headers，随包构建并打包），
+    # 供 detail/hccl/cc 内 mc2_client 的实验数据面开关（MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE）链接。
     include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
+    add_subdirectory(detail/hccl/cc)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
