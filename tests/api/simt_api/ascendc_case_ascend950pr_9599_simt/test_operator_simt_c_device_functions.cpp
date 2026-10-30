@@ -33,8 +33,9 @@ TEST_F(DeviceTestsuite, MathApiTest)
 #ifdef __BISHENG_DISABLE_SOFT_IMPL__
     EXPECT_EQ(64, __mul64hi(1LL << 40, 1LL << 30));
     EXPECT_EQ(-1, __mul64hi(-1LL, 1LL));
-    EXPECT_EQ(9, __clz(1LL << 40));
-    EXPECT_EQ(1, __clz(1L << 32));
+    EXPECT_EQ(23, __clz(1LL << 40));
+    EXPECT_EQ(31, __clz(1L << 32));
+    EXPECT_EQ(64, __clz(0LL));
     EXPECT_EQ(64, __popc(0xFFFFFFFFFFFFFFFFULL));
     EXPECT_EQ(64, __popc(0xFFFFFFFFFFFFFFFFUL));
     EXPECT_EQ(41, __ffs(1LL << 40));

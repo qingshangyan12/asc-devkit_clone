@@ -655,10 +655,9 @@ static inline int __ffs(int x)
 static inline int __clz(int x)
 {
     if (x == 0) {
-        return 0;
+        return 32;
     }
-    int lsb = x & (~x + 1);
-    return __builtin_ctz(lsb) + 1;
+    return __builtin_clz(static_cast<unsigned int>(x));
 }
 
 static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
