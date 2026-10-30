@@ -83,11 +83,19 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
-    static_assert(SupportType<T, uint8_t, int8_t, half>(), "LoadDataWithTranspose only support uint8_t, int8_t, half \
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, int8_t, half>(),
+        "LoadDataWithTranspose only support int4b_t, uint8_t, int8_t, half \
          on current device!");
-    load_cbuf_to_cb_transpose(
-        dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap,
-        inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
+    if constexpr (IsSameType<T, int4b_t>::value) {
+        load_cbuf_to_cb_transpose_s4(
+            (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
+    } else {
+        load_cbuf_to_cb_transpose(
+            dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
+            loadDataParam.dstGap, inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
+    }
 }
 
 template <typename T>
