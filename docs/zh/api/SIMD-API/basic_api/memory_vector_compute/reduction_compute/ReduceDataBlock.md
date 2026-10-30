@@ -114,6 +114,7 @@
 <!-- end id17 -->
 
 目的操作数与源操作数的数据类型需要保持一致。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock_res.md#id2 -->
 
 ## 返回值说明
 
@@ -180,6 +181,7 @@
         **图2**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
 
         ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock_res.md#id3 -->
 
 ## 关键特性说明
 

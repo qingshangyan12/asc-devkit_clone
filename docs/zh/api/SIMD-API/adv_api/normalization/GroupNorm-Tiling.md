@@ -74,8 +74,8 @@ void GetGroupNormNDTilingInfo(const AscendC::TensorShape& srcShape, const uint32
 | typeSize | 输入 | 输入数据inputX的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。 |
 | groupNum | 输入 | 在C维度上的分组数。 |
-| maxValue | 输出 | 输出GroupNorm接口所需的tiling信息（最大临时空间大小）。<br><br>GroupNorm接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。在最小临时空间-最大临时空间范围内，随着临时空间增大，核函数（Kernel）侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。<br>maxValue仅作为参考值，有可能大于Unified Buffer（UB）剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
-| minValue | 输出 | 输出GroupNorm接口所需的tiling信息（最小临时空间大小）。<br><br>GroupNorm接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
+| maxValue | 输出 | 输出GroupNorm接口所需的tiling信息（最大临时空间大小，单位为字节）。<br><br>GroupNorm接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。在最小临时空间-最大临时空间范围内，随着临时空间增大，核函数（Kernel）侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。<br>maxValue仅作为参考值，有可能大于Unified Buffer（UB）剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
+| minValue | 输出 | 输出GroupNorm接口所需的tiling信息（最小临时空间大小，单位为字节）。<br><br>GroupNorm接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
 
 **表2**  GetGroupNormNDTilingInfo接口参数列表：
 

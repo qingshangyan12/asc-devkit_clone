@@ -109,10 +109,11 @@ def check_is_regbase_v2():
     from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import KIRIN_X90
     from .platform.platform_info import KIRIN_9030
-    from .platform.platform_info import KIRIN_DEV_0000
+    from .platform.platform_info import KIRIN_9050
     from .platform.platform_info import KIRIN_DEV_0001
     from .platform.platform_info import KIRIN_DEV_0002
     from .platform.platform_info import KIRIN_DEV_0003
+    from .platform.platform_info import KIRIN_9020
 
     if get_soc_spec("SHORT_SOC_VERSION") in [
         ASCEND_031,
@@ -126,7 +127,7 @@ def check_is_regbase_v2():
         ASCEND_960PR,
         KIRIN_X90,
         KIRIN_9030,
-        KIRIN_DEV_0000,
+        KIRIN_9050,
         KIRIN_DEV_0001,
         KIRIN_DEV_0002,
         KIRIN_DEV_0003,

@@ -25,7 +25,7 @@
 | [Min](Min.md) | $dstReg_i = \min(srcReg0_i, srcReg1_i)$ |
 | [Mul](Mul.md) | $dstReg_i = srcReg0_i \times srcReg1_i$ |
 | [Mull](Mull.md) | $dstReg0_i = (srcReg0_i \times srcReg1_i) \bmod 2^{bit}$<br>$dstReg1_i = (srcReg0_i \times srcReg1_i) / 2^{bit}$<br>其中，bit表示操作数的位宽bit数。 |
-| [Prelu](Prelu.md) | $dstReg_i = \begin{cases} srcReg0_i & srcReg0_i > 0 \\ srcReg0_i \times srcReg1_i & srcReg0_i \leq 0 \end{cases}$ |
+| [Prelu](Prelu.md) | $dstReg_i = \begin{cases} srcReg0_i & srcReg0_i \geq 0 \\ srcReg0_i \times srcReg1_i & srcReg0_i < 0 \end{cases}$ |
 | [Sub](Sub.md) | $dstReg_i = srcReg0_i - srcReg1_i$ <br>$\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, \sim srcReg1_i\} + 33'b1$ |
 | [SubC](SubC.md) | $\{carry_i, dstReg_i\} = \{1'b0, srcReg0_i\} + \{1'b0, \sim srcReg1_i\} + \{32'b0,carrySrc_i\}$ |
 

@@ -256,6 +256,19 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMxFix(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixParams& mmadFixParams);
+
+/*
+ * @ingroup MacroCube
+ * @brief post process
+ * @param [out] dst
+ * @param [in] src
+ * @param [in] params register
+ */
+template <typename T, typename U>
+__aicore__ inline void PostProc(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcBitModeParams& params);
+template <typename T, typename U>
+__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& src, const PostProcParams& params);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

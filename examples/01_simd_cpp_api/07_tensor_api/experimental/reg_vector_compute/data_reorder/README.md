@@ -8,7 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构
 
@@ -38,7 +38,7 @@ data_reorder
 - 样例实现：  
   data_reorder_vf函数内调用deinterleave接口进行数据重排：
   - 使用load将输入从UB读取到src0_reg和src1_reg寄存器中
-  - 使用deinterleave接口将标量值填充到目的reg_tensor的每个元素
+  - 使用deinterleave接口对src0_reg和src1_reg组成的连续序列进行解交织，将偶数位置的元素写入result.first，将奇数位置的元素写入result.second
   - 使用store将结果写回UB
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -47,7 +47,7 @@ data_reorder
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 

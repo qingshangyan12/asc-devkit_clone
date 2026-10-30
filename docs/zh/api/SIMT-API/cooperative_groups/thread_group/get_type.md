@@ -62,11 +62,11 @@ group_type get_type() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
         group_type type = tile.get_type(); // 返回group_type::tiled_group_type
-        ...
+        result[threadIdx.x] = static_cast<uint32_t>(type);
     }
     ```
 
@@ -76,10 +76,16 @@ group_type get_type() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
         group_type type = tile.get_type(); // 返回group_type::tiled_group_type
-        ...
+        result[threadIdx.x] = static_cast<uint32_t>(type);
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+```

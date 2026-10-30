@@ -10,4 +10,5 @@ This document presents feature samples based on Ascend C SIMT, demonstrating var
 |----------------------------------------------------|--------------------|
 | [00_framework](./00_framework)       | Samples demonstrating custom operator implementation based on different frameworks. |
 | [01_api_features](./01_api_features)       | Samples demonstrating API-related features in SIMT. |
+| [02_language_features](./02_language_features) | Samples demonstrating the use of key device-side C++ language features (such as Lambda capturing) in SIMT. |
 | [06_compile](./06_compile)                 | Samples demonstrating SIMT compile-related features. |

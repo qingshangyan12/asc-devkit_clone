@@ -122,6 +122,7 @@ $$
 | src0、src1数据类型 | dst数据类型 |
 | :----------------- | :---------- |
 | int32_t            | half        |
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddDeqRelu_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -160,6 +161,7 @@ $$
     8K, & \text{if } count \gt 2K
   \end{cases}
   $$
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddDeqRelu_res.md#id3 -->
 
 ## 关键特性
 

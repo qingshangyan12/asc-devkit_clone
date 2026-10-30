@@ -12,7 +12,7 @@ Ascend 950PR&950DT系列产品对应的架构中，Vector Function（VF）是实
 
 -   迭代变量类型
 
-    VF内所有Loop的迭代变量必须是uint16\_t类型。
+    VF内所有Hardware Loop的迭代变量必须是uint16\_t类型，非uint16_t类型不会有功能错误，但性能会变差。
 
 -   起始值与步长
 
@@ -20,9 +20,13 @@ Ascend 950PR&950DT系列产品对应的架构中，Vector Function（VF）是实
 
     每次迭代的步长必须是递增1。
 
--   循环内不允许跳转指令，比如if/else、三元运算符?:等条件判断跳转。
-
-    VF内if/else在Loop内会阻碍Hardware Loop的生成，编译器虽然会尽可能做if/else消除优化，但是不做完全性保证。
+-   循环嵌套层数
+ 
+    VF内最多支持四层级的嵌套循环，否则最外层会被编译为Software Loop。
+ 
+-   循环内不允许C++标准跳转控制流，比如if/else、三元运算符?:、switch、break、goto、continue等条件判断跳转。
+ 
+    VF内if/else在Loop内会阻碍Hardware Loop的生成，编译器虽然会尽可能做if/else消除优化，但是不做完全性保证。如果循环内某些跳转指令无法被优化，此循环将会被编译为Aux Scalar构成的Software Loop，无功能性错误。
 
     if控制流可使用if constexpr或者for(1)替换。if constexpr在编译时已经完成，无运行时开销，但是需要传入的参数是编译时常量，不能依赖运行时变量；for(1)可以触发编译器的循环优化，在当前硬件条件下，Vector侧执行Loop的性能是远远优于条件分支跳转的。
 
@@ -51,6 +55,10 @@ Ascend 950PR&950DT系列产品对应的架构中，Vector Function（VF）是实
 
 -   一旦执行，循环计数/边界不允许被更改。
 -   若要利用外层循环的计数作为循环边界，将外层循环计数器移动到另一个寄存器中，然后将其设置为循环边界。
+
+-   避免不可终止的控制流
+    
+    如果存在程序无法结束的控制流（如无限循环、无终止条件的递归等），编译器会认为该行为未定义，编译期间尽可能识别，抛出编译错误。
 
 下文示例展示了编译器识别并处理为Hardware Loop和Software Loop的两种场景：
 

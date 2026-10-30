@@ -44,6 +44,8 @@ private:
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const;
     SelectorStatus SelectMeshAlgoCcuSchedule(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const;
+    SelectorStatus SelectMeshAlgoCcuScheduleMesh1D(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const;
     SelectorStatus SelectMeshAlgoAicpuForMesh1D(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName, u64 dataSize,
         double ratio) const;

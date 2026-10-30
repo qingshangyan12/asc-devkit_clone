@@ -71,6 +71,20 @@ HcclResult SimThreadMgr::HcclThreadAcquire(
     return HCCL_SUCCESS;
 }
 
+HcclResult SimThreadMgr::HcclDedicatedThreadAcquire(
+    HcclDedicatedThreadType useType, uint32_t notifyNumPerThread, ThreadHandle* thread)
+{
+    std::lock_guard<std::mutex> lock(dedicatedThreadMutex_);
+    auto it = dedicatedThreadMap_.find(useType);
+    if (it != dedicatedThreadMap_.end()) {
+        *thread = it->second;
+        return HCCL_SUCCESS;
+    }
+    CHK_RET(HcclThreadAcquire(CommEngine::COMM_ENGINE_CPU, 1, notifyNumPerThread, thread));
+    dedicatedThreadMap_[useType] = *thread;
+    return HCCL_SUCCESS;
+}
+
 HcclResult SimThreadMgr::CommGetNotifyNumInThread(ThreadHandle thread, uint32_t* notifyNum)
 {
     SimHcclThread* hcclThread = reinterpret_cast<SimHcclThread*>(thread);

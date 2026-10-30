@@ -498,6 +498,22 @@ TEST_F(AicpuMc2Test, LaunchPropagatesRuntimeFailure)
     EXPECT_EQ(state.launchCalls, 1U);
 }
 
+// 模拟 ACL Graph capture 期间直接 aclrtMemcpy 被运行时拒绝：
+// launch 链上的 OpResCtx D2H 回读必须经 haclrtMemcpy（RELAXED 模式交换），不能直连 aclrtMemcpy。
+TEST_F(AicpuMc2Test, LaunchSurvivesDirectMemcpyRejection)
+{
+    g_rejectDirectAclrtMemcpy = true;
+
+    OpParam opParam{};
+    OpResCtx opResCtx{};
+    BuildAicpuLaunchCtx(opParam, opResCtx, COMM_ENGINE_AICPU);
+
+    EXPECT_EQ(Mc2CcKernelLaunch(stream_, &opResCtx, sizeof(opResCtx)), HCCL_SUCCESS);
+    EXPECT_EQ(g_aclrtMemcpyCallCount, 1U);
+
+    EXPECT_EQ(GetMc2AicpuLaunchStubState().launchCalls, 1U);
+}
+
 TEST_F(AicpuMc2Test, LaunchRejectsUnsupportedDevice)
 {
     ReinitWorld(DevType::DEV_TYPE_910_93, RANK_SIZE);

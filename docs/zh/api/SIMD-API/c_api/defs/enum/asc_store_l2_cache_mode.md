@@ -15,7 +15,8 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
     NORMAL_LAST_VICTIM = 1,
     NORMAL_PERSISTENT = 2,
-    NOTALLOC_CLEAN = 4
+    NOTALLOC_CLEAN = 4,
+    WT_SHARE_FIRST_VICTIM = 12
 };
 ```
 
@@ -23,9 +24,17 @@ enum class asc_store_l2_cache_mode : uint8_t {
 
 **表1** 枚举值说明
 
-|枚举值|L2 Cache策略|
-|------|-----------|
-| NORMAL_FIRST_VICTIM | 启用L2 Cache，并且将分配的Cache Line标记为高替换优先级。 |
-| NORMAL_LAST_VICTIM | 启用L2 Cache，并且将分配的Cache Line标记为低替换优先级。 |
+| 枚举值 | L2 Cache策略 |
+| ------ | ----------- |
+| NORMAL_FIRST_VICTIM | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级（FIRST_VICTIM），即在发生替换时优先被淘汰。 |
+| NORMAL_LAST_VICTIM | 启用L2 Cache，并将分配的Cache Line标记为低替换优先级（LAST_VICTIM），即在发生替换时优先保留。 |
 | NORMAL_PERSISTENT | 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。 |
 | NOTALLOC_CLEAN | 不启用L2 Cache，若L2 Cache中已有同地址缓存会被保留并标记为Clean，标记为Clean的Cache Line被移出L2 Cache时会被直接丢弃。 |
+| WT_SHARE_FIRST_VICTIM | 启用L2 Cache，采用write-through（直写）策略，并将新分配的Cache Line标记为高替换优先级（FIRST_VICTIM），即在发生替换时优先被淘汰。<br>write-through表示写入数据时同步更新GM和L2 Cache，Cache Line无需标记为Dirty，也无需等待Cache Line被替换或执行Clean操作后再回写GM。<br>share表示使用本模式分配的Cache Line处于Shared（共享）状态。在MESI缓存一致性协议中，Shared表示该Cache Line为Clean状态，数据与下一级存储保持一致，并允许其他缓存持有同一地址的有效副本。 |
+
+Clean和Dirty用于表示Cache Line是否需要回写GM：
+
+- Clean（干净）：该Cache Line未被标记为需要回写，被替换时可直接丢弃，无需回写GM。
+- Dirty（脏）：该Cache Line包含尚未回写GM的修改数据，被替换时需要先将修改数据回写GM。
+
+Clean操作表示将Dirty Cache Line中的修改数据回写GM，并将其标记为Clean。

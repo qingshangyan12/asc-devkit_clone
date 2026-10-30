@@ -141,6 +141,9 @@ const u32& GetExternalInputIntraRoceSwitch();
 
 const bool& GetExternalInputHcclAicpuUnfold();
 
+// 确定性级别（DeterministicEnableLevel：0 不支持 / 1 确定性 / 2 确定性+规约保序），仅取 HCCL_DETERMINISTIC 环境变量
+const u8& GetExternalInputHcclDeterministic();
+
 const uint8_t& GetExternalInputHcclAicpuCacheEnable();
 
 const bool& GetExternalInputHcclAivMode();

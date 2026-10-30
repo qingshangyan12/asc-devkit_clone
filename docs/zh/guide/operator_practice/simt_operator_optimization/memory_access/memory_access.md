@@ -5,3 +5,4 @@
 - [DCache访问优化](./dcache_access.md)
 - [通过类型对齐提升搬运效率](./type_alignment_transfer.md)
 - [使用短向量类型提升效率](./short_vector_efficiency.md)
+- [使用SoA布局提升哈希表查找效率](./soa_layout_efficiency.md)

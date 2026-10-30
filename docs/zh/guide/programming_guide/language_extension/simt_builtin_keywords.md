@@ -228,6 +228,11 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 算术运算符 | ++ | x | √ | √ | √ | x |
 | 算术运算符 | -- | x | √ | √ | √ | x |
 | 算术运算符 | - (取反) | x | √ | √ | √ | x |
+| 赋值运算符 | = | √ | √ | √ | √ | x |
+| 复合赋值运算符 | += | x | √ | √ | √ | x |
+| 复合赋值运算符 | -= | x | √ | √ | √ | x |
+| 复合赋值运算符 | *= | x | √ | √ | √ | x |
+| 复合赋值运算符 | /= | x | √ | √ | √ | x |
 | 比较运算符 | &lt; | x | √ | √ | x | x |
 | 比较运算符 | &lt;= | x | √ | √ | x | x |
 | 比较运算符 | &gt; | x | √ | √ | x | x |
@@ -245,7 +250,11 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 逻辑运算符 | ! | √ | √ | √ | x | x |
 | 条件运算符 | a ? b : c | √ | √ | √ | √ | x |
 
-> **约束说明**：除法运算符（/）当前不支持Subnormal（指数位全为0，且尾数位不全为0，表示接近零的极小值）输入，当输入为Subnormal值时会被刷为0。
+> **约束说明**：
+>
+> 除法运算符（/）受编译选项[--cce-use-fast-math](../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
+> -  --cce-use-fast-math=true：开启快速计算模式，不支持Subnormal场景的低精度除法计算，处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+> -  --cce-use-fast-math=false：支持Subnormal场景的高精度除法计算。
 
 运算符使用示例如下所示：
 
@@ -255,6 +264,13 @@ res[idx] = x[idx] + y[idx];
 
 // 取反运算
 x[idx] = (-x[idx]);
+
+// 赋值与复合赋值运算
+res[idx] = x[idx];
+res[idx] += y[idx];
+res[idx] -= y[idx];
+res[idx] *= y[idx];
+res[idx] /= y[idx];
 
 // 比较运算
 if (x[idx] > y[idx]) {

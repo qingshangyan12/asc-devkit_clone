@@ -55,11 +55,16 @@ static unsigned long long block_rank()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned long long* result)
     {
-        ...
         grid_group g = this_grid();
-        unsigned long long block = g.block_rank();
-        ...
+        unsigned long long block_rank = g.block_rank();
+        result[threadIdx.x] = block_rank;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+```
