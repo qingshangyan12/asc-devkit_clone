@@ -85,11 +85,12 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
-            except Exception:
+            except Exception as e:
                 LogUtil.print_compile_log(
-                    "", " ascend610lite execute objcopy fail!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
+                    "", f" ascend610lite execute objcopy fail: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
                 )
                 return None
             return [sym + "_start", sym + "_end"]
@@ -112,7 +113,8 @@ class PackKernel:
                         "i386",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
             elif target_platform == "aarch64":
                 subprocess.run(
@@ -126,7 +128,8 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ],
+                    check=True,
                 )
             else:
                 subprocess.run(["echo", "unsupported environment!"])
@@ -161,7 +164,10 @@ class PackKernel:
                 op_info[file_name] = []
                 path, filename = os.path.split(op_cfgs[file_name])
                 op_info[file_name].append(os.path.join(self.vendor_name, path))
-                op_info[file_name].append(self.ascendc_gen_object(op_cfgs[file_name], path, self.vendor_name))
+                obj_syms = self.ascendc_gen_object(op_cfgs[file_name], path, self.vendor_name)
+                if obj_syms is None:
+                    raise RuntimeError(f"ascendc_gen_object failed for {op_cfgs[file_name]} ({path})")
+                op_info[file_name].append(obj_syms)
         self.op_info = op_info
 
     def ascendc_gen_register(self, macro_op, var_str):
@@ -268,12 +274,13 @@ class PackKernel:
             sub_objs = objs[start : start + batch_size]
             start += batch_size
             try:
-                subprocess.run(["ar", "qc", out_lib] + sub_objs)
-                subprocess.run(["ranlib", out_lib])
+                subprocess.run(["ar", "qc", out_lib] + sub_objs, check=True)
+                subprocess.run(["ranlib", out_lib], check=True)
             except Exception as e:
                 LogUtil.print_compile_log(
                     "", f"execute ar/ranlib command error: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC
                 )
+                raise
 
     def ascendc_copy_dir_recursive(self: any, src_dir, dst_dir):
         try:
