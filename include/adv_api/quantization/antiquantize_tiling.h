@@ -25,8 +25,8 @@ namespace AscendC {
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetAntiQuantizeMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorShape& scaleShape, bool isTranspose,

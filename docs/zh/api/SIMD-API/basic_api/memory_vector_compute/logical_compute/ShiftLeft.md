@@ -138,6 +138,7 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 <!-- npu="310b" id18 -->
 - 针对Atlas 200I/500 A2推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_res.md#id2 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -165,6 +166,7 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 <!-- npu="950" id24 -->
 - 针对Ascend 950PR&950DT系列产品，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 <!-- end id24 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_res.md#id3 -->
 
 ## 调用示例<a name="section132384819392"></a>
 

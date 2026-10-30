@@ -89,7 +89,8 @@ __aicore__ inline void Scatter(
  */
 template <typename T, typename U>
 __aicore__ inline void ScatterDataCopy(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offset, ScatterParams& scatterParams);
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offset,
+    const ScatterParams& scatterParams);
 #endif
 } // namespace AscendC
 #pragma end_pipe

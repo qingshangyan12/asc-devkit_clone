@@ -104,8 +104,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -127,29 +130,51 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
-constexpr uint32_t BUFFER_BYTES = 256;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint16_t);
 
-__simd_vf__ inline void floor_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+__simd_vf__ inline void floor_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_half src;
-    asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
-    vector_half dst = asc_floor(src, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b16(remaining_length);
+        vector_half src;
+        asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input + offset * sizeof(uint16_t)));
+        vector_half dst = asc_floor(src, mask);
+        asc_storealign(reinterpret_cast<__ubuf__ half*>(output + offset * sizeof(uint16_t)), dst, mask);
+    }
 }
 
 __global__ __vector__ void asc_floor_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_BYTES];
-    __ubuf__ uint8_t input_local[BUFFER_BYTES];
-    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    floor_vf(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    __ubuf__ uint8_t output_local[PADDED_BUFFER_BYTES];
+    __ubuf__ uint8_t input_local[PADDED_BUFFER_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, PADDED_BUFFER_BYTES);
+    asc_copy_gm2ub_align(output_local, input, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<floor_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, output_local, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
@@ -158,20 +183,20 @@ int main()
 {
     constexpr uint8_t input_pattern[] = {0x00, 0x3f};
     constexpr uint8_t golden_pattern[] = {0x00, 0x3c};
-    std::vector<uint8_t> input(BUFFER_BYTES);
-    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
-    std::vector<uint8_t> golden(BUFFER_BYTES);
-    for (size_t i = 0; i < BUFFER_BYTES; ++i) {
+    std::vector<uint8_t> input(PADDED_BUFFER_BYTES);
+    std::vector<uint8_t> output(PADDED_BUFFER_BYTES, 0xff);
+    std::vector<uint8_t> golden(PADDED_BUFFER_BYTES);
+    for (size_t i = 0; i < PADDED_BUFFER_BYTES; ++i) {
         input[i] = input_pattern[i % sizeof(input_pattern)];
-        golden[i] = golden_pattern[i % sizeof(golden_pattern)];
+        golden[i] = (i < BUFFER_BYTES) ? golden_pattern[i % sizeof(golden_pattern)] : input[i];
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), PADDED_BUFFER_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), PADDED_BUFFER_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
         ACL_MEMCPY_HOST_TO_DEVICE);

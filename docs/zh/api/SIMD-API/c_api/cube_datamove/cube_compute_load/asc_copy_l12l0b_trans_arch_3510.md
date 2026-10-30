@@ -1,4 +1,4 @@
-# asc_copy_l12l0b_trans
+# asc_copy_l12l0b_trans（NPU架构版本3510）
 
 ## 产品支持情况
 

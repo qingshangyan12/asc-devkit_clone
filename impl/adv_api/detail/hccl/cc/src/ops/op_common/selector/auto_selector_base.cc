@@ -51,17 +51,17 @@ SelectorStatus AutoSelectorBase::Select(
         HCCL_DEBUG("[asc][AlgoSelect][AutoSelectorBase::Select] try CCU_SCHED, opType[%d].", opParam.opType);
         ret = SelectCcuScheduleAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
         if (ret == SelectorStatus::NOT_MATCH) {
-            opParam.opExecuteConfig = OpExecuteConfig::CCU_FAIL;
-            HCCL_INFO(
-                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED not match, fallback to CCU_FAIL, "
-                "opType[%d].",
+            // CCU(KFC)上下文无法运行 AICPU 算法，选不到即失败，不降级
+            HCCL_WARNING(
+                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED not match, opType[%d], fail without AICPU "
+                "fallback.",
                 opParam.opType);
-        } else {
-            HCCL_INFO(
-                "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED matched, opType[%d], algName[%s].",
-                opParam.opType, selectAlgName.c_str());
             return ret;
         }
+        HCCL_INFO(
+            "[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED matched, opType[%d], algName[%s].", opParam.opType,
+            selectAlgName.c_str());
+        return ret;
     }
     if (ProcessAivConfig(opParam, topoInfo, configAlgMap, selectAlgName, ret)) {
         HCCL_INFO(

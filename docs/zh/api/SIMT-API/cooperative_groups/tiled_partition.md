@@ -83,9 +83,8 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         // 无需使用跨warp的thread_block_tile
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
@@ -94,7 +93,6 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         __ubuf__ block_tile_memory<1024> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);
-        ...
     }
     ```
 
@@ -104,9 +102,8 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         // 无需使用跨warp的thread_block_tile
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
@@ -115,6 +112,5 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         __ubuf__ block_tile_memory<1024> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);
-        ...
     }
     ```

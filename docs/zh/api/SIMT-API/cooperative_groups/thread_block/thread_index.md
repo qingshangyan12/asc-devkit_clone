@@ -55,12 +55,15 @@ static dim3 thread_index()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(dim3* result)
     {
-        ...
         thread_block g = this_thread_block();
-        dim3 thread_idx = g.thread_index();
-        ...
+        dim3 thread_index = g.thread_index();
+        if (threadIdx.x == 0) {
+            result[blockIdx.x].x = thread_index.x;
+            result[blockIdx.x].y = thread_index.y;
+            result[blockIdx.x].z = thread_index.z;
+        }
     }
     ```
 
@@ -70,11 +73,21 @@ static dim3 thread_index()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ dim3* result)
     {
-        ...
         thread_block g = this_thread_block();
-        dim3 thread_idx = g.thread_index();
-        ...
+        dim3 thread_index = g.thread_index();
+        if (threadIdx.x == 0) {
+            result[blockIdx.x].x = thread_index.x;
+            result[blockIdx.x].y = thread_index.y;
+            result[blockIdx.x].z = thread_index.z;
+        }
     }
     ```
+
+输入输出示例如下：
+
+```text
+使用启动参数: blocks = 4, threads = 1024
+result: dim3(0, 0, 0), dim3(0, 0, 0), dim3(0, 0, 0), dim3(0, 0, 0)
+```

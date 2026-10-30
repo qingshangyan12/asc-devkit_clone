@@ -169,6 +169,7 @@ $dst_i = \frac{1}{src_i}$
 <!-- npu="9030" id27 -->
 - 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id27 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Reciprocal_res.md#id3 -->
 
 ## 返回值说明<a name="section15227195416231"></a>
 
@@ -202,6 +203,7 @@ $dst_i = \frac{1}{src_i}$
 
 - 如果src中的数值为0，可能会产生未知结果。
 - 使用Reciprocal时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)替代实现。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Reciprocal_res.md#id4 -->
 
 <!-- npu="950" id35 -->
 

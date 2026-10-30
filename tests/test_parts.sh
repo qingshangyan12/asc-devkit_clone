@@ -99,6 +99,7 @@ basic_test_three_targets=(
 )
 
 basic_test_four_targets=(
+    ascendc_ut_debug_api
     ascendc_ut_std_api_ascend910B1
     ascendc_ut_std_api_ascend950pr_9599
     ascendc_pyut_asc_compile_common

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运。场景 1 完成非对齐复制，场景 2 完成非对齐加载、归约和存储GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器清零和归约使用实验性 Tensor API，流水同步使用 C API `asc_lock/asc_unlock`。
+本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运。场景 1 完成非对齐复制，场景 2 完成非对齐加载、归约和存储GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器清零和归约使用实验性 Tensor API，流水同步使用 Tensor API `asc::te::mutex`。
 
 样例包含两个场景，通过 `SCENARIO_NUM` 选择：
 
@@ -11,9 +11,11 @@
 | 1 | `float [1024]` | `float [1024]` | 从第 1 个元素开始非对齐复制两个寄存器，即 128 个元素；其余输出元素为 0。 |
 | 2 | `uint16_t [14, 255]` | `uint16_t [14, 16]` | 4 个核按行分工，每核最多 4 行，尾核处理 2 行；每 16 个输入元素取最大值，最后一个数据块只包含 15 个有效元素。 |
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| --- | --- |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.3.0 |
 
 ## 目录结构介绍
 

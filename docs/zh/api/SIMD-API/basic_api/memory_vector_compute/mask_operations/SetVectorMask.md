@@ -92,6 +92,7 @@
 <!-- npu="910b,A3" id10 -->
 - 针对Atlas A3系列产品、Atlas A2系列产品，mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）。
 <!-- end id10 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask_res.md#id2 -->
 
 ## 调用示例<a name="section837496171220"></a>
 
