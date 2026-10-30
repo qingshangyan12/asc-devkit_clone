@@ -26,6 +26,18 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+constexpr int32_t float_exponent_shift = 23;
+constexpr int32_t float_exponent_bias = 127;
+constexpr int32_t float_min_normal_exponent = -126;
+constexpr int32_t float_max_normal_exponent = 127;
+constexpr int32_t float_normalization_scale_exponent = 23;
+constexpr int32_t float_mantissa_drop_width = 24;
+
+constexpr int16_t half_exponent_shift = 10;
+constexpr int16_t half_exponent_bias = 15;
+constexpr int16_t half_scale_underflow_bound = -9;
+constexpr int16_t half_scale_overflow_bound = 31;
+
 __simd_callee__ inline vector_float div_flush_subnormal(vector_float src, vector_bool mask)
 {
     vector_uint32_t bits;
@@ -462,7 +474,7 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
     asc_sub(scale, (vector_int16_t&)src0_exponent, (vector_int16_t&)src1_exponent, mask);
     asc_add_scalar(scale, scale, 15, mask);
 
-    asc_duplicate_scalar(tmp1, static_cast<int16_t>(-9), mask);
+    asc_duplicate_scalar(tmp1, half_scale_underflow_bound, mask);
     asc_eq(mask0, scale, tmp1, mask);
     asc_and(mask0, mask0, mask_valid, mask);
     asc_duplicate_scalar(tmp0, min_denormal, mask0);
@@ -482,7 +494,7 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
     asc_not(mask0, mask0, mask);
     asc_and(mask_valid, mask0, mask_valid, mask);
 
-    asc_duplicate_scalar(tmp0, 31u, mask);
+    asc_duplicate_scalar(tmp0, static_cast<uint16_t>(half_scale_overflow_bound), mask);
     asc_eq(mask0, scale, (vector_int16_t&)tmp0, mask);
     asc_and(mask0, mask0, mask_valid, mask);
     asc_duplicate_scalar(tmp1, 1, mask0);

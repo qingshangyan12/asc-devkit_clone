@@ -44,7 +44,7 @@ $$
 
 **图 1** asc_mull计算示意图
 
-![](../figures/asc_mull.png)
+![](../../../figures/asc_mull.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -55,8 +55,8 @@ $$
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_mull(vector_<dtype> src0,
-                                                        vector_<dtype> src1,
-                                                        vector_bool mask)
+                                                         vector_<dtype> src1,
+                                                         vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -68,8 +68,8 @@ __simd_callee__ inline asc_<dtype>_<dtype>_pair asc_mull(vector_<dtype> src0,
 ```c
 // 通过函数返回值返回结果示例：uint32_t类型乘法。
 __simd_callee__ inline asc_uint32_t_uint32_t_pair asc_mull(vector_uint32_t src0,
-                                                         vector_uint32_t src1,
-                                                         vector_bool mask)
+                                                           vector_uint32_t src1,
+                                                           vector_bool mask)
 ```
 
 ## 参数说明

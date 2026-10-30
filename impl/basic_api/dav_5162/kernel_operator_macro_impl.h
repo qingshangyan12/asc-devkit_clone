@@ -321,56 +321,6 @@ __aicore__ inline void CheckCubeFixSupportTypes(__cbuf__ DstT* c, __cbuf__ Src0T
         "MmadFix dst type or src type is not supported on current device!");
 }
 
-__aicore__ inline uint8_t GetQuantPreMode(pre_quant_t quantPre)
-{
-    uint8_t quantPreMode = 0;
-    switch (quantPre) {
-        case pre_quant_t::No_Quant:
-            quantPreMode = 0;
-            break;
-        case pre_quant_t::REQS8_Vector:
-            quantPreMode = 2;
-            break;
-        case pre_quant_t::REQS8_Scalar:
-            quantPreMode = 3;
-            break;
-        case pre_quant_t::DEQF16_Vector:
-            quantPreMode = 4;
-            break;
-        case pre_quant_t::DEQF16_Scalar:
-            quantPreMode = 5;
-            break;
-        case pre_quant_t::DEQS16_Vector:
-            quantPreMode = 6;
-            break;
-        case pre_quant_t::DEQS16_Scalar:
-            quantPreMode = 7;
-            break;
-        case pre_quant_t::DEQS32_Vector:
-            quantPreMode = 8;
-            break;
-        case pre_quant_t::DEQS32_Scalar:
-            quantPreMode = 9;
-            break;
-        case pre_quant_t::REQS4_Vector:
-            quantPreMode = 10;
-            break;
-        case pre_quant_t::REQS4_Scalar:
-            quantPreMode = 11;
-            break;
-        case pre_quant_t::QS322FP8_E4M3_INT_Vector:
-            quantPreMode = 12;
-            break;
-        case pre_quant_t::QS322FP8_E4M3_INT_Scalar:
-            quantPreMode = 13;
-            break;
-        default:
-            quantPreMode = 0;
-            break;
-    }
-    return quantPreMode;
-}
-
 __aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t& config)
 {
     constexpr uint8_t POS_BIAS_MATRIX_INIT = 0;
@@ -395,18 +345,18 @@ __aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t& c
     config = 0;
     config |= (((uint64_t)params.biasMatrixInitVal & 0x1) << POS_BIAS_MATRIX_INIT);
     config |= (((uint64_t)params.biasMatrixBroadcast & 0x1) << POS_BIAS_MATRIX_BRC);
-    config |= (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << POS_PRE_QUANT_MODE);
-    config |= (((uint64_t)params.preReluMode & 0x7) << POS_PRE_RELU_MODE);
-    config |= (((uint64_t)params.postQuantMode & 0x1f) << POS_POST_QUANT_MODE);
+    config |= ((static_cast<uint64_t>(params.preQuantMode) & 0x1F) << POS_PRE_QUANT_MODE);
+    config |= ((static_cast<uint64_t>(params.preReluMode) & 0x7) << POS_PRE_RELU_MODE);
+    config |= ((static_cast<uint64_t>(params.postQuantMode) & 0x1f) << POS_POST_QUANT_MODE);
     config |= (((uint64_t)params.actPostMode & 0x7) << POS_POST_RELU_MODE);
     config |= (((uint64_t)params.preClipReluMode & 0x1) << POS_PRE_CLIP_RELU_MODE);
-    config |= (((uint64_t)params.eltwiseOp & 0x7) << POS_ELTWISE_OP);
+    config |= ((static_cast<uint64_t>(params.eltwiseOp) & 0x7) << POS_ELTWISE_OP);
     config |= (((uint64_t)params.eltwiseAntiqEnable & 0x1) << POS_ELTWISE_ANTIQ_EN);
     config |= (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << POS_ELTWISE_M_BRC);
-    config |= (((uint64_t)params.lsbMask & 0x7) << POS_MASK_CTRL);
+    config |= ((static_cast<uint64_t>(params.lsbMask) & 0x7) << POS_MASK_CTRL);
     config |= (((uint64_t)params.dualSrcEnable & 0x1) << POS_DUAL_SRC_EN);
     config |= (((uint64_t)params.dependEnable & 0x1) << POS_DEPEND_EN);
-    config |= (((uint64_t)params.instrId & 0x3) << POS_INSTR_ID);
+    config |= ((static_cast<uint64_t>(params.instrId) & 0x3) << POS_INSTR_ID);
     config |= (((uint64_t)params.postProcHalfEnable & 0x1) << POS_POST_PROC_HALF);
     config |= (((uint64_t)params.nbrcBiasCtrl & 0x1) << POS_NBRC_BIAS_CTRL);
     config |= (((uint64_t)params.cin & 0xffff) << POS_CIN);

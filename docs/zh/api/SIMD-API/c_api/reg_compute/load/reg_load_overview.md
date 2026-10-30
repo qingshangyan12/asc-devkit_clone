@@ -193,7 +193,7 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 **图1** 非对齐搬入示意图<a id="fig-loadunalign"></a>
 
-![非对齐搬入示意图](../../figures/capi_loadunalign.png "非对齐搬入示意图")
+![非对齐搬入示意图](../../../../figures/capi_loadunalign.png "非对齐搬入示意图")
 
 设有效起始字节地址为`src_start_addr`，将其向低地址方向按32字节对齐，得到`aligned_src_start_addr`。处理过程如下：
 
@@ -218,13 +218,13 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 **图2** 非对齐搬出示意图（首次搬出）<a id="fig-storeunalign-empty"></a>
 
-![非对齐搬出示意图（首次搬出）](../../figures/capi_storeunalign_1.png "非对齐搬出示意图（首次搬出）")
+![非对齐搬出示意图（首次搬出）](../../../../figures/capi_storeunalign_1.png "非对齐搬出示意图（首次搬出）")
 
 首次搬出时，非对齐寄存器中没有前序尾块数据。主搬出接口将矢量数据寄存器中可直接写入的数据写入UB，并将末尾数据保存至非对齐寄存器。调用后处理接口后，尾块数据被写入UB。
 
 **图3** 非对齐搬出示意图（连续搬出）<a id="fig-storeunalign-cached"></a>
 
-![非对齐搬出示意图（连续搬出）](../../figures/capi_storeunalign_2.png "非对齐搬出示意图（连续搬出）")
+![非对齐搬出示意图（连续搬出）](../../../../figures/capi_storeunalign_2.png "非对齐搬出示意图（连续搬出）")
 
 后续连续搬出时，主搬出接口将非对齐寄存器中的前序尾块与本次矢量数据寄存器的主块数据拼接后写入UB，再将本次尾块更新至非对齐寄存器。连续搬出结束后，调用后处理接口写入最后一次缓存的尾块。
 
@@ -242,7 +242,7 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 **图4** 连续非对齐搬入搬出示例<a id="fig-loadstoreunalign"></a>
 
-![连续非对齐搬入搬出示例](../../figures/capi_loadunalign_storeunalign.png "连续非对齐搬入搬出示例")
+![连续非对齐搬入搬出示例](../../../../figures/capi_loadunalign_storeunalign.png "连续非对齐搬入搬出示例")
 
 ```c
 __simd_vf__ inline void load_store_unalign_vf(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,

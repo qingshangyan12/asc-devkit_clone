@@ -25,6 +25,8 @@
 #include "../../../include/basic_api/kernel_struct_macro.h"
 
 namespace AscendC {
+constexpr uint32_t POS_PRE_VALUE_OFFSET = 13;
+
 struct ConvKernelBitModeConfig0 {
     uint64_t wStride : 6;
     uint64_t hStride : 6;
@@ -242,17 +244,17 @@ struct FixPipeReluAlphaBitModeConfig0 {
     __aicore__ inline void Init(const FixPipeReluAlphaParams& params)
     {
         lut = static_cast<uint8_t>(params.lut);
-        preValue = params.preValue >> 13;
+        preValue = params.preValue >> POS_PRE_VALUE_OFFSET;
     }
 
     __aicore__ inline void SetLut(lut_mode_t lut_) { lut = static_cast<uint8_t>(lut_); };
     /* PreValue is (1, 8, 10) for computation that is 1 sign bit, 8 exponent bits and 10 mantissa bits,
      * use for f32 static_cast to u32 to set Value
      */
-    __aicore__ inline void SetPreValue(uint32_t preValue_) { preValue = preValue_ >> 13; };
+    __aicore__ inline void SetPreValue(uint32_t preValue_) { preValue = preValue_ >> POS_PRE_VALUE_OFFSET; };
 
     __aicore__ inline lut_mode_t GetLut() const { return static_cast<lut_mode_t>(lut); };
-    __aicore__ inline uint32_t GetPreValue() const { return preValue << 13; };
+    __aicore__ inline uint32_t GetPreValue() const { return preValue << POS_PRE_VALUE_OFFSET; };
 };
 
 struct FixPipeAddrBitModeConfig0 {

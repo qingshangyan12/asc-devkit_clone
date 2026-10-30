@@ -32,7 +32,7 @@
 
 **图1** 广播搬入矢量数据寄存器
 
-![](../../figures/capi_loadalign_brc_elem.png)
+![](../../../../figures/capi_loadalign_brc_elem.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 

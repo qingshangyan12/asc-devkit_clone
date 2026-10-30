@@ -53,14 +53,14 @@ $$
 ```c
 // 通过函数返回值返回结果（占位符形式），不带输入进位。
 __simd_callee__ inline asc_<dtype>_bool_pair asc_add_carry(vector_<dtype> src0,
-                                                                  vector_<dtype> src1,
-                                                                  vector_bool mask)
+                                                           vector_<dtype> src1,
+                                                           vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式），带输入进位。
 __simd_callee__ inline asc_<dtype>_bool_pair asc_add_carry(vector_<dtype> src0,
-                                                                  vector_<dtype> src1,
-                                                                  vector_bool carry_src,
-                                                                  vector_bool mask)
+                                                           vector_<dtype> src1,
+                                                           vector_bool carry_src,
+                                                           vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -72,14 +72,14 @@ __simd_callee__ inline asc_<dtype>_bool_pair asc_add_carry(vector_<dtype> src0,
 ```c
 // 通过函数返回值返回结果示例：不带输入进位的uint32_t类型加法。
 __simd_callee__ inline asc_uint32_t_bool_pair asc_add_carry(vector_uint32_t src0,
-                                                                   vector_uint32_t src1,
-                                                                   vector_bool mask)
+                                                            vector_uint32_t src1,
+                                                            vector_bool mask)
 
 // 通过函数返回值返回结果示例：带输入进位的uint32_t类型加法。
 __simd_callee__ inline asc_uint32_t_bool_pair asc_add_carry(vector_uint32_t src0,
-                                                                   vector_uint32_t src1,
-                                                                   vector_bool carry_src,
-                                                                   vector_bool mask)
+                                                            vector_uint32_t src1,
+                                                            vector_bool carry_src,
+                                                            vector_bool mask)
 ```
 
 ## 参数说明
@@ -114,9 +114,9 @@ __simd_callee__ inline asc_uint32_t_bool_pair asc_add_carry(vector_uint32_t src0
 - 使用本接口前，需要包含头文件：`#include "c_api/experimental/reg_arith_exp.h"`。
 - 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
 - Reg矢量计算C API通用约束请参见[通用约束](../reg_compute/overview.md#通用约束)。
-- 运算输出完整计算结果（包含进位位），不受[asc_set_ctrl](../spr/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
-- 进位输出按32位无符号加法产生：每个元素的进位为`(src0_i + src1_i) >> 32`取最高位1bit。
-- 和值截断为32位：返回值`result.first`写入`(src0_i + src1_i) & 0xFFFFFFFF`，超出32位的部分不保留，仅通过`result.second`的进位输出体现。
+- 运算输出包含低32位加法结果及进位标志，不受[asc_set_ctrl](../spr/asc_set_ctrl.md)影响，硬件不会对结果进行饱和处理。
+- 进位输出按32位无符号加法产生，不表示有符号溢出。不带输入进位时，将`src0`和`src1`的对应元素按无符号数相加；带输入进位时，还需加上`carry_src`中对应元素的输入进位（0或1）。若和值超过`0xFFFFFFFF`，则输出进位标志为1，否则为0。
+- `result.first`仅保存和值的低32位，超出32位的部分通过`result.second`的进位输出体现。
 
 ## 调用示例
 
