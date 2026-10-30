@@ -12,30 +12,16 @@ option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_clien
 option(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE "Use asc-comm CCU dataplane in mc2_client" ON)
 
 # 实验构建：mc2_client 的 CCU 数据面切到 asc-comm（libasccomm_ccu.so）。
-# 前置：asc-comm 已安装到 CANN 包（asc/include/comm_api + asc/lib64），或通过 ASCCOMM_CCU_ROOT 指向
-# 同布局目录（例如 asc-comm 出包产物 payload/asc）。控制面（通信域/拓扑/channel/instance/thread）仍走 hcomm。
+# libasccomm_ccu.so 由 cmake/third_party/asc-comm.cmake 随包从源码构建（asccomm_ccu 目标，
+# BUILD_OPEN_PROJECT 下生效），无需 CANN 包预装 asc-comm，也不再使用 ASCCOMM_CCU_ROOT 预检。
+# 控制面（通信域/拓扑/channel/instance/thread）仍走 hcomm。
 if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
-    set(ASCCOMM_CCU_ROOT "" CACHE PATH
-        "asc-comm install root containing include/comm_api and lib64/libasccomm_ccu.so; empty = auto-detect from CANN package")
-    if(NOT ASCCOMM_CCU_ROOT)
-        foreach(_asccomm_cand
-                "${ASCEND_CANN_PACKAGE_PATH}/asc"
-                "${ASCEND_CANN_PACKAGE_PATH}/${CMAKE_SYSTEM_PROCESSOR}-linux/asc")
-            if(EXISTS "${_asccomm_cand}/lib64/libasccomm_ccu.so")
-                set(ASCCOMM_CCU_ROOT "${_asccomm_cand}")
-                break()
-            endif()
-        endforeach()
-    endif()
-    if(NOT EXISTS "${ASCCOMM_CCU_ROOT}/lib64/libasccomm_ccu.so")
+    if(NOT TARGET asccomm_ccu)
         message(FATAL_ERROR
-            "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE requires asc-comm: install asc-comm into the CANN package or set "
-            "-DASCCOMM_CCU_ROOT=<dir with include/comm_api and lib64/libasccomm_ccu.so>")
+            "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE requires the asccomm_ccu target: build with BUILD_OPEN_PROJECT=ON "
+            "so cmake/third_party/asc-comm.cmake builds libasccomm_ccu.so from the asc-comm source tree.")
     endif()
-    if(NOT EXISTS "${ASCCOMM_CCU_ROOT}/include/comm_api/ccu/hcomm/ccu_primitives.hpp")
-        message(FATAL_ERROR "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE: ${ASCCOMM_CCU_ROOT}/include/comm_api misses ccu headers")
-    endif()
-    message(STATUS "mc2_client uses asc-comm CCU dataplane: ${ASCCOMM_CCU_ROOT}")
+    message(STATUS "mc2_client uses asc-comm CCU dataplane (asccomm_ccu target built from source).")
 endif()
 
 set(INCLUDE_LIST
