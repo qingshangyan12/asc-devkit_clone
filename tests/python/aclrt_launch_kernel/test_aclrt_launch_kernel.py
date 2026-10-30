@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 import os
+import re
 import sys
 import shutil
 import unittest
@@ -48,6 +49,47 @@ class TestAclrtLaunchKernel(unittest.TestCase):
     def tearDown(self):
         # operator after each testcase
         print("-------------------TearDown-------------")
+
+    def _assert_cpu_wrapper_modes(self, modes, expected):
+        groups = []
+        for mode in modes:
+            name = "vec_kernel" if mode == CodeMode.KERNEL_TYPE_AIV_ONLY else "cube_kernel"
+            kernel = FuncSign(
+                return_type="void",
+                func_name=name,
+                func_template_decl="",
+                func_template_specialization_args=(),
+                func_params_specialization_args=(),
+                func_params=(FuncParam(parts=("uint32_t", "value")),),
+            )
+            groups.append(
+                FuncSignGroupWithModeBase(
+                    filepath=name + ".cpp.o",
+                    func_signs=(trans_func_sign(kernel),),
+                    dump_info={"dump_type": "", "dump_size": 1048576},
+                    mode=mode,
+                    base_key=0,
+                )
+            )
+        generated = generate_host_stub_code_cpu(groups, "")
+        actual = re.findall(r"AscendC::SetKernelMode\(KernelMode::([A-Z0-9_]+)\)", generated)
+        self.assertEqual(actual, expected)
+
+    def test_cpu_mode_vector_only(self):
+        self._assert_cpu_wrapper_modes([CodeMode.KERNEL_TYPE_AIV_ONLY], ["AIV_MODE"])
+
+    def test_cpu_mode_cube_only(self):
+        self._assert_cpu_wrapper_modes([CodeMode.KERNEL_TYPE_AIC_ONLY], ["AIC_MODE"])
+
+    def test_cpu_mode_vector_then_cube(self):
+        self._assert_cpu_wrapper_modes(
+            [CodeMode.KERNEL_TYPE_AIV_ONLY, CodeMode.KERNEL_TYPE_AIC_ONLY], ["AIV_MODE", "AIC_MODE"]
+        )
+
+    def test_cpu_mode_cube_then_vector(self):
+        self._assert_cpu_wrapper_modes(
+            [CodeMode.KERNEL_TYPE_AIC_ONLY, CodeMode.KERNEL_TYPE_AIV_ONLY], ["AIC_MODE", "AIV_MODE"]
+        )
 
     def test_parse_func_signature(self):
         func_sign_str: Tuple[str, str] = (
