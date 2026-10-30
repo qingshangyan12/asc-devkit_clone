@@ -22,7 +22,7 @@ __aicore__ inline void get_matrix_copy_param(
     uint32_t dumpSize, uint16_t& n, uint16_t& m, uint16_t& dstStrideDstD, uint16_t& srcStride)
 {
     constexpr int32_t blockCube = 16;
-    constexpr int32_t defaultOneBlockSize = 256;
+    constexpr int32_t defaultOneBlockSize = blockCube * blockCube * sizeof(float);
     constexpr int32_t srcBurstLenSizeEle = 16;
 
     uint16_t align = (dumpSize % defaultOneBlockSize == 0) ? 0 : 1;
@@ -55,7 +55,8 @@ template <typename T>
 __aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
 {
 #if defined(__DAV_CUBE__)
-    copy_cbuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1, len, 0, 0);
+    const uint32_t blockLen = len / ASC_ONE_DATABLOCK_SIZE;
+    copy_cbuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src), 0, 1, blockLen, 0, 0);
     return 0;
 #else
     return 1;

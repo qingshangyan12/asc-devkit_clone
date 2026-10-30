@@ -38,6 +38,32 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
     return DumpTensorDataType::ACL_MAX;
 }
 
+__aicore__ constexpr inline bool is_printf_supported_impl() { return false; }
+
+__aicore__ constexpr inline bool is_super_tensor_dump_supported_impl()
+{
+    return false;
+}
+
+__aicore__ inline uint64_t asc_debug_get_block_total_num_impl() { return get_block_num(); }
+
+__aicore__ constexpr inline uint64_t get_ringbuf_wait_cycle_impl()
+{
+    return 15ULL * 1000 * 1000;
+}
+
+__aicore__ inline bool ringbuf_has_pending_data_impl(
+    __gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
+{
+    return writeInfo->bufOffset != readInfo->bufOffset;
+}
+
+__aicore__ inline void asc_vf_debug_init_impl() {}
+
+__aicore__ inline void asc_vf_debug_finish_impl() {}
+
+__aicore__ inline bool asc_vf_debug_transfer_ub_impl() { return false; }
+
 } // namespace __asc_aicore
 
 #endif // IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_IMPL_STUB_H

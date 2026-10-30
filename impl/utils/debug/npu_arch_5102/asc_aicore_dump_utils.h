@@ -25,7 +25,7 @@ template <typename T>
 __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& dumpSize)
 {
     constexpr int32_t blockCube = 16;
-    constexpr int32_t defaultOneBlockSize = 256;
+    constexpr int32_t defaultOneBlockSize = blockCube * blockCube * sizeof(float);
     constexpr int32_t srcBurstLenSizeEle = 16;
     constexpr uint16_t b32ByteSize = 4;
 

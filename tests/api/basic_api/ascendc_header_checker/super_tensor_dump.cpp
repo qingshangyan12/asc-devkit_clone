@@ -8,7 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+#if (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 9201) && \
+    !defined(ASCENDC_CPU_DEBUG)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 
 using AscendC::Hardware;
@@ -17,14 +18,21 @@ __aicore__ inline void CheckSuperTensorDumpInstantiation(__gm__ __asc_aicore::De
 {
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::GM, uint32_t>(
         static_cast<__gm__ uint32_t*>(nullptr), 0, 64, nullptr, 0, blockInfo);
-#if defined(__DAV_VEC__)
+#if defined(__DAV_VEC__) || __NPU_ARCH__ == 5102
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::UB, uint32_t>(
         static_cast<__ubuf__ uint32_t*>(nullptr), 0, 64, nullptr, 0, blockInfo);
-#elif defined(__DAV_CUBE__)
+#endif
+#if defined(__DAV_CUBE__) || __NPU_ARCH__ == 5102
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::L1, uint32_t>(
         static_cast<__cbuf__ uint32_t*>(nullptr), 0, 64, nullptr, 0, blockInfo);
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::L0C, uint32_t>(
         static_cast<__cc__ uint32_t*>(nullptr), 0, 1024, nullptr, 0, blockInfo);
+    __asc_aicore::asc_dump_impl<Hardware::L0C, uint32_t>(
+        static_cast<__cc__ uint32_t*>(nullptr), 0, 1, nullptr, 0);
+    __asc_aicore::asc_dump_impl<Hardware::L1, uint32_t>(
+        static_cast<__cbuf__ uint32_t*>(nullptr), 0, 1, nullptr, 0);
+#endif
+#if (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) && defined(__DAV_CUBE__)
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::BIAS, uint32_t>(
         static_cast<__biasbuf__ uint32_t*>(nullptr), 0, 64, nullptr, 0, blockInfo);
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::FIXBUF, uint32_t>(
