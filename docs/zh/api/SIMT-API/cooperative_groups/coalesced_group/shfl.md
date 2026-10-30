@@ -71,7 +71,7 @@ T shfl(T var, int src_rank) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl(threadIdx.x + 100, 3);
+            uint32_t result = active.shfl(active.thread_rank() + 100, 3);
         }
         ...
     }
@@ -88,7 +88,7 @@ T shfl(T var, int src_rank) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl(threadIdx.x + 100, 3);
+            uint32_t result = active.shfl(active.thread_rank() + 100, 3);
         }
         ...
     }
