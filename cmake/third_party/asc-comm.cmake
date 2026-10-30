@@ -136,3 +136,27 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
 endif()
+
+# 构建 asc-comm CPU TS 同步库，并交付到 asc-devkit run 包。
+# 该库仅依赖运行时已导出的 notify API，不依赖 hcomm 源码或符号。
+set(ASC_COMM_CPU_TS_CMAKE_DIR ${ASC_COMM_SOURCE_PATH}/src/cpu)
+if(EXISTS "${ASC_COMM_CPU_TS_CMAKE_DIR}/CMakeLists.txt")
+    if(NOT TARGET asccomm_cpu_ts)
+        add_subdirectory(${ASC_COMM_CPU_TS_CMAKE_DIR} ${CMAKE_BINARY_DIR}/asccomm_cpu_ts)
+    endif()
+
+    if(TARGET asccomm_cpu_ts)
+        if(NOT TARGET asccomm_cpu_ts_build)
+            add_custom_target(asccomm_cpu_ts_build ALL DEPENDS asccomm_cpu_ts)
+        endif()
+        install(TARGETS asccomm_cpu_ts
+            LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64 ${INSTALL_OPTIONAL}
+            COMPONENT asc-devkit)
+        install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/cpu/
+            DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/cpu
+            COMPONENT asc-devkit
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    endif()
+else()
+    message(STATUS "[ThirdPartyLib][asc-comm] Missing CPU TS cmake dir: ${ASC_COMM_CPU_TS_CMAKE_DIR}, skip CPU TS so build")
+endif()
