@@ -46,7 +46,6 @@ typedef enum {
     HCCL_E_OPRETRY_FAIL = 23,         /**< retry constraint */
     HCCL_E_OOM = 24,                  /**< out of memory */
     HCCL_E_IN_STATUS = 1041,          /**< The error information is in the status. */
-    HCCL_E_ALG_NOT_SUPPORTED = 1042,  /**< algorithm is not supported */
     HCCL_E_RES_NOT_SUFFICIENT = 1043, /**< resource insufficient */
     HCCL_E_RESERVED                   /**< reserved */
 } HcclResult;
