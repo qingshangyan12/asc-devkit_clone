@@ -825,17 +825,19 @@ HcclResult ExtractNetLayerDetails(const HcclComm comm, TopoInfoWithNetLayerDetai
             netLayerNum),
         HCCL_E_INTERNAL);
     const auto& layer0List = instSizeListOfLayer[netLayers[0]];
-    topoInfo->level0Symmetric = !layer0List.empty() &&
-        std::all_of(layer0List.begin(), layer0List.end(), [&](u32 size) { return size == layer0List[0]; });
+    topoInfo->level0Symmetric = !layer0List.empty() && std::all_of(layer0List.begin(), layer0List.end(), [&](u32 size) {
+        return size == layer0List[0];
+    });
     topoInfo->level1Symmetric = false;
     if (topoLevelNum > 1) {
         const auto& layer1List = instSizeListOfLayer[netLayers[1]];
-        topoInfo->level1Symmetric = !layer1List.empty() &&
+        topoInfo->level1Symmetric =
+            !layer1List.empty() &&
             std::all_of(layer1List.begin(), layer1List.end(), [&](u32 size) { return size == layer1List[0]; });
     }
     HCCL_INFO(
-        "[BaseSelector][ExtractNetLayerDetails] level0Symmetric[%d], level1Symmetric[%d]",
-        topoInfo->level0Symmetric, topoInfo->level1Symmetric);
+        "[BaseSelector][ExtractNetLayerDetails] level0Symmetric[%d], level1Symmetric[%d]", topoInfo->level0Symmetric,
+        topoInfo->level1Symmetric);
     return HCCL_SUCCESS;
 }
 

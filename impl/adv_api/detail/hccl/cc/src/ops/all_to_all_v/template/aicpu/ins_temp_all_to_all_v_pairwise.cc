@@ -36,8 +36,8 @@ void FilterPairwiseChannelsByDie(HcclComm comm, u32 myRank, std::vector<HcclChan
     for (const auto& channel : channels) {
         EndpointDesc localEndpoint = channel.localEndpoint;
         EndpointAttrDieId dieId = 0;
-        const HcclResult ret = HcclRankGraphGetEndpointInfo(
-            comm, myRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
+        const HcclResult ret =
+            HcclRankGraphGetEndpointInfo(comm, myRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
         // Match HCCL: keep the link when the endpoint does not expose a die id.
         if (ret != HCCL_SUCCESS || seenDiesByPeer[channel.remoteRank].insert(dieId).second) {
             selectedChannels.push_back(channel);
@@ -53,9 +53,9 @@ bool InsTempAllToAllVPairwise::IsSupportedTopology(const TopoInfoWithNetLayerDet
     constexpr u32 MAX_RANK_SIZE = 128U;
     constexpr u32 UNIT_RANK_SIZE = THREAD_SET_NUM * RANK_NUM_PER_BOARD;
     return topoInfo != nullptr && topoInfo->topoLevelNums > 1U && topoInfo->level0Topo == Level0Shape::MESH_1D &&
-           topoInfo->deviceNumPerModule == RANK_NUM_PER_BOARD &&
-           topoInfo->level0Symmetric && topoInfo->userRankSize >= UNIT_RANK_SIZE &&
-           topoInfo->userRankSize <= MAX_RANK_SIZE && topoInfo->userRankSize % UNIT_RANK_SIZE == 0;
+           topoInfo->deviceNumPerModule == RANK_NUM_PER_BOARD && topoInfo->level0Symmetric &&
+           topoInfo->userRankSize >= UNIT_RANK_SIZE && topoInfo->userRankSize <= MAX_RANK_SIZE &&
+           topoInfo->userRankSize % UNIT_RANK_SIZE == 0;
 }
 
 InsTempAllToAllVPairwise::InsTempAllToAllVPairwise(
