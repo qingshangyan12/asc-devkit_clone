@@ -94,7 +94,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
     #include "tiling/platform/platform_ascendc.h"
     namespace optiling {
     static constexpr uint32_t NUM_BLOCKS = 8;
-    static constexpr uint32_t TILE_NUM = 3;
+    static constexpr uint32_t TILE_NUM = 6;
     static constexpr size_t MAX_WORKSPACE_SIZE = 32; // 算子所需用户workspace空间最大值，AddCustomTilingSink算子本身逻辑无需用户workspace空间，此处设置为固定值仅作为示例
     static constexpr size_t DEFAULT_WORKSPACE_SIZE = 0;
     ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext *context)
@@ -121,20 +121,20 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   算子核函数（Kernel）实现
 
-    当前Tiling下沉仅支持融合算子，为了模拟融合算子场景，通过[KERNEL\_TASK\_TYPE\_DEFAULT](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)接口强制指定算子在AIC、AIV混合场景运行。
+    通过[KERNEL\_TASK\_TYPE\_DEFAULT](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)接口指定核函数（Kernel）的执行类型。
 
     ```
     extern "C" __global__ __aicore__ void add_custom_tiling_sink(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
+        constexpr uint32_t STATIC_TILE_LENGTH = 8;
         REGISTER_TILING_DEFAULT(TilingSinkTilingData);
         GET_TILING_DATA(tiling_data, tiling);
-        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_AIC_1_2); // 将算子强制指定在AIC、AIV混合场景运行，模拟融合算子场景
-        if ASCEND_IS_AIC {
-            return;
-        }
-        AscendC::KernelAdd op;
+        KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
+        AscendC::InitSocState();
+        KernelAdd<STATIC_TILE_LENGTH> op;
         op.Init(x, y, z, tiling_data.totalLength, tiling_data.tileNum);
         op.Process();
+        AscendC::PipeBarrier<PIPE_ALL>();
     }
     ```
 
