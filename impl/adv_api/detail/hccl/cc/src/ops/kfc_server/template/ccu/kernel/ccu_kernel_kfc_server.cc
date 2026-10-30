@@ -442,13 +442,21 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
+        { ccu::Event testEvt;
+        for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        { ccu::Event testEvt;
+        for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
+            { ccu::Event testEvt;
+            for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx, recordAddr);
+            { ccu::Event testEvt;
+            for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
             MissionPostSync(ctx);
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
