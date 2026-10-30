@@ -8,7 +8,7 @@
 
 1.  环境准备。
     1.  CANN软件安装请参考[环境准备](../../../getting_started/environment_setup.md)。
-    2.  [创建算子工程](../aclnn_operator_development/aclnn_quick_start.md#create-project)。快速入门仅构建aclnn调用所需的库；入图场景还需按[编译入图原型库](#graph-library)补充GRAPH库配置。
+    2.  [创建算子工程](../aclnn_operator_development/aclnn_quick_start.md#create-project)。快速入门仅构建aclnn调用所需的库；入图场景还需按[编译与部署基本流程](../aclnn_operator_development/compilation_and_deployment/basic_process.md#graph-library)补充GRAPH库配置。
 
 2.  算子实现。
     -   [算子原型定义](../aclnn_operator_development/design_and_implementation/operator_prototype_definition.md)。通过原型定义来描述算子输入输出、属性等信息以及算子在AI处理器上相关实现信息，并关联tiling实现等函数。
@@ -17,22 +17,3 @@
 3.  [算子入图（GE图）开发](basic_development_flow.md)。算子入图场景下，需要提供shape推导等算子入图适配函数的实现。
 4.  编译部署。通过CMake完成算子的编译部署，分为[算子包编译](../aclnn_operator_development/compilation_and_deployment/basic_process.md)和[算子动态库编译](../aclnn_operator_development/compilation_and_deployment/dynamic_static_lib_compilation.md)两种方式。
 5.  [图编译和图执行](graph_compilation_and_execution.md)：基于图IR执行算子，比如IR构图的方式调用自定义算子。
-
-
-## 编译入图原型库<a id="graph-library"></a>
-
-以快速入门工程为基础，在`op_host/CMakeLists.txt`中、`npu_op_code_gen`之后添加以下内容。`ops_srcs`沿用该文件收集的Host源文件列表；生成的`op_proto.cc`与Host实现共同编译成入图所需的原型库：
-
-```cmake
-file(GLOB proto_src ${ASCEND_AUTOGEN_PATH}/op_proto.cc)
-set_source_files_properties(${proto_src} PROPERTIES GENERATED TRUE)
-npu_op_library(cust_op_proto GRAPH
-    ${ops_srcs}
-    ${proto_src}
-)
-npu_op_package_add(${vendor_name}
-    LIBRARY cust_op_proto
-)
-```
-
-保留已有的ACLNN、TILING和Kernel库配置。完成原型和推导函数实现后，按[编译与部署基本流程](../aclnn_operator_development/compilation_and_deployment/basic_process.md)重新编译安装；算子包中应包含`op_proto`目录下的原型库。TensorFlow或ONNX框架适配场景还需额外编译并打包相应的框架插件库。
