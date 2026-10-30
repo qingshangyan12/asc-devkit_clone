@@ -426,17 +426,17 @@ __aicore__ inline void MmadCal(__cc__ float* c, __ca__ U* a, __cb__ S* b, const 
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const MmadParams& mmadParams)
 {
-    ASCENDC_ASSERT((
-        SupportType<Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
-            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
-            Tuple<int32_t, int8_t, int4b_t>>()
-    ), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in Mmad, current api support dtype combination is "
-            "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
-            "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-            "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
-    });
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
@@ -468,17 +468,17 @@ __aicore__ inline void MmadCal(
     ASCENDC_ASSERT((cmatrixSource == mmadParams.cmatrixSource), {
         KERNEL_LOG(KERNEL_ERROR, "Mmad cmatrixSource param config error");
     });
-    ASCENDC_ASSERT((
-        SupportType<Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
-            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
-            Tuple<int32_t, int8_t, int4b_t>>()
-    ), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in Mmad, current api support dtype combination is "
-            "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
-            "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-            "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
-    });
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
@@ -499,17 +499,18 @@ __aicore__ inline void MmadCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    ASCENDC_ASSERT((
-        SupportType<Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
             Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
-            Tuple<int32_t, int8_t, int4b_t>>()
-    ), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in Mmad, current api support dtype combination is "
-            "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
-            "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-            "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
-    });
+            Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
     } else {
@@ -521,17 +522,18 @@ template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
-    ASCENDC_ASSERT((
-        SupportType<Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
             Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
-            Tuple<int32_t, int8_t, int4b_t>>()
-    ), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in Mmad, current api support dtype combination is "
-            "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
-            "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-            "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
-    });
+            Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     mmadParams.SetCmatrixInitVal(false);
     if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
