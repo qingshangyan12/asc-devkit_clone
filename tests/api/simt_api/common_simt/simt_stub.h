@@ -643,6 +643,53 @@ static float2 __half22float2(half2 const x)
     return res;
 }
 
+static inline int __ffs(int x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    int lsb = x & (~x + 1);
+    return __builtin_ctz(lsb) + 1;
+}
+
+static inline int __clz(int x)
+{
+    int32_t count = 0;
+    for (int i = 0; i < 32; i++) {
+        int32_t tmp = one << (32 - 1 - i);
+        if (((tmp & x) >> (32 - 1 - i)) == 0) {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+    return count;
+}
+
+static inline unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
+{
+    uint32_t a0 = (uint32_t)x;
+    uint32_t a1 = x >> 32;
+    uint32_t b0 = (uint32_t)y;
+    uint32_t b1 = y >> 32;
+
+    uint64_t lo0 = (uint64_t)a0 * b0;
+    uint64_t m1 = (uint64_t)a0 * b1;
+    uint64_t m2 = (uint64_t)a1 * b0;
+    uint64_t hi1 = (uint64_t)a1 * b1;
+
+    uint64_t mid = m1 + m2;
+    uint64_t carry = mid < m1; // mid加法进位
+
+    uint64_t mid_hi = mid >> 32;
+    uint64_t mid_lo = (uint32_t)mid;
+
+    uint64_t t = mid_lo + (lo0 >> 32);
+    uint64_t t_carry = t < mid_lo;
+
+    return hi1 + mid_hi + carry + t_carry;
+}
+
 namespace cce {
 template <auto funcPtr, typename... Args>
 void async_invoke(const dim3& dim, Args&&... args)
