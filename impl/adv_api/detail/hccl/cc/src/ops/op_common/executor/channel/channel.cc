@@ -796,7 +796,6 @@ HcclResult ProcessLinksForChannelMutiJetty(
     uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool expectMesh, bool isIsolation)
 {
 #ifndef AICPU_COMPILE
-    const bool requestedIsolation = isIsolation;
     if (linkList.size() < MIN_PHY_LINK_COUNT) {
         isIsolation = false;
     }
@@ -819,12 +818,6 @@ HcclResult ProcessLinksForChannelMutiJetty(
             break;
         }
     }
-    HCCL_INFO(
-        "[LINK_PERF_DIAG][Select] rank[%u] peer[%u] netLayer[%u] protocol[%u] links[%zu] "
-        "requestedIsolation[%u] effectiveIsolation[%u] expectMesh[%u] selected[%zu]",
-        myRank, remoteRank, netLayer, static_cast<u32>(expectedProtocol), linkList.size(),
-        static_cast<u32>(requestedIsolation), static_cast<u32>(isIsolation), static_cast<u32>(expectMesh),
-        selectedChannels.size());
     channels.insert(channels.end(), selectedChannels.begin(), selectedChannels.end());
 #else
     (void)comm;

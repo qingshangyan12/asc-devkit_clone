@@ -45,12 +45,6 @@ HcclResult InsTempAllGatherNHR::CalcRes(
             param.engine == CommEngine::COMM_ENGINE_AICPU_TS && param.DataDes.count == 0 &&
             param.inputPtr == nullptr && param.outputPtr == nullptr;
         const bool isIsolation = !fullMesh && (reservePipelineChannels || dataSize > SMALL_SIZE_512KB);
-        HCCL_INFO(
-            "[AG_PERF_DIAG][NhrRequest] rank[%u] algTag[%s] resourceCount[%llu] bytes[%llu] "
-            "fullMesh[%u] reservePipelineChannels[%u] requestedIsolation[%u]",
-            topoInfo->userRank, param.algTag, static_cast<unsigned long long>(param.DataDes.count),
-            static_cast<unsigned long long>(dataSize), static_cast<u32>(fullMesh),
-            static_cast<u32>(reservePipelineChannels), static_cast<u32>(isIsolation));
         CHK_RET(CalcChannelRequestNhrMultiJetty(comm, param, topoInfo, subCommRanks_, myChannelDescs, isIsolation));
         for (const auto& channel : myChannelDescs) {
             if (channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
@@ -67,9 +61,6 @@ HcclResult InsTempAllGatherNHR::CalcRes(
     resourceRequest.channels.push_back(level1Channels);
     channelsPerRank_ = CalcChannelsPerRankMin(level1Channels);
     maxChannelsPerRank_ = CalcChannelsPerRank(level1Channels);
-    HCCL_INFO(
-        "[AG_PERF_DIAG][NhrChannels] rank[%u] algTag[%s] totalChannels[%zu] minPerPeer[%u] maxPerPeer[%u]",
-        topoInfo->userRank, param.algTag, level1Channels.size(), channelsPerRank_, maxChannelsPerRank_);
     if (channelsPerRank_ > MAX_JETTY_NUM) {
         HCCL_WARNING(
             "[InsTempAllGatherNHR][CalcRes] channelsPerRank_ %u is greater than MAX_JETTY_NUM %u", channelsPerRank_,

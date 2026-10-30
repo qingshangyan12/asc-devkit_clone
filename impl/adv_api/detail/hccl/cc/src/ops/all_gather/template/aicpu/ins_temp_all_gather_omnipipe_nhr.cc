@@ -14,6 +14,13 @@
 #include "hcomm_primitives_dl.h"
 
 namespace mc2_ops_hccl {
+// devkit 适配：GetSymWinRemoteMem 的本地封装（hccl 侧由 hccl_sym_win_dl.h 提供，devkit 侧
+// hcomm_primitives_dl.h 已有 HcclSymWinGetPeerPointer 弱符号，此处直接调用）
+static HcclResult GetSymWinRemoteMem(void* winHandle, size_t offset, uint32_t peerRank, void** ptr)
+{
+    return HcclSymWinGetPeerPointer(winHandle, offset, peerRank, ptr);
+}
+
 InsTempAllGatherOmniPipeNHR::InsTempAllGatherOmniPipeNHR(
     const OpParam& param,
     const u32 rankId, // 传通信域的rankId，userRank
@@ -205,7 +212,7 @@ HcclResult InsTempAllGatherOmniPipeNHR::RunAllGatherNHR(
         void* sendRemoteOut = nullptr;
         void* recvRemoteOut = nullptr;
         if (enableRemoteMemAccess_) {
-            HcclResult ret = Mc2GetSymWinRemoteMem(outputSymWindow_, outputOffset_, sendRank, &sendRemoteOut);
+            HcclResult ret = GetSymWinRemoteMem(outputSymWindow_, outputOffset_, sendRank, &sendRemoteOut);
             CHK_PRT_RET(
                 ret != HCCL_SUCCESS || sendRemoteOut == nullptr,
                 HCCL_ERROR(
@@ -214,7 +221,7 @@ HcclResult InsTempAllGatherOmniPipeNHR::RunAllGatherNHR(
                     sendRank, ret, sendRemoteOut),
                 HcclResult::HCCL_E_INTERNAL);
 
-            ret = Mc2GetSymWinRemoteMem(outputSymWindow_, outputOffset_, recvRank, &recvRemoteOut);
+            ret = GetSymWinRemoteMem(outputSymWindow_, outputOffset_, recvRank, &recvRemoteOut);
             CHK_PRT_RET(
                 ret != HCCL_SUCCESS || recvRemoteOut == nullptr,
                 HCCL_ERROR(

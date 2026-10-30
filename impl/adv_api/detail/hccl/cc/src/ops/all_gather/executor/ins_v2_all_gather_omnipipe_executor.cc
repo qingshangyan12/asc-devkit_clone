@@ -216,18 +216,7 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     resourceRequest.notifyNumPerThread.insert(
         resourceRequest.notifyNumPerThread.end(), resReqlevel.notifyNumPerThread.begin(),
         resReqlevel.notifyNumPerThread.end());
-    if (!resReqlevel.channels.empty()) {
-        if (param.supportSymmetricMemory) {
-            // Exchange symmetric window handles in a single channel acquisition.
-            if (resourceRequest.channels.empty()) {
-                resourceRequest.channels.resize(1);
-            }
-            resourceRequest.channels[0].insert(
-                resourceRequest.channels[0].end(), resReqlevel.channels[0].begin(), resReqlevel.channels[0].end());
-        } else {
-            resourceRequest.channels.emplace_back(resReqlevel.channels[0]);
-        }
-    }
+    resourceRequest.channels.emplace_back(resReqlevel.channels[0]);
     return HCCL_SUCCESS;
 }
 
@@ -384,10 +373,6 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     u64 scratchBoundDataSize = maxTmpMemSize_ / rankSize_ / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN / dataTypeSize_;
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
     u64 maxCountPerLoop = std::min(scratchBoundDataSize, transportBoundDataSize);
-    if (param.supportSymmetricMemory && dataCount_ > 0) {
-        // Symmetric templates communicate in the complete user output layout.
-        maxCountPerLoop = dataCount_;
-    }
     CHK_PRT_RET(
         maxCountPerLoop == 0,
         HCCL_ERROR(
@@ -395,14 +380,6 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             maxTmpMemSize_, rankSize_, dataTypeSize_),
         HCCL_E_INTERNAL);
     u64 loopTimes = dataCount_ / maxCountPerLoop + static_cast<u64>(dataCount_ % maxCountPerLoop != 0);
-    HCCL_INFO(
-        "[AG_PERF_DIAG][Runtime] rank[%u] algTag[%s] rankSize[%u] levelRanks[%u,%u,%u] "
-        "count[%llu] typeBytes[%llu] scratchBytes[%llu] maxCountPerLoop[%llu] loops[%llu] symmetric[%u]",
-        myRank_, param.algTag, rankSize_, rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1],
-        rankSizeLevel_[OMNIPIPE_LEVEL2], static_cast<unsigned long long>(dataCount_),
-        static_cast<unsigned long long>(dataTypeSize_), static_cast<unsigned long long>(maxTmpMemSize_),
-        static_cast<unsigned long long>(maxCountPerLoop), static_cast<unsigned long long>(loopTimes),
-        static_cast<u32>(param.supportSymmetricMemory));
 
     u64 perLoopSize = maxCountPerLoop * dataTypeSize_;
     std::vector<u64> dataSizePerLoop(rankSize_, perLoopSize);
@@ -471,19 +448,13 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
         tempAlgParamMap[temp.first].buffInfo.hcclBuff = resCtx.cclMem;
         tempResMap[temp.first].npu2DpuShmemPtr = resCtx.npu2DpuShmemPtr;
         tempResMap[temp.first].dpu2NpuShmemPtr = resCtx.dpu2NpuShmemPtr;
-        tempAlgParamMap[temp.first].buffInfo.inputPtr = param.inputPtr;
-        tempAlgParamMap[temp.first].buffInfo.outputPtr = param.outputPtr;
-        tempAlgParamMap[temp.first].enableRemoteMemAccess = param.supportSymmetricMemory;
     }
     HCCL_DEBUG("loopTimes[%llu]", loopTimes);
     for (u64 loop = 0; loop < loopTimes; loop++) {
         u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
         DataSlice src(param.inputPtr, processedDataCount * dataTypeSize_, currDataCount * dataTypeSize_, currDataCount);
-        void* initDstPtr = param.supportSymmetricMemory ? param.outputPtr : resCtx.cclMem.addr;
-        u64 initDstOffset = param.supportSymmetricMemory ?
-                                myRank_ * rankStrideBytes + processedDataCount * dataTypeSize_ :
-                                myRank_ * currDataCount * dataTypeSize_;
-        DataSlice dst(initDstPtr, initDstOffset, currDataCount * dataTypeSize_, currDataCount);
+        DataSlice dst(
+            resCtx.cclMem.addr, myRank_ * currDataCount * dataTypeSize_, currDataCount * dataTypeSize_, currDataCount);
         CHK_RET(LocalCopy(controlThread_, src, dst));
 
         if (loop == loopTimes - 1 && dataCount_ % maxCountPerLoop != 0) {
@@ -508,14 +479,11 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             if (rankSizeLevel_[OMNIPIPE_LEVEL2] > 1) {
                 CHK_RET(GenTemplateAlgParamsByDimData(
                     tempAlgParamMap[OMNIPIPE_LEVEL2], omniPipeSliceInfo.dataSliceLevel2[i]));
-                tempAlgParamMap[OMNIPIPE_LEVEL2].omniReadDstStepSliceInfo =
-                    omniPipeSliceLocalcopyInfo.dataSliceLevel2[i];
-                tempAlgParamMap[OMNIPIPE_LEVEL2].processedDataCount = processedDataCount;
                 CHK_RET(PreSyncInterThreads(controlThread_, tempMainThreadsZ_, ntfIdxCtrlToTempZ_));
             }
             for (u32 j = 0; j < level0StepCount; j++) {
                 CHK_RET(PreSyncInterThreads(controlThread_, tempMainThreadsXY_, ntfIdxCtrlToTempXY_));
-                if (omniUbxLastStepRead_ == true && j == level0StepCount - 1 && !param.supportSymmetricMemory) {
+                if (omniUbxLastStepRead_ == true && j == level0StepCount - 1) {
                     tempAlgParamMap[OMNIPIPE_LEVEL0].omniLastStepRead_ = true;
                     tempAlgParamMap[OMNIPIPE_LEVEL0].omniReadDstStepSliceInfo =
                         omniPipeSliceLocalcopyInfo.dataSliceLevel0[i * level0StepCount + j];
@@ -546,7 +514,7 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
                     CHK_RET(tempMap[OMNIPIPE_LEVEL1]->KernelRun(
                         param, tempAlgParamMap[OMNIPIPE_LEVEL1], tempResMap[OMNIPIPE_LEVEL1]));
                 }
-                if (omniUbxLastStepRead_ && j != 0 && !param.supportSymmetricMemory) {
+                if (omniUbxLastStepRead_ && j != 0) {
                     CHK_RET(UbxLastStepLocalCopy(
                         param, omniPipeSliceInfo, omniPipeSliceLocalcopyInfo, tempAlgParamMap, processedDataCount, j));
                 }
@@ -559,11 +527,11 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             }
         }
 
-        if (omniUbxLastStepRead_ && !param.supportSymmetricMemory) {
+        if (omniUbxLastStepRead_) {
             CHK_RET(UbxLocalCopy(
                 param, omniPipeSliceInfo, omniPipeSliceLocalcopyInfo, tempAlgParamMap, processedDataCount,
                 level0StepCount));
-        } else if (!param.supportSymmetricMemory) {
+        } else {
             HCCL_INFO("ccl->out_localcopy");
             for (u32 rank = 0; rank < rankSize_; rank++) {
                 DataSlice dst(
