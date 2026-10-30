@@ -34,7 +34,7 @@ $$
 dst_i = \frac{src0_i}{src1_i}
 $$
 
-`operator/`直接使用硬件除法指令，不提供精度模式和算法配置；`div`支持通过模板参数配置除法精度和算法，并根据所选配置处理Subnormal。支持与基础API [Div](../../../basic_api/memory_vector_compute/basic_arithmetic/Div.md)对应的六种算法。默认配置及高精度默认配置保持兼容。
+`operator/`直接使用硬件除法指令，不提供精度模式和算法配置；`div`支持通过模板参数配置除法精度和算法，并根据所选配置处理Subnormal。
 
 ## 函数原型
 
