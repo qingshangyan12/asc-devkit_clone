@@ -21,7 +21,7 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,
     ccu::Variable lastSliceSizePerJetty, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, uint32_t jettyNum);
+    uint32_t rankId, uint32_t jettyNum, ccu::Variable turnEndAddr);
 
 } // namespace mc2_ops_hccl
 

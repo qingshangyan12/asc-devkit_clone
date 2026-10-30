@@ -19,9 +19,9 @@
 namespace HcclSim {
 namespace CcuSt {
 
-// 基础 11 个下发参数 + sliceSizePerJetty + lastSliceSizePerJetty（hccl_ccu_v0_prepare.h
-// CcuPrepareForAllToAllMultiJetty）
-constexpr uint32_t ALL_TO_ALL_MJ_TASK_ARG_COUNT = 13;
+// 基础 11 个下发参数 + sliceSizePerJetty + lastSliceSizePerJetty + turnEndAddr（D3 提前
+// turn-end；产品侧由 kfc server 的 recordAddr 传入，见 DispatchKfcSubKernel）
+constexpr uint32_t ALL_TO_ALL_MJ_TASK_ARG_COUNT = 14;
 
 struct AllToAllMjKernelConfig {
     uint32_t rankId{0};
@@ -41,6 +41,7 @@ struct AllToAllMjLaunchConfig {
     std::array<uint64_t, 4> goSize{};
     uint64_t sliceSizePerJetty{0};
     uint64_t lastSliceSizePerJetty{0};
+    uint64_t turnEndAddress{0};
 };
 
 Result CaptureAllToAllMjKernel(void* kernelArg);
