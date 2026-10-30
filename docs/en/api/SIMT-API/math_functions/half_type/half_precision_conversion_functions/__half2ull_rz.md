@@ -1,0 +1,96 @@
+# \_\_half2ull\_rz
+
+<!-- md-trans-meta sourceCommit=754fb95859dead826727a591e674261c6a829a08 translatedAt=2026-10-21T07:50:03.856Z pushedAt=2026-10-22T00:33:26.784Z nl=2 -->
+
+## Applicable Products
+
+<!-- npu="950" id1 -->
+- Ascend 950PR&950DT products: Supported
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 products: Not supported
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 products: Not supported
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 inference products: Not supported
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas inference products AI Core: Not supported
+- Atlas inference products Vector Core: Not supported
+<!-- end id5 -->
+<!-- npu="910" id6 -->
+- Atlas training products: Not supported
+<!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/half_type/half_precision_conversion_functions/__half2ull_rz_res.md#id1 -->
+
+## Description
+
+The header file path is `"simt_api/asc_fp16.h"`.
+
+Converts half type data to unsigned long long int type data following the CAST\_TRUNC mode and returns the converted value.
+
+## Prototype
+
+```cpp
+inline unsigned long long int __half2ull_rz(const half x)
+```
+
+## Parameters
+
+**Table 1**  Parameters
+
+| Parameter | Input/Output | Description |
+| --- | --- | --- |
+| x | Input | Source operand. |
+
+## Return Value
+
+Returns unsigned long long int data converted from the input following the CAST\_TRUNC mode. The special values are as follows:
+
+| x Value | Return Value |
+| --- | --- |
+| ±0 | 0 |
+| nan | 0 |
+| inf | 18446744073709551615 (maximum value of uint64_t) |
+| -inf | 0 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
+| -ASCRT\_MAX\_NORMAL\_FP16 | 0 |
+| ASCRT\_MIN\_DENORM\_FP16 | 0 |
+
+## Constraints
+
+None
+
+## Examples
+
+-   SIMT programming scenario:
+
+    ```cpp
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel__half2ull_rz(uint64_t* dst, half* x, uint32_t total_length)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
+        dst[idx] = __half2ull_rz(x[idx]);
+    }
+    ```
+
+-   SIMD and SIMT hybrid programming scenario:
+
+    ```cpp
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ull_rz(__gm__ uint64_t* dst, __gm__ half* x, uint32_t total_length)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
+        dst[idx] = __half2ull_rz(x[idx]);
+    }
+    ```
