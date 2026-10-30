@@ -26,6 +26,18 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+constexpr int32_t float_exponent_shift = 23;
+constexpr int32_t float_exponent_bias = 127;
+constexpr int32_t float_min_normal_exponent = -126;
+constexpr int32_t float_max_normal_exponent = 127;
+constexpr int32_t float_normalization_scale_exponent = 23;
+constexpr int32_t float_mantissa_drop_width = 24;
+
+constexpr int16_t half_exponent_shift = 10;
+constexpr int16_t half_exponent_bias = 15;
+constexpr int16_t half_scale_underflow_bound = -9;
+constexpr int16_t half_scale_overflow_bound = 31;
+
 __simd_callee__ inline vector_float div_flush_subnormal(vector_float src, vector_bool mask)
 {
     vector_uint32_t bits;
@@ -51,7 +63,7 @@ __simd_callee__ inline void div_precision(
     constexpr uint32_t infNanBound = 0xff800000u;
     constexpr uint32_t signBit = 0x80000000u;
     constexpr uint32_t exponentMask = 0x7F800000u;
-    constexpr int32_t exponentBias = 127;
+    constexpr int32_t exponentBias = float_exponent_bias;
     constexpr int32_t precisionThreshold = -64;
 
     if (forceFtz) {
@@ -91,14 +103,14 @@ __simd_callee__ inline void div_precision(
 
     asc_duplicate_scalar(src0Reg, exponentMask, mask);
     asc_and(src0ExpBits, (vector_uint32_t&)src0, src0Reg, mask);
-    asc_shiftright_scalar(src0ExpBits, src0ExpBits, 23, mask);
+    asc_shiftright_scalar(src0ExpBits, src0ExpBits, float_exponent_shift, mask);
     asc_add_scalar(src0Exp, (vector_int32_t&)src0ExpBits, -exponentBias, mask);
     asc_lt_scalar(needScaleMask, src0Exp, precisionThreshold, mask);
 
     asc_duplicate_scalar(thresholdVec, precisionThreshold, mask);
     asc_sub(k, thresholdVec, src0Exp, needScaleMask);
     asc_add_scalar(newExp, k, exponentBias, mask);
-    asc_shiftleft_scalar(scaleBits, (vector_uint32_t&)newExp, 23, mask);
+    asc_shiftleft_scalar(scaleBits, (vector_uint32_t&)newExp, float_exponent_shift, mask);
 
     asc_mul((vector_float&)src0Reg, src0, (vector_float&)scaleBits, mask);
     asc_mul((vector_float&)src0ExpBits, src1, (vector_float&)scaleBits, mask);
@@ -198,8 +210,8 @@ __simd_callee__ inline void div_scale_round(
     asc_and(qSign, (vector_uint32_t&)dst, tmpU0, mask);
     asc_duplicate_scalar(tmpU0, exponentExtractor, mask);
     asc_and(qExponent, (vector_uint32_t&)dst, tmpU0, mask);
-    asc_shiftright_scalar(qExponent, qExponent, 23, mask);
-    asc_duplicate_scalar(tmpI0, 127, mask);
+    asc_shiftright_scalar(qExponent, qExponent, float_exponent_shift, mask);
+    asc_duplicate_scalar(tmpI0, float_exponent_bias, mask);
     asc_sub(e, (vector_int32_t&)qExponent, tmpI0, mask);
     asc_add(e, e, scale, mask);
     asc_duplicate_scalar(tmpU0, mantissaMask, mask);
@@ -207,23 +219,23 @@ __simd_callee__ inline void div_scale_round(
     asc_duplicate_scalar(tmpU0, implicitBit, mask);
     asc_or(m24, qMantissa, tmpU0, mask);
 
-    asc_gt_scalar(overflowMask, e, 127, mask);
+    asc_gt_scalar(overflowMask, e, float_max_normal_exponent, mask);
     asc_duplicate_scalar(tmpU0, inf, overflowMask);
     asc_or(resultBits, qSign, tmpU0, overflowMask);
     asc_select((vector_uint32_t&)dst, resultBits, (vector_uint32_t&)dst, overflowMask);
     asc_not(notOverflowMask, overflowMask, mask);
-    asc_ge_scalar(normalMask, e, -126, notOverflowMask);
-    asc_add_scalar(tmpI1, e, 127, normalMask);
-    asc_shiftleft_scalar(tmpU0, (vector_uint32_t&)tmpI1, 23, normalMask);
+    asc_ge_scalar(normalMask, e, float_min_normal_exponent, notOverflowMask);
+    asc_add_scalar(tmpI1, e, float_exponent_bias, normalMask);
+    asc_shiftleft_scalar(tmpU0, (vector_uint32_t&)tmpI1, float_exponent_shift, normalMask);
     asc_or(resultBits, qSign, tmpU0, normalMask);
     asc_or(resultBits, resultBits, qMantissa, normalMask);
     asc_select((vector_uint32_t&)dst, resultBits, (vector_uint32_t&)dst, normalMask);
 
     asc_not(subnormalMask, normalMask, notOverflowMask);
     asc_mul_scalar(tmpI0, (vector_int32_t&)e, -1, subnormalMask);
-    asc_add_scalar(tmpI0, tmpI0, -126, subnormalMask);
+    asc_add_scalar(tmpI0, tmpI0, float_min_normal_exponent, subnormalMask);
     drop = tmpI0;
-    asc_gt_scalar(zeroMask, drop, 24, subnormalMask);
+    asc_gt_scalar(zeroMask, drop, float_mantissa_drop_width, subnormalMask);
     asc_select((vector_uint32_t&)dst, qSign, (vector_uint32_t&)dst, zeroMask);
     asc_not(subnormalRoundMask, zeroMask, subnormalMask);
     asc_duplicate_scalar(oneU, 1u, subnormalRoundMask);
@@ -332,12 +344,12 @@ __simd_callee__ inline void div_subnormal(vector_float& dst, vector_float src0, 
     asc_duplicate_scalar(tmp0, inf, mask);
     asc_and(src0Exponent, (vector_uint32_t&)src0All, tmp0, mask);
     asc_and(src1Exponent, (vector_uint32_t&)src1All, tmp0, mask);
-    asc_shiftright_scalar(src0Exponent, src0Exponent, 23, mask);
-    asc_shiftright_scalar(src1Exponent, src1Exponent, 23, mask);
+    asc_shiftright_scalar(src0Exponent, src0Exponent, float_exponent_shift, mask);
+    asc_shiftright_scalar(src1Exponent, src1Exponent, float_exponent_shift, mask);
     asc_sub(scale, (vector_int32_t&)src0Exponent, (vector_int32_t&)src1Exponent, mask);
-    asc_add_scalar(tmp1, scale, -23, maskSrc0Subnormal);
+    asc_add_scalar(tmp1, scale, -float_normalization_scale_exponent, maskSrc0Subnormal);
     asc_select(scale, tmp1, scale, maskSrc0Subnormal);
-    asc_add_scalar(tmp1, scale, 23, maskSrc1Subnormal);
+    asc_add_scalar(tmp1, scale, float_normalization_scale_exponent, maskSrc1Subnormal);
     asc_select(scale, tmp1, scale, maskSrc1Subnormal);
     div_scale_round<useSticky>(dst, scale, stickyPositive, stickyZero, maskValid);
     asc_ne(maskNan, src0Abs, src0Abs, mask);
@@ -456,13 +468,13 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
     asc_and(src0Exponent, (vector_uint16_t&)src0All, tmp0, mask);
     asc_and(src1Exponent, (vector_uint16_t&)src1All, tmp0, mask);
     asc_and(dstExponent, (vector_uint16_t&)dst, tmp0, mask);
-    asc_shiftright_scalar(src0Exponent, src0Exponent, 10, mask);
-    asc_shiftright_scalar(src1Exponent, src1Exponent, 10, mask);
-    asc_shiftright_scalar(dstExponent, dstExponent, 10, mask);
+    asc_shiftright_scalar(src0Exponent, src0Exponent, half_exponent_shift, mask);
+    asc_shiftright_scalar(src1Exponent, src1Exponent, half_exponent_shift, mask);
+    asc_shiftright_scalar(dstExponent, dstExponent, half_exponent_shift, mask);
     asc_sub(scale, (vector_int16_t&)src0Exponent, (vector_int16_t&)src1Exponent, mask);
-    asc_add_scalar(scale, scale, 15, mask);
+    asc_add_scalar(scale, scale, half_exponent_bias, mask);
 
-    asc_duplicate_scalar(tmp1, static_cast<int16_t>(-9), mask);
+    asc_duplicate_scalar(tmp1, half_scale_underflow_bound, mask);
     asc_eq(mask0, scale, tmp1, mask);
     asc_and(mask0, mask0, maskValid, mask);
     asc_duplicate_scalar(tmp0, minDenormal, mask0);
@@ -474,7 +486,7 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
     asc_not(mask0, mask0, mask);
     asc_and(maskValid, mask0, maskValid, mask);
 
-    asc_lt_scalar(mask0, scale, static_cast<int16_t>(-9), mask);
+    asc_lt_scalar(mask0, scale, half_scale_underflow_bound, mask);
     asc_and(mask0, mask0, maskValid, mask);
     asc_duplicate_scalar(tmp0, 0u, mask);
     asc_add((vector_uint16_t&)z1, dstSign, tmp0, mask0);
@@ -482,7 +494,7 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
     asc_not(mask0, mask0, mask);
     asc_and(maskValid, mask0, maskValid, mask);
 
-    asc_duplicate_scalar(tmp0, 31u, mask);
+    asc_duplicate_scalar(tmp0, static_cast<uint16_t>(half_scale_overflow_bound), mask);
     asc_eq(mask0, scale, (vector_int16_t&)tmp0, mask);
     asc_and(mask0, mask0, maskValid, mask);
     asc_duplicate_scalar(tmp1, 1, mask0);
@@ -501,7 +513,7 @@ __simd_callee__ inline void div_subnormal_half(vector_half& dst, vector_half src
 
     asc_duplicate_scalar(tmp0, 0u, maskValid);
     asc_gt(mask0, scale, (vector_int16_t&)tmp0, maskValid);
-    asc_shiftleft_scalar(tmp1, scale, 10, mask0);
+    asc_shiftleft_scalar(tmp1, scale, half_exponent_shift, mask0);
     asc_mul(z1, dst, (vector_half&)tmp1, mask0);
     asc_select(dst, z1, dst, mask0);
     asc_not(mask0, mask0, maskValid);
