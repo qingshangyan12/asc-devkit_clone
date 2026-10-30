@@ -33,7 +33,14 @@ def get_config_opts(file):
                 macros = node.get("cacheVariables")
                 if macros is not None:
                     for key in macros:
-                        opts += "-D{}={} ".format(key, macros[key]["value"])
+                        value = macros[key]
+                        if value is None:
+                            continue
+                        if isinstance(value, dict):
+                            value = value["value"]
+                        elif not isinstance(value, (str, bool)):
+                            raise TypeError("Unsupported cacheVariables entry for {}".format(key))
+                        opts += "-D{}={} ".format(key, value)
 
     opts = opts.replace("${sourceDir}", src_dir)
     print(opts)
