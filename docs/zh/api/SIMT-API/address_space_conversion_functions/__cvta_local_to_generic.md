@@ -69,7 +69,7 @@ __global__ __launch_bounds__(1024) void kernel__cvta_local_to_generic(uint32_t* 
     if (idx >= total_len) {
         return;
     }
-    uint32_t* ptr = static_cast<uint32_t*>(__cvta_local_to_generic(addr_val));
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_local_to_generic(addr_val)); // addr_val : 栈空间地址值
     dst[idx] = ptr[0];
 }
 ```

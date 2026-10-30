@@ -66,7 +66,7 @@ SIMT编程场景：
 __global__ __launch_bounds__(1024) void kernel__cvta_global_to_generic(uint32_t* dst, uint64_t addr_val)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    uint32_t* ptr = static_cast<uint32_t*>(__cvta_global_to_generic(addr_val));
+    uint32_t* ptr = static_cast<uint32_t*>(__cvta_global_to_generic(addr_val)); // addr_val : GM内存空间的地址值
     dst[idx] = ptr[0];
 }
 ```

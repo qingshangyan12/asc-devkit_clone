@@ -71,7 +71,7 @@ T shfl_down(T var, unsigned int delta) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_down(threadIdx.x + 100, 2);
+            uint32_t result = active.shfl_down(active.thread_rank() + 100, 2);
         }
         ...
     }
@@ -88,7 +88,7 @@ T shfl_down(T var, unsigned int delta) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_down(threadIdx.x + 100, 2);
+            uint32_t result = active.shfl_down(active.thread_rank() + 100, 2);
         }
         ...
     }
