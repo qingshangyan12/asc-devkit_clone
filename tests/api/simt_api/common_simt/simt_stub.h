@@ -679,15 +679,14 @@ static inline unsigned long long __umul64hi(unsigned long long x, unsigned long 
     uint64_t hi1 = (uint64_t)a1 * b1;
 
     uint64_t mid = m1 + m2;
-    uint64_t carry = mid < m1; // mid加法进位
+    uint64_t carry = mid < m1; // mid加法进位，权重为2^64，对应结果bit32
 
     uint64_t mid_hi = mid >> 32;
     uint64_t mid_lo = (uint32_t)mid;
 
     uint64_t t = mid_lo + (lo0 >> 32);
-    uint64_t t_carry = t < mid_lo;
 
-    return hi1 + mid_hi + carry + t_carry;
+    return hi1 + mid_hi + (carry << 32) + (t >> 32);
 }
 
 namespace cce {
