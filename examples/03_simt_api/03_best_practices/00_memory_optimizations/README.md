@@ -6,9 +6,10 @@
 
 ## 样例列表
 
-| 目录名称                                               | 功能描述                                                                                        |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [matrix_transpose_practice](./matrix_transpose_practice)   | 样例以矩阵转置为例，从直接索引转置出发，逐步引入UB中转、全局访存合并、Thread Block映射与线程数选择、通过padding降低UB Bank冲突以及双缓冲去除循环尾部同步等优化方法，展示SIMT编程方式下矩阵转置的访存调优路径。 |
-| [short_vector_add](./short_vector_add)            | 样例以向量加法为例，对比基础half类型逐元素加法与half2短向量化加法，演示SIMT编程方式下基于短向量提升访存带宽利用率的调优方法。 |
-| [cache_hint](./cache_hint)   | 样例以查表法计算sin值为例，通过为不同类型数据指定缓存策略，使频繁访问的sin查找表常驻DCache、减少Global Memory访问次数，展示SIMT编程方式下数据缓存优化的调优路径。 |
-| [aligned_types](./aligned_types) | 样例基于Ascend C SIMT编程方式，展示结构体类型对齐对Global Memory访存吞吐的影响。 |
+| 目录名称                                                 | 功能描述                                                     |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| [matrix_transpose_practice](./matrix_transpose_practice) | 样例以矩阵转置为例，从直接索引转置出发，逐步引入UB中转、全局访存合并、Thread Block映射与线程数选择、通过padding降低UB Bank冲突以及双缓冲去除循环尾部同步等优化方法，展示SIMT编程方式下矩阵转置的访存调优路径。 |
+| [short_vector_add](./short_vector_add)                   | 样例以向量加法为例，对比基础half类型逐元素加法与half2短向量化加法，演示SIMT编程方式下基于短向量提升访存带宽利用率的调优方法。 |
+| [cache_hint](./cache_hint)                               | 样例以查表法计算sin值为例，通过为不同类型数据指定缓存策略，使频繁访问的sin查找表常驻DCache、减少Global Memory访问次数，展示SIMT编程方式下数据缓存优化的调优路径。 |
+| [aligned_types](./aligned_types)                         | 样例基于Ascend C SIMT编程方式，展示结构体类型对齐对Global Memory访存吞吐的影响。 |
+| [hashtable_lookup](./hashtable_lookup)                   | 实现哈希表查找算子，该哈希表处理哈希冲突基于开放寻址法，本样例通过不同的哈希表结构设计以及线程访问方式查找哈希表并进行性能比较，展示不同优化手段对性能的影响。 |

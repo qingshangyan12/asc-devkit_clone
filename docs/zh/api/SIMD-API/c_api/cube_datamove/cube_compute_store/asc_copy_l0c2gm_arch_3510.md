@@ -1,4 +1,4 @@
-# asc_copy_l0c2gm_arch_3510
+# asc_copy_l0c2gm（NPU架构版本3510）
 
 ## 产品支持情况
 

@@ -181,6 +181,7 @@ Atlas A2系列产品
 | enSsparse | 开启结构化稀疏特性，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradA | 指示矩阵a是否通过winograd_feature_map_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
 | enWinogradB | 指示矩阵b是否通过winograd_weight_transform()生成，用于支持winograd特性，bool类型，默认false；<br><br>注：未使用，兼容旧款产品接口传入，Atlas A2系列产品及往后产品不做处理。 |
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id3 -->
 
 ## 数据类型<a id="zh_cn_topic_mmad_section5"></a>
 
@@ -297,6 +298,7 @@ Atlas A2系列产品
     数据为half类型，当M=30，K=70，N=40的时候，L0A Buffer（A2）中有2x5个16x16矩阵，L0B Buffer（B2）中有5x3个16x16矩阵，L0C Buffer（CO1）中有2x3个16x16矩阵。在这种场景下M、K和N都不是16的倍数，A2中右下角的矩阵实际有效的数据只有14x6个，但是也需要占一个16x16矩阵的空间，其他无效数据在计算中会被忽略。一个16x16分形的数据块中，无效数据与有效数据排布的方式示意如下：
 
     ![有效数据相乘示意图](../../../../figures/mmad_validshape_demo.png)
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id4 -->
 
 - **同步优化说明**
 
@@ -330,20 +332,23 @@ Atlas A2系列产品
 
 - **特殊值/边界值约束说明**
 
-  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式：
+  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式。该配置适用于浮点类型输入，不适用于整数类型输入，且由CTRL\[48\]直接决定：
 
   - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
   - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
     ```cpp
-    // 设置CTRL[48]为0，开启浮点数计算饱和模式
-    AscendC::AscendCUtils::SetOverflow(0);
+    // 设置CTRL[48]为0，开启浮点数饱和模式。
+    AscendC::SetCtrlSpr<48, 48>(0);
     ```
 
     注：Mmad指令应避免NaN输入，否则可能会产生执行报错。
+
+  - 边界值计算结果请见[Mmad接口边界值汇总](../../../../appendix/mmad_interface_boundary_value_summary.md)。
 
   对于整数类型只有饱和模式。
 
 ## 调用示例
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->

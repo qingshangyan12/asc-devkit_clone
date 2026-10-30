@@ -747,116 +747,19 @@ __aicore__ inline void CastIntrinsicsImpl(
     }
 }
 
+template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask, typename MaskT>
+__aicore__ inline void CastImplMaskCommonDavM510(
+    __ubuf__ ORI_DST_TYPE* oriDst, __ubuf__ ORI_SRC_TYPE* oriSrc, const RoundMode& roundMode, MaskT mask,
+    uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
 // Cast::Level 0 - mask bit mode
 template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask = true>
 __aicore__ inline void CastImpl(
     __ubuf__ ORI_DST_TYPE* oriDst, __ubuf__ ORI_SRC_TYPE* oriSrc, const RoundMode& roundMode, const uint64_t mask[],
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    using DST_TYPE = typename CastParam::CastTypeTrait<ORI_DST_TYPE>::RealType;
-    using SRC_TYPE = typename CastParam::CastTypeTrait<ORI_SRC_TYPE>::RealType;
-    __ubuf__ DST_TYPE* dst = reinterpret_cast<__ubuf__ DST_TYPE*>(oriDst);
-    __ubuf__ SRC_TYPE* src = reinterpret_cast<__ubuf__ SRC_TYPE*>(oriSrc);
-
-    constexpr bool cast_round_all = SupportType<
-        Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<int64_t, float>, Tuple<int32_t, float>,
-        Tuple<int16_t, float>, Tuple<bfloat16_t, float>, Tuple<int32_t, half>, Tuple<int16_t, half>,
-        Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4x2_t, half>, Tuple<bfloat16_t, half>, Tuple<half, int16_t>,
-        Tuple<float, int32_t>, Tuple<float, int64_t>, Tuple<int32_t, bfloat16_t>, Tuple<half, bfloat16_t>,
-        Tuple<fp4x2_e1m2_t, bfloat16_t>, Tuple<fp4x2_e2m1_t, bfloat16_t>, Tuple<half, int32_t>, Tuple<float, float>>();
-    constexpr bool cast_none = SupportType<
-        Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<half, int4x2_t>,
-        Tuple<half, uint8_t>, Tuple<uint16_t, uint8_t>, Tuple<uint32_t, uint8_t>, Tuple<half, int8_t>,
-        Tuple<int16_t, int8_t>, Tuple<int32_t, int8_t>, Tuple<uint8_t, uint16_t>, Tuple<uint32_t, uint16_t>,
-        Tuple<float, int16_t>, Tuple<uint8_t, int16_t>, Tuple<uint32_t, int16_t>, Tuple<int32_t, int16_t>,
-        Tuple<uint8_t, uint32_t>, Tuple<uint16_t, uint32_t>, Tuple<int16_t, uint32_t>, Tuple<int64_t, int32_t>,
-        Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>, Tuple<int32_t, int64_t>,
-        Tuple<half, hifloat8_t>, Tuple<float, hifloat8_t>, Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>,
-        Tuple<bfloat16_t, fp4x2_e1m2_t>, Tuple<bfloat16_t, fp4x2_e2m1_t>, Tuple<int4x2_t, int16_t>,
-        Tuple<int16_t, int4x2_t>, Tuple<bfloat16_t, int4x2_t>>();
-    constexpr bool using_cast_rint = SupportType<
-        Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4x2_t, half>, Tuple<half, float>,
-        Tuple<half, int16_t>, Tuple<float, int32_t>>();
-    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>>();
-    constexpr bool cast_rint =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<fp8_e5m2_t, float>, Tuple<fp8_e4m3fn_t, float>>();
-    constexpr bool cast_round =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
-    constexpr bool cast_hybrid =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
-    switch (roundMode) {
-        case RoundMode::CAST_RINT:
-            if constexpr (cast_round_all || cast_rint) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast rint"); });
-            }
-            break;
-        case RoundMode::CAST_FLOOR:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_FLOOR, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast floor"); });
-            }
-            break;
-        case RoundMode::CAST_CEIL:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_CEIL, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast ceil"); });
-            }
-            break;
-        case RoundMode::CAST_ROUND:
-            if constexpr (cast_round_all || cast_round) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ROUND, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast round"); });
-            }
-            break;
-        case RoundMode::CAST_TRUNC:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_TRUNC, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast trunc"); });
-            }
-            break;
-        case RoundMode::CAST_ODD:
-            if constexpr (cast_odd) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ODD, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast odd"); });
-            }
-            break;
-        case RoundMode::CAST_NONE:
-            if constexpr (cast_none) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_NONE, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else if constexpr (using_cast_rint) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast none"); });
-            }
-            break;
-        case RoundMode::CAST_HYBRID:
-            if constexpr (cast_hybrid) {
-                CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_HYBRID, isSetMask>(
-                    dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast hybrid"); });
-            }
-            break;
-        default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
-            break;
-    }
+    CastImplMaskCommonDavM510<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask>(
+        oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
@@ -1018,10 +921,10 @@ __aicore__ inline void CastIntrinsicsImpl(
     }
 }
 
-// Cast::Level 0 - mask count mode
-template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask = true>
-__aicore__ inline void CastImpl(
-    __ubuf__ ORI_DST_TYPE* oriDst, __ubuf__ ORI_SRC_TYPE* oriSrc, const RoundMode& roundMode, const uint64_t mask,
+// Cast::Level 0 - shared mask dispatcher
+template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask, typename MaskT>
+__aicore__ inline void CastImplMaskCommonDavM510(
+    __ubuf__ ORI_DST_TYPE* oriDst, __ubuf__ ORI_SRC_TYPE* oriSrc, const RoundMode& roundMode, MaskT mask,
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using DST_TYPE = typename CastParam::CastTypeTrait<ORI_DST_TYPE>::RealType;
@@ -1128,6 +1031,16 @@ __aicore__ inline void CastImpl(
                 (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
             break;
     }
+}
+
+// Cast::Level 0 - mask count mode
+template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask = true>
+__aicore__ inline void CastImpl(
+    __ubuf__ ORI_DST_TYPE* oriDst, __ubuf__ ORI_SRC_TYPE* oriSrc, const RoundMode& roundMode, const uint64_t mask,
+    uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+    CastImplMaskCommonDavM510<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask>(
+        oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
 }
 
 // scale is stored as  1 sign bit, 8 exponent bits and 10 mantissa bits in 1971 hardware

@@ -8,9 +8,11 @@ This sample demonstrates how to use the experimental Tensor API `asc::te::experi
 dst[i] = |src0[i] - src1[i]|
 ```
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR&950DT series
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 

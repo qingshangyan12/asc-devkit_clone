@@ -59,13 +59,11 @@ unsigned int ballot(int predicate) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.ballot(1);          // 返回0xf
-        ...
+        result[threadIdx.x] = tile4.ballot(1);          // 返回0xf
     }
     ```
 
@@ -75,12 +73,16 @@ unsigned int ballot(int predicate) const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ uint32_t* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.ballot(1);          // 返回0xf
-        ...
+        result[threadIdx.x] = tile4.ballot(1);          // 返回0xf
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf
+```

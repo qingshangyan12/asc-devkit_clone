@@ -29,7 +29,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
-Prelu属于双目矢量类计算接口，源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。计算公式如下：
+Prelu属于双目矢量类计算接口，源操作数src0大于等于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。注：源操作数src0中数据为浮点数正零（+0）时按正数处理并直接输出；为浮点数负零（-0）时按负数处理并与src1相乘。计算公式如下：
 
 $dst_i = (src0_i \ge 0) ? src0_i : src0_i * src1_i$
 
@@ -61,6 +61,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 <!-- npu="950" id8 -->
 针对Ascend 950PR&950DT系列产品，支持的数据为half、float。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Prelu_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -70,6 +71,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md)。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Prelu_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

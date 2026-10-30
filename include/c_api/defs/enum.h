@@ -27,7 +27,8 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
     NORMAL_LAST_VICTIM = 1,
     NORMAL_PERSISTENT = 2,
-    NOTALLOC_CLEAN = 4
+    NOTALLOC_CLEAN = 4,
+    WT_SHARE_FIRST_VICTIM = 12
 };
 
 enum class asc_l13d_repeat_direction : uint8_t { M_DIRECTION = 0, K_DIRECTION = 1 };

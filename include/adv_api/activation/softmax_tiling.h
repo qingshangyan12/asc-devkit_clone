@@ -27,7 +27,7 @@ namespace AscendC {
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return max temporary local space size
+ * @return max temporary local space size, in bytes
  */
 uint32_t GetSoftMaxMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
@@ -37,7 +37,7 @@ uint32_t GetSoftMaxMaxTmpSize(
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return min temporary local space size
+ * @return min temporary local space size, in bytes
  */
 uint32_t GetSoftMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
@@ -64,6 +64,8 @@ void SoftMaxTilingFunc(
  * @param [in] dataTypeSize2 : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isUpdate : whether to enable the flash calculation
  * @param [in] isBasicBlock : whether enable basicblock calculate
+ * @param [out] maxValue : maximum temporary local space size, in bytes
+ * @param [out] minValue : minimum temporary local space size, in bytes
  */
 void GetSoftMaxFlashV3MaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
@@ -95,7 +97,7 @@ void SoftMaxFlashV3TilingFunc(
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isUpdate : whether to enable the flash calculation
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return max temporary local space size
+ * @return max temporary local space size, in bytes
  */
 uint32_t GetSoftMaxFlashMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isUpdate, const bool isReuseSource);
@@ -106,7 +108,7 @@ uint32_t GetSoftMaxFlashMaxTmpSize(
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isUpdate : whether to enable the flash calculation
  * @param [in] isReuseSource : whether to reuse the src Tensor
- * @return min temporary local space size
+ * @return min temporary local space size, in bytes
  */
 uint32_t GetSoftMaxFlashMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isUpdate, const bool isReuseSource);
@@ -134,7 +136,7 @@ void SoftMaxFlashTilingFunc(
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
  * @param [in] isFront : whether to enable the front calculation
- * @return max temporary local space size
+ * @return max temporary local space size, in bytes
  */
 uint32_t GetSoftMaxGradMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource);
@@ -145,7 +147,7 @@ uint32_t GetSoftMaxGradMaxTmpSize(
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
  * @param [in] isReuseSource : whether to reuse the src Tensor
  * @param [in] isFront : whether to enable the front calculation
- * @return min temporary local space size
+ * @return min temporary local space size, in bytes
  */
 uint32_t GetSoftMaxGradMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource);
@@ -184,7 +186,7 @@ bool IsBasicBlockInSoftMax(AscendC::tiling::SoftMaxTiling& tiling, const uint32_
  * @param [in] isUpdate : whether to enable the flash calculation
  * @param [in] isBasicBlock : whether enable basicblock calculate
  * @param [in] isFlashOutputBrc : whether enable output data broadcast
- * @return min temporary local space size
+ * @return min temporary local space size, in bytes
  */
 uint32_t GetSoftMaxFlashV2MinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
@@ -198,7 +200,7 @@ uint32_t GetSoftMaxFlashV2MinTmpSize(
  * @param [in] isUpdate : whether to enable the flash calculation
  * @param [in] isBasicBlock : whether enable basicblock calculate
  * @param [in] isFlashOutputBrc : whether enable output data broadcast
- * @return max temporary local space size
+ * @return max temporary local space size, in bytes
  */
 uint32_t GetSoftMaxFlashV2MaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
