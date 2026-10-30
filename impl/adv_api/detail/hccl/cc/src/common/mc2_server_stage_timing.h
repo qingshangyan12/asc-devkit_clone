@@ -334,7 +334,8 @@ inline void Finish(uint32_t status)
     if (!backendValid) { backendText[0] = '-'; backendText[1] = '\0'; }
     // MC2_CACHE_DETAIL_DIAG END
 
-    HCCL_RUN_INFO(
+    char record[8192];
+    const int recordSize = snprintf(record, sizeof(record),
         "[MC2_SERVER_PERF] schema=%u first=%llu last=%llu count=%u init_mean_ns=%.6f msg_parse_mean_ns=%.6f "
         "sq_expand_mean_ns=%.6f cache=%d status=%d init_top3_ns=%llu,%llu,%llu msg_parse_top3_ns=%llu,%llu,%llu sq_expand_top3_ns=%llu,%llu,%llu"
         // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
@@ -373,6 +374,22 @@ inline void Finish(uint32_t status)
         static_cast<unsigned long long>(BackendTotals().unavailable), static_cast<unsigned>(backendValid), backendText
         // MC2_CACHE_DETAIL_DIAG END
     );
+    // MC2_CACHE_DETAIL_DIAG BEGIN: bounded fragments, emitted after the message loop only.
+    if (recordSize > 0 && static_cast<size_t>(recordSize) < sizeof(record)) {
+        constexpr int CHUNK_BYTES = 512;
+        const int parts = (recordSize + CHUNK_BYTES - 1) / CHUNK_BYTES;
+        for (int part = 0; part < parts; ++part) {
+            const int offset = part * CHUNK_BYTES;
+            const int length = recordSize - offset < CHUNK_BYTES ? recordSize - offset : CHUNK_BYTES;
+            HCCL_RUN_INFO("[MC2_SERVER_PERF_PART] first=%llu last=%llu part=%d total=%d bytes=%d data=%.*s",
+                static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last),
+                part, parts, length, length, record + offset);
+        }
+    } else {
+        HCCL_RUN_INFO("[MC2_SERVER_PERF_PART] serialization_failed first=%llu last=%llu",
+            static_cast<unsigned long long>(b.first), static_cast<unsigned long long>(b.last));
+    }
+    // MC2_CACHE_DETAIL_DIAG END
     b = {};
     // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
     detail = {};
