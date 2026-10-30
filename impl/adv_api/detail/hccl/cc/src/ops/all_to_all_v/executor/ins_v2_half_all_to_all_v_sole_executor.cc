@@ -66,8 +66,7 @@ HcclResult InsV2HalfAlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     rankSize_ = resCtx.topoInfo.userRankSize;
     CHK_PRT_RET(
         rankSize_ == 0U || myRank_ >= rankSize_,
-        HCCL_ERROR("[InsV2HalfAlltoAllVSoleExecutor] invalid rank[%u]/rankSize[%u].", myRank_, rankSize_),
-        HCCL_E_PARA);
+        HCCL_ERROR("[InsV2HalfAlltoAllVSoleExecutor] invalid rank[%u]/rankSize[%u].", myRank_, rankSize_), HCCL_E_PARA);
     CHK_PRT_RET(
         resCtx.algHierarchyInfo.infos.empty() || resCtx.algHierarchyInfo.infos[0].empty(),
         HCCL_ERROR("[InsV2HalfAlltoAllVSoleExecutor] hierarchy info is empty."), HCCL_E_PARA);
@@ -143,8 +142,8 @@ HcclResult InsV2HalfAlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
 
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
     HCCL_DEBUG(
-        "[InsV2HalfAlltoAllVSoleExecutor][OrchestrateLoop] myRank[%u], perRankCapacity[%llu], ccuKernels[%lu]",
-        myRank_, static_cast<unsigned long long>(perRankCapacity), templateAlgRes.ccuKernels.size());
+        "[InsV2HalfAlltoAllVSoleExecutor][OrchestrateLoop] myRank[%u], perRankCapacity[%llu], ccuKernels[%lu]", myRank_,
+        static_cast<unsigned long long>(perRankCapacity), templateAlgRes.ccuKernels.size());
     CHK_RET(algTemplate.KernelRun(param, tempAlgParams, templateAlgRes));
     HCCL_INFO("[InsV2HalfAlltoAllVSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;

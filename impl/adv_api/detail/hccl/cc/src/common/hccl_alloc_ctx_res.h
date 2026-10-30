@@ -65,7 +65,6 @@ struct AlgInfo {
     uint64_t opParam;
 };
 
-
 struct OpResCtx {
     uint64_t version;
     uint64_t workSpace;

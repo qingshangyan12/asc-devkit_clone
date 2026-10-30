@@ -17,7 +17,7 @@ SuperKernel是一种算子的二进制融合技术。与源码融合不同，它
 > - Atlas A2系列产品
 > <!-- end id2 -->
 > <!-- npu="950" id3 -->
-> - Ascend 950PR&950DT系列产品，该型号下SuperKernel特性是试验特性，在后续版本中会调整或改进，不保证后续兼容性，请开发者在使用过程中关注后续版本更新。
+> - Ascend 950PR&950DT系列产品：仅支持通过npugraph_ex后端开启SuperKernel，不支持GE图模式。
 > <!-- end id3 -->
 
 ## 性能收益来源

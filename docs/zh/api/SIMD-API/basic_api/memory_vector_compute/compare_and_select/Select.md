@@ -212,6 +212,7 @@ Kirin 9030处理器系列产品，支持模式0、1、2。
     <!-- end id32 -->
 
 - U支持的数据类型为：uint8_t、uint16_t、uint32_t、uint64_t。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select_res.md#id2 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -251,6 +252,7 @@ Kirin 9030处理器系列产品，支持模式0、1、2。
   - tensor高维切分计算Select模式1中，不传入mask参数的函数原型（需配合[SetVectorMask](../mask_operations/SetVectorMask.md)、[SetCmpMask_ISASI](SetCmpMask_ISASI.md)使用）。
   - tensor高维切分计算Select模式0和模式2中，不传入mask参数的函数原型（需配合[SetVectorMask](../mask_operations/SetVectorMask.md)、[SetCmpMask_ISASI](SetCmpMask_ISASI.md)使用）。
 <!-- end id33 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

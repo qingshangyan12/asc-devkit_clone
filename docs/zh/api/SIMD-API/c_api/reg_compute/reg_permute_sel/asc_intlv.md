@@ -141,58 +141,84 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 256;
-constexpr uint32_t HALF_COUNT = ELEMENT_COUNT / 2;
-constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint8_t);
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t DATA_BYTES = 557 * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t HALF_COUNT = ELEMENTS_PER_REGISTER / 2;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(uint8_t);
 
 __simd_vf__ inline void intlv_vf(__ubuf__ uint8_t* output0, __ubuf__ uint8_t* output1,
-                                 __ubuf__ uint8_t* input0, __ubuf__ uint8_t* input1)
+                                 __ubuf__ uint8_t* input0, __ubuf__ uint8_t* input1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint8_t src0;
     vector_uint8_t src1;
     vector_uint8_t dst0;
     vector_uint8_t dst1;
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    asc_loadalign(src0, input0);
-    asc_loadalign(src1, input1);
-    asc_intlv(dst0, dst1, src0, src1);
-    asc_storealign(output0, dst0, mask);
-    asc_storealign(output1, dst1, mask);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        uint32_t valid_count = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        uint32_t remaining_length_output = valid_count < HALF_COUNT ? valid_count * 2 : ELEMENTS_PER_REGISTER;
+        uint32_t remaining_length_output_2 = valid_count > HALF_COUNT ? (valid_count - HALF_COUNT) * 2 : 0;
+        vector_bool output0_mask = asc_update_mask_b8(remaining_length_output);
+        vector_bool output1_mask = asc_update_mask_b8(remaining_length_output_2);
+        asc_loadalign(src0, input0 + offset);
+        asc_loadalign(src1, input1 + offset);
+        asc_intlv(dst0, dst1, src0, src1);
+        asc_storealign(output0 + offset, dst0, output0_mask);
+        asc_storealign(output1 + offset, dst1, output1_mask);
+    }
 }
 
 __global__ __vector__ void asc_intlv_kernel(__gm__ uint8_t* output0, __gm__ uint8_t* output1,
                                             __gm__ uint8_t* input0, __gm__ uint8_t* input1)
 {
     asc_init();
-    __ubuf__ uint8_t output0_local[ELEMENT_COUNT];
-    __ubuf__ uint8_t output1_local[ELEMENT_COUNT];
-    __ubuf__ uint8_t input0_local[ELEMENT_COUNT];
-    __ubuf__ uint8_t input1_local[ELEMENT_COUNT];
+    __ubuf__ uint8_t output0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint8_t output1_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint8_t input0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ uint8_t input1_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input0_local, input0, BUFFER_BYTES);
     asc_copy_gm2ub_align(input1_local, input1, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    intlv_vf(output0_local, output1_local, input0_local, input1_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output0, output0_local, BUFFER_BYTES);
-    asc_copy_ub2gm_align(output1, output1_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<intlv_vf>(output0_local, output1_local, input0_local, input1_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output0, output0_local, PADDED_BUFFER_BYTES);
+    asc_copy_ub2gm_align(output1, output1_local, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input0(ELEMENT_COUNT);
-    std::vector<uint8_t> input1(ELEMENT_COUNT);
-    std::vector<uint8_t> output0(ELEMENT_COUNT, 0);
-    std::vector<uint8_t> output1(ELEMENT_COUNT, 0);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<uint8_t> input0(TOTAL_LENGTH);
+    std::vector<uint8_t> input1(TOTAL_LENGTH);
+    std::vector<uint8_t> output0(PADDED_ELEMENT_COUNT, 0);
+    std::vector<uint8_t> output1(PADDED_ELEMENT_COUNT, 0);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         input0[i] = static_cast<uint8_t>(i);
-        input1[i] = static_cast<uint8_t>(255 - i);
+        input1[i] = static_cast<uint8_t>(255 - i % 256);
     }
 
     aclInit(nullptr);
@@ -203,20 +229,30 @@ int main()
     uint8_t* output1_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&input0_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&input1_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output0_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output1_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output0_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output1_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input0_device, BUFFER_BYTES, input0.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(input1_device, BUFFER_BYTES, input1.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_intlv_kernel<<<1, 0>>>(output0_device, output1_device, input0_device, input1_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output0.data(), BUFFER_BYTES, output0_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
-    aclrtMemcpy(output1.data(), BUFFER_BYTES, output1_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output0.data(), PADDED_BUFFER_BYTES, output0_device, PADDED_BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output1.data(), PADDED_BUFFER_BYTES, output1_device, PADDED_BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
     bool passed = true;
-    for (uint32_t i = 0; i < HALF_COUNT; ++i) {
-        passed = passed && output0[2 * i] == input0[i] && output0[2 * i + 1] == input1[i];
-        passed = passed && output1[2 * i] == input0[i + HALF_COUNT]
-                 && output1[2 * i + 1] == input1[i + HALF_COUNT];
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        const uint32_t valid_count = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        const uint32_t output0_pairs = valid_count < HALF_COUNT ? valid_count : HALF_COUNT;
+        const uint32_t output1_pairs = valid_count > HALF_COUNT ? valid_count - HALF_COUNT : 0;
+        for (uint32_t i = 0; i < output0_pairs; ++i) {
+            passed = passed && output0[offset + 2 * i] == input0[offset + i]
+                     && output0[offset + 2 * i + 1] == input1[offset + i];
+        }
+        for (uint32_t i = 0; i < output1_pairs; ++i) {
+            passed = passed && output1[offset + 2 * i] == input0[offset + i + HALF_COUNT]
+                     && output1[offset + 2 * i + 1] == input1[offset + i + HALF_COUNT];
+        }
     }
     std::cout << (passed ? "[Success] asc_intlv completed." : "[Failed] asc_intlv output mismatch.")
               << std::endl;

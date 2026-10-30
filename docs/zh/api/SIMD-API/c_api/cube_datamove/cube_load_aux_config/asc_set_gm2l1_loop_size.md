@@ -131,7 +131,7 @@ __global__ __mix__(1, 2) void LoopKernel(  // __mix__：AIC搬运到L1，AIV将�
         asc_sync_pipe(PIPE_MTE1);
         asc_sync_intra_arrive(PIPE_MTE1, AIC_TO_AIV_SYNC_ID);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 bool IsGolden(const std::vector<uint8_t>& output)
