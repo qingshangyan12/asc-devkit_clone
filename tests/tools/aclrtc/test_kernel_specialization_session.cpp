@@ -46,6 +46,7 @@ using ascendc::specialization_compile::ResourceStatus;
 enum class FakeCompilerOutcome : uint32_t {
     Success,
     Failure,
+    SpecializationFlagFailure,
 };
 
 constexpr char RESOURCE_ID[] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -100,9 +101,16 @@ public:
         WriteFile(sourceDirectoryPath_ / "add_custom.cpp", "// user source\n");
         WriteFile(worktreePath_ / "resources/include/constants.h", "TILING=@@STATIC_TILING@@;\n");
         WriteFile(worktreePath_ / "resources/src/basic.cpp", "// basic source\n");
-        WriteExecutable(
-            toolchainPath_ / "bin/bisheng",
-            compilerOutcome == FakeCompilerOutcome::Success ? CreateOutputScript("object") : "#!/bin/sh\nexit 2\n");
+        std::string compilerScript = CreateOutputScript("object");
+        if (compilerOutcome == FakeCompilerOutcome::Failure) {
+            compilerScript = "#!/bin/sh\nexit 2\n";
+        } else if (compilerOutcome == FakeCompilerOutcome::SpecializationFlagFailure) {
+            compilerScript.insert(
+                compilerScript.find('\n') + 1U, "for arg in \"$@\"; do\n"
+                                                "  case \"$arg\" in */specialization_flag.cpp) exit 2 ;; esac\n"
+                                                "done\n");
+        }
+        WriteExecutable(toolchainPath_ / "bin/bisheng", compilerScript);
         WriteExecutable(toolchainPath_ / "bin/ld.lld", CreateOutputScript("linked-elf"));
         manifest_ = CreateManifest();
     }
@@ -158,27 +166,29 @@ private:
         return Json{
             {"schema_version", "1.0"},
             {"source_file", "add_custom.cpp"},
-            {"kernels", Json::array(
-                            {{{"kernel_name", "add_custom_100000"},
-                              {"constant_infos", Json::array(
-                                                     {{{"name", "tiling"},
-                                                       {"parameter_index", 0},
-                                                       {"arg_type", "pointer"},
-                                                       {"byte_size", 2},
-                                                       {"file", "${resource}/resources/include/constants.h"},
-                                                       {"template", "@@STATIC_TILING@@"}}})},
-                              {"link_options", Json::array({"-m", "aicorelinux", "-Ttext=0"})},
-                              {"objects", Json::array(
-                                              {{{"object_name", "basic"},
-                                                {"object_type", "basic"},
-                                                {"commands", Json::array(
-                                                                 {{{"type", "compile"},
-                                                                   {"stage", 0},
-                                                                   {"cmd", Json::array(
-                                                                               {"${env:ASCEND_HOME_PATH}/bin/bisheng",
-                                                                                "${resource}/resources/src/basic.cpp",
-                                                                                "-o", "${output}/basic.o"})}}})},
-                                                {"outputs", Json::array({"${output}/basic.o"})}}})}}})}};
+            {"kernels",
+             Json::array(
+                 {{{"kernel_name", "add_custom_100000"},
+                   {"constant_infos", Json::array(
+                                          {{{"name", "tiling"},
+                                            {"parameter_index", 0},
+                                            {"arg_type", "pointer"},
+                                            {"byte_size", 2},
+                                            {"file", "${resource}/resources/include/constants.h"},
+                                            {"template", "@@STATIC_TILING@@"}}})},
+                   {"link_options", Json::array({"-m", "aicorelinux", "-Ttext=0"})},
+                   {"objects",
+                    Json::array(
+                        {{{"object_name", "basic"},
+                          {"object_type", "basic"},
+                          {"commands", Json::array(
+                                           {{{"type", "compile"},
+                                             {"stage", 0},
+                                             {"cmd", Json::array(
+                                                         {"${env:ASCEND_HOME_PATH}/bin/bisheng",
+                                                          "${resource}/resources/src/basic.cpp", "-o",
+                                                          "${output}/basic.o", "--cce-aicore-arch=dav-c220-cube"})}}})},
+                          {"outputs", Json::array({"${output}/basic.o"})}}})}}})}};
     }
 
     fs::path rootPath_;
@@ -285,6 +295,38 @@ TEST(KernelSpecializationSessionTest, RunsPatchCompileLinkPublishAndCleanupWithM
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 }
 
+TEST(KernelSpecializationSessionTest, GeneratesAndLinksStaticSpecializationFlag)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    const auto request =
+        NormalizeRequestForTest(CreateRequest(constantByteCounts, constantAddresses), testResource.OutputElfPath());
+
+    KernelSpecializationSession session;
+    ASSERT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            request, testResource.CreateMaterializedCompilationResource()),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    const fs::path outputDirectory =
+        testResource.WorktreePath() / (".aclrtc_" + request.specializationSessionId) / "outputs";
+    const fs::path sourcePath = outputDirectory / "specialization_flag.cpp";
+    ASSERT_TRUE(fs::is_regular_file(sourcePath));
+    const std::string source = ReadFile(sourcePath);
+    EXPECT_NE(source.find("section(\".ascend.meta\")"), std::string::npos);
+    EXPECT_NE(source.find("BinaryMetaSpecializationFlag"), std::string::npos);
+    EXPECT_NE(source.find("{{B_TYPE_SPECIALIZATION_FLAG, sizeof(uint32_t)}, 0}"), std::string::npos);
+    EXPECT_TRUE(fs::is_regular_file(outputDirectory / "specialization_flag.o"));
+    const std::string replay = ReadFile(testResource.WorktreePath() / "aclrtc_replay.sh");
+    const size_t linkPosition = replay.find((testResource.ToolchainPath() / "bin/ld.lld").string());
+    ASSERT_NE(linkPosition, std::string::npos);
+    EXPECT_NE(
+        replay.substr(linkPosition).find((outputDirectory / "specialization_flag.o").string()), std::string::npos);
+}
+
 TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilationFails)
 {
     EndToEndTestResource testResource(FakeCompilerOutcome::Failure);
@@ -301,6 +343,27 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
         session.RunSpecializationWithMaterializedResource(
             NormalizeRequestForTest(request, testResource.OutputElfPath()),
             testResource.CreateMaterializedCompilationResource()),
+        ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
+    EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "previous-elf");
+    EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
+}
+
+TEST(KernelSpecializationSessionTest, PreservesOutputWhenSpecializationFlagCompilationFails)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::SpecializationFlagFailure);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
+    std::ofstream(testResource.OutputElfPath().string()) << "previous-elf";
+    const uint8_t constantBytes[] = {1, 2};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    const auto request =
+        NormalizeRequestForTest(CreateRequest(constantByteCounts, constantAddresses), testResource.OutputElfPath());
+
+    KernelSpecializationSession session;
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            request, testResource.CreateMaterializedCompilationResource()),
         ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "previous-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
