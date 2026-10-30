@@ -51,7 +51,6 @@ def change_dir(path):
 
 class SubOperatorInfos:
     def __init__(self, index, info_dict, stream_index: int, op_options, compile_log_path=None):
-        keys_list = list(info_dict.keys())
         self.json_path: str = info_dict["json_path"]
         self.bin_path: list = info_dict["bin_path"]
         self.compile_log_path: str = compile_log_path
@@ -508,7 +507,6 @@ dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 
     def gen_switch_code_of_dynamic_op(self):
         dynamic_func_names = self.called_kernel_name["dynamic_func_names"]
-        param_types = ", ".join(["GM_ADDR " for param in self.kernel_params])
         origin_switch_block = []
         for tiling_key in dynamic_func_names:
             kernel_info_of_tiling_key = dynamic_func_names[tiling_key]
