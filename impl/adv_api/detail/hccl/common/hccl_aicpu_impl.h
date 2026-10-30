@@ -21,17 +21,19 @@
 namespace AscendC {
 template <const auto& config>
 __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::CheckAlltoAllVPrepareParamValid(
-    const CommonPrepareParam& param)
+    const CommonPrepareParam& param, uint32_t& rankNum)
 {
+    rankNum = GetRankDim();
     ASCENDC_HCCL_API_ASSERT(
         param.paramExt.sendCounts != nullptr && param.paramExt.sdispls != nullptr &&
             param.paramExt.recvCounts != nullptr && param.paramExt.rdispls != nullptr,
         { return false; },
         "Call AlltoAllV failed, "
         "param sendCounts/recvCounts/sdispls/rdispls is nullptr, invalid.");
-    const uint32_t rankDim = GetRankDim();
+    const uint32_t rankDim = rankNum;
     ASCENDC_HCCL_API_ASSERT(
         IsValidMsgExtRankNum(rankDim), { return false; }, "Call AlltoAllV failed, rank dim is %u, invalid.", rankDim);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if (param.sendBuf == nullptr) {
         bool hasSendData = false;
         for (uint32_t i = 0U; i < rankDim; ++i) {
@@ -50,15 +52,17 @@ __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
             !hasRecvData, { return false; },
             "Call AlltoAllV failed, param recvBuf is nullptr while recvCounts is not all zero, invalid.");
     }
+#endif
     return true;
 }
 
 template <const auto& config>
 template <HcclCMDType cmdType>
 __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::CheckCommonPrepareParamValid(
-    const CommonPrepareParam& param, uint64_t& tiling)
+    const CommonPrepareParam& param, uint64_t& tiling, uint32_t& rankNum)
 {
     tiling = 0UL;
+    rankNum = 0U;
     if constexpr (cmdType < HcclCMDType::HCCL_CMD_ALL) {
         if (curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
             tiling = ccOpParamTable_[static_cast<uint32_t>(cmdType)];
@@ -66,37 +70,37 @@ __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
             tiling = ccOpTilingDataTable_[static_cast<uint32_t>(cmdType)];
         }
     }
-    // if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION ||
-    //     curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION ||
-    //     curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
-    //     ASCENDC_HCCL_API_ASSERT(
-    //         tiling != 0UL, { return false; }, "Failed to prepare for type %u, ensure SetCcTiling has been called.",
-    //         static_cast<uint32_t>(cmdType));
-    // } else {
-    //     ASCENDC_HCCL_API_ASSERT(
-    //         curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION && tiling == 0UL, { return false; },
-    //         "Failed to prepare for type %u, ensure Init has been called", static_cast<uint32_t>(cmdType));
-    // }
-//     ASCENDC_HCCL_API_ASSERT(
-// #if __NPU_ARCH__ == 3510
-//         param.dataType >= HCCL_DATA_TYPE_INT8 && param.dataType < HCCL_DATA_TYPE_RESERVED,
-// #else
-//         cmdType == HcclCMDType::HCCL_CMD_BATCH_WRITE ||
-//             (param.dataType >= HCCL_DATA_TYPE_INT8 && param.dataType < HCCL_DATA_TYPE_RESERVED),
-// #endif
-//         { return false; }, "Call Prepare[%d] failed, param HcclDataType is %d, invalid.",
-//         static_cast<int32_t>(cmdType), static_cast<int32_t>(param.dataType));
-    if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        return CheckAlltoAllVPrepareParamValid(param);
+    if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION ||
+        curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION ||
+        curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION) {
+        ASCENDC_HCCL_API_ASSERT(
+            tiling != 0UL, { return false; }, "Failed to prepare for type %u, ensure SetCcTiling has been called.",
+            static_cast<uint32_t>(cmdType));
     } else {
-        // ASCENDC_HCCL_API_ASSERT(
-        //     param.sendBuf != nullptr && param.recvBuf != nullptr, { return false; },
-        //     "Call Prepare[%d] failed, the param sendBuf/recvBuf is nullptr, "
-        //     "which is an invalid parameter.",
-        //     static_cast<int32_t>(cmdType));
-        // ASCENDC_HCCL_API_ASSERT(
-        //     param.count != 0, { return false; }, "Call Prepare[%d] failed, param sendCount/recvCount is 0, invalid.",
-        //     static_cast<int32_t>(cmdType));
+        ASCENDC_HCCL_API_ASSERT(
+            curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION && tiling == 0UL, { return false; },
+            "Failed to prepare for type %u, ensure Init has been called", static_cast<uint32_t>(cmdType));
+    }
+    ASCENDC_HCCL_API_ASSERT(
+#if __NPU_ARCH__ == 3510
+        param.dataType >= HCCL_DATA_TYPE_INT8 && param.dataType < HCCL_DATA_TYPE_RESERVED,
+#else
+        cmdType == HcclCMDType::HCCL_CMD_BATCH_WRITE ||
+            (param.dataType >= HCCL_DATA_TYPE_INT8 && param.dataType < HCCL_DATA_TYPE_RESERVED),
+#endif
+        { return false; }, "Call Prepare[%d] failed, param HcclDataType is %d, invalid.",
+        static_cast<int32_t>(cmdType), static_cast<int32_t>(param.dataType));
+    if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        return CheckAlltoAllVPrepareParamValid(param, rankNum);
+    } else {
+        ASCENDC_HCCL_API_ASSERT(
+            param.sendBuf != nullptr && param.recvBuf != nullptr, { return false; },
+            "Call Prepare[%d] failed, the param sendBuf/recvBuf is nullptr, "
+            "which is an invalid parameter.",
+            static_cast<int32_t>(cmdType));
+        ASCENDC_HCCL_API_ASSERT(
+            param.count != 0, { return false; }, "Call Prepare[%d] failed, param sendCount/recvCount is 0, invalid.",
+            static_cast<int32_t>(cmdType));
     }
     return true;
 }
@@ -150,26 +154,24 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-#if __NPU_ARCH__ == 3510
-    const CommonPrepareParam& param, uint64_t tiling)
+    uint16_t queId, const CommonPrepareParam& param, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling)
 {
+#if __NPU_ARCH__ == 3510
+    (void)queId;
+    (void)srcGroupID;
+    (void)srcHandleID;
     if (!workingFlag_) {
         return;
     }
     __gm__ HcclMsg* hcclSendMsg = hcclMsgArea_->commMsg.singleMsg.sendMsgs + curMsgPosition_[0U];
     do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-        FlushDataCacheRaw(hcclSendMsg);
-#else
         FlushDataCache(hcclSendMsg);
-#endif
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[0U]);
-    AssembleHcclMsgV2A5(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+    AssembleHcclMsgV2(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+    FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg));
 #else
-    uint16_t queId, const CommonPrepareParam& param, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling)
-{
     if (!workingFlag_ && queueNum_ == 0U) {
         return;
     }
@@ -201,7 +203,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-    const AlltoAllVParamExt& param)
+    const AlltoAllVParamExt& param, uint32_t rankNum)
 {
     if (!workingFlag_) {
         return;
@@ -212,20 +214,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         FlushDataCache(hcclSendMsg);
     } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
     KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
-    uint32_t rankNum = GetRankDim();
-    if (!IsValidMsgExtRankNum(rankNum)) {
-        KERNEL_LOG(KERNEL_ERROR, "Invalid rank num %u for extended message.", rankNum);
-        return;
-    }
     AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
-    GlobalTensor<int64_t> globalHcclMsgArea;
     for (uint32_t i = 0U; i < rankNum; i += MAX_DCCI_CNT / sizeof(uint64_t)) {
-        FlushDataCache(globalHcclMsgArea, (hcclSendMsg->sendCounts + i));
-        FlushDataCache(globalHcclMsgArea, (hcclSendMsg->sendOffset + i));
-        FlushDataCache(globalHcclMsgArea, (hcclSendMsg->recvCounts + i));
-        FlushDataCache(globalHcclMsgArea, (hcclSendMsg->recvOffset + i));
+        FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendCounts + i));
+        FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendOffset + i));
+        FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->recvCounts + i));
+        FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->recvOffset + i));
     }
-    FlushDataCache(globalHcclMsgArea, hcclSendMsg->reserved);
+    FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->reserved));
 }
 
 template <const auto& config>
@@ -313,43 +309,40 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     const CommonPrepareParam& param)
 {
     HCCL_CHECK_RESTART(hcclMsgArea_, return INVALID_HANDLE_ID);
-//     ASCENDC_HCCL_API_ASSERT(
-//         param.repeat != 0U, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param repeat is 0, invalid.",
-//         static_cast<int32_t>(cmdType));
-// #if __NPU_ARCH__ != 3510
-//     if constexpr (cmdType != HcclCMDType::HCCL_CMD_BATCH_WRITE) {
-// #endif
-//         ASCENDC_HCCL_API_ASSERT(
-//             GetHcclDataTypeSize(param.dataType) != 0U, { return INVALID_HANDLE_ID; },
-//             "Call Prepare[%d] failed, param HcclDataType is %d, invalid.", static_cast<int32_t>(cmdType),
-//             static_cast<int32_t>(param.dataType));
-// #if __NPU_ARCH__ != 3510
-//     }
-// #endif
+    ASCENDC_HCCL_API_ASSERT(
+        param.repeat != 0U, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param repeat is 0, invalid.",
+        static_cast<int32_t>(cmdType));
+#if __NPU_ARCH__ != 3510
+    if constexpr (cmdType != HcclCMDType::HCCL_CMD_BATCH_WRITE) {
+#endif
+        ASCENDC_HCCL_API_ASSERT(
+            GetHcclDataTypeSize(param.dataType) != 0U, { return INVALID_HANDLE_ID; },
+            "Call Prepare[%d] failed, param HcclDataType is %d, invalid.", static_cast<int32_t>(cmdType),
+            static_cast<int32_t>(param.dataType));
+#if __NPU_ARCH__ != 3510
+    }
+#endif
     uint64_t tiling = 0UL;
-    const bool paramValid = CheckCommonPrepareParamValid<cmdType>(param, tiling);
-    // ASCENDC_HCCL_API_ASSERT(
-    //     paramValid, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param invalid.",
-    //     static_cast<int32_t>(cmdType));
+    uint32_t rankNum = 0U;
+    const bool paramValid = CheckCommonPrepareParamValid<cmdType>(param, tiling, rankNum);
+    ASCENDC_HCCL_API_ASSERT(
+        paramValid, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param invalid.",
+        static_cast<int32_t>(cmdType));
 
     HcclHandle handleId = ++curHandleId_;
-    // ASCENDC_HCCL_API_ASSERT(
-    //     handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
-    //     "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
-    //     static_cast<int32_t>(cmdType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    ASCENDC_HCCL_API_ASSERT(
+        handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
+        "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
+        static_cast<int32_t>(cmdType), handleId + 1, HCCL_MAX_HANDLE_ID);
     if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        SendMsgToServer(param.paramExt);
+        SendMsgToServer(param.paramExt, rankNum);
     }
 #if __NPU_ARCH__ == 3510
     constexpr uint16_t queId = 0U;
 #else
     const uint16_t queId = (queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType));
 #endif
-#if __NPU_ARCH__ == 3510
-    SendMsgToServer(param, tiling);
-#else
     SendMsgToServer(queId, param, -1, INVALID_HANDLE_ID, tiling);
-#endif
     handleIdMsgPosition_[handleId] = curMsgPosition_[queId];
     handleIdRepeat_[handleId] = param.repeat;
     handleId2CmdType_[handleId] = static_cast<uint8_t>(cmdType);
@@ -361,9 +354,9 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
         }
     }
     ++(curMsgPosition_[queId]);
-    // ASCENDC_HCCL_API_ASSERT(
-    //     curMsgPosition_[queId] < HCCL_MSG_CNT, { return INVALID_HANDLE_ID; },
-    //     "Message amount exceeds the maximum value when prepare.");
+    ASCENDC_HCCL_API_ASSERT(
+        curMsgPosition_[queId] < HCCL_MSG_CNT, { return INVALID_HANDLE_ID; },
+        "Message amount exceeds the maximum value when prepare.");
     return handleId;
 }
 
@@ -390,11 +383,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         KERNEL_LOG(
             KERNEL_INFO, "Only block idx[%ld] write sendMsgList[%u] when Finalize.", GetBlockIdx(),
             curMsgPosition_[idx]);
-#if __NPU_ARCH__ == 3510
-        SendMsgToServer(param, 0UL);
-#else
         SendMsgToServer(idx, param, -1, INVALID_HANDLE_ID, 0UL);
-#endif
         if constexpr (!sync) {
             ++(curMsgPosition_[idx]);
             ASCENDC_HCCL_API_ASSERT(
