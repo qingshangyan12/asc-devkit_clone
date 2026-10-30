@@ -234,6 +234,11 @@ __aicore__ inline void FixpipeL0cToL1(
     __cbuf__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL310<config.format>& intriParams,
     const FixpipeTiling& fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex = 0)
 {
+    ASCENDC_DEBUG_ASSERT(
+        (!(intriParams.isChannelSplit)),
+        KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
+                          "L0C Buffer(CO1) and dst position is L1 Buffer(C1), isChannelSplit must be set as false \n"));
     static_assert(
         SupportType<
             Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
@@ -331,6 +336,19 @@ __aicore__ inline void FixpipeL0cToOut(
     __gm__ DstT* dst, __cc__ SrcT* src, const FixpipeParamsL310<config.format>& intriParams,
     const FixpipeTiling& fixpipeTiling, uint16_t calNSize, uint16_t nIterIndex = 0)
 {
+    if (intriParams.isChannelSplit) {
+        ASCENDC_DEBUG_ASSERT(
+            (IsSameType<SrcT, float>::value && IsSameType<DstT, float>::value),
+            KERNEL_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check "
+                              "isChannelSplit value in Fixpipe, isChannelSplit can be set true only when src and dst "
+                              "are both float \n"));
+        ASCENDC_DEBUG_ASSERT(
+            (config.format == CO2Layout::NZ),
+            KERNEL_LOG_INTERNAL(
+                KERNEL_ERROR, "Failed to check format value in Fixpipe, "
+                              "when isChannelSplit is set true, format must be set as NZ \n"));
+    }
     static_assert(
         SupportType<
             Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
@@ -367,6 +385,9 @@ __aicore__ inline void FixpipeL0cToOut(
             intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
             false, false, false, false, false, nz2dnEn);
     }
+    ASCENDC_DEBUG_ASSERT(
+        !(IsSameType<SrcT, float>::value || IsSameType<DstT, float>::value),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupported float L0c 2 GM "));
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
