@@ -444,9 +444,13 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     }
     if (kind == ForcedAlgKind::BARE_NAME) {
         if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
+            // 未注册裸名不在此处拒绝：与 TryForcedAlgAndPrepareEngine 的既有回退语义
+            // 对齐（未注册 → WARNING + 回退默认 selector 兜底），保持"算法名指定错误
+            // 回退兜底算法"的行为；若 selector 也无法兜底才向上报不支持
             HCCL_WARNING(
-                "[MC2_EXT_ALG] algorithm[%s] is not registered in mc2_client for opType[%u].", algName.c_str(),
-                ccTiling->opType);
+                "[MC2_EXT_ALG] algorithm[%s] is not registered in mc2_client for opType[%u], fallback to default "
+                "selector.",
+                algName.c_str(), ccTiling->opType);
             return false;
         }
         HCCL_INFO("[MC2_EXT_ALG] ccu gate passed, algConfig[%s], algorithm registered.", ccTiling->algConfig);
