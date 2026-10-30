@@ -32,7 +32,7 @@ x86_64-linux-gnu-g++ --version
 
 ## 配置交叉编译
 
-交叉编译需配置`ENABLE_CROSS_COMPILE=True`和`CMAKE_CROSS_PLATFORM_COMPILER`。推荐在CMake配置命令中通过`-D`传入；也可以在顶层CMakeLists.txt中、`find_package(ASC)`之前设置。这些变量不能在ASC加载后才赋值。
+交叉编译需配置`ENABLE_CROSS_COMPILE=True`和`CMAKE_CROSS_PLATFORM_COMPILER`；如需覆盖默认的交叉编译库路径，可选配置`CMAKE_CROSS_LIBRARY_PATH`。推荐在CMake配置命令中通过`-D`传入；也可以在顶层CMakeLists.txt中、`find_package(ASC)`之前设置。这些变量不能在ASC加载后才赋值。
 
 使用`which aarch64-linux-gnu-g++`或`which x86_64-linux-gnu-g++`确认目标平台交叉编译器的路径。如果选择preset方式，需先按[编译配置](./basic_process.md#cmake-presets)创建`CMakePresets.json`，再将上述变量加入`cacheVariables`。下面的命令不依赖preset文件。
 
