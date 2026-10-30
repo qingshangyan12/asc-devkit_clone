@@ -12,7 +12,11 @@
 
 """Testcases for struct_parser.py"""
 
+import subprocess
+
 import pytest
+
+from extract_host_stub import StructRaw, generate_type_definition_content, search_undefined_types
 
 from struct_parser import ParseError, parse_struct_by_str
 
@@ -71,3 +75,25 @@ def test_parse_struct_by_str_05():
 def test_parse_struct_by_str_ex_01():
     with pytest.raises(ParseError):
         parse_struct_by_str(MY_STRUCT_EX)
+
+
+@pytest.mark.parametrize("child_type", ["Child", "struct Child"])
+@pytest.mark.parametrize("count", [1, 2])
+def test_struct_dependency_definitions_compile_and_preserve_layout(tmp_path, child_type, count):
+    field = f"{child_type} child" + (f"[{count}]" if count > 1 else "")
+    structs = {
+        "Child": StructRaw("Child", "struct Child { unsigned value; };"),
+        "Payload": StructRaw("Payload", "struct Payload { " + field + "; };"),
+    }
+    definitions = generate_type_definition_content(search_undefined_types({"Payload"}, structs), structs)
+    source = tmp_path / "definitions.cpp"
+    source.write_text(
+        definitions
+        + f"\nint main() {{ Payload value{{}}; return sizeof(value) == {count} * sizeof(unsigned) ? 0 : 1; }}\n",
+        encoding="utf-8",
+    )
+    executable = tmp_path / "definitions"
+    compiled = subprocess.run(["g++", "-std=c++17", str(source), "-o", str(executable)], text=True, capture_output=True)
+    assert compiled.returncode == 0, compiled.stdout + compiled.stderr
+    executed = subprocess.run([str(executable)], text=True, capture_output=True)
+    assert executed.returncode == 0, executed.stdout + executed.stderr

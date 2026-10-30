@@ -28,6 +28,8 @@ def extract_type_name(line: str) -> str:
     line = line.split(",")[0].strip()
     line = line.split("=")[0].strip()
     parts = line.split()
+    if parts and parts[0] == "struct":
+        parts = parts[1:]
     # drop the last part to get type name.
     return " ".join(parts[:-1])
 
