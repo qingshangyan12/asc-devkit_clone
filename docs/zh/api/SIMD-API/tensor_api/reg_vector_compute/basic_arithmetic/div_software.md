@@ -34,14 +34,18 @@ $$
 dst_i = \frac{src0_i}{src1_i}
 $$
 
-`operator/`直接使用硬件除法指令，不提供精度模式和算法配置；`div`支持通过模板参数配置除法精度和算法，并根据所选配置处理Subnormal。`INTRINSIC`模式的Subnormal处理遵循编译选项`--cce-ftz`；`PRECISION_0ULP_FTZ_TRUE`模式始终启用FTZ。
+`operator/`直接使用硬件除法指令，不提供精度模式和算法配置；`div`支持通过模板参数配置除法精度和算法，并根据所选配置处理Subnormal。
 
 ## 函数原型
 
 ```cpp
 enum class div_algo {
     INTRINSIC,
-    PRECISION_0ULP_FTZ_TRUE
+    PRECISION_0ULP_FTZ_TRUE,
+    DIFF_COMPENSATION,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_FALSE,
+    PRECISION_1ULP_FTZ_FALSE
 };
 
 template <bool precisionMode = false, div_algo algo = div_algo::INTRINSIC, typename T>
@@ -56,7 +60,7 @@ __simd_callee__ inline reg_tensor<T> div(
 | 参数名 | 描述 |
 | --- | --- |
 | precisionMode | 是否启用高精度除法路径。为`true`时使用差值补偿算法，仅支持`float`。精度说明请参考[关键特性说明](#关键特性说明)。 |
-| algo | 除法算法。仅支持`INTRINSIC`和`PRECISION_0ULP_FTZ_TRUE`。后者要求`precisionMode=true`。算法与Subnormal模式的关系请参考[关键特性说明](#关键特性说明)。 |
+| algo | 除法算法，支持上述枚举值。算法与Subnormal模式的关系请参考[关键特性说明](#关键特性说明)。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2** 参数说明
@@ -68,9 +72,13 @@ __simd_callee__ inline reg_tensor<T> div(
 
 ## 数据类型
 
-`precisionMode=false`且`algo=INTRINSIC`时支持：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+| algo | precisionMode=false时支持的数据类型 |
+| --- | --- |
+| `INTRINSIC`、`PRECISION_1ULP_FTZ_TRUE` | int16_t、uint16_t、half、int32_t、uint32_t、float |
+| `PRECISION_1ULP_FTZ_FALSE` | half、float |
+| `DIFF_COMPENSATION`、`PRECISION_0ULP_FTZ_TRUE`、`PRECISION_0ULP_FTZ_FALSE` | float |
 
-`precisionMode=true`的两种模式暂仅支持`float`。
+`precisionMode=true`时，各算法均仅支持float。非法数据类型或算法组合会产生编译错误。
 
 ## 返回值说明
 
@@ -79,7 +87,7 @@ __simd_callee__ inline reg_tensor<T> div(
 ## 约束说明
 
 - `src0.mask`用于指定参与计算的有效元素。调用接口前需通过`with_mask`预先设置；mask为0的元素不参与计算，输出对应元素置零。
-- `INTRINSIC`是否保留Subnormal由`--cce-ftz`决定；高精度模式不表示自动关闭FTZ。
+- `INTRINSIC`、`DIFF_COMPENSATION`是否保留Subnormal由`--cce-ftz`决定；高精度模式不表示自动关闭FTZ，详见[配置Subnormal模式](#配置subnormal模式)。
 - 使用整数类型时，除数不能为0，结果为按元素进行整数除法得到的商。
 - 使用浮点类型时，除数为`0.0`或`-0.0`且被除数为非零有限值时，结果为带相应符号的`inf`；被除数和除数均为零时，结果为`nan`。
 - 使用浮点类型时，被除数或除数为`nan`时，结果为`nan`；有限值除以`inf`或`-inf`时，结果为带相应符号的零；`inf`或`-inf`除以有限非零值时，结果为带相应符号的`inf`；`inf`或`-inf`除以`inf`或`-inf`时，结果为`nan`。
@@ -94,8 +102,9 @@ __simd_callee__ inline reg_tensor<T> div(
 | precisionMode | algo | 支持的浮点类型 | 最大精度误差 |
 | --- | --- | --- | --- |
 | `false`（默认值） | `div_algo::INTRINSIC`（默认值） | half、float | 1 ULP |
-| `true` | `div_algo::INTRINSIC` | float | 0 ULP |
-| `true` | `div_algo::PRECISION_0ULP_FTZ_TRUE` | float | 0 ULP |
+| `false` | `div_algo::PRECISION_1ULP_FTZ_TRUE`、`div_algo::PRECISION_1ULP_FTZ_FALSE` | half、float | 1 ULP |
+| `false` | `div_algo::DIFF_COMPENSATION`、`div_algo::PRECISION_0ULP_FTZ_TRUE`、`div_algo::PRECISION_0ULP_FTZ_FALSE` | float | 0 ULP |
+| `true` | 所有支持的算法 | float | 0 ULP |
 
 `precisionMode=true`时通过差值补偿提高除法精度，但不表示自动保留Subnormal。Subnormal的处理方式由`algo`与编译选项共同决定。
 
@@ -114,16 +123,33 @@ FTZ（Flush-To-Zero）是一种浮点运算模式，当结果为[Subnormal](../.
 
 #### 显式指定的算法
 
-`div_algo::PRECISION_0ULP_FTZ_TRUE`要求`precisionMode=true`，仅支持float类型，始终采用FTZ模式，不受`--cce-ftz`取值影响。即使设置`--cce-ftz=false`，该算法也不保留Subnormal结果。
+下表列出不同`precisionMode`、`algo`与`--cce-ftz`编译选项组合下的浮点配置。表中枚举值省略`div_algo::`前缀，ULP表示对应Subnormal模式下的最大精度误差。
 
-Tensor API当前仅支持上述三种配置，不支持直接指定基础API中的`DivAlgo::DIFF_COMPENSATION`、`DivAlgo::PRECISION_1ULP_FTZ_TRUE`或名称中包含`FTZ_FALSE`的算法。
+| precisionMode | algo | 支持的浮点类型 | `--cce-ftz=true`（默认值）：Subnormal处理及最大精度误差 | `--cce-ftz=false`：Subnormal处理及最大精度误差 |
+| --- | --- | --- | --- | --- |
+| `false` | `INTRINSIC`（默认值） | half、float | FTZ，1 ULP | 保留Subnormal，1 ULP |
+| `false` | `DIFF_COMPENSATION` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
+| `false` | `PRECISION_0ULP_FTZ_TRUE` | float | FTZ，0 ULP | FTZ，0 ULP |
+| `false` | `PRECISION_0ULP_FTZ_FALSE` | float | 保留Subnormal，0 ULP | 保留Subnormal，0 ULP |
+| `false` | `PRECISION_1ULP_FTZ_TRUE` | half、float | FTZ，1 ULP | FTZ，1 ULP |
+| `false` | `PRECISION_1ULP_FTZ_FALSE` | half、float | 保留Subnormal，1 ULP | 保留Subnormal，1 ULP |
+| `true` | `INTRINSIC`（默认值） | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
+| `true` | `DIFF_COMPENSATION` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
+| `true` | `PRECISION_0ULP_FTZ_TRUE` | float | FTZ，0 ULP | FTZ，0 ULP |
+| `true` | `PRECISION_0ULP_FTZ_FALSE` | float | 保留Subnormal，0 ULP | 保留Subnormal，0 ULP |
+| `true` | `PRECISION_1ULP_FTZ_TRUE` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
+| `true` | `PRECISION_1ULP_FTZ_FALSE` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
+
+当`precisionMode=true`时，始终使用0 ULP算法。`PRECISION_0ULP_FTZ_TRUE`始终采用FTZ路径，`PRECISION_0ULP_FTZ_FALSE`始终保留Subnormal；其余算法的Subnormal处理跟随`--cce-ftz`。
+
+`precisionMode`不是FTZ开关，设置为`false`也不表示只能达到1 ULP精度。需要显式控制FTZ行为时，建议设置`precisionMode=false`，通过`algo`同时选择精度和FTZ策略，避免高精度模式覆盖显式1 ULP算法的FTZ语义。显式0 ULP算法的精度和FTZ策略不受`precisionMode`影响。
 
 #### 使用建议
 
 - 一般场景可使用`div(src0, src1)`，在`--cce-ftz=true`（默认值）时采用硬件除法路径，避免高精度差值补偿的额外开销。
 - 需要0 ULP精度且Subnormal处理跟随编译选项时，使用`div<true>(src0, src1)`。
 - 需要0 ULP精度且始终采用FTZ模式时，使用`div<true, div_algo::PRECISION_0ULP_FTZ_TRUE>(src0, src1)`。
-- 需要保留Subnormal结果时，设置`--cce-ftz=false`并使用`div_algo::INTRINSIC`；若同时要求0 ULP精度，使用`div<true>(src0, src1)`。
+- 需要保留Subnormal结果且不依赖编译选项时，使用`div<false, div_algo::PRECISION_1ULP_FTZ_FALSE>(src0, src1)`；若同时要求0 ULP精度，使用`div<false, div_algo::PRECISION_0ULP_FTZ_FALSE>(src0, src1)`。
 
 ## 调用示例
 
@@ -137,4 +163,8 @@ using asc::te::experimental::div_algo;
 auto default_result = div(src0, src1);
 auto precise_result = div<true>(src0, src1);
 auto ftz_result = div<true, div_algo::PRECISION_0ULP_FTZ_TRUE>(src0, src1);
+auto compensation_result = div<false, div_algo::DIFF_COMPENSATION>(src0, src1);
+auto explicit_ftz_result = div<false, div_algo::PRECISION_1ULP_FTZ_TRUE>(src0, src1);
+auto subnormal_result = div<false, div_algo::PRECISION_1ULP_FTZ_FALSE>(src0, src1);
+auto precise_subnormal_result = div<false, div_algo::PRECISION_0ULP_FTZ_FALSE>(src0, src1);
 ```
