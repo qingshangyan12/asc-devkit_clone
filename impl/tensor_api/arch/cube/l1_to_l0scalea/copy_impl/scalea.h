@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l1_to_l0scalea/copy_impl/scalea.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -38,17 +38,19 @@ public:
         } else if constexpr (DstTensor::layout_type::depth == four_dim_data) {
             load_data_impl<trait, DstTensor, SrcTensor>(dst, src);
         } else {
-            static_assert(DstTensor::layout_type::depth == four_dim_data
-                              || DstTensor::layout_type::depth == five_dim_data,
-                          "load_data_l1_to_l0a_microscale only supports the plain fractal layout "
-                          "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
+            static_assert(
+                DstTensor::layout_type::depth == four_dim_data || DstTensor::layout_type::depth == five_dim_data,
+                "load_data_l1_to_l0a_microscale only supports the plain fractal layout "
+                "((row0,row1),(col0,col1)) or the batch layout (B,((row0,row1),(col0,col1))).");
         }
     }
 
-    template <const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         check_template<trait, DstTensor, SrcTensor>();
         auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
@@ -59,8 +61,8 @@ public:
         auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src.layout()) >> 5;
         auto dst_stride = get_element<attr_info::stride, attr_info::row, 1>(dst.layout()) >> 5;
         uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>((dst.data() + dst_offset).get()));
-        load_l1_to_l0a_scale_instr::load_data_with_offset(mx_dst_addr, src, _0{}, src_offset, 0, 0, m_step, k_step,
-                                                          src_stride, dst_stride);
+        load_l1_to_l0a_scale_instr::load_data_with_offset(
+            mx_dst_addr, src, _0{}, src_offset, 0, 0, m_step, k_step, src_stride, dst_stride);
     }
 
 private:
@@ -72,8 +74,8 @@ private:
     }
 
     template <typename DstTensor, typename SrcTensor, typename DstLayout, typename SrcLayout>
-    __aicore__ inline static void load_data_fractal(const DstTensor& dst, const SrcTensor& src,
-                                                    const DstLayout& dst_layout, const SrcLayout& src_layout)
+    __aicore__ inline static void load_data_fractal(
+        const DstTensor& dst, const SrcTensor& src, const DstLayout& dst_layout, const SrcLayout& src_layout)
     {
         uint16_t m_start_position = 0;
         uint16_t k_start_position = 0;
@@ -84,8 +86,8 @@ private:
         auto src_stride = get_element<attr_info::stride, attr_info::row, 1>(src_layout) >> 5;
         auto dst_stride = k_step;
         uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.data().get()));
-        load_l1_to_l0a_scale_instr::load_data(mx_dst_addr, src.data().get(), m_start_position, k_start_position, m_step,
-                                              k_step, src_stride, dst_stride);
+        load_l1_to_l0a_scale_instr::load_data(
+            mx_dst_addr, src.data().get(), m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
     }
 
     template <const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor>
@@ -101,9 +103,10 @@ private:
         auto src_no_batch_layout = remove_batch_dim(src.layout());
         auto batch_num = get<0>(dst.layout().shape());
         for (uint32_t i = 0; i < batch_num; ++i) {
-            load_data_fractal(dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
-                              src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))), dst_no_batch_layout,
-                              src_no_batch_layout);
+            load_data_fractal(
+                dst(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))),
+                src(make_coord(i, make_coord(make_coord(0, 0), make_coord(0, 0)))), dst_no_batch_layout,
+                src_no_batch_layout);
         }
     }
 };

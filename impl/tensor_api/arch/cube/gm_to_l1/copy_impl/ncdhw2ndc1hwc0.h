@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/gm_to_l1/copy_impl/ncdhw2ndc1hwc0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -67,7 +67,7 @@ public:
             loop4_src_stride = loop4_src_stride >> 1;
             loop1_src_stride = loop1_src_stride >> 1;
         }
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // Per depth slice: index the slice with tensor(coord) to offset the address (engine moves by
         // Layout()(coord); pattern/trait preserved), same idiom as the batch-loop scenarios. The DMA
@@ -83,10 +83,12 @@ public:
         }
     }
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape)
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
     {
         using type = typename SrcTensor::element_type;
         auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
@@ -113,11 +115,10 @@ public:
         for (uint16_t d = 0; d < depth; ++d) {
             auto depth_src_offset = src_offset + d * get<2>(src_layout.stride());
             auto depth_dst_offset = dst_offset + d * get<1>(dst_layout.stride());
-            copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(dst, src, depth_dst_offset, depth_src_offset, dn_num,
-                                                                   loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
-                                                                   loop1_src_stride, src.engine().get_cache_mode(),
-                                                                   n_value, d_value, loop4_src_stride, false,
-                                                                   trait.pre_allocation);
+            copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(
+                dst, src, depth_dst_offset, depth_src_offset, dn_num, loop2_dst_stride, loop3_dst_stride,
+                loop4_dst_stride, loop1_src_stride, static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()),
+                n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
         }
     }
 };

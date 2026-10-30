@@ -32,14 +32,13 @@ template <typename tensor_type, typename coord_type>
 struct has_member_reg_load<
     tensor_type, coord_type,
     void_t<decltype(AscendC::Std::declval<const tensor_type&>()
-                         .template load<asc::te::experimental::load_sideband_mode::direct>(
-                             AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
+                        .template load<asc::te::experimental::load_sideband_mode::direct>(
+                            AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
 
-template <typename T,
-          asc::te::experimental::load_sideband_mode sideband_mode =
-              asc::te::experimental::load_sideband_mode::direct>
-__simd_vf__ inline void compile_reg_local_tensor_load_store(
-    __ubuf__ T* dst, __ubuf__ T* src, vector_bool mask)
+template <
+    typename T,
+    asc::te::experimental::load_sideband_mode sideband_mode = asc::te::experimental::load_sideband_mode::direct>
+__simd_vf__ inline void compile_reg_local_tensor_load_store(__ubuf__ T* dst, __ubuf__ T* src, vector_bool mask)
 {
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto dst_mem = asc::te::make_mem_ptr<asc::te::location::ub>(dst);
@@ -54,7 +53,7 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
     static_assert(!has_member_reg_load<decltype(src_tensor), coord_type>::value);
     static_assert(AscendC::Std::is_base_of_v<tensor_api_base, decltype(src_tensor)>);
 
-    asc::te::experimental::reg_tensor<bool> mask_reg {mask};
+    asc::te::experimental::reg_tensor<bool> mask_reg{mask};
     auto value = asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0)).with_mask(mask_reg);
     static_assert(AscendC::Std::is_same_v<typename decltype(value)::elem_type, T>);
     asc::te::experimental::store(dst_tensor, asc::te::make_coord(0), value);
@@ -72,19 +71,19 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store_without_coord(
     auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
 
-    auto value = asc::te::experimental::load(src_tensor).with_mask(
-        asc::te::experimental::reg_tensor<bool> {mask});
+    auto value = asc::te::experimental::load(src_tensor).with_mask(asc::te::experimental::reg_tensor<bool>{mask});
     static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::store(dst_tensor, value)), void>);
     asc::te::experimental::store(dst_tensor, value);
 
-    asc::te::experimental::reg_tensor<T> dst0 {mask};
-    asc::te::experimental::reg_tensor<T> dst1 {mask};
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::load(src_tensor, dst0, dst1)), void>);
-    asc::te::experimental::load(src_tensor, dst0, dst1);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(asc::te::experimental::store(dst_tensor, dst0, dst1)), void>);
-    asc::te::experimental::store(dst_tensor, dst0, dst1);
+    auto deinterleaved = asc::te::experimental::load<asc::te::experimental::load_sideband_mode::deintlv>(src_tensor);
+    static_assert(AscendC::Std::is_same_v<decltype(deinterleaved), asc::te::experimental::reg_pair<T>>);
+    asc::te::experimental::reg_tensor<bool> mask_reg{mask};
+    deinterleaved.first.with_mask(mask_reg);
+    deinterleaved.second.with_mask(mask_reg);
+    static_assert(AscendC::Std::is_same_v<
+                  decltype(asc::te::experimental::store(dst_tensor, deinterleaved.first, deinterleaved.second)), void>);
+    asc::te::experimental::store(dst_tensor, deinterleaved.first, deinterleaved.second);
 
     auto broadcast = asc::te::experimental::load_broadcast(src_tensor);
     static_assert(AscendC::Std::is_same_v<decltype(broadcast), asc::te::experimental::reg_tensor<T>>);
@@ -97,14 +96,11 @@ __simd_vf__ inline void compile_reg_local_tensor_load_mode(__ubuf__ uint8_t* src
     auto layout = asc::te::make_layout(asc::te::make_shape(256));
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
     if constexpr (sideband_mode == asc::te::experimental::load_sideband_mode::deintlv) {
-        asc::te::experimental::reg_tensor<uint8_t> dst0;
-        asc::te::experimental::reg_tensor<uint8_t> dst1;
-        static_assert(AscendC::Std::is_same_v<
-                      decltype(asc::te::experimental::load(src_tensor, asc::te::make_coord(0), dst0, dst1)), void>);
-        asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0), dst0, dst1);
+        auto value = asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0));
+        static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_pair<uint8_t>>);
         auto mask = asc::te::experimental::all_mask<uint8_t>();
-        dst0.with_mask(mask);
-        dst1.with_mask(mask);
+        value.first.with_mask(mask);
+        value.second.with_mask(mask);
     } else {
         auto value = asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0));
         static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<uint8_t>>);
@@ -122,35 +118,15 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
     value.with_mask(asc::te::experimental::all_mask<float>());
 }
 
-template <typename TensorDataType, typename IndexDataType, typename DstDataType = TensorDataType>
-__simd_vf__ inline void compile_reg_local_tensor_gather(__ubuf__ TensorDataType* src, vector_bool mask)
-{
-    auto layout = asc::te::make_layout(asc::te::make_shape(64));
-    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
-    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
-
-    auto value = asc::te::experimental::gather<DstDataType>(src_tensor, asc::te::make_coord(0), index);
-    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DstDataType>>);
-
-    auto value_without_coord = asc::te::experimental::gather<DstDataType>(src_tensor, index);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(value_without_coord), asc::te::experimental::reg_tensor<DstDataType>>);
-
-    if constexpr (AscendC::Std::is_same_v<TensorDataType, DstDataType>) {
-        auto inferred_value = asc::te::experimental::gather(src_tensor, asc::te::make_coord(0), index);
-        static_assert(
-            AscendC::Std::is_same_v<decltype(inferred_value), asc::te::experimental::reg_tensor<TensorDataType>>);
-        (void)inferred_value;
-    }
-}
-
 template <typename DataType, typename IndexDataType>
 __simd_vf__ inline void compile_reg_register_gather(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<DataType> src {mask};
-    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
+    asc::te::experimental::reg_tensor<DataType> src{};
+    asc::te::experimental::reg_tensor<IndexDataType> index{};
+    index.mask = mask;
     auto value = asc::te::experimental::gather(src, index);
     static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DataType>>);
+    EXPECT_EQ(value.mask, index.mask);
 }
 
 template <asc::te::experimental::store_sideband_mode sideband_mode>
@@ -158,15 +134,16 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
 {
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
-    asc::te::experimental::reg_tensor<uint32_t> src0 {mask};
+    asc::te::experimental::reg_tensor<uint32_t> src0{mask};
     if constexpr (sideband_mode == asc::te::experimental::store_sideband_mode::intlv) {
-        asc::te::experimental::reg_tensor<uint32_t> src1 {mask};
+        asc::te::experimental::reg_tensor<uint32_t> src1{mask};
         static_assert(AscendC::Std::is_same_v<
                       decltype(asc::te::experimental::store(dst_tensor, asc::te::make_coord(0), src0, src1)), void>);
         asc::te::experimental::store<sideband_mode>(dst_tensor, asc::te::make_coord(0), src0, src1);
     } else {
-        static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::store<sideband_mode>(
-                                                     dst_tensor, asc::te::make_coord(0), src0)), void>);
+        static_assert(
+            AscendC::Std::is_same_v<
+                decltype(asc::te::experimental::store<sideband_mode>(dst_tensor, asc::te::make_coord(0), src0)), void>);
         asc::te::experimental::store<sideband_mode>(dst_tensor, asc::te::make_coord(0), src0);
     }
 }
@@ -223,14 +200,12 @@ __simd_vf__ inline void compile_reg_mask(uint32_t remain)
 template <typename T>
 __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_bool src1)
 {
-    asc::te::experimental::reg_tensor<bool> mask0 {src0};
-    asc::te::experimental::reg_tensor<bool> mask1 {src1};
+    asc::te::experimental::reg_tensor<bool> mask0{src0};
+    asc::te::experimental::reg_tensor<bool> mask1{src1};
     auto interleaved = asc::te::experimental::interleave<T>(mask0, mask1);
     static_assert(AscendC::Std::is_same_v<decltype(interleaved), asc::te::experimental::reg_pair<bool>>);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(interleaved.first), asc::te::experimental::reg_tensor<bool>>);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(interleaved.second), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(interleaved.first), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(interleaved.second), asc::te::experimental::reg_tensor<bool>>);
 
     auto restored = asc::te::experimental::deinterleave<T>(interleaved.first, interleaved.second);
     static_assert(AscendC::Std::is_same_v<decltype(restored), asc::te::experimental::reg_pair<bool>>);
@@ -308,7 +283,7 @@ STORE_SCATTER_TEST(float, uint32_t)
 
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
 {
-    asc::te::experimental::reg_tensor<float> value {};
+    asc::te::experimental::reg_tensor<float> value{};
     (void)value.reg;
     (void)value.mask;
 
@@ -317,18 +292,13 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_load_store;
     (void)compile_load_store_without_coord;
 
-    auto compile_direct =
-        &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::direct>;
-    auto compile_deintlv =
-        &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::deintlv>;
+    auto compile_direct = &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::direct>;
+    auto compile_deintlv = &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::deintlv>;
     auto compile_downsample =
         &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::downsample>;
-    auto compile_unpack =
-        &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::unpack>;
-    auto compile_unpack4 =
-        &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::unpack4>;
-    auto compile_upsample =
-        &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::upsample>;
+    auto compile_unpack = &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::unpack>;
+    auto compile_unpack4 = &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::unpack4>;
+    auto compile_upsample = &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::upsample>;
     (void)compile_direct;
     (void)compile_deintlv;
     (void)compile_downsample;
@@ -336,8 +306,7 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_unpack4;
     (void)compile_upsample;
 
-    auto compile_broadcast_elem =
-        &compile_reg_local_tensor_broadcast<asc::te::experimental::broadcast_mode::elem>;
+    auto compile_broadcast_elem = &compile_reg_local_tensor_broadcast<asc::te::experimental::broadcast_mode::elem>;
     auto compile_broadcast_datablock =
         &compile_reg_local_tensor_broadcast<asc::te::experimental::broadcast_mode::datablock>;
     auto compile_broadcast_elem2datablock =
@@ -346,33 +315,12 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_broadcast_datablock;
     (void)compile_broadcast_elem2datablock;
 
-    auto compile_gather_ub_b8 = &compile_reg_local_tensor_gather<int8_t, uint16_t>;
-    auto compile_gather_ub_b16 = &compile_reg_local_tensor_gather<half, uint16_t>;
-    auto compile_gather_ub_b16_uint32_index = &compile_reg_local_tensor_gather<half, uint32_t>;
-    auto compile_gather_ub_b32 = &compile_reg_local_tensor_gather<float, uint32_t>;
-    auto compile_gather_ub_widen_s8 = &compile_reg_local_tensor_gather<int8_t, uint16_t, int16_t>;
-    auto compile_gather_ub_widen_u8 = &compile_reg_local_tensor_gather<uint8_t, uint16_t, uint16_t>;
-    auto compile_gather_reg_b8 = &compile_reg_register_gather<int8_t, uint8_t>;
-    auto compile_gather_reg_b16 = &compile_reg_register_gather<half, uint16_t>;
-    auto compile_gather_reg_b32 = &compile_reg_register_gather<uint32_t, uint32_t>;
-    (void)compile_gather_ub_b8;
-    (void)compile_gather_ub_b16;
-    (void)compile_gather_ub_b16_uint32_index;
-    (void)compile_gather_ub_b32;
-    (void)compile_gather_ub_widen_s8;
-    (void)compile_gather_ub_widen_u8;
-    (void)compile_gather_reg_b8;
-    (void)compile_gather_reg_b16;
-    (void)compile_gather_reg_b32;
-
     auto compile_store_direct =
         &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::direct>;
     auto compile_store_1st =
         &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::store_1st>;
-    auto compile_store_intlv =
-        &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::intlv>;
-    auto compile_store_pack =
-        &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::pack>;
+    auto compile_store_intlv = &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::intlv>;
+    auto compile_store_pack = &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::pack>;
     auto compile_store_pack_quarter =
         &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::pack_quarter>;
     (void)compile_store_direct;
@@ -395,5 +343,28 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_reg_mask_data_reorder_b16;
     (void)compile_reg_mask_data_reorder_b32;
 }
+
+#define TENSOR_API_REG_GATHER_TEST(DataType, IndexType)             \
+    TEST(tensor_api_reg_tensor_3510, gather_register_##DataType)    \
+    {                                                               \
+        auto mask = asc::te::experimental::all_mask<IndexType>();   \
+        compile_reg_register_gather<DataType, IndexType>(mask.reg); \
+    }
+
+TENSOR_API_REG_GATHER_TEST(int8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(uint8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e4m3fn_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e5m2_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(fp8_e8m0_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(hifloat8_t, uint8_t)
+TENSOR_API_REG_GATHER_TEST(int16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(uint16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(half, uint16_t)
+TENSOR_API_REG_GATHER_TEST(bfloat16_t, uint16_t)
+TENSOR_API_REG_GATHER_TEST(int32_t, uint32_t)
+TENSOR_API_REG_GATHER_TEST(uint32_t, uint32_t)
+TENSOR_API_REG_GATHER_TEST(float, uint32_t)
+
+#undef TENSOR_API_REG_GATHER_TEST
 
 } // namespace

@@ -19,8 +19,8 @@ class TensorApiVectorDataPadding3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestFillScalar()
 {
-    auto mask  = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
-    auto dst = asc::te::experimental::fill(T {}, mask);
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    auto dst = asc::te::experimental::fill(T{}, mask);
     static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, mask.reg);
 }
@@ -28,8 +28,8 @@ __aicore__ inline void TestFillScalar()
 template <typename T>
 __aicore__ inline void TestFillRegTensor()
 {
-    asc::te::experimental::reg_tensor<T> src {};
-    auto mask  = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    asc::te::experimental::reg_tensor<T> src{};
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
     auto dst = asc::te::experimental::fill(src, mask);
     static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, mask.reg);
@@ -38,9 +38,9 @@ __aicore__ inline void TestFillRegTensor()
 template <typename T>
 __aicore__ inline void TestFillDefaultMask()
 {
-    asc::te::experimental::reg_tensor<T> src {};
+    asc::te::experimental::reg_tensor<T> src{};
 
-    auto scalar_dst = asc::te::experimental::fill(T {});
+    auto scalar_dst = asc::te::experimental::fill(T{});
     auto reg_tensor_dst = asc::te::experimental::fill(src);
     static_assert(AscendC::Std::is_same_v<decltype(scalar_dst), asc::te::experimental::reg_tensor<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(reg_tensor_dst), asc::te::experimental::reg_tensor<T>>);
@@ -49,22 +49,72 @@ __aicore__ inline void TestFillDefaultMask()
     EXPECT_EQ(reg_tensor_dst.mask, mask.reg);
 }
 
-#define DATA_PADDING_TEST(Function, DataType)                       \
-    TEST_F(TensorApiVectorDataPadding3510, Function##_##DataType)   \
-    {                                                               \
-        Test##Function<DataType>();                                 \
-        SUCCEED();                                                   \
+template <typename T>
+__aicore__ inline void TestFillDstScalar()
+{
+    asc::te::experimental::reg_tensor<T> dst{};
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every4, T>();
+    dst.mask = dst_mask.reg;
+
+    auto zeroing_dst = asc::te::experimental::fill(dst, T{}, mask);
+    auto merging_dst = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(dst, T{}, mask);
+    static_assert(AscendC::Std::is_same_v<decltype(zeroing_dst), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(merging_dst), asc::te::experimental::reg_tensor<T>>);
+    EXPECT_EQ(zeroing_dst.mask, dst_mask.reg);
+    EXPECT_EQ(merging_dst.mask, dst_mask.reg);
+}
+
+template <typename T>
+__aicore__ inline void TestFillDstRegTensor()
+{
+    asc::te::experimental::reg_tensor<T> dst{};
+    asc::te::experimental::reg_tensor<T> src{};
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, T>();
+    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every4, T>();
+    dst.mask = dst_mask.reg;
+
+    auto zeroing_dst = asc::te::experimental::fill(dst, src, mask);
+    auto merging_dst = asc::te::experimental::fill<asc::te::experimental::merge_mode::merging>(dst, src, mask);
+    static_assert(AscendC::Std::is_same_v<decltype(zeroing_dst), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(merging_dst), asc::te::experimental::reg_tensor<T>>);
+    EXPECT_EQ(zeroing_dst.mask, dst_mask.reg);
+    EXPECT_EQ(merging_dst.mask, dst_mask.reg);
+}
+
+template <typename T>
+__aicore__ inline void TestFillDstDefaultMask()
+{
+    asc::te::experimental::reg_tensor<T> dst{};
+    asc::te::experimental::reg_tensor<T> src{};
+    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every4, T>();
+    dst.mask = dst_mask.reg;
+
+    auto scalar_dst = asc::te::experimental::fill(dst, T{});
+    auto reg_tensor_dst = asc::te::experimental::fill(dst, src);
+    EXPECT_EQ(scalar_dst.mask, dst_mask.reg);
+    EXPECT_EQ(reg_tensor_dst.mask, dst_mask.reg);
+}
+
+#define DATA_PADDING_TEST(Function, DataType)                     \
+    TEST_F(TensorApiVectorDataPadding3510, Function##_##DataType) \
+    {                                                             \
+        Test##Function<DataType>();                               \
+        SUCCEED();                                                \
     }
 
-#define DATA_PADDING_TYPE_TESTS(DataType)       \
-    DATA_PADDING_TEST(FillScalar, DataType)     \
-    DATA_PADDING_TEST(FillRegTensor, DataType)  \
-    DATA_PADDING_TEST(FillDefaultMask, DataType)
+#define DATA_PADDING_TYPE_TESTS(DataType)         \
+    DATA_PADDING_TEST(FillScalar, DataType)       \
+    DATA_PADDING_TEST(FillRegTensor, DataType)    \
+    DATA_PADDING_TEST(FillDefaultMask, DataType)  \
+    DATA_PADDING_TEST(FillDstScalar, DataType)    \
+    DATA_PADDING_TEST(FillDstRegTensor, DataType) \
+    DATA_PADDING_TEST(FillDstDefaultMask, DataType)
 
 DATA_PADDING_TYPE_TESTS(uint8_t)
 DATA_PADDING_TYPE_TESTS(int8_t)
 DATA_PADDING_TYPE_TESTS(fp8_e4m3fn_t)
-//DATA_PADDING_TYPE_TESTS(fp8_e8m0_t)
+DATA_PADDING_TYPE_TESTS(fp8_e8m0_t)
 DATA_PADDING_TYPE_TESTS(fp8_e5m2_t)
 DATA_PADDING_TYPE_TESTS(uint16_t)
 DATA_PADDING_TYPE_TESTS(int16_t)

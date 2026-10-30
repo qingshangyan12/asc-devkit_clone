@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/tensor/layout_frame.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -39,23 +39,22 @@ using layout_format_set = tuple_map<
     Std::tuple<nhwc_layout_ptn, make_nhwc_frame_layout>, Std::tuple<nc1hwc0_layout_ptn, make_nc1hwc0_frame_layout>,
     Std::tuple<ncdhw_layout_ptn, make_ncdhw_frame_layout>, Std::tuple<ndc1hwc0_layout_ptn, make_ndc1hwc0_frame_layout>>;
 
-using format_trait_set =
-    tuple_map<Std::tuple<nz_layout_ptn, layout_trait_default<>>,
-              Std::tuple<nd_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<dn_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<nd_ext_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<dn_ext_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<nn_layout_ptn, layout_trait<Std::ignore_t, _2>>,
-              Std::tuple<zz_layout_ptn, layout_trait_default<>>, Std::tuple<zn_layout_ptn, layout_trait_default<>>,
-              Std::tuple<scalea_nd_layout_ptn, layout_trait<Std::ignore_t, _2>>,
-              Std::tuple<scalea_dn_layout_ptn, layout_trait<Std::ignore_t, _2>>,
-              Std::tuple<scaleb_nd_layout_ptn, layout_trait<Std::ignore_t, _2>>,
-              Std::tuple<scaleb_dn_layout_ptn, layout_trait<Std::ignore_t, _2>>,
-              Std::tuple<nchw_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<nhwc_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<nc1hwc0_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<ncdhw_layout_ptn, layout_trait<Std::ignore_t, _1>>,
-              Std::tuple<ndc1hwc0_layout_ptn, layout_trait<Std::ignore_t, _1>>>;
+using format_trait_set = tuple_map<
+    Std::tuple<nz_layout_ptn, layout_trait_default<>>, Std::tuple<nd_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<dn_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<nd_ext_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<dn_ext_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<nn_layout_ptn, layout_trait<Std::ignore_t, _2>>, Std::tuple<zz_layout_ptn, layout_trait_default<>>,
+    Std::tuple<zn_layout_ptn, layout_trait_default<>>,
+    Std::tuple<scalea_nd_layout_ptn, layout_trait<Std::ignore_t, _2>>,
+    Std::tuple<scalea_dn_layout_ptn, layout_trait<Std::ignore_t, _2>>,
+    Std::tuple<scaleb_nd_layout_ptn, layout_trait<Std::ignore_t, _2>>,
+    Std::tuple<scaleb_dn_layout_ptn, layout_trait<Std::ignore_t, _2>>,
+    Std::tuple<nchw_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<nhwc_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<nc1hwc0_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<ncdhw_layout_ptn, layout_trait<Std::ignore_t, _1>>,
+    Std::tuple<ndc1hwc0_layout_ptn, layout_trait<Std::ignore_t, _1>>>;
 
 template <typename Trait, typename = void>
 struct is_frame_layout_trait : Std::false_type {};
@@ -71,9 +70,10 @@ struct trait_conversion {
 private:
     using raw_trait = Std::remove_cvref_t<TraitType>;
 
-    static_assert(Std::is_same_v<raw_trait, Std::ignore_t> || is_integral_constant_v<raw_trait>
-                      || is_frame_layout_trait_v<raw_trait> || is_data_type<raw_trait>,
-                  "TraitType must be ignore_t, integral constant, frame layout trait, or data type.");
+    static_assert(
+        Std::is_same_v<raw_trait, Std::ignore_t> || is_integral_constant_v<raw_trait> ||
+            is_frame_layout_trait_v<raw_trait> || is_data_type<raw_trait>,
+        "TraitType must be ignore_t, integral constant, frame layout trait, or data type.");
 
     using from_pattern = typename format_trait_set::template get<LayoutPattern>;
     using from_int = layout_trait<Std::ignore_t, raw_trait>;
@@ -82,9 +82,10 @@ private:
 
     using converted = typename Std::conditional<
         Std::is_same_v<raw_trait, Std::ignore_t>, from_pattern,
-        typename Std::conditional<is_integral_constant_v<raw_trait>, from_int,
-                                  typename Std::conditional<is_frame_layout_trait_v<raw_trait>, from_trait,
-                                                            from_data_type>::type>::type>::type;
+        typename Std::conditional<
+            is_integral_constant_v<raw_trait>, from_int,
+            typename Std::conditional<is_frame_layout_trait_v<raw_trait>, from_trait, from_data_type>::type>::type>::
+        type;
 
 public:
     using type = converted;
@@ -100,8 +101,8 @@ template <typename Maker, typename Trait, typename = void>
 struct supports_row_col_make : Std::false_type {};
 
 template <typename Maker, typename Trait>
-struct supports_row_col_make<Maker, Trait,
-                             void_t<decltype(Maker::template make<Trait>(Std::declval<int>(), Std::declval<int>()))>>
+struct supports_row_col_make<
+    Maker, Trait, void_t<decltype(Maker::template make<Trait>(Std::declval<int>(), Std::declval<int>()))>>
     : Std::true_type {};
 
 template <typename Maker, typename Trait>
@@ -126,15 +127,15 @@ __aicore__ inline constexpr auto batch_stride_at(const BatchTuple& batches, cons
 //   (batch0, batch1, ((row0, row1), (col0, col1)))
 // so rank is batch_num + 1 (not a chain of nested single-batch layouts).
 template <typename LayoutPattern, typename Trait, typename BatchTuple, typename BaseLayout, size_t... batch_is>
-__aicore__ inline constexpr auto make_flat_batch_layout(const BatchTuple& batches, const BaseLayout& base,
-                                                        Std::index_sequence<batch_is...>)
+__aicore__ inline constexpr auto make_flat_batch_layout(
+    const BatchTuple& batches, const BaseLayout& base, Std::index_sequence<batch_is...>)
 {
     constexpr size_t batch_num = sizeof...(batch_is);
     auto capacity = base.capacity();
     return make_pattern_layout<LayoutPattern, Trait>(
         make_shape(get<batch_is>(batches)..., base.shape()),
-        make_stride(batch_stride_at<batch_is, batch_num, BatchTuple, decltype(capacity)>(batches, capacity)...,
-                    base.stride()));
+        make_stride(
+            batch_stride_at<batch_is, batch_num, BatchTuple, decltype(capacity)>(batches, capacity)..., base.stride()));
 }
 
 // Peels the trailing (row, column) off the argument pack, builds the 2D base layout from them, then

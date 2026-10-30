@@ -35,7 +35,9 @@ __aicore__ inline void datacache_clean_and_invalid(clean_target target)
             asc_dcci_entire_all();
             break;
         case clean_target::ub:
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
             asc_dcci_entire_ub();
+#endif
             break;
         case clean_target::gm:
             asc_dcci_entire_out();

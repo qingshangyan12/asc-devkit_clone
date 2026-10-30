@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/utils/location_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -27,52 +27,52 @@
 namespace asc {
 namespace te {
 
-#define TENSOR_API_QUAL_LOC_PAIRS(Q)                                                                                   \
-    Q(_gm__, gm)                                                                                                       \
-    Q(_ubuf__, ub)                                                                                                     \
-    Q(_cbuf__, l1)                                                                                                     \
-    Q(_ca__, l0a)                                                                                                      \
-    Q(_cb__, l0b)                                                                                                      \
-    Q(_cc__, l0c)                                                                                                      \
-    Q(_biasbuf__, bias)                                                                                                \
-    Q(_fbuf__, fixbuf)                                                                                                 \
+#define TENSOR_API_QUAL_LOC_PAIRS(Q) \
+    Q(_gm__, gm)                     \
+    Q(_ubuf__, ub)                   \
+    Q(_cbuf__, l1)                   \
+    Q(_ca__, l0a)                    \
+    Q(_cb__, l0b)                    \
+    Q(_cc__, l0c)                    \
+    Q(_biasbuf__, bias)              \
+    Q(_fbuf__, fixbuf)               \
     Q(_ssbuf__, ssbuf)
 
 // hifloat4x2_t and hif4_scale are specific to arch 9201 and are not generated on other arches.
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
-#define TENSOR_API_ARCH_SPECIFIC_TYPES(M, ...)                                                                          \
-    M(hifloat4x2_t, __VA_ARGS__)                                                                                        \
+#define TENSOR_API_ARCH_SPECIFIC_TYPES(M, ...) \
+    M(hifloat4x2_t, __VA_ARGS__)               \
     M(hif4_scale, __VA_ARGS__)
 #else
 #define TENSOR_API_ARCH_SPECIFIC_TYPES(M, ...)
 #endif
 
-#define TENSOR_API_USER_TYPES(M, ...)                                                                                  \
-    M(int8_t, __VA_ARGS__)                                                                                             \
-    M(int16_t, __VA_ARGS__)                                                                                            \
-    M(int32_t, __VA_ARGS__)                                                                                            \
-    M(int64_t, __VA_ARGS__)                                                                                            \
-    M(int4b_t, __VA_ARGS__)                                                                                            \
-    M(uint8_t, __VA_ARGS__)                                                                                            \
-    M(uint16_t, __VA_ARGS__)                                                                                           \
-    M(uint32_t, __VA_ARGS__)                                                                                           \
-    M(uint64_t, __VA_ARGS__)                                                                                           \
-    M(half, __VA_ARGS__)                                                                                               \
-    M(float, __VA_ARGS__)                                                                                              \
-    M(hifloat8_t, __VA_ARGS__)                                                                                         \
-    M(bfloat16_t, __VA_ARGS__)                                                                                         \
-    M(fp4x2_e1m2_t, __VA_ARGS__)                                                                                       \
-    M(fp4x2_e2m1_t, __VA_ARGS__)                                                                                       \
-    M(fp8_e5m2_t, __VA_ARGS__)                                                                                         \
-    M(fp8_e4m3fn_t, __VA_ARGS__)                                                                                       \
-    M(fp8_e8m0_t, __VA_ARGS__)                                                                                         \
+#define TENSOR_API_USER_TYPES(M, ...) \
+    M(int8_t, __VA_ARGS__)            \
+    M(int16_t, __VA_ARGS__)           \
+    M(int32_t, __VA_ARGS__)           \
+    M(int64_t, __VA_ARGS__)           \
+    M(uint8_t, __VA_ARGS__)           \
+    M(uint16_t, __VA_ARGS__)          \
+    M(uint32_t, __VA_ARGS__)          \
+    M(uint64_t, __VA_ARGS__)          \
+    M(half, __VA_ARGS__)              \
+    M(float, __VA_ARGS__)             \
+    M(hifloat8_t, __VA_ARGS__)        \
+    M(bfloat16_t, __VA_ARGS__)        \
+    M(fp4x2_e1m2_t, __VA_ARGS__)      \
+    M(fp4x2_e2m1_t, __VA_ARGS__)      \
+    M(fp8_e5m2_t, __VA_ARGS__)        \
+    M(fp8_e4m3fn_t, __VA_ARGS__)      \
+    M(fp8_e8m0_t, __VA_ARGS__)        \
+    M(int4b_t, __VA_ARGS__)           \
     TENSOR_API_ARCH_SPECIFIC_TYPES(M, __VA_ARGS__)
 
 #define TENSOR_API_TYPE_ALIAS(qual, type) qual##_##type
 
 #define TENSOR_API_MAKE_COMBO(qual, type) _##qual type*
 
-#define TENSOR_API_GEN_ONE_TYPE(type, qualifier)                                                                       \
+#define TENSOR_API_GEN_ONE_TYPE(type, qualifier) \
     using TENSOR_API_TYPE_ALIAS(qualifier, type) = TENSOR_API_MAKE_COMBO(qualifier, type);
 
 #define TENSOR_API_GENERATE_ALL_TYPES(qual, loc) TENSOR_API_USER_TYPES(TENSOR_API_GEN_ONE_TYPE, qual)

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/utils/check_format.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -36,19 +36,22 @@ struct check_nz_layout_pattern {
         constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>,
-                      "Layout->Shape->Row->ZeroDim must be Int<16>!");
-        static_assert(Std::is_same_v<shape_column0, Std::Int<c0_element>>,
-                      "Layout->Shape->Column->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>, "Layout->Shape->Row->ZeroDim must be Int<16>!");
+        static_assert(
+            Std::is_same_v<shape_column0, Std::Int<c0_element>>,
+            "Layout->Shape->Column->ZeroDim is different from c0_element!");
 
         using stride_row0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::column, 0>::type;
         using stride_row1 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 1>::type;
-        static_assert(Std::is_same_v<stride_row0, Std::Int<c0_element>>,
-                      "Layout->Stride->Row->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<stride_row0, Std::Int<c0_element>>,
+            "Layout->Stride->Row->ZeroDim is different from c0_element!");
         static_assert(Std::is_same_v<stride_column0, _1>, "Layout->Stride->Column->ZeroDim must be Int<1>!");
-        static_assert(Std::is_same_v<stride_row1, Std::Int<c0_element * fractal_fixed>>,
-                      "Layout->Stride->Row->OneDim is different from c0_element * fractal_fixed!");
+        static_assert(
+            Std::is_same_v<stride_row1, Std::Int<c0_element * fractal_fixed>>,
+            "Layout->Stride->Row->OneDim is different from c0_element * fractal_fixed!");
     }
 };
 
@@ -140,16 +143,18 @@ struct check_zz_layout_pattern {
         constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_column0, Std::Int<c0_element>>,
-                      "Layout->Shape->Column->ZeroDim is different from c0_element!");
-        static_assert(Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>,
-                      "Layout->Shape->Row->ZeroDim must be Int<16>!");
+        static_assert(
+            Std::is_same_v<shape_column0, Std::Int<c0_element>>,
+            "Layout->Shape->Column->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<shape_row0, Std::Int<fractal_fixed>>, "Layout->Shape->Row->ZeroDim must be Int<16>!");
 
         using stride_row0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::column, 0>::type;
         static_assert(Std::is_same_v<stride_column0, _1>, "Layout->Stride->Column->ZeroDim must be Int<1>!");
-        static_assert(Std::is_same_v<stride_row0, Std::Int<c0_element>>,
-                      "Layout->Stride->Row->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<stride_row0, Std::Int<c0_element>>,
+            "Layout->Stride->Row->ZeroDim is different from c0_element!");
     }
 };
 
@@ -160,15 +165,17 @@ struct check_zn_layout_pattern {
         constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_column0, Std::Int<fractal_fixed>>,
-                      "Layout->Shape->Column->ZeroDim must be Int<16>!");
-        static_assert(Std::is_same_v<shape_row0, Std::Int<c0_element>>,
-                      "Layout->Shape->Row->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<shape_column0, Std::Int<fractal_fixed>>, "Layout->Shape->Column->ZeroDim must be Int<16>!");
+        static_assert(
+            Std::is_same_v<shape_row0, Std::Int<c0_element>>,
+            "Layout->Shape->Row->ZeroDim is different from c0_element!");
 
         using stride_row0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 0>::type;
         using stride_column0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<stride_column0, Std::Int<c0_element>>,
-                      "Layout->Stride->Column->ZeroDim is different from c0_element!");
+        static_assert(
+            Std::is_same_v<stride_column0, Std::Int<c0_element>>,
+            "Layout->Stride->Column->ZeroDim is different from c0_element!");
         static_assert(Std::is_same_v<stride_row0, _1>, "Layout->Stride->Row->ZeroDim must be Int<1>!");
     }
 };
@@ -251,20 +258,20 @@ struct check_scaleb_dn_layout_pattern {
     }
 };
 
-using layout_pattern_check_set =
-    tuple_map<Std::tuple<zn_layout_ptn, check_zn_layout_pattern>, Std::tuple<zz_layout_ptn, check_zz_layout_pattern>,
-              Std::tuple<nn_layout_ptn, check_nn_layout_pattern>, Std::tuple<nz_layout_ptn, check_nz_layout_pattern>,
-              Std::tuple<nd_layout_ptn, check_nd_layout_pattern>, Std::tuple<dn_layout_ptn, check_dn_layout_pattern>,
-              Std::tuple<one_dim_layout_ptn, check_one_dim_layout_pattern>,
-              Std::tuple<nd_ext_layout_ptn, check_nd_ext_layout_pattern>,
-              Std::tuple<dn_ext_layout_ptn, check_dn_ext_layout_pattern>,
-              Std::tuple<scalea_nd_layout_ptn, check_scalea_nd_layout_pattern>,
-              Std::tuple<scalea_dn_layout_ptn, check_scalea_dn_layout_pattern>,
-              Std::tuple<scaleb_nd_layout_ptn, check_scaleb_nd_layout_pattern>,
-              Std::tuple<scaleb_dn_layout_ptn, check_scaleb_dn_layout_pattern>>;
+using layout_pattern_check_set = tuple_map<
+    Std::tuple<zn_layout_ptn, check_zn_layout_pattern>, Std::tuple<zz_layout_ptn, check_zz_layout_pattern>,
+    Std::tuple<nn_layout_ptn, check_nn_layout_pattern>, Std::tuple<nz_layout_ptn, check_nz_layout_pattern>,
+    Std::tuple<nd_layout_ptn, check_nd_layout_pattern>, Std::tuple<dn_layout_ptn, check_dn_layout_pattern>,
+    Std::tuple<one_dim_layout_ptn, check_one_dim_layout_pattern>,
+    Std::tuple<nd_ext_layout_ptn, check_nd_ext_layout_pattern>,
+    Std::tuple<dn_ext_layout_ptn, check_dn_ext_layout_pattern>,
+    Std::tuple<scalea_nd_layout_ptn, check_scalea_nd_layout_pattern>,
+    Std::tuple<scalea_dn_layout_ptn, check_scalea_dn_layout_pattern>,
+    Std::tuple<scaleb_nd_layout_ptn, check_scaleb_nd_layout_pattern>,
+    Std::tuple<scaleb_dn_layout_ptn, check_scaleb_dn_layout_pattern>>;
 
 template <typename Tensor>
-__aicore__ inline void constexpr check_one_layout_pattern()
+__aicore__ inline constexpr void check_one_layout_pattern()
 {
     using layout = typename Tensor::layout_type;
     using layout_pattern = get_layout_pattern<layout>;

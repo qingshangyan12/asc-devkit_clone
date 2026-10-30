@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -23,6 +23,15 @@
 namespace asc {
 namespace te {
 namespace experimental {
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
+{
+    static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
+    reg_tensor<T> dst;
+    asc_not(dst.reg, src.reg, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator&(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
@@ -54,63 +63,48 @@ __simd_callee__ inline reg_tensor<T> operator^(const reg_tensor<T>& src0, const 
     return dst;
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
-{
-    static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
-
-    if constexpr (Std::is_same_v<T, bool>) {
-        reg_tensor<bool> dst;
-        asc_not(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-        return dst;
-    } else {
-        reg_tensor<T> dst;
-        vector_bool is_zero;
-        asc_eq_scalar(is_zero, src.reg, static_cast<T>(0), src.mask);
-        asc_duplicate_scalar(dst.reg, static_cast<T>(0), src.mask);
-        asc_duplicate_scalar(dst.reg, static_cast<T>(1), is_zero);
-        dst.mask = src.mask;
-        return dst;
-    }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const U& shift)
+template <typename T, typename ShiftType>
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const reg_tensor<ShiftType>& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
-
+    static_assert(
+        detail::supports_shift_pair_v<T, ShiftType>,
+        "register operator<< requires a signed shift register of the same width");
     reg_tensor<T> dst;
-    if constexpr (is_reg_tensor_v<U>) {
-        using shift_type = detail::reg_elem_t<U>;
-        static_assert(detail::supports_shift_pair_v<T, shift_type>,
-            "register operator<< requires a signed shift register of the same width");
-        asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
-    } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator<< requires an int16_t shift value");
-        asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
-    }
+    asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     dst.mask = src.mask;
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const U& shift)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const int16_t& shift)
+{
+    static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
+    reg_tensor<T> dst;
+    asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T, typename ShiftType>
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const reg_tensor<ShiftType>& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
-
+    static_assert(
+        detail::supports_shift_pair_v<T, ShiftType>,
+        "register operator>> requires a signed shift register of the same width");
     reg_tensor<T> dst;
-    if constexpr (is_reg_tensor_v<U>) {
-        using shift_type = detail::reg_elem_t<U>;
-        static_assert(detail::supports_shift_pair_v<T, shift_type>,
-            "register operator>> requires a signed shift register of the same width");
-        asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
-    } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator>> requires an int16_t shift value");
-        asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
-    }
+    asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const int16_t& shift)
+{
+    static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
+    reg_tensor<T> dst;
+    asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     dst.mask = src.mask;
     return dst;
 }

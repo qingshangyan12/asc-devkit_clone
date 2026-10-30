@@ -20,8 +20,8 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_OPS_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_OPS_H
 
-#include "version/asc_devkit_version.h"
 #include "tensor_api/tensor.h"
+#include "version/asc_devkit_version.h"
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 #if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
@@ -31,19 +31,19 @@
 #include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
 #include "tensor_api/experimental/arch/vector/composite_compute.h"
-#include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/histogram_compute.h"
+#include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
 #include "tensor_api/experimental/arch/vector/reg_compute_sel.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
-#include "tensor_api/experimental/arch/vector/reg_index.h"
+#include "tensor_api/experimental/arch/vector/reg_index_compute.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_gather.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
-#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
+#include "tensor_api/experimental/arch/vector/gather_compute.h"
 #endif
 #else
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
@@ -53,19 +53,19 @@
 #include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
 #include "tensor_api/experimental/arch/vector/composite_compute.h"
-#include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/histogram_compute.h"
+#include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
 #include "tensor_api/experimental/arch/vector/reg_compute_sel.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
-#include "tensor_api/experimental/arch/vector/reg_index.h"
+#include "tensor_api/experimental/arch/vector/reg_index_compute.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_gather.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-#include "tensor_api/experimental/arch/vector/reg_sync_control.h"
-#include "tensor_api/experimental/arch/vector/reg_data_copy.h"
+#include "tensor_api/experimental/arch/vector/gather_compute.h"
 #endif
 #endif
 

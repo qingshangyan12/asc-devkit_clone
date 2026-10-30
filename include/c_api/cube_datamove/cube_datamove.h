@@ -1515,7 +1515,7 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
 
-#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90300000)
 // ==========asc_copy_l0c2l1 (9201 unique: quant_pre_rnd)==========
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
