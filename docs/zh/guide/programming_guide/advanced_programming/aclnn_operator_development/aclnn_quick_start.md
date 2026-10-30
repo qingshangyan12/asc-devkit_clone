@@ -57,7 +57,7 @@ source /usr/local/Ascend/cann/set_env.sh
 >[!NOTE]说明
 >除了手写CMakeLists.txt外，也可以使用msOpGen工具生成自定义算子工程骨架，具体用法请参考[msOpGen快速入门](https://www.hiascend.com/document/detail/zh/mindstudio/latest/msOT/Operatordevelopmenttools/docs/zh/quick_start/msopgen_quick_start.md)。本文后续步骤均以手写CMakeLists.txt为例。
 
-先创建工程目录（建议放在全英文路径下）：
+先创建工程目录：
 
 ```bash
 mkdir -p AddCustom/op_host AddCustom/op_kernel
@@ -260,13 +260,9 @@ OP_ADD(AddCustom);
 
 #### 配置构建目标<a id="target-configuration"></a>
 
-设备查询命令得到的`soc_version`与工程使用的构建目标标识（soc_series）不是同一个值，不能直接把查询结果填入`ASCEND_SOC_SERIES`或`AddConfig`，具体映射关系见下方说明。
+本示例的CMake和Host原型均使用`ascend910b`作为构建目标。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准，各产品对应的取值请参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的表1。
 
-本示例的CMake和Host原型均使用`ascend910b`。使用其他构建目标时，两处需要对应修改；配置多个目标时，Host原型应为各目标分别调用`AddConfig`。具体支持范围以所安装CANN版本为准。
-
-`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。该变量应在`find_package(ASC)`之前设置，便于ASC加载时完成校验。更多配置方式及存量工程使用`ASCEND_COMPUTE_UNIT`的说明见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
-
-设备型号`soc_version`的获取方式请参考[CMake函数参考](./appendix/cmake_function_reference.md#npu_op_kernel_options)。
+`ASCEND_SOC_SERIES`用于选择构建目标，支持单个或多个取值，输入不区分大小写。更多配置方式及存量工程使用`ASCEND_COMPUTE_UNIT`的说明见[编译配置](./compilation_and_deployment/basic_process.md#compile-configuration)。
 
 #### 编写顶层文件
 
