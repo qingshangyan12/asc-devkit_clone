@@ -1000,6 +1000,9 @@ CcuResult LaunchCcuKernel(const HcclComm comm, const OpParam& opParamHost)
         if (ret != CCU_SUCCESS) {
             return ret;
         }
+        HCCL_RUN_INFO(
+            "[MC2_DATAPLANE] asccomm ccu kernel launch: mission[%u], stream[%p], kernelHandle[0x%llx], argSize[%u].",
+            missionIndex, stream, static_cast<unsigned long long>(kernelHandle), resourceCtx.kfcServerArgSize);
         ret = asccomm_ccu_kernel_launch(
             reinterpret_cast<ccu_launch_stream>(stream), kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
 #else

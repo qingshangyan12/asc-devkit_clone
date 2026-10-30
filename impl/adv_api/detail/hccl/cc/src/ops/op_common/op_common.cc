@@ -1955,7 +1955,8 @@ static HcclResult RegisterCcuKernels(
     CHK_PRT_RET(
         totalKernelNum != resRequest.ccuKernelInfos.size(), HCCL_ERROR("[RegisterCcuKernels]ccuKernel num not match!"),
         HCCL_E_INTERNAL);
-    HCCL_INFO("[RegisterCcuKernels] start, totalKernelNum[%u], insEntity[%p].", totalKernelNum, insEntity);
+    HCCL_INFO(
+        "[RegisterCcuKernels][asccomm] start, totalKernelNum[%u], insEntity[%p].", totalKernelNum, insEntity);
 
     // 遍历计算最大resGroup号
     auto maxIt = std::max_element(
@@ -2472,6 +2473,10 @@ HcclResult HcclGetCcuKernel(
     // 与 asc-comm 数据面不兼容；改用 HcclCommQueryCcuIns 实体查询 + asc-comm 注册。
     // CCU 资源不足由 asccomm_ccu_kernel_register 返回 CCU_E_UNAVAIL（注册事务回滚）触发回退。
     // checkRes 探测链路同样依赖动态资源流，实验构建跳过（与基线 legacy 行为一致）。
+    HCCL_RUN_INFO(
+        "[MC2_DATAPLANE] asccomm CCU dataplane branch: register via asccomm_ccu_kernel_register, opType[%u], "
+        "algName[%s].",
+        static_cast<uint32_t>(param.opType), param.algName);
     if (param.checkRes) {
         HCCL_INFO("[HcclGetCcuKernel] checkRes in asccomm dataplane mode, probe skipped; real registration validates.");
         return HCCL_SUCCESS;

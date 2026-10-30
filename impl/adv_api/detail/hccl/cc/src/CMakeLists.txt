@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
-option(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE "Use asc-comm CCU dataplane in mc2_client" OFF)
+option(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE "Use asc-comm CCU dataplane in mc2_client" ON)
 
 # 实验构建：mc2_client 的 CCU 数据面切到 asc-comm（libasccomm_ccu.so）。
 # 前置：asc-comm 已安装到 CANN 包（asc/include/comm_api + asc/lib64），或通过 ASCCOMM_CCU_ROOT 指向
@@ -309,18 +309,16 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
     )
 
     if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
-        # asc-comm 数据面：直接链接 libasccomm_ccu.so，编译期切换数据面 API（snake_case）。
-        # BEFORE：asc-comm 携带的 pod 契约头（hcomm/ccu/*、hcomm/hcomm_primitives.h）优先于环境内同路径头。
-        target_include_directories(mc2_client BEFORE PRIVATE
-            ${ASCCOMM_CCU_ROOT}/include/comm_api
+        # asc-comm 数据面：复用 third_party/asc-comm.cmake 的 asccomm_ccu 目标（随包构建+安装），
+        # 编译期切换数据面 API（snake_case）；asccomm_ccu_headers 提供 include/ 与 pkg_inc/ 头文件路径。
+        target_link_libraries(mc2_client PRIVATE
+            -Wl,--no-as-needed
+            asccomm_ccu
+            asccomm_ccu_headers
+            -Wl,--no-as-needed
         )
         target_compile_definitions(mc2_client PRIVATE
             MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
-        )
-        target_link_libraries(mc2_client PRIVATE
-            -Wl,--no-as-needed
-            ${ASCCOMM_CCU_ROOT}/lib64/libasccomm_ccu.so
-            -Wl,--no-as-needed
         )
     endif()
 
@@ -398,6 +396,8 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
     install(TARGETS mc2_client
         DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" COMPONENT asc-devkit
     )
+    # libasccomm_ccu.so 的随包安装由 cmake/third_party/asc-comm.cmake 的
+    # install(TARGETS asccomm_ccu ...) 承载，此处不重复安装。
 endif()
 
 add_subdirectory(common)
