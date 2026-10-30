@@ -151,16 +151,16 @@ aclRet = aclFinalize();
 
         **cd build**
 
-        **cmake ../src -DCMAKE\_SKIP\_RPATH=TRUE**
+        **cmake ..**
 
     3.  执行如下命令，生成可执行文件。
 
         **make**
 
-        会在工程目录的output目录下生成可执行文件**execute\_add\_op**。
+        会在build目录下生成可执行文件**execute\_add\_op**。
 
 3.  执行单算子
-    1.  以运行用户（例如HwHiAiUser）拷贝开发环境中样例工程output下的**execute\_add\_op**到运行环境任一目录。
+    1.  以运行用户（例如HwHiAiUser）拷贝开发环境中样例工程build目录下的**execute\_add\_op**到运行环境任一目录。
 
         说明：若您的开发环境即为运行环境，此拷贝操作可跳过。
 

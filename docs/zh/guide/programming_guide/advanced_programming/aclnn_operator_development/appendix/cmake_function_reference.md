@@ -4,7 +4,7 @@
 
 ## 概述
 
-使用msOpGen工具创建算子工程时，相关编译脚本被固化在本地。为便于开发者直接使用算子工程对外提供的cmake函数接口而无需频繁重建工程，CANN软件包中将算子工程的cmake脚本打包，开发者可通过`find_package`查找对应的cmake modules包来使用这些函数。
+自定义算子工程的CMakeLists.txt由开发者直接编写。为便于开发者组织编译脚本，CANN软件包中将算子工程编译所需的cmake脚本打包为cmake modules，开发者可通过`find_package`查找并使用这些函数。
 
 本文说明算子工程编译过程中使用的8个CMake函数，按用途分为**Package类**、**Library类**、**其他**三类。
 
@@ -98,18 +98,26 @@ npu_op_package_add(${package_name}
 
 ## Library类函数
 
+> [!NOTE]说明
+> 本节`npu_op_kernel_options`/`npu_op_kernel_sources`的`SOC_SERIES`/`COMPUTE_UNIT`参数，与[编译配置](../compilation_and_deployment/basic_process.md#compile-configuration)中工程级的`ASCEND_SOC_SERIES`/`ASCEND_COMPUTE_UNIT`变量是两个不同层次的概念，参数名相同但含义不同，容易混淆：
+
+| 层次 | 配置项 | 作用 |
+|---|---|---|
+| 全局 | `ASCEND_SOC_SERIES`（或`ASCEND_COMPUTE_UNIT`），工程级CMake变量 | 决定整个工程为哪些AI处理器系列构建产物 |
+| 细粒度 | 本节函数的`SOC_SERIES`/`COMPUTE_UNIT`参数 | 在全局已配置的范围内，这一条编译选项或核函数（Kernel）源码具体用在哪些型号上 |
+
 ### npu_op_library
 
 创建Host侧库。
 
 ```cmake
-npu_op_library(<library_name> TYPE <library_type> <files>)
+npu_op_library(<library_name> <library_type> <files>)
 ```
 
 **参数说明：**
 
 - `<library_name>`（必选）：Host侧库的名称。
-- `TYPE <library_type>`（必选）：Host库的类型，可选值为`TILING`、`ACLNN`、`GRAPH`、`TF_PLUGIN`、`ONNX_PLUGIN`。
+- `<library_type>`（必选）：Host库的类型，可选值为`TILING`、`ACLNN`、`GRAPH`、`TF_PLUGIN`、`ONNX_PLUGIN`。
   - `TILING`：Tiling相关库。
   - `ACLNN`：aclnn单算子调用库。
   - `GRAPH`：算子入图所需的算子原型库。
@@ -213,9 +221,9 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 
 ```cmake
 npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)   #为算子添加编译选项
-```
 
 npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxx Ascendyyy OPTIONS -DASCENDC_DEBUG)
+```
 
 ### npu_op_kernel_sources
 
@@ -253,6 +261,21 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_DIR ./Add
     SOC_SERIES Ascendxxx
     KERNEL_FILE add_custom.cpp
+)
+```
+
+如果同一算子在不同AI处理器系列上需要不同的核函数（Kernel）实现，可多次调用`npu_op_kernel_sources`，分别用`SOC_SERIES`指定各自生效的范围：
+
+```cmake
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustom
+    SOC_SERIES ascend910b ascend910_93
+    KERNEL_FILE add_custom_v220.cpp
+)
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustom
+    SOC_SERIES ascend950
+    KERNEL_FILE add_custom_v310.cpp
 )
 ```
 

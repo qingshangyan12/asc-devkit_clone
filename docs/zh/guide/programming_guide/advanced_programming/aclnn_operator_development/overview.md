@@ -11,7 +11,7 @@
 
 | 名称 | 含义 |
 |------|------|
-| 自定义算子工程 | 根据算子原型定义编写或者生成的工程骨架，包含原型定义、Tiling实现、核函数（Kernel）实现和CMake编译配置。 |
+| 自定义算子工程 | 开发者直接编写的工程骨架，包含原型定义、Tiling实现、核函数（Kernel）实现和CMake编译配置。 |
 | 算子原型 | 描述算子的输入、输出、属性、数据类型、格式、Shape推导等信息。 |
 | Host侧 | 运行在CPU侧的准备逻辑，例如Shape推导、Tiling计算、workspace大小设置。 |
 | 核函数（Kernel）侧 | 运行在AI Core上的计算逻辑，是算子真正执行计算的部分。 |
@@ -20,7 +20,7 @@
 
 ### 工程化开发是什么
 
-工程化算子开发是指基于**自定义算子工程**完成算子实现、编译部署和调用验证的开发方式，主要面向CANN相关场景对接：单算子调用场景通过aclnn API完成接入，算子入图场景通过GE图执行链路完成接入。通过工程化开发，算子原型、Host侧Tiling、核函数（Kernel）实现和编译部署配置可以在两类场景中最大化复用同一份交付件。相比手动组织编译流程和分别对接调用链路，工程化开发由msOpGen生成工程骨架，CMake管理编译，编译产物自动包含aclnn API以及入图所需的原型定义等文件，部署时只需安装.run包或者链接静态/动态库。
+工程化算子开发是指基于**自定义算子工程**完成算子实现、编译部署和调用验证的开发方式，主要面向CANN相关场景对接：单算子调用场景通过aclnn API完成接入，算子入图场景通过GE图执行链路完成接入。通过工程化开发，算子原型、Host侧Tiling、核函数（Kernel）实现和编译部署配置可以在两类场景中最大化复用同一份交付件。相比分别对接调用链路，工程化开发的编译流程由CMake统一管理，部署时只需安装.run包或者链接静态/动态库；默认编译产物包含aclnn API，算子入图场景还需按[编译与部署基本流程](./compilation_and_deployment/basic_process.md#graph-library)补充GRAPH原型库配置。
 
 ### 集成方式
 
@@ -80,5 +80,5 @@
 以下为查阅型内容，可在开发过程中按需检索：
 
 - [命名转换规则对照表](./appendix/naming_conversion_table.md) — 算子类型名、文件名、核函数（Kernel）名的转换规则。
-- [cmake函数参考](./appendix/cmake_function_reference.md) — CMake函数的参数与用法详解。
+- [CMake函数参考](./appendix/cmake_function_reference.md) — CMake函数的参数与用法详解。
 - [外部样例链接汇总](./appendix/external_sample_links.md) — 文档中引用的外部样例与API链接汇总。
