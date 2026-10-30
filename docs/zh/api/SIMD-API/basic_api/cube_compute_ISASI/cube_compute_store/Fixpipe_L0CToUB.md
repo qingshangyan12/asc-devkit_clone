@@ -181,13 +181,14 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 - 量化和ReLU参数不能为inf/nan和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
+
 <!-- npu="950" id18 -->
 - dualDstCtrl仅支持在普通搬运模式（NZ2NZ）或NZ2ND搬运场景下使用，不支持随路功能场景。
 - 当启用NZ2DN且srcNzC0Stride不等于1时，不能同时开启unitFlag。
 - 该接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为1:2的配置。在该场景下，subBlockId仅支持取值0或1。
 - Ascend 950PR&950DT系列产品特殊值/边界值约束说明：
 
-    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式，该模式由CTRL\[48\]直接决定；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
@@ -195,16 +196,15 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+        // 该模式由CTRL[48]直接决定，不受CTRL[60]限制。
+        AscendC::SetCtrlSpr<48, 48>(0);
         ```
 
     对于整数类型只有饱和模式。
     L0C Buffer到UB搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id18 -->
-
-<!-- npu="950" id20 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id3 -->
+<!-- npu="950" id20 -->
 
 ## 关键特性说明
 
@@ -355,3 +355,5 @@ M方向切分：
     AscendC::Fixpipe<outputType, l0cType, CFG_ROW_MAJOR_UB>(cUB, c, fixpipeParams);
     ```
 <!-- end id19 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id4 -->

@@ -1,4 +1,4 @@
-# asc_copy_ub2gm_align_sync_arch_2201（废弃）
+# asc_copy_ub2gm_align_sync（NPU架构版本2201，废弃）
 
 ## 产品支持情况
 

@@ -17,5 +17,6 @@ Tensor API通过`copy`统一执行不同存储位置之间的数据搬运。Tens
 - [copy（Unified Buffer到Global Memory的数据搬运）](../reg_vector_compute/vector_compute_store/copy_ub_to_gm.md)
 - [copy（Unified Buffer到Unified Buffer的数据搬运）](../reg_vector_compute/vector_compute_load/copy_ub_to_ub.md)
 - [copy（Unified Buffer到L1 Buffer的数据搬运）](../reg_vector_compute/vector_compute_load/copy_ub_to_l1.md)
+- [set_copy_pad_val](set_copy_pad_val.md)
 
 `copy`、`make_copy`、Copy Operation、Trait和Atom的统一说明参见[Algorithm](../algorithm.md)。

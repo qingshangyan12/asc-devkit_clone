@@ -20,6 +20,10 @@ extern "C" {
 
 DECL_SUPPORT_FLAG(HcclThreadExportToCommEngine);
 DECL_WEAK_FUNC(
+    HcclResult, HcclDedicatedThreadAcquire, HcclComm comm, HcclDedicatedThreadType useType, uint32_t notifyNumPerThread,
+    ThreadHandle* thread);
+DECL_SUPPORT_FLAG(HcclDedicatedThreadAcquire);
+DECL_WEAK_FUNC(
     HcclResult, HcclChannelQuery, HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescs,
     uint32_t channelNum, ChannelHandle* channels);
 DECL_SUPPORT_FLAG(HcclChannelQuery);

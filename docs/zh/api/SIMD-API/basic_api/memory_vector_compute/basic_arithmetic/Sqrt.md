@@ -146,6 +146,7 @@ $dst_i = \sqrt{src_i}$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id3 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -179,6 +180,7 @@ T支持的数据类型为：half、float。
 <!-- end id21 -->
 
 - 如果src中的数值为非正数，可能会产生未知结果。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt_res.md#id4 -->
 
 <!-- npu="950" id35 -->
 

@@ -8,7 +8,7 @@ This example implements data reordering based on the static Tensor API programmi
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -39,7 +39,7 @@ data_reorder
 - Implementation:  
   The `data_reorder_vf` function calls the `deinterleave` interface to reorder data:
   - Use `load` to read the inputs from UB into the `src0_reg` and `src1_reg` registers.
-  - Use `deinterleave` to deinterleave the source data into the destination `reg_tensor` objects.
+  - Use `deinterleave` to treat `src0_reg` and `src1_reg` as one contiguous sequence, writing the even-positioned elements to `result.first` and the odd-positioned elements to `result.second`.
   - Use `store` to write the results back to UB.
   - Invoke the kernel function using the `<<<>>>` kernel launch syntax.
 
@@ -48,7 +48,7 @@ data_reorder
 Perform the following steps in the example root directory to build and run the example.
 
 - Configure environment variables  
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install).
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 

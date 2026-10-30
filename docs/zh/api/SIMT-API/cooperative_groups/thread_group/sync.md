@@ -55,12 +55,10 @@ void sync() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
-        ...
         tile.sync();
-        ...
     }
     ```
 
@@ -70,11 +68,9 @@ void sync() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
         thread_group tile = tiled_partition(this_thread_block(), 16);
-        ...
         tile.sync();
-        ...
     }
     ```

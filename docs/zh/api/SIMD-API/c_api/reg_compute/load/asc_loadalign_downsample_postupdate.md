@@ -107,27 +107,35 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
+constexpr uint8_t MUTEX_ID = 0;
 
-constexpr uint32_t INPUT_ELEMENTS = 1024;
-constexpr uint32_t OUTPUT_ELEMENTS = 512;
+constexpr uint32_t INPUT_ELEMENTS = 1030;
+constexpr uint32_t OUTPUT_ELEMENTS = 517;
 constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint8_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint8_t);
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = AscendC::Std::ceil_div(OUTPUT_ELEMENTS, ELEMENTS_PER_REGISTER);
+constexpr uint32_t OUTPUT_STORAGE_ELEMENTS = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t INPUT_STORAGE_ELEMENTS = REPEAT_COUNT * 512;
 
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = OUTPUT_ELEMENTS;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_downsample_postupdate_vf(__ubuf__ uint8_t* output,
                                                               __ubuf__ uint8_t* input,
-                                                              uint16_t one_repeat_size, uint16_t repeat_time)
+                                                              uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = OUTPUT_ELEMENTS;
     vector_uint8_t dst_reg;
     __ubuf__ uint8_t* src = input;
     for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool mask = asc_update_mask_b8(remaining_length);
         asc_loadalign_downsample_postupdate(dst_reg, src, 512);
         asc_storealign(output + i * one_repeat_size, dst_reg, mask);
     }
@@ -136,24 +144,28 @@ __simd_vf__ inline void asc_loadalign_downsample_postupdate_vf(__ubuf__ uint8_t*
 __global__ __vector__ void asc_loadalign_downsample_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t input_local[INPUT_ELEMENTS];
-    __ubuf__ uint8_t output_local[OUTPUT_ELEMENTS];
-    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
-    uint16_t repeat_time = ceil_division(OUTPUT_ELEMENTS, one_repeat_size);
+    __ubuf__ uint8_t input_local[INPUT_STORAGE_ELEMENTS];
+    __ubuf__ uint8_t output_local[OUTPUT_STORAGE_ELEMENTS];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, INPUT_STORAGE_ELEMENTS);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
     asc_vf_call<asc_loadalign_downsample_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(INPUT_ELEMENTS);
+    std::vector<uint8_t> input(INPUT_STORAGE_ELEMENTS, 0);
     std::vector<uint8_t> output(OUTPUT_ELEMENTS, 0xff);
     std::vector<uint8_t> golden(OUTPUT_ELEMENTS, 0);
     for (uint16_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
@@ -165,9 +177,9 @@ int main()
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_STORAGE_ELEMENTS, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(input_device, INPUT_STORAGE_ELEMENTS, input.data(), INPUT_STORAGE_ELEMENTS, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_loadalign_downsample_postupdate_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);

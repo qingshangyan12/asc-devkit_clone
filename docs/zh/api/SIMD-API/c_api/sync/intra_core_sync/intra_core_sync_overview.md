@@ -73,34 +73,25 @@ typedef enum {
 
 ## 核内同步分类
 
-对上述核内并行流水的同步控制：
+对上述核内并行流水的同步控制可按表2选择。
 
-- 多流水同步：同一核内具有数据依赖的不同类型流水指令之间的同步。
+**表2** 核内同步接口分类说明
 
-    - 通过[asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md)接口进行不同流水间的同步控制。在`asc_sync_notify`/`asc_sync_wait`的指令中，可以指定一对指令流水（源流水与目的流水）先后执行的关系，表示两个指令流水之间完成一组“锁”机制，其作用原理为：
-        - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
-        - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
-     <!-- npu="950" id3 -->
-     - Ascend 950PR&950DT系列产品新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水间的同步控制。通过`asc_lock`锁定指定流水（阻塞后续指令），再通过`asc_unlock`释放流水，完成流水间的同步依赖。
-        - `asc_lock`：根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应`mutex_id`的Mutex被`asc_unlock`。
-        - `asc_unlock`：当前流水的前置指令退出后，根据`mutex_id`释放对应Mutex。
-     - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
-     <!-- end id3 -->
-     - 通过[asc_sync_mte2](asc_sync_mte2.md)、[asc_sync_mte3](asc_sync_mte3.md)与[asc_sync_vec](asc_sync_vec.md)等易用性接口进行多流水同步。这些接口内部集成了多对`asc_sync_notify`与`asc_sync_wait`，用于同时阻塞多条目的流水，直到指定源流水的前序指令完成，从而减少手写同步代码量。各接口内部封装的同步关系如下：
-        - `asc_sync_mte2`：等待`PIPE_MTE2`前序指令完成后，同时放行`PIPE_MTE3`与`PIPE_V`两条目的流水的后续指令，等价于分别对`PIPE_MTE2`->`PIPE_MTE3`与`PIPE_MTE2`->`PIPE_V`各执行一组`asc_sync_notify`与`asc_sync_wait`。
-        - `asc_sync_mte3`：等待`PIPE_MTE3`前序指令完成后，同时放行`PIPE_MTE2`与`PIPE_V`两条目的流水的后续指令，等价于分别对`PIPE_MTE3`->`PIPE_MTE2`与`PIPE_MTE3`->`PIPE_V`各执行一组`asc_sync_notify`与`asc_sync_wait`。
-        - `asc_sync_vec`：等待`PIPE_V`前序指令完成后，同时放行`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`三条目的流水的后续指令，等价于分别对`PIPE_V`->`PIPE_MTE2`、`PIPE_V`->`PIPE_MTE3`与`PIPE_V`->`PIPE_S`各执行一组`asc_sync_notify`与`asc_sync_wait`。
-- 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。
-    - 通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持`PIPE_S`单流水的同步。
-    - 若需对所有流水进行全流水同步，可使用[asc_sync](asc_sync.md)接口，其功能与`asc_sync_pipe(PIPE_ALL)`等价，即阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。
-- 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
+| 同步类型 | 接口 | 适用场景 | 差异点 |
+| --- | --- | --- | --- |
+| 多流水同步 | [asc_sync_notify](asc_sync_notify.md)/[asc_sync_wait](asc_sync_wait.md) | 同一核内具有数据依赖的不同类型流水指令之间的同步。 | 需要开发者显式指定一对源流水和目的流水。`asc_sync_notify`在源流水前序指令的所有读写操作完成后设置标志位；`asc_sync_wait`阻塞目的流水，直至检测到该标志位，解除阻塞并清除标志位。 |
+| 多流水同步 | [asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md) | 同一核内不同流水之间的同步控制。 | 通过`mutex_id`锁定和释放指定流水。`asc_lock`根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行；`asc_unlock`在指定流水的前序指令执行完成后释放对应Mutex。与`asc_sync_notify`/`asc_sync_wait`相比，该组合内聚性更强、与其他流水解耦，可简化反向同步逻辑。 |
+| 多流水同步 | [asc_sync_mte2](asc_sync_mte2.md)、[asc_sync_mte3](asc_sync_mte3.md)、[asc_sync_vec](asc_sync_vec.md) | 需要同时阻塞多条目的流水，直到指定源流水的前序指令完成。 | **易用性接口**，内部封装了多对`asc_sync_notify`与`asc_sync_wait`。<br>`asc_sync_mte2`等价于分别执行`PIPE_MTE2`->`PIPE_MTE3`和`PIPE_MTE2`->`PIPE_V`两组同步。<br>`asc_sync_mte3`等价于分别执行`PIPE_MTE3`->`PIPE_MTE2`和`PIPE_MTE3`->`PIPE_V`两组同步。<br>`asc_sync_vec`等价于分别执行`PIPE_V`->`PIPE_MTE2`、`PIPE_V`->`PIPE_MTE3`和`PIPE_V`->`PIPE_S`三组同步。 |
+| 单流水同步 | [asc_sync_pipe](asc_sync_pipe.md) | 同一核内具有数据依赖的相同类型流水指令之间的同步。 | 同一流水中虽然指令是顺序执行，但后一条指令开始执行时前一条指令不一定执行结束。`asc_sync_pipe`保证前序指令中所有数据读写全部完成后，后序指令才开始执行。该接口不支持`PIPE_S`单流水同步。 |
+| 全流水同步 | [asc_sync](asc_sync.md) | 需要阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。 | 功能与`asc_sync_pipe(PIPE_ALL)`等价，适用于无法只约束单条流水的场景。 |
+| 内存访问屏障 | [asc_sync_data_barrier](asc_sync_data_barrier.md) | 需要等待此前已发出但尚未完成的内存访问指令全部执行完成。 | 通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。 |
 
 <!-- npu="A3,910b" id4 -->
-以[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#aic_intra_core_sync_combinations)和[表3](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
+以[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表3](#aic_intra_core_sync_combinations)和[表4](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
 
 <a id="aic_intra_core_sync_combinations"></a>
 
-**表2** AIC中所有合法的核内同步组合
+**表3** AIC中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -113,7 +104,7 @@ typedef enum {
 
 <a id="aiv_intra_core_sync_combinations"></a>
 
-**表3** AIV中所有合法的核内同步组合
+**表4** AIV中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |

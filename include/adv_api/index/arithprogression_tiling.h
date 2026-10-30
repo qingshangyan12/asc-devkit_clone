@@ -21,8 +21,8 @@ namespace AscendC {
  * \brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.
  * The developer selects a proper space size based on this range as the tiling parameter.
  *
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetArithProgressionMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue);
 

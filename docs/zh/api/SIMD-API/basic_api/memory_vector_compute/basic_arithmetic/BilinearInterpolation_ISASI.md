@@ -200,6 +200,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 ## 数据类型
 
 支持的数据类型为：half。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/BilinearInterpolation_ISASI_res.md#id2 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -219,6 +220,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     - 偏移地址后不能超出Unified Buffer（UB）大小数据的范围。
     - 地址偏移的取值范围：不能超出uint32\_t的范围。
 - 当参数repeatMode配置为true时，需确保src1的有效数据长度*16 ≥ src0的数据长度。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/BilinearInterpolation_ISASI_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

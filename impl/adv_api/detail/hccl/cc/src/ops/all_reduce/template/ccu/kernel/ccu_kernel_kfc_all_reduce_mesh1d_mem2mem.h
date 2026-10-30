@@ -26,6 +26,45 @@ struct CcuKernelArgAllReduceKfc : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
+struct KfcAllReduceMesh1DMem2MemContext : CcuKernelCtxBase {
+    const ChannelHandle* channels{nullptr};
+    uint32_t channelCount{0};
+    uint32_t rankSize{0};
+    uint32_t rankId{0};
+
+    HcclDataType dataType;
+    HcclDataType outputDataType;
+    HcclReduceOp reduceOp;
+
+    std::vector<ccu::Variable> input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable myScratch;
+    ccu::Variable currentRankSliceInputOffset;
+    ccu::Variable currentRankSliceOutputOffset;
+    ccu::Variable normalSliceSize;
+    ccu::Variable lastSliceSize;
+    ccu::Variable mySliceSize;
+    ccu::Variable sliceOffset;
+    ccu::Variable isInputOutputEqual;
+    ccu::Variable sliceSize;
+    GroupOpSizeVars goSize;
+    ccu::Variable chunkSize;
+    ccu::Variable currentSliceSize;
+    ccu::Variable tailSize;
+    ccu::Variable chunkLoopNum;
+    GroupOpSizeVars fullGoSize;
+    GroupOpSizeVars tailGoSize;
+
+    std::vector<ccu::Event> events;
+
+    ccu::LocalAddr srcMem;
+    ccu::LocalAddr localDstMem;
+    ccu::RemoteAddr remoteDstMem;
+    std::vector<ccu::RemoteAddr> reduceScatterSrc;
+    std::vector<ccu::LocalAddr> reduceScatterDst;
+};
+
 CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
@@ -37,5 +76,7 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 
+CcuResult ReduceLoopGroupV1(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::LocalAddr srcOrg);
+CcuResult ReduceLoopGroupV2(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::LocalAddr srcOrg);
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_KFC_ALL_REDUCE_MESH_1D_MEM2MEM_H

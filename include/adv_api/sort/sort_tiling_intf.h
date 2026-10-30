@@ -28,6 +28,7 @@ constexpr uint32_t REGION_PROPOSAL_DATA_SIZE_FLOAT_V220 = 2;
  * @param [in] ascendcPlatform ascendc platform infomation
  * @param [in] elemCount element count number
  * @param [in] dataTypeSize data size number
+ * @return temporary buffer size, in bytes
  */
 uint32_t GetConcatTmpSize(
     const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t elemCount, const uint32_t dataTypeSize);
@@ -39,6 +40,7 @@ uint32_t GetConcatTmpSize(
  * @param [in] ascendcPlatform ascendc platform infomation
  * @param [in] elemCount element count number
  * @param [in] dataTypeSize data size number
+ * @return temporary buffer size, in bytes
  */
 uint32_t GetSortTmpSize(
     const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t elemCount, const uint32_t dataTypeSize);
@@ -53,6 +55,17 @@ struct SortConfig {
 };
 #endif
 
+/*
+ * @ingroup GetSortMaxMinTmpSize
+ * @brief get sort api calculate need max and min temporary space size
+ * @param [in] srcShape input tensor shape
+ * @param [in] valueType input value data type
+ * @param [in] indexType input index data type
+ * @param [in] isReuseSource whether to reuse the input space of the source operand
+ * @param [in] config sort configuration
+ * @param [out] maxValue maximum temporary space size, in bytes
+ * @param [out] minValue minimum temporary space size, in bytes
+ */
 void GetSortMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, AscendC::TensorDataType valueType, AscendC::TensorDataType indexType,
     bool isReuseSource, const SortConfig& config, uint32_t& maxValue, uint32_t& minValue);

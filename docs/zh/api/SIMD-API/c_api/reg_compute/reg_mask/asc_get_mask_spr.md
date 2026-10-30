@@ -73,9 +73,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -111,69 +115,94 @@ bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expe
     return true;
 }
 
-constexpr uint16_t ONE_REPEAT_ELEMENTS = 256 / sizeof(uint16_t);
-constexpr uint16_t REPEAT_TIMES = 2;
-constexpr uint32_t BUFFER_ELEMENTS = ONE_REPEAT_ELEMENTS * REPEAT_TIMES;
-constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint16_t);
+constexpr uint32_t CHUNK_BYTES = 768;
+constexpr uint32_t DATA_BYTES = 1028;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (DATA_BYTES + CHUNK_BYTES - 1) / CHUNK_BYTES;
+constexpr uint32_t BUFFER_BYTES = CHUNK_BYTES * REPEAT_COUNT;
 
-__simd_vf__ inline void get_mask_spr_vf(__ubuf__ uint16_t* output,
-                                uint16_t one_repeat_size, uint16_t repeat_time)
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(uint8_t);
+__simd_vf__ inline void exercise(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask16 = asc_get_mask_spr_b16();
-    vector_uint16_t dst_reg;
-    for (uint16_t repeat_index = 0; repeat_index < repeat_time; ++repeat_index) {
-        asc_duplicate_scalar(dst_reg, static_cast<uint16_t>(1), mask16);
-        asc_storealign(output + repeat_index * one_repeat_size, dst_reg, mask16);
+    vector_uint16_t value16;
+    vector_uint32_t value32;
+    uint32_t remaining = DATA_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * CHUNK_BYTES;
+        const uint32_t valid_count = remaining > CHUNK_BYTES ? CHUNK_BYTES : remaining;
+        // 保留剩余有效元素数，供更新掩码处理尾块。
+        uint32_t remaining_length = valid_count / sizeof(uint16_t);
+        if (remaining_length > 128) remaining_length = 128;
+        vector_bool seed16 = asc_update_mask_b16(remaining_length);
+        vector_bool mask16 = asc_get_mask_spr_b16();
+        asc_duplicate_scalar(value16, static_cast<uint16_t>(1), seed16);
+        asc_storealign(reinterpret_cast<__ubuf__ uint16_t*>(output + offset), value16, mask16);
+        uint32_t remaining_length_2 = valid_count > 256 ? (valid_count - 256) / sizeof(uint32_t) : 0;
+        if (remaining_length_2 > 64) remaining_length_2 = 64;
+        vector_bool seed32 = asc_update_mask_b32(remaining_length_2);
+        vector_bool mask32 = asc_get_mask_spr_b32();
+        asc_duplicate_scalar(value32, static_cast<uint32_t>(1), seed32);
+        asc_storealign(reinterpret_cast<__ubuf__ uint32_t*>(output + offset + 256), value32, mask32);
+        remaining -= valid_count;
     }
 }
 
-__global__ __vector__ void asc_get_mask_spr_kernel(__gm__ uint16_t* output, __gm__ uint16_t* input)
+__global__ __vector__ void asc_get_mask_spr_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint16_t output_local[BUFFER_ELEMENTS];
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    __ubuf__ uint8_t input_local[BUFFER_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
     asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_set_vector_mask(0, 0xffffffffULL);
-    asc_vf_call<get_mask_spr_vf>(output_local, ONE_REPEAT_ELEMENTS, REPEAT_TIMES);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint16_t one_repeat_size = 3 * asc_get_vf_len() / sizeof(uint8_t);
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<exercise>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint16_t> input(BUFFER_ELEMENTS), output(BUFFER_ELEMENTS, 0xffff), golden(BUFFER_ELEMENTS);
-    for (uint32_t index = 0; index < BUFFER_ELEMENTS; ++index) {
-        input[index] = static_cast<uint16_t>(index + 2);
-    }
-    golden = input;
-    for (uint16_t repeat_index = 0; repeat_index < REPEAT_TIMES; ++repeat_index) {
-        for (uint32_t index = 0; index < 32; ++index) {
-            golden[repeat_index * ONE_REPEAT_ELEMENTS + index] = 1;
+    std::vector<uint8_t> input(BUFFER_BYTES), output(BUFFER_BYTES, 0xff), golden(BUFFER_BYTES);
+    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * CHUNK_BYTES;
+        const uint32_t end = DATA_BYTES - offset > CHUNK_BYTES ? CHUNK_BYTES : DATA_BYTES - offset;
+        for (uint32_t i = 0; i < end && i < 256; i += sizeof(uint16_t)) golden[offset + i] = 1;
+        for (uint32_t i = 256; i < end && i < 512; i += sizeof(uint32_t)) golden[offset + i] = 1;
+        if (end > 512) {
+            std::copy(input.begin() + offset + 512, input.begin() + offset + end, golden.begin() + offset + 512);
         }
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
-    uint16_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES,
+    uint8_t* input_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
-    uint16_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES,
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES,
+    aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
     asc_get_mask_spr_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES,
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_data("Input elements", input);
-    print_data("Output elements", output);
-    print_data("Golden elements", golden);
-    const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_get_mask_spr_b16 passed." : "[Failed] asc_get_mask_spr_b16 failed.") << std::endl;
+    print_data("Input bytes", input);
+    print_data("Output bytes", output);
+    print_data("Golden bytes", golden);
+    const bool passed = compare_range_data(output, golden, 0, DATA_BYTES);
+    std::cout << (passed ? "[Success] asc_get_mask_spr_b16/asc_get_mask_spr_b32 passed." : "[Failed] asc_get_mask_spr_b16/asc_get_mask_spr_b32 failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

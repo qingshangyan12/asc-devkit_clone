@@ -48,6 +48,12 @@ constexpr uint32_t INIT_TILING_VERSION = 100U;
 constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
+// OpResCtx.res 槽位约定（设备侧 hccl_ccu_v0.h / AIC op kernel 按同序读取）：
+// res[0]=scratch 基址；res[1]=die 切分千分比；res[2]=KFC mission 数；
+// res[3]/res[4]=本端 cclBuffer 基址/大小（HalfAlltoAllV window，AIC 回读结果通道）
+constexpr uint32_t RES_IDX_CCL_BUFFER_ADDR = 3U;
+constexpr uint32_t RES_IDX_CCL_BUFFER_SIZE = 4U;
+
 struct Mc2ServerCfg {
     uint32_t version;
     uint8_t debugMode;
@@ -64,7 +70,6 @@ struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
 };
-
 
 struct OpResCtx {
     uint64_t version;

@@ -27,9 +27,9 @@
 
 #include "kernel_reg_compute_common_intf.h"
 
-#if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || \
-     (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5162))
 #include "../../../impl/basic_api/kernel_macros.h"
 #endif
 

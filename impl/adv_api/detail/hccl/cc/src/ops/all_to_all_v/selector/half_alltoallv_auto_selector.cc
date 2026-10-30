@@ -14,8 +14,7 @@
 namespace mc2_ops_hccl {
 namespace {
 constexpr u32 TOPO_LEVEL_NUM_3 = 3U;
-// PostSync 源端保序方案上限（见 CcuKfcHalfAlltoAllVMesh1DKernel 注释），
-// 超过该 rank 数通道保序无法保证，不选择该算法
+// PostSync 源端保序方案上限，超过该 rank 数通道保序无法保证
 constexpr u32 HALF_A2AV_MAX_RANK_SIZE = 8U;
 constexpr char HALF_A2AV_ALG_NAME[] = "CcuHalfAll2AllVMesh1D";
 } // namespace
@@ -28,7 +27,6 @@ SelectorStatus HalfAlltoAllVAutoSelector::SelectCcuScheduleAlgo(
     (void)configAlgMap;
     CHK_PRT_RET(
         topoInfo == nullptr, HCCL_ERROR("[HalfAlltoAllVAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
-    // 与兄弟 CCU selector 一致的前置约束
     if (topoInfo->level2UbRtp) {
         HCCL_INFO(
             "[HalfAlltoAllVAutoSelector][%s] ccu schedule is not supported with level2UbRtp, reset to default.",
@@ -42,8 +40,6 @@ SelectorStatus HalfAlltoAllVAutoSelector::SelectCcuScheduleAlgo(
             __func__, topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
-    // 对齐 hcomm Mc2Selector::SelectDefaultCcuSchedAlgo：level0 为 1D mesh
-    // （MESH_1D / MESH_1D_CLOS）即选 CcuHalfAll2AllVMesh1D，无数据量/dtype 门槛
     if (topoInfo->level0Topo != Level0Shape::MESH_1D && topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         HCCL_INFO(
             "[HalfAlltoAllVAutoSelector][%s] level0Topo[%u] is not 1D mesh, reset to default.", __func__,
