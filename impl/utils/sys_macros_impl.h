@@ -18,6 +18,19 @@
 #include <cstdint>
 #include "utils/base/sys_constants.h"
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+    __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
+[[block_local]] __inline__ uint32_t g_super_kernel_dynamic_block_num;
+#endif
+#endif
+
+#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__
+namespace AscendC {
+[[block_local]] __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
+}
+#endif
+
 #if (defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
 #include "stub_def.h"
 #endif
