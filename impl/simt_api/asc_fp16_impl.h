@@ -1710,7 +1710,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hfmax2(const half2 x, const half2 
     return h;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hnegx2(const half2 x) { return -x; }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hnegx2(const half2 x)
+{
+    half2 h;
+    h.x = __hneg(x.x);
+    h.y = __hneg(x.y);
+    return h;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hadd(const half x, const half y) { return x + y; }
 

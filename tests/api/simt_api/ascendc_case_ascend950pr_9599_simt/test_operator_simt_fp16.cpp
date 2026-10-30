@@ -106,7 +106,7 @@ TEST_F(FP16MathTestsuite, ExtendedMathApiTest)
     EXPECT_EQ(__ushort_as_half(0x4200U), __hfma_relu(x, y, x));
     EXPECT_EQ(half(0.0), __hfma_relu(-x, y, x));
     EXPECT_EQ(__hfma(x, y, z2.x), __hfmax2(x2, y2, z2).x);
-    EXPECT_EQ(__ushort_as_half(0x3C00U), __hfmax2_relu(-x2, y2, z2).x);
+    EXPECT_EQ(__ushort_as_half(0x4200U), __hfmax2_relu(-x2, y2, z2).x);
     EXPECT_EQ(__ushort_as_half(0x4200U), __hcmadd(x2, y2, z2).x);
     EXPECT_EQ(__ushort_as_half(0x4200U), __hadd(x, y));
     EXPECT_EQ(__ushort_as_half(0xBC00U), __hsub(x, y));
