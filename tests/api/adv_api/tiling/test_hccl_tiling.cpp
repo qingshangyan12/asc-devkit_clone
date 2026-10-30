@@ -42,6 +42,8 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
     string algConfig = "fullmesh";
     uint32_t reduceType = 1;
     Mc2CcTilingConfig ccTilingConfig(groupName, opType, algConfig, reduceType);
+    EXPECT_EQ(ccTilingConfig.SetDebugMode(5U), EXIT_SUCCESS);
+    EXPECT_EQ(ccTilingConfig.SetDebugMode(4U), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetDebugMode(1U), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetQueueNum(40U), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetCommBlockNum(48U), EXIT_SUCCESS);

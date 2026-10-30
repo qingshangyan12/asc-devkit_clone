@@ -46,8 +46,11 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     const auto* desc = reinterpret_cast<const CommKfcParamDesc*>(&descriptor);
     const bool single = descriptor == MC2_AICPU_SIMPLE_CTX_PROTOCOL || desc->itemNum == 1;
     const auto* ctx = args && single ? static_cast<const OpResCtx*>(args[1]) : nullptr;
-    Mc2ServerStageTiming::Start(
-        ctx && ctx->res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] == 4, reinterpret_cast<uintptr_t>(ctx));
+    const uint64_t debugMode = ctx ? ctx->res[Mc2ServerDebugConfig::DEBUG_MODE_RES_INDEX] : 0;
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic mode 5; mode 4 stays basic.
+    Mc2ServerStageTiming::Start(debugMode == 4 || debugMode == 5,
+        reinterpret_cast<uintptr_t>(ctx), debugMode == 5);
+    // MC2_CACHE_DETAIL_DIAG END
     const uint32_t status = Mc2ServerKernelBody(args);
     // Both protocol paths return from CommKfcDispatcher::Run before reporting.
     // The message loop and all three measured intervals have ended here.

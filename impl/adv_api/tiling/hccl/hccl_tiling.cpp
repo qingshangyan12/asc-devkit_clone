@@ -323,8 +323,9 @@ uint32_t Mc2CcTilingConfig::SetSkipBufferWindowCopy(uint8_t skipBufferWindowCopy
 
 uint32_t Mc2CcTilingConfig::SetDebugMode(uint8_t debugMode)
 {
-    bool ret = (1 <= debugMode && debugMode <= 4) || (debugMode >= 250);
-    ASCENDC_HOST_ASSERT(ret, return EXIT_FAILURE, "debugMode(%u) only support [1,4] or [250,255].", debugMode);
+    // MC2_CACHE_DETAIL_DIAG: mode 5 enables temporary A5 Server detail probes.
+    bool ret = (1 <= debugMode && debugMode <= 5) || (debugMode >= 250);
+    ASCENDC_HOST_ASSERT(ret, return EXIT_FAILURE, "debugMode(%u) only support [1,5] or [250,255].", debugMode);
     impl_.debugMode_ = debugMode;
     return EXIT_SUCCESS;
 }
