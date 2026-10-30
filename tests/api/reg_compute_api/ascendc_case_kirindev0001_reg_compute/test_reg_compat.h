@@ -17,6 +17,24 @@
 
 namespace AscendC {
 namespace Reg {
+/* =====================================================================================================
+ * GCC编译期间，自上而下解析头文件，测试用例如果include对应的头文件，会逐行解析
+ * 例如如下：
+ * impl\basic_api\reg_compute\kernel_reg_compute_vec_binary_intf_impl.h
+ * 解析And函数调用到了AndImpl,但是impl\basic_api\reg_compute\dav_5161对应目录下没有AndImpl任何声明定义则报错
+ * 本文件提供前置声明，防止编译期报错
+ *
+ * 形态（基线将来不起5161支持时的处理规则）
+ * 1.pill 桩采用 template <typename...> void XxxImpl(...) = delete;
+ *    函数参数为字面省略号：任何真实模板一旦出现，重载决议中的省略号
+ *    转换等级必然低于精确匹配。
+ * 2.唯一例外MoveMaskImpl：其包装按值返回MaskReg，桩承载真是返回语义
+ *    保留精确签名；基线如将来定义同签名版本将报 redefinition,
+ *    删除该桩即可（唯一预期的人工维护点）
+ * 3.本文件桩均不承载用例行为：用例值调用dav_5161已经支持的公开API
+ *    桩仅满足解析期名字查找
+======================================================================================================= */
+
 // kernel_reg_compute_maskreg_intf_impl.h
 template <typename T>
 __simd_callee__ inline MaskReg MoveMaskImpl()
@@ -25,85 +43,76 @@ __simd_callee__ inline MaskReg MoveMaskImpl()
 }
 
 // kernel_reg_compute_vec_unary_intf_impl.h
-template <typename T, auto mode, typename U>
-__simd_callee__ inline void Log2Impl(U&, U&, MaskReg&)
-{}
+template <typename...>
+void Log2Impl(...) = delete;
 
-template <typename T, auto mode, typename U>
-__simd_callee__ inline void Log10Impl(U&, U&, MaskReg&)
-{}
+template <typename...>
+void Log10Impl(...) = delete;
 
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void NotImpl(U&, U&, MaskReg&)
-{}
+template <typename...>
+void NotImpl(...) = delete;
 
 // kernel_reg_compute_vec_binary_intf_impl.h
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void AndImpl(U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void AndImpl(...) = delete;
 
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void XorImpl(U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void XorImpl(...) = delete;
 
-template <typename T, typename U, MaskMergeMode mode, typename S, typename V>
-__simd_callee__ inline void ShiftLeftImpl(S&, S&, V&, MaskReg&)
-{}
+template <typename...>
+void ShiftLeftImpl(...) = delete;
 
-template <typename T, typename U, MaskMergeMode mode, typename S, typename V>
-__simd_callee__ inline void ShiftRightImpl(S&, S&, V&, MaskReg&)
-{}
+template <typename...>
+void ShiftRightImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void MullImpl(U&, U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void MullImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void AddCarryOutImpl(MaskReg&, U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void AddCarryOutImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void SubCarryOutImpl(MaskReg&, U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void SubCarryOutImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void AddCarryOutsImpl(MaskReg&, U&, U&, U&, MaskReg&, MaskReg&)
-{}
+template <typename...>
+void AddCarryOutsImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void SubCarryOutsImpl(MaskReg&, U&, U&, U&, MaskReg&, MaskReg&)
-{}
+template <typename...>
+void SubCarryOutsImpl(...) = delete;
 
 // kernel_reg_compute_vec_binary_scalar_intf_impl.h
-template <typename T, typename U, MaskMergeMode mode, typename S>
-__simd_callee__ inline void ShiftLeftsImpl(S&, S&, U, MaskReg&)
-{}
+template <typename...>
+void ShiftLeftsImpl(...) = delete;
 
-template <typename T, typename U, MaskMergeMode mode, typename S>
-__simd_callee__ inline void ShiftRightsImpl(S&, S&, U, MaskReg&)
-{}
+template <typename...>
+void ShiftRightsImpl(...) = delete;
 
 // kernel_reg_compute_datacopy_intf_impl.h
-template <typename T, typename U>
-__simd_callee__ inline void LoadImpl(U&, __ubuf__ T*)
-{}
+template <typename...>
+void LoadImpl(...) = delete;
 
-template <typename T, typename U>
-__simd_callee__ inline void StoreImpl(__ubuf__ T*, U&)
-{}
-
-template <typename T, typename U>
-__simd_callee__ inline void StoreImpl(__ubuf__ T*, U&, uint32_t)
-{}
+template <typename...>
+void StoreImpl(...) = delete;
 
 // kernel_reg_compute_vec_fused_intf_impl.h
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void FusedAbsSubImpl(U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void FusedAbsSubImpl(...) = delete;
 
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void FusedMulDstAddImpl(U&, U&, U&, MaskReg&)
-{}
+template <typename...>
+void FusedMulDstAddImpl(...) = delete;
+
+// kernel_reg_compute_vec_reduce_intf_impl.h
+template <typename...>
+void ReduceSumWithDataBlockImpl(...) = delete;
+
+template <typename...>
+void ReduceMaxWithDataBlockImpl(...) = delete;
+
+template <typename...>
+void ReduceMinWithDataBlockImpl(...) = delete;
+
+template <typename...>
+void PairReduceSumImpl(...) = delete;
 } // namespace Reg
 } // namespace AscendC
 

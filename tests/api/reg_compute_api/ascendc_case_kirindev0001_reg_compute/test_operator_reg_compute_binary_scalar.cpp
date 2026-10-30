@@ -186,6 +186,10 @@ protected:
 INSTANTIATE_TEST_CASE_P(
     MicroBinaryScalarTestCase, MicroBinaryScalarTestsuite,
     ::testing::Values(
+        MicroBinaryScalarParams{RunCase<uint8_t, 0>}, MicroBinaryScalarParams{RunCase<int8_t, 0>},
+        MicroBinaryScalarParams{RunCase<uint16_t, 0>}, MicroBinaryScalarParams{RunCase<int16_t, 0>},
+        MicroBinaryScalarParams{RunCase<uint32_t, 0>}, MicroBinaryScalarParams{RunCase<int32_t, 0>},
+        MicroBinaryScalarParams{RunCase<half, 0>}, MicroBinaryScalarParams{RunCase<float, 0>},
         MicroBinaryScalarParams{RunCase<uint16_t, 1>}, MicroBinaryScalarParams{RunCase<int16_t, 1>},
         MicroBinaryScalarParams{RunCase<int32_t, 1>},
         MicroBinaryScalarParams{RunCase<uint8_t, 2>},
