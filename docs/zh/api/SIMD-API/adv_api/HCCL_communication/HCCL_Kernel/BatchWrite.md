@@ -102,7 +102,8 @@ struct BatchWriteItem {
 <!-- npu="910b" id13 -->
 -   对于Atlas A2系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
 <!-- end id13 -->
--   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](../../../basic_api/cache_control/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
+-   batchWriteInfo指向的描述符区域不能与本次通信的源数据、目的数据区域重叠，否则写入描述符字段时会覆盖待发送的数据。建议将描述符存放在独立预留的区域（例如workspace）中，并保证描述符区域按64字节对齐。
+-   通信任务信息写入batchWriteInfo后，必须通过调用[DataCacheCleanAndInvalid](../../../basic_api/cache_control/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。SINGLE_CACHE_LINE模式每次只刷新传入地址所在的Cache Line，不会随itemNum自动扩展，需逐条刷新以覆盖所有描述符。
 
 ## 调用示例
 
@@ -188,7 +189,7 @@ struct BatchWriteItem {
 <!-- npu="A3" id17 -->
 -   <a name="batchwrite_multi_queue"></a>多个队列的点对点通信
 
-    在Atlas A3系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以通过调用一次BatchWrite接口，实现批量点对点通信。
+    在Atlas A3系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以将两条通信任务分别下发到不同的通信队列上并行执行。
 
     ```
     struct BatchWriteItem {
@@ -214,7 +215,9 @@ struct BatchWriteItem {
             hccl.InitV2(contextGM, &tilingData);
             hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
 
-            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(inputGM);
+            // 描述符不能与输入、输出数据区域重叠，此处从workspace中划分出描述符区域；
+            // 发送数据源地址为inputGM，两条描述符分别指向outputGM1、outputGM2
+            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(workspace);
 
             sendInfo->type = 0UL;
             sendInfo->length = 64U;
@@ -231,14 +234,17 @@ struct BatchWriteItem {
             (sendInfo + 1)->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM2) & 0xFFFFFFFF);
             (sendInfo + 1)->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM2) >> 32) & 0xFFFFFFFF);
 
-            // 确保cache中的数据已刷新到GM地址上
+            // 确保cache中的数据已刷新到GM地址上：每条描述符占64字节，
+            // 逐条刷新，保证两条描述符所在的Cache Line均已刷新到GM
             GlobalTensor<int64_t> tempTensor;
-            tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
-            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            for (uint32_t i = 0U; i < 2U; ++i) {
+                tempTensor.SetGlobalBuffer((__gm__ int64_t*)(sendInfo + i));
+                DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            }
 
             // 分别将两次拷贝部署在队列0、队列1上
             auto handleId0 = hccl.BatchWrite<true>(sendInfo, 1U, 0U);
-            auto handleId1 = hccl.BatchWrite<true>(sendInfo, 1U, 1U);
+            auto handleId1 = hccl.BatchWrite<true>(sendInfo + 1, 1U, 1U);
 
             // 在所有队列上阻塞BatchWrite通信任务，所有队列将等到通信任务全部完成后再继续往下执行，实现所有队列的同步
             const uint16_t queueNum = hccl.GetQueueNum();

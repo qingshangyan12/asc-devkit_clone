@@ -52,6 +52,14 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
     AddImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void Add3(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    Add3Impl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+#endif
+
 template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Sub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {

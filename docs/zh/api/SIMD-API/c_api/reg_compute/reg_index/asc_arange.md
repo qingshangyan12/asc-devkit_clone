@@ -148,9 +148,12 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -161,31 +164,48 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(int32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(int32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 constexpr int32_t START_VALUE = 10;
 
-__simd_vf__ inline void arange_vf(__ubuf__ int32_t* ascending, __ubuf__ int32_t* descending)
+__simd_vf__ inline void arange_vf(__ubuf__ int32_t* ascending, __ubuf__ int32_t* descending, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_int32_t ascending_reg;
-    vector_int32_t descending_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_arange(ascending_reg, START_VALUE);
-    asc_arange_descend(descending_reg, START_VALUE);
-    asc_storealign(ascending, ascending_reg, mask);
-    asc_storealign(descending, descending_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_int32_t ascending_reg;
+        vector_int32_t descending_reg;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_arange(ascending_reg, START_VALUE + static_cast<int32_t>(offset));
+        asc_arange_descend(descending_reg, START_VALUE + static_cast<int32_t>(offset));
+        asc_storealign(ascending + offset, ascending_reg, mask);
+        asc_storealign(descending + offset, descending_reg, mask);
+    }
 }
 
 __global__ __vector__ void asc_arange_kernel(__gm__ int32_t* ascending, __gm__ int32_t* descending)
 {
     asc_init();
-    __ubuf__ int32_t ascending_local[ELEMENT_COUNT];
-    __ubuf__ int32_t descending_local[ELEMENT_COUNT];
-    arange_vf(ascending_local, descending_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(ascending, ascending_local, ELEMENT_COUNT * sizeof(int32_t));
-    asc_copy_ub2gm_align(descending, descending_local, ELEMENT_COUNT * sizeof(int32_t));
+    __ubuf__ int32_t ascending_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ int32_t descending_local[PADDED_ELEMENT_COUNT];
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(int32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<arange_vf>(ascending_local, descending_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(ascending, ascending_local, TOTAL_LENGTH * sizeof(int32_t));
+    asc_copy_ub2gm_align(descending, descending_local, TOTAL_LENGTH * sizeof(int32_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
@@ -193,14 +213,14 @@ __global__ __vector__ void asc_arange_kernel(__gm__ int32_t* ascending, __gm__ i
 int main()
 {
     std::vector<int32_t> input = {START_VALUE};
-    std::vector<int32_t> ascending(ELEMENT_COUNT, 0), descending(ELEMENT_COUNT, 0);
+    std::vector<int32_t> ascending(TOTAL_LENGTH, 0), descending(TOTAL_LENGTH, 0);
     aclInit(nullptr);
     aclrtSetDevice(0);
     int32_t* ascending_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&ascending_device), (ELEMENT_COUNT) * sizeof(int32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&ascending_device), (TOTAL_LENGTH) * sizeof(int32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     int32_t* descending_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&descending_device), (ELEMENT_COUNT) * sizeof(int32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&descending_device), (TOTAL_LENGTH) * sizeof(int32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     asc_arange_kernel<<<1, 0>>>(ascending_device, descending_device);
     aclrtSynchronizeDevice();

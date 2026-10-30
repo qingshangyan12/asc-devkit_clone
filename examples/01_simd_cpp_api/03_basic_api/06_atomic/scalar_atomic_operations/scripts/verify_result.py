@@ -21,10 +21,10 @@ ERROR_TOL = 0.0
 
 
 def verify_result(output, golden, scenario_num):
-    if scenario_num == 1:
-        output_type = np.int32
-    else:
+    if scenario_num == 2:
         output_type = np.uint32
+    else:
+        output_type = np.int32
 
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)

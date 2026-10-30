@@ -52,7 +52,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 | recvBuf | 输出 | 目的数据buffer地址，集合通信结果输出到此buffer中。 |
 | count | 输入 | 参与AllReduce操作的数据个数，比如只有一个int32数据参与，则count=1。 |
 | dataType | 输入 | AllReduce操作的数据类型，目前支持float、half（即float16）、int8_t、int16_t、int32_t、bfloat16_t数据类型，即支持取值为HCCL_DATA_TYPE_FP32、HCCL_DATA_TYPE_FP16、HCCL_DATA_TYPE_INT8、HCCL_DATA_TYPE_INT16、HCCL_DATA_TYPE_INT32、HCCL_DATA_TYPE_BFP16。HcclDataType数据类型的介绍请参考[表1](HCCL_usage.md#table116710585514)。 |
-| op | 输入 | Reduce的操作类型，目前支持sum、max、min操作类型，即支持取值为HCCL_REDUCE_SUM、HCCL_REDUCE_MAX、HCCL_REDUCE_MIN。HcclReduceOp数据类型的介绍请参考[表2](HCCL_usage.md#table2469980529)。 |
+| op | 输入 | Reduce的操作类型，目前支持sum、max、min、prod操作类型，即支持取值为HCCL_REDUCE_SUM、HCCL_REDUCE_MAX、HCCL_REDUCE_MIN、HCCL_REDUCE_PROD。prod操作不支持int16_t、bfloat16_t数据类型。HcclReduceOp数据类型的介绍请参考[表2](HCCL_usage.md#table2469980529)。 |
 | repeat | 输入 | 一次下发的AllReduce通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AllReduce任务的sendBuf和recvBuf地址由服务端自动算出，计算公式如下：<br><br>sendBuf[i] = sendBuf + count* sizeof(datatype) * i, i∈[0, repeat)<br><br>recvBuf[i] = recvBuf + count* sizeof(datatype) * i, i∈[0, repeat)<br><br>注意：当设置repeat>1时，须与count参数配合使用，规划通信数据地址。 |
 
 **图1**  AllReduce三轮切分通信示例  

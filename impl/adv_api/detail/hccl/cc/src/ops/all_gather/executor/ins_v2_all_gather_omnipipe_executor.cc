@@ -18,6 +18,8 @@
 #include "topo_match_ubx.h"
 #include "ins_temp_all_gather_omnipipe_mesh_1D.h"
 #include "ins_temp_all_gather_omnipipe_nhr.h"
+#include "ins_temp_all_gather_omnipipe_nhr_dpu.h"
+#include "topo_match_two_level.h"
 #include "omnipipe_template_utils.h"
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
@@ -65,37 +67,48 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     HCCL_INFO("[BuildSubCommAndTempMap]infos,%s", ThreeDVecToStrOmni(algHierarchyInfo_.infos).c_str());
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         HCCL_INFO("[BuildSubCommAndTempMap] topoUBX");
-        if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].size() < RANK_LEVEL_2 ||
-            algHierarchyInfo_.infos[0][0].empty() || algHierarchyInfo_.infos[0][1].empty()) {
+        if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].empty() ||
+            algHierarchyInfo_.infos[0][0].empty()) {
             HCCL_ERROR(
-                "[%s] invalid MESH_1D_CLOS algHierarchyInfo, infosSize[%zu], level0Size[%zu].", __func__,
-                algHierarchyInfo_.infos.size(),
-                algHierarchyInfo_.infos.empty() ? 0 : algHierarchyInfo_.infos[0].size());
+                "[%s] invalid MESH_1D_CLOS algHierarchyInfo, infosSize[%zu].", __func__,
+                algHierarchyInfo_.infos.size());
             return HCCL_E_PARA;
         }
-        std::vector<u32> closRanks;
-        subCommRanks0 = {algHierarchyInfo_.infos[0][0]};
-        u32 meshSize = algHierarchyInfo_.infos[0][0].size();
-        for (auto rank : algHierarchyInfo_.infos[0][1]) {
-            if (rank % meshSize == topoInfo->userRank % meshSize) {
-                closRanks.push_back(rank);
+        if (algHierarchyInfo_.infos[0].size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[0][1].empty()) {
+            // V1 格式（TopoMatchUBX）：infos[0]=[mesh组, clos全量]，需同余过滤出代表组
+            subCommRanks0 = {algHierarchyInfo_.infos[0][0]};
+            u32 meshSize = algHierarchyInfo_.infos[0][0].size();
+            std::vector<u32> closRanks;
+            for (auto rank : algHierarchyInfo_.infos[0][1]) {
+                if (rank % meshSize == topoInfo->userRank % meshSize) {
+                    closRanks.push_back(rank);
+                }
             }
+            CHK_PRT_RET(closRanks.empty(), HCCL_ERROR("[%s] MESH_1D_CLOS closRanks is empty.", __func__), HCCL_E_PARA);
+            subCommRanks1 = {closRanks};
+            // V1 的 infos[1] 是第三层级（V1 的 infos[0] 打包了 mesh+clos 两级）
+            if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
+                subCommRanks2 = algHierarchyInfo_.infos[1];
+            } else {
+                subCommRanks2.emplace_back(std::vector<u32>{myRank_});
+            }
+        } else {
+            // V2 格式（TopoMatchTwoLevel）：分组已由 TopoMatch 完成，直接按层级取用
+            subCommRanks0 = algHierarchyInfo_.infos[0];
+            if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
+                subCommRanks1 = algHierarchyInfo_.infos[1];
+            } else {
+                subCommRanks1.emplace_back(std::vector<u32>{myRank_});
+            }
+            // V2 两级算法的 L2 恒为退化单卡（TopoMatchTwoLevel 只产出 2 级，无第三级）
+            subCommRanks2.emplace_back(std::vector<u32>{myRank_});
         }
-        if (closRanks.empty()) {
-            HCCL_ERROR("[%s] MESH_1D_CLOS closRanks is empty.", __func__);
-            return HCCL_E_PARA;
-        }
-        subCommRanks1 = {closRanks};
         omniNeedSetStepNum_ = (subCommRanks1[0].size() == RANK_LEVEL_4) ? OmniNeedSetStepNum::OMNIPIPE_UBX_16P :
                                                                           OmniNeedSetStepNum::OMNIPIPE_DEFAULT;
         omniUbxLastStepRead_ = true;
-        if (algHierarchyInfo_.infos.size() >= RANK_LEVEL_2 && !algHierarchyInfo_.infos[1].empty()) {
-            subCommRanks2 = algHierarchyInfo_.infos[1];
-            omniUbxLastStepRead_ = (subCommRanks2[0].size() > 1) ? false : omniUbxLastStepRead_;
-            omniNeedSetStepNum_ =
-                (subCommRanks2[0].size() > 1) ? OmniNeedSetStepNum::OMNIPIPE_UBX_32P : omniNeedSetStepNum_;
-        } else {
-            subCommRanks2.emplace_back(std::vector<u32>{myRank_});
+        if (subCommRanks2[0].size() > 1) {
+            omniUbxLastStepRead_ = false;
+            omniNeedSetStepNum_ = OmniNeedSetStepNum::OMNIPIPE_UBX_32P;
         }
     } else if (topoType_ == TopoType::THREE_LEVEL) {
         HCCL_INFO("[BuildSubCommAndTempMap] treeLevel");
@@ -281,7 +294,14 @@ HcclResult InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     controlThread_ = threads_.at(0);
     levelThreads_.resize(OMNIPIPE_LEVEL_NUM);
 
-    CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
+    // 按本 rank 与对端 rank 所属的子通信域重新归层（对齐 hccl :401-405）
+    // 兼容 CalcRes 按层序列化和对称内存合并到 channels[0] 两种资源布局
+    const std::vector<const std::vector<std::vector<u32>>*> subCommsByLevel = {
+        &subCommRanks0, &subCommRanks1, &subCommRanks2};
+    const std::vector<uint64_t> rankSizesByLevel = {
+        rankSizeLevel_[OMNIPIPE_LEVEL0], rankSizeLevel_[OMNIPIPE_LEVEL1], rankSizeLevel_[OMNIPIPE_LEVEL2]};
+    CHK_RET(ClassifyOmniPipeChannelsByLevel(
+        myRank_, resCtx.channels, subCommsByLevel, rankSizesByLevel, remoteRankToChannelInfo_));
     if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
         if (rankSizeLevel_[OMNIPIPE_LEVEL1] > 1) {
             tempMap[OMNIPIPE_LEVEL1]->SetchannelsPerRank(remoteRankToChannelInfo_[1]);
@@ -364,6 +384,10 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     u64 perLoopSize = maxCountPerLoop * dataTypeSize_;
     std::vector<u64> dataSizePerLoop(rankSize_, perLoopSize);
     std::vector<u64> dataWholeSize(rankSize_, perLoopSize);
+    for (int i = 0; i < rankSize_; i++) {
+        dataSizePerLoop.push_back(perLoopSize);
+        dataWholeSize.push_back(perLoopSize);
+    }
 
     OmniPipeSliceParam omniPipeSliceParam;
     omniPipeSliceParam.levelRankSize = {
@@ -649,6 +673,14 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     }
     return HCCL_SUCCESS;
 }
+
+// 2级算法: TopoMatchTwoLevel 产出 2 级 infos，3 个模板中 L2 模板不执行（subCommRanks2 退化为单卡）
+REGISTER_EXEC_V2_MULTI(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, InsV2AllGatherOmniPipeExecutor, TopoMatchTwoLevel,
+    InsTempAllGatherOmniPipeMesh1D, InsTempAllGatherOmniPipeNHR, InsTempAllGatherOmniPipeNHRDPU);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLineMeshNHR, AlgEngine::AICPU, "pipeline[mesh,nhr]", COND_NONE,
+    FLAG_UBX, 0);
 
 REGISTER_EXEC_V2_MULTI(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLinePcie, InsV2AllGatherOmniPipeExecutor, TopoMatchPcieMix,

@@ -45,27 +45,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __bfloat1622fp4x2_e2m1_ru(
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __bfloat1622fp4x2_e2m1_rz(const bfloat16x2_t x);
 
-#if (__NPU_ARCH__ == 9202)
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e1m2x2_t __bfloat1622fp4x2_e1m2_rha(const bfloat16x2_t x);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __hmul22fp4x2_e2m1_rna(const half2 x, const half2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __hmul22fp4x2_e2m1_rha(const half2 x, const half2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e1m2x2_t __hmul22fp4x2_e1m2_rna(const half2 x, const half2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e1m2x2_t __hmul22fp4x2_e1m2_rha(const half2 x, const half2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __hmul22fp4x2_e2m1_rna(const bfloat16x2 x, const bfloat16x2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e2m1x2_t __hmul22fp4x2_e2m1_rha(const bfloat16x2 x, const bfloat16x2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e1m2x2_t __hmul22fp4x2_e1m2_rna(const bfloat16x2 x, const bfloat16x2 y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4_e1m2x2_t __hmul22fp4x2_e1m2_rha(const bfloat16x2 x, const bfloat16x2 y);
-#endif
-
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "impl/simt_api/asc_fp4_impl.h"
 #endif

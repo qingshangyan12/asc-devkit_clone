@@ -27,8 +27,8 @@ namespace AscendC {
  *
  * \param [in] srcShape input shape
  * \param [in] typeSize data type size: sizeof(TYPE)
- * \param [out] maxValue max size of tmp buffer
- * \param [out] minValue min size of tmp buffer
+ * \param [out] maxValue max size of tmp buffer, in bytes
+ * \param [out] minValue min size of tmp buffer, in bytes
  */
 void GetPadMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue);
@@ -58,8 +58,8 @@ void PadTilingFunc(
  * \param [in] ascendcPlatform ascendc platform
  * \param [in] srcShape input shape
  * \param [in] typeSize data type size: sizeof(TYPE)
- * \param [out] maxValue max size of tmp buffer
- * \param [out] minValue min size of tmp buffer
+ * \param [out] maxValue max size of tmp buffer, in bytes
+ * \param [out] minValue min size of tmp buffer, in bytes
  */
 void GetUnPadMaxMinTmpSize(
     const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::TensorShape& srcShape,
