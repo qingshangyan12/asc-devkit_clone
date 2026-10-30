@@ -4,4 +4,4 @@
 
 AI框架调用时，除了需要提供CANN框架调用时需要的代码实现文件，还需要进行插件适配开发。
 
-<img src="../../../figures/kernelLaunch.png" alt="" width="900px" height="714px">
+<img src="../../../figures/kernelLaunch.png" alt="" width="600px" height="478px">

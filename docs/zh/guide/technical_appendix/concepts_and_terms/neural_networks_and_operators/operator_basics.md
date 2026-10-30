@@ -101,7 +101,7 @@ Tensor是算子计算数据的容器，包含如下属性信息。
 假设有一些照片，每个像素点都由红/绿/蓝3色组成，即shape里面3的含义，照片的宽和高都是20，也就是20\*20=400个像素，总共有4张的照片，这就是shape=\(4, 20, 20, 3\)的物理含义。
 
 **图2**  示意图<a name="fig2036333061811"></a>  
-<img src="../../../figures/diagram.png" alt="示意图" width="900px" height="908px">
+<img src="../../../figures/diagram.png" alt="示意图" width="300px" height="303px">
 
 如果体现在编程上，可以简单把shape理解为操作Tensor的各层循环，比如我们要对shape=\(4, 20, 20, 3\)的A tensor进行操作，循环语句如下：
 
@@ -130,4 +130,4 @@ produce A {
 N维Tensor的轴有：0 , 1, 2,……，N-1。
 
 **图3**  轴示意图<a name="zh-cn_topic_0228422146_fig82601017112413"></a>  
-<img src="../../../figures/axis.png" alt="轴示意图" width="900px" height="605px">
+<img src="../../../figures/axis.png" alt="轴示意图" width="300px" height="203px">
