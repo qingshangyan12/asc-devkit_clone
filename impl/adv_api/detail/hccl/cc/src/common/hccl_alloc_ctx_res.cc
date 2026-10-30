@@ -300,7 +300,10 @@ HcclResult AllocWorkspaceMemory(HcclComm comm, const std::string& ctxTag, CommEn
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), commEngine, memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     }
-    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
+    // A5 keeps the protocol-compatible 512B round-up on host so the device Init can skip it.
+    resCtx.workSpace = (resCtx.workSpace + 0x1ffULL) & ~0x1ffULL;
+    HCCL_INFO(
+        "HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
     return HCCL_SUCCESS;
 }
 

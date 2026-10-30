@@ -91,10 +91,11 @@ public:
 private:
     // Generic implementation for corresponding interface of each Prepare primitive. Return identifier(handleId) of
     // corresponding comm task. HandleId >= 0 when successful, otherwise return -1.
-    template <bool commit = false>
+    template <bool commit = false, HcclCMDType cmdType = HcclCMDType::HCCL_CMD_ALL>
     __aicore__ inline HcclHandle CommonPrepareImpl(const CommonPrepareParam& param);
 
-    __aicore__ inline bool CheckCommonPrepareParamValid(const CommonPrepareParam& param);
+    template <HcclCMDType cmdType>
+    __aicore__ inline bool CheckCommonPrepareParamValid(const CommonPrepareParam& param, uint64_t& tiling);
 
     __aicore__ inline bool CheckAlltoAllVPrepareParamValid(const CommonPrepareParam& param);
 
@@ -104,9 +105,12 @@ private:
     template <bool sync>
     __aicore__ inline void SendFinalizeMsg();
 
+#if __NPU_ARCH__ == 3510
+    __aicore__ inline void SendMsgToServer(const CommonPrepareParam& para, uint64_t tiling);
+#else
     __aicore__ inline void SendMsgToServer(
-        uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID = -1,
-        HcclHandle srcHandleID = INVALID_HANDLE_ID);
+        uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling);
+#endif
 
     __aicore__ inline void SendMsgToServer(const AlltoAllVParamExt& para);
 
@@ -137,7 +141,11 @@ private:
     uint16_t handleIdCommitTurnCnt_[HCCL_MAX_HANDLE_ID] = {0U};
     uint16_t handleIdWaitCallNum_[HCCL_MAX_HANDLE_ID] = {0U};
     uint8_t handleId2CmdType_[HCCL_MAX_HANDLE_ID] = {0U};
+#if __NPU_ARCH__ == 3510
+    alignas(alignof(uint64_t)) int8_t handleIdMsgPosition_[HCCL_MAX_HANDLE_ID + 1];
+#else
     int8_t handleIdMsgPosition_[HCCL_MAX_HANDLE_ID];
+#endif
     uint8_t handleIdRepeat_[HCCL_MAX_HANDLE_ID] = {0U};
     uint8_t curMsgPosition_[MAX_QUE_NUM] = {0U};
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;

@@ -33,16 +33,25 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     if (initTiling != nullptr) {
         const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
         debugMode_ = initTilingPtr->debugMode;
-        devType_ = initTilingPtr->devType;
+#if __NPU_ARCH__ == 3510
+        // A5-only build: context decoupling does not consume devType.
         tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
         hcclContext_ = (__gm__ OpResCtx*)context;
-        ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+        if (hcclContext_ == nullptr) {
+            KERNEL_LOG(KERNEL_ERROR, "Init Hccl failed, context addr is nullptr.");
+            return;
+        }
         InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
         return;
     }
+#endif
+
     // initTiling is nullptr, get opType from context
     hcclContext_ = (__gm__ OpResCtx*)context;
-    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    if (hcclContext_ == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "Init Hccl failed, context addr is nullptr.");
+        return;
+    }
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
     const uint32_t opType = hcclContext_->opType[0];
     ASCENDC_HCCL_API_ASSERT(
