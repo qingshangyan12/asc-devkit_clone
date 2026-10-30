@@ -45,7 +45,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
         return;
     }
-
     // initTiling is nullptr, get opType from context
     hcclContext_ = (__gm__ OpResCtx*)context;
     if (hcclContext_ == nullptr) {

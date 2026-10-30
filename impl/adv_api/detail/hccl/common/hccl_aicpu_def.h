@@ -105,12 +105,8 @@ private:
     template <bool sync>
     __aicore__ inline void SendFinalizeMsg();
 
-#if __NPU_ARCH__ == 3510
-    __aicore__ inline void SendMsgToServer(const CommonPrepareParam& para, uint64_t tiling);
-#else
     __aicore__ inline void SendMsgToServer(
         uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling);
-#endif
 
     __aicore__ inline void SendMsgToServer(const AlltoAllVParamExt& para);
 
