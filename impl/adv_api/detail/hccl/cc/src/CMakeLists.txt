@@ -15,7 +15,9 @@ option(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE "Use asc-comm CCU dataplane in mc2_c
 # libasccomm_ccu.so 由 cmake/third_party/asc-comm.cmake 随包从源码构建（asccomm_ccu 目标，
 # BUILD_OPEN_PROJECT 下生效），无需 CANN 包预装 asc-comm，也不再使用 ASCCOMM_CCU_ROOT 预检。
 # 控制面（通信域/拓扑/channel/instance/thread）仍走 hcomm。
-if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+# 仅 host 构建需要：mc2_client 与 asccomm_ccu 都是 host 侧目标；device/KERNEL_MODE 配置
+# （cmake/device 入口不经 impl/adv_api，无 asc-comm.cmake）不涉及数据面，跳过校验。
+if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE AND NOT KERNEL_MODE)
     if(NOT TARGET asccomm_ccu)
         message(FATAL_ERROR
             "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE requires the asccomm_ccu target: build with BUILD_OPEN_PROJECT=ON "
