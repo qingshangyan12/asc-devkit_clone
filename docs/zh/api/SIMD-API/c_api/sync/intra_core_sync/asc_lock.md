@@ -191,7 +191,7 @@ __global__ __vector__ void asc_lock_kernel(__gm__ float* output, __gm__ float* s
     asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, z, BYTES);
     asc_unlock(PIPE_MTE3, MUTEX_ID);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

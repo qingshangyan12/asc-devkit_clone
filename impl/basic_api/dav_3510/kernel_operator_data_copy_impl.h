@@ -497,8 +497,8 @@ __aicore__ inline void DataCopyGM2UBND2NZImpl(
 
 __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^22");
     });
     ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
         KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
@@ -538,8 +538,8 @@ __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
 
 __aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^22");
     });
     ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
         KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
@@ -577,6 +577,49 @@ __aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
     set_loop2_stride_ubtoout(loop2StridePara);
 }
 
+__aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopParams)
+{
+    if ASCEND_IS_AIC {
+        ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^22");
+        });
+        ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1DstStride is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 21)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2DstStride is too big and needs to be less than 2^21");
+        });
+        ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 40)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big and needs to be less than 2^40");
+        });
+        ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 40)), {
+            KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big and needs to be less than 2^40");
+        });
+        uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_OUTTOL1[42:21]
+        loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_OUTTOL1[20:0]
+
+        // LOOP1_STRIDE_OUTTOL1[60:40], must be 32B aligned
+        ASCENDC_ASSERT((loopParams.loop1DstStride % GetDataBlockSizeInBytes() == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "loop1DstStride must be 32B aligned");
+        });
+        uint64_t loop1StridePara = (loopParams.loop1DstStride) << 40;
+        loop1StridePara |= loopParams.loop1SrcStride; // LOOP1_STRIDE_OUTTOL1[39:0]
+        // LOOP2_STRIDE_OUTTOL1[60:40], must be 32B aligned
+        ASCENDC_ASSERT((loopParams.loop2DstStride % GetDataBlockSizeInBytes() == 0), {
+            KERNEL_LOG(KERNEL_ERROR, "loop2DstStride must be 32B aligned");
+        });
+        uint64_t loop2StridePara = (loopParams.loop2DstStride) << 40;
+        loop2StridePara |= loopParams.loop2SrcStride; // LOOP2_STRIDE_OUTTOL1[39:0]
+
+        set_loop_size_outtol1(loopSizePara);
+        set_loop1_stride_outtol1(loop1StridePara);
+        set_loop2_stride_outtol1(loop2StridePara);
+    }
+}
+
 __aicore__ inline void ResetUBLoopModeParaImpl(void)
 {
     constexpr uint64_t loopSizePara = (1ul << 21) | 1ul; // 设置SPR寄存器，硬件约定置1为normal
@@ -589,6 +632,15 @@ __aicore__ inline void ResetOutLoopModeParaImpl(void)
     constexpr uint64_t loopSizePara = (1ul << 21) | 1ul; // 设置SPR寄存器，硬件约定置1为normal
 
     set_loop_size_outtoub(loopSizePara);
+}
+
+__aicore__ inline void ResetOutToL1LoopModeParaImpl(void)
+{
+    if ASCEND_IS_AIC {
+        constexpr uint64_t loopSizePara = (1ul << 21) | 1ul; // 设置SPR寄存器，硬件约定置1为normal
+
+        set_loop_size_outtol1(loopSizePara);
+    }
 }
 
 template <typename T>

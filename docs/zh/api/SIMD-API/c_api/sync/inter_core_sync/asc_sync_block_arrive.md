@@ -167,7 +167,7 @@ __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ half* input, __gm__ f
                         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
                         asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     }
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

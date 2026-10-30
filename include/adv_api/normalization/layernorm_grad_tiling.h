@@ -36,8 +36,8 @@ constexpr uint32_t LAYERNORM_GRAD_B16_DATA_NUM_PER_BLOCK = 16;
  * \param [in] srcShape: input shape
  * \param [in] typeSize: data type size
  * \param [in] isReuseSource: indicate whether to reuse source tensor. Reserved parameter.
- * \param [out] maxValue: max size required for tmp buffer
- * \param [out] minValue: min size required for tmp buffer
+ * \param [out] maxValue: max size required for tmp buffer, in bytes
+ * \param [out] minValue: min size required for tmp buffer, in bytes
  */
 void GetLayerNormGradMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,

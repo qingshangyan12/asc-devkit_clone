@@ -41,27 +41,27 @@ Tensor API提供三个调试打印接口：
 ### print
 
 ```cpp
-__aicore__ inline void print(__gm__ const char* fmt);
+__aicore__ inline void print(__gm__ const char* fmt)
 
 template <typename Arg0, typename... Args>
-__aicore__ inline void print(__gm__ const char* fmt, Arg0&& arg0, Args&&... args);
+__aicore__ inline void print(__gm__ const char* fmt, Arg0&& arg0, Args&&... args)
 
 template <typename Value, typename Std::enable_if_t<!detail::is_print_string_v<Value>, int> = 0>
-__aicore__ inline void print(const Value& value);
+__aicore__ inline void print(const Value& value)
 ```
 
 ### print_layout
 
 ```cpp
 template <typename Layout>
-__aicore__ inline void print_layout(const Layout& layout);
+__aicore__ inline void print_layout(const Layout& layout)
 ```
 
 ### print_tensor
 
 ```cpp
 template <typename Tensor>
-__aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true);
+__aicore__ inline void print_tensor(const Tensor& tensor, bool print_type = true)
 ```
 
 ## 参数说明

@@ -60,8 +60,8 @@ enum class ReducePattern : uint32_t {
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceProdMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -76,8 +76,8 @@ void GetReduceProdMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceSumMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -92,8 +92,8 @@ void GetReduceSumMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceMeanMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -108,8 +108,8 @@ void GetReduceMeanMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceMaxMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -124,8 +124,8 @@ void GetReduceMaxMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceMinMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -140,8 +140,8 @@ void GetReduceMinMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceAnyMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
@@ -156,8 +156,8 @@ void GetReduceAnyMaxMinTmpSize(
  * \param [in] pattern, reduce pattern
  * \param [in] isSrcInnerPad, whether the last axis of input data is padded
  * \param [in] isReuseSource, whether to reuse the input space of the source operand
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  */
 void GetReduceAllMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,

@@ -56,7 +56,7 @@ def enable_exception_dump(kernels=None):
         enable_exception_dump()
 
         # 仅开启指定前缀的算子
-        enable_exception_dump(["incre_flash_attention"])
+        enable_exception_dump(["my_kernel"])
     """
     ret = _init(kernels)
     if ret != 0:
@@ -198,7 +198,7 @@ def dump_tensors(named_tensors, stage=None, dump_dir=None):
     """批量 dump 一组命名 tensor。
 
     Args:
-        named_tensors: dict[str, Tensor]，如 {"query": q, "block_table": bt}
+        named_tensors: dict[str, Tensor]，如 {"x": x, "y": y}
         stage:         阶段标签（"input" / "output"），仅影响产物文件名前缀
         dump_dir:      输出目录，决策链同 dump_tensor
 
@@ -226,16 +226,14 @@ def run_with_tensor_dump(func, *args, tag=None, dump_inputs=True, dump_outputs=T
     单个 tensor dump 失败仅打印告警、不中断业务调用（保证故障复现流程不受影响）。
 
     Args:
-        func:         被包装的算子/函数（如 torch.ops.ascend_ops.xxx）
+        func:         被包装的算子/函数（如 torch.add）
         tag:          产物命名中的算子标签；缺省尝试取 func.__name__，取不到用 "op"
         dump_inputs:  是否 dump 输入 tensor（默认 True）
         dump_outputs: 是否 dump 输出 tensor（默认 True）
         dump_dir:     输出目录，决策链同 dump_tensor
 
     Example:
-        out, lse = run_with_tensor_dump(
-            torch.ops.ascend_ops.npu_fused_infer_attention_score,
-            tag="npu_fused_infer_attention_score", **params)
+        out = run_with_tensor_dump(torch.add, input=x, other=y, tag="add")
     """
     tag = _safe_name(tag or getattr(func, "__name__", "") or "op")
 

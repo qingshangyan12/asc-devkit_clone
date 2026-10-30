@@ -174,10 +174,14 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint8_t MUTEX_ID = 0;
+
+
+constexpr uint32_t ELEMENT_COUNT = 133;
 constexpr uint32_t REPEAT_TIMES = 3;
 constexpr uint32_t DIRECT_BASE = 0;
 constexpr uint32_t IMMEDIATE_BASE = 16;
@@ -187,17 +191,27 @@ constexpr uint32_t ADDR_STRIDE = 7;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 
-__simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input)
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = REPEAT_TIMES;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(uint16_t);
+__simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
     addr_reg offset;
-    for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
-        asc_storealign_1st(output + DIRECT_BASE + i, src);
-        asc_storealign_1st(output + IMMEDIATE_BASE + i, src,
-                           static_cast<int32_t>(IMMEDIATE_OFFSET));
-        offset = asc_update_addr_reg_b16(ADDR_STRIDE);
-        asc_storealign_1st(output + ADDR_BASE, src, offset);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint16_t valid_count = remaining_length > one_repeat_size ? one_repeat_size : remaining_length;
+        for (uint16_t j = 0; j < valid_count; ++j) {
+            const uint32_t index = i * one_repeat_size + j;
+            asc_storealign_1st(output + DIRECT_BASE + index, src);
+            asc_storealign_1st(output + IMMEDIATE_BASE + index, src,
+                               static_cast<int32_t>(IMMEDIATE_OFFSET));
+            offset = asc_update_addr_reg_b16(ADDR_STRIDE);
+            asc_storealign_1st(output + ADDR_BASE, src, offset);
+        }
+        remaining_length -= valid_count;
     }
 }
 
@@ -206,15 +220,21 @@ __global__ __vector__ void store_first_kernel(__gm__ uint16_t* output, __gm__ ui
     asc_init();
     __ubuf__ uint16_t input_local[ELEMENT_COUNT];
     __ubuf__ uint16_t output_local[ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub(input_local, input, BUFFER_BYTES);
     asc_copy_gm2ub(output_local, output, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<store_first_vf>(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint16_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<store_first_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm(output, output_local, BUFFER_BYTES);
-    asc_sync_pipe(PIPE_ALL);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
+    asc_sync();
 }
 } // namespace
 

@@ -82,6 +82,7 @@
 ## 数据类型
 
 支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_store_to_register_res.md#id2 -->
 
 ## 返回值说明<a name="section128671456102513"></a>
 
@@ -108,6 +109,7 @@
   - Atlas A2系列产品
   <!-- end id11 -->
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_store_to_register_res.md#id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

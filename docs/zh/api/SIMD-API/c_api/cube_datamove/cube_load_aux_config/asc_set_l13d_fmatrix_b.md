@@ -153,7 +153,7 @@ __global__ __cube__ void asc_set_l13d_fmatrix_b_kernel(
     asc_copy_l0c2gm(output, output_l0, M, COUT, M, COUT,
         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::F322F16,
         asc_relu_pre_mode::NONE, false, true, false, false);
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 } // namespace

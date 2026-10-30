@@ -134,7 +134,7 @@ def _get_kernel_magic_asecnd_910B(
     aicore_type: str, mix: str = None, compatible_needed: bool = False, mix_type_info: str = None
 ) -> dict:
     """
-    get the magic info for Ascend910B / Ascend910_93 / Ascend950 / Ascend960DT / Ascend960PR / MC62 / MC32DM11A
+    get the magic info for Ascend910B / Ascend910_93 / Ascend950 / Ascend960DT / Ascend960PR / MC62
     Parameters
     ----------
     aicore_type: core type, VectorCore or AiCore
@@ -207,7 +207,6 @@ def _add_kernel_magic(
         "Ascend960DT",
         "Ascend960PR",
         "MC62",
-        "MC32DM11A",
         "Ascend350",
     ]:
         title_dict = _get_kernel_magic_asecnd_910B(aicore_type, mix, compatible_needed, mix_type_info)
@@ -684,10 +683,9 @@ def tvm_callback_cce_postproc(
     from asc_op_compile_base.common.platform.platform_info import ASCEND_960DT
     from asc_op_compile_base.common.platform.platform_info import ASCEND_960PR
     from asc_op_compile_base.common.platform.platform_info import MC62
-    from asc_op_compile_base.common.platform.platform_info import MC32DM11A
 
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
-    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_950, ASCEND_960DT, ASCEND_960PR, MC62, MC32DM11A]:
+    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_950, ASCEND_960DT, ASCEND_960PR, MC62]:
         if is_ffts_id_needed or mix == "MIX" or ccec.current_build_config().get(enforce_mix_mode):
             title_dict["coreType"] = "MIX"
             from asc_op_compile_base.common import cce_params
@@ -700,15 +698,7 @@ def tvm_callback_cce_postproc(
     title_dict["blockDim"] = numblocks
     title_dict["opParaSize"] = args_size
 
-    if short_soc_version in [
-        "Ascend910B",
-        "Ascend910_93",
-        "Ascend950",
-        "Ascend960DT",
-        "Ascend960PR",
-        "MC62",
-        "MC32DM11A",
-    ]:
+    if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950", "Ascend960DT", "Ascend960PR", "MC62"]:
         mode_in_args_first_field = 0
         if is_ffts_id_needed or ccec.current_build_config().get(enforce_mix_mode):
             mode_in_args_first_field = 1

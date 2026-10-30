@@ -36,6 +36,6 @@ int32_t SetBType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans
 ```
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
-// 设置B矩阵，buffer位置为GM，数据格式为ND，数据类型为bfloat16，默认不转置
+// 设置B矩阵，buffer位置为GM，数据格式为ND，数据类型为half，默认不转置
 tiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
 ```
