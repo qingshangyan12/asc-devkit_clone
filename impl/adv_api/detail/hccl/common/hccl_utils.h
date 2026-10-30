@@ -31,6 +31,17 @@ __aicore__ inline void FlushDataCache(__gm__ void* gmAddr)
     FlushDataCache(globalHcclMsgArea, gmAddr);
 }
 
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+__aicore__ inline void FlushDataCacheRaw(__gm__ void* gmAddr)
+{
+    AscendC::Barrier();
+    __asm__("NOP");
+    dcci(static_cast<__gm__ void*>(gmAddr), static_cast<uint64_t>(cache_line_t::SINGLE_CACHE_LINE),
+          static_cast<uint64_t>(dcci_dst_t::CACHELINE_OUT));
+    DataSyncBarrier<MemDsbT::ALL>();
+}
+#endif
+
 __aicore__ inline void FlushDataCacheAicpu(GlobalTensor<int64_t>& globalHcclMsgArea, __gm__ void* gmAddr)
 {
     AscendC::Barrier();
