@@ -769,7 +769,7 @@ class BackendScope {
 public:
     explicit BackendScope(Mc2ServerStageTiming::BackendZone zone)
     {
-        if (!Mc2ServerStageTiming::Enabled()) return;
+        if (!Mc2ServerStageTiming::DetailEnabled()) return;
         auto& b = Mc2ServerStageTiming::BackendTotals();
         bound_ = Mc2HcommDiagBindV1(b.words + zone * Mc2ServerStageTiming::BACKEND_WORDS,
                                   Mc2ServerStageTiming::BACKEND_WORDS) == HCCL_SUCCESS;
