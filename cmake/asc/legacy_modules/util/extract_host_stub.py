@@ -1115,9 +1115,9 @@ def generate_host_stub_code_cpu(func_groups: List[FuncSignGroupWithModeBase], ty
     """Generate host_stub.cpp code for cpu."""
     buff = io.StringIO()
     buff.write(generate_host_stub_head_code_cpu())
-    has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
 
     for func_group in func_groups:
+        has_mode_func = partial(has_mode_in_func_groups, func_groups=[func_group])
         for key, func_sign in enumerate(func_group.func_signs, func_group.base_key):
             param_names = tuple(get_param_names_by_func_sign(func_sign))
             stream_name = param_names[1]
