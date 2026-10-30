@@ -18,7 +18,7 @@
 
 ## 基本流程
 
-算子工程的CMakeLists.txt由开发者自行编写，详细的编写方法请参考[编译组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，算子工程编译部署只需三步：
+算子工程的CMakeLists.txt由开发者自行编写，详细的编写方法请参考[工程目录组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，算子工程编译部署只需三步：
 
 1. 在CMakeLists.txt中设置`ASCEND_SOC_SERIES`（构建目标）以及`vendor_name`（厂商名称）等编译配置选项；
 2. 执行`cmake`和`make`命令，生成`custom_opp_*.run`安装包；
@@ -35,9 +35,9 @@
 | ASCEND_SOC_SERIES | 构建目标（AI处理器系列），支持配置一个或多个值，输入不区分大小写，取值需与Host原型中的`AddConfig`对应。 | `ascend910b` |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
 
-`ASCEND_SOC_SERIES`不能为空，应在`find_package(ASC)`前设置，由ASC加载时完成校验；交叉编译相关变量则必须在`find_package(ASC)`前设置。设备型号与构建目标标识的区别见[构建目标配置](../aclnn_quick_start.md#target-configuration)。
+`ASCEND_SOC_SERIES`不能为空；交叉编译相关变量则必须在`find_package(ASC)`前设置。设备查询命令得到的设备型号与`ASCEND_SOC_SERIES`的构建目标标识不是同一个值，不能直接把查询结果填入`ASCEND_SOC_SERIES`或`AddConfig`，各产品对应的取值请参考[产品形态说明](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)中的表1。
 
-**存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，取值为构建目标的小写标识（如`ascend910b`），行为保持不变，存量工程无需迁移。两者不能同时配置；与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`不会自动转小写。切换两种配置方式时，请使用新的构建目录，避免旧`CMakeCache.txt`中残留的目标变量与新配置冲突而报错。
+**存量工程说明**：`ASCEND_COMPUTE_UNIT`是`ASCEND_SOC_SERIES`之前的配置入口，取值为构建目标的小写标识（如`ascend910b`），行为保持不变，存量工程无需迁移。两者不能同时配置；与`ASCEND_SOC_SERIES`不同，`ASCEND_COMPUTE_UNIT`不会自动转小写。切换两种配置方式时，请使用新的构建目录，避免旧`CMakeCache.txt`中残留的`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`缓存值与新配置冲突而报错。
 
 除上述必改参数外，其他可选编译配置选项详情如下：
 
@@ -63,10 +63,8 @@
 cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
-# 在加载ASC前提供默认目标；外部配置ASCEND_COMPUTE_UNIT时不再设置另一种目标变量。
-if(NOT DEFINED ASCEND_COMPUTE_UNIT)
-    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
-endif()
+# 在加载ASC前提供默认构建目标
+set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)
 
@@ -78,7 +76,12 @@ npu_op_package(${vendor_name}
 )
 ```
 
-以上为顶层文件的配置部分，还需按[快速入门](../aclnn_quick_start.md)或[编译组织](#编译组织)添加源文件和各类库的构建配置。`CACHE`设置提供默认值，允许命令行`-D`和preset传入的同名值生效；不要再用普通`set(...)`覆盖这些值。要在文件中直接指定其他构建目标，修改该默认值即可，例如`set(ASCEND_SOC_SERIES "Ascend950" CACHE STRING "AI processor series")`；修改后请使用新的构建目录。
+以上代码中`vendor_name`和`ASCEND_SOC_SERIES`均通过`CACHE`设置默认值，这样命令行`-D`和preset传入的同名值才能生效覆盖；不要再用普通`set(...)`覆盖这些值。要在文件中直接指定其他构建目标，修改该默认值即可，例如`set(ASCEND_SOC_SERIES "Ascend950" CACHE STRING "AI processor series")`；修改后请使用新的构建目录。
+
+> [!NOTE]说明
+> 如需通过命令行`-DASCEND_COMPUTE_UNIT=...`覆盖构建目标，请删除或注释掉文件中`set(ASCEND_SOC_SERIES ...)`这一行，否则两个变量同时被设置会导致CMake配置阶段报错。
+
+以上为顶层文件的配置部分，还需按[快速入门](../aclnn_quick_start.md)或[工程目录组织](#编译组织)添加源文件和各类库的构建配置。
 
 其他配置（如动态库编译、交叉编译等）也可在CMakeLists.txt中通过变量或`npu_op_package` CONFIG参数设置。完整参数说明请参考[cmake函数参考](../appendix/cmake_function_reference.md)。
 
@@ -120,7 +123,8 @@ npu_op_package(${vendor_name}
 }
 ```
 
-需要注意如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如自定义配置直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
+> [!NOTE]说明
+> 如果`npu_op_package(... CONFIG ...)`中硬编码了`ENABLE_SOURCE_PACKAGE`或`ENABLE_BINARY_PACKAGE`的值（如自定义配置直接写True），命令行或`CMakePresets.json`中的同名变量将无法覆盖。要允许外部变量生效，CONFIG中应使用`${ENABLE_SOURCE_PACKAGE}`、`${ENABLE_BINARY_PACKAGE}`变量形式。
 
 ## 执行编译
 
@@ -316,7 +320,7 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ---
 
-## 编译组织（进阶）<a id="advanced-build-organization"></a><a id="编译组织"></a>
+## 工程目录组织（进阶）<a id="advanced-build-organization"></a><a id="编译组织"></a>
 
 算子工程通过CMake组织编译。如需自行组织工程或用CANN提供的CMake modules定制编译流程，可参考以下内容。
 
@@ -344,9 +348,7 @@ cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
 # 1. 在加载ASC前设置配置默认值，也可由命令行或preset传入。
-if(NOT DEFINED ASCEND_COMPUTE_UNIT)
-    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
-endif()
+set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)
 
@@ -373,7 +375,7 @@ endif()
 - `SHARED`：生成动态库，用于集成到应用。
 - `STATIC`：生成静态库，用于静态链接。
 
-**2. Host侧CMakeLists.txt**
+**2. Host侧CMakeLists.txt**<a id="graph-library"></a>
 
 `op_host/`下的CMakeLists.txt生成aclnn调用代码，编译Host侧各类库：
 
@@ -462,7 +464,7 @@ npu_op_package_add(${package_name}
 )
 ```
 
-示例中的源码声明默认对工程配置的所有目标生效；如需限制生效范围，可按[CMake函数参考](../appendix/cmake_function_reference.md#npu_op_kernel_sources)添加`COMPUTE_UNIT`或`SOC_SERIES`参数（二选一）。示例中核函数（Kernel）实现文件名为`add_custom.cpp`，所以在`npu_op_kernel_sources`中同时指定了`OP_TYPE`和`KERNEL_FILE`。如果想按目录扫描核函数（Kernel）源码，可改用`KERNEL_DIR ./`，此时`KERNEL_DIR`相对于后续`npu_op_kernel_library`中的`SRC_BASE`。
+示例中的源码声明默认对工程配置的所有目标生效；如需限制生效范围，可按[CMake函数参考](../appendix/cmake_function_reference.md#npu_op_kernel_sources)添加`SOC_SERIES`参数。示例中核函数（Kernel）实现文件名为`add_custom.cpp`，所以在`npu_op_kernel_sources`中同时指定了`OP_TYPE`和`KERNEL_FILE`。如果想按目录扫描核函数（Kernel）源码，可改用`KERNEL_DIR ./`，此时`KERNEL_DIR`相对于后续`npu_op_kernel_library`中的`SRC_BASE`。
 
 ### 按算子划分的目录结构
 
@@ -498,9 +500,7 @@ cmake_minimum_required(VERSION 3.19.0)
 project(opp)
 
 # 在加载ASC前设置默认配置，允许命令行或preset覆盖。
-if(NOT DEFINED ASCEND_COMPUTE_UNIT)
-    set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
-endif()
+set(ASCEND_SOC_SERIES "ascend910b" CACHE STRING "AI processor series")
 set(vendor_name "customize" CACHE STRING "Operator package vendor")
 find_package(ASC REQUIRED)
 
