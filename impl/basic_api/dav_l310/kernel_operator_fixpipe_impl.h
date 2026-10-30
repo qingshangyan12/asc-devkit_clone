@@ -74,7 +74,7 @@ __aicore__ inline void SetFixPipeConfigImpl(const LocalTensor<T>& preTensor, boo
     set_fpc(config);
 }
 
-__aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
+__aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
 {
     // ND_PARA[63:32], dst nd stride in unit of element
     // ND_PARA[31:16], src nd stride in uint of C0_SIZE
@@ -241,9 +241,9 @@ __aicore__ inline void FixpipeL0cToL1(
                           "L0C Buffer(CO1) and dst position is L1 Buffer(C1), isChannelSplit must be set as false \n"));
     static_assert(
         SupportType<
-            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, int32_t>, Tuple<half, half>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>, Tuple<half, int32_t>,
+            Tuple<half, half>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,
+            Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     // Loop1_src_stride in unit of C0_size
@@ -279,9 +279,9 @@ __aicore__ inline void FixpipeL0cToUB(
 {
     static_assert(
         SupportType<
-            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, int32_t>, Tuple<half, half>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>, Tuple<half, int32_t>,
+            Tuple<half, half>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,
+            Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     // Loop1_src_stride in unit of C0_size
@@ -351,9 +351,9 @@ __aicore__ inline void FixpipeL0cToOut(
     }
     static_assert(
         SupportType<
-            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, int32_t>, Tuple<half, half>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<SrcT, DstT>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>, Tuple<half, int32_t>,
+            Tuple<half, half>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>,
+            Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
