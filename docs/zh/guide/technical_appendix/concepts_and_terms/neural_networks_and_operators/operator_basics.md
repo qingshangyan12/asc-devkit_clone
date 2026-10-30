@@ -9,7 +9,7 @@
 算子的名称，用于标识网络中的某个算子，同一网络中算子的名称需要保持唯一。如下图所示Conv1、Pool1、Conv2都是此网络中的算子名称，其中Conv1与Conv2算子的类型为Convolution，表示分别做一次卷积运算。
 
 **图1**  网络拓扑示例<a name="fig129541116161914"></a>  
-<img src="../../../figures/net_topology.png" alt="网络拓扑示例" width="300px" height="1257px">
+<img src="../../../figures/net_topology.png" alt="网络拓扑示例" width="68px" height="285px">
 
 ## 算子类型（Op Type）<a name="zh-cn_topic_0228422146_zh-cn_topic_0187054064_section44191431191313"></a>
 
