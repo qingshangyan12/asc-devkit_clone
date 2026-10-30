@@ -37,7 +37,7 @@
 
 **图 1** int8_t类型交织过程
 
-![](../figures/asc_intlv.png)
+![](../../../figures/asc_intlv.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
