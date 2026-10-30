@@ -32,7 +32,7 @@ template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
 {
     static_assert(
-        SupportType<T, half>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half");
+        SupportType<T, half, int16_t>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half/int16_t");
     const Hardware eleWiseHWPos = GetPhyType((TPosition)eleWiseTensor.GetPosition());
     if (eleWiseHWPos != Hardware::L1) {
         ASCENDC_CHECK_TPOSITION(
