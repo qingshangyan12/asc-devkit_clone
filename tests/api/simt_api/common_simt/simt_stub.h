@@ -656,7 +656,7 @@ static inline int __clz(int x)
 {
     int32_t count = 0;
     for (int i = 0; i < 32; i++) {
-        int32_t tmp = one << (32 - 1 - i);
+        int32_t tmp = 1 << (32 - 1 - i);
         if (((tmp & x) >> (32 - 1 - i)) == 0) {
             count += 1;
         } else {
