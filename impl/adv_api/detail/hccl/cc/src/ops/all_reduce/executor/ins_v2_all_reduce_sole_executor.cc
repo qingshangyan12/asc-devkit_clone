@@ -12,7 +12,7 @@
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
 #include "ins_temp_all_reduce_nhr.h"
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
 #endif
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
@@ -292,7 +292,7 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, AlgEngine::AICPU, "sole[mesh.one_shot]", COND_NONE,
     FLAG_NONE, 0);
 
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempKfcAllReduceMesh1DMem2Mem);

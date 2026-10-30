@@ -11,8 +11,11 @@
 #include "hccl_res_dl.h"
 #include "ccu_res_dl.h"
 #include "hccl_ccu_res_dl.h"
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：CCU 数据面/注册 launch 的手抄 dlsym wrapper 不进入活跃编译。
 #include "ccu_launch_dl.h"
 #include "ccu_primitives_impl_dl.h"
+#endif
 #include "hccl_rank_graph_dl.h"
 #include "hcomm_primitives_dl.h"
 #include "hccl_inner_dl.h"
@@ -100,10 +103,12 @@ void HcommDlInit(void)
     CcuResDlInit(gLibHandle);
     HcclCcuResDlInit(gLibHandle);
 
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
     HCCL_INFO("Calling CcuLaunchDlInit...");
 
     CcuLaunchDlInit(gLibHandle);
     CcuPrimitivesImplDlInit(gLibHandle);
+#endif
 
     HCCL_INFO("HcommDlInit completed successfully, final gLibHandle=%p", gLibHandle);
 }

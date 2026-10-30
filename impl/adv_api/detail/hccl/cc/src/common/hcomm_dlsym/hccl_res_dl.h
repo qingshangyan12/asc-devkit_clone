@@ -29,6 +29,11 @@ DECL_WEAK_FUNC(
 DECL_SUPPORT_FLAG(HcclChannelQuery);
 DECL_WEAK_FUNC(HcclResult, HcclChannelDestroy, HcclComm comm, const ChannelHandle* channels, uint32_t channelNum);
 DECL_SUPPORT_FLAG(HcclChannelDestroy);
+// 控制面：ThreadHandle -> 底层资源（如 stream）查询；asc-comm 数据面 launch 需要 stream。
+DECL_WEAK_FUNC(
+    HcclResult, HcclThreadResGetInfo, HcclComm comm, ThreadHandle thread, ThreadResType resType, uint32_t infoLen,
+    void** info);
+DECL_SUPPORT_FLAG(HcclThreadResGetInfo);
 // 动态库管理接口（大驼峰命名）
 void HcclResDlInit(void* libHcommHandle);
 

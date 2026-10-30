@@ -18,7 +18,11 @@
 #include "log.h"
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+#include "ccu/hcomm/ccu_primitives.hpp"
+#else
 #include "ccu_primitives_dl.hpp"
+#endif
 #include "ccu_log.h"
 
 namespace ccu = ::AscendC::ccu;
@@ -37,6 +41,89 @@ constexpr uint64_t CCU_LOOP_CKE_NUM_BCAST_V2 = 2;
 constexpr uint64_t CCU_LOOP_CKE_NUM_REDUCE_V2 = 3;
 constexpr uint64_t CCU_LOOP_CKE_NUM_COPY_V2 = 2;
 constexpr uint64_t CCU_LOOP_CKE_NUM_REDUCE_LOOP_V2 = 3;
+
+struct LoopGroupConfig {
+    uint32_t msInterleave; // loop使用的ms步长，即与前一个loop间的间距
+    uint32_t loopCount;    // loop的并行次数
+    uint64_t memSlice;     // 单个loop内使用的ms总字节大小
+};
+
+struct LoopGroupResource; // 定义随数据面分支不同（asc-comm / hcomm dlsym），仅作引用形参前向声明
+
+std::vector<uint64_t> CalGoSize(uint64_t size);
+std::vector<uint64_t> CalGoSize(uint64_t size, CcuVersion ccuVersion);
+std::vector<uint64_t> CalGoSize(
+    uint64_t size, const LoopGroupConfig& config, CcuVersion ccuVersion = CcuVersion::CCU_V1);
+CcuResult AllocGoResource(
+    LoopGroupConfig& config, LoopGroupResource& res, bool& allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT,
+    uint32_t msPerLoop = 1,
+    uint32_t ckeNum = 1); // ckeNum: 每个loop克隆的event隔离数, V1默认1, V2传对应CCU_LOOP_CKE_NUM_*常量
+
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// ============================================================================
+// 实验构建（asc-comm 数据面）：直接使用 asc-comm snake_case API。
+// 实验范围仅 AllGather Sole Mesh（GroupCopy 链路），其余 Group* 辅助暂不编译。
+// ============================================================================
+
+struct LoopGroupResource {
+    ccu::array<ccu::event> completedEvent{0};
+    ccu::array<ccu::ccu_buffer> ccuBuf{0};
+    uint32_t eventCount;
+    uint32_t bufCount;
+};
+
+struct GroupOpSizeVars {
+    ccu::variable addr_offset;   // 第二个loopGroup搬运的起始偏移
+    ccu::variable loop_param_;   // loop串行重复执行次数
+    ccu::variable parallel_param; // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
+    ccu::variable residual;      // 尾块数据size
+};
+
+struct GroupCopyVar {
+    ccu::local_addr loopSrc[2];
+    ccu::local_addr loopDst[2];
+    ccu::variable loopLen[2];
+};
+
+struct CcuKernelCtxBase {
+    struct CcuLoopEntity {
+        std::unique_ptr<ccu::func> body[2];
+        std::unique_ptr<ccu::loop> loops[2];
+        ccu::variable loop_param_[2];
+    };
+
+    LoopGroupConfig moConfig;
+    LoopGroupResource moRes;
+    bool resourceAllocated;
+
+    std::map<std::string, CcuLoopEntity> loopMap;
+    CcuLoopExecutors enginePool;
+
+    // GroupCopyVar 延迟分配：仅使用 GroupCopy 的 kernel 才会创建，避免资源浪费
+    std::unique_ptr<GroupCopyVar> gcVarPtr;
+    GroupCopyVar& GetGcVar()
+    {
+        if (!gcVarPtr) {
+            gcVarPtr.reset(new GroupCopyVar());
+        }
+        return *gcVarPtr;
+    }
+
+    void CreateLoopEntity(std::string loopStr) { loopMap.emplace(loopStr, CcuLoopEntity()); }
+
+    bool IsLoopEntityRegistered(std::string loopStr) { return loopMap.count(loopStr) != 0; }
+};
+
+CcuResult CreateMultiOpCopyV1(CcuKernelCtxBase& ctx, GroupCopyVar& var);
+CcuResult GroupCopy(
+    CcuKernelCtxBase& ctx, ccu::local_addr dst, ccu::local_addr src, GroupOpSizeVars goSize,
+    CcuVersion ccuVersion = CcuVersion::CCU_V1);
+CcuResult GroupCopyV1(CcuKernelCtxBase& ctx, ccu::local_addr dst, ccu::local_addr src, GroupOpSizeVars goSize);
+
+#else
+// ============================================================================
+// 基线构建：原 hcomm 数据面路径（PascalCase dlsym wrapper），用于基线对照和回退。
+// ============================================================================
 
 // 逻辑Event：封装多个物理 ccu::Event，提供超过16位的信号空间。
 // 算法侧按逻辑 signalIdx (0..N-1) 进行 Record/Wait，内部自动处理 event 分组与 mask 计算。
@@ -128,12 +215,6 @@ private:
     uint32_t signalCount_ = 0;
 };
 
-struct LoopGroupConfig {
-    uint32_t msInterleave; // loop使用的ms步长，即与前一个loop间的间距
-    uint32_t loopCount;    // loop的并行次数
-    uint64_t memSlice;     // 单个loop内使用的ms总字节大小
-};
-
 struct LoopGroupResource {
     ccu::Array<ccu::Event> completedEvent{0};
     ccu::Array<ccu::CcuBuffer> ccuBuf{0};
@@ -206,15 +287,6 @@ struct CcuKernelCtxBase {
     bool IsLoopEntityRegistered(std::string loopStr) { return loopMap.count(loopStr) != 0; }
 };
 
-std::vector<uint64_t> CalGoSize(uint64_t size);
-std::vector<uint64_t> CalGoSize(uint64_t size, CcuVersion ccuVersion);
-std::vector<uint64_t> CalGoSize(
-    uint64_t size, const LoopGroupConfig& config, CcuVersion ccuVersion = CcuVersion::CCU_V1);
-CcuResult AllocGoResource(
-    LoopGroupConfig& config, LoopGroupResource& res, bool& allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT,
-    uint32_t msPerLoop = 1,
-    uint32_t ckeNum = 1); // ckeNum: 每个loop克隆的event隔离数, V1默认1, V2传对应CCU_LOOP_CKE_NUM_*常量
-
 CcuResult GroupBroadcastWithoutMyRank(
     CcuKernelCtxBase& ctx, const size_t channels[], uint32_t channelCount, std::vector<ccu::RemoteAddr> dst,
     ccu::LocalAddr src, GroupOpSizeVars goSize);
@@ -284,6 +356,8 @@ CcuResult GroupBroadcastV2(
     CcuKernelCtxBase& ctx, const size_t channels[], uint32_t channelCount, ccu::LocalAddr localDst,
     std::vector<ccu::RemoteAddr> dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
 CcuResult GroupCopyV2(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
+
+#endif // MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 
 inline void InitCcuKernelCtxBase(CcuKernelCtxBase& ctx)
 {

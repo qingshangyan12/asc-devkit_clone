@@ -17,6 +17,16 @@ namespace mc2_ops_hccl {
 // 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：仅保留 AllGather Sole Mesh kernel；数据面形参直接使用
+// asc-comm snake_case 类型。Parallel 版本（CcuSchedAllGatherParallelMeshNHRMultiLink）临时禁用。
+CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
+    ccu::variable inputAddr, ccu::variable outputAddr, ccu::variable tokenInfo, ccu::variable outputOffset,
+    ccu::variable sliceSize, ccu::variable goSize0, ccu::variable goSize1, ccu::variable goSize2, ccu::variable goSize3,
+    ccu::variable currentRankSliceInputOffset, ccu::variable tmpRepeatNum, ccu::variable inputRepeatStride,
+    ccu::variable outputRepeatStride, ccu::variable lastSliceSize, ccu::variable isInputOutputEqual,
+    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+#else
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
     ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
@@ -31,6 +41,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable part0GoSize3, ccu::Variable part1GoSize0, ccu::Variable part1GoSize1, ccu::Variable part1GoSize2,
     ccu::Variable part1GoSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSizeLevel0,
     uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1);
+#endif
 
 } // namespace mc2_ops_hccl
 

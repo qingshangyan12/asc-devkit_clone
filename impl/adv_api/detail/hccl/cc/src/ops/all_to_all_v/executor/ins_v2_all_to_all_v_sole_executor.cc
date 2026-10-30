@@ -16,11 +16,11 @@
 #include "ins_temp_ubx_all_to_all_v_mesh_1D.h"
 #include "topo_match_1d.h"
 #include "topo_match_ubx_1d.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
-#ifndef AICPU_COMPILE
+#if !defined(AICPU_COMPILE) && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_all_to_all_mesh_1D.h"
 #endif
 #include "alg_meta_registry.h"
@@ -341,7 +341,7 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAllToAllSoleMeshUBX, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_UBX, 0);
 
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALLV, CcuSchedAllToAllVSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     CcuTempAlltoAllVMesh1D);
@@ -354,7 +354,9 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, AlgEngine::CCU, "sole[mesh.multi_channel]",
     COND_NONE, FLAG_UBX, 0);
 #endif
-#ifndef AICPU_COMPILE
+// 实验构建（asc-comm 数据面）临时禁用 AllToAll Sole Mesh 直启（非 KFC）路径：其模板/内核源文件
+// 已从实验构建裁剪，注册会引入未编译符号导致链接失败。
+#if !defined(AICPU_COMPILE) && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     CcuTempAlltoAllMesh1D);

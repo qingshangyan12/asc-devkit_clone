@@ -9,6 +9,34 @@
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
+option(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE "Use asc-comm CCU dataplane in mc2_client" OFF)
+
+# 实验构建：mc2_client 的 CCU 数据面切到 asc-comm（libasccomm_ccu.so）。
+# 前置：asc-comm 已安装到 CANN 包（asc/include/comm_api + asc/lib64），或通过 ASCCOMM_CCU_ROOT 指向
+# 同布局目录（例如 asc-comm 出包产物 payload/asc）。控制面（通信域/拓扑/channel/instance/thread）仍走 hcomm。
+if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+    set(ASCCOMM_CCU_ROOT "" CACHE PATH
+        "asc-comm install root containing include/comm_api and lib64/libasccomm_ccu.so; empty = auto-detect from CANN package")
+    if(NOT ASCCOMM_CCU_ROOT)
+        foreach(_asccomm_cand
+                "${ASCEND_CANN_PACKAGE_PATH}/asc"
+                "${ASCEND_CANN_PACKAGE_PATH}/${CMAKE_SYSTEM_PROCESSOR}-linux/asc")
+            if(EXISTS "${_asccomm_cand}/lib64/libasccomm_ccu.so")
+                set(ASCCOMM_CCU_ROOT "${_asccomm_cand}")
+                break()
+            endif()
+        endforeach()
+    endif()
+    if(NOT EXISTS "${ASCCOMM_CCU_ROOT}/lib64/libasccomm_ccu.so")
+        message(FATAL_ERROR
+            "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE requires asc-comm: install asc-comm into the CANN package or set "
+            "-DASCCOMM_CCU_ROOT=<dir with include/comm_api and lib64/libasccomm_ccu.so>")
+    endif()
+    if(NOT EXISTS "${ASCCOMM_CCU_ROOT}/include/comm_api/ccu/hcomm/ccu_primitives.hpp")
+        message(FATAL_ERROR "MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE: ${ASCCOMM_CCU_ROOT}/include/comm_api misses ccu headers")
+    endif()
+    message(STATUS "mc2_client uses asc-comm CCU dataplane: ${ASCCOMM_CCU_ROOT}")
+endif()
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
@@ -279,6 +307,22 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
         -DHOST_COMPILE
         MC2_CLIENT_ENABLE_CCU=$<BOOL:${MC2_CLIENT_ENABLE_CCU}>
     )
+
+    if(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+        # asc-comm 数据面：直接链接 libasccomm_ccu.so，编译期切换数据面 API（snake_case）。
+        # BEFORE：asc-comm 携带的 pod 契约头（hcomm/ccu/*、hcomm/hcomm_primitives.h）优先于环境内同路径头。
+        target_include_directories(mc2_client BEFORE PRIVATE
+            ${ASCCOMM_CCU_ROOT}/include/comm_api
+        )
+        target_compile_definitions(mc2_client PRIVATE
+            MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+        )
+        target_link_libraries(mc2_client PRIVATE
+            -Wl,--no-as-needed
+            ${ASCCOMM_CCU_ROOT}/lib64/libasccomm_ccu.so
+            -Wl,--no-as-needed
+        )
+    endif()
 
     target_compile_options(mc2_client PRIVATE
         -Werror

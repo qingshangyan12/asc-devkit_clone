@@ -46,6 +46,30 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
 struct KfcServerContext : CcuKernelCtxBase {
     const CcuKernelArgKfcServer* arg;
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+    // 实验构建（asc-comm 数据面）：直接使用 asc-comm snake_case 类型。
+    ccu::variable xnAddr; // HBM上的算子执行参数首地址
+    ccu::variable ckeAddr;
+    ccu::variable waitAddr;   // HBM上的每轮开始信号的首地址
+    ccu::variable recordAddr; // HBM上的每轮完成信号的首地址
+
+    ccu::variable token;
+    ccu::variable dieNum; // Die数量，用于判断单双Die，默认为1即单Die
+
+    ccu::variable missionNum;
+    ccu::variable missionIndex;
+
+    // 用于Die间同步信号[missionId=0]
+    const char* exportDieSig;
+    const char* importDieSig;
+
+    // 当前missionNum_=1，missionIndex_=0，用于Mission间同步信号
+    std::vector<const char*> exportMissoinSig;
+    std::vector<const char*> importMissionSig;
+    // 用于Mission间同步变量
+    std::vector<ccu::variable> exportMissionVar;
+    std::vector<ccu::variable> importMissionVar;
+#else
     ccu::Variable xnAddr; // HBM上的算子执行参数首地址
     ccu::Variable ckeAddr;
     ccu::Variable waitAddr;   // HBM上的每轮开始信号的首地址
@@ -67,6 +91,7 @@ struct KfcServerContext : CcuKernelCtxBase {
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar;
     std::vector<ccu::Variable> importMissionVar;
+#endif
 };
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {

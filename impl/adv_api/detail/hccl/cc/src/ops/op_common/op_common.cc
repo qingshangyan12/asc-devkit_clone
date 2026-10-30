@@ -44,7 +44,12 @@
 #include "rt.h"
 #include "dlhcomm_function.h"
 #include "cann_host_bridge.h"
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：注册链走 asc-comm C ABI（libasccomm_ccu.so）。
+#include "ccu/hcomm/ccu_launch.h"
+#else
 #include "ccu_launch_dl.h"
+#endif
 #include "ccu_res_dl.h"
 #include "hccl_ccu_res_dl.h"
 #include "hccl_res_dl.h"
@@ -1939,6 +1944,62 @@ static HcclResult CalcMaxResReqWithDefault(
     return HCCL_SUCCESS;
 }
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：insEntity 为 hcomm 控制面 HcclCommQueryCcuIns（entity 查询模式）
+// 返回的 HcommCcuInstanceEntity*（借用，不转移所有权）。注册链直接走 asc-comm；
+// CCU 资源不足时 asccomm_ccu_kernel_register 返回 CCU_E_UNAVAIL，注册事务在 asc-comm 内部回滚。
+static HcclResult RegisterCcuKernels(
+    void* insEntity, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+{
+    u32 totalKernelNum = std::accumulate(resRequest.ccuKernelNum.begin(), resRequest.ccuKernelNum.end(), 0u);
+    CHK_PRT_RET(
+        totalKernelNum != resRequest.ccuKernelInfos.size(), HCCL_ERROR("[RegisterCcuKernels]ccuKernel num not match!"),
+        HCCL_E_INTERNAL);
+    HCCL_INFO("[RegisterCcuKernels] start, totalKernelNum[%u], insEntity[%p].", totalKernelNum, insEntity);
+
+    // 遍历计算最大resGroup号
+    auto maxIt = std::max_element(
+        resRequest.ccuKernelInfos.begin(), resRequest.ccuKernelInfos.end(),
+        [](const CcuKernelInfo& a, const CcuKernelInfo& b) { return a.resGroup < b.resGroup; });
+    u32 maxResGroup = (maxIt != resRequest.ccuKernelInfos.end()) ? maxIt->resGroup : 0;
+    resCtxHost->ccuKernels.resize(totalKernelNum);
+
+    for (u32 currentResGroup = 0; currentResGroup <= maxResGroup; currentResGroup++) {
+        HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] start, maxResGroup[%u].", currentResGroup, maxResGroup);
+        CcuResult regStartRet = asccomm_ccu_kernel_register_start(insEntity);
+        CHK_PRT_RET(
+            regStartRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet),
+            ConvertCcuToHccl(regStartRet));
+        for (u32 i = 0; i < totalKernelNum; i++) {
+            CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
+            if (kernelInfo.resGroup != currentResGroup)
+                continue;
+            CcuKernelHandle kernelHandle;
+            const void* kernelArgs[] = {kernelInfo.kernelArg};
+            CcuResult regRet = asccomm_ccu_kernel_register(
+                insEntity, kernelInfo.dieId, kernelInfo.kernelFuncName,
+                reinterpret_cast<void*>(kernelInfo.kernelFunc), kernelArgs, 1, &kernelHandle);
+            if (regRet == CCU_E_UNAVAIL) {
+                HCCL_WARNING("[RegisterCcuKernels] kernel[%s] unavailable, fallback.", kernelInfo.kernelFuncName);
+                return HCCL_E_UNAVAIL;
+            }
+            CHK_PRT_RET(
+                regRet != CCU_SUCCESS,
+                HCCL_ERROR("ccu kernel register failed: ccuRet -> %d, kernel[%s]", regRet, kernelInfo.kernelFuncName),
+                ConvertCcuToHccl(regRet));
+            resCtxHost->ccuKernels[i] = kernelHandle;
+        }
+        CcuResult regEndRet = asccomm_ccu_kernel_register_end(insEntity);
+        CHK_PRT_RET(
+            regEndRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet),
+            ConvertCcuToHccl(regEndRet));
+        HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] finish.", currentResGroup);
+    }
+    resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
+    HCCL_INFO("[RegisterCcuKernels] finish, totalKernelNum[%u] registered.", totalKernelNum);
+    return HCCL_SUCCESS;
+}
+#else
 static HcclResult RegisterCcuKernels(
     CcuInsHandle insHandle, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
@@ -1990,6 +2051,7 @@ static HcclResult RegisterCcuKernels(
     HCCL_INFO("[RegisterCcuKernels] finish, totalKernelNum[%u] registered.", totalKernelNum);
     return HCCL_SUCCESS;
 }
+#endif
 
 // 探测 die 是否使能：调用 HcommCcuQueryRemainResDesc，返回 CCU_E_UNAVAIL 表示未使能。
 // support flag 已在 IsCcuDynamicResApiSupported 中校验，本函数不重复判断。
@@ -2147,7 +2209,13 @@ static HcclResult ReuseExistingCcuIns(
         HCCL_INFO("[ReuseExistingCcuIns] checkRes only, resource sufficient, skip kernel register.");
         return HCCL_SUCCESS;
     }
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+    // 实验构建：动态资源流由 HcclGetCcuKernel 绕开，正常不可达；防御性拒绝，避免误用 hcomm 注册链。
+    HCCL_ERROR("[ReuseExistingCcuIns] dynamic res flow is disabled in asccomm ccu dataplane build.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     return RegisterCcuKernels(insHandle, resRequest, resCtxHost);
+#endif
 }
 
 // 为每个 die 创建 finalReqDesc = max(reqDesc, 默认阈值)，避免按实际需求申请造成资源碎片。出参由调用方销毁。
@@ -2285,7 +2353,13 @@ static HcclResult CreateAndAssignNewCcuIns(
         HCCL_INFO("[CreateAndAssignNewCcuIns] checkRes only, resource sufficient, skip kernel register.");
         return HCCL_SUCCESS;
     }
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+    // 实验构建：动态资源流由 HcclGetCcuKernel 绕开，正常不可达；防御性拒绝，避免误用 hcomm 注册链。
+    HCCL_ERROR("[CreateAndAssignNewCcuIns] dynamic res flow is disabled in asccomm ccu dataplane build.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     return RegisterCcuKernels(newInsHandle, resRequest, resCtxHost);
+#endif
 }
 
 // CCU kernel 动态资源申请主流程：1.聚合资源需求 -> 2.查询可复用 CcuIns
@@ -2346,6 +2420,37 @@ static HcclResult HcclGetCcuKernelDynamic(
 } // namespace
 #endif
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：entity 查询模式。哨兵值为 8 字节对齐且 > UINT32_MAX 的地址，
+// hcomm 检测到后返回其持有的 HcommCcuInstanceEntity 稳定地址（借用，不转移所有权，
+// 不把 CcuInsHandle 直接当指针传给 asc-comm）。
+// 与 hcomm 侧 IsInstanceEntityQueryRequest 同口径回检：旧版 hcomm 不识别哨兵时返回小值实例
+// token，直接透传会触发 asc-comm 侧非法解引用；此处拦截并报 INTERNAL。
+static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
+{
+    CcuInsHandle insHandle = reinterpret_cast<CcuInsHandle>(&insEntity);
+    uint32_t insNum = 0;
+    HcclResult queryRet = HcclCommQueryCcuIns(comm, &insHandle, &insNum);
+    CHK_PRT_RET(
+        queryRet != HCCL_SUCCESS,
+        HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns failed, ret -> %d", queryRet), queryRet);
+    CHK_PRT_RET(
+        insNum != 1, HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
+        HCCL_E_INTERNAL);
+    const bool isEntityAddress = insHandle > static_cast<CcuInsHandle>(UINT32_MAX) &&
+                                 (insHandle % sizeof(void*)) == 0;
+    CHK_PRT_RET(
+        !isEntityAddress,
+        HCCL_ERROR("[QueryCcuInstanceEntity] hcomm returned a non-entity CcuInsHandle[%llu]; entity query mode "
+                   "requires a newer hcomm with sentinel detection",
+                   static_cast<unsigned long long>(insHandle)),
+        HCCL_E_INTERNAL);
+    insEntity = reinterpret_cast<void*>(insHandle);
+    HCCL_INFO("[QueryCcuInstanceEntity] entity[%p].", insEntity);
+    return HCCL_SUCCESS;
+}
+#endif
+
 HcclResult HcclGetCcuKernel(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
@@ -2362,6 +2467,19 @@ HcclResult HcclGetCcuKernel(
     CHK_RET(ValidateCcuKernelRequest(resRequest, totalKernelNum));
     CHK_RET(RegisterCcuDfxOpInfo(comm, param));
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+    // 实验构建：hcomm 动态资源流依赖 HcommCcuKernelQueryResReq 回放 kernel（hcomm 数据面），
+    // 与 asc-comm 数据面不兼容；改用 HcclCommQueryCcuIns 实体查询 + asc-comm 注册。
+    // CCU 资源不足由 asccomm_ccu_kernel_register 返回 CCU_E_UNAVAIL（注册事务回滚）触发回退。
+    // checkRes 探测链路同样依赖动态资源流，实验构建跳过（与基线 legacy 行为一致）。
+    if (param.checkRes) {
+        HCCL_INFO("[HcclGetCcuKernel] checkRes in asccomm dataplane mode, probe skipped; real registration validates.");
+        return HCCL_SUCCESS;
+    }
+    void* insEntity = nullptr;
+    CHK_RET(QueryCcuInstanceEntity(comm, insEntity));
+    return RegisterCcuKernels(insEntity, resRequest, resCtxHost);
+#else
     if (IsCcuDynamicResApiSupported()) {
         HCCL_INFO(
             "[HcclGetCcuKernel] use dynamic resource apply flow, opMode[%u].",
@@ -2384,6 +2502,7 @@ HcclResult HcclGetCcuKernel(
         insNum != 1, HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
         HCCL_E_INTERNAL);
     return RegisterCcuKernels(insHandle, resRequest, resCtxHost);
+#endif
 #endif
 }
 

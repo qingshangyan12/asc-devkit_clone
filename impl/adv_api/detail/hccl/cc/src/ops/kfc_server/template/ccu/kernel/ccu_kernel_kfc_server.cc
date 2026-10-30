@@ -9,6 +9,10 @@
  */
 
 #include "ccu_kernel_alg_base.h"
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：KFC server 仅保留 AllGather Sole Mesh 分支。
+#include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#else
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
@@ -22,9 +26,12 @@
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
+#endif
 #include "ccu_kernel_kfc_server.h"
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
+#endif
 #include "mc2_type.h"
 #include "hccl_alloc_ctx_res.h"
 
@@ -33,6 +40,8 @@ namespace mc2_ops_hccl {
 using namespace hcomm;
 using namespace std;
 
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建之外的算法参数宽度校验依赖各 kernel 头文件中的 PARAM_NUM 常量。
 static_assert(
     KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllGather parameters exceed the KFC server load width");
@@ -47,6 +56,7 @@ static_assert(
 static_assert(
     KFC_CONCURRENT_RS_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent ReduceScatter parameters exceed the KFC server load width");
+#endif
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -95,6 +105,226 @@ const uint32_t DIE0_ID = 0;
 const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
+
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// ============================================================================
+// 实验构建（asc-comm 数据面）：KFC server 仅保留 AllGather Sole Mesh 分支。
+// 保留 6 参数 launch ABI（xnAddr/ckeAddr/dieNum/missionNum/missionIndex/token）与
+// 15 参数 XN 帧协议（[0]=opId/哨兵, [1..14] 与 AIV 侧 CcuPrepareForAllGatherM2M 一致）。
+// 数据面直接使用 asc-comm snake_case API；顶层捕获 ccu_exception 并转换为 CcuResult。
+// ============================================================================
+
+static CcuResult ParseKernelArg(KfcServerContext& ctx, const CcuKernelArgKfcServer* kernelArg)
+{
+    ctx.arg = kernelArg;
+    return CCU_SUCCESS;
+}
+
+static CcuResult InitResource(const KfcServerContext& ctx)
+{
+    (void)ctx;
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(KfcServerContext& ctx)
+{
+    uint32_t argId = 0;
+
+    // 顺序需与 kfcServerArgs 中的字段顺序一致：xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token
+    CCU_CHK_RET(ccu::load_arg(ctx.xnAddr, argId++));
+    CCU_CHK_RET(ccu::load_arg(ctx.ckeAddr, argId++));
+    CCU_CHK_RET(ccu::load_arg(ctx.dieNum, argId++));
+    CCU_CHK_RET(ccu::load_arg(ctx.missionNum, argId++));
+    CCU_CHK_RET(ccu::load_arg(ctx.missionIndex, argId++));
+    CCU_CHK_RET(ccu::load_arg(ctx.token, argId++));
+
+    return CCU_SUCCESS;
+}
+
+static CcuResult CompArgs(KfcServerContext& ctx)
+{
+    ccu::variable regionSize;
+    ctx.waitAddr = ctx.ckeAddr;
+    regionSize = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ctx.recordAddr = ctx.ckeAddr + regionSize;
+    CCU_IF(ctx.missionIndex == 1)
+    {
+        ctx.waitAddr = ctx.recordAddr + regionSize;
+        ctx.recordAddr = ctx.waitAddr + regionSize;
+    }
+    return CCU_SUCCESS;
+}
+
+void MissionPreSync(const ccu::variable& func, const KfcServerContext& ctx)
+{
+    (void)func;
+    (void)ctx;
+}
+
+void MissionPostSync(const KfcServerContext& ctx) { (void)ctx; }
+
+CcuResult WaitTurnStartSig(const ccu::variable& hbmSigAddr, ccu::variable& turnStartSig, const KfcServerContext& ctx)
+{
+    (void)ctx;
+    // 单Die场景：等待HBM中的信号
+    CCU_WHILE(turnStartSig != 1)
+    {
+        CCU_CHK_RET(ccu::load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+    }
+    turnStartSig = 0;                                 // reset Xn
+    CCU_CHK_RET(ccu::store(hbmSigAddr, turnStartSig)); // reset HBM
+    return CCU_SUCCESS;
+}
+
+CcuResult SetTurnEndSig(const ccu::variable& hbmSigAddr, const ccu::variable& turnEndSig, const KfcServerContext& ctx)
+{
+    (void)ctx;
+    CCU_CHK_RET(ccu::store(hbmSigAddr, turnEndSig));
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadFuncParamFromMemory(
+    const ccu::variable& paramAddr, ccu::array<ccu::variable>& param, const KfcServerContext& ctx)
+{
+    (void)ctx;
+    // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
+    ccu::variable doubleDie;
+    doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
+    ccu::variable addr;
+    addr = paramAddr;
+
+    // 一次性读取本轮32个参数
+    CCU_CHK_RET(ccu::load(addr, param, CCU_PARAM_NUM_PER_DIE));
+    return CCU_SUCCESS;
+}
+
+// 实验构建仅注册 CcuSchedAllGatherSoleMesh（role=DEFAULT、missionNum=1），server 侧
+// dispatch 后统一发放 turn-end（无 SoleNHR 提前写 turn-end 的角色）。
+static void DispatchKfcSubKernel(
+    ccu::array<ccu::variable>& param, KfcServerContext& ctx, const ccu::variable& turnEndAddr)
+{
+    (void)turnEndAddr;
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+        // The queue payload layout is
+        // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,
+        // [5..8]=goSize, [9]=inputOffset, [10]=repeat, [11..12]=strides,
+        // [13]=lastSliceSize, [14]=inplace.  The memory token is immutable
+        // for the KFC server lifetime and comes from ctx.token.
+        HCCL_INFO("[KFC][AllGather][Dispatch] route queue payload to CcuKfcAllGatherMesh1DMem2MemKernel, "
+                  "token=serverContext");
+
+        CcuKfcAllGatherMesh1DMem2MemKernel(
+            param[KFC_CONCURRENT_AG_MESH_INPUT], param[KFC_CONCURRENT_AG_MESH_OUTPUT], ctx.token,
+            param[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET], param[KFC_CONCURRENT_AG_MESH_SLICE_SIZE],
+            param[KFC_CONCURRENT_AG_MESH_GO_SIZE_0], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_1],
+            param[KFC_CONCURRENT_AG_MESH_GO_SIZE_2], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_3],
+            param[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET],
+            param[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV], param[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE],
+            param[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE],
+            param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+    } else {
+        HCCL_WARNING(
+            "[KFC][Server][Dispatch] opType[%u] is not enabled in the asccomm ccu dataplane build, skip dispatch.",
+            static_cast<uint32_t>(ctx.arg->opParam.opType));
+    }
+}
+
+CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
+{
+    HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
+
+    ccu::variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
+    repeatCond = 0;
+    ccu::variable turnStartSig; // 存放《轮次执行开始信号》的寄存器
+    turnStartSig = 0;
+    ccu::variable turnEndSig; // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
+    turnEndSig = 1;
+
+    // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
+    ccu::variable waitAddr;
+    ccu::variable recordAddr;
+    ccu::variable paramAddr;
+    waitAddr = ctx.waitAddr;
+    recordAddr = ctx.recordAddr;
+    paramAddr = ctx.xnAddr;
+
+    ccu::variable ckeSize; // 其他寄存器
+    ckeSize = CCU_ONE_PARAM_SIZE;
+    ccu::variable paramSize;
+    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+
+    ccu::variable queueIdx;
+    ccu::variable queueEnd;
+    ccu::variable one;
+    queueIdx = 0;
+    one = 1;
+    queueEnd = CCU_TASK_NUM_MAX;
+
+    // 存放<每轮算子参数>的寄存器
+    ccu::array<ccu::variable> param(CCU_PARAM_NUM_PER_DIE);
+
+    CCU_WHILE(repeatCond == 0)
+    {
+        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+        {
+            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            DispatchKfcSubKernel(param, ctx, recordAddr);
+            MissionPostSync(ctx);
+            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+        }
+        waitAddr += ckeSize;
+        recordAddr += ckeSize;
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            waitAddr = ctx.waitAddr;
+            recordAddr = ctx.recordAddr;
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
+        }
+    }
+    return CCU_SUCCESS;
+}
+
+// ============================================================================
+// 主入口 Kernel 函数
+// ============================================================================
+CcuResult CcuKfcServerKernel(CcuKernelArg arg)
+{
+    try {
+        auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+        KfcServerContext ctx;
+        HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
+        CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
+        HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
+        CCU_CHK_RET(InitResource(ctx));
+        HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
+        CCU_CHK_RET(LoadArgs(ctx));
+        HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
+        CCU_CHK_RET(CompArgs(ctx));
+        HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
+        HCCL_INFO("[GenCircularQueue] KfcServer start");
+        CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
+        HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
+        return CCU_SUCCESS;
+    } catch (const AscendC::ccu::detail::ccu_exception& e) {
+        HCCL_ERROR("[CcuKernelKfcServer] ccu exception: %s", e.what());
+        return e.code();
+    } catch (...) {
+        HCCL_ERROR("[CcuKernelKfcServer] unknown exception");
+        return CcuResult::CCU_E_INTERNAL;
+    }
+}
+
+#else
+// ============================================================================
+// 基线构建：原 hcomm 数据面路径（PascalCase dlsym wrapper）。
+// ============================================================================
 
 static CcuResult ParseKernelArg(KfcServerContext& ctx, const CcuKernelArgKfcServer* kernelArg)
 {
@@ -520,4 +750,5 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
+#endif // MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 } // namespace mc2_ops_hccl

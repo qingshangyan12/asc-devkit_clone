@@ -13,7 +13,7 @@
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
 #include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
 #include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
@@ -294,7 +294,7 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, AlgEngine::AICPU, "sole[mesh]",
     COND_Z_AXIS, FLAG_NONE, 0);
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterMesh1DMem2Mem);

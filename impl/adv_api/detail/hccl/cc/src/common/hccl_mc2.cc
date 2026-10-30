@@ -21,7 +21,12 @@
 #include "adapter_acl.h"
 #include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "kfc_server_protocol.h"
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：launch 链走 asc-comm C ABI（libasccomm_ccu.so）。
+#include "ccu/hcomm/ccu_launch.h"
+#else
 #include "ccu_launch_dl.h"
+#endif
 #include "ccu_kernel_utils.h"
 #include <new>
 #include "hcomm_host_profiling_dl.h"
@@ -942,6 +947,30 @@ void LogKernelLaunchArgs(
 }
 } // namespace
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建：ThreadHandle -> aclrtStream 解析（hcomm 控制面 HcclThreadResGetInfo），
+// 供 asccomm_ccu_kernel_launch 使用；产品路径统一走 thread 解析，不允许直传裸 stream。
+static CcuResult ResolveStreamFromCcuThread(HcclComm comm, ThreadHandle threadHandle, aclrtStream& stream)
+{
+    ThreadResTypeStream streamRes = nullptr;
+    HcclResult streamRet = HcclThreadResGetInfo(
+        comm, threadHandle, THREAD_RES_TYPE_STREAM, sizeof(ThreadResTypeStream), reinterpret_cast<void**>(&streamRes));
+    CHK_PRT_RET(
+        streamRet != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[CcuKernelLaunch] resolve stream from thread failed, threadHandle[0x%llx], ret[%d]",
+            static_cast<unsigned long long>(threadHandle), streamRet),
+        CCU_E_INTERNAL);
+    CHK_PRT_RET(
+        streamRes == nullptr,
+        HCCL_ERROR("[CcuKernelLaunch] resolved stream is nullptr, threadHandle[0x%llx]",
+                   static_cast<unsigned long long>(threadHandle)),
+        CCU_E_PTR);
+    stream = streamRes;
+    return CCU_SUCCESS;
+}
+#endif
+
 CcuResult LaunchCcuKernel(const HcclComm comm, const OpParam& opParamHost)
 {
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
@@ -965,7 +994,17 @@ CcuResult LaunchCcuKernel(const HcclComm comm, const OpParam& opParamHost)
         LogKernelLaunchArgs(resourceCtx, missionIndex, threadHandle, kernelHandle);
         const void* kfcArgs =
             static_cast<const void*>(resourceCtx.kfcServerArgs.data() + missionIndex * KFC_SERVER_ARG_NUM);
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+        aclrtStream stream = nullptr;
+        ret = ResolveStreamFromCcuThread(comm, threadHandle, stream);
+        if (ret != CCU_SUCCESS) {
+            return ret;
+        }
+        ret = asccomm_ccu_kernel_launch(
+            reinterpret_cast<ccu_launch_stream>(stream), kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
+#else
         ret = HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
+#endif
         if (ret != CCU_SUCCESS) {
             HCCL_ERROR("[CcuKernelLaunch] mission[%u] launch failed, ret[%d]", missionIndex, ret);
             return ret;
