@@ -211,7 +211,9 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            CCU_CHK_RET(CallKfcSubKernel(param, ctx, recordAddr));
+            CCU_IF (ctx.missionIndex == 0) {
+                CCU_CHK_RET(CallKfcSubKernel(param, ctx, recordAddr));
+            }
             MissionPostSync(ctx);
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。

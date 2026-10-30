@@ -235,9 +235,9 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernelMission2(CcuKernelArg arg)
     ccu::Func func(
         [&ctx](ccu::Array<ccu::Variable>& args) {
             LoadArgsMission2(ctx, args);
-            //PreSync(ctx);
-            //DoAllToAll(ctx);
-            //PostSync(ctx);
+            PreSync(ctx);
+            DoAllToAll(ctx);
+            PostSync(ctx);
         },
         CCU_FUNC_TASK_ARG_MAX, KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_MISSION2_NAME);
     return CCU_SUCCESS;
