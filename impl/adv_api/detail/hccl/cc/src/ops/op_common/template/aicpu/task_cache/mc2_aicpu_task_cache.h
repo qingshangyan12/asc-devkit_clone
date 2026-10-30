@@ -11,6 +11,8 @@
 #define MC2_AICPU_TASK_CACHE_H
 
 #include <array>
+#include <memory>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -19,6 +21,31 @@
 #include "alg_param.h"
 
 namespace mc2_ops_hccl {
+
+// A domain owns immutable resource metadata and serializes mutable replay images.
+class Mc2ReplayDomain;
+std::shared_ptr<Mc2ReplayDomain> BindMc2ReplayDomain(
+    const OpParam& param, std::shared_ptr<const AlgResourceCtxSerializable> resources);
+class Mc2ReplayScope {
+public:
+    explicit Mc2ReplayScope(std::shared_ptr<Mc2ReplayDomain> domain);
+    ~Mc2ReplayScope();
+    Mc2ReplayScope(const Mc2ReplayScope&) = delete;
+    Mc2ReplayScope& operator=(const Mc2ReplayScope&) = delete;
+    static bool Active();
+
+private:
+    std::shared_ptr<Mc2ReplayDomain> domain_;
+    Mc2ReplayScope* previous_ = nullptr;
+    std::unique_lock<std::mutex> lock_;
+    friend HcclResult RunMc2BoundReplay(
+        const OpParam&, const AlgResourceCtxSerializable&, const std::function<HcclResult()>&);
+    bool repeatReady_ = false;
+    std::array<uint64_t, 2> repeatSizes_{{0, 0}};
+    void* repeatEntry_ = nullptr;
+};
+HcclResult RunMc2BoundReplay(
+    const OpParam& param, const AlgResourceCtxSerializable& resources, const std::function<HcclResult()>& execute);
 
 constexpr size_t MC2_TASK_CACHE_MAX_TRACKED_TAG_COUNT = 65536U;
 constexpr size_t MC2_TASK_CACHE_MAX_TRACKED_TAG_BYTES = 8U * 1024U * 1024U;
