@@ -704,7 +704,8 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
         vdiv((RegTensor<float>&)dstReg, dstReg0, dstReg1, mask, modeValue);
         constexpr auto satModeValue =
             std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::SAT)>();
-        vcvt((RegTensor<int32_t>&)dstReg, (RegTensor<float>&)dstReg, mask, roundModeValue, satModeValue, modeValue);
+        constexpr auto truncModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_TRUNC>()>();
+        vcvt((RegTensor<int32_t>&)dstReg, (RegTensor<float>&)dstReg, mask, truncModeValue, satModeValue, modeValue);
     } else {
         vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }

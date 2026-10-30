@@ -19,7 +19,7 @@ template <typename T, typename RegDataType = T>
 __simd_vf__ inline void run_unalign_load_store(__ubuf__ T* dst, __ubuf__ T* src)
 {
     constexpr uint32_t packing_factor = asc::te::is_b4_type<T> ? 2 : 1;
-    constexpr uint32_t elements_per_register = packing_factor * asc_get_vf_len() / sizeof(RegDataType);
+    constexpr uint32_t elements_per_register = packing_factor * asc::te::get_vf_len() / sizeof(RegDataType);
     auto layout = asc::te::make_layout(asc::te::make_shape(elements_per_register * 2));
     auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
@@ -56,7 +56,7 @@ TYPED_TEST_SUITE(tensor_api_reg_data_unalign_3510, UnalignDataTypes);
 
 TYPED_TEST(tensor_api_reg_data_unalign_3510, full_register_sessions)
 {
-    constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(TypeParam) + 32;
+    constexpr uint32_t capacity = 2 * asc::te::get_vf_len() / sizeof(TypeParam) + 32;
     alignas(32) TypeParam src[capacity]{};
     alignas(32) TypeParam dst[capacity]{};
     run_unalign_load_store(dst, src);
@@ -65,7 +65,7 @@ TYPED_TEST(tensor_api_reg_data_unalign_3510, full_register_sessions)
 
 TEST(tensor_api_reg_data_unalign_3510_int4, full_register_session)
 {
-    constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(int4x2_t) + 32;
+    constexpr uint32_t capacity = 2 * asc::te::get_vf_len() / sizeof(int4x2_t) + 32;
     alignas(32) int4b_t src[capacity]{};
     alignas(32) int4b_t dst[capacity]{};
     run_unalign_load_store<int4b_t, int4x2_t>(dst, src);
@@ -75,7 +75,7 @@ TEST(tensor_api_reg_data_unalign_3510_int4, full_register_session)
 TYPED_TEST(tensor_api_reg_data_unalign_3510, partial_stores_from_nonzero_coordinate)
 {
     constexpr uint32_t packing_factor = asc::te::is_b4_type<TypeParam> ? 2 : 1;
-    constexpr uint32_t elements_per_register = packing_factor * asc_get_vf_len() / sizeof(TypeParam);
+    constexpr uint32_t elements_per_register = packing_factor * asc::te::get_vf_len() / sizeof(TypeParam);
     constexpr uint32_t columns = 2 * elements_per_register + 32;
     alignas(32) TypeParam src[2 * columns]{};
     alignas(32) TypeParam dst[2 * columns]{};
@@ -104,11 +104,11 @@ TYPED_TEST(tensor_api_reg_data_unalign_3510, partial_stores_from_nonzero_coordin
 TYPED_TEST(tensor_api_reg_data_unalign_3510, continuous_partial_stores)
 {
     constexpr uint32_t packing_factor = asc::te::is_b4_type<TypeParam> ? 2 : 1;
-    constexpr uint32_t elements_per_register = packing_factor * asc_get_vf_len() / sizeof(TypeParam);
+    constexpr uint32_t elements_per_register = packing_factor * asc::te::get_vf_len() / sizeof(TypeParam);
     constexpr uint32_t first_count = elements_per_register - 2 * packing_factor;
     constexpr uint32_t last_count = packing_factor;
     constexpr uint32_t total_count = first_count + last_count;
-    constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(TypeParam) + 32;
+    constexpr uint32_t capacity = 2 * asc::te::get_vf_len() / sizeof(TypeParam) + 32;
     alignas(32) TypeParam src[capacity]{};
     alignas(32) TypeParam dst[capacity]{};
     auto layout = asc::te::make_layout(asc::te::make_shape(2 * elements_per_register));

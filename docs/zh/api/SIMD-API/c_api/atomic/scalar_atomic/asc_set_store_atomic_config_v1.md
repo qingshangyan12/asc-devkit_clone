@@ -92,7 +92,7 @@ void PrintData(const char* label, const std::vector<T>& data)
     std::cout << std::endl;
 }
 
-__global__ __vector__ void AscGetStoreAtomicConfigKernel(__gm__ int32_t* output, __gm__ int32_t* input,
+__global__ __vector__ void AscSetStoreAtomicConfigV1Kernel(__gm__ int32_t* output, __gm__ int32_t* input,
     __gm__ uint64_t* raw_config)
 {
     asc_init();
@@ -124,7 +124,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&config_device), sizeof(uint64_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, BYTES, input.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(output_device, BYTES, output.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    AscGetStoreAtomicConfigKernel<<<1, 0>>>(output_device, input_device, config_device);
+    AscSetStoreAtomicConfigV1Kernel<<<1, 0>>>(output_device, input_device, config_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     std::vector<uint64_t> raw_config(1);

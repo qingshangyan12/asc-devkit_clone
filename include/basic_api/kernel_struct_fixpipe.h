@@ -257,28 +257,6 @@ struct FixpipeParamsArch3510 {
 #endif
 };
 
-#if (__NPU_ARCH__ == 9202)
-template <CO2Layout format = CO2Layout::ROW_MAJOR>
-struct FixpipeParamsArch9202 : FixpipeParamsArch3510<format> {
-    __aicore__ FixpipeParamsArch9202() : FixpipeParamsArch3510<format>() {}
-    __aicore__ FixpipeParamsArch9202(
-        const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn, const uint32_t dstStrideIn)
-        : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn)
-    {}
-    bool rowMaxEn = false;
-    bool groupMaxEn = false;
-};
-
-template <CO2Layout format = CO2Layout::ROW_MAJOR>
-struct FixpipeParamsC310 : FixpipeParamsArch9202<format> {
-    __aicore__ FixpipeParamsC310() : FixpipeParamsArch9202<format>() {}
-
-    __aicore__ FixpipeParamsC310(
-        const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn, const uint32_t dstStrideIn)
-        : FixpipeParamsArch9202<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn)
-    {}
-};
-#else
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
 struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
     __aicore__ FixpipeParamsC310() : FixpipeParamsArch3510<format>() {}
@@ -288,7 +266,6 @@ struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
         : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn)
     {}
 };
-#endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
 using FixpipeParamsM310 = FixpipeParamsV220;

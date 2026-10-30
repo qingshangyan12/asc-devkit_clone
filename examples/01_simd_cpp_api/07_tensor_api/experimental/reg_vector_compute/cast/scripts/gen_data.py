@@ -18,7 +18,7 @@ import numpy as np
 
 
 def gen_golden_data(scenario_num):
-    total_length = 256
+    total_length = 512
     np.random.seed(42)
 
     if scenario_num == 1:
@@ -37,13 +37,20 @@ def gen_golden_data(scenario_num):
         x_f32 = np.random.uniform(-100, 100, total_length).astype(np.float32)
         x = (x_f32.view(np.uint32) >> 16).astype(np.uint16)
         golden = (x.astype(np.uint32) << 16).view(np.float32)
-    else:
+    elif scenario_num == 6:
         x = np.random.uniform(-100, 100, total_length).astype(np.float32)
         bits = x.view(np.uint32)
         upper = bits >> np.uint32(16)
         lower = bits & np.uint32(0xFFFF)
         carry = (lower > np.uint32(0x8000)) | ((lower == np.uint32(0x8000)) & ((upper & np.uint32(1)) != 0))
         golden = (upper + carry.astype(np.uint32)).astype(np.uint16)
+    else:
+        x = ((np.arange(total_length // 2, dtype=np.uint16) * 73 + 19) % 256).astype(np.uint8)
+        nibbles = np.empty(total_length, dtype=np.int16)
+        nibbles[0::2] = x & 0x0F
+        nibbles[1::2] = x >> 4
+        golden = np.where(nibbles >= 8, nibbles - 16, nibbles).astype(np.float16)
+        golden = golden.reshape(-1, 4, 2).transpose(1, 0, 2).copy().reshape(-1)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -53,6 +60,6 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--scenario_num", type=int, default=1, choices=[1, 2, 3, 4, 5, 6])
+    parser.add_argument("--scenario_num", type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7])
     args = parser.parse_args()
     gen_golden_data(args.scenario_num)

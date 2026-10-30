@@ -146,6 +146,7 @@ $dst_i = e^{src_i}$
 ## 数据类型
 
 T支持的数据类型为：half、float。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Exp_res.md#id3 -->
 
 ## 返回值说明<a name="section14483414194"></a>
 
@@ -176,6 +177,7 @@ T支持的数据类型为：half、float。
   - tensor高维切分计算占用8KB UB。
   - tensor前n个数据连续计算不涉及8KB UB的占用。
 <!-- end id21 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Exp_res.md#id4 -->
 
 <!-- npu="950" id24 -->
 

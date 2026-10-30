@@ -59,6 +59,7 @@ __aicore__ inline void Interleave(const LocalTensor<T>& dst0, const LocalTensor<
 ## 数据类型
 
 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。源操作数的数据类型需要与目的操作数保持一致。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/Interleave_res.md#id2 -->
 
 ## 返回值说明<a name="section14483414194"></a>
 
@@ -67,6 +68,7 @@ __aicore__ inline void Interleave(const LocalTensor<T>& dst0, const LocalTensor<
 ## 约束说明<a name="section633mcpsimp"></a>
 
 不支持源操作数与目的操作数地址重叠。
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/Interleave_res.md#id3 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 

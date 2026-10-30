@@ -14,16 +14,6 @@ build
 """
 
 
-def build(sch, config_map=None):
-    """
-    :param build:
-    :param config_map:
-    :return:
-    """
-
-    return
-
-
 # def compute(_operator=None):
 #     """
 #     :param _compute:
@@ -39,9 +29,12 @@ def auto_schedule(outs, option=None):
     return outs
 
 
+cce_special = {}
+
+
 class Sch:
     def __init__(self):
-        cce_special["real_out_tensor"] = false
+        cce_special["real_out_tensor"] = False
 
 
 class Compute:

@@ -106,9 +106,12 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #else
     return TOTAL_UB_SIZE; // cube core not support get_shmem_sz
 #endif
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
     constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
     return get_shmem_sz() - RESERVED_UB_SIZE; // m510 aicore reserve 8KB
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5162))
+    constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+    return TOTAL_UB_SIZE - RESERVED_UB_SIZE; // 5162 aicore reserve 8KB
 #else
     return TOTAL_UB_SIZE;
 #endif

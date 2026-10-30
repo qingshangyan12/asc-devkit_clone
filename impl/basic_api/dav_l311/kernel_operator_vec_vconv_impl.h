@@ -787,85 +787,18 @@ __aicore__ inline void CastIntrinsicsImpl(
     }
 }
 
+template <typename T, typename U, bool isSetMask, typename MaskT>
+__aicore__ inline void CastImplMaskCommonDavL311(
+    __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, MaskT mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
 // Cast::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void CastImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    constexpr bool cast_round_all = SupportType<
-        Tuple<T, U>, Tuple<half, float>, Tuple<int32_t, float>, Tuple<int16_t, float>, Tuple<int32_t, half>,
-        Tuple<int16_t, half>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, int16_t>,
-        Tuple<float, int32_t>, Tuple<half, int32_t>>();
-
-    constexpr bool cast_none = SupportType<
-        Tuple<T, U>, Tuple<float, half>, Tuple<half, int4b_t>, Tuple<half, uint8_t>, Tuple<uint16_t, uint8_t>,
-        Tuple<uint32_t, uint8_t>, Tuple<half, int8_t>, Tuple<int16_t, int8_t>, Tuple<int32_t, int8_t>,
-        Tuple<uint8_t, uint16_t>, Tuple<uint32_t, uint16_t>, Tuple<float, int16_t>, Tuple<uint8_t, int16_t>,
-        Tuple<uint32_t, int16_t>, Tuple<int32_t, int16_t>, Tuple<uint8_t, uint32_t>, Tuple<uint16_t, uint32_t>,
-        Tuple<int16_t, uint32_t>, Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>>();
-
-    constexpr bool using_cast_rint = SupportType<
-        Tuple<T, U>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, float>,
-        Tuple<half, int16_t>, Tuple<float, int32_t>>();
-    constexpr bool cast_odd = SupportType<Tuple<T, U>, Tuple<half, float>>();
-    switch (roundMode) {
-        case RoundMode::CAST_RINT:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast rint"); });
-            }
-            break;
-        case RoundMode::CAST_FLOOR:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_FLOOR, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast floor"); });
-            }
-            break;
-        case RoundMode::CAST_CEIL:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_CEIL, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast ceil"); });
-            }
-            break;
-        case RoundMode::CAST_ROUND:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_ROUND, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast round"); });
-            }
-            break;
-        case RoundMode::CAST_TRUNC:
-            if constexpr (cast_round_all) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_TRUNC, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast trunc"); });
-            }
-            break;
-        case RoundMode::CAST_ODD:
-            if constexpr (cast_odd) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_ODD, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast odd"); });
-            }
-            break;
-        case RoundMode::CAST_NONE:
-            if constexpr (cast_none) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_NONE, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else if constexpr (using_cast_rint) {
-                CastIntrinsicsImpl<T, U, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
-            } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast none"); });
-            }
-            break;
-        default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
-            break;
-    }
+    CastImplMaskCommonDavL311<T, U, isSetMask>(dst, src, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename T, typename U, RoundMode roundMode, bool isSetMask>
@@ -950,10 +883,10 @@ __aicore__ inline void CastIntrinsicsImpl(
     }
 }
 
-// Cast::Level 0 - mask count mode
-template <typename T, typename U, bool isSetMask = true>
-__aicore__ inline void CastImpl(
-    __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, const uint64_t mask, uint8_t repeatTime,
+// Cast::Level 0 - shared mask dispatcher
+template <typename T, typename U, bool isSetMask, typename MaskT>
+__aicore__ inline void CastImplMaskCommonDavL311(
+    __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, MaskT mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     constexpr bool cast_round_all = SupportType<
@@ -1030,6 +963,15 @@ __aicore__ inline void CastImpl(
                 (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
             break;
     }
+}
+
+// Cast::Level 0 - mask count mode
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void CastImpl(
+    __ubuf__ T* dst, __ubuf__ U* src, const RoundMode& roundMode, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    CastImplMaskCommonDavL311<T, U, isSetMask>(dst, src, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename U, typename T, bool isVecDeq, bool halfBlock>

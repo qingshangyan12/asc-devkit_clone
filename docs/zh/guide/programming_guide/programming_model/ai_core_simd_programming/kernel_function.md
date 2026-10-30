@@ -23,7 +23,7 @@
 
 -   **其他规则**<a name="zh-cn_topic_0000001447989210_li94421027152419"></a>
     1.  规则：核函数（Kernel）必须具有void返回类型。
-    2.  规则：核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/syntax_restrictions/functions.md#section_kernel_function_argument_list_constraint)。
+    2.  规则：核函数（Kernel）参数列表需遵循[函数参数列表限制](../../../technical_appendix/cpp_standard_support/cpp_language_restrictions/general_restrictions.md#section_kernel_func_param_restriction)。
 
 -   代码示例如下：
 
