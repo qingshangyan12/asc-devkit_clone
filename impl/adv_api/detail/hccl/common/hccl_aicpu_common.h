@@ -102,6 +102,8 @@ __aicore__ inline void AssembleHcclMsgV2A5(
     HcclMsg tmp{};
     const bool isFinalize = (param.commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE);
     uint8_t seqNum = 0U;
+    // Refresh shared control state before reading restart/reset and sequence fields.
+    FlushDataCacheRaw(controlMsgGM);
     if (isFinalize) {
         controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 0U;
         controlMsgGM->reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 0U;
