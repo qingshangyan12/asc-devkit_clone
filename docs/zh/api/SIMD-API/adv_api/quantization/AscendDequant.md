@@ -3,29 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id7 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id7 -->
 <!-- npu="A3" id8 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id8 -->
 <!-- npu="910b" id9 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id9 -->
 <!-- npu="310b" id10 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id10 -->
 <!-- npu="310p" id11 -->
-- Atlas 推理系列产品AI Core：支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id11 -->
 <!-- npu="910" id12 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id12 -->
 <!-- npu="x90" id1 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id1 -->
 <!-- npu="9030" id2 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id2 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/AscendDequant_res.md#id1 -->
 
@@ -41,11 +41,11 @@
 
 -   如下图示例中，srcTensor的数据类型为int32\_t，m = 4，n = 8，calCount = 4，表明srcTensor中每行进行反量化的元素个数为4，deqScale中的前4个数生效，后12个数不参与反量化计算；dstTensor的数据类型为bfloat16\_t，m = 4，n\_dst = 16 \(16 \* sizeof\(bfloat16\_t\) % 32 = 0\)。计算逻辑是srcTensor的每n个数为一行，对于每行中的前calCount个元素，该行srcTensor的第i个元素与deqScale的第i个元素进行相乘写入dstTensor对应行的第i个元素，dstTensor对应行的第calCount + 1个元素\~第n\_dst个元素均为不确定的值。
 
-    ![](../../../figures/zh-cn_image_0000002155016964.png)
+    ![](../../../figures/image_0000002155016964.png)
 
 -   如下示例中，srcTensor的数据类型为int32\_t，m = 4，n = 8， calCount = 4，表明srcTensor中每行进行反量化的元素个数为4；dstTensor的数据类型为float，m = 4，n\_dst = 8 \(8 \* sizeof\(float\) % 32 = 0\)。对于srcTensor每行中的前4个元素都和标量deqScale相乘并写入dstTensor中每行的对应位置。
 
-    ![](../../../figures/zh-cn_image_0000001819864122.png)
+    ![](../../../figures/image_0000001819864122.png)
 
 当用户将模板参数中的mode配置为**DEQUANT\_WITH\_SINGLE\_ROW**时：
 
@@ -59,22 +59,22 @@
 
 具体效果可看下图所示，传入的DequantParams为 \{1, 16, 8\}。因为dstT为float，所以calCount满足为8的倍数，在**DEQUANT\_WITH\_SINGLE\_ROW**模式下会将\{1, 2 \* 8, 8\}转换为 \{2, 8, 8\}进行计算。
 
-![](../../../figures/zh-cn_image_0000001820178290.png)
+![](../../../figures/image_0000001820178290.png)
 
-![](../../../figures/zh-cn_image_0000001866976705.png)
+![](../../../figures/image_0000001866976705.png)
 
 -   PER\_TOKEN反量化：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一组deqscale参数，srcTensor为\[m, n\]时，deqscale为\[m, 1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002105578933.png)
+    ![](../../../figures/formulaimage_0000002105578933.png)
 
 -   PER\_GROUP反量化：这里定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组deqscale参数。srcTensor为\[m, n\]时，如果kDim=0，表示k是m方向，deqscale为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，deqscale的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
     -   kDim=0：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002069815092.png)
+        ![](../../../figures/formulaimage_0000002069815092.png)
 
     -   kDim=1：
 
-        ![](../../../figures/zh-cn_formulaimage_0000002105655005.png)
+        ![](../../../figures/formulaimage_0000002105655005.png)
 
 ## 实现原理
 
@@ -121,7 +121,7 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
     -   PER\_TOKEN/PER\_GROUP量化
 
         <!-- npu="950" id21 -->
-        仅支持Ascend 950PR/Ascend 950DT。
+        仅支持Ascend 950PR&950DT系列产品。
         <!-- end id21 -->
 
         -   通过sharedTmpBuffer入参传入临时空间
@@ -291,72 +291,72 @@ struct AscendDeQuantParam {
 -   PER\_TOKEN/PER\_GROUP量化场景支持情况如下：
 
     <!-- npu="950" id22 -->
-    - Ascend 950PR/Ascend 950DT：支持。
+    - Ascend 950PR&950DT系列产品：支持。
     <!-- end id22 -->
 
     <!-- npu="A3" id23 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    - Atlas A3系列产品：不支持。
     <!-- end id23 -->
 
     <!-- npu="910b" id24 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    - Atlas A2系列产品：不支持。
     <!-- end id24 -->
 
     <!-- npu="310p" id25 -->
-    - Atlas 推理系列产品AI Core：不支持。
+    - Atlas推理系列产品AI Core：不支持。
     <!-- end id25 -->
 
 -   PER\_TOKEN/PER\_GROUP场景，连续计算方向（即n方向）的数据量要求32B对齐。
 -   非PER\_TOKEN/PER\_GROUP场景dstTensor支持的数据类型<a id="li17926145114504"></a>
 
     <!-- npu="950" id13 -->
-    - Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16\_t、float。
+    - Ascend 950PR&950DT系列产品，支持的数据类型为：half、bfloat16\_t、float。
     <!-- end id13 -->
 
     <!-- npu="A3" id14 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、bfloat16\_t、float。
+    - Atlas A3系列产品，支持的数据类型为：half、bfloat16\_t、float。
     <!-- end id14 -->
 
     <!-- npu="910b" id15 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、bfloat16\_t、float。
+    - Atlas A2系列产品，支持的数据类型为：half、bfloat16\_t、float。
     <!-- end id15 -->
 
     <!-- npu="310p" id16 -->
-    - Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
+    - Atlas推理系列产品AI Core，支持的数据类型为：half、float。
     <!-- end id16 -->
 
     <!-- npu="x90" id3 -->
-    - Kirin X90，支持的数据类型为：half、float。
+    - Kirin X90处理器系列产品，支持的数据类型为：half、float。
     <!-- end id3 -->
 
     <!-- npu="9030" id4 -->
-    - Kirin 9030，支持的数据类型为：half、float。
+    - Kirin 9030处理器系列产品，支持的数据类型为：half、float。
     <!-- end id4 -->
 
 -   非PER\_TOKEN/PER\_GROUP场景deqScale支持的数据类型<a id="li189021550175211"></a>
 
     <!-- npu="950" id17 -->
-    - Ascend 950PR/Ascend 950DT，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
+    - Ascend 950PR&950DT系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
     <!-- end id17 -->
 
     <!-- npu="A3" id18 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
+    - Atlas A3系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
     <!-- end id18 -->
 
     <!-- npu="910b" id19 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
+    - Atlas A2系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float、bfloat16\_t；当deqScale为标量时，支持的数据类型为bfloat16\_t、float。
     <!-- end id19 -->
 
     <!-- npu="310p" id20 -->
-    - Atlas 推理系列产品AI Core，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
+    - Atlas推理系列产品AI Core，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
     <!-- end id20 -->
 
     <!-- npu="x90" id5 -->
-    - Kirin X90，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
+    - Kirin X90处理器系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
     <!-- end id5 -->
 
     <!-- npu="9030" id6 -->
-    - Kirin 9030，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
+    - Kirin 9030处理器系列产品，当deqScale为矢量时，支持的数据类型为：uint64\_t、float；当deqScale为标量时，支持的数据类型为float。
     <!-- end id6 -->
 
 ## 调用示例

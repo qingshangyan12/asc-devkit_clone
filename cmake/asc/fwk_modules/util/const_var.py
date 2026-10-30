@@ -30,14 +30,18 @@ SOC_MAP_EXT = {
     "ascend610lite": "Ascend610Lite",
     "ascend950": "Ascend950PR_9599",
     "kirinx90": "KirinX90",
+    "kirin9020": "Kirin9020",
     "kirin9030": "Kirin9030",
-    "kirindev0000": "KirinDev0000",
+    "kirin9050": "Kirin9050",
     "kirindev0001": "KirinDev0001",
     "kirindev0002": "KirinDev0002",
     "kirindev0003": "KirinDev0003",
     "mc62": "MC62CM12AA",
+    "ascend5162a": "Ascend5162A",
     "mc32dm11a": "MC32DM11AA",
     "ascend350": "Ascend350_354f",
+    "ascend960dt": "Ascend960DT_968B7",
+    "ascend960pr": "Ascend960PR_963A1",
 }
 BIN_CMD = "opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
 --output=$2 --impl_mode={impl} --simplified_key_mode=0 --op_mode=dynamic\n"
@@ -75,6 +79,7 @@ ATTR_DEF_VAL = {
     "list_float": [],
     "list_list_int": [[]],
 }
+KERNEL_SPEC_RESULT_PREFIX = "ASCENDC_KERNEL_SPEC_RESULT="
 
 
 def conv_soc_ver(ver: str):

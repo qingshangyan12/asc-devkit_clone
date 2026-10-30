@@ -64,8 +64,8 @@ bool GetBatchNormNDTilingInfo(const AscendC::TensorShape& srcShape, const Ascend
 | originSrcShape | 输入 | 输入数据inputX的originshape信息[originB, originS, originH]，参数类型为[AscendC::TensorShape](../data_structures/TensorShape.md)。 |
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 中间变量是否能够复用输入内存。该参数预留，传入默认值false即可。 |
-| maxValue | 输出 | BatchNorm接口能完成计算所需的最大临时空间大小，超出max的空间不会被该接口使用。在min-max范围内，预留/申请空间越大，接口计算性能越好。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。maxValue为0表示计算不需要临时空间。<br>maxValue仅作为参考值，有可能大于Unified Buffer（UB）剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
-| minValue | 输出 | BatchNorm接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于min的数值。最小空间为0表示计算不需要临时空间。 |
+| maxValue | 输出 | BatchNorm接口能完成计算所需的最大临时空间大小，单位为字节，超出max的空间不会被该接口使用。在min-max范围内，预留/申请空间越大，接口计算性能越好。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。maxValue为0表示计算不需要临时空间。<br>maxValue仅作为参考值，有可能大于Unified Buffer（UB）剩余空间的大小，该场景下，开发者需要根据UB剩余空间的大小来选取合适的临时空间大小。 |
+| minValue | 输出 | BatchNorm接口能完成计算所需最小临时空间大小，单位为字节。为保证功能正确，接口计算时预留/申请的临时空间不能小于min的数值。最小空间为0表示计算不需要临时空间。 |
 | isBasicBlock | 输入 | 是否开启基本块，与BatchNorm接口一致。 |
 
 **表2**  GetBatchNormNDTilingInfo接口参数列表：

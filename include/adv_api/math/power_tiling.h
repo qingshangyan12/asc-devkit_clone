@@ -27,8 +27,8 @@ namespace AscendC {
  * @param [in] typeIsInt : whether the src type is int
  * @param [in] typeSize : src tensor dtype size
  * @param [in] isReuseSource: whether to reuse the input space of the source operand
- * @param [out] maxValue: max temporary local space size
- * @param [out] minValue: min temporary local space size
+ * @param [out] maxValue: max temporary local space size, in bytes
+ * @param [out] minValue: min temporary local space size, in bytes
  */
 void GetPowerMaxMinTmpSize(
     const AscendC::TensorShape& srcShape1, const AscendC::TensorShape& srcShape2, const bool typeIsInt,

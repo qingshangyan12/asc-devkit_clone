@@ -9,31 +9,29 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
     \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
     <!-- npu="950" id1 -->
-    - Ascend 950PR/Ascend 950DT：3510
+    - Ascend 950PR&950DT系列产品：3510
     <!-- end id1 -->
     <!-- npu="A3" id2 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持SIMT
+    - Atlas A3系列产品：不支持SIMT
     <!-- end id2 -->
     <!-- npu="910b" id3 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持SIMT
+    - Atlas A2系列产品：不支持SIMT
     <!-- end id3 -->
     <!-- npu="310b" id4 -->
-    - Atlas 200I/500 A2 推理产品：不支持SIMT
+    - Atlas 200I/500 A2推理产品：不支持SIMT
     <!-- end id4 -->
     <!-- npu="310p" id5 -->
-    - Atlas 推理系列产品：不支持SIMT
+    - Atlas推理系列产品：不支持SIMT
     <!-- end id5 -->
     <!-- npu="910" id6 -->
-    - Atlas 训练系列产品：不支持SIMT
+    - Atlas训练系列产品：不支持SIMT
     <!-- end id6 -->
 
 ## 函数执行空间限定符<a name="section204112391232"></a>
 
 函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及能被调用的空间范围。
 
-**表1**  函数执行空间限定符概览
-
-<a name="table121121062614"></a>
+**表1**  函数执行空间限定符概览<a name="table121121062614"></a>
 
 | 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
 | --- | --- | --- | --- | --- |
@@ -70,9 +68,7 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
 
     动态内存的实际内存大小需要在核函数（Kernel）启动时配置，具体内容请参考[核函数（Kernel）配置](#section97005415463)。
 
-## 内置常量<a name="section784531219338"></a>
-
-<a name="table878553753515"></a>
+## 内置常量<a name="section784531219338"></a><a name="table878553753515"></a>
 
 | 常量名 | 取值 | 功能 |
 | --- | --- | --- |
@@ -153,9 +149,7 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。以下数据类型是编译器默认支持的数据类型，使用时无需引入头文件。
 
-**表2**  标量数据类型
-
-<a name="table114921244133211"></a>
+**表2**  标量数据类型<a name="table114921244133211"></a>
 
 | 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
 | --- | --- | --- | --- | --- |
@@ -175,9 +169,7 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
 | 浮点型 | bfloat16_t | 符号位宽1，指数位宽8，尾数位宽7 | 16 | [2<sup>120</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>120</sup>] |
 | 浮点型 | float | 符号位宽1，指数位宽8，尾数位宽23 | 32 | [2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
 
-短向量数据类型分为Vector X2、Vector X3、Vector X4，表示一个短向量变量有2、3、4个元素，当前支持的类型分布如下：
-
-<a name="table49986503175"></a>
+短向量数据类型分为Vector X2、Vector X3、Vector X4，表示一个短向量变量有2、3、4个元素，当前支持的类型分布如下：<a name="table49986503175"></a>
 
 | 元素数据类型 | Vector X2 | Vector X3 | Vector X4 |
 | --- | --- | --- | --- |
@@ -200,9 +192,7 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
 | 浮点型，1符号位，8指数位，7尾数位 | bfloat16x2_t | - | - |
 | 浮点型，1符号位，8指数位，23尾数位 | float2 | float3 | float4 |
 
-**表3**  短向量数据类型
-
-<a name="table13856144241"></a>
+**表3**  短向量数据类型<a name="table13856144241"></a>
 
 | 数据类型 | 内存大小（字节） | 地址对齐（字节） |
 | --- | --- | --- |
@@ -226,9 +216,7 @@ SIMT会提供内置的宏方便用户编写程序。预定义宏一节着重介�
 
 SIMT编程提供了一系列运算符，用于执行数学运算。以下是支持的运算符列表。
 
-**表4**  SIMT编程支持的运算符列表
-
-<a name="table11745172843710"></a>
+**表4**  SIMT编程支持的运算符列表<a name="table11745172843710"></a>
 
 | 类别 | 运算符 | bool | int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t | half/bfloat16_t/float | half2/bfloat16x2_t | hifloat8_t |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -240,6 +228,11 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 算术运算符 | ++ | x | √ | √ | √ | x |
 | 算术运算符 | -- | x | √ | √ | √ | x |
 | 算术运算符 | - (取反) | x | √ | √ | √ | x |
+| 赋值运算符 | = | √ | √ | √ | √ | x |
+| 复合赋值运算符 | += | x | √ | √ | √ | x |
+| 复合赋值运算符 | -= | x | √ | √ | √ | x |
+| 复合赋值运算符 | *= | x | √ | √ | √ | x |
+| 复合赋值运算符 | /= | x | √ | √ | √ | x |
 | 比较运算符 | &lt; | x | √ | √ | x | x |
 | 比较运算符 | &lt;= | x | √ | √ | x | x |
 | 比较运算符 | &gt; | x | √ | √ | x | x |
@@ -257,7 +250,11 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 逻辑运算符 | ! | √ | √ | √ | x | x |
 | 条件运算符 | a ? b : c | √ | √ | √ | √ | x |
 
-> **约束说明**：除法运算符（/）当前不支持Subnormal（指数位全为0，且尾数位不全为0，表示接近零的极小值）输入，当输入为Subnormal值时会被刷为0。
+> **约束说明**：
+>
+> 除法运算符（/）受编译选项[--cce-use-fast-math](../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
+> -  --cce-use-fast-math=true：开启快速计算模式，不支持Subnormal场景的低精度除法计算，处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+> -  --cce-use-fast-math=false：支持Subnormal场景的高精度除法计算。
 
 运算符使用示例如下所示：
 
@@ -267,6 +264,13 @@ res[idx] = x[idx] + y[idx];
 
 // 取反运算
 x[idx] = (-x[idx]);
+
+// 赋值与复合赋值运算
+res[idx] = x[idx];
+res[idx] += y[idx];
+res[idx] -= y[idx];
+res[idx] *= y[idx];
+res[idx] /= y[idx];
 
 // 比较运算
 if (x[idx] > y[idx]) {
@@ -328,10 +332,8 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
   
     函数标记宏，在核函数（Kernel）上可选配置，用于指定核函数（Kernel）启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现寄存器溢出等问题。建议最大线程数与启动核函数（Kernel）时的dim3线程数保持一致。
 
-    **表5**  \_\_launch\_bounds\_\_(N)与每个线程可用的寄存器个数的关系
+    **表5**  \_\_launch\_bounds\_\_(N)与每个线程可用的寄存器个数的关系<a name="table1715318510594"></a>
     
-    <a name="table1715318510594"></a>
-
     | N | 每个线程可用寄存器个数 |
     | --- | --- |
     | 1025~2048 | 16 |
@@ -344,6 +346,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
     ```cpp
     __global__ __launch_bounds__(512) inline void add(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
     ```
+
     \_\_launch\_bounds\_\_\(N\)的参数N需要满足：
     -   N \>= dimx \* dimy \* dimz；dimx, dimy, dimz为表示线程的dim3结构体。
     -   N的取值范围为1到2048。

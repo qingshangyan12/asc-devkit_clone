@@ -13,7 +13,8 @@
 | **Host（主机）** | CPU + Host Memory | 通用计算、资源管理、任务调度、统筹协调 |
 | **Device（设备）** | 昇腾NPU + Device Memory | 高密度并行计算（深度学习推理/训练、图像处理等） |
 
-> 💡 **通俗理解**：Host如同项目经理，负责规划、分配、协调；Device如同专业工程师团队，专注于高效完成高强度、重复性的计算工作。两者分工协作，提升整体效率。
+>[!NOTE]说明 
+>**通俗理解**：Host如同项目经理，负责规划、分配、协调；Device如同专业工程师团队，专注于高效完成高强度、重复性的计算工作。两者分工协作，提升整体效率。
 
 ---
 
@@ -26,7 +27,8 @@
 | **Host代码** | CPU（Host侧） | 标准C/C++ | 管理Device设备、搬运数据、启动NPU任务、同步状态 |
 | **Device代码** | NPU（Device侧） | **Ascend C** | 执行具体的并行计算任务，称为[核函数（Kernel）](../../programming_guide/programming_model/ai_core_simd_programming/kernel_function.md) |
 
-> ✅ **便捷提示**：Host代码与Device代码可编写在同一个`.asc`文件中，由毕昇编译器自动识别、分别编译，简化开发流程。
+>[!NOTE]说明 
+>**便捷提示**：Host代码与Device代码可编写在同一个`.asc`文件中，由毕昇编译器自动识别、分别编译，简化开发流程。
 
 ---
 
@@ -40,7 +42,8 @@ Host侧通过调用**CANN Runtime API**完成与Device的协同工作。典型�
 4. **同步等待**：Host端等待NPU执行完成，确保数据计算完整（避免未完成就读取结果）。
 5. **数据搬出**：将计算结果从Device Memory拷贝回Host Memory，供后续处理。
 
-> 📌 **关键点**：Host与NPU是异步执行的，第4步的同步必不可少，否则可能读取到未完成的数据。
+>[!NOTE]说明 
+>**关键点**：Host与NPU是异步执行的，第4步的同步必不可少，否则可能读取到未完成的数据。
 
 ---
 
@@ -53,10 +56,13 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 - **标量处理单元**：处理控制流（如分支、循环）和地址计算，类似传统CPU核心，是AI Core的“控制核心”。
 - **向量处理单元**：执行向量运算，是SIMD/SIMT两种并行模型的主要载体。不同昇腾芯片架构对两种模式的支持有所差异。
 - **矩阵运算单元**：专门优化矩阵乘加运算，仅兼容SIMD模式，是深度学习卷积、全连接层等算子的“性能加速核心”。
-- **本地存储**：用于缓存计算所需的数据，有效降低对全局Device Memory的访问延迟，提升计算效率。
+- **Device侧本地存储**：指AI Core片内Local Memory（如Unified Buffer），用于缓存计算所需的数据，有效降低对全局Device Memory的访问延迟，提升计算效率。
 
 <!-- npu="950" id1 -->
-> 🧬 **架构演进**：Ascend 950PR/Ascend 950DT架构之前，AI Core**仅支持SIMD**；从Ascend 950PR/Ascend 950DT架构开始，向量处理单元**同时支持SIMD和SIMT**，为不同算子任务提供更灵活的选择。
+
+>[!NOTE]说明 
+>**架构演进**：Ascend 950PR&950DT系列产品架构之前，AI Core**仅支持SIMD**；从Ascend 950PR&950DT系列产品架构开始，向量处理单元**同时支持SIMD和SIMT**，为不同算子任务提供更灵活的选择。
+
 <!-- end id1 -->
 
 ---
@@ -75,9 +81,9 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 > **SIMD的SPMD模型（Single Program, Multiple Data）**：将每个AI Core抽象成一个Block，通过内置变量[block_idx](../../programming_guide/language_extension/simd_builtin_keywords.md)作为Block索引。每个Block执行同一份算子核函数（Kernel）代码，基于block_idx划分每个Block的数据处理范围，实现多核负载均衡与并行调度。
 
 1. **Tiling（分块）**：将数据划分为均匀的块，每个AI Core负责一块，实现负载均衡。
-2. **数据搬入**：需要**显式调用数据搬运API**将数据从Device Memory搬到本地存储。
+2. **数据搬入**：需要**显式调用数据搬运API**将数据从Device Memory搬到Device侧本地存储。
 3. **数据计算**：调用**SIMD指令对应的API**完成计算。注意数据搬运与计算异步，需插入同步指令。
-4. **数据搬出**：需要**显式调用数据搬运API**将本地存储中的结果写回Device Memory。
+4. **数据搬出**：需要**显式调用数据搬运API**将Device侧本地存储中的结果写回Device Memory。
 
 ### SIMT核函数（Kernel）编程基本步骤（遵循SPMD模型）
 
@@ -88,7 +94,8 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 3. **数据计算**：编写**标量代码**（支持分支、循环）；多线程协作时需插入同步指令。
 4. **数据搬出**：可通过指针将结果直接写回Device Memory，**无需显式调用数据搬运API**。
 
-> 📌 **提示**：Host端可通过`<<<>>>`语法糖或CANN Runtime API调用并运行核函数（Kernel）。
+>[!NOTE]说明 
+>**提示**：Host端可通过`<<<>>>`语法糖或CANN Runtime API调用并运行核函数（Kernel）。
 
 ---
 
@@ -99,10 +106,11 @@ NPU是Device侧的计算核心，而 **AI Core**则是NPU内部的“最小计�
 | 编程模型 | 支持范围 | 适用场景 | 芯片支持 |
 |----------|----------|----------|----------|
 | **SIMD(主）** | 向量、矩阵、融合计算 | 规整、高密度任务（卷积、矩阵乘、逐元素变换） | 昇腾全系列 |
-| **SIMT(辅）** | 仅向量计算 | 离散访问、复杂分支、稀疏计算 | <!-- npu="950" id2 -->仅限Ascend 950PR/Ascend 950DT<!-- end id2 --> |
-| **SIMD+SIMT混合** | 向量、矩阵、融合计算  | 用SIMT处理不规则逻辑，用SIMD批量高效计算 | <!-- npu="950" id3 -->仅限Ascend 950PR/Ascend 950DT<!-- end id3 --> |
+| **SIMT(辅）** | 仅向量计算 | 离散访问、复杂分支、稀疏计算 | <!-- npu="950" id2 -->仅限Ascend 950PR&950DT系列产品<!-- end id2 --> |
+| **SIMD+SIMT混合** | 向量、矩阵、融合计算  | 用SIMT处理不规则逻辑，用SIMD批量高效计算 | <!-- npu="950" id3 -->仅限Ascend 950PR&950DT系列产品<!-- end id3 --> |
 
-> 📌 **快速选型建议**：
+>[!NOTE]说明 
+>**快速选型建议**：
 > - 开发常规高性能算子（如矩阵乘、逐元素算子）时，建议使用SIMD编程模型。该模型支持昇腾全系列产品，且具有较高的能效比。
 > - 对于涉及离散数据或复杂分支逻辑的算子，建议使用SIMT编程模型。
 

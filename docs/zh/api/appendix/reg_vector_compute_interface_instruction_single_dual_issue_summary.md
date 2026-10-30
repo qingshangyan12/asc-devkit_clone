@@ -5,7 +5,7 @@
 
 本节内容不包含软仿类接口，仅针对如下型号生效：
 
-Ascend 950PR/Ascend 950DT
+Ascend 950PR&950DT系列产品
 
 **表 1**  接口指令双发汇总<a id="table-dual-issue"></a>
 
@@ -62,7 +62,7 @@ Ascend 950PR/Ascend 950DT
 | 比较与选择 | VSEL/PSEL | Select |
 | 类型转换 | VCVTFI/VCVTFF/VCVTFF2/VCVTIF/VCVTII | Cast |
 | 类型转换 | VTRC | Truncate |
-| 数据填充 | VBR | Duplicate |
+| 数据填充 | VBR/VDUPI | （将scalarValue广播到寄存器）Duplicate |
 | 索引操作 | VCI | Arange |
 
 **表 2**  接口指令单发汇总<a id="table-single-issue"></a>
@@ -93,6 +93,7 @@ Ascend 950PR/Ascend 950DT
 | 归约计算 | VCGMIN | ReduceDataBlock（ReduceType::MIN） |
 | 归约计算 | VCPADD | PairReduceElem |
 | 比较与选择 | VSQZ | Squeeze |
+| 数据填充 | VDUP | 将srcReg的最低位元素广播到寄存器（Duplicate） |
 | 离散操作 | VSELR | Gather |
 | 数据重排 | VINTLV | Interleave |
 | 数据重排 | VDINTLV | DeInterleave |

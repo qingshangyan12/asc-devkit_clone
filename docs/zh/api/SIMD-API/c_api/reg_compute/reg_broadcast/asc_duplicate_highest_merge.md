@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -73,8 +73,7 @@ __simd_callee__ inline void asc_duplicate_highest_merge(vector_float& dst,
 
 ## 约束说明
 
-- 本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
-- 使用`mask`前，需要通过掩码设置或搬入接口完成初始化；未初始化的掩码寄存器内容不确定。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `mask`仅筛选`dst`中写入广播值的位置，不筛选`src`中的元素。无论`mask`的最高位是否有效，待广播的数据均为`src`的最高位元素。
 - 调用接口前需要初始化`dst`，否则未被`mask`筛选的元素值不确定。
 - 同一寄存器的数据依赖由硬件保序，无需额外插入同步指令。本接口与前后Reg数据搬运接口之间，如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖，需要调用[asc_mem_bar](../reg_sync/asc_mem_bar.md)进行同步。
@@ -84,7 +83,7 @@ __simd_callee__ inline void asc_duplicate_highest_merge(vector_float& dst,
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -99,65 +98,103 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-constexpr uint32_t ACTIVE_COUNT = 4;
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(float);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(float);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t ACTIVE_COUNT = 16;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(float);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
 constexpr float INITIAL_VALUE = -1.0f;
 
-__simd_vf__ inline void duplicate_highest_merge(__ubuf__ float* dst, __ubuf__ float* src)
+__simd_vf__ inline void duplicate_highest_merge(__ubuf__ float* dst, __ubuf__ float* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float dst_reg;
     vector_float src_reg;
-    uint32_t active_count = ACTIVE_COUNT;
-    uint32_t full_count = ELEMENT_COUNT;
-    vector_bool active_mask = asc_update_mask_b32(active_count);
-    vector_bool full_mask = asc_update_mask_b32(full_count);
-
-    asc_loadalign(dst_reg, dst);
-    asc_loadalign(src_reg, src);
-    asc_duplicate_highest_merge(dst_reg, src_reg, active_mask);
-    asc_storealign(dst, dst_reg, full_mask);
+    // 剩余有效元素数由asc_update_mask_b32逐轮更新，无需按offset重新计算。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        // active_mask控制本轮广播的生效位置：最多启用前ACTIVE_COUNT个元素，尾块不足时只启用有效元素。
+        // 例如133个元素按每轮64个处理，ACTIVE_COUNT为16时，三轮分别启用16、16、5个元素。
+        // remaining_length_active是本轮的独立计数；update_mask会将它扣减到0，因此每轮都要重新计算。
+        // 必须在生成store_mask之前计算，因为生成store_mask会更新跨轮使用的remaining_length。
+        uint32_t remaining_length_active = remaining_length < ACTIVE_COUNT ? remaining_length : ACTIVE_COUNT;
+        vector_bool active_mask = asc_update_mask_b32(remaining_length_active);
+        // store_mask控制写回范围，三轮分别写回64、64、5个有效元素，并自动更新剩余数量。
+        // 广播未生效的位置也可能需要写回，因此不能直接用active_mask代替store_mask。
+        vector_bool store_mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(dst_reg, dst + offset);
+        asc_loadalign(src_reg, src + offset);
+        asc_duplicate_highest_merge(dst_reg, src_reg, active_mask);
+        asc_storealign(dst + offset, dst_reg, store_mask);
+    }
 }
 
 __global__ __vector__ void asc_duplicate_highest_merge_kernel(__gm__ float* dst, __gm__ float* src)
 {
     asc_init();
-    __ubuf__ float dst_local[ELEMENT_COUNT];
-    __ubuf__ float src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(dst_local, dst, sizeof(dst_local));
-    asc_copy_gm2ub_align(src_local, src, sizeof(src_local));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    duplicate_highest_merge(dst_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, sizeof(dst_local));
+    __ubuf__ float dst_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ float src_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(dst_local, dst, PADDED_BUFFER_BYTES);
+    asc_copy_gm2ub_align(src_local, src, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<duplicate_highest_merge>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> src(ELEMENT_COUNT);
-    std::vector<float> output(ELEMENT_COUNT, INITIAL_VALUE);
-    std::vector<float> golden(ELEMENT_COUNT, INITIAL_VALUE);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) src[i] = static_cast<float>(i + 1);
-    for (uint32_t i = 0; i < ACTIVE_COUNT; ++i) golden[i] = src.back();
+    std::vector<float> src(PADDED_ELEMENT_COUNT);
+    std::vector<float> output(PADDED_ELEMENT_COUNT, INITIAL_VALUE);
+    std::vector<float> golden(TOTAL_LENGTH, INITIAL_VALUE);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) src[i] = static_cast<float>(i + 1);
+    for (uint32_t i = TOTAL_LENGTH; i < PADDED_ELEMENT_COUNT; ++i) {
+        src[i] = -1000.0f - static_cast<float>(i);
+    }
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        // 保留剩余有效元素数，供更新掩码处理尾块。
+        const uint32_t remaining_length = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        const uint32_t remaining_length_active = remaining_length < ACTIVE_COUNT ? remaining_length : ACTIVE_COUNT;
+        const float register_highest = src[offset + ELEMENTS_PER_REGISTER - 1];
+        for (uint32_t i = 0; i < remaining_length_active; ++i) golden[offset + i] = register_highest;
+    }
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* src_device = nullptr;
     float* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), src.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
-    aclrtMemcpy(dst_device, output.size() * sizeof(float), output.data(), output.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, PADDED_BUFFER_BYTES, src.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(dst_device, PADDED_BUFFER_BYTES, output.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_duplicate_highest_merge_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
+    output.resize(TOTAL_LENGTH);
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 

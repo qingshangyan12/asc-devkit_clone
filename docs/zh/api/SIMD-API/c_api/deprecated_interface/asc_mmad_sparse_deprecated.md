@@ -3,32 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR&950DT系列产品：不支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-**入参`unit_flag`类型为`uint8_t`的`asc_mmad_sparse`接口和`asc_mmad_sparse_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)接口替代；原`asc_mmad_sparse_sync`接口的同步功能请通过新`asc_mmad_sparse`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。**
+**入参`unit_flag`类型为`uint8_t`的`asc_mmad_sparse`接口和`asc_mmad_sparse_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_sparse](../cube_compute/mmad_compute/asc_mmad_sparse.md)接口替代；原`asc_mmad_sparse_sync`接口的同步功能请通过新`asc_mmad_sparse`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/intra_core_sync/asc_sync.md)。**
 
 本接口完成稀疏矩阵乘加操作。传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵；矩阵A在计算时完成稠密化，矩阵B需在输入数据准备阶段完成稠密化。
 
@@ -87,4 +87,4 @@ PIPE_M
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - 原始稀疏矩阵B每4个元素中最多包含2个非零元素；如果存在3个或更多非零元素，则仅使用前2个非零元素。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
-- 稀疏矩阵的数据准备、稠密算法及其他约束请参见[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)。
+- 稀疏矩阵的数据准备、稠密算法及其他约束请参见[asc_mmad_sparse](../cube_compute/mmad_compute/asc_mmad_sparse.md)。

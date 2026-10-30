@@ -3,7 +3,7 @@
 <!-- npu="950" id1 -->
 本节汇总介绍了SIMT接口的理论性能，仅针对如下型号生效：
 
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT系列产品
 <!-- end id1 -->
 
 对本节提供的理论性能指标说明如下：
@@ -342,7 +342,7 @@
 | [floorf](../SIMT-API/math_functions/float_math_functions/floorf.md) | float | float | 64 |
 | [ceilf](../SIMT-API/math_functions/float_math_functions/ceilf.md) | float | float | 64 |
 
-对于expf、sqrf接口，上表中数据为非高精度模式下的理论性能。
+对于expf、sqrtf接口，上表中数据为非高精度模式下的理论性能。
 
 ### 数据类型转换
 

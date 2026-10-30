@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -45,7 +45,7 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | addr | 输入 | 预取指令的Global Memory起始地址。 |
-| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte。 |
+| prefetch_len | 输入 | 预加载指令的长度，单位为2K Byte。 |
 
 ## 返回值说明
 
@@ -75,7 +75,7 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -136,8 +136,8 @@ __global__ __mix__(1, 2) void MatmulScaleKernel(
 
     if ASC_IS_AIC {
         // AIC直接将两个输入矩阵从GM搬入L1 Buffer。
-        asc_copy_gm2l1(matrix_a_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, 0, 0, 0);
-        asc_copy_gm2l1(matrix_b_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, 0, 0, 0);
+        asc_copy_gm2l1(matrix_a_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, asc_channel_pad_mode::NONE, 0, 0);
+        asc_copy_gm2l1(matrix_b_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, asc_channel_pad_mode::NONE, 0, 0);
         asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12l0a(matrix_a_l0, matrix_a_l1, 0, 0, 1, 1, 1, 1);
@@ -177,7 +177,7 @@ __global__ __mix__(1, 2) void MatmulScaleKernel(
         asc_copy_ub2gm_align(output + aiv_index * ELEMENTS_PER_AIV, output_ub, FP32_BYTES_PER_AIV);
     }
 
-    asc_sync_pipe(PIPE_ALL);
+    asc_sync();
 }
 
 bool CheckResult(const std::vector<float>& matmul_result, const std::vector<float>& output)

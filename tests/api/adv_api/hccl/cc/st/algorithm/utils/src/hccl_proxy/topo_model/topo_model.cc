@@ -80,6 +80,21 @@ TopoModel::TopoModel(const TopoMeta& topoMeta)
         isUbxTopo_ = true;
         InitUbxTopo();
     }
+
+    // 双 die L1 双链路 opt-in：默认关闭（每 pair 单 L1 链路 → dieNum=1）。
+    char* twoDieEnv = getenv("ENABLE_2DIE_L1_LINK_FOR_LLT");
+    if (twoDieEnv != nullptr && std::string(twoDieEnv) == "1") {
+        is2DieL1Link_ = true;
+    }
+
+    // 大禹纯 CLOS opt-in：默认关闭。开启后 L0 只保留一个覆盖全 server rank 的 CLOS 实例
+    // （GetTopoType 返回 COMM_TOPO_CLOS，无 mesh 实例），L0 链路协议置 UBC_CTP，
+    // 对应纯 CLOS 单层组网（selector 纯 CLOS 分支 + CalcChannelRequestMesh1DOnDie DIE 过滤建链）。
+    char* pureClosEnv = getenv("ENABLE_PURE_CLOS_TOPO_FOR_LLT");
+    if (pureClosEnv != nullptr && std::string(pureClosEnv) == "1") {
+        isPureClosTopo_ = true;
+        InitPureClosTopo();
+    }
 }
 
 // UBX 模式：L0 只保留一个覆盖全 server rank 的 CLOS 实例（GetTopoType 返回 COMM_TOPO_CLOS），
@@ -97,6 +112,23 @@ void TopoModel::InitUbxTopo()
     }
     for (auto& endpointEntry : rankId2Endpoint_) {
         endpointEntry.second.commAddr.eid[UBX_PORT_IDX] = UBX_NON_ISOLATED_PORT;
+    }
+}
+
+// 大禹纯 CLOS 模式：每个 server 的 L0 只保留一个覆盖全部 rank 的 CLOS 实例（GetTopoType 返回
+// COMM_TOPO_CLOS）。CalcLevel0TopoShape 据此判定 topoInstNum==1 且 rankNumForTopoType[CLOS]==1 →
+// Level0Shape::CLOS。链路协议在 Create910DLinks 的 isPureClosTopo_ 分支置 UBC_CTP。
+void TopoModel::InitPureClosTopo()
+{
+    for (const auto& serverEntry : serverId2RankList_) {
+        const uint32_t serverId = serverEntry.first;
+        instId2RankIds_[serverId].clear();
+        // 单一 CLOS 实例覆盖 server 内全部 rank；复用 SERVER_CLOS_INSTID（GetTopoType 对它返回 CLOS）
+        instId2RankIds_[serverId][SERVER_CLOS_INSTID] = serverEntry.second;
+        for (auto& devEntry : dev2TopoInsts_[serverId]) {
+            devEntry.second.clear();
+            devEntry.second.push_back(SERVER_CLOS_INSTID);
+        }
     }
 }
 
@@ -675,6 +707,15 @@ void TopoModel::Create910DLinks(uint32_t srcRank, uint32_t dstRank)
         link.linkAttr.linkProtocol =
             isDpuEnable ? CommProtocol::COMM_PROTOCOL_ROCE : CommProtocol::COMM_PROTOCOL_UBC_CTP;
         allLinkMap_[rankPair][NetLayerL1].push_back(link);
+        // 双 die L1 双链路 opt-in：同 pair 追加第二条链路，src/dst endpoint 的 devPhyId 翻转
+        // die 位（+4 mod 8，与 HcclRankGraphGetEndpointInfo 的 devPhyId>=4→die1 判定配合），
+        // 使 GetDieInfoFromChannelDescs 探测到 2 链路 2 die → dieNum=2（SoleNHR2die 双 mission）。
+        if (is2DieL1Link_) {
+            CommLink dieLink = link;
+            dieLink.srcEndpointDesc.loc.device.devPhyId = (link.srcEndpointDesc.loc.device.devPhyId + 4U) % 8U;
+            dieLink.dstEndpointDesc.loc.device.devPhyId = (link.dstEndpointDesc.loc.device.devPhyId + 4U) % 8U;
+            allLinkMap_[rankPair][NetLayerL1].push_back(dieLink);
+        }
     }
 
     // level0 同server才有level0链路
@@ -684,6 +725,25 @@ void TopoModel::Create910DLinks(uint32_t srcRank, uint32_t dstRank)
 
     uint32_t srcPhyId = rankId2PhyId_[srcRank];
     uint32_t dstPhyId = rankId2PhyId_[dstRank];
+
+    // 大禹纯 CLOS：每对 rank 生成 die0/die1 各一条 UBC_CTP 链路（模拟 12 出口 = DIE0×8 + DIE1×4，
+    // 每个 die 对全部 peer 可达；stub 端 HcclRankGraphGetEndpointInfo 按 devPhyId>=4 判 die1）。
+    // CCU 侧 CalcChannelRequestMesh1DOnDie 只取 die0 → 通道集同 die；die1 链路留给 AICPU 盲选散布。
+    if (isPureClosTopo_) {
+        CommLink die0Link = link;
+        die0Link.srcEndpointDesc.loc.device.devPhyId = srcPhyId % 4U;
+        die0Link.dstEndpointDesc.loc.device.devPhyId = dstPhyId % 4U;
+        die0Link.linkAttr.linkProtocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+        allLinkMap_[rankPair][NetLayerL0].push_back(die0Link);
+
+        CommLink die1Link = link;
+        die1Link.srcEndpointDesc.loc.device.devPhyId = srcPhyId % 4U + 4U;
+        die1Link.dstEndpointDesc.loc.device.devPhyId = dstPhyId % 4U + 4U;
+        die1Link.linkAttr.linkProtocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+        allLinkMap_[rankPair][NetLayerL0].push_back(die1Link);
+        return; // 不走 link910d_/is2D 的常规 L0 建链
+    }
+
     auto protocol = link910d_.find({srcPhyId, dstPhyId});
     if (protocol != link910d_.end()) {
         link.linkAttr.linkProtocol = protocol->second;

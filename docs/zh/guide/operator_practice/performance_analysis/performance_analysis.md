@@ -1,3 +1,4 @@
 # 性能分析
 
-本文件为文档发布时所需的索引文件。
+- [获取性能数据](./collect_performance_data.md)
+- [分析性能数据](./analyze_performance_data.md)

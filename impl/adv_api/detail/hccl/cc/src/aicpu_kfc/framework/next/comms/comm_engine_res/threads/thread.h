@@ -26,7 +26,6 @@
 #include "stream_lite.h"
 #include "task_info.h"
 #include "adapter_prof.h"
-#include "../../../../../legacy/framework/dfx/profiling/dlprof_function.h"
 
 namespace hccl {
 
@@ -65,6 +64,7 @@ public:
     virtual HcclResult DeInit() = 0;
     virtual std::string& GetUniqueId() = 0;
     virtual uint32_t GetNotifyNum() const = 0;
+    virtual size_t GetNotifySize() const = 0;
     virtual LocalNotify* GetNotify(uint32_t index) const = 0;
     virtual HcclResult SupplementNotify(uint32_t notifyNum) = 0;
 
@@ -72,6 +72,7 @@ public:
     virtual bool IsDeviceA5() const = 0;
     virtual Stream* GetStream() const = 0;
     virtual void* GetStreamLitePtr() const = 0;
+    virtual s32 GetStreamId() const = 0;
     virtual void LaunchTask() const = 0;
     virtual void TryLaunchTask() const = 0;
 

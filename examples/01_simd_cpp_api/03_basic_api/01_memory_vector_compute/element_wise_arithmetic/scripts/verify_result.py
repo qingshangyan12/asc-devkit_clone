@@ -13,6 +13,7 @@
 
 
 import sys
+from pathlib import Path
 import numpy as np
 
 
@@ -22,11 +23,17 @@ error_tol = 1e-3
 
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float16).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
-    different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
-    )
+    output_bytes = Path(output).read_bytes()
+    golden_bytes = Path(golden).read_bytes()
+    if (
+        not golden_bytes
+        or len(output_bytes) != len(golden_bytes)
+        or len(golden_bytes) % np.dtype(np.float16).itemsize != 0
+    ):
+        raise ValueError(f"[ERROR] invalid FP16 file sizes: output={len(output_bytes)}, golden={len(golden_bytes)}")
+    output = np.frombuffer(output_bytes, dtype=np.float16)
+    golden = np.frombuffer(golden_bytes, dtype=np.float16)
+    different_element_results = np.isclose(output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True)
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]
@@ -34,12 +41,7 @@ def verify_result(output, golden):
         output_data = output[real_index]
         print(
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f"
-            % (
-                real_index,
-                golden_data,
-                output_data,
-                abs(output_data - golden_data) / golden_data,
-            )
+            % (real_index, golden_data, output_data, abs(output_data - golden_data) / golden_data)
         )
         if index == 100:
             break

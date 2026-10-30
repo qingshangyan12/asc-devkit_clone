@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_common_impl.h"
-#include "kernel_utils.h"
+#include "../kernel_utils.h"
 
 namespace AscendC {
 // all input params: need conversion by *32
@@ -156,30 +156,34 @@ __aicore__ inline void CopyCbufToGmAlignV2(
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    // ISA/API: Is the ND matrix number to be moved
-    uint64_t ndNum = 1;
-    // ISA/API: unit of element
-    uint16_t loop2Size = burstLength;
-    // ISA/API: unit of element
-    uint32_t loop3Size = blockCount;
-    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-    constexpr uint64_t loop2SrcStride = 1;
-    // ISA: unit of C0_size(32B)
-    uint64_t loop3SrcStride = DivCeil(actSrcStride, BYTE_32_ALIGN);
-    // ISA: unit of C0_size(32B)
-    uint64_t loop4SrcStride = 0;
-    // ISA: unit of byte
-    uint64_t loop2DstStride = actDstStride;
-    // ISA: unit of byte
-    uint64_t loop4DstStride = 0;
+    if constexpr (SupportBytes<T, 1, 2>()) {
+        // ISA/API: Is the ND matrix number to be moved
+        uint64_t ndNum = 1;
+        // ISA/API: unit of element
+        uint16_t loop2Size = burstLength / sizeof(T);
+        // ISA/API: unit of element
+        uint32_t loop3Size = blockCount;
+        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+        constexpr uint64_t loop2SrcStride = 1;
+        // ISA: unit of C0_size(32B)
+        uint64_t loop3SrcStride = DivCeil(actSrcStride, BYTE_32_ALIGN);
+        // ISA: unit of C0_size(32B)
+        uint64_t loop4SrcStride = 0;
+        // ISA: unit of byte
+        uint64_t loop2DstStride = actDstStride;
+        // ISA: unit of byte
+        uint64_t loop4DstStride = 0;
 
-    // SPR.FIXP_NZ_PARA
-    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-    set_fixp_nz_para(config);
+        // SPR.FIXP_NZ_PARA
+        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+        set_fixp_nz_para(config);
 
-    fix_cbuf_to_gm(
-        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NORMAL_DMA,
-        sid);
+        fix_cbuf_to_gm(
+            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride,
+            fixp_trans_mode_t::NORMAL_DMA, sid);
+    } else {
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
+    }
 #endif
 }
 
@@ -230,22 +234,26 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
 template <typename T>
 __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-    constexpr uint32_t POS_LOOP3_SIZE = 40;
-    constexpr uint32_t POS_MODE = 61;
-    constexpr uint32_t POS_LOOP4_SRC_STRIDE = 48;
+    if constexpr (SupportBytes<T, 1, 2>()) {
+        constexpr uint32_t POS_LOOP3_SIZE = 40;
+        constexpr uint32_t POS_MODE = 61;
+        constexpr uint32_t POS_LOOP4_SRC_STRIDE = 48;
 
-    uint64_t xm = 0;
-    xm |= ((uint64_t)intriParams.blockLen * 32 / sizeof(T)) << POS_LOOP3_SIZE;
-    xm |= (uint64_t)fixp_trans_mode_t::NORMAL_DMA << POS_MODE;
+        uint64_t xm = 0;
+        xm |= ((uint64_t)intriParams.blockLen * 32 / sizeof(T)) << POS_LOOP3_SIZE;
+        xm |= (uint64_t)fixp_trans_mode_t::NORMAL_DMA << POS_MODE;
 
-    uint64_t xt = ((uint64_t)intriParams.blockLen + (uint64_t)intriParams.srcStride);
+        uint64_t xt = ((uint64_t)intriParams.blockLen + (uint64_t)intriParams.srcStride);
 
-    uint64_t config = 0;
-    config |= (uint64_t)intriParams.blockCount;
-    config |= ((uint64_t)intriParams.blockLen + (uint64_t)intriParams.dstStride) << POS_LOOP4_SRC_STRIDE;
+        uint64_t config = 0;
+        config |= (uint64_t)intriParams.blockCount;
+        config |= ((uint64_t)intriParams.blockLen + (uint64_t)intriParams.dstStride) << POS_LOOP4_SRC_STRIDE;
 
-    set_fixp_nz_para(config);
-    fix_cbuf_to_ubuf((__ubuf__ int8_t*)dst, (__cbuf__ int8_t*)src, xm, xt);
+        set_fixp_nz_para(config);
+        fix_cbuf_to_ubuf((__ubuf__ int8_t*)dst, (__cbuf__ int8_t*)src, xm, xt);
+    } else {
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
+    }
 }
 
 template <typename T>
@@ -280,9 +288,15 @@ __aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const Da
 {
     constexpr uint8_t POS_DST_MEM_BLOCK = 16;
     dst |= static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     copy_cbuf_to_fbuf_v2(
         (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
         intriParams.dstStride);
+#else
+    copy_cbuf_to_fbuf_v2(
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
+        intriParams.srcStride, intriParams.dstStride);
+#endif
 }
 
 template <typename T>
@@ -310,45 +324,43 @@ template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZImplBase(
     __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
-    if ASCEND_IS_AIC {
-        SmallC0Checker(enableSmallC0, intriParams.dValue);
+    SmallC0Checker(enableSmallC0, intriParams.dValue);
 
-        if constexpr (g_gm_overflow_check) {
-            __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-            AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-        }
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
+    }
 
-        uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2DstStride = dst_nz_n_stride
-        uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
-        // loop4DstStride: dst_nz_matrix_stride * size_of_dst_type / C0_size
-        uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLK_SIZE);
+    uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2DstStride = dst_nz_n_stride
+    uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
+    // loop4DstStride: dst_nz_matrix_stride * size_of_dst_type / C0_size
+    uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLK_SIZE);
 
-        uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
-        mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
-        mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
-        mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
-        set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
+    uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
+    mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
+    mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
+    mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
+    set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
 
-        // input params: srcDValue, srcNdMatrixStride                        unit of element nums
-        // expected params for ISA: loop1_src_stride, loop4SrcStride       uint of bytes
-        // loop1SrcStride = srcD * sizeof(srcType)     loop4SrcStride = srcNdMatrixStride * sizeof(srcType)
-        uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
-        if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, intriParams.sid, loop1SrcStride, cacheMode,
-                intriParams.nValue, intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
-        if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ half*)dst, (__gm__ half*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
-                intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
-        if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ float*)dst, (__gm__ float*)src, intriParams.sid, loop1SrcStride, cacheMode,
-                intriParams.nValue, intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
+    // input params: srcDValue, srcNdMatrixStride                        unit of element nums
+    // expected params for ISA: loop1_src_stride, loop4SrcStride       uint of bytes
+    // loop1SrcStride = srcD * sizeof(srcType)     loop4SrcStride = srcNdMatrixStride * sizeof(srcType)
+    uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
+    if constexpr (sizeof(T) == B8_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
+    }
+    if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ half*)dst, (__gm__ half*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
+    }
+    if constexpr (sizeof(T) == B32_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ float*)dst, (__gm__ float*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
     }
 }
 
@@ -364,7 +376,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2UBND2NZImpl(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
     ASSERT(false && "unsupported data copy GM to UB ND2NZ on current device");
 }
@@ -432,7 +445,7 @@ __aicore__ inline void DataCopyGM2L1DN2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    if constexpr (SupportBytes<T, 1, 2>()) {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
         // ISA/API: Is the ND matrix number to be moved
         uint64_t ndNum = intriParams.ndNum;
@@ -486,14 +499,14 @@ __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, co
             intriParams.sid);
 #endif
     } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2NDImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    if constexpr (SupportBytes<T, 1, 2>()) {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
         // ISA/API: Is the ND matrix number to be moved
         uint64_t ndNum = intriParams.ndNum;
@@ -545,7 +558,7 @@ __aicore__ inline void DataCopyL12UBNZ2NDImpl(__ubuf__ T* dst, __cbuf__ T* src, 
             dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2ND);
 #endif
     } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
     }
 }
 
@@ -561,7 +574,7 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2DNImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    if constexpr (SupportBytes<T, 1, 2>()) {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
         // ISA/API: Is the ND matrix number to be moved
         uint64_t dnNum = intriParams.dnNum;
@@ -615,14 +628,14 @@ __aicore__ inline void DataCopyL12GMNZ2DNImpl(__gm__ T* dst, __cbuf__ T* src, co
             intriParams.sid);
 #endif
     } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
     }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2DNImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    if constexpr (SupportBytes<T, 1, 2>()) {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
         // ISA/API: Is the ND matrix number to be moved
         uint64_t dnNum = intriParams.dnNum;
@@ -674,7 +687,7 @@ __aicore__ inline void DataCopyL12UBNZ2DNImpl(__ubuf__ T* dst, __cbuf__ T* src, 
             dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2DN);
 #endif
     } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
     }
 }
 
@@ -783,9 +796,6 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
 {
-    if ASCEND_IS_AIC {
-        return;
-    }
     if (padParams.isPad == true) {
         set_pad_val_outtoub(padParams.paddingValue);
     }
@@ -920,30 +930,35 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    // ISA/API: Is the ND matrix number to be moved
-    uint64_t ndNum = 1;
-    // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
-    // ISA/API: unit of element
-    uint32_t loop3Size = intriParams.blockCount;
-    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-    constexpr uint64_t loop2SrcStride = 1;
-    // ISA: unit of C0_size(32B)
-    uint64_t loop3SrcStride = DivCeil(srcStride, BYTE_32_ALIGN);
-    // ISA: unit of C0_size(32B)
-    uint64_t loop4SrcStride = 0;
-    // ISA: unit of byte
-    uint64_t loop2DstStride = dstStride;
-    // ISA: unit of byte
-    uint64_t loop4DstStride = 0;
+    if constexpr (SupportBytes<T, 1, 2>()) {
+        // ISA/API: Is the ND matrix number to be moved
+        uint64_t ndNum = 1;
+        // ISA/API: unit of element
+        uint16_t loop2Size = intriParams.blockLen / sizeof(T);
+        // ISA/API: unit of element
+        uint32_t loop3Size = intriParams.blockCount;
+        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+        constexpr uint64_t loop2SrcStride = 1;
+        // ISA: unit of C0_size(32B)
+        uint64_t loop3SrcStride = DivCeil(srcStride, BYTE_32_ALIGN);
+        // ISA: unit of C0_size(32B)
+        uint64_t loop4SrcStride = 0;
+        // ISA: unit of byte
+        uint64_t loop2DstStride = dstStride;
+        // ISA: unit of byte
+        uint64_t loop4DstStride = 0;
 
-    // SPR.FIXP_NZ_PARA
-    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-    set_fixp_nz_para(config);
+        // SPR.FIXP_NZ_PARA
+        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+        set_fixp_nz_para(config);
 
-    fix_cbuf_to_gm(
-        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NORMAL_DMA,
-        intriParams.sid);
+        fix_cbuf_to_gm(
+            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride,
+            fixp_trans_mode_t::NORMAL_DMA, intriParams.sid);
+
+    } else {
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
+    }
 #endif
 }
 
@@ -970,33 +985,53 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    // ISA/API: Is the ND matrix number to be moved
-    uint64_t ndNum = 1;
-    // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
-    // ISA/API: unit of element
-    uint32_t loop3Size = intriParams.blockCount;
-    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-    constexpr uint64_t loop2SrcStride = 1;
-    // ISA: unit of C0_size(32B)
-    uint64_t loop3SrcStride = DivCeil(srcStride, BYTE_32_ALIGN);
-    // ISA: unit of C0_size(32B)
-    uint64_t loop4SrcStride = 0;
-    // ISA: unit of byte
-    uint64_t loop2DstStride = dstStride;
-    // ISA: unit of byte
-    uint64_t loop4DstStride = 0;
+    if constexpr (SupportBytes<T, 1, 2>()) {
+        // ISA/API: Is the ND matrix number to be moved
+        uint64_t ndNum = 1;
+        // ISA/API: unit of element
+        uint16_t loop2Size = intriParams.blockLen / sizeof(T);
+        // ISA/API: unit of element
+        uint32_t loop3Size = intriParams.blockCount;
+        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+        constexpr uint64_t loop2SrcStride = 1;
+        // ISA: unit of C0_size(32B)
+        uint64_t loop3SrcStride = DivCeil(srcStride, BYTE_32_ALIGN);
+        // ISA: unit of C0_size(32B)
+        uint64_t loop4SrcStride = 0;
+        // ISA: unit of byte
+        uint64_t loop2DstStride = dstStride;
+        // ISA: unit of byte
+        uint64_t loop4DstStride = 0;
 
-    // SPR.FIXP_NZ_PARA
-    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-    set_fixp_nz_para(config);
+        // SPR.FIXP_NZ_PARA
+        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+        set_fixp_nz_para(config);
 
-    fix_cbuf_to_gm(
-        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NORMAL_DMA,
-        intriParams.sid);
+        fix_cbuf_to_gm(
+            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride,
+            fixp_trans_mode_t::NORMAL_DMA, intriParams.sid);
+    } else {
+        ASSERT(false && "fix copy only support type b8/b16 on current device");
+    }
 #endif
 }
 
+#pragma begin_pipe(V)
+template <typename T>
+__aicore__ inline void DataCopyUB2UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyUB2UBImpl(
+        (__ubuf__ PrimT<T>*)dstLocal.GetPhyAddr(), (__ubuf__ PrimT<T>*)srcLocal.GetPhyAddr(), intriParams);
+}
+#pragma end_pipe
+
+template <typename T>
+__aicore__ inline void DataCopyL12UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 

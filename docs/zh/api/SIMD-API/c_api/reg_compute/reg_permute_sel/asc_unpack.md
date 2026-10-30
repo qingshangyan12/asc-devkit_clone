@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -43,13 +43,13 @@
 
 **图1** 矢量数据寄存器unpack流程
 
-![矢量数据寄存器unpack流程](../../figures/capi_unpack_reg.png)
+![矢量数据寄存器unpack流程](../../../../figures/capi_unpack_reg.png)
 
 掩码数据寄存器unpack流程如图2所示：
 
 **图2** 掩码数据寄存器unpack流程
 
-![掩码数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
+![掩码数据寄存器unpack流程](../../../../figures/capi_unpack_mask.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -72,6 +72,7 @@ __simd_callee__ inline void asc_unpack_upper(vector_<dtype_dst>& dst,
 ```
 
 #### dtype支持数据类型
+
 dtype_src与dtype_dst支持的数据类型对如下：
 
 | dtype_src | dtype_dst |
@@ -132,8 +133,8 @@ __simd_callee__ inline void asc_unpack_upper(vector_bool& dst,
 
 ## 约束说明
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- dst与src均为矢量数据寄存器或掩码寄存器。
 - 低半段解包与高半段解包配合可分别解包源寄存器前半段与后半段，两次调用即可将整个源寄存器的窄类型数据全部扩展为宽类型写入两个目的寄存器。
 
 ## 调用示例
@@ -141,7 +142,7 @@ __simd_callee__ inline void asc_unpack_upper(vector_bool& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510&& ./main
@@ -154,9 +155,13 @@ bisheng example.asc -o main --npu-arch=dav-3510&& ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -181,10 +186,10 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
 
 template <typename T>
 bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
+    size_t begin, size_t remaining_length, double tolerance = 0.0)
 {
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
+    if (begin + remaining_length > actual.size() || begin + remaining_length > expected.size()) return false;
+    for (size_t i = begin; i < begin + remaining_length; ++i) {
         if (actual[i] == expected[i]) continue;
         const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
         if (diff > tolerance || diff < -tolerance) return false;
@@ -192,49 +197,79 @@ bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expe
     return true;
 }
 
-constexpr uint32_t SRC_COUNT = 256;
-constexpr uint32_t DST_COUNT = 128;
-__simd_vf__ inline void unpack(__ubuf__ uint16_t* lower, __ubuf__ uint16_t* upper, __ubuf__ uint8_t* src)
+constexpr uint32_t SRC_ELEMENTS_PER_REGISTER = 256;
+constexpr uint32_t DST_ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t SRC_COUNT = 269;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (SRC_COUNT + SRC_ELEMENTS_PER_REGISTER - 1) / SRC_ELEMENTS_PER_REGISTER;
+constexpr uint32_t PADDED_SRC_COUNT = REPEAT_COUNT * SRC_ELEMENTS_PER_REGISTER;
+constexpr uint32_t DST_COUNT = REPEAT_COUNT * DST_ELEMENTS_PER_REGISTER;
+constexpr uint32_t DATA_BYTES = SRC_COUNT * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = SRC_COUNT;
+__simd_vf__ inline void unpack(__ubuf__ uint16_t* lower, __ubuf__ uint16_t* upper, __ubuf__ uint8_t* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_uint16_t lower_reg;
-    vector_uint16_t upper_reg;
-    vector_uint8_t src_reg;
-    uint32_t count = DST_COUNT;
-    vector_bool mask = asc_update_mask_b16(count);
-    asc_loadalign(src_reg, src);
-    asc_unpack_lower(lower_reg, src_reg);
-    asc_unpack_upper(upper_reg, src_reg);
-    asc_storealign(lower, lower_reg, mask);
-    asc_storealign(upper, upper_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = DST_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        const uint32_t dst_offset = (offset / SRC_ELEMENTS_PER_REGISTER) * DST_ELEMENTS_PER_REGISTER;
+        vector_uint16_t lower_reg;
+        vector_uint16_t upper_reg;
+        vector_uint8_t src_reg;
+        vector_bool mask = asc_update_mask_b16(remaining_length);
+        asc_loadalign(src_reg, src + offset);
+        asc_unpack_lower(lower_reg, src_reg);
+        asc_unpack_upper(upper_reg, src_reg);
+        asc_storealign(lower + dst_offset, lower_reg, mask);
+        asc_storealign(upper + dst_offset, upper_reg, mask);
+    }
 }
 __global__ __vector__ void asc_unpack_kernel(__gm__ uint16_t* lower, __gm__ uint16_t* upper, __gm__ uint8_t* src)
 {
     asc_init();
     __ubuf__ uint16_t lower_local[DST_COUNT];
     __ubuf__ uint16_t upper_local[DST_COUNT];
-    __ubuf__ uint8_t src_local[SRC_COUNT];
-    asc_copy_gm2ub_align(src_local, src, SRC_COUNT);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    unpack(lower_local, upper_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    __ubuf__ uint8_t src_local[PADDED_SRC_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, PADDED_SRC_COUNT);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<unpack>(lower_local, upper_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(lower, lower_local, DST_COUNT * sizeof(uint16_t));
     asc_copy_ub2gm_align(upper, upper_local, DST_COUNT * sizeof(uint16_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<uint8_t> src(SRC_COUNT);
+    std::vector<uint8_t> src(PADDED_SRC_COUNT, 0);
     std::vector<uint16_t> lower(DST_COUNT, 0), upper(DST_COUNT, 0);
-    std::vector<uint16_t> golden_lower(DST_COUNT), golden_upper(DST_COUNT);
+    std::vector<uint16_t> golden_lower(DST_COUNT, 0), golden_upper(DST_COUNT, 0);
     for (uint32_t i = 0; i < SRC_COUNT; ++i) src[i] = static_cast<uint8_t>(i);
-    for (uint32_t i = 0; i < DST_COUNT; ++i) { golden_lower[i] = src[i]; golden_upper[i] = src[DST_COUNT + i]; }
+    for (uint32_t offset = 0; offset < SRC_COUNT; offset += SRC_ELEMENTS_PER_REGISTER) {
+        const uint32_t dst_offset = (offset / SRC_ELEMENTS_PER_REGISTER) * DST_ELEMENTS_PER_REGISTER;
+        const uint32_t chunk_count = (offset + SRC_ELEMENTS_PER_REGISTER < SRC_COUNT) ?
+            SRC_ELEMENTS_PER_REGISTER : SRC_COUNT - offset;
+        const uint32_t lower_count = chunk_count < DST_ELEMENTS_PER_REGISTER ? chunk_count : DST_ELEMENTS_PER_REGISTER;
+        for (uint32_t i = 0; i < lower_count; ++i) golden_lower[dst_offset + i] = src[offset + i];
+        if (chunk_count > DST_ELEMENTS_PER_REGISTER) {
+            for (uint32_t i = 0; i < chunk_count - DST_ELEMENTS_PER_REGISTER; ++i) {
+                golden_upper[dst_offset + i] = src[offset + DST_ELEMENTS_PER_REGISTER + i];
+            }
+        }
+    }
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (SRC_COUNT) * sizeof(uint8_t),
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_SRC_COUNT * sizeof(uint8_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint16_t* lower_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&lower_device), (DST_COUNT) * sizeof(uint16_t),

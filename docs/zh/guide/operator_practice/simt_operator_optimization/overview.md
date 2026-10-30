@@ -85,15 +85,18 @@ SIMT编程模式以线程（Thread）为基本编程单位，由开发者编写�
 | [使用短向量类型提升效率](./memory_access/short_vector_efficiency.md) | 中 | [short_vector_add](../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/short_vector_add) |
 | [通过类型对齐提升搬运效率](./memory_access/type_alignment_transfer.md) | 中 | [aligned_types](../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/aligned_types) |
 | [DCache访问优化](./memory_access/dcache_access.md) | 中 | [cache_hint](../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/cache_hint) |
+| [使用SoA布局提升哈希表查找效率](./memory_access/soa_layout_efficiency.md) | 中 | [hashtable_lookup](../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/hashtable_lookup) |
 
 表3 最大化指令吞吐量（控制流）
 
 | 优化建议 | 优先级 | 样例 |
 | --- | :---: | --- |
 | [同一Warp内避免分支跳转](./control_flow/avoid_warp_branch.md) | 高 | [warp_divergence](../../../../../examples/03_simt_api/03_best_practices/02_control_flow/warp_divergence) |
+| [分支处理](./control_flow/branch_handing.md) | 中 | [predicate_optimization](../../../../../examples/03_simt_api/03_best_practices/02_control_flow/predicate_optimization) |
 
 表4 最大化指令吞吐量（指令优化）
 
 | 优化建议 | 优先级 | 样例 |
 | --- | :---: | --- |
 | [原子操作指令优化](./instruction_optimization/atomic_instruction_optimization.md) | 高 | [histogram](../../../../../examples/03_simt_api/03_best_practices/03_instruction_optimizations/atomic_histogram)<br>[atomic_add_perf](../../../../../examples/03_simt_api/02_features/01_api_features/02_atomic_operation/atomic_add_perf) |
+| [原地加法指令优化](./instruction_optimization/inplace_add_instruction_optimization.md) | 中 | [inplace_add_atomic](../../../../../examples/03_simt_api/03_best_practices/03_instruction_optimizations/inplace_add_atomic) |

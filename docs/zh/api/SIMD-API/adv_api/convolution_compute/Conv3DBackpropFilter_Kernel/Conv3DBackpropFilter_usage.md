@@ -6,7 +6,7 @@ Ascend C提供一组Conv3DBackpropFilter高阶API，便于用户快速实现卷�
 
 Conv3dBackpropFilter的计算公式为：
 
-![](../../../../figures/zh-cn_formulaimage_0000002067618970.png)
+![](../../../../figures/formulaimage_0000002067618970.png)
 
 -   X为卷积的特征矩阵Input。
 -   ∂L/∂Y为卷积正向损失函数对输出Y的梯度GradOutput，作为求反向传播误差∂L/∂W的输入，即卷积的输出反向GradOutput。
@@ -88,8 +88,8 @@ Conv3dBackpropFilter的计算公式为：
 
     | Input | WeightSize | GradOutput | GradWeight | 支持平台 |
     | --- | --- | --- | --- | --- |
-    | half | int32_t | half | float | <!-- npu="A3" id1 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<br><!-- end id1 --><!-- npu="910b" id2 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id2 --> |
-    | bfloat16_t | int32_t | bfloat16_t | float | <!-- npu="A3" id3 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<br><!-- end id3 --><!-- npu="910b" id4 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id4 --> |
+    | half | int32_t | half | float | <!-- npu="A3" id1 -->Atlas A3系列产品<br><!-- end id1 --><!-- npu="910b" id2 -->Atlas A2系列产品<!-- end id2 --> |
+    | bfloat16_t | int32_t | bfloat16_t | float | <!-- npu="A3" id3 -->Atlas A3系列产品<br><!-- end id3 --><!-- npu="910b" id4 -->Atlas A2系列产品<!-- end id4 --> |
 
     <!-- end id5 -->
 

@@ -101,7 +101,7 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
     ```
 
 <!-- npu="950" id1 -->
-- 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
+- 支持enableSmallC0模式（仅Ascend 950PR&950DT系列产品支持）
 
     ```cpp
     template <typename T, bool enableSmallC0 = false>
@@ -110,6 +110,7 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
+
 ## DataCopy（GMToL1随路转换-DN2NZ搬运）<a name="ZH-CN_TOPIC_0000002573902899"></a>
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，并支持在数据搬运时进行[DN](../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_details.md)到[NZ](../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_details.md)格式的转换。
@@ -123,7 +124,7 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 
 src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配置参数。
 
-- 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
+- 支持enableSmallC0模式（仅Ascend 950PR&950DT系列产品支持）
 
     ```cpp
     template <typename T, bool enableSmallC0 = false>
@@ -132,6 +133,7 @@ src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配�
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
+
 ## DataCopyPad（GMToL1非对齐数据搬运）<a name="ZH-CN_TOPIC_0000002543262891"></a>
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，并支持在数据搬运时提供非对齐数据搬运功能，可以根据开发者的需要自行填充数据。
@@ -145,7 +147,7 @@ src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配�
 
 src和dst分别为源操作数和目的操作数；dataCopyParams和padParams为搬运参数。
 
-- 仅Ascend 950PR/Ascend 950DT支持
+- 仅Ascend 950PR&950DT系列产品支持
 
     ```cpp
     template <typename T, PaddingMode mode = PaddingMode::Normal>
@@ -172,6 +174,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 ```
 
 <!-- npu="950" id4 -->
+
 ## GMToL1 NZ数据搬运(LoadData（2D矩阵搬运V2）)
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运。
@@ -185,7 +188,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数。
 
-- 仅Ascend 950PR/Ascend 950DT支持
+- 仅Ascend 950PR&950DT系列产品支持
 
     ```cpp
     template <typename T>
@@ -256,7 +259,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>
 - L0C Buffer -> Global Memory
     - CO1 -> GM
 
-搬运的数据为[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)的结果，以Ascend 950PR/Ascend 950DT为例，接口示例如下：
+搬运的数据为[矩阵计算](../cube_compute_ISASI/cube_compute_ISASI.md)的结果，以Ascend 950PR&950DT系列产品为例，接口示例如下：
 
 注意，不同产品型号的接口原型可能不同，具体介绍请参考：[Fixpipe（L0C到GM数据搬运）](../cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)。
 

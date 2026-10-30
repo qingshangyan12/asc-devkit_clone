@@ -73,6 +73,7 @@ constexpr uint32_t OP_ALG_LENGTH = 128;                                       //
 constexpr uint32_t ALG_TAG_LENGTH = TAG_LENGTH + OP_ALG_LENGTH;
 constexpr uint32_t MAX_TAG_LENGTH = 255;
 constexpr uint32_t AICPU_CONTROL_NOTIFY_NUM = 2;
+constexpr uint32_t UNFOLD_THREAD_NOTIFY_NUM = 3;
 constexpr uint32_t MAX_MEM_TAG_LENGTH = OP_ALG_LENGTH + 32;
 constexpr uint32_t RES_PACK_TAG_LENGTH = 255;
 constexpr uint32_t MAX_TEMP_NUM_IN_ALGO = 8; // 单个算法中最大template数量
@@ -98,7 +99,7 @@ constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 // Z axis detour 需要
 constexpr u32 MESH_CHANNELS_NUM = 1;
 
-constexpr uint64_t CCU_MAX_RANK_SIZE = 16;
+constexpr uint64_t CCU_MAX_RANK_SIZE = 64; // 与老树 A2A/A2AV CCU 上限对齐（hccl A2AV_CCU_MAX_RANK_SIZE=64）
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
@@ -418,6 +419,13 @@ static_assert(
     std::is_trivially_copyable<ParallelChannelPortInfo>::value,
     "ParallelChannelPortInfo must be trivially copyable for serialization");
 
+// dieSplitRatio ∈ (0,1) 表示有效双 die 切分；1.0/0.0（单 die 或未设置）统一折算为 1000（不切分）。
+// OpResCtx/kernelArg 以千分比整数传递到 AIV/ST，消费侧按 sliceCount*permille/1000 切分。
+inline uint64_t DieSplitRatioToPermille(double ratio)
+{
+    return (ratio > 0.0 && ratio < 1.0) ? static_cast<uint64_t>(ratio * 1000.0 + 0.5) : 1000U;
+}
+
 // A5用了cntNotify
 struct AlgResourceRequest {
     double dieSplitRatio = 0.0;
@@ -636,6 +644,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* inputSymWindow = nullptr;
     void* outputSymWindow = nullptr;
     bool supportSymmetricMemory{false};
+    bool symMemChecked{false};
     u64 inputOffset = 0;
     u64 outputOffset = 0;
     HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址

@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -43,7 +43,7 @@ def asc_xor(dst, src0, src1, mask):
         dst[i] = src0[i] ^ src1[i] if mask[i] else 0
 ```
 
-本接口为`Reg`矢量计算接口，仅在AIV上生效。
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -52,8 +52,8 @@ def asc_xor(dst, src0, src1, mask):
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_xor(vector_<dtype> src0,
-                                               vector_<dtype> src1,
-                                               vector_bool mask)
+                                              vector_<dtype> src1,
+                                              vector_bool mask)
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_xor(vector_<dtype>& dst,
@@ -63,15 +63,16 @@ __simd_callee__ inline void asc_xor(vector_<dtype>& dst,
 ```
 
 #### dtype支持数据类型
-`dtype`支持的数据类型：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
+
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
 
 #### 函数原型典型示例
 
 ```c
 // 示例：对int8_t矢量数据寄存器执行按位异或，通过函数返回值返回结果。
 __simd_callee__ inline vector_int8_t asc_xor(vector_int8_t src0,
-                                              vector_int8_t src1,
-                                              vector_bool mask)
+                                             vector_int8_t src1,
+                                             vector_bool mask)
 
 // 示例：对int8_t矢量数据寄存器执行按位异或。
 __simd_callee__ inline void asc_xor(vector_int8_t& dst,
@@ -123,7 +124,7 @@ __simd_callee__ inline void asc_xor(vector_bool& dst,
 
 ## 约束说明
 
-- 本接口非AIV调用直接返回。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `dst`中未被`mask`筛选的位置被置为0。
 
 ## 调用示例
@@ -131,7 +132,7 @@ __simd_callee__ inline void asc_xor(vector_bool& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -144,9 +145,12 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <vector>
 
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -169,46 +173,64 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
-constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t DATA_BYTES = 137 * sizeof(int32_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(int32_t);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
 
-__simd_vf__ inline void compute(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1)
+__simd_vf__ inline void compute(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int32_t dst_reg;
     vector_int32_t src0_reg;
     vector_int32_t src1_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    asc_loadalign(src0_reg, src0);
-    asc_loadalign(src1_reg, src1);
-    asc_xor(dst_reg, src0_reg, src1_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
+        asc_loadalign(src0_reg, src0 + offset);
+        asc_loadalign(src1_reg, src1 + offset);
+        asc_xor(dst_reg, src0_reg, src1_reg, mask);
+        asc_storealign(dst + offset, dst_reg, mask);
+    }
 }
 
 __global__ __vector__ void asc_xor_kernel(__gm__ int32_t* dst, __gm__ int32_t* src0, __gm__ int32_t* src1)
 {
     asc_init();
-    __ubuf__ int32_t dst_local[ELEMENT_COUNT];
-    __ubuf__ int32_t src0_local[ELEMENT_COUNT];
-    __ubuf__ int32_t src1_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(src0_local, src0, ELEMENT_COUNT * sizeof(int32_t));
-    asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(int32_t));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    compute(dst_local, src0_local, src1_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(int32_t));
+    __ubuf__ int32_t dst_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ int32_t src0_local[PADDED_ELEMENT_COUNT];
+    __ubuf__ int32_t src1_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src0_local, src0, TOTAL_LENGTH * sizeof(int32_t));
+    asc_copy_gm2ub_align(src1_local, src1, TOTAL_LENGTH * sizeof(int32_t));
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(int32_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<compute>(dst_local, src0_local, src1_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, TOTAL_LENGTH * sizeof(int32_t));
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<int32_t> src0(ELEMENT_COUNT);
-    std::vector<int32_t> src1(ELEMENT_COUNT);
-    std::vector<int32_t> output(ELEMENT_COUNT, 0);
-    std::vector<int32_t> golden(ELEMENT_COUNT);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+    std::vector<int32_t> src0(TOTAL_LENGTH);
+    std::vector<int32_t> src1(TOTAL_LENGTH);
+    std::vector<int32_t> output(TOTAL_LENGTH, 0);
+    std::vector<int32_t> golden(TOTAL_LENGTH);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
         src0[i] = static_cast<int32_t>(0x101010U + i);
         src1[i] = static_cast<int32_t>(0x0f0f0000U + i);
         golden[i] = src0[i] ^ src1[i];
@@ -217,13 +239,13 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     int32_t* src0_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (ELEMENT_COUNT) * sizeof(int32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (TOTAL_LENGTH) * sizeof(int32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     int32_t* src1_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (ELEMENT_COUNT) * sizeof(int32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (TOTAL_LENGTH) * sizeof(int32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     int32_t* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(int32_t),
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (TOTAL_LENGTH) * sizeof(int32_t),
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src0_device, src0.size() * sizeof(int32_t), src0.data(), src0.size() * sizeof(int32_t),
         ACL_MEMCPY_HOST_TO_DEVICE);

@@ -3,30 +3,30 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-**`asc_copy_l0c2gm`的旧参数形式及`asc_copy_l0c2gm_sync`接口已废弃。请使用[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)接口和[asc_sync](../sync/asc_sync.md)接口替代。**
+**`asc_copy_l0c2gm`的旧参数形式及`asc_copy_l0c2gm_sync`接口已废弃。请使用[asc_copy_l0c2gm](../cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。**
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
@@ -40,11 +40,11 @@
 
 本接口支持多种随路能力的组合，需通过配套接口预先配置量化参数、激活参数、通道参数等寄存器，再调用本接口完成搬运。
 
-- Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
-- Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
-- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_datamove/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
+- Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
+- Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
+- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用；
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用；
+- 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
 
 `quant_pre_mode`量化模式参数支持的枚举值如下：
 
@@ -103,29 +103,29 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ <dst_dtype>* dst,
                                        bool broadcast_en,
                                        bool enable_nz2dn)
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ <dst_dtype>* dst,
-                                       __cc__ <src_dtype>* src,
-                                       uint16_t n_size,
-                                       uint16_t m_size,
-                                       uint32_t dst_stride,
-                                       uint16_t src_stride,
-                                       uint8_t l2_cache_mode,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
-                                       bool enable_channel_split,
-                                       bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       bool eltwise_antq_en,
-                                       bool c0_pad_en,
-                                       bool broadcast_en,
-                                       bool enable_nz2dn)
+                                            __cc__ <src_dtype>* src,
+                                            uint16_t n_size,
+                                            uint16_t m_size,
+                                            uint32_t dst_stride,
+                                            uint16_t src_stride,
+                                            uint8_t l2_cache_mode,
+                                            uint8_t enable_clip_relu_pre,
+                                            uint8_t unit_flag_mode,
+                                            uint64_t quant_pre_mode,
+                                            uint8_t relu_pre_mode,
+                                            bool enable_channel_split,
+                                            bool enable_nz2nd,
+                                            uint64_t quant_post,
+                                            uint8_t relu_post,
+                                            bool clip_relu_post,
+                                            uint8_t eltwise_op,
+                                            bool eltwise_antq_en,
+                                            bool c0_pad_en,
+                                            bool broadcast_en,
+                                            bool enable_nz2dn)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 src dtype与dst dtype支持以下组合：
 
@@ -221,8 +221,8 @@ PIPE_FIX
 - src与dst dtype组合需与`quant_pre_mode`量化模式匹配，否则会导致搬运结果不符合预期。
 - `enable_channel_split`仅在输出dtype为`float`且输出为Nz格式时可设为true。
 - 量化与激活模式中使用的量化系数不可为INF/NaN和非规格化数，否则会导致量化激活结果错误。
-- 开启Nz2DN转换时，需通过[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
-- 开启Nz2DN转换时，仅当通过[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
+- 开启Nz2DN转换时，需通过[asc_set_l0c_copy_channel_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
+- 开启Nz2DN转换时，仅当通过[asc_set_l0c_copy_channel_para](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
 - `enable_clip_relu_pre`设为Clip ReLU（标量模式）时需搭配`relu_pre_mode`与量化功能一起使用。
 
 ## 调用示例
@@ -234,7 +234,7 @@ PIPE_FIX
 本示例占用32KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer和64KB L0C Buffer，并使用`EVENT_ID0`完成流水同步。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main

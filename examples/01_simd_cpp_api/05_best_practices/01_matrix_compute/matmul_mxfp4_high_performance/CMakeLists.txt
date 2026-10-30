@@ -36,6 +36,7 @@ target_link_libraries(demo PRIVATE
     tiling_api
     register
     platform
+    ${CMAKE_DL_LIBS}
 )
 
 target_compile_options(demo PRIVATE

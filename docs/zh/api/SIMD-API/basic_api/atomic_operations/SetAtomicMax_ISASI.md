@@ -3,25 +3,25 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id11 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id11 -->
 <!-- npu="A3" id12 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id12 -->
 <!-- npu="910b" id13 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id13 -->
 <!-- npu="310b" id14 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id14 -->
 <!-- npu="310p" id15 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id15 -->
 <!-- npu="310p" id16 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id16 -->
 <!-- npu="910" id17 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id17 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetAtomicMax_ISASI_res.md#id1 -->
 
@@ -57,20 +57,23 @@ __aicore__ inline void SetAtomicMax()
 ## 约束说明<a name="section633mcpsimp"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer->GM。
+- Ascend 950PR&950DT系列产品，支持的数据通路为UB/L0C Buffer->GM。
 <!-- end id1 -->
 
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
+- Atlas A3系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
 <!-- end id2 -->
 
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
+- Atlas A2系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
 <!-- end id3 -->
 
 - 使用完后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子最大操作，以免影响后续相关功能。
 - 该接口执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
 - SetAtomicMax内部已集成与[SetAtomicType](SetAtomicType.md)相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用SetAtomicType接口。
+<!-- npu="A3,910b" id4 -->
+- 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，整数类型和bfloat16_t数据类型**默认均为非饱和模式**，原子最大操作时的饱和模式无法通过[SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md)或[SetCtrlSpr](../special_register_access/SetCtrlSpr_ISASI.md)设置，需要通过`npu-smi`命令进行设备级设置，具体设置方法请参考[SetAtomicAdd约束说明](SetAtomicAdd.md#npu_smi_saturation_mode)。
+<!-- end id4 -->
 
 ## 调用示例<a name="section177231425115410"></a>
 

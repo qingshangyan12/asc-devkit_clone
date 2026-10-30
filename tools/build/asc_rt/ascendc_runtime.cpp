@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 enum class ElfType { ELF_TYPE_ELF = 0, ELF_TYPE_AIVEC, ELF_TYPE_AICUBE, ELF_TYPE_MAX };
-enum class SocVersion { UNKNOWN, ASCEND310P, ASCEND910B, ASCEND950, ASCEND350 };
+enum class SocVersion { UNKNOWN, ASCEND310P, ASCEND910B, ASCEND950, ASCEND350, ASCEND960DT, ASCEND960PR };
 
 typedef enum KernelType : unsigned int {
     K_TYPE_AICORE = 1,
@@ -86,12 +86,11 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
 
         {"ascend310p1", "ascend310p"},      {"ascend310p3", "ascend310p"},      {"ascend310p5", "ascend310p"},
         {"ascend310p7", "ascend310p"},      {"ascend310p3vir01", "ascend310p"}, {"ascend310p3vir02", "ascend310p"},
-        {"ascend310p3vir04", "ascend310p"}, {"ascend310p3vir08", "ascend310p"},
-
-        {"ascend310b1", "ascend310b"},      {"ascend310b2", "ascend310b"},      {"ascend310b3", "ascend310b"},
-        {"ascend310b4", "ascend310b"},      {"kirinx90", "kirinx90"},           {"kirin9030", "kirin9030"},
-        {"kirindev0000", "kirindev0000"},   {"kirindev0001", "kirindev0001"},   {"kirindev0002", "kirindev0002"},
-        {"kirindev0003", "kirindev0003"}};
+        {"ascend310p3vir04", "ascend310p"}, {"ascend310p3vir08", "ascend310p"}, {"ascend310b1", "ascend310b"},
+        {"ascend310b2", "ascend310b"},      {"ascend310b3", "ascend310b"},      {"ascend310b4", "ascend310b"},
+        {"kirinx90", "kirinx90"},           {"kirin9020", "kirin9020"},         {"kirin9030", "kirin9030"},
+        {"kirin9050", "kirin9050"},         {"kirindev0001", "kirindev0001"},   {"kirindev0002", "kirindev0002"},
+        {"kirindev0003", "kirindev0003"},   {"ascend5162A", "Ascend5162A"}};
 
     static const std::unordered_map<std::string, std::string> ascendcOriSocVersionMap{
         {"ascend910b1", "Ascend910B1"},
@@ -127,9 +126,10 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend310b2", "Ascend310B2"},
         {"ascend310b3", "Ascend310B3"},
         {"ascend310b4", "Ascend310B4"},
+        {"ascend5162a", "Ascend5162A"},
         {"kirinx90", "KirinX90"},
         {"kirin9030", "Kirin9030"},
-        {"kirindev0000", "KirinDev0000"},
+        {"kirin9050", "Kirin9050"},
         {"kirindev0001", "KirinDev0001"},
         {"kirindev0002", "KirinDev0002"},
         {"kirindev0003", "KirinDev0003"}};
@@ -210,6 +210,12 @@ static SocVersion GetSocVersion()
     if (std::strncmp(socName, "Ascend350", sizeof("Ascend350") - 1) == 0) {
         return SocVersion::ASCEND350;
     }
+    if (std::strncmp(socName, "Ascend960DT", sizeof("Ascend960DT") - 1) == 0) {
+        return SocVersion::ASCEND960DT;
+    }
+    if (std::strncmp(socName, "Ascend960", sizeof("Ascend960") - 1) == 0) {
+        return SocVersion::ASCEND960PR;
+    }
     ASCENDLOGE("unsupport soc name: %s\n", socName);
     return SocVersion::UNKNOWN;
 }
@@ -231,10 +237,14 @@ int32_t AscendLaunchKernelWithHostArgs(
         }
     }
     if (currentSoc == SocVersion::ASCEND910B ||
-        ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350) && ubufDynamicSize == 0)) {
+        ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350 ||
+          currentSoc == SocVersion::ASCEND960DT || currentSoc == SocVersion::ASCEND960PR) &&
+         ubufDynamicSize == 0)) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
-    if ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350) && ubufDynamicSize != 0) {
+    if ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350 ||
+         currentSoc == SocVersion::ASCEND960DT || currentSoc == SocVersion::ASCEND960PR) &&
+        ubufDynamicSize != 0) {
         constexpr uint32_t attrLen = 1;
         aclrtLaunchKernelAttrValue attrValue{};
         attrValue.dynUBufSize = ubufDynamicSize;
@@ -372,6 +382,8 @@ static int32_t AscendProfilingCallBack(uint32_t type, void* data, uint32_t len)
 bool GetAscendProfStatus() { return g_profEnable; }
 
 void AscendProfRegister() { MsprofRegisterCallback(ASCENDC_KERNEL_ID, AscendProfilingCallBack); }
+
+void AscendProfUnRegister() { MsprofUnRegisterCallback(ASCENDC_KERNEL_ID, AscendProfilingCallBack); }
 
 void StartAscendProf(const char* name, uint64_t* startTime)
 {

@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -52,19 +52,19 @@
 以下以2维的例子，介绍几个典型使用场景。
 
 - 2D Padding场景，使用固定值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
 
 - 2D Padding场景，使用最近值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_nearest.png "2D Padding场景，使用最近值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_nearest.png "2D Padding场景，使用最近值填充方式")
 
 - 2D Transpose场景
-![](../figures/asc_ndim_copy_gm2ub_2d_transpose.png "2D Transpose场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_transpose.png "2D Transpose场景")
 
 - 2D Slice场景
-![](../figures/asc_ndim_copy_gm2ub_2d_slice.png "2D Slice场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_slice.png "2D Slice场景")
 
 - 2D Broadcast场景
-![](../figures/asc_ndim_copy_gm2ub_2d_broadcast.png "2D Broadcast场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_broadcast.png "2D Broadcast场景")
 
 本接口仅在AIV上生效。
 
@@ -137,7 +137,7 @@ PIPE_MTE2
 
 - 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入[同步指令](../sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 - 多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新，应在调用本接口前调用[asc_ndim_copy_dci](asc_ndim_copy_dci.md)刷新NDDMA DataCache，保证多核间数据一致性。
 - 一条指令所能获取的所有数据的地址范围宽度不能超过40位（1TB），即：源操作数的i维大小为（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_src_stride，目的操作数的i维大小为：（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_dst_stride，所有的维度的大小加起来不超过2^40位。
 - 当每维的loopi_dst_stride为升序序列，则不同循环间的地址空间不能交织或重叠。
@@ -147,12 +147,12 @@ PIPE_MTE2
 ## 调用示例
 
 2D Padding场景，使用固定值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -177,6 +177,7 @@ __global__ __vector__ void asc_ndim_copy_gm2ub_kernel(__gm__ uint8_t* output, __
 {
     asc_init();
     __ubuf__ uint8_t local[64];
+    // 输入每行4字节，左右分别填充2字节和3字节，因此输出每行扩展为9字节。
     asc_set_ndim_loop0_stride(1, 1);
     asc_set_ndim_loop1_stride(6, 3);
     asc_set_ndim_loop2_stride(0, 0);
@@ -189,9 +190,11 @@ __global__ __vector__ void asc_ndim_copy_gm2ub_kernel(__gm__ uint8_t* output, __
     asc_set_ndim_pad_count(config);
     asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 2, 1, true,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
-    asc_sync_mte2(0);
+    // PIPE_MTE3等待PIPE_MTE2搬入完成后，再将UB数据搬出到GM。
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync();
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

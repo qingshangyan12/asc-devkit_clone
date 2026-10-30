@@ -34,8 +34,14 @@
 #include "dav_m310/kernel_operator_determine_compute_sync_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_determine_compute_sync_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_determine_compute_sync_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_determine_compute_sync_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_determine_compute_sync_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_5162/kernel_operator_determine_compute_sync_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_determine_compute_sync_impl.h"
 #elif __NPU_ARCH__ == 3113

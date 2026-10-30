@@ -3,32 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR&950DT系列产品：不支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/composite/vector_compute_composite.h"`。
 
-**`asc_deq_int162b8_h_sync`和`asc_deq_int162b8_l_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_deq_int162b8.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
+**`asc_deq_int162b8_h_sync`和`asc_deq_int162b8_l_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_deq_int162b8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](../vector_compute/vector_fused/asc_set_deq_scale.md)接口设置量化参数。
 
@@ -36,7 +36,7 @@
 - asc_deq_int162b8_l：将数据存放在每个DataBlock的低半块。
 
 如下图所示：
-![](../figures/asc_deq_int162b8_halfblock.png)
+![](../../../figures/asc_deq_int162b8_halfblock.png)
 
 计算公式如下：
 

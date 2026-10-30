@@ -93,12 +93,19 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
-    B_TYPE_SK_INFO = 5
+    B_TYPE_SK_INFO = 5,
+    B_TYPE_SPECIALIZATION_RESOURCE_ID = 6,
+    B_TYPE_ICACHE_PRELOAD_FLAG = 7
 };
 
 struct BaseTlv { // definition of TLV head
     unsigned short type;
     unsigned short len;
+};
+
+struct BinaryMetaSpecializationResourceId {
+    BaseTlv head;
+    char value[64];
 };
 
 struct BinaryMetaVersion {
@@ -127,6 +134,12 @@ struct BinaryMetaOptionalParam {
 struct BinaryMetaAscFeature {
     BaseTlv head;
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
+};
+
+struct BinaryMetaIcachePreloadFlag {
+    BaseTlv head;
+    uint16_t icachePreloadFlag; // 0: no preload, 1: preload
+    uint16_t reserved;
 };
 
 enum FuncMetaType {                       // function level TLV type
@@ -212,7 +225,8 @@ enum class CacheRwMode { READ = 1, WRITE = 2, RW = 3 };
 
 #if defined(__NPU_ARCH__) &&                                                                             \
         (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163) ||                        \
+         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162 || \
+         __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) ||                                                \
     defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
@@ -412,10 +426,25 @@ const uint64_t KEEP_FP16 = 0;
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
 constexpr bool g_gm_overflow_check = true;
 constexpr uint64_t g_oomAddrRangeMaxSize = 128;
+namespace AscendC {
+namespace Internal {
+constexpr uint8_t g_oomStorageShapeMagic = 0x4FU;
+constexpr uint8_t g_oomStorageShapeVersion = 1U;
+constexpr uint8_t g_oomTensorViewVersion = 1U;
+constexpr uint8_t g_oomNibbleMask = 0x0fU;
+constexpr uint8_t g_oomDescriptorTypeTensor = 1U;
+constexpr uint8_t g_oomDescriptorTypeTensorList = 2U;
+constexpr uint64_t g_oomStorageShapeHeaderSize = 2UL;
+constexpr uint64_t g_oomTensorDescriptorHeaderSize = 10UL;
+constexpr uint64_t g_oomTensorListDescriptorHeaderSize = 12UL;
+constexpr uint64_t g_oomTensorViewDescriptorSize = 9UL;
+} // namespace Internal
+} // namespace AscendC
 struct OomAddrRange {
     uintptr_t addr[g_oomAddrRangeMaxSize];
     uint64_t len[g_oomAddrRangeMaxSize];
     uint8_t isLevelOnePointer[g_oomAddrRangeMaxSize];
+    __gm__ uint8_t* tensorListStorageShape[g_oomAddrRangeMaxSize];
     uint64_t count;
 };
 __BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange;

@@ -190,6 +190,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         msgQueueIsAvailable_[i] = true;
     }
 
+    // 性能优化(A2)：per-handle mission 缓存预置单 mission（真实值由 CcuPrepareForOp 按算法写入）
+    for (uint32_t i = 0; i < HCCL_MAX_HANDLE_ID; ++i) {
+        handleMissionNum_[i] = 1U;
+    }
+
     isInited_ = true;
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
@@ -218,12 +223,21 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         const Mc2InitTilingInner* tilingInner = static_cast<const Mc2InitTilingInner*>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
+            if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A5) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
+            } else if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A6) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V2;
+            } else {
+                ccuProtocolVersion_ = CcuProtocolVersion::INVALID;
+                KERNEL_LOG(KERNEL_ERROR, "ApiClient InitV2 invalid CCU devType:%d", tilingInner->devType);
+            }
         }
     } else if (context != nullptr) {
         __gm__ const HcclApi::OpResCtx* opResCtx = reinterpret_cast<__gm__ const HcclApi::OpResCtx*>(context);
         if (opResCtx->version == static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION)) {
             newCcuFlag_ = true;
             version = HcclTilingVersion::CONTEXT_DECOUPLE_VERSION;
+            ccuProtocolVersion_ = GetArchCcuProtocolVersion();
         }
     }
     InitInner(context, version);
@@ -268,13 +282,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const HcclHandle handleId)
 {
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
-    FlushDataCache(&handleParamGM_[handleId]);
+    // 性能优化(A1/A2)：algorithmType/missionNum 单次求值——原 else-if 链逐支重复求值
+    // （GetAlgorithmType = prepareType GM 读 + opType 表扫描；GetKfcMissionNum 内部再次求值），
+    // SoleNHR AG 命中前最多 ~3 组重复；missionNum 写入 per-handle 缓存供 CcuSendMsg/Wait/Finalize 复用
+    const uint32_t algorithmType = GetAlgorithmType(handleId);
+    const uint8_t missionNum = GetKfcMissionNumByType(algorithmType);
+    handleMissionNum_[handleId] = missionNum;
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (GetAlgorithmType(handleId) ==
-            static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
+        if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
             ccuUsedXnNum_ = KFC_PARALLEL_AG_STORAGE_NUM;
             CcuPrepareForParallelAllGatherM2M(&handleParamGM_[handleId]);
-        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR)) {
+            ccuUsedXnNum_ = KFC_AG_SOLE_NHR_PARAM_NUM;
+            CcuPrepareForAllGatherSoleNhrM2M(&handleParamGM_[handleId]);
+        } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
@@ -285,10 +306,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
+        if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
             ccuUsedXnNum_ = KFC_A2A_MJ_PARAM_NUM;
             CcuPrepareForAllToAllMultiJetty(&handleParamGM_[handleId]);
-        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
             CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
         } else {
@@ -308,15 +329,17 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR)) {
+            // 2die 判定先于 missionNum（其 mission 数为动态 dieNum，勿路由到并发 prepare）
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
+        } else if (missionNum == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
             CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
-        } else if (
-            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
+        } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
             ccuUsedXnNum_ = 9;
             CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
-        } else if (
-            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
+        } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
             CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
         } else {
@@ -355,6 +378,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitCcuParam(const HcclHandle handleId)
 {
+    // Snapshot the tiling mode per handle, including deferred Commit and legacy callers.
+    handleParamGM_[handleId].skipLocalRankCopy = 0U;
     uint64_t ccTiling = 0;
     if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION) {
         ccTiling = ccOpTilingDataTable_[static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)];
@@ -373,11 +398,16 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+            handleParamGM_[handleId].skipLocalRankCopy = (tilingPtr->skipLocalRankCopy == 1U) ? 1U : 0U;
+        }
     }
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
     ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
     ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
+    // res[1]=die 切分千分比（1000/0=不切分），host 侧 GetCcuOpParamResCtx 写入
+    ccuParam_.dieSplitRatioPermille = newCcuFlag_ ? hcclNewContext_->res[1] : 1000U;
 }
 
 template <const auto& config>
@@ -453,7 +483,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].op = commonPrepareParam.op;
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
-        FlushDataCache(&handleParamGM_[handleId]);
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
@@ -501,39 +530,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
+    // 性能优化：原 26 参日志的参数表达式（26 次 __gm__ 读）在日志级别过滤前
+    // 无条件求值，每轮必付 26 次 GM 读；降为 0 GM 读的单行摘要。
     KERNEL_LOG(
-        KERNEL_INFO,
-        "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
-        "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
-        "0x%llx, Id14: 0x%llx, Id15: 0x%llx, Id16: 0x%llx, Id17: 0x%llx, Id18: 0x%llx, Id19: 0x%llx, Id20: 0x%llx, "
-        "Id21: 0x%llx, Id22: 0x%llx, Id23: 0x%llx, Id24: 0x%llx, Id25: 0x%llx",
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr), *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 8),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 16),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 24),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 32),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 40),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 48),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 56),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 64),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 72),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 80),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 88),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 96),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 120),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 128),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 136),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 144),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 152),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 160),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 168),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 176),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 184),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 192),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 200));
+        KERNEL_INFO, "ApiClient CcuSendMsg xnAddr: 0x%llx, xnNum: %u", ccuMsg_.xnAddr,
+        static_cast<uint32_t>(ccuUsedXnNum_));
 
-    const uint8_t missionNum = GetKfcMissionNum(handleId);
+    // 性能优化(A2)：missionNum 取 per-handle 缓存（CcuPrepareForOp 单次求值写入），
+    // 免 GetKfcMissionNum 的 prepareType/opType 表/res[2] 重复 GM 读
+    const uint8_t missionNum = handleMissionNum_[handleId];
     for (uint8_t mission = 0; mission < missionNum; ++mission) {
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId, mission);
         WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
@@ -561,13 +566,33 @@ template <const auto& config>
 __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
     HcclHandle handleId) const
 {
-    const uint32_t algorithmType = GetAlgorithmType(handleId);
+    // 性能优化(A1)：单次求值算法类型后按类型映射（原实现内嵌求值）
+    return GetKfcMissionNumByType(GetAlgorithmType(handleId));
+}
+
+template <const auto& config>
+__aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNumByType(
+    const uint32_t algorithmType) const
+{
     uint8_t missionNum = 1U;
     if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
         algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink) ||
         algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent) ||
         algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
+    } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR) && newCcuFlag_) {
+        // 2die 的 mission 数 = dieNum（资源期动态探测），host 经 OpResCtx.res[2] 下发；0/越界回退 1（兼容旧 host lib）
+        const uint64_t missionCnt = hcclNewContext_->res[2];
+        if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {
+            missionNum = static_cast<uint8_t>(missionCnt);
+        }
+    } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR) && newCcuFlag_) {
+        // D4：AG SoleNHR 双 die——mission 数 = dieNum（res[2]，注册期按通道探测修正）；
+        // 0/越界回退 1（兼容旧 host lib）
+        const uint64_t missionCnt = hcclNewContext_->res[2];
+        if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {
+            missionNum = static_cast<uint8_t>(missionCnt);
+        }
     }
     return missionNum;
 }
@@ -661,7 +686,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 
 #ifndef ASCENDC_CPU_DEBUG
     if (workingFlag_) {
-        const uint8_t missionNum = GetKfcMissionNum(handleId);
+        // 性能优化(A2)：missionNum 取 per-handle 缓存（CcuPrepareForOp 单次求值写入）
+        const uint8_t missionNum = handleMissionNum_[handleId];
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
             while (true) {
@@ -727,7 +753,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
-        const uint8_t missionNum = GetKfcMissionNum(handleId);
+        // 性能优化(A2)：missionNum 取 per-handle 缓存（CcuPrepareForOp 单次求值写入）
+        const uint8_t missionNum = handleMissionNum_[handleId];
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_, mission);
             WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);

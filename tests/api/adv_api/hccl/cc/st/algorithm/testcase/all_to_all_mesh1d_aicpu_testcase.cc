@@ -17,6 +17,7 @@
 #include "alltoallv_auto_selector.h"
 #include "cann_host_bridge.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "execute_selector.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
@@ -72,12 +73,12 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_bridge_routes)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_bridge_routes)
 {
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, engine)));
     }
@@ -85,6 +86,19 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, COMM_ENGINE_CPU)));
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_alltoall)
+{
+    ExecuteSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    u64 sendCounts[4] = {1U, 1U, 1U, 1U};
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+
+    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
@@ -202,4 +216,71 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, peer_group_rounds_cover_18_ranks)
         sortedFirstRound, std::vector<u32>({1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 10U, 11U, 12U, 13U, 14U, 15U, 16U, 17U}));
     EXPECT_EQ(secondRound, std::vector<u32>({9U}));
 }
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_mesh1d_clos_nullptr_sendcounts_selects_smallest_path)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = nullptr; // tiling 期常态
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX"); // 0 > 512 为假 → 最小路径
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_multilevel_mesh1d_clos_keeps_concurrent_ubx_judgment)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U; // 多级
+    u64 sendCounts[4] = {600U, 600U, 600U, 600U};
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+    // 多级 MESH_1D_CLOS 保持既有行为：落入单级 Concurrent/UBX 判断。
+    // Concurrent/UBX 不受"SoleMesh 双实例契约阻塞"影响（与 alltoallv 多级拒绝不矛盾）：
+    //   - AicpuAllToAllSoleMeshConcurrent → InsV2AllToAllConcurrentExecutor + TopoMatchUBX，
+    //     自有 CalcRes 恰好要求双实例（meshRanks/closRanks 双模板），TopoMatchUBX 正供给该结构；
+    //   - AicpuAllToAllSoleMeshUBX → InsV2AlltoAllVSoleExecutor + TopoMatchUBX1d，
+    //     该 matcher 产双实例（满足 BuildResourceHierarchyInfo 的 infos[0].size()==2 校验）
+    //     且多级时产 infos[1]（layer3 组）；
+    //   - 被阻塞的仅是 TopoMatch1D（扁平结构）+ MESH_1D_CLOS 双实例要求的错配组合，
+    //     即 alltoallv 多级唯一可选的 AicpuAllToAllVSoleMesh（见下方 not_supported 用例）。
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent"); // 600>512 且 mesh==clos 且 4P
+
+    param.all2AllVDataDes.sendCounts = nullptr; // 多级 + nullptr → 最小路径 UBX
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_alltoallv_multilevel_mesh1d_clos_is_not_supported)
+{
+    AlltoAllVAutoSelector selector;
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
+    std::string algName;
+
+    // 对应实现：alltoallv_auto_selector.cc SelectAicpuAlgo 的 MESH_1D_CLOS 非 pcieMix 路径
+    // （多级 MATCH 分支已删除，多级由末尾 topoLevelNums != 1U 判断拒绝）。
+    // 拒绝依据：alltoallv 在该形态下唯一可选的 AicpuAllToAllVSoleMesh 用 TopoMatch1D（扁平
+    // hierarchy），与 executor 对 MESH_1D_CLOS 的双实例契约（BuildResourceHierarchyInfo 要求
+    // infos[0].size()==2）错配，资源阶段必报错。注意该阻塞仅针对 TopoMatch1D 扁平 matcher：
+    // alltoall 侧多级可选的 Concurrent/UBX 用 TopoMatchUBX/TopoMatchUBX1d（产双实例），
+    // 契约匹配不受影响（见上方 keeps_concurrent_ubx_judgment 用例注释）
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+
+    // 3 级及以上同样拒绝
+    topo.topoLevelNums = 3U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+
+    // pcieMix 不受级数限制（该路径按 mesh1d 算法处理，且绕开 executor 双实例契约）
+    TopoInfoWithNetLayerDetails pcieMixTopo = MakeConcurrentTopo();
+    pcieMixTopo.topoLevelNums = 2U;
+    pcieMixTopo.level0PcieMix = true;
+    EXPECT_EQ(selector.Select(param, &pcieMixTopo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllVSoleMesh");
+}
+
 } // namespace checker

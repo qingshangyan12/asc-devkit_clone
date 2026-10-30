@@ -187,11 +187,26 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
  *       The CCU path currently supports Ascend 950 only and obtains its launch stream
  *       from the thread resource embedded in ccResCtx.
  */
-extern void __attribute__((visibility("default"))) Mc2CcKernelLaunch(
+extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
     void* stream, void* ccResCtx, uint32_t ccResCtxSize);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
+
+/**
+ * @brief Check whether communication resource can be allocated for the given MC2 ccArgs
+ * @param comm A pointer identifying the communication resource based on.
+ * @param ccType The MC2 operation type (HcclCMDType).
+ * @param ccArgs Opaque argument object created by Mc2GetCcArgs and filled by Mc2SetCc* APIs.
+ * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
+ *
+ * @note ccArgs must be created by Mc2GetCcArgs. The real probe runs only for rankSize > 1 on the
+ *       CCU_SCHED engine; other cases return HCCL_SUCCESS without probing.
+ *       Declared with C++ linkage (outside the extern "C" block) to allow overloading without
+ *       conflicting with the C-linkage overload symbol.
+ */
+extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
+    HcclComm comm, uint8_t ccType, void* ccArgs);
 
 #endif // HCCL_MC2_H

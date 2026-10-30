@@ -1,9 +1,10 @@
 # 辅助矩阵分形格式详解
 
 <!-- npu="950" id1 -->
+
 ## MX系数矩阵
 
-针对Ascend 950PR/Ascend 950DT产品：
+针对Ascend 950PR&950DT系列产品：
 
 浮点数在科学计算、图像处理、神经网络等领域应用广泛。以AI训练为例，现有的浮点数格式或数值范围不足，或精度不高，这影响了模型的收敛速度和性能。如果要同时满足数值范围和精度的要求，将会导致内存占用过大，从而增加数据存储和传输的成本。基于此种情况，业内提出了一种新的浮点数格式——微缩放（Microscaling，MX）格式。MX格式的浮点数可以支持更低比特位宽的AI训练和推理，并且占用的内存更少。符合MX标准的数据格式在使用8位或更低比特位的情况下，能够实现稳健的AI训练和推理模型精度。
 
@@ -67,17 +68,18 @@ MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵�
     **图4** scaleB矩阵在不同位置上的排布格式  
     ![](../../../../figures/mx_scaleB_format.png "scaleB矩阵在不同位置上的排布格式")
 
-系数搬运接口见[asc_copy_l12l0a_mx](../../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../../cube_datamove/asc_copy_l12l0b_mx.md)。
+系数搬运接口见[asc_copy_l12l0a_mx](../../cube_datamove/cube_compute_load/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../../cube_datamove/cube_compute_load/asc_copy_l12l0b_mx.md)。
 <!-- end id1 -->
 
 <!-- npu="A3,910b" id2 -->
+
 ## 4选2稀疏索引矩阵
 
-针对Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品：
+针对Atlas A2系列产品和Atlas A3系列产品：
 
 - 定义：原始B矩阵稠密化过程中生成的索引矩阵。假设原始B矩阵每4个元素有至少2个零元素，稠密化的B矩阵是过滤掉2个零的稠密矩阵。
 - 场景：通常存在于Global Memory（GM）中。在进行sparse矩阵运算前，通常需要离线生成并将其转换为大Z小n格式（Zn）以适配Cube单元。
-- 生成过程：如下图所示密化过程中生成的索引矩阵。假设原始B矩阵每4个元素有至少2个零元素，稠密化的B矩阵是过滤掉2个零的稠密矩阵。，对于原始矩阵B中的每4个元素，将在index矩阵中生成2个2位索引，并按照以下规则进行编码。索引必须在\{0, 1, 2\}范围内。
+- 生成过程：如下图所示稠密化过程中生成的索引矩阵。假设原始B矩阵每4个元素有至少2个零元素，稠密化的B矩阵是过滤掉2个零的稠密矩阵。对于原始矩阵B中的每4个元素，将在index矩阵中生成2个2位索引，并按照以下规则进行编码。索引必须在\{0, 1, 2\}范围内。
 
     **图5** index生成示意图  
     ![](../../../../figures/index_generation.png "index生成示意图")
@@ -123,3 +125,5 @@ MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵�
 
 - **分形大小约束：** 存储为uint8数据类型时，分形大小为16x8（N0，K0）。
 <!-- end id2 -->
+
+准备Bias矩阵时，搬运接口参见[asc_copy_l12bt](../../cube_datamove/cube_compute_load/asc_copy_l12bt.md)，Bias参与计算的方式见[asc_mmad](../mmad_compute/asc_mmad.md)；Scale矩阵用于[asc_mmad_mx](../mmad_compute/asc_mmad_mx.md)，稀疏权重与索引矩阵的搬入和计算分别参见[asc_copy_l12l0b_sparse](../../cube_datamove/cube_compute_load/asc_copy_l12l0b_sparse.md)与[asc_mmad_sparse](../mmad_compute/asc_mmad_sparse.md)。

@@ -8,7 +8,7 @@ This example implements the `fill` operation in scalar fill mode based on the Te
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -44,7 +44,7 @@ fill
 Perform the following steps in the example root directory to build and run the example.
 
 - Configure environment variables  
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install).
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 
@@ -54,7 +54,7 @@ Perform the following steps in the example root directory to build and run the e
 
   ```bash
   mkdir -p build && cd build;                                               # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # Build the project (NPU mode by default)
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # Build the project (NPU mode by default)
   python3 ../scripts/gen_data.py                                            # Generate test ground truth data
   ./demo                                                                    # Run the generated executable
   ```
@@ -64,7 +64,7 @@ Perform the following steps in the example root directory to build and run the e
   Example:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
   > **Note:** Clear the CMake cache before switching build modes. Run `rm CMakeCache.txt` in the `build` directory, and then run CMake again.
@@ -74,8 +74,7 @@ Perform the following steps in the example root directory to build and run the e
 | Option | Values | Description |
 | --- | --- | --- |
 | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: `dav-3510` corresponds to Ascend 950PR/Ascend 950DT |
-| `CANN_ASC_USE_EXPERIMENTAL` | `ON` (required for this example), `OFF` (default) | Enables experimental ASC interfaces |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: `dav-3510` corresponds to Ascend 950PR&950DT products |
 
 - Execution result
 

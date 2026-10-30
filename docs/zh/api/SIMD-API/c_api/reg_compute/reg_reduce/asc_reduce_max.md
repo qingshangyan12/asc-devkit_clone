@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -37,12 +37,14 @@ dst_1 &= \operatorname{argmax}\{src_i \mid mask_i = 1\}
 \end{aligned}
 $$
 
+本接口为Reg矢量计算接口，仅在AIV上生效。
+
 ## 函数原型
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_reduce_max(vector_<dtype> src,
-                                                      vector_bool mask)
+                                                     vector_bool mask)
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_max(vector_<dtype>& dst,
@@ -67,11 +69,11 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 描述                                     |
+| 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ---------------------------------------- |
-| dst  | 输出      | 目的操作数（矢量数据寄存器）。           |
-| src  | 输入      | 源操作数（矢量数据寄存器）。             |
-| mask | 输入      | 掩码寄存器，用于控制各元素是否参与归约。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 掩码寄存器，用于控制各元素是否参与归约。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -82,9 +84,7 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 ## 约束说明
 
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
-- `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果`src`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的第0个元素，并将其余元素置0。
 - 比较时遵循$max(-0, +0) = +0$。
 - 如果输入数据中存在nan，则将nan写入`dst`的第0个元素，并将第一个nan的索引写入`dst`的第1个元素。
@@ -93,14 +93,14 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 **规约产生值+索引两个结果，索引值需要强制类型转换**：
 
-`dst`的索引按照`dst`的数据类型存储，比如`dst`为half类型时，索引按照half类型存储，因此读取索引需要使用  reinterpret\_cast方法转换到整数类型。若数据类型是half，需要使用reinterpret\_cast\<uint16_t\*\>；若数据类型是float，需要使用reinterpret\_cast\<uint32\_t\*\>。值+索引的分别提取方式请参见[调用示例](#调用示例)。
+`dst`的索引按照`dst`的数据类型存储，比如`dst`为half类型时，索引按照half类型存储，因此读取索引需要使用 reinterpret\_cast方法转换到整数类型。若数据类型是half，需要使用reinterpret\_cast\<uint16_t\*\>；若数据类型是float，需要使用reinterpret\_cast\<uint32\_t\*\>。值+索引的分别提取方式请参见[调用示例](#调用示例)。
 
 ## 调用示例
 
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -114,55 +114,92 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 64;
-__simd_vf__ inline void reduce(__ubuf__ half* dst, __ubuf__ half* src)
+constexpr uint8_t MUTEX_ID = 0;
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 128;
+constexpr uint32_t DATA_BYTES = 133 * sizeof(half);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATA_BYTES / sizeof(half);
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (TOTAL_LENGTH + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = TOTAL_LENGTH * sizeof(half);
+constexpr uint32_t PADDED_BUFFER_BYTES = PADDED_ELEMENT_COUNT * sizeof(half);
+
+__simd_vf__ inline void reduce(__ubuf__ half* dst, __ubuf__ half* src, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst_reg, src_reg;
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b16(count);
-    asc_loadalign(src_reg, src);
-    asc_reduce_max(dst_reg, src_reg, mask);
-    asc_storealign(dst, dst_reg, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = 2;
+    vector_bool result_mask = asc_update_mask_b16(remaining_length);
+    uint32_t remaining_length_2 = TOTAL_LENGTH;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b16(remaining_length_2);
+        asc_loadalign(src_reg, src + offset);
+        asc_reduce_max(dst_reg, src_reg, mask);
+        asc_storealign(dst + offset, dst_reg, result_mask);
+    }
 }
 __global__ __vector__ void asc_reduce_max_kernel(__gm__ half* dst, __gm__ half* src)
 {
     asc_init();
-    __ubuf__ half dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(half));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    reduce(dst_local, src_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(half));
+    __ubuf__ half dst_local[PADDED_ELEMENT_COUNT], src_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(src_local, src, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(half));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<reduce>(dst_local, src_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(dst, dst_local, PADDED_BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
-    std::vector<half> src(ELEMENT_COUNT), output(ELEMENT_COUNT, half(0));
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        src[i] = half(static_cast<float>(i) + 1.0f);  // 1, 2, ..., 64
+    std::vector<half> src(PADDED_ELEMENT_COUNT, half(-1000.0f));
+    std::vector<half> output(PADDED_ELEMENT_COUNT, half(0));
+    std::vector<half> golden_value(REPEAT_COUNT);
+    std::vector<uint16_t> golden_index(REPEAT_COUNT);
+    for (uint32_t i = 0; i < TOTAL_LENGTH; ++i) {
+        src[i] = half(static_cast<float>(i) + 1.0f);
+    }
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        const uint32_t remaining = TOTAL_LENGTH - offset;
+        const uint32_t remaining_length_2 = remaining < ELEMENTS_PER_REGISTER ? remaining : ELEMENTS_PER_REGISTER;
+        golden_value[repeat] = src[offset + remaining_length_2 - 1];
+        golden_index[repeat] = static_cast<uint16_t>(remaining_length_2 - 1);
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
     half* src_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(half),
-        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     half* dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(half),
-        ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(src_device, src.size() * sizeof(half), src.data(), src.size() * sizeof(half),
-        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), PADDED_BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, PADDED_BUFFER_BYTES, src.data(), PADDED_BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_reduce_max_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), output.size() * sizeof(half), dst_device, output.size() * sizeof(half),
-        ACL_MEMCPY_DEVICE_TO_HOST);
-    half max_value = output[0];                                      // 提取最大值
-    uint16_t max_index = *reinterpret_cast<uint16_t*>(&output[1]);   // 提取最大值索引：索引按half类型存储，需强制转换到整数类型
-    const bool passed = (static_cast<float>(max_value) == 64.0f) && (max_index == ELEMENT_COUNT - 1);
+    aclrtMemcpy(output.data(), PADDED_BUFFER_BYTES, dst_device, PADDED_BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    bool passed = true;
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t offset = repeat * ELEMENTS_PER_REGISTER;
+        half max_value = output[offset];  // 提取当前VL的最大值
+        uint16_t max_index = *reinterpret_cast<uint16_t*>(&output[offset + 1]);  // 提取当前VL的最大值索引
+        passed = passed && (static_cast<float>(max_value) == static_cast<float>(golden_value[repeat]))
+                 && (max_index == golden_index[repeat]);
+    }
     std::cout << (passed ? "[Success] asc_reduce_max passed." : "[Failed] asc_reduce_max failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

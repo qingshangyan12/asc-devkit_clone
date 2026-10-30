@@ -1,3 +1,17 @@
 # 内存访问
 
-本文件为文档发布时所需的索引文件。
+- [尽量一次搬运较大的数据块](./transfer_larger_data_blocks.md)
+- [GM地址尽量512B对齐](./gm_address_512b_alignment.md)
+- [高效的使用搬运API](./efficient_transfer_api.md)
+- [非对齐场景减少无效数据的搬运](./reduce_invalid_data_transfer.md)
+- [非连续搬运场景减少搬运次数](./reduce_non_contiguous_transfer.md)
+- [避免同地址访问](./avoid_same_address_access.md)
+- [设置合理的L2 CacheMode](./l2_cache_mode_config.md)
+- [算子与高阶API共享临时Buffer](./shared_temp_buffer.md)
+- [纯搬运类算子VECIN和VECOUT建议复用](./vecin_vecout_reuse.md)
+- [通过缩减Tensor ShapeInfo维度，优化栈空间](./reduce_shapeinfo_optimize_stack.md)
+- [避免UB的bank冲突](./avoid_ub_bank_conflict/avoid_ub_bank_conflict.md)
+  - [概述](./avoid_ub_bank_conflict/overview.md)
+  - [避免bank冲突（NPU架构版本2201）](./avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_2201.md)
+  - [避免bank冲突（NPU架构版本3510）](./avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_3510.md)
+- [L2 Cache切分](./l2_cache_split.md)

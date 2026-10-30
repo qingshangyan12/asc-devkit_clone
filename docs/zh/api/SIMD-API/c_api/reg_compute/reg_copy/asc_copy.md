@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -39,10 +39,10 @@
 - 矢量数据寄存器复制到掩码寄存器：
     - 数据类型为uint16_t时，矢量数据寄存器（256B）分成16个数据块（16B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成2bit后变为32B，即输出的mask。
     - 数据类型为uint32_t时，矢量数据寄存器（256B）分成32个数据块（8B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成4bit后变为32B，即输出的mask。
-    
+
     具体搬运原理请参考[关键特性说明](#关键特性说明)。
 
-本接口为Reg矢量计算接口，仅在AIV上生效。
+本接口为Reg矢量搬运接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -56,7 +56,8 @@ __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
 ```
 
 #### dtype支持数据类型
-dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 #### 函数原型典型示例
 
@@ -124,8 +125,8 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 
 ## 约束说明
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- dst与src均为矢量数据寄存器或掩码寄存器。
 - 针对矢量数据寄存器复制到矢量数据寄存器：dst中未被mask筛选的位置保持原值。
 - 针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
 - 针对矢量寄存器复制到掩码寄存器：**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
@@ -143,23 +144,23 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 - 当操作数类型为uint16_t时，矢量数据寄存器的一个数据块大小为16B，每个bit经过broadcast成2bit后变为32B，即一个MaskReg（32B）。此外，一个矢量数据寄存器有256B/16B = 16个数据块，偏移量part取值范围为[0, 15]。
 - 当操作数类型为uint32_t时，矢量数据寄存器的一个数据块大小为8B，每个bit经过broadcast成4bit后变为32B，即一个MaskReg（32B）。此外，一个矢量数据寄存器有256B/8B = 32个数据块，偏移量part取值范围为[0, 31]。
 
-**图1**  矢量寄存器复制到掩码寄存器（uint16_t）<a id="fig-maskgen-b16"></a>
+**图1** 矢量寄存器复制到掩码寄存器（uint16_t）<a id="fig-maskgen-b16"></a>
 
-![矢量寄存器复制到掩码寄存器（uint16_t）](../../figures/capi_copy_reg2mask_b16.png)
+![矢量寄存器复制到掩码寄存器（uint16_t）](../../../../figures/capi_copy_reg2mask_b16.png)
 
-**图2**  矢量寄存器复制到掩码寄存器（uint32_t）<a id="fig-maskgen-b32"></a>
+**图2** 矢量寄存器复制到掩码寄存器（uint32_t）<a id="fig-maskgen-b32"></a>
 
-![矢量寄存器复制到掩码寄存器（uint32_t）](../../figures/capi_copy_reg2mask_b32.png)
+![矢量寄存器复制到掩码寄存器（uint32_t）](../../../../figures/capi_copy_reg2mask_b32.png)
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510&& ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
@@ -168,8 +169,12 @@ bisheng example.asc -o main --npu-arch=dav-3510&& ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 namespace {
+constexpr uint8_t MUTEX_ID = 0;
+
+
 template <typename T>
 void print_data(const char* label, const std::vector<T>& values)
 {
@@ -180,38 +185,54 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-constexpr uint32_t BUFFER_BYTES = 256;
-__simd_vf__ inline void load(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t ELEMENT_COUNT = 260;
+constexpr uint32_t ELEMENTS_PER_REGISTER = 256;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT = (ELEMENT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+constexpr uint32_t BUFFER_BYTES = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t DATA_BYTES = ELEMENT_COUNT * sizeof(uint8_t);
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
+__simd_vf__ inline void load(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    for (uint16_t repeat = 0; repeat < 1; ++repeat) {
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = ELEMENT_COUNT;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+    const uint32_t offset = i * ELEMENTS_PER_REGISTER;
+    vector_bool mask = asc_update_mask_b8(remaining_length);
     vector_int8_t arg_0_0;
-    asc_loadalign(arg_0_0, reinterpret_cast<__ubuf__ int8_t*>(input));
+    asc_loadalign(arg_0_0, reinterpret_cast<__ubuf__ int8_t*>(input + offset));
     vector_int8_t arg_0_1;
-    asc_loadalign(arg_0_1, reinterpret_cast<__ubuf__ int8_t*>(input));
+    asc_loadalign(arg_0_1, reinterpret_cast<__ubuf__ int8_t*>(input + offset));
     asc_copy(arg_0_0, arg_0_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int8_t*>(output), arg_0_0, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int8_t*>(output + offset), arg_0_0, mask);
     }
 }
 __global__ __vector__ void asc_copy_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
     __ubuf__ uint8_t output_local[BUFFER_BYTES], input_local[BUFFER_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
     asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    load(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(uint8_t));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<load>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 int main()
 {
     std::vector<uint8_t> input(BUFFER_BYTES), output(BUFFER_BYTES, 0xff);
-    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) input[i] = static_cast<uint8_t>(i % 251);
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;

@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -32,7 +32,7 @@
 
 本接口与[asc_loadalign](asc_loadalign.md)的非连续对齐搬入模式功能相同，区别在于本接口通过函数返回值返回结果。
 
-本接口仅在AIV上生效，非AIV调用直接返回。
+本接口为Reg矢量搬运接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -45,7 +45,7 @@ __simd_callee__ inline vector_<dtype> asc_loadalign_datablock_strided(__ubuf__ <
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，返回值的实际类型为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当`dtype`为`int4b_t`时，返回值的实际类型为`vector_int4x2_t`。
 
 ### 函数原型典型示例
 
@@ -76,19 +76,17 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_datablock_strided(__ubuf__ u
 
 ## 约束说明
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 实际读取地址必须按32字节对齐，且有效`DataBlock`的读取范围必须在UB地址空间内且不越界，否则会报错。
 - 当一个`DataBlock`中的元素全部被`mask`设置为无效时，该`DataBlock`即使越界也不会报错。
-- `mask`需通过[掩码设置接口](../../defs/type/data_type_definition.md#掩码寄存器)预先赋值后再传入。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -100,22 +98,43 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
+
 constexpr uint32_t DATABLOCK_BYTES = 32;
-constexpr uint32_t DATABLOCK_COUNT = 8;
+constexpr uint32_t DATABLOCKS_PER_REGISTER = 8;
+constexpr uint32_t DATABLOCK_COUNT = 11;
 constexpr uint16_t BLOCK_STRIDE = 2;
-constexpr uint16_t REPEAT_STRIDE = 1;
-constexpr uint32_t INPUT_BYTES = 16 * DATABLOCK_BYTES;
-constexpr uint32_t OUTPUT_BYTES = DATABLOCK_COUNT * DATABLOCK_BYTES;
+constexpr uint16_t REPEAT_STRIDE = 0;
+constexpr uint32_t START_BLOCK = 1;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (DATABLOCK_COUNT + DATABLOCKS_PER_REGISTER - 1) / DATABLOCKS_PER_REGISTER;
+constexpr uint32_t INPUT_BYTES_PER_REPEAT = 16 * DATABLOCK_BYTES;
+constexpr uint32_t OUTPUT_BYTES_PER_REPEAT = DATABLOCKS_PER_REGISTER * DATABLOCK_BYTES;
+constexpr uint32_t INPUT_BYTES = INPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_BYTES_PER_REPEAT * REPEAT_COUNT;
+
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = DATABLOCK_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * DATABLOCK_BYTES;
+constexpr uint8_t MUTEX_ID = 0;
 
 __simd_vf__ inline void asc_loadalign_datablock_strided_vf(
-    __ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+    __ubuf__ uint8_t* output, __ubuf__ uint8_t* input, uint32_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_uint8_t dst = asc_loadalign_datablock_strided(input, BLOCK_STRIDE, REPEAT_STRIDE, mask);
-    asc_storealign(output, dst, mask);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = DATABLOCK_COUNT * DATABLOCK_BYTES;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        vector_bool mask = asc_update_mask_b8(remaining_length);
+        const uint32_t input_offset = i * INPUT_BYTES_PER_REPEAT;
+        const uint32_t output_offset = i * OUTPUT_BYTES_PER_REPEAT;
+        // 起始块偏移通过指针指定，repeat_stride不是本次读取的起始偏移。
+        vector_uint8_t dst = asc_loadalign_datablock_strided(input + input_offset + START_BLOCK * DATABLOCK_BYTES, BLOCK_STRIDE, REPEAT_STRIDE, mask);
+        asc_storealign(output + output_offset, dst, mask);
+    }
 }
 
 __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
@@ -124,13 +143,20 @@ __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
     asc_init();
     __ubuf__ uint8_t input_local[INPUT_BYTES];
     __ubuf__ uint8_t output_local[OUTPUT_BYTES];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_datablock_strided_vf>(output_local, input_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_gm2ub_align(output_local, output, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = asc_get_vf_len() / DATABLOCK_BYTES;
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<asc_loadalign_datablock_strided_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
@@ -138,14 +164,20 @@ __global__ __vector__ void asc_loadalign_datablock_strided_kernel(
 int main()
 {
     std::vector<uint8_t> input(INPUT_BYTES);
-    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0);
     std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
     for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint32_t block = 0; block < DATABLOCK_COUNT; ++block) {
-        const uint32_t src_offset = (REPEAT_STRIDE + block * BLOCK_STRIDE) * DATABLOCK_BYTES;
-        const uint32_t dst_offset = block * DATABLOCK_BYTES;
-        for (uint32_t i = 0; i < DATABLOCK_BYTES; ++i) {
-            golden[dst_offset + i] = input[src_offset + i];
+    for (uint32_t repeat = 0; repeat < REPEAT_COUNT; ++repeat) {
+        const uint32_t input_base = repeat * INPUT_BYTES_PER_REPEAT;
+        const uint32_t output_base = repeat * OUTPUT_BYTES_PER_REPEAT;
+        const uint32_t valid_blocks = repeat + 1 == REPEAT_COUNT ?
+            DATABLOCK_COUNT - repeat * DATABLOCKS_PER_REGISTER : DATABLOCKS_PER_REGISTER;
+        for (uint32_t block = 0; block < valid_blocks; ++block) {
+            const uint32_t src_offset = input_base + (START_BLOCK + block * BLOCK_STRIDE) * DATABLOCK_BYTES;
+            const uint32_t dst_offset = output_base + block * DATABLOCK_BYTES;
+            for (uint32_t i = 0; i < DATABLOCK_BYTES; ++i) {
+                golden[dst_offset + i] = input[src_offset + i];
+            }
         }
     }
 
@@ -156,6 +188,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_loadalign_datablock_strided_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);

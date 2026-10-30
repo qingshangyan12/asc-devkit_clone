@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/GroupNorm_res.md#id1 -->
 
@@ -27,13 +27,13 @@
 
 对一个特征进行标准化的一般公式如下所示：
 
-![](../../../figures/zh-cn_formulaimage_0000002080754290.png)
+![](../../../figures/formulaimage_0000002080754290.png)
 
-其中，i表示特征中的索引，![](../../../figures/zh-cn_formulaimage_0000002116393957.png)和![](../../../figures/zh-cn_formulaimage_0000002080755382.png)表示特征中每个值标准化前后的值，μ和σ表示特征的均值和标准差，计算公式如下所示：
+其中，i表示特征中的索引，![](../../../figures/formulaimage_0000002116393957.png)和![](../../../figures/formulaimage_0000002080755382.png)表示特征中每个值标准化前后的值，μ和σ表示特征的均值和标准差，计算公式如下所示：
 
-![](../../../figures/zh-cn_formulaimage_0000002080756222.png)
+![](../../../figures/formulaimage_0000002080756222.png)
 
-![](../../../figures/zh-cn_formulaimage_0000002116310613.png)
+![](../../../figures/formulaimage_0000002116310613.png)
 
 其中，ε是一个很小的常数，S表示参与计算的数据的集合，m表示集合的大小。不同类型的特征标准化方法（BatchNorm、LayerNorm、InstanceNorm、GroupNorm等）的主要区别在于参与计算的数据集合的选取上。不同Norm类算子参与计算的数据集合的选取方式如下：
 
@@ -41,7 +41,7 @@
 
 对于一个shape为\[N, C, H, W\]的输入，GroupNorm将每个\[C, H, W\]在C维度上分为groupNum组，然后对每一组进行标准化。最后对标准化后的特征进行缩放和平移。其中缩放参数γ和平移参数β是可训练的。
 
-![](../../../figures/zh-cn_formulaimage_0000002081645994.png)
+![](../../../figures/formulaimage_0000002081645994.png)
 
 ## 函数原型
 
@@ -92,7 +92,7 @@
 -   当前仅支持ND格式的输入，不支持其他格式。
 
 <!-- npu="950" id7 -->
--   针对Ascend 950PR/Ascend 950DT，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
+-   针对Ascend 950PR&950DT系列产品，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
     -   配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
     -   配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id7 -->

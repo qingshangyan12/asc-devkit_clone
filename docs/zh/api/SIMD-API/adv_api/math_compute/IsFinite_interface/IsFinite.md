@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite_res.md#id1 -->
 
@@ -29,15 +29,15 @@
 
 按元素判断输入的浮点数是否非NAN、非±INF，输出结果为浮点数或者布尔值。对于非NAN或者非±INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之为false。计算公式如下：
 
-![](../../../../figures/zh-cn_formulaimage_0000002218496437.png)
+![](../../../../figures/formulaimage_0000002218496437.png)
 
 -   当输出为浮点类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224017961.png)
+    ![](../../../../figures/formulaimage_0000002224017961.png)
 
 -   当输出为bool类型时：
 
-    ![](../../../../figures/zh-cn_formulaimage_0000002224061861.png)
+    ![](../../../../figures/formulaimage_0000002224061861.png)
 
 ## 函数原型
 

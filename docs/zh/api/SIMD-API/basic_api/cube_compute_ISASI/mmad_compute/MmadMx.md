@@ -5,62 +5,62 @@
 ### 不传入bias的原型
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id1 -->
 
 ### 传入bias的原型
 
 <!-- npu="950" id10 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id10 -->
 <!-- npu="A3" id11 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id11 -->
 <!-- npu="910b" id12 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id12 -->
 <!-- npu="310b" id13 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id13 -->
 <!-- npu="310p" id14 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id14 -->
 <!-- npu="310p" id15 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id15 -->
 <!-- npu="910" id16 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id17 -->
 <!-- npu="9030" id18 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id2 -->
 
@@ -156,7 +156,7 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 
 ## 数据类型<a id="zh_cn_topic_mmadmx_section_datatype"></a>
 
-**表3** MmadMx接口左矩阵、右矩阵、Scale矩阵、Bias矩阵、结果矩阵支持的精度类型组合（Ascend 950PR/Ascend 950DT）
+**表3** MmadMx接口左矩阵、右矩阵、Scale矩阵、Bias矩阵、结果矩阵支持的精度类型组合（Ascend 950PR&950DT系列产品）
 
 | 左矩阵fm | 右矩阵filter | Scale矩阵 | 偏置Bias | 结果矩阵dst |
 | ------------ | ------------ | ---------- | -------- | ----------- |
@@ -186,7 +186,22 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 - 对于fp4场景A/B矩阵的起始地址需要按照512字节对齐，对于fp8场景A/B矩阵的起始地址需要按照1024字节对齐。
 - 左矩阵A/B对应的scale矩阵起始地址为：A/B矩阵起始对应地址/16。
 - 其他特殊场景约束可参考[Mmad接口约束说明](Mmad.md#约束说明)。
-- 边界值计算结果请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
+
+- **特殊值/边界值约束说明**
+
+  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL[48]比特位进行设置，控制MmadMx计算时的饱和模式。该配置适用于表3中的全部浮点输入组合，由CTRL[48]直接决定，不受CTRL[60]限制。
+
+  - 非饱和模式：CTRL[48]设置成1'b1，inf/nan保持原输出。
+  - 饱和模式：CTRL[48]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
+
+    ```cpp
+    // MmadMx的饱和模式由CTRL[48]直接决定，不受CTRL[60]限制。
+    AscendC::SetCtrlSpr<48, 48>(0);
+    ```
+
+   注：MmadMx指令应避免NaN输入，否则可能会产生执行报错。
+
+  - 边界值计算结果请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
 
 ## 调用示例
 

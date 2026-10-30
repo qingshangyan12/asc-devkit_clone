@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -31,7 +31,7 @@
 Reg矢量计算内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。
 读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令执行，则需要插入同步指令。写写场景同理。
 
-![SIMD_VF函数内流水线等待示意图.png](../../figures/simd_vf_pipeline_wait_diagram.png)
+![SIMD_VF函数内流水线等待示意图.png](../../../../figures/simd_vf_pipeline_wait_diagram.png)
 
 本接口仅在AIV上生效。
 
@@ -45,13 +45,13 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 **表1** 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数名 | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | mem_type | 输入 | 同步流水线的类型，类型为`MEM_TYPE`，取值范围见表2 `mem_type`取值说明。 |
 
 **表2** 本接口支持的mem_type取值范围说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
 
-| 值  | 源流水线 | 目的流水线 |
+| 值 | 源流水线 | 目的流水线 |
 | ------ | -------- | -------- |
 | `VV_ALL` | `VEC_ALL` | `VEC_ALL` |
 | `VST_VLD` | `VEC_STORE` | `VEC_LOAD` |
@@ -85,8 +85,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 ### 通用约束
 
-- 非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 
 ### 指令约束
 
@@ -100,10 +99,12 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 如下示例中，前一次循环通过`asc_storealign`将累加结果写入UB，后一次循环通过`asc_loadalign`从同一块UB地址空间读取该结果。由于两条指令使用不同的矢量数据寄存器，后一次循环读取UB前需调用`asc_mem_bar(VST_VLD)`，等待前一次循环写入UB完成。
 
+示例输入包含323个`float`类型元素，每次循环最多处理64个元素，最后一次循环通过`mask`处理剩余的3个元素。
+
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -116,26 +117,42 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 #include "c_api/asc_simd.h"
+#include "utils/std/cmath.h"
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t VECTOR_ELEMENT_COUNT = 64;
-constexpr uint32_t BLOCK_COUNT = 4;
-constexpr uint32_t INPUT_COUNT = VECTOR_ELEMENT_COUNT * BLOCK_COUNT;
-constexpr uint32_t INPUT_BYTES = INPUT_COUNT * sizeof(float);
-constexpr uint32_t OUTPUT_BYTES = VECTOR_ELEMENT_COUNT * sizeof(float);
+constexpr uint8_t MUTEX_ID = 0;
 
-__simd_vf__ inline void accumulate_vf(__ubuf__ float* data)
+
+constexpr uint32_t ELEMENTS_PER_REGISTER = 64;
+constexpr uint32_t ELEMENT_COUNT = 323;
+// 按单轮处理能力向上取整，确保非整寄存器长度的尾块也被处理。
+constexpr uint32_t REPEAT_COUNT =
+    (ELEMENT_COUNT + ELEMENTS_PER_REGISTER - 1) / ELEMENTS_PER_REGISTER;
+// 按完整寄存器块扩展UB容量，避免尾轮整寄存器访问越界；有效范围仍由掩码控制。
+constexpr uint32_t PADDED_ELEMENT_COUNT = REPEAT_COUNT * ELEMENTS_PER_REGISTER;
+constexpr uint32_t OUTPUT_COUNT = ELEMENTS_PER_REGISTER;
+constexpr uint32_t INPUT_BYTES = PADDED_ELEMENT_COUNT * sizeof(float);
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(float);
+
+// 统一记录实际处理长度，用于计算迭代次数并限制尾轮的有效范围。
+constexpr uint32_t TOTAL_LENGTH = ELEMENT_COUNT;
+constexpr uint32_t DATA_BYTES = TOTAL_LENGTH * sizeof(float);
+__simd_vf__ inline void accumulate_vf(__ubuf__ float* data, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0;
     vector_float src1;
     vector_float dst;
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    // 保留剩余有效元素数，供更新掩码处理尾块。
+    uint32_t remaining_length = ELEMENT_COUNT > ELEMENTS_PER_REGISTER ?
+        ELEMENT_COUNT - ELEMENTS_PER_REGISTER : 0;
 
-    for (uint32_t i = 1; i < BLOCK_COUNT; ++i) {
+    for (uint16_t i = 1; i < repeat_time; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        vector_bool mask = asc_update_mask_b32(remaining_length);
         asc_mem_bar(VST_VLD);
         asc_loadalign(src0, data);
-        asc_loadalign(src1, data + i * VECTOR_ELEMENT_COUNT);
+        asc_loadalign(src1, data + offset);
         asc_add(dst, src0, src1, mask);
         asc_storealign(data, dst, mask);
     }
@@ -144,27 +161,37 @@ __simd_vf__ inline void accumulate_vf(__ubuf__ float* data)
 __global__ __vector__ void asc_mem_bar_kernel(__gm__ float* output, __gm__ float* input)
 {
     asc_init();
-    __ubuf__ float data_local[INPUT_COUNT];
+    __ubuf__ float data_local[PADDED_ELEMENT_COUNT];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
     asc_copy_gm2ub_align(data_local, input, INPUT_BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    accumulate_vf(data_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    uint32_t one_repeat_size = static_cast<uint32_t>(asc_get_vf_len() / sizeof(float));
+    uint16_t repeat_time = static_cast<uint16_t>(AscendC::Std::ceil_div(TOTAL_LENGTH, one_repeat_size));
+    asc_lock(PIPE_V, MUTEX_ID);
+    asc_vf_call<accumulate_vf>(data_local, one_repeat_size, repeat_time);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
     asc_copy_ub2gm_align(output, data_local, OUTPUT_BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<float> input(INPUT_COUNT);
-    std::vector<float> output(VECTOR_ELEMENT_COUNT, 0.0f);
-    std::vector<float> expected(VECTOR_ELEMENT_COUNT, 0.0f);
-    for (uint32_t block = 0; block < BLOCK_COUNT; ++block) {
-        for (uint32_t i = 0; i < VECTOR_ELEMENT_COUNT; ++i) {
-            input[block * VECTOR_ELEMENT_COUNT + i] = static_cast<float>(block * 10U + i);
-            expected[i] += input[block * VECTOR_ELEMENT_COUNT + i];
+    std::vector<float> input(PADDED_ELEMENT_COUNT, 0.0f);
+    std::vector<float> output(OUTPUT_COUNT, 0.0f);
+    std::vector<float> expected(OUTPUT_COUNT, 0.0f);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        input[i] = static_cast<float>(i);
+    }
+    for (uint32_t offset = 0; offset < ELEMENT_COUNT; offset += ELEMENTS_PER_REGISTER) {
+        const uint32_t valid_count = ELEMENT_COUNT - offset < ELEMENTS_PER_REGISTER ?
+            ELEMENT_COUNT - offset : ELEMENTS_PER_REGISTER;
+        for (uint32_t i = 0; i < valid_count; ++i) {
+            expected[i] += input[offset + i];
         }
     }
 
@@ -180,7 +207,7 @@ int main()
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
     bool passed = true;
-    for (uint32_t i = 0; i < VECTOR_ELEMENT_COUNT; ++i) {
+    for (uint32_t i = 0; i < OUTPUT_COUNT; ++i) {
         if (std::fabs(output[i] - expected[i]) > 1e-6f) {
             passed = false;
             break;

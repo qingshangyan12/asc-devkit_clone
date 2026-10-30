@@ -3,40 +3,41 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-**`asc_copy_l12ub_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_l12ub.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
+**`asc_copy_l12ub_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/cube_compute_store/asc_copy_l12ub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
 将数据从L1 Buffer搬运到Unified Buffer（UB）中。
 
 ## 函数原型
 
 - 同步搬运
+
     ```cpp
-    __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
     ```
 
 ## 参数说明
@@ -47,7 +48,7 @@
 | :--- | :--- | :--- |
 | dst_addr | 输出 | 目的操作数起始地址。 |
 | src_addr | 输入 | 源操作数起始地址。 |
-| sub_blockid | 输入 | 使用的子块ID。 |
+| sub_blockid | 输入 | 使用的子块ID，bool类型，false为0，true为1。 |
 | burst_count | 输入 | 待搬运的连续传输数据块个数。 |
 | burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。 |
 | src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |

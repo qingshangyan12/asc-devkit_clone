@@ -43,6 +43,8 @@ enum class cast_round_mode {
     floor,
     ceil,
     trunc,
+    odd,
+    hybrid,
 };
 
 /** @brief Saturation behavior for register cast. */
@@ -97,6 +99,47 @@ enum class mask_pattern : uint8_t {
     half,
     quarter,
     none,
+};
+
+enum class high_low_part : uint8_t {
+    low,
+    high,
+};
+
+enum class histogram_half {
+    low,
+    high,
+};
+
+enum class histogram_mode {
+    frequency,
+    cumulative,
+};
+
+enum class reduce_scope : uint8_t { element, datablock, pair };
+
+enum class iota_order : uint8_t { increase, decrease };
+
+enum class gather_mode {
+    element = 0, // per-element gather
+    data_block,  // datablock-width gather
+};
+
+/** @brief Memory access pipeline type used by register synchronization interfaces. */
+enum class mem_type {
+    vec_load,
+    vec_store,
+    scalar_load,
+    scalar_store,
+    vec_all,
+    scalar_all,
+};
+
+enum class div_algo { INTRINSIC, PRECISION_0ULP_FTZ_TRUE };
+
+enum class merge_mode {
+    zeroing,
+    merging,
 };
 } // namespace experimental
 } // namespace te

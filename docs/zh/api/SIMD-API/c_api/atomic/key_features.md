@@ -124,9 +124,9 @@ if (block_idx == 0) {
 
 ## 核内同步
 
-搬运指令和开启原子操作的指令流水类型如下表所示，当上述指令在同一个核内执行时，开发者按需插入[asc_sync_pipe](../sync/asc_sync_pipe.md)或者[asc_sync_notify](../sync/asc_sync_notify.md)与[asc_sync_wait](../sync/asc_sync_wait.md)。
+搬运指令和开启原子操作的指令流水类型如下表所示，当上述指令在同一个核内执行时，开发者按需插入[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)或者[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)。
 
-**表1**  原子操作确定性计算相关指令的流水类型
+**表1** 原子操作确定性计算相关指令的流水类型
 
 | 指令名称 | 流水类型 |
 | --- | --- |
@@ -147,7 +147,7 @@ if (block_idx == 0) {
 - 当前核在执行搬运任务前，会通过Scalar单元不断读取该信号量的值。如果信号量不等于1，当前核会进入阻塞等待状态；当检测到信号量等于1时，当前核会解除阻塞，开始执行自己的数据搬运或原子操作。为确保信号量等于1之前，当前核不会执行搬运指令，需要在搬运指令之前插入核内同步3。
 
 **图4**  一对核之间软件同步方案流程图    
-![](../figures/software_synchronization_between_two_cores_flowchart.png "Software synchronization flowchart between two cores")
+![](../../../figures/software_synchronization_between_two_cores_flowchart_c_api.png "Software synchronization flowchart between two cores")
 
 Scalar单元访问GM上的信号量，存在两种访问方式：
 

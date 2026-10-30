@@ -37,7 +37,8 @@ using namespace HcclSim;
 
 namespace mc2_ops_hccl {
 uint32_t g_hcclEngineCtxCopyCallCount = 0;
-}
+uint32_t g_stubEndpointBwCoeff = 1; // 均匀带宽：双 die 场景 dieSplitRatio=0.5（0 会导致 p0+p1=0 不切分）
+} // namespace mc2_ops_hccl
 
 namespace {
 struct SymWinStub {
@@ -197,6 +198,8 @@ HcclResult HcclRankGraphGetEndpointInfo(
     uint32_t* intInfo = static_cast<uint32_t*>(info);
     if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_DIE_ID) {
         *intInfo = (endpointDesc->loc.device.devPhyId >= 4) ? 1 : 0;
+    } else if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_BW_COEFF) {
+        *intInfo = mc2_ops_hccl::g_stubEndpointBwCoeff;
     } else {
         *intInfo = 0;
     }
@@ -444,6 +447,16 @@ HcclResult HcclThreadAcquireWithStream(
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
     return simComm->independentOpThreadMgr_->HcclThreadAcquireWithStream(engine, stream, notifyNum, thread);
+}
+
+bool HcommIsSupportHcclDedicatedThreadAcquire() { return true; }
+
+HcclResult HcclDedicatedThreadAcquire(
+    HcclComm comm, HcclDedicatedThreadType useType, uint32_t notifyNumPerThread, ThreadHandle* thread)
+{
+    auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
+    CHK_PTR_NULL(simComm);
+    return simComm->independentOpThreadMgr_->HcclDedicatedThreadAcquire(useType, notifyNumPerThread, thread);
 }
 
 HcclResult HcclEngineCtxGet(HcclComm comm, const char* engineTag, CommEngine engine, void** ctx, uint64_t* size)

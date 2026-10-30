@@ -9,22 +9,22 @@
     \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
     <!-- npu="950" id1 -->
-    - Ascend 950PR/Ascend 950DT：3510
+    - Ascend 950PR&950DT系列产品：3510
     <!-- end id1 -->
     <!-- npu="A3" id2 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：2201
+    - Atlas A3系列产品：2201
     <!-- end id2 -->
     <!-- npu="910b" id3 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：2201
+    - Atlas A2系列产品：2201
     <!-- end id3 -->
     <!-- npu="310b" id4 -->
-    - Atlas 200I/500 A2 推理产品：3002
+    - Atlas 200I/500 A2推理产品：3002
     <!-- end id4 -->
     <!-- npu="310p" id5 -->
-    - Atlas 推理系列产品：2002
+    - Atlas推理系列产品：2002
     <!-- end id5 -->
     <!-- npu="910" id6 -->
-    - Atlas 训练系列产品：1001
+    - Atlas训练系列产品：1001
     <!-- end id6 -->
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
@@ -506,7 +506,7 @@ $$
 -   使用**基础API**时，应使用GetBlockIdx获取核的逻辑位置，而非直接使用内置变量。
 
     <!-- npu="310p" id7 -->
-    在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+    在Atlas推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
     <!-- end id7 -->
 
 -   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
@@ -543,6 +543,18 @@ $$
 
 更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
 
+使用内置数据类型时需要导入对应的头文件：
+
+**表6**  内置数据类型的头文件
+
+| 提供层级 | 数据类型 | 需要包含的头文件 |
+| --- | --- | --- |
+| 语言扩展层C API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double | c_api/asc_simd.h |
+| 基础API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64 | kernel_operator.h |
+
+> [!NOTE]说明  
+> `c_api/asc_simd.h`属于语言扩展层C API，面向底层硬件能力，而complex32和complex64是基础API在硬件能力之上提供的C++复合类型，因此并未放入`c_api/asc_simd.h`中。
+
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
@@ -566,7 +578,7 @@ $$
     >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](../../../api/Utils-API/platform_info/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
 -   dynUBufSize：Dynamic UB Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
--   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+-   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/README.md)。
 
 以下示例展示了核函数（Kernel）的声明与调用方式。
 

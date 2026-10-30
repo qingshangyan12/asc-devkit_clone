@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -38,7 +38,7 @@ make_tensor会根据内存指针的物理位置标记，自动推导返回global
 
 ```cpp
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args)
+__aicore__ inline auto make_tensor(const Iterator& iter, const Args&... args)
 ```
 
 ## 参数说明
@@ -61,8 +61,6 @@ __aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&..
 
   using namespace asc::te;
 
-  constexpr uint64_t gm_addr = 128;
-
   // 示例1：使用GM指针和layout创建global_tensor
   auto gm_ptr = make_mem_ptr<location::gm, half>(gm_addr);
   auto gm_layout = make_layout(make_shape(32, 32), make_stride(32, 1));
@@ -71,7 +69,6 @@ __aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&..
   // 示例2：使用Local Memory指针和layout创建local_tensor
   constexpr int tile_num = 4;
   __cbuf__ half data_ptr[tile_num]; // 初始化
-  // data_ptr为__cbuf__ half类型数组，其物理位置为L1 Buffer。
   auto ptr = make_mem_ptr(data_ptr);
   auto layout = make_frame_layout<nz_layout_ptn, half>(32, 32);
   auto tensor = make_tensor(ptr, layout);

@@ -18,6 +18,8 @@
 #include "include/adv_api/hccl/hccl_mc2.h"
 #include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "hccl_alloc_ctx_res.h"
+#include "external_alg_resolver.h"
+#include "external_alg_rules.h"
 #include "kfc_server_protocol.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
@@ -32,14 +34,43 @@ extern bool g_stubCcuAlgExecNull;
 extern std::string g_stubCcuAlgExecNullName;
 extern std::string g_stubSelectorAlgName;
 extern bool g_stubCcuAlgResUnavailable;
+extern std::string g_stubCcuAlgResUnavailableName;
 extern bool g_stubAclrtMemcpyFail;
 extern uint32_t g_stubAclrtMemcpyCallCount;
 extern uint32_t g_stubAclrtMemcpyFailOnCall;
 extern HcclResult g_stubHcomCheckDataTypeResult;
 extern HcclResult g_stubHcomCheckReductionOpResult;
+extern HcclResult g_stubCalcTopoInfoResult;
 extern bool g_stubHcommCcuKernelLaunchFail;
 extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
+extern std::string g_stubCcuAlgNotRegisteredName;
+extern bool g_stubHcommIsSupportCcuV2;
 } // namespace mc2_ops_hccl
+
+// 夹具：本目标不编 executor 文件（-DAICPU_COMPILE 裁掉产品 CCU sidecar 注册行），
+// 按产品现场同款注册供 EXTERNAL 用例使用。
+// (AR, sole[mesh]) 键两条 CCU 候选；闸门 B 全量校验用例
+// （GateBRejectsDriftedExternalCandidate）以按名桩把其中一条打成双名单不过，
+// 验证"任一候选未过即整体拒绝"（D8）。
+namespace mc2_ops_hccl {
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE,
+    FLAG_NONE, 0);
+} // namespace mc2_ops_hccl
+
+// hccl_mc2.cc 的 CheckCcuAlgorithmsRegistered（非 static 自由函数，须在全局作用域声明）
+bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
+HcclResult CheckMc2CcDeviceType(const char* apiName);
 
 namespace {
 
@@ -66,14 +97,18 @@ static void StubCleanup()
     mc2_ops_hccl::g_stubCcuAlgExecNullName.clear();
     mc2_ops_hccl::g_stubSelectorAlgName.clear();
     mc2_ops_hccl::g_stubCcuAlgResUnavailable = false;
+    mc2_ops_hccl::g_stubCcuAlgResUnavailableName.clear();
     mc2_ops_hccl::g_cannBridgeTestState = {};
     mc2_ops_hccl::g_stubAclrtMemcpyFail = false;
     mc2_ops_hccl::g_stubAclrtMemcpyCallCount = 0U;
     mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall = 0U;
     mc2_ops_hccl::g_stubHcomCheckDataTypeResult = HCCL_SUCCESS;
     mc2_ops_hccl::g_stubHcomCheckReductionOpResult = HCCL_SUCCESS;
+    mc2_ops_hccl::g_stubCalcTopoInfoResult = HCCL_SUCCESS;
+    mc2_ops_hccl::g_stubCcuAlgNotRegisteredName.clear();
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchFail = false;
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount = 0U;
+    mc2_ops_hccl::g_stubHcommIsSupportCcuV2 = true;
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 
@@ -174,6 +209,7 @@ static OpResCtx BuildLaunchOpResCtx(OpParam& opParam, HcclComm comm, CommEngine 
     opParam.ctxSize = 1U;
 
     OpResCtx opResCtx{};
+    opResCtx.commEngine = static_cast<uint64_t>(engine);
     opResCtx.workSpace = 1U;
     opResCtx.workSpaceSize = 1U;
     opResCtx.algInfo[0].opParam = reinterpret_cast<uint64_t>(&opParam);
@@ -266,6 +302,31 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
 }
 
+// EXTERNAL 通道端到端：合法外部名经 tiling algConfig 进入，resolver 定名
+// CcuSchedAllGatherSoleMesh，algorithmType 回填正确
+TEST_F(CcuMc2TestSuite, CcuSelectAlg_ExternalNameAccepted)
+{
+    SetCommEngineEnv(COMM_ENGINE_CCU);
+
+    OpResCtx resCtx{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "external_alg_ctx", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
+
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.reduceType = HCCL_REDUCE_SUM;
+    strcpy(ccTiling.algConfig, "sole[mesh]");
+    const void* ccTilingList[] = {&ccTiling};
+    std::string topoTag[] = {"external_alg_tag"};
+
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
+    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
+    EXPECT_TRUE(resCtx.isKfc[0]);
+}
+
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ParallelMeshNhrMultiLink)
 {
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
@@ -279,6 +340,9 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ParallelMeshNhrMultiLink)
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     strcpy(ccTiling.algConfig, "CcuSchedAllGatherParallelMeshNHRMultiLink");
+    // 新契约：裸名不再是强制算法（归为 NONE），算法由默认 selector 决定；
+    // 本用例聚焦 algName→algorithmType 映射，用 selector 输出桩固定选名结果
+    mc2_ops_hccl::g_stubSelectorAlgName = "CcuSchedAllGatherParallelMeshNHRMultiLink";
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"parallel_mesh_nhr_tag"};
 
@@ -331,6 +395,9 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterMesh1DMem2MemPeerOnly)
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
     ASSERT_EQ(strcpy_s(ccTiling.algConfig, sizeof(ccTiling.algConfig), KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME), EOK);
+    // 新契约：裸名不再是强制算法（归为 NONE），算法由默认 selector 决定；
+    // 本用例聚焦 algName→algorithmType 映射，用 selector 输出桩固定选名结果
+    mc2_ops_hccl::g_stubSelectorAlgName = KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME;
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
@@ -353,6 +420,9 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterKfcSoleNhrMultiLink)
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
     strcpy(ccTiling.algConfig, "CcuSchedReduceScatterSoleNHRMultiLink");
+    // 新契约：裸名不再是强制算法（归为 NONE），算法由默认 selector 决定；
+    // 本用例聚焦 algName→algorithmType 映射，用 selector 输出桩固定选名结果
+    mc2_ops_hccl::g_stubSelectorAlgName = "CcuSchedReduceScatterSoleNHRMultiLink";
     const void* ccTilingList[] = {&ccTiling};
     std::string topoTag[] = {"tag0"};
 
@@ -541,7 +611,9 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(
         algorithmMap.at("CcuSchedReduceScatterConcurMeshNHRMultiLink"),
         AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink);
-    EXPECT_EQ(algorithmMap.size(), 15U);
+    EXPECT_EQ(algorithmMap.at("CcuSchedReduceScatterSoleNHR"), AlgorithmType::CcuSchedReduceScatterSoleNHR);
+    EXPECT_EQ(algorithmMap.at("CcuSchedAllGatherSoleNHR"), AlgorithmType::CcuSchedAllGatherSoleNHR);
+    EXPECT_EQ(algorithmMap.size(), 17U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
@@ -564,12 +636,16 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink), 154U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent), 155U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink), 156U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR), 158U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR), 159U);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：CCU 路径只认外部名（裸名归为 NONE，闸门直接拒绝）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
     void* opResCtx = nullptr;
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
@@ -602,6 +678,8 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：CCU 路径只认外部名（裸名归为 NONE，闸门直接拒绝）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
     void* opResCtx = nullptr;
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
@@ -624,11 +702,13 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
-    // 合法强制算法名（已注册且可校验通过）
-    strcpy(ccTiling.algConfig, "CcuAllGatherMesh1DMem2Mem");
+    // 合法强制算法：新契约下只有外部名可作强制算法（裸名归为 NONE），
+    // 此处用夹具注册的 sole[mesh] -> CcuSchedAllGatherSoleMesh
+    strcpy(ccTiling.algConfig, "sole[mesh]");
 
     // 场景1：强制算法执行器不可用 → CheckForcedAlgResource校验失败 → 回退到默认selector
     mc2_ops_hccl::g_stubCcuAlgExecNull = true;
+    mc2_ops_hccl::g_stubCcuAlgExecNullName = "CcuSchedAllGatherSoleMesh";
     OpParam opParam{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
     std::string algName;
@@ -650,7 +730,7 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     HcclResult ret2 = TryForcedAlgAndPrepareEngine(comm_, &ccTiling, opParam2, algName2, topoInfo2, forcedAlgAccepted2);
     EXPECT_EQ(ret2, HCCL_SUCCESS);
     EXPECT_TRUE(forcedAlgAccepted2);
-    EXPECT_EQ(algName2, "CcuAllGatherMesh1DMem2Mem");
+    EXPECT_EQ(algName2, "CcuSchedAllGatherSoleMesh");
 }
 
 TEST_F(CcuMc2TestSuite, ForcedBridgeAlgorithmUsesMetadataAndV2)
@@ -686,7 +766,8 @@ TEST_F(CcuMc2TestSuite, ForcedBridgeAlgorithmAcceptanceAndFallback)
         g_cannBridgeTestState.hierarchyResult = stage == 1 ? HCCL_E_PARA : HCCL_SUCCESS;
         g_cannBridgeTestState.resourceResult = stage == 2 ? HCCL_E_UNAVAIL : HCCL_SUCCESS;
         Mc2CcTilingInner tiling{};
-        strcpy(tiling.algConfig, "AicpuAllReduceParallelMeshNHR");
+        // 新契约：强制算法只认外部名；AICPU 引擎下用夹具注册的 (ALLREDUCE, sole[mesh]) -> InsAllReduceMesh1D
+        strcpy(tiling.algConfig, "sole[mesh]");
         OpParam param{};
         param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
         param.engine = COMM_ENGINE_AICPU_TS;
@@ -695,7 +776,7 @@ TEST_F(CcuMc2TestSuite, ForcedBridgeAlgorithmAcceptanceAndFallback)
         bool accepted = true;
         ASSERT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, param, algName, topo, accepted), HCCL_SUCCESS);
         EXPECT_EQ(accepted, stage == -1);
-        EXPECT_EQ(algName, stage == -1 ? "AicpuAllReduceParallelMeshNHR" : "");
+        EXPECT_EQ(algName, stage == -1 ? "InsAllReduceMesh1D" : "");
         EXPECT_EQ(param.engine, COMM_ENGINE_AICPU_TS);
         EXPECT_EQ(g_cannBridgeTestState.lookupCalls, 1U);
         EXPECT_EQ(g_cannBridgeTestState.resourceCalls, stage == -1 || stage == 2 ? 1U : 0U);
@@ -720,6 +801,121 @@ TEST_F(CcuMc2TestSuite, AutomaticAndLegacyConfigSkipForcedBridgePrecheck)
         EXPECT_EQ(g_cannBridgeTestState.lookupCalls, 0U);
         EXPECT_EQ(g_cannBridgeTestState.v2Calls, 0U);
     }
+}
+
+// EXTERNAL 坏配置：与裸名未注册同路——WARNING + false，调用方走默认 selector
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailFallsBackToSelector)
+{
+    // 语法错：不报错中止，回退 selector
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "sole[ring]");
+    OpParam opParam{};
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    bool accepted = true;
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
+    EXPECT_FALSE(accepted);
+    EXPECT_TRUE(algName.empty());
+}
+
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailFallsBackToSelector)
+{
+    // 语义错（无 3 层注册候选）：WARNING + false 回退 selector，且 opParam 复位到入口现场
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "pipeline[mesh,nhr,nhr]");
+    OpParam opParam{};
+    opParam.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    opParam.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    bool accepted = true;
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
+    EXPECT_FALSE(accepted);
+    EXPECT_TRUE(algName.empty());
+    // hcclComm 入口为 nullptr 而 PrepareTopoInfoForOp 会改写为 comm，
+    // 此断言钉住失败路径 opParam 复位真正生效
+    EXPECT_EQ(opParam.hcclComm, nullptr);
+    EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
+}
+
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalTopoFailFallsBackToSelector)
+{
+    // topo 准备失败（HcclCalcTopoInfo 打桩失败）：WARNING + false 回退 selector，且 opParam 复位到入口现场
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "sole[mesh]");
+    OpParam opParam{};
+    opParam.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    opParam.engine = CommEngine::COMM_ENGINE_CCU; // 入口值与 topo 准备的改写值不同，钉住复位
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    bool accepted = true;
+
+    mc2_ops_hccl::g_stubCalcTopoInfoResult = HcclResult::HCCL_E_INTERNAL;
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
+    mc2_ops_hccl::g_stubCalcTopoInfoResult = HcclResult::HCCL_SUCCESS;
+
+    EXPECT_FALSE(accepted);
+    EXPECT_TRUE(algName.empty());
+    // topo 准备会改写 hcclComm(→comm) 与 engine(→AICPU_TS)，复位后须回到入口值
+    EXPECT_EQ(opParam.hcclComm, nullptr);
+    EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_CCU);
+}
+
+// CCU 闸门（本 PR 后语义）：只放行外部名（含 '[' 且可解析）；
+// 裸名/缺省/老语法一律归为 NONE → 拒绝。原"全部候选必须已注册"校验已随白名单机制移除。
+TEST_F(CcuMc2TestSuite, CcuAlgorithmGateAcceptsOnlyExternalAlgConfig)
+{
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    const void* ccTilingList[] = {&tiling};
+
+    // 裸名不再作为强制算法
+    strcpy(tiling.algConfig, "CcuSchedAllReduceSoleMesh");
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
+    // 缺省与老语法同样拒绝
+    strcpy(tiling.algConfig, "default");
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
+    strcpy(tiling.algConfig, "AllReduce=level0:doublering");
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
+
+    // 合法外部名放行
+    strcpy(tiling.algConfig, "sole[mesh]");
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
+
+    // 外部名词法错误 → 拒绝
+    strcpy(tiling.algConfig, "sole[ring]");
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
+}
+
+// EXTERNAL 资源失败回退（与裸名同路）：定名成功 → 资源失败（按名桩限定）→
+// 回退默认 selector 重选 → 二次资源申请成功 → GetOpParam 整体 SUCCESS
+TEST_F(CcuMc2TestSuite, GetOpParam_ExternalNameResourceFallbackToSelector)
+{
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
+    tiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    tiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    tiling.reduceType = HCCL_REDUCE_SUM;
+    strcpy(tiling.algConfig, "sole[mesh]");
+
+    // 仅定名算法（夹具 AICPU 行 InsAllGatherMesh1D）资源不足；回退算法资源正常
+    mc2_ops_hccl::g_stubCcuAlgResUnavailableName = "InsAllGatherMesh1D";
+    mc2_ops_hccl::g_stubSelectorAlgName = "AicpuAllGatherSoleNHR";
+
+    OpParam opParam{};
+    HcclResult ret = GetOpParam(comm_, stream_, "external_res_fallback_tag", &tiling, opParam);
+
+    // 回退后 selector 选定算法，作业继续（与裸名资源回退行为一致）
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    EXPECT_STREQ(opParam.algName, "AicpuAllGatherSoleNHR");
 }
 
 TEST_F(CcuMc2TestSuite, LocalForcedAlgorithmKeepsLegacyHierarchy)
@@ -854,8 +1050,13 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
 
     std::string algName;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    // 新契约：裸名归为 NONE（不再作为强制算法，也不产出 algName）。
+    // 本用例聚焦 GetCcuOpParamResCtx 流程，算法名由用例直接指定。
+    ASSERT_EQ(ClassifyForcedAlgConfig(ccTiling.algConfig, extSpec, extParseErrMsg), ForcedAlgKind::NONE);
+    algName = ccTiling.algConfig;
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam, algName), HCCL_SUCCESS);
     ASSERT_EQ(algName, "CcuSchedAllGatherSoleMesh");
@@ -929,8 +1130,12 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam1), HCCL_SUCCESS);
 
     std::string algName;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    // 新契约：裸名归为 NONE，不产出 algName；算法名由用例直接指定
+    ASSERT_EQ(ClassifyForcedAlgConfig(ccTiling.algConfig, extSpec, extParseErrMsg), ForcedAlgKind::NONE);
+    algName = ccTiling.algConfig;
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam1, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam1, algName), HCCL_SUCCESS);
     ASSERT_EQ(algName, "CcuSchedAllGatherSoleMesh");
@@ -961,7 +1166,8 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
 
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam2), HCCL_SUCCESS); // 相同tag
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    ASSERT_EQ(ClassifyForcedAlgConfig(ccTiling.algConfig, extSpec, extParseErrMsg), ForcedAlgKind::NONE);
+    algName = ccTiling.algConfig;
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam2, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam2, algName), HCCL_SUCCESS);
     result = sprintf_s(opParam2.algName, sizeof(opParam2.algName), "%s", algName.c_str());
@@ -992,6 +1198,8 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_CcuSufficient)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：CCU 路径只认外部名（裸名归为 NONE，闸门直接拒绝）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
 
     HcclResult ret = CheckOpResSufficient(comm_, stream_, &tiling);
 
@@ -1005,6 +1213,8 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ResourceInsufficient)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：CCU 路径只认外部名（裸名归为 NONE，闸门直接拒绝）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
     mc2_ops_hccl::g_stubCcuAlgResUnavailable = true;
 
     // checkOnly：UNAVAIL 统一翻译为 HCCL_E_RES_NOT_SUFFICIENT
@@ -1017,26 +1227,29 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ResourceInsufficient)
 
 TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ReduceScatterCcu)
 {
-    // ReduceScatter 走 CCU_SCHED 校验分支：强制算法名CcuKfcReduceScatterMesh1DMem2Mem
-    // 被直接接受，资源计算成功即视为校验通过
+    // ReduceScatter 走 CCU_SCHED 校验分支：外部名 sole[mesh] 定名为 CcuSchedReduceScatterSoleMesh，
+    // 资源计算成功即视为校验通过
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：CCU 路径只认外部名（裸名归为 NONE，闸门直接拒绝）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
 
     HcclResult ret = CheckOpResSufficient(comm_, stream_, &tiling);
 
     EXPECT_EQ(ret, HCCL_SUCCESS);
 }
 
-// 校验路径端到端回退：algConfig为合法强制算法名，但强制算法执行器不可用
+// 校验路径端到端回退：algConfig 为合法外部名，但强制算法执行器不可用
 // （CheckForcedAlgResource校验失败）→ 回退到默认selector重新选择算法 → 资源校验通过。
-// BuildMc2Tiling已将algConfig置为"CcuAllGatherMesh1DMem2Mem"，
-// g_stubCcuAlgExecNullName限定仅该强制算法返回nullptr，不影响回退后算法的资源计算。
+// g_stubCcuAlgExecNullName限定仅定名结果返回nullptr，不影响回退后算法的资源计算。
 TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ForcedAlgFallbackToSelector)
 {
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    // 新契约：强制算法只认外部名（裸名归为 NONE）
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
     mc2_ops_hccl::g_stubCcuAlgExecNull = true;
-    mc2_ops_hccl::g_stubCcuAlgExecNullName = "CcuAllGatherMesh1DMem2Mem";
+    mc2_ops_hccl::g_stubCcuAlgExecNullName = "CcuSchedAllGatherSoleMesh";
     // 回退后默认selector选择合法CCU算法（与强制算法不同名，避免再次命中执行器不可用桩）
     mc2_ops_hccl::g_stubSelectorAlgName = "CcuAllGatherMeshMem2Mem1D";
 
@@ -1142,8 +1355,7 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_MixedEnginesRejected)
 TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ReduceScatterRejectsUnsupportedCombos)
 {
     // 端到端：CCU_SCHED + REDUCE_SCATTER 时，64位数据类型与PROD归约在默认selector被拒绝。
-    // CheckCcuAlgorithmsRegistered要求algConfig为非空且已注册的强制算法名，
-    // 因此保留BuildMc2Tiling写入的CcuSchedReduceScatterSoleMesh；
+    // 新契约下闸门只放行外部名，故将algConfig置为sole[mesh]（定名CcuSchedReduceScatterSoleMesh）；
     // 通过g_stubCcuAlgExecNull令强制算法校验失败→回退到默认selector，
     // 桩ExecuteSelector复刻真实selector的64位/PROD拒绝规则。
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
@@ -1154,12 +1366,14 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ReduceScatterRejectsUnsupportedComb
     for (const uint8_t dataType : unsupportedTypes) {
         Mc2TilingTestData tiling =
             BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+        strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
         tiling.ccTiling[0].srcDataType = dataType;
         tiling.ccTiling[0].dstDataType = dataType;
         EXPECT_EQ(CheckOpResSufficient(comm_, stream_, &tiling), HCCL_E_NOT_SUPPORT);
     }
 
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    strcpy(tiling.ccTiling[0].algConfig, "sole[mesh]");
     tiling.ccTiling[0].reduceType = HCCL_REDUCE_PROD;
     EXPECT_EQ(CheckOpResSufficient(comm_, stream_, &tiling), HCCL_E_NOT_SUPPORT);
 }
@@ -1204,6 +1418,134 @@ TEST_F(CcuMc2TestSuite, Mc2SetCcCommEngine_AcceptsCcuEngines)
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
 
+// ---------- CheckOpResSufficient(ccArgs) ----------
+// ccArgs版checkOnly预检：由Mc2GetCcArgs/Mc2SetCc*构造参数，
+// 走与tiling版相同的算法选择与资源校验链路，不落盘OpResCtx
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_NullParameters)
+{
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    EXPECT_EQ(CheckOpResSufficient(nullptr, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs), HCCL_E_PTR);
+    EXPECT_EQ(CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), nullptr), HCCL_E_PTR);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_CcuSufficient)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "sole[mesh]");
+    ASSERT_NE(ccArgs, nullptr);
+
+    HcclResult ret = CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs);
+
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+// 端到端验证UNAVAIL→RES_NOT_SUFFICIENT映射（ccArgs路径）：
+// 打桩HcclGetAlgRes返回UNAVAIL（模拟CCU通道/实例资源不足），
+// checkOnly场景统一翻译为HCCL_E_RES_NOT_SUFFICIENT
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_ResourceInsufficient)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "sole[mesh]");
+    ASSERT_NE(ccArgs, nullptr);
+    mc2_ops_hccl::g_stubCcuAlgResUnavailable = true;
+
+    EXPECT_EQ(
+        CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs),
+        HCCL_E_RES_NOT_SUFFICIENT);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_UnsupportedDevice)
+{
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_910B;
+
+    EXPECT_EQ(
+        CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs), HCCL_E_NOT_SUPPORT);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_UnsupportedCcType)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    // 0xFF非Mc2支持的算子类型，BuildMc2CcTiling拒绝
+    EXPECT_EQ(CheckOpResSufficient(comm_, 0xFFU, ccArgs), HCCL_E_NOT_SUPPORT);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_SingleRankBypass)
+{
+    // 单rank场景资源必然充足：入口层提前返回SUCCESS，不进入算法选择与资源校验
+    auto simComm = static_cast<HcclSim::SimCommunicator*>(comm_);
+    delete simComm;
+    comm_ = nullptr;
+    HcclSim::SimWorld::Global()->Deinit();
+    g_stubRankSize = 1;
+    TopoMeta topoMeta = BuildTopoMeta(g_stubRankSize);
+    HcclSim::SimWorld::Global()->Init(topoMeta, mc2_ops_hccl::g_stubDeviceType);
+    ASSERT_EQ(HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_), HCCL_SUCCESS);
+
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    EXPECT_EQ(CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs), HCCL_SUCCESS);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_AicpuBypass)
+{
+    // 非CCU_SCHED引擎（AICPU等）不做CCU校验，直接返回SUCCESS
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS), nullptr);
+    ASSERT_NE(ccArgs, nullptr);
+
+    EXPECT_EQ(CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs), HCCL_SUCCESS);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+// 新契约：CCU 闸门不再校验"算法是否已注册"，只认外部名；裸名/缺省一律 ALG_NOT_SUPPORTED
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_RejectsNonExternalAlgConfig)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");
+    ASSERT_NE(ccArgs, nullptr);
+
+    EXPECT_EQ(
+        CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs),
+        HCCL_E_ALG_NOT_SUPPORTED);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSufficientByArgs_ForcedAlgFallbackToSelector)
+{
+    SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "sole[mesh]");
+    ASSERT_NE(ccArgs, nullptr);
+    // 强制算法执行器不可用→回退默认selector；桩selector返回另一合法CCU算法
+    mc2_ops_hccl::g_stubCcuAlgExecNull = true;
+    mc2_ops_hccl::g_stubCcuAlgExecNullName = "CcuSchedAllGatherSoleMesh";
+    mc2_ops_hccl::g_stubSelectorAlgName = "CcuAllGatherMeshMem2Mem1D";
+
+    EXPECT_EQ(CheckOpResSufficient(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs), HCCL_SUCCESS);
+
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
 TEST_F(CcuMc2TestSuite, Mc2SetCcAlgConfig_ParameterValidation)
 {
     void* ccArgs = nullptr;
@@ -1213,6 +1555,21 @@ TEST_F(CcuMc2TestSuite, Mc2SetCcAlgConfig_ParameterValidation)
     EXPECT_EQ(Mc2SetCcAlgConfig(nullptr, "CcuSchedAllGatherSoleMesh"), HCCL_E_PTR);
     EXPECT_EQ(Mc2SetCcAlgConfig(ccArgs, nullptr), HCCL_E_PTR);
     EXPECT_EQ(Mc2SetCcAlgConfig(ccArgs, "CcuSchedAllGatherSoleMesh"), HCCL_SUCCESS);
+    EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+// algConfig最终要装入Mc2CcTilingInner::algConfig[ALG_CONFIG_SIZE]（128字节），
+// 长度>=128的algConfig应在设置阶段即以HCCL_E_PARA拒绝，不应静默截断
+TEST_F(CcuMc2TestSuite, Mc2SetCcAlgConfig_RejectsOverlongConfig)
+{
+    void* ccArgs = nullptr;
+    ASSERT_EQ(Mc2GetCcArgs(&ccArgs), HCCL_SUCCESS);
+    ASSERT_NE(ccArgs, nullptr);
+
+    const std::string maxValid(HcclApi::ALG_CONFIG_SIZE - 1U, 'a'); // 127字节：合法上限
+    const std::string overlong(HcclApi::ALG_CONFIG_SIZE, 'a');      // 128字节：无NUL终止位，拒绝
+    EXPECT_EQ(Mc2SetCcAlgConfig(ccArgs, maxValid.c_str()), HCCL_SUCCESS);
+    EXPECT_EQ(Mc2SetCcAlgConfig(ccArgs, overlong.c_str()), HCCL_E_PARA);
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
 
@@ -1356,7 +1713,8 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_RejectsUnsupportedDevice)
 TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_CcuMs)
 {
     SetCommEngineEnv(static_cast<uint8_t>(OpExecuteConfig::CCU_MS));
-    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_MS), "CcuAllGatherMesh1DMem2Mem");
+    // 新契约：CCU 引擎下算法只由外部名/默认selector决定，裸名不再生效
+    void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_MS), "sole[mesh]");
     ASSERT_NE(ccArgs, nullptr);
     ASSERT_EQ(Mc2SetCcSrcDataType(ccArgs, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
     ASSERT_EQ(Mc2SetCcDstDataType(ccArgs, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
@@ -1443,18 +1801,25 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_PropagatesOpResCtxCopyFailure)
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
 
+TEST_F(CcuMc2TestSuite, CheckMc2CcDeviceType_Supports950And960)
+{
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_950;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
+
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_960;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
+}
+
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_NullContext)
 {
-    Mc2CcKernelLaunch(nullptr, nullptr, 0U);
-    SUCCEED();
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, nullptr, 0U), HCCL_E_PTR);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsInvalidContextSize)
 {
     OpParam opParam{};
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
-    Mc2CcKernelLaunch(nullptr, &opResCtx, 0U);
-    SUCCEED();
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, 0U), HCCL_E_PARA);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_HandlesOpResCopyFailure)
@@ -1463,8 +1828,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_HandlesOpResCopyFailure)
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
     mc2_ops_hccl::g_stubAclrtMemcpyFail = true;
 
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
-    SUCCEED();
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_INTERNAL);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_HandlesOpParamCopyFailure)
@@ -1473,7 +1837,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_HandlesOpParamCopyFailure)
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
     mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall = 2U;
 
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_INTERNAL);
     EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
 }
 
@@ -1482,7 +1846,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsNullCommInCcuContext)
     OpParam opParam{};
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, nullptr, COMM_ENGINE_CCU);
 
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_INTERNAL);
     EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
 }
 
@@ -1494,7 +1858,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsInvalidOpResCtx)
     opResCtx.workSpace = 0U;
     opResCtx.workSpaceSize = 0U;
 
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_INTERNAL);
     EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 1U);
 }
 
@@ -1503,8 +1867,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedEngine)
     OpParam opParam{};
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, static_cast<CommEngine>(0xFFU));
 
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
-    SUCCEED();
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_NOT_SUPPORT);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_CcuPath)
@@ -1522,7 +1885,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_CcuPath)
     ASSERT_NE(ccResCtx, nullptr);
 
     // CCU obtains the launch stream from the thread handles in ccResCtx.
-    Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize), HCCL_SUCCESS);
     EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 5U);
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 1U);
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
@@ -1543,9 +1906,8 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_PropagatesCcuLaunchFailure)
     ASSERT_NE(ccResCtx, nullptr);
 
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchFail = true;
-    Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize);
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, ccResCtx, ccResCtxSize), HCCL_E_INTERNAL);
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 1U);
-    SUCCEED();
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
 
@@ -1555,9 +1917,9 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedDevice)
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
 
     mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_910B;
-    Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx)), HCCL_E_NOT_SUPPORT);
 
-    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 1U);
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 0U);
 }
 

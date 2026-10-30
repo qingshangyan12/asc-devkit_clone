@@ -7,10 +7,10 @@
 <!-- npu="A3,910b" id1 -->
 以如下产品型号为例：
 <!-- npu="A3" id2 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品
+Atlas A3系列产品
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品
+Atlas A2系列产品
 <!-- end id3 -->
 Nz2Nz转化过程可以参考以下伪代码（src/dst及临时地址均按字节地址计数）：
 
@@ -33,7 +33,7 @@ for (j = 0; j < m_size; j++) {
 - 目的操作数中Nz矩阵每一行的起始地址为dst\_temp\_n\_addr。
 - 在每一行中，以16个数据为粒度进行数据块切分，源操作数每一块数据块的起始地址为src\_block\_addr，目的操作数中每一数据块起始地址为dst\_block\_addr。
 
-以下参数为Nz2Nz用户可配置参数（2201目的步长参数名为dst_stride_dst_d，本文统一记为dst_stride），含义及取值范围参见[C API搬出参数](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
+以下参数为Nz2Nz用户可配置参数（2201目的步长参数名为dst_stride_dst_d，本文统一记为dst_stride），含义及取值范围参见[C API搬出参数](../cube_compute_store/asc_copy_l0c2gm.md)：
 
 - m_size与n_size分别表示矩阵M方向和N方向上的维度。
 - src_stride表示源Nz矩阵中不同Z分形列的间隔，单位为C0\_Size（C0\_Size=16\*sizeof\(T\)，T为操作数的数据类型）。
@@ -41,7 +41,7 @@ for (j = 0; j < m_size; j++) {
 <!-- end id1 -->
 
 <!-- npu="950" id4 -->
-以Ascend 950PR/Ascend 950DT为例，Nz2Nz转化过程可以参考以下伪代码（src/dst及临时地址均按字节地址计数）：
+以Ascend 950PR&950DT系列产品为例，Nz2Nz转化过程可以参考以下伪代码（src/dst及临时地址均按字节地址计数）：
 
 ```cpp
 for (j = 0; j < m_size; j++) {
@@ -62,12 +62,14 @@ for (j = 0; j < m_size; j++) {
 - 目的操作数中Nz矩阵每一行的起始地址为dst\_temp\_n\_addr。
 - 在每一行中，以16个数据为粒度进行数据块切分，源操作数每一块数据块的起始地址为src\_block\_addr，目的操作数中每一数据块起始地址为dst\_block\_addr。
 
-以下参数为Nz2Nz用户可配置参数，含义及取值范围参见[C API搬出参数](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
+以下参数为Nz2Nz用户可配置参数，含义及取值范围参见[C API搬出参数](../cube_compute_store/asc_copy_l0c2gm.md)：
 
 - m_size与n_size分别表示矩阵M方向和N方向上的维度。
 - src_stride表示源Nz矩阵中不同Z分形列的间隔，单位为C0\_Size（C0\_Size=16\*sizeof\(T\)，T为操作数的数据类型）。
 - dst_stride表示目标Nz矩阵中不同Z分形列的间隔，单位为element。
 <!-- end id4 -->
+
+本特性用于保持分形输出布局的场景。各架构的搬出参数见[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm.md)和[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1.md)；输出类型与小分形宽度的关系见[随路量化](accompanying_quantization.md)、[F32 Channel Split](F32-Channel-Split.md)和[Int8 Channel Merge](Int8-Channel-Merge.md)。
 
 ## 特性约束
 

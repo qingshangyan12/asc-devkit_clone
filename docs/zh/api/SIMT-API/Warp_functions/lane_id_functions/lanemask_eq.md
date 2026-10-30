@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/lane_id_functions/lanemask_eq_res.md#id1 -->
 
@@ -57,7 +57,7 @@ int32_t lanemask_eq()
 
 ## 调用示例
 
-下面示例使用`lanemask_eq()`获取当前Lane对应的位掩码，并根据掩码将Warp内偶数Lane和奇数Lane的数据分别重排到输出Warp的前16个位置和后16个位置。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含`simt_api/device_warp_functions.h`头文件，其中`srcLane`的取值范围为[0, 15]。
+下面示例使用`lanemask_eq()`获取当前Lane对应的位掩码，并据此判断当前线程位于Warp的上半区还是下半区，再通过`asc_shfl()`分别广播上下半Warp中指定Lane的数据。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含`simt_api/device_warp_functions.h`头文件，其中`srcLane`的取值范围为[0, 15]。
 
 -   SIMT编程场景：
 
@@ -92,3 +92,11 @@ int32_t lanemask_eq()
         dst[idx] = value;
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: 12, 45, 8, 39, 27, 55, 3, 68, 16, 72, 24, 6, 81, 33, 48, 19, 58, 2, 75, 31, 9, 64, 37, 51, 14, 88, 22, 5, 70, 42, 29, 66
+srcLane: 3
+dst: 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31
+```

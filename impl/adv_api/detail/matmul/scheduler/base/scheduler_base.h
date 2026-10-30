@@ -146,7 +146,7 @@ public:
             var.tpipe_->InitBuffer(var.qidB2_, 1, L0BSize_);
 #endif
         }
-        if constexpr (!HasScalePosition<A_TYPE>::value) {
+        if constexpr (!HasScalePosition<A_TYPE>::value && !HasScalePosition<B_TYPE>::value) {
             InitShareBufEnd(var.tpipe_);
         }
     }
@@ -379,7 +379,7 @@ protected:
         }
     }
 
-    __aicore__ inline constexpr bool IsInTrianMatmul()
+    __aicore__ inline bool IsInTrianMatmul()
     {
         if constexpr (POLICY_TYPE == PolicyType::MATMUL_UPPER_TRIANGULAR) {
             CheckSupportTrianMatmul();

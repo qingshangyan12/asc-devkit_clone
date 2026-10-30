@@ -183,3 +183,140 @@ TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHRMultiLink_2Rank_Fp16_Min)
 {
     VerifyScenario(MakeNhrMultiLinkScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_FP16, 50, HCCL_REDUCE_MIN));
 }
+
+// ============================================================================
+// CcuSchedReduceScatterSoleNHR（两级拓扑 L1 NHR 中继，forced-only，双 die 自适应）
+// ============================================================================
+
+namespace {
+
+CcuStScenario MakeSoleNhr2DieScenario(
+    const TopoMeta& topoMeta, HcclDataType dataType, uint64_t count, HcclReduceOp reduceType = HCCL_REDUCE_SUM)
+{
+    const uint32_t rankSize = CcuStFixture::CountRanks(topoMeta);
+    const uint64_t typeSize = DATATYPE_SIZE_TABLE[dataType];
+    const uint64_t sliceSize = count * typeSize;
+    CcuStScenario scenario;
+    scenario.topoMeta = topoMeta;
+    scenario.dataType = dataType;
+    scenario.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    scenario.expectedAlgName = "CcuSchedReduceScatterSoleNHR";
+    scenario.algConfig = scenario.expectedAlgName;
+    scenario.count = count;
+    scenario.reduceType = reduceType;
+    scenario.sizes.assign(rankSize, std::vector<uint64_t>(rankSize, sliceSize));
+    return scenario;
+}
+
+} // namespace
+
+// 单 die 两级拓扑（2 server × 4 卡，L0=server 内 mesh，L1=跨 server NHR 中继）：
+// 每 rank 对端仅 1 条 L1 链路 → dieNum=1 → 单 mission
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_Fp16_50Elem)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_Int32_25Elem)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_INT32, 25));
+}
+
+// goSize 三分支逐个过（(8,32K) 口径）：MemSlice / MemSlice+2B / LoopSize
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_GoSize_MemSlice)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 16384));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_GoSize_MemSlicePlus2B)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 16385));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_GoSize_LoopSize)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 131072));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_ZeroLength)
+{
+    VerifyScenario(MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 0));
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_Fp32_Max)
+{
+    VerifyScenario(
+        MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP32, 25, HCCL_REDUCE_MAX));
+}
+
+// 大数据触发 die 切分（> rankSize*4 元素 → die0/die1 对半）：
+// 每 rank 对端仅 1 条链路时 dieNum 仍为 1（die1 参数不被消费），数据切分路径由 AIV prepare 公式覆盖
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2Server8Rank_Fp16_512KElem)
+{
+    VerifyScenario(
+        MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 512 * 1024));
+}
+
+// —— 双 die（L1 双链路 → dieNum=2 → 双 mission）：die1 数据为 0（链路待接期）空转，
+// 验证双 mission 调度/channelsPerDie 分组/axisId 机制的正确性 ——
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2DieLink_2Server8Rank_Fp16_50Elem)
+{
+    CcuStScenario scenario =
+        MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50);
+    scenario.twoDieLink = true;
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2DieLink_2Server8Rank_GoSize_LoopSize)
+{
+    CcuStScenario scenario =
+        MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 131072);
+    scenario.twoDieLink = true;
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, CcuSchedReduceScatterSoleNHR_2DieLink_2Server8Rank_Fp32_Max)
+{
+    CcuStScenario scenario =
+        MakeSoleNhr2DieScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP32, 25, HCCL_REDUCE_MAX);
+    scenario.twoDieLink = true;
+    VerifyScenario(scenario);
+}
+
+// ============================================================================
+// 默认 selector（algConfig 为空，走 selector 而非 forced；注册期无 count → 小数据口径）
+// ============================================================================
+
+namespace {
+
+CcuStScenario MakeSelectorScenario(
+    const TopoMeta& topoMeta, HcclDataType dataType, uint64_t count, HcclReduceOp reduceType = HCCL_REDUCE_SUM)
+{
+    const uint32_t rankSize = CcuStFixture::CountRanks(topoMeta);
+    const uint64_t typeSize = DATATYPE_SIZE_TABLE[dataType];
+    const uint64_t sliceSize = count * typeSize;
+    CcuStScenario scenario;
+    scenario.topoMeta = topoMeta;
+    scenario.dataType = dataType;
+    scenario.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    scenario.expectedAlgName = "CcuSchedReduceScatterSoleMesh";
+    scenario.count = count;
+    scenario.reduceType = reduceType;
+    scenario.sizes.assign(rankSize, std::vector<uint64_t>(rankSize, sliceSize));
+    return scenario;
+}
+
+} // namespace
+
+// 单层单 die mesh：selector 选 SoleMesh
+TEST_F(CcuStReduceScatter, Selector_1LevelMesh_8Rank_Fp16)
+{
+    VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3, 4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 32));
+}
+
+// 两级 2server×4P（GCD=4 → Level1Nhr=false，level0 双 mesh 实例）：总数据量 <512K 走多实例小数据分支，
+// 与 hccl 对齐选 SoleMesh（跨 server 对端链路由通道请求按 rank 图解析）
+TEST_F(CcuStReduceScatter, Selector_2LevelMesh_2Server8Rank_Fp16)
+{
+    VerifyScenario(MakeSelectorScenario(TopoMeta{{{{0, 1, 2, 3}}, {{4, 5, 6, 7}}}}, HCCL_DATA_TYPE_FP16, 50));
+}

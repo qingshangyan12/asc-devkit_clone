@@ -8,9 +8,11 @@ Scenarios 1 through 3 use `int8_t` tensors with a shape of `[32, 32]`. Scenario 
 tensor with a shape of `[1024]`. Scenario 5 pads an input of shape `[32, 24]` to produce an output of shape
 `[32, 32]`. Each scenario validates the entire output.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Sample Scenarios
 
@@ -20,7 +22,7 @@ tensor with a shape of `[1024]`. Scenario 5 pads an input of shape `[32, 24]` to
 | 2 | UB->GM | DN | Four-dimensional | Calls `atom.call(dst, src)` after `make_copy(..., trait)` |
 | 3 | UB->UB | NZ | Four-dimensional | Uses an explicit atom and the coordinate/shape region transfer overload |
 | 4 | GM->UB | ND | One-dimensional | Uses `make_shape(1024)` and `make_stride(1)` to select the one-dimensional copy route |
-| 5 | GM->UB | ND | Four-dimensional | Pads three elements on the left and five on the right, and uses `asc_set_copy_pad_val` to set the padding value to `-9` |
+| 5 | GM->UB | ND | Four-dimensional | Pads three elements on the left and five on the right, and sets the padding value to `-9` through `set_copy_pad_val` |
 
 The kernels for all five scenarios are declared with `__global__ __vector__`.
 
@@ -41,7 +43,7 @@ The kernels for all five scenarios are declared with `__global__ __vector__`.
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -70,7 +72,7 @@ Run the following steps in the sample root directory to build and execute the op
   ```
 
   The `scenario_num` passed when generating data must match the `SCENARIO_NUM` used at build time. To run a
-  different scenario, change both values to the corresponding number from 1 through 6.
+  different scenario, change both values to the corresponding number from 1 through 5.
 
   To use NPU simulation, add the following build option:
 
@@ -87,8 +89,7 @@ Run the following steps in the sample root directory to build and execute the op
   | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default value is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default value is `dav-3510`. |
-  | `CANN_ASC_USE_EXPERIMENTAL` | Enables experimental ASC interfaces. This sample requires `ON`. The default value is `OFF`. |
-  | `SCENARIO_NUM` | Type conversion scenario number. This option is required and accepts values from 1 through 6. |
+  | `SCENARIO_NUM` | Type conversion scenario number. This option is required and accepts values from 1 through 5. |
 
 - Expected result
 

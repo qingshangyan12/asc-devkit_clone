@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/Quantize_res.md#id1 -->
 
@@ -31,15 +31,15 @@ Quantize与[AscendQuant](AscendQuant.md)的功能类似，Quantize在PER\_TENSOR
 
 -   PER\_TENSOR量化：整个srcTensor对应一个量化参数，scale和offset的shape为\[1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002292405593.png)
+    ![](../../../figures/formulaimage_0000002292405593.png)
 
 -   PER\_CHANNEL量化：srcTensor的shape为\[m, n\]，每个channel维度对应一个量化参数，scale和offset的shape为\[1, n\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002257766684.png)
+    ![](../../../figures/formulaimage_0000002257766684.png)
 
 -   PER\_TOKEN量化：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
 
-    ![](../../../figures/zh-cn_formulaimage_0000002257767428.png)
+    ![](../../../figures/formulaimage_0000002257767428.png)
 
 -   PER\_GROUP量化：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
 
@@ -48,20 +48,20 @@ Quantize与[AscendQuant](AscendQuant.md)的功能类似，Quantize在PER\_TENSOR
     -   fp4x2\_e2m1\_t/fp4x2\_e1m2\_t场景（float4场景）
         -   kDim = 0:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002257871838.png)
+            ![](../../../figures/formulaimage_0000002257871838.png)
 
         -   kDim = 1:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292420797.png)
+            ![](../../../figures/formulaimage_0000002292420797.png)
 
     -   int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（b8场景）
         -   kDim = 0：
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292412281.png)
+            ![](../../../figures/formulaimage_0000002292412281.png)
 
         -   kDim = 1:
 
-            ![](../../../figures/zh-cn_formulaimage_0000002292420789.png)
+            ![](../../../figures/formulaimage_0000002292420789.png)
 
 ## 函数原型
 
