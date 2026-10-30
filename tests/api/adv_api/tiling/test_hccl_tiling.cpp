@@ -187,6 +187,8 @@ protected:
     }
 };
 
+// fork 保留白名单：白名单内裸名（--alg 直指算法）仍触发 CCU 新版本；
+// 白名单外裸名与 UnregisteredAlgorithmUsesDefaultVersion 行为一致。
 TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
@@ -295,6 +297,13 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "sole[mesh]", 6U, INIT_TILING_CCU_NEW_VERSION);
+}
+
+// 外部名 + CCU MS 引擎（5）同样设 101，覆盖引擎 5 的正路径
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuMsUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "sole[mesh]", 5U, INIT_TILING_CCU_NEW_VERSION);
 }
 
 // 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，精确判断在

@@ -78,6 +78,7 @@ bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
     if (commEngine != 5U && commEngine != 6U) {
         return false;
     }
+    // fork 裸名通路：白名单命中即升 101（上游已改外部名文法，fork 保留裸名供 --alg 直指算法）
     if (REGISTERED_CCU_ALGORITHMS.count(algConfig) != 0U) {
         return true;
     }

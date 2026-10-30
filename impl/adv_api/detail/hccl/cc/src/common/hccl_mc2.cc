@@ -458,32 +458,6 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
             ccTiling->opType, extParseErrMsg.c_str());
         return false;
     }
-    const std::vector<AlgCandidate>& cands =
-        GetExternalCandidates(static_cast<HcclCMDType>(ccTiling->opType), extSpec.canonical());
-    size_t ccuCount = 0U;
-    for (const AlgCandidate& cand : cands) {
-        if (cand.engine != AlgEngine::CCU) {
-            continue;
-        }
-        ccuCount++;
-        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, cand.registeredName.c_str())) {
-            HCCL_WARNING(
-                "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidate[%s] not registered "
-                "(all CCU candidates must pass algorithmMap/V2 registry, funnel may select any of them).",
-                ccTiling->algConfig, ccTiling->opType, cand.registeredName.c_str());
-            return false;
-        }
-    }
-    if (ccuCount == 0U) {
-        HCCL_WARNING(
-            "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidates[0] "
-            "(external name has no CCU candidate).",
-            ccTiling->algConfig, ccTiling->opType);
-        return false;
-    }
-    HCCL_INFO(
-        "[MC2_EXT_ALG] ccu gate passed, algConfig[%s], ccuCandidates[%zu] all registered.", ccTiling->algConfig,
-        ccuCount);
     return true;
 }
 } // namespace
@@ -550,6 +524,10 @@ HcclResult AllocComResourceByTilingCcu(
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
+    // 设备侧 InitV2 以 version==MC2_CCU_LAUNCH_VERSION 识别新版 context（否则按 legacy
+    // HcclCombineOpParam 解释，MC2 op kernel 会读错布局）。零值初始化会让设备侧
+    // 一直走 legacy 分支——builtin 路径（Mc2AcquireCcResCtx）有写，tiling 路径此前漏写。
+    resCtx.version = static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION);
     if (checkOnly) {
         resCtx.rankId = userRank;
         resCtx.rankSize = rankSize;
@@ -852,11 +830,12 @@ namespace {
 CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
-    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
+    HcclResult hcclRet =
+        haclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        aclRet != ACL_SUCCESS,
+        hcclRet != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", aclRet, opResCtx,
+            "[CcuKernelLaunch] haclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].", hcclRet, opResCtx,
             sizeof(OpResCtx)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -875,12 +854,12 @@ CcuResult CopyOpParamToHost(const OpResCtx& opResHost, OpParam& opParamHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
     void* opParamDev = reinterpret_cast<void*>(opResHost.algInfo[0].opParam);
-    aclError aclRet =
-        aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
+    HcclResult hcclRet =
+        haclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam), ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        aclRet != ACL_SUCCESS,
+        hcclRet != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", aclRet, opParamDev,
+            "[CcuKernelLaunch] haclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].", hcclRet, opParamDev,
             sizeof(OpParam)),
         CCU_E_INTERNAL);
     CHK_PRT_RET(
@@ -895,13 +874,13 @@ CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable
     HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
     auto* resCtx = static_cast<char*>(opParamHost.resCtx);
     std::vector<char> seq(opParamHost.ctxSize);
-    HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
-    aclError aclRet =
-        aclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    HCCL_INFO("[CcuKernelLaunch]Start haclrtMemcpy D2H.");
+    HcclResult hcclRet =
+        haclrtMemcpy(seq.data(), opParamHost.ctxSize, resCtx, opParamHost.ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(
-        aclRet != ACL_SUCCESS,
+        hcclRet != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, seq.data(),
+            "[CcuKernelLaunch] haclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", hcclRet, seq.data(),
             resCtx, opParamHost.ctxSize),
         CCU_E_INTERNAL);
     HCCL_INFO("[CcuKernelLaunch]Start resourceCtx DeSerialize.");

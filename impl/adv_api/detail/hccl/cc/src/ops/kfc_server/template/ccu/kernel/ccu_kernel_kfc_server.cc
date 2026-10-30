@@ -142,55 +142,40 @@ CcuResult MissionPreSync(const ccu::Variable& func, KfcServerContext& ctx)
 {
     (void)func;
 
-    // 单 mission 时短路，零影响现有路径
-    // Variable 支持 == 和 != 与 uint64_t 比较
-    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
-    CCU_IF(ctx.missionNum == 1)
-    {
-        // 单 mission 模式：无需同步，直接返回
+    // 单 mission 时短路，零影响现有路径。missionNum 用宿主常量（GetKfcServerMissionNum）
+    // 而非 ctx.missionNum（Variable 是运行时值，CCU_IF 两分支都会在构图期执行）。
+    const uint32_t hostMissionNum = GetKfcServerMissionNum(ctx.arg->opParam.algName);
+    if (hostMissionNum == 1) {
+        return CCU_SUCCESS;
     }
-    CCU_ELSE
-    {
-        // 双 mission 栅障同步：用 tag-based local notify 实现 mission 间互斥等待
-        // 替代 hcomm 的 ExportMaskSignal + LocalCtxPost/LocalWait 机制
-        // missionIndex==0 发出 bit 0，等待 bit 1
-        // missionIndex==1 发出 bit 1，等待 bit 0
-        CCU_IF(ctx.missionIndex == 0)
-        {
-            // mission 0: post bit 0, wait bit 1
-            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi0", 1 << 0));
-            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi1", 1 << 1));
-        }
-        CCU_ELSE
-        {
-            // mission 1: post bit 1, wait bit 0
-            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi1", 1 << 1));
-            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi0", 1 << 0));
-        }
+
+    // 双 mission 栅障同步：tag-based local notify 实现 mission 间互斥等待
+    // （对应 hcomm 原版 Mc2ContextBase 的 ExportMaskSignal/LocalWait 语义）。
+    // 分支必须用构图期宿主常量（kfcServerArgs 同值的 hostMissionIndex），
+    // 且 tag 按发出方 mission 命名：每个 kernel 只 export 一个 tag，
+    // 避免两 kernel 的 exported sharedNotifies 同名（ProcessInterCtxRes 合并冲突）。
+    // LocalNotifyRecord(tag) 注册到 imported（发信号侧），LocalNotifyWait(tag) 注册到
+    // exported（等信号侧）：m0 record MiSync_m0 / wait MiSync_m1，m1 record MiSync_m1 /
+    // wait MiSync_m0 —— m0 的 record 绑定 m1 的导出，信号配对正确。
+    if (ctx.arg->hostMissionIndex == 0) {
+        // mission 0: post bit 0, wait bit 1
+        CCU_CHK_RET(ccu::EventRecord("MiSync_m0", 1 << 0));
+        CCU_CHK_RET(ccu::EventWait("MiSync_m1", 1 << 1));
+    } else {
+        // mission 1: post bit 1, wait bit 0
+        CCU_CHK_RET(ccu::EventRecord("MiSync_m1", 1 << 1));
+        CCU_CHK_RET(ccu::EventWait("MiSync_m0", 1 << 0));
     }
     return CCU_SUCCESS;
 }
 
 CcuResult MissionPostSync(KfcServerContext& ctx)
 {
-    // 单 mission 时短路
-    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
-    CCU_IF(ctx.missionNum == 1)
-    {
-        // 单 mission 模式：无需同步，直接返回
-    }
-    CCU_ELSE
-    {
-        // 双 mission 模式：仅 mission 0 负责执行远程 Post 同步
-        // （对应 hcomm 的 PostSync：RemotePost 到各 transport + GroupWait）
-        // mission 1 无需执行此步骤
-        CCU_IF(ctx.missionIndex == 0)
-        {
-            // mission 0 的远程 Post 逻辑由具体算子 kernel 的 PostSync 实现
-            // （HalfAlltoAllV 已在其 PostSync 中实现 NotifyRecord + NotifyWait 循环）
-            // 此处仅作为框架层的 hook，确保调用时机正确
-        }
-        // mission 1 走 ELSE 分支：什么都不做
+    // 单 mission 时短路（宿主常量，理由同 MissionPreSync）；双 mission 下此 hook
+    // 不产生指令（mission 0 的远程 Post 由具体算子 kernel 的 PostSync 实现），无需分支。
+    const uint32_t hostMissionNum = GetKfcServerMissionNum(ctx.arg->opParam.algName);
+    if (hostMissionNum == 1) {
+        return CCU_SUCCESS;
     }
     return CCU_SUCCESS;
 }
@@ -454,18 +439,21 @@ static void DispatchKfcSubKernel(
                 ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
         }
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
-        // 单 mission xn 布局（与 CcuPrepareForAllToAllVWrite 严格对应）：
+        // xn 布局（与 CcuPrepareForAllToAllVWrite 严格对应）：
         // [0]=opId(签名+哨兵) [1]=sendBuf [2]=sendSizes [3]=sendOffsets
         // [4..7]=goSize [8]=remoteWinOffset
-        // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位
-        //
-        // 阶段 3-1：将 missionNum 和 missionIndex 传递给 HalfAlltoAllV kernel
-        // 使其能够根据 mission 选择对应的 A/B 切片
+        // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位。
+        // 双 mission：两个 server 各自 dispatch 本 kernel，missionNum/missionIndex
+        // 来自各自的 kfcServerArgs，kernel 内按 missionIndex 选 A/B 切片；
+        // hostMissionIndex/hostMissionNum 为构图期常量，kernel 用它们选通知位与收尾
+        // 栅栏门控（双 mission 共享 channel，同一位会死锁；CCU_IF 是运行时分支，
+        // 构图期两分支都会注册 tag）。
         CcuKfcHalfAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             ctx.token, ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex);
+            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex, ctx.arg->hostMissionIndex,
+            GetKfcServerMissionNum(ctx.arg->opParam.algName));
     }
 }
 

@@ -234,6 +234,19 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     // 注意：HalfAlltoAllV 的 window 基址不走 res[1]——master 上 res[1] 已固定为 dieSplitRatio
     // 千分比（GetCcuOpParamResCtx 会覆写，设备侧 hccl_ccu_v0.h 按比例语义读取）。
     // 本端 cclBuffer 落点由模板 CalcRes 经 CcuKernelInfo::localWinAddr → KfcServer kernelArg 传递。
+    // res[3]/res[4]：本端 cclBuffer 基址/大小（与 localWinAddr 同源同值）。KFC server 写入侧
+    // 用 kernelArg.localWinAddr；AIC 侧（MC2 op kernel 回读结果）无 kernelArg 通道，经 OpResCtx
+    // 下发（旧链路里该值由 AICPU server 填 legacy HcclCombineOpParam.windowsOut[0]，新链路无此填写方）。
+    {
+        void* cclBufferAddr = nullptr;
+        uint64_t cclBufferSize = 0;
+        CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
+        opResCtx.res[3] = reinterpret_cast<uint64_t>(cclBufferAddr);
+        opResCtx.res[4] = cclBufferSize;
+        HCCL_INFO(
+            "[AllocCcuOpResCtx] cclBuffer[0x%llx], cclBufferSize[%llu] via res[3]/res[4].",
+            static_cast<unsigned long long>(opResCtx.res[3]), static_cast<unsigned long long>(opResCtx.res[4]));
+    }
 
     HCCL_INFO(
         "[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "
@@ -1014,19 +1027,6 @@ HcclResult GetCcuOpParamResCtx(
     return HCCL_SUCCESS;
 }
 
-static HcclResult PrepareAlltoAllSendCounts(HcclComm comm, OpParam& opParam, std::vector<uint64_t>& sendCounts)
-{
-    if (opParam.opType != HcclCMDType::HCCL_CMD_ALLTOALL) {
-        return HCCL_SUCCESS;
-    }
-    constexpr uint64_t ALLTOALL_DEFAULT_SEND_COUNTS = 200ULL * 1024 * 1024;
-    uint32_t userRankSize = 0;
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    sendCounts.assign(userRankSize, ALLTOALL_DEFAULT_SEND_COUNTS);
-    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
-    return HCCL_SUCCESS;
-}
-
 HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& opParam, bool skipStreamCheck)
 {
     CHK_PTR_NULL(comm);
@@ -1035,12 +1035,9 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
         CHK_PTR_NULL(opParam.stream);
     }
 
-    // ALLTOALL场景下sendCounts需指向host侧真实数组，且必须在整个算法选择与资源申请调用链
-    // (含SelectAlgAndPrepareEngine、GetOpParamResCtx中的GetAlgExecViaCann)期间保持存活。
-    // 该数组持有在本函数栈帧，覆盖opParam的全部使用范围。
-    std::vector<uint64_t> sendCounts;
+    // 算法选择与资源申请调用链(含SelectAlgAndPrepareEngine、GetOpParamResCtx中的GetAlgExecViaCann)执行结束后，
+    // 将sendCounts恢复为调用方传入的原值。
     void* origSendCounts = opParam.all2AllVDataDes.sendCounts;
-    CHK_RET(PrepareAlltoAllSendCounts(comm, opParam, sendCounts));
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
@@ -1079,8 +1076,7 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
     } else {
         CHK_RET(resRet);
     }
-    // GetOpParamResCtx执行结束，sendCounts的临时host数组已不再需要，
-    // 将指向恢复为原值(大概率为nullptr)，避免遗留指向本函数栈内vector的悬空指针。
+    // 调用链执行结束，将sendCounts恢复为调用方传入的原值。
     opParam.all2AllVDataDes.sendCounts = origSendCounts;
     return HCCL_SUCCESS;
 }

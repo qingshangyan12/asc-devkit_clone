@@ -12,6 +12,7 @@
 #include "hccl_res.h"
 #include "ccu_assist_pub.h"
 #include "ccu_kernel_alg_base.h"
+#include "kfc_server_protocol.h"
 #include "ccu_temp_kfc_half_alltoallv_mesh_1D.h"
 
 namespace mc2_ops_hccl {
@@ -32,9 +33,10 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_RET(GetRes(resourceRequest));
-    // HalfAlltoAllV 走 KFC Server 单 mission 路径（master 的 mission 数由 GetKfcServerMissionNum
-    // 静态名单决定，该算法不在双 mission 名单内，恒为 1），与 ReduceScatter KFC 模板口径一致
-    resourceRequest.ccuKernelNum.push_back(1);
+    // 双 mission（KFC_MAX_MISSION_NUM=2）：mission0 搬 A 切片、mission1 搬 B 切片（kernel 内按
+    // missionIndex 选段），由 CcuTempKfcServer::CalcRes 将两个源 kernel 各映射为一个 mission。
+    // 两个 kernel 同构（同名占位），channel 复用同一份 Mesh1D 描述。
+    resourceRequest.ccuKernelNum.push_back(KFC_MAX_MISSION_NUM);
 
     CcuKernelInfo kernelInfo;
     CHK_SAFETY_FUNC_RET(
@@ -83,6 +85,13 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     kernelInfo.localWinAddr = PointerToAddr(cclBufferAddr);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
+    // mission1 与 mission0 同构：同名占位 kernel、同一份 channel、同一个 localWinAddr
+    // （window 基址是本端属性，与 mission 无关）；InheritKfcServerKernelArg 按 missionIndex
+    // 生成两份 kfcServerArgs（仅 missionIndex 字段不同），dispatch 侧由 kernel 的
+    // missionNum/missionIndex 分支选 A/B 切片。
+    CcuKernelInfo kernelInfo1 = kernelInfo;
+    resourceRequest.ccuKernelInfos.push_back(kernelInfo1);
+
     // localWinAddr 是跨端契约：设备侧回读结果必须用同一地址，故按 RUN_INFO 打出便于核对
     HCCL_RUN_INFO(
         "[CcuTempKfcHalfAlltoAllVMesh1D::CalcRes] localWinAddr[0x%llx], cclBufferSize[%llu]",
@@ -129,7 +138,8 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(localSliceSize, config);
 
-    // 单 mission：推 1 个 submitInfo
+    // 双 mission：各推 1 个 submitInfo（kernelHandle 不同；cachedArgs 相同——
+    // 两 mission 读同一份 xn 参数帧，A/B 切片由 kernel 内 missionIndex 分支选择）
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     // 参数顺序与 CcuPrepareForAllToAllVWrite 的 xnData_ 布局对应：
@@ -142,6 +152,11 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
         submitInfo, userInAddr, sendSizeAddr, sendOffsetAddr, goSize[0], goSize[1], goSize[2], goSize[3],
         recvOffset));
     templateResource.submitInfos.push_back(submitInfo);
+    if (templateResource.ccuKernels.size() > 1U) {
+        CcuKernelSubmitInfo submitInfo1 = submitInfo;
+        submitInfo1.kernelHandle = templateResource.ccuKernels[1];
+        templateResource.submitInfos.push_back(submitInfo1);
+    }
     return HcclResult::HCCL_SUCCESS;
 }
 
