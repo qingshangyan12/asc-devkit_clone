@@ -98,6 +98,14 @@ npu_op_package_add(${package_name}
 
 ## Library类函数
 
+> [!NOTE]说明
+> 本节`npu_op_kernel_options`/`npu_op_kernel_sources`的`SOC_SERIES`/`COMPUTE_UNIT`参数，与[编译配置](../compilation_and_deployment/basic_process.md#compile-configuration)中工程级的`ASCEND_SOC_SERIES`/`ASCEND_COMPUTE_UNIT`变量是两个不同层次的概念，参数名相同但含义不同，容易混淆：
+
+| 层次 | 配置项 | 作用 |
+|---|---|---|
+| 全局 | `ASCEND_SOC_SERIES`（或`ASCEND_COMPUTE_UNIT`），工程级CMake变量 | 决定整个工程为哪些AI处理器系列构建产物 |
+| 细粒度 | 本节函数的`SOC_SERIES`/`COMPUTE_UNIT`参数 | 在全局已配置的范围内，这一条编译选项或核函数（Kernel）源码具体用在哪些型号上 |
+
 ### npu_op_library
 
 创建Host侧库。
@@ -213,9 +221,9 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 
 ```cmake
 npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)   #为算子添加编译选项
-```
 
 npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxx Ascendyyy OPTIONS -DASCENDC_DEBUG)
+```
 
 ### npu_op_kernel_sources
 
@@ -253,6 +261,21 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_DIR ./Add
     SOC_SERIES Ascendxxx
     KERNEL_FILE add_custom.cpp
+)
+```
+
+如果同一算子在不同AI处理器系列上需要不同的核函数（Kernel）实现，可多次调用`npu_op_kernel_sources`，分别用`SOC_SERIES`指定各自生效的范围：
+
+```cmake
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustom
+    SOC_SERIES ascend910b ascend910_93
+    KERNEL_FILE add_custom_v220.cpp
+)
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustom
+    SOC_SERIES ascend950
+    KERNEL_FILE add_custom_v310.cpp
 )
 ```
 
