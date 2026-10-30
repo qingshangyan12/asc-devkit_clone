@@ -389,6 +389,35 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
     }
     return vInfo->flag != 0;
 }
+__aicore__ constexpr inline bool is_printf_supported_impl() { return true; }
+
+__aicore__ constexpr inline bool is_super_tensor_dump_supported_impl()
+{
+    return true;
+}
+
+__aicore__ inline uint64_t asc_debug_get_block_total_num_impl() { return get_block_num(); }
+
+__aicore__ constexpr inline uint64_t get_ringbuf_wait_cycle_impl()
+{
+    // SYS_CNT runs at 1 GHz; retain the original 300 ms wait budget.
+    return 15ULL * 1000 * 1000 * 20;
+}
+
+__aicore__ inline bool ringbuf_has_pending_data_impl(
+    __gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
+{
+    volatile uint64_t readofst = ld_dev((__gm__ uint64_t*)(&(readInfo->bufOffset)), 0);
+    volatile uint64_t writeofst = ld_dev((__gm__ uint64_t*)(&(writeInfo->bufOffset)), 0);
+    return readofst != writeofst;
+}
+
+__aicore__ inline void asc_vf_debug_init_impl() {}
+
+__aicore__ inline void asc_vf_debug_finish_impl() {}
+
+__aicore__ inline bool asc_vf_debug_transfer_ub_impl() { return false; }
+
 } // namespace __asc_aicore
 
 namespace __asc_simd_vf {
