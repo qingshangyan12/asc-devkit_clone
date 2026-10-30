@@ -33,7 +33,6 @@ extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
 | HCCL_E_PARA | 参数格式非法，如Tiling版本、数量非法等。 |
 | HCCL_E_PTR | 空指针错误。 |
 | HCCL_E_NOT_SUPPORT | 通信类型、算法路径等不支持。 |
-| HCCL_E_ALG_NOT_SUPPORTED | 算法未注册。 |
 | HCCL_E_RES_NOT_SUFFICIENT | 所选通信算法所需的通信资源不足。 |
 
 ## 约束说明
