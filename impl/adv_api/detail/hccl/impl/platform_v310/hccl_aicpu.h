@@ -33,8 +33,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     if (initTiling != nullptr) {
         const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
         debugMode_ = initTilingPtr->debugMode;
-#if __NPU_ARCH__ == 3510
-        // A5-only build: context decoupling does not consume devType.
+#if __NPU_ARCH__ != 3510
+        devType_ = initTilingPtr->devType;
+#endif
         tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
         hcclContext_ = (__gm__ OpResCtx*)context;
         if (hcclContext_ == nullptr) {
@@ -44,7 +45,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
         return;
     }
-#endif
 
     // initTiling is nullptr, get opType from context
     hcclContext_ = (__gm__ OpResCtx*)context;
