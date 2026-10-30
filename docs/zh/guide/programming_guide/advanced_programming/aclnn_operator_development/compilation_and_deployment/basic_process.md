@@ -195,14 +195,14 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ### 部署后的目录结构<a id="部署后的目录结构"></a>
 
-以默认安装场景为例：
+以默认安装场景为例，下列目录结构包含了单算子调用、入图、框架适配三类场景分别对应的产物；`framework`（框架适配场景）、`op_proto`（入图场景）是否存在取决于工程是否编译并打包了对应的库，参考前文"执行编译"中各场景产物的说明。
 
 ```
 ├── opp    //算子库目录
 │   ├── vendors     //自定义算子所在目录
 │       ├── config.ini
 │       └── vendor_name1   // 存储对应厂商部署的自定义算子
-│           ├── framework     //自定义算子插件库
+│           ├── framework     //自定义算子插件库，框架适配场景才会生成
 │           ├── op_api
 │           │   ├── include
 │           │   │   └── aclnn_xx.h      //算子调用API声明文件
@@ -223,7 +223,7 @@ source /usr/local/Ascend/cann/set_env.sh
 │           │           └── op_tiling
 │           │               ├── lib
 │           │               └── liboptiling.so
-│           ├── op_proto     //自定义算子原型库所在目录
+│           ├── op_proto     //自定义算子原型库所在目录，入图场景才会生成
 │                ├── inc
 │                │   └── op_proto.h
 │                └── lib
