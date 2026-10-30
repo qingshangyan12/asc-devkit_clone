@@ -166,7 +166,7 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,
     ccu::Variable lastSliceSizePerJetty, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, uint32_t jettyNum)
+    uint32_t rankId, uint32_t jettyNum, ccu::Variable turnEndAddr)
 {
     AllToAllMesh1DMultiJettyContext ctx;
     ctx.channels = channels;
@@ -193,6 +193,12 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoAllToAll(ctx));
+    // D3 同款（参照 CcuKernelKfcAllGatherNHR1DMem2MemKernel）：末步逐 rank EventWait 收齐即
+    // 本 rank 输出已完整，PostSync 屏障仅服务下一轮通道状态；在 PostSync 前写 turn-end，
+    // AIV 提前返回，server 侧相应跳过本轮 SetTurnEndSig。
+    ccu::Variable turnEndSig;
+    turnEndSig = 1U;
+    CCU_CHK_RET(ccu::Store(turnEndAddr, turnEndSig));
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
