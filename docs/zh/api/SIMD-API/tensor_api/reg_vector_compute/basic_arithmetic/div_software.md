@@ -60,7 +60,7 @@ __simd_callee__ inline reg_tensor<T> div(
 | 参数名 | 描述 |
 | --- | --- |
 | precisionMode | 是否启用高精度除法路径。为`true`时使用差值补偿算法，仅支持`float`。精度说明请参考[关键特性说明](#关键特性说明)。 |
-| algo | 除法算法，支持上述六种枚举值。算法与Subnormal模式的关系请参考[关键特性说明](#关键特性说明)。 |
+| algo | 除法算法，支持上述枚举值。算法与Subnormal模式的关系请参考[关键特性说明](#关键特性说明)。 |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2** 参数说明
@@ -78,7 +78,7 @@ __simd_callee__ inline reg_tensor<T> div(
 | `PRECISION_1ULP_FTZ_FALSE` | half、float |
 | `DIFF_COMPENSATION`、`PRECISION_0ULP_FTZ_TRUE`、`PRECISION_0ULP_FTZ_FALSE` | float |
 
-`precisionMode=true`时，六种算法均仅支持float。非法数据类型或算法组合会产生编译错误。
+`precisionMode=true`时，各算法均仅支持float。非法数据类型或算法组合会产生编译错误。
 
 ## 返回值说明
 
@@ -104,7 +104,7 @@ __simd_callee__ inline reg_tensor<T> div(
 | `false`（默认值） | `div_algo::INTRINSIC`（默认值） | half、float | 1 ULP |
 | `false` | `div_algo::PRECISION_1ULP_FTZ_TRUE`、`div_algo::PRECISION_1ULP_FTZ_FALSE` | half、float | 1 ULP |
 | `false` | `div_algo::DIFF_COMPENSATION`、`div_algo::PRECISION_0ULP_FTZ_TRUE`、`div_algo::PRECISION_0ULP_FTZ_FALSE` | float | 0 ULP |
-| `true` | 六种算法 | float | 0 ULP |
+| `true` | 所有支持的算法 | float | 0 ULP |
 
 `precisionMode=true`时通过差值补偿提高除法精度，但不表示自动保留Subnormal。Subnormal的处理方式由`algo`与编译选项共同决定。
 
@@ -123,7 +123,7 @@ FTZ（Flush-To-Zero）是一种浮点运算模式，当结果为[Subnormal](../.
 
 #### 显式指定的算法
 
-下表列出`precisionMode`、六种`algo`和两种`--cce-ftz`编译选项的全部24种浮点配置。表中枚举值省略`div_algo::`前缀，ULP表示对应Subnormal模式下的最大精度误差。
+下表列出不同`precisionMode`、`algo`与`--cce-ftz`编译选项组合下的浮点配置。表中枚举值省略`div_algo::`前缀，ULP表示对应Subnormal模式下的最大精度误差。
 
 | precisionMode | algo | 支持的浮点类型 | `--cce-ftz=true`（默认值）：Subnormal处理及最大精度误差 | `--cce-ftz=false`：Subnormal处理及最大精度误差 |
 | --- | --- | --- | --- | --- |
@@ -140,7 +140,7 @@ FTZ（Flush-To-Zero）是一种浮点运算模式，当结果为[Subnormal](../.
 | `true` | `PRECISION_1ULP_FTZ_TRUE` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
 | `true` | `PRECISION_1ULP_FTZ_FALSE` | float | FTZ，0 ULP | 保留Subnormal，0 ULP |
 
-当`precisionMode=true`时，始终使用0 ULP算法。`PRECISION_0ULP_FTZ_TRUE`始终采用FTZ路径，`PRECISION_0ULP_FTZ_FALSE`始终保留Subnormal；其余四种算法的Subnormal处理跟随`--cce-ftz`。
+当`precisionMode=true`时，始终使用0 ULP算法。`PRECISION_0ULP_FTZ_TRUE`始终采用FTZ路径，`PRECISION_0ULP_FTZ_FALSE`始终保留Subnormal；其余算法的Subnormal处理跟随`--cce-ftz`。
 
 `precisionMode`不是FTZ开关，设置为`false`也不表示只能达到1 ULP精度。需要显式控制FTZ行为时，建议设置`precisionMode=false`，通过`algo`同时选择精度和FTZ策略，避免高精度模式覆盖显式1 ULP算法的FTZ语义。显式0 ULP算法的精度和FTZ策略不受`precisionMode`影响。
 
