@@ -44,7 +44,7 @@ After [collecting performance data](collect_performance_data.md), the parts that
     **Figure 3**  op\_summary\_\*.csv example<a name="fig10442174973013"></a>  
     ![](../../figures/op_csv_ex.png "op_summary_-csv example")
 
-    The example in the figure above shows data acquired on one of the AI processors. The hardware platform shows that this AI processor has 48 vector cores. The Mul operator is a vector-only operator, but in some scenarios not all vector cores are used (Block Dim < 48), resulting in wasted computing power. Therefore, the next optimization foucs is [Tiling optimization](../simd_operator_optimization/tiling_strategy/tiling_strategy.md).
+    The example in the figure above shows data acquired on one of the AI processors. The hardware platform shows that this AI processor has 48 vector cores. The Mul operator is a vector-only operator, but in some scenarios not all vector cores are used (Block Dim < 48), resulting in wasted computing power. Therefore, the next optimization focus is [Tiling optimization](../simd_operator_optimization/tiling_strategy/tiling_strategy.md).
 
 -   <a name="li169522115204"></a>**Method 3: Analyze the pipeline situation through the simulation pipeline diagram**
 

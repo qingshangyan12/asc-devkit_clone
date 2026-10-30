@@ -18,7 +18,7 @@
         if (threadIdx.x >= count) {
             return;
         }
-        // __simt_callee__ marks the attribute of this lamda function
+        // __simt_callee__ marks the attribute of this lambda function
         auto affine = [scale, bias](float v) __simt_callee__ {
             return v * scale + bias; };
         out[threadIdx.x] = affine(in[threadIdx.x]);
