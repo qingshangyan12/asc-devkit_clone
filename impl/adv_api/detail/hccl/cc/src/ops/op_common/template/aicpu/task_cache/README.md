@@ -35,6 +35,16 @@ Added UT cases cover SDMA grouping boundaries and the nonblocking capacity predi
 
 ## First-version fallback on current master
 
-This branch ports the initial three-stage optimization for an independent fallback comparison. It does not include later detailed timing probes, thread deduplication, pending-DB capacity reuse, contiguous capture storage, allocation recycling or DFX predecoding. Existing upstream features and basic debugMode=4 Server timing remain in place. The earlier roughly 30 us hit observation is not a performance guarantee for this port.
+This branch ports the initial three-stage optimization for an independent fallback comparison. It does not include later thread deduplication, pending-DB capacity reuse, contiguous capture storage, allocation recycling or DFX predecoding. Optional detailed timing probes are described below. Existing upstream features and basic debugMode=4 Server timing remain in place. The earlier roughly 30 us hit observation is not a performance guarantee for this port.
 
 Validate the paired packages against the current optimization packages using the same toolkit, cards, algorithms, dtype, data sizes and debugMode=4: five collectives at 4 KiB, 10 rounds, each with one cold invocation, 29 warmups, 30 miss and 30 hit invocations. Keep cache clearing outside the timed interval. Compare each operation separately and alternate package order to expose environment drift. Also cover repeat >1, repeated Prepare, varying counts/displacements, zero-length peers and queue wraparound before adoption.
+
+## Optional debugMode=5 diagnostics
+
+`SetDebugMode(4)` retains the three basic stage means and Top3. `SetDebugMode(5)` additionally collects Server phase durations/calls and HCOMM SQE, copy, capture allocation, thread scan, replay token/patch/submit and DFX statistics. Temporary additions are marked `MC2_CACHE_DETAIL_DIAG`. Neither mode changes cache decisions or queue ordering.
+
+Use paired diagnostic packages and hccl_api_test branch `perf/server-detail-timing-20261029`. Set `server.debug_mode` to 4 or 5 in `suite_config.json`; the suite command is unchanged. Detailed results are in `server_detail.csv`/`server_detail_samples.csv` and `server_backend.csv`/`server_backend_samples.csv`; `summary.csv` and `aicpu_benchmark.xlsx` keep the three-stage summary. Missing backend symbols are explicitly reported as unavailable.
+
+Mode 5 accumulates unsigned 64-bit integers without per-event logging. After the message loop has exited, every 30 launches the summary is serialized into bounded 512-byte fragments, compatible with the existing parser. Mode 4 does not read detail clocks, accumulate detail counters, clear detail arrays, bind backend buffers or format detail records. Large serialization buffers live in a separate non-inline function. Policy/replay and the per-WQE loop use compile-time disabled probe specializations. Other probe sites retain a flag/null-pointer check; code-layout and branch effects are not claimed to be zero and require target A/B measurement.
+
+For performance acceptance use mode 4. Compare its paired package with the previous fallback package under identical conditions; use mode 5 separately for attribution, since its timing includes diagnostic overhead. Host mock tests cover disabled-clock/counter behavior, 4/5 switching, batch resets and bounded log framing; these tests do not replace target compilation or NPU performance validation.

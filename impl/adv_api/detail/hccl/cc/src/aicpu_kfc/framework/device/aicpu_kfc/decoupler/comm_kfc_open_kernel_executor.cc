@@ -13,6 +13,9 @@
 #include <vector>
 
 #include "log.h"
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+#include "mc2_server_stage_timing.h"
+// MC2_CACHE_DETAIL_DIAG END
 #include "alg_param.h"
 #include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
@@ -193,10 +196,24 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
     HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
-        CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+        {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::VAR_RESTORE);
+            // MC2_CACHE_DETAIL_DIAG END
+            CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+        }
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope createTiming(Mc2ServerStageTiming::EXECUTOR_CREATE);
+        // MC2_CACHE_DETAIL_DIAG END
         auto executor =
             mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        createTiming.Stop();
+        // MC2_CACHE_DETAIL_DIAG END
         CHK_SMART_PTR_NULL(executor);
+        // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+        Mc2ServerStageTiming::DetailScope algorithmTiming(Mc2ServerStageTiming::ALGORITHM_EXECUTE);
+        // MC2_CACHE_DETAIL_DIAG END
         return executor->Orchestrate(*param, resCtx);
     });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);

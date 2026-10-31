@@ -735,6 +735,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         }
 
         if (i == 0U && execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::DFX_REGISTER);
+            // MC2_CACHE_DETAIL_DIAG END
             if (runParam.size() < sizeof(mc2_ops_hccl::OpParam)) {
                 HCCL_ERROR(
                     "Group %u: run op param size %zu is smaller than OpParam size %zu for DFX registration.", groupIdx_,
@@ -771,7 +774,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::CCORE_WAIT);
+            // MC2_CACHE_DETAIL_DIAG END
+            ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        }
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -791,7 +799,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::KERNEL_DISPATCH);
+            // MC2_CACHE_DETAIL_DIAG END
+            ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        }
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -811,7 +824,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        {
+            // MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+            Mc2ServerStageTiming::DetailScope timing(Mc2ServerStageTiming::CCORE_RECORD);
+            // MC2_CACHE_DETAIL_DIAG END
+            ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        }
         Mc2ServerStageTiming::Submitted(static_cast<int>(ret));
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(

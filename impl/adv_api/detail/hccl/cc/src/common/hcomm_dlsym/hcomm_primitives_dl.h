@@ -97,6 +97,9 @@ DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
 
 bool Mc2HcommIsSupportAicpuTsTaskCache(void);
 bool Mc2HcommHasReplayV1(void);
+// MC2_CACHE_DETAIL_DIAG BEGIN: temporary diagnostic; remove this marked block.
+int32_t Mc2HcommDiagBindV1(uint64_t* buffer, uint32_t words);
+// MC2_CACHE_DETAIL_DIAG END
 int32_t Mc2HcommReplayV1(
     uint32_t action, void** handle, void** addrs, uint64_t* sizes, uint32_t count, uint64_t* bytes);
 int32_t Mc2HcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit);

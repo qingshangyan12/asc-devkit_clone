@@ -38,8 +38,11 @@ private:
     std::shared_ptr<Mc2ReplayDomain> domain_;
     Mc2ReplayScope* previous_ = nullptr;
     std::unique_lock<std::mutex> lock_;
-    friend HcclResult RunMc2BoundReplay(
+    // MC2_CACHE_DETAIL_DIAG BEGIN: shared implementation with compile-time probe selection.
+    template <bool Detailed>
+    friend HcclResult RunMc2BoundReplayImpl(
         const OpParam&, const AlgResourceCtxSerializable&, const std::function<HcclResult()>&);
+    // MC2_CACHE_DETAIL_DIAG END
     bool repeatReady_ = false;
     std::array<uint64_t, 2> repeatSizes_{{0, 0}};
     void* repeatEntry_ = nullptr;
