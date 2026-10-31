@@ -136,7 +136,7 @@ bool CheckOutputTensor(const ge::Tensor& outputTensor)
     for (size_t i = 0U; i < ELEMENT_COUNT; ++i) {
         const float diff = std::abs(output[i] - golden[i]);
         const float tolerance = CHECK_RTOL * std::abs(golden[i]);
-        if (diff > tolerance) {
+        if (!std::isfinite(output[i]) || diff > tolerance) {
             std::cerr << "Unexpected output at index " << i << ", expected " << golden[i] << ", got " << output[i]
                       << ", diff " << diff << ", tolerance " << tolerance << std::endl;
             return false;

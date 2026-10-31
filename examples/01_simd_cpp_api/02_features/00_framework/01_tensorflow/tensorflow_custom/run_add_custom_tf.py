@@ -64,6 +64,7 @@ def main(unused_argv):
         print("test pass")
     else:
         print("test failed")
+    return 0 if cmp_result else 1
 
 
 if __name__ == "__main__":
