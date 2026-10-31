@@ -140,7 +140,9 @@ public:
     __aicore__ inline void WaitForQuitNotification()
     {
         CrossCoreWaitFlag(KFC_SYNC_ID);
-        dcci(reinterpret_cast<__gm__ int64_t*>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        dcci(
+            reinterpret_cast<__gm__ int64_t*>(this->msgRcvStart), cache_line_t::SINGLE_CACHE_LINE,
+            dcci_dst_t::CACHELINE_OUT);
         // Traverse all matmul objects to compensate for waiting events
         for (int i = 0; i < MAX_MATMUL_OBJ_CNT; i++) {
             uint32_t eventId = reinterpret_cast<__gm__ SuperKernelWaitEventCnt*>(this->msgRcvStart)->eventId[i];
