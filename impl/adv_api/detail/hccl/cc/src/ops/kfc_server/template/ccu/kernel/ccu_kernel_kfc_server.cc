@@ -413,6 +413,23 @@ static void DispatchKfcSubKernel(
     }
 }
 
+// 相位打点（KfcServerGenCircularQueue 热循环）：CCU DSL 无时钟原语
+// （ccu_primitives_dl.hpp 全量原语无 cycle/time 接口），无法在核上计算耗时；采用
+// EventRecord+EventWait 边界标记——profiler 对 EventWait 指令采样为零耗时 Wait 事件，
+// 相邻标记的 ts 差即为被夹相位的耗时。每轮 4 处调用（M0~M3，共 8 条指令）：
+//   WaitTurnStartSig 耗时        = M1.ts - M0.ts
+//   LoadFuncParamFromMemory 耗时 = M2.ts - M1.ts
+//   DispatchKfcSubKernel 耗时    = M3.ts - M2.ts（含被派发算法的执行时间）
+// 识别方式：每轮队列头部连续的 dur=0 Wait 事件按序即 M0/M1/M2，M3 紧随算法自身的
+// Wait/LoopGroup 事件之后；退出轮（param[0]==INVALID）只有 M0~M2。
+// 测量完成后删除本函数与 4 处调用点即可完全还原。
+static CcuResult EmitPhaseMark(ccu::Event& evt)
+{
+    CCU_CHK_RET(ccu::EventRecord(evt, 1));
+    CCU_CHK_RET(ccu::EventWait(evt, 1));
+    return CCU_SUCCESS;
+}
+
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
@@ -423,6 +440,7 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
     turnStartSig = 0;
     ccu::Variable turnEndSig; // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
     turnEndSig = 1;
+    ccu::Event phaseMarkEvt; // 相位打点事件（EmitPhaseMark 复用同一句柄，M0~M3 共用）
 
     // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
     ccu::Variable waitAddr;
@@ -449,13 +467,17 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
+        CCU_CHK_RET(EmitPhaseMark(phaseMarkEvt)); // M0：WaitTurnStartSig 前
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        CCU_CHK_RET(EmitPhaseMark(phaseMarkEvt)); // M1：WaitTurnStartSig 后/参数装载前
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+        CCU_CHK_RET(EmitPhaseMark(phaseMarkEvt)); // M2：参数装载后/dispatch 前
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx, recordAddr);
+            CCU_CHK_RET(EmitPhaseMark(phaseMarkEvt)); // M3：dispatch 后（M3-M2 = dispatch+算法执行耗时）
             MissionPostSync(ctx);
             // D3：SoleNHR AG / A2A MultiJetty kernel 已在末步同步后、PostSync 前写 turn-end
             // （AIV 提前返回），其余角色维持 dispatch 后统一发放。条件为宿主侧常量，
