@@ -1193,7 +1193,11 @@ uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
     CHK_PTR_NULL(comm);
     CHK_PTR_NULL(ccArgs);
     CHK_PTR_NULL(ccResCtx);
-    CHK_PTR_NULL(ccResCtxSize);
+    // nullptr is the default argument: keep one C symbol and drop the size output.
+    uint32_t omittedSize = 0U;
+    if (ccResCtxSize == nullptr) {
+        ccResCtxSize = &omittedSize;
+    }
     *ccResCtx = nullptr;
     *ccResCtxSize = 0U;
 
@@ -1227,7 +1231,10 @@ uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx, uint32_t ccResCtxSize)
 {
     CHK_PTR_NULL(ccResCtx);
-    if (ccResCtxSize < sizeof(OpResCtx)) {
+    // 0 is the default argument and selects the context size both acquire paths publish.
+    if (ccResCtxSize == 0U) {
+        ccResCtxSize = static_cast<uint32_t>(sizeof(OpResCtx));
+    } else if (ccResCtxSize < sizeof(OpResCtx)) {
         HCCL_ERROR(
             "[Mc2CcKernelLaunch] invalid ccResCtxSize[%u], expected at least[%zu].", ccResCtxSize, sizeof(OpResCtx));
         return HCCL_E_PARA;
@@ -1272,19 +1279,3 @@ uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, 
     }
 }
 } // extern "C"
-
-// C++ overloads. Acquire drops the size output. Launch supplies sizeof(OpResCtx), which is the only
-// length the size check compares and the length both acquire paths publish.
-uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
-    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
-{
-    uint32_t ccResCtxSize = 0U;
-    const uint32_t ret = Mc2AcquireCcResCtx(comm, ccType, ccArgs, ccResCtx, &ccResCtxSize);
-    (void)ccResCtxSize;
-    return ret;
-}
-
-uint32_t __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
-{
-    return Mc2CcKernelLaunch(stream, ccResCtx, static_cast<uint32_t>(sizeof(OpResCtx)));
-}

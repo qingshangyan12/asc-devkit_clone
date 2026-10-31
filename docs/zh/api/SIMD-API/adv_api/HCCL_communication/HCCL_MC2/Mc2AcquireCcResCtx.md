@@ -27,19 +27,16 @@
 
 根据通信域、通信任务类型和MC2通信参数，完成算法选择和通信资源申请，并返回设备侧通信资源上下文。该上下文既用于启动通信服务端，也用于AI Core侧HCCL客户端初始化。
 
-不带ccResCtxSize的重载与带大小参数的重载走同一条申请路径。前者把上下文长度写入临时变量后丢弃，不向调用方返回长度。
+ccResCtxSize带默认值nullptr。不传该参数和显式传入nullptr是同一次调用，都不回写上下文长度。接口只有一个extern "C"导出符号。
 
 ## 函数原型
 
 ```cpp
 extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
-    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx)
-
-extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
-    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize)
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize = nullptr)
 ```
 
-不带ccResCtxSize的重载使用C++链接，避免与extern "C"版本的符号冲突。带ccResCtxSize的重载保持C链接。
+默认参数由调用方编译器在调用点补上，动态库中不产生第二个Mc2AcquireCcResCtx符号。
 
 ## 参数说明
 
@@ -51,7 +48,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 | ccType | 输入 | 通信任务类型，取值为HcclCMDType枚举值。AI CPU和CCU路径均支持AllGather、AllReduce、ReduceScatter、AlltoAll和AlltoAllV。 |
 | ccArgs | 输入 | [Mc2GetCcArgs](Mc2GetCcArgs.md)创建并通过Mc2SetCc*接口填充的MC2通信参数对象。 |
 | ccResCtx | 输出 | 设备侧通信资源上下文地址。 |
-| ccResCtxSize | 输出 | 仅带大小参数的重载返回该值，单位为字节。AI CPU路径和CCU路径返回的长度均为sizeof(OpResCtx)。不带该参数的重载不向调用方返回长度。 |
+| ccResCtxSize | 输出 | 可选，默认nullptr。非空时返回设备侧通信资源上下文大小，单位为字节。AI CPU路径和CCU路径返回的长度均为sizeof(OpResCtx)。不传该参数或传入nullptr时不回写长度。 |
 
 ## 返回值说明
 
@@ -64,7 +61,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
 -   ccResCtx由通信域生命周期管理，用户不需要单独释放。
 -   AI CPU路径使用AICPU_TS；CCU路径使用CCU_MS或CCU_SCHED。
 -   返回的ccResCtx需要同时传给[Mc2CcKernelLaunch](Mc2CcKernelLaunch.md)和AI Core侧[InitV2](../HCCL_Kernel/InitV2.md)接口。InitV2只使用上下文地址。
--   不带ccResCtxSize的重载内部调用带大小参数的实现。资源申请、上下文内容和返回码与带大小参数的重载一致。
+-   不传ccResCtxSize与传入nullptr是同一个C符号上的同一次调用。需要上下文字节长度时传入非空指针。
 
 ## 调用示例
 

@@ -1627,9 +1627,6 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_NullParameters)
         Mc2AcquireCcResCtx(
             comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, nullptr, &ccResCtxSize),
         HCCL_E_PTR);
-    EXPECT_EQ(
-        Mc2AcquireCcResCtx(comm_, static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER), ccArgs, &ccResCtx, nullptr),
-        HCCL_E_PTR);
 
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
@@ -1644,6 +1641,9 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_RejectsUnsupportedOperation)
     EXPECT_EQ(Mc2AcquireCcResCtx(comm_, 0xFFU, ccArgs, &ccResCtx, &ccResCtxSize), HCCL_E_NOT_SUPPORT);
     EXPECT_EQ(ccResCtx, nullptr);
     EXPECT_EQ(ccResCtxSize, 0U);
+    ccResCtx = reinterpret_cast<void*>(0x1);
+    EXPECT_EQ(Mc2AcquireCcResCtx(comm_, 0xFFU, ccArgs, &ccResCtx, nullptr), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(ccResCtx, nullptr);
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
 }
 
@@ -1819,7 +1819,8 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsInvalidContextSize)
 {
     OpParam opParam{};
     OpResCtx opResCtx = BuildLaunchOpResCtx(opParam, comm_, COMM_ENGINE_CCU);
-    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, 0U), HCCL_E_PARA);
+    // 0 is the default and selects sizeof(OpResCtx). A smaller non-zero size is still rejected.
+    EXPECT_EQ(Mc2CcKernelLaunch(nullptr, &opResCtx, 1U), HCCL_E_PARA);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_HandlesOpResCopyFailure)
@@ -1923,8 +1924,8 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedDevice)
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 0U);
 }
 
-// Overloads without ccResCtxSize. Launch supplies sizeof(OpResCtx) internally, so the old
-// "ccResCtxSize < sizeof(OpResCtx) -> HCCL_E_PARA" case is outside this contract.
+// Calls that omit ccResCtxSize. Acquire defaults the size pointer to nullptr, and launch defaults
+// the size to 0, which the C function replaces with sizeof(OpResCtx).
 TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtxNoSize_NullParameters)
 {
     void* ccArgs = CreateMc2CcArgs(static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), "CcuSchedAllGatherSoleMesh");

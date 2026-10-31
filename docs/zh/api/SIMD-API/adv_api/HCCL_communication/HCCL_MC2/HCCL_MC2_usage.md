@@ -31,7 +31,7 @@ HCCL MC2接口由Host侧参数配置、资源上下文申请和通信服务端�
 
 上述流程中的第3步与第5步必须使用同一个资源上下文。ccResCtx是[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的设备侧通信资源上下文地址，包含通信算法和通信资源相关信息；该资源由通信域生命周期管理，用户不需要调用单独的接口释放。
 
-不带ccResCtxSize的重载与带大小参数的重载行为一致。申请接口在AI CPU和CCU路径上写出的上下文长度都是sizeof(OpResCtx)，启动接口内部也使用这个长度。需要拿到字节长度时，使用带ccResCtxSize参数的重载。
+ccResCtxSize是带默认值的参数，调用时可以不传。Mc2AcquireCcResCtx和Mc2CcKernelLaunch各自只有一个C导出符号。不传时，申请接口不回写上下文长度，启动接口按sizeof(OpResCtx)检查。需要拿到字节长度时，向Mc2AcquireCcResCtx传入非空的ccResCtxSize。
 
 [Mc2GetCcArgs](Mc2GetCcArgs.md)创建的参数对象默认通信引擎为`AICPU_TS`，即AI CPU通信服务端。若使用CCU路径，必须调用[Mc2SetCcCommEngine](Mc2SetCcCommEngine.md)显式设置通信引擎，推荐设置为`CCU_SCHED`。
 

@@ -27,18 +27,16 @@
 
 使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的通信资源上下文启动通信服务端。AI CPU路径下，本接口在指定AI CPU任务流上启动AI CPU Server；CCU路径下，本接口启动CCU服务端。后续AI Core侧调用HCCL高阶API时，会作为客户端向服务端下发实际通信任务。
 
-不带ccResCtxSize的重载与带大小参数的重载走同一条启动路径。前者内部以sizeof(OpResCtx)作为上下文长度。
+ccResCtxSize带默认值0。不传该参数和显式传入0是同一次调用，都按sizeof(OpResCtx)做上下文长度检查。接口只有一个extern "C"导出符号。
 
 ## 函数原型
 
 ```cpp
-extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(void* stream, void* ccResCtx)
-
 extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
-    void* stream, void* ccResCtx, uint32_t ccResCtxSize)
+    void* stream, void* ccResCtx, uint32_t ccResCtxSize = 0U)
 ```
 
-不带ccResCtxSize的重载使用C++链接，避免与extern "C"版本的符号冲突。带ccResCtxSize的重载保持C链接。
+默认参数由调用方编译器在调用点补上，动态库中不产生第二个Mc2CcKernelLaunch符号。
 
 ## 参数说明
 
@@ -48,7 +46,7 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 | --- | --- | --- |
 | stream | 输入 | aclrtStream指针。AI CPU路径为必填，用于启动AI CPU Server；CCU路径不使用该参数，可传入nullptr。 |
 | ccResCtx | 输入 | [Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的设备侧通信资源上下文。 |
-| ccResCtxSize | 输入 | 仅带大小参数的重载需要该值，单位为字节，且不小于sizeof(OpResCtx)。不带该参数的重载内部使用sizeof(OpResCtx)。 |
+| ccResCtxSize | 输入 | 可选，默认0。0表示按sizeof(OpResCtx)检查上下文长度。传入大于0且小于sizeof(OpResCtx)的值时返回参数错误。 |
 
 ## 返回值说明
 
@@ -60,8 +58,8 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
 -   AI CPU路径的stream必须与AI Core任务所在stream不同。AI CPU Server会阻塞等待AI Core客户端消息，若共用stream会导致任务无法完成。
 -   AI CPU路径建议先同步AI Core任务流、再同步AI CPU任务流。
 -   CCU路径的启动stream由通信资源上下文内部携带，stream参数不参与CCU服务端启动。
--   本接口必须使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx。带ccResCtxSize的重载还需要传入同一次申请返回的大小。
--   ccResCtxSize在启动路径中只参与下限检查。后续按sizeof(OpResCtx)读取OpResCtx，AI CPU启动参数只传递上下文地址。申请接口在AI CPU和CCU路径上写出的长度都是sizeof(OpResCtx)，因此不带大小参数的重载与传入该长度的带大小重载行为一致。
+-   本接口必须使用[Mc2AcquireCcResCtx](Mc2AcquireCcResCtx.md)返回的同一个ccResCtx。
+-   ccResCtxSize只参与下限检查。后续按sizeof(OpResCtx)读取OpResCtx，AI CPU启动参数只传递上下文地址。不传ccResCtxSize时，调用点传入默认值0，实现按sizeof(OpResCtx)继续执行。
 -   AI Core侧调用Finalize后，AI CPU Server才能正常退出。
 
 ## 调用示例
