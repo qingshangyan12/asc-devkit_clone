@@ -39,3 +39,7 @@ target_compile_definitions(hashtable_lookup PRIVATE
 target_compile_options(hashtable_lookup PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--cce-res-usage>
 )
+
+target_link_libraries(hashtable_lookup PRIVATE
+    m
+)
