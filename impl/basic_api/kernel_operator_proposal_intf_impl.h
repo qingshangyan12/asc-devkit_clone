@@ -52,6 +52,8 @@
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_proposal_impl.h"
 #include "dav_m510/kernel_operator_vec_gather_mask_impl.h"
+#elif (__NPU_ARCH__ == 5161)
+#include "dav_5161/kernel_operator_proposal_impl.h"
 #elif (__NPU_ARCH__ == 5162)
 #include "dav_5162/kernel_operator_proposal_impl.h"
 #include "dav_5162/kernel_operator_vec_gather_mask_impl.h"
