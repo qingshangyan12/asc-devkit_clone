@@ -13,7 +13,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #endif
@@ -88,7 +88,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     AlgResourceRequest interTempRequest;
     CHK_RET(intraTempAlg.CalcRes(comm, param, topoInfo, intraTempRequest));
     CHK_RET(interTempAlg.CalcRes(comm, param, topoInfo, interTempRequest));
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         // 原 hccl 的四组 TemplateDataParams 依赖这两个维度。不能仅将
         // Server 的 Mesh rankId 当作全局 rank，也不能由 Server 猜 NHR 步骤。
@@ -604,7 +604,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
     COND_NONE, FLAG_PCIE_MIX, 0);
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherParallelMeshNHRMultiLink, InsV2AllGatherParallelExecutor,
     TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem, CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);

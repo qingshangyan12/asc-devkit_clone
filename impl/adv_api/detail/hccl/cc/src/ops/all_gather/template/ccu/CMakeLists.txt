@@ -9,18 +9,25 @@
 # ----------------------------------------------------------------------------------------------------------
 add_subdirectory(kernel)
 
-set(src_list
-    # Legacy direct-launch/non-Mem2Mem AllGather templates are kept for recovery; KFC Mem2Mem is the active path.
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_mesh_1D_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_nhr_1d_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_nhr_1D_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1d_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1D.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.cc
-)
+if(NOT MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+    set(src_list
+        # Legacy direct-launch/non-Mem2Mem AllGather templates are kept for recovery; KFC Mem2Mem is the active path.
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_mesh_1D_mem2mem.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_nhr_1d_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_nhr_1D_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1d_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1D.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.cc
+    )
+else()
+    # 实验构建（asc-comm 数据面）：仅保留 AllGather Sole Mesh 模板。
+    set(src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_mesh_1D_mem2mem.cc
+    )
+endif()
 
 target_sources(mc2_client PRIVATE
     ${src_list}

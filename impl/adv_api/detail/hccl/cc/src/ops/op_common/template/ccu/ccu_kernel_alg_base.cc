@@ -12,6 +12,206 @@
 
 namespace mc2_ops_hccl {
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// ============================================================================
+// 实验构建（asc-comm 数据面）：仅保留 AllGather Sole Mesh 所需的 GroupCopy 链路，
+// 直接使用 asc-comm snake_case API。其余 Group* 辅助由基线分支（#else）承载。
+// ============================================================================
+
+std::vector<uint64_t> CalGoSize(uint64_t size)
+{
+    LoopGroupConfig config{};
+    config.msInterleave = CCU_MS_INTERLEAVE;
+    config.loopCount = CCU_MS_DEFAULT_LOOP_COUNT;
+    config.memSlice = CCU_MS_SIZE;
+    return CalGoSize(size, config);
+}
+
+std::vector<uint64_t> CalGoSize(uint64_t size, CcuVersion ccuVersion)
+{
+    LoopGroupConfig config{};
+    config.msInterleave = CCU_MS_INTERLEAVE;
+    config.loopCount = CCU_MS_DEFAULT_LOOP_COUNT;
+    config.memSlice = CCU_MS_SIZE;
+    return CalGoSize(size, config, ccuVersion);
+}
+
+CcuResult AllocGoResource(
+    LoopGroupConfig& config, LoopGroupResource& res, bool& allocated, uint32_t parallelDim, uint32_t msPerLoop,
+    uint32_t ckeNum)
+{
+    if (allocated) {
+        return CCU_SUCCESS;
+    }
+
+    config.msInterleave = CCU_MS_INTERLEAVE;
+    config.loopCount = parallelDim;
+    config.memSlice = msPerLoop * CCU_MS_SIZE;
+
+    // V1 loop 通过 loop_param_ 索引 event，每次 loop 克隆偏移 ckeNum 个 event，故需 loopCount*ckeNum 个 event
+    res.eventCount = config.loopCount * ckeNum;
+    res.completedEvent = ccu::array<ccu::event>(res.eventCount);
+
+    res.bufCount = config.loopCount * config.msInterleave;
+    res.ccuBuf = ccu::array<ccu::ccu_buffer>(res.bufCount);
+
+    allocated = true;
+    return CCU_SUCCESS;
+}
+
+std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig& config, CcuVersion ccuVersion)
+{
+    uint64_t loopSize = config.loopCount * config.memSlice;
+    uint64_t maxSize = loopSize * (GetMaxLoopIterNum() + 1);
+
+    uint64_t m = size / loopSize;
+    uint64_t n = (size - m * loopSize) / config.memSlice;
+    uint64_t p = size - m * loopSize - n * config.memSlice;
+
+    if (size == maxSize) {
+        m = GetMaxLoopIterNum();
+        n = config.loopCount - 1;
+        p = config.memSlice;
+    }
+
+    HCCL_INFO("Ccu Slice Split: m = %lu, n = %lu, p = %lu", m, n, p);
+
+    uint64_t offset = config.memSlice * config.loopCount * m;
+    uint64_t loopIterNum = m;
+
+    uint64_t loopExtendNum = 0;
+    uint64_t tailSize = 0;
+    uint64_t LoopNumTwo = 2;
+    if (n == 0 && p == 0) {
+        loopExtendNum = 0;
+        tailSize = 0;
+    } else if (n != 0 && p == 0) {
+        loopExtendNum = GetParallelParam(n - 1, 0, 1, ccuVersion);
+        tailSize = config.memSlice;
+    } else if (n == 0 && p != 0) {
+        loopExtendNum = GetParallelParam(0, 0, 1, ccuVersion);
+        tailSize = p;
+    } else {
+        loopExtendNum = GetParallelParam(n - 1, 1, LoopNumTwo, ccuVersion);
+        tailSize = p;
+    }
+
+    HCCL_INFO(
+        "[CalGoSize] offset = %lu, loopIterNum = %lu, loopExtendNum = %lu, tailSize = %lu", offset, loopIterNum,
+        loopExtendNum, tailSize);
+
+    return {offset, loopIterNum, loopExtendNum, tailSize};
+}
+
+CcuResult CreateMultiOpCopyV1(CcuKernelCtxBase& ctx, GroupCopyVar& var)
+{
+    AllocGoResource(
+        ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_MS_LOCAL_COPY_LOOP_COUNT, LOCAL_COPY_MS_PER_LOOP);
+
+    std::string loopType = "localcopy";
+    if (ctx.IsLoopEntityRegistered(loopType)) {
+        return CCU_SUCCESS;
+    }
+    ctx.CreateLoopEntity(loopType);
+    auto& loops = ctx.loopMap[loopType];
+
+    uint32_t usedBufNum = ctx.moConfig.memSlice / CCU_MS_SIZE;
+    uint32_t loopNum = 2;
+    for (uint32_t index = 0; index < loopNum; index++) {
+        uint32_t bufBase = index * ctx.moConfig.msInterleave;
+        ccu::event loopEvt = ctx.moRes.completedEvent[index];
+
+        loops.body[index].reset(new ccu::func([&ctx, index, bufBase, loopEvt, usedBufNum, &var]() {
+            ccu::local_copy(ctx.moRes.ccuBuf[bufBase], var.loopSrc[index], var.loopLen[index], loopEvt, 1);
+            ccu::event_wait(loopEvt, 1);
+            ccu::local_copy(var.loopDst[index], ctx.moRes.ccuBuf[bufBase], var.loopLen[index], loopEvt, 1);
+            ccu::event_wait(loopEvt, 1);
+        }));
+
+        loops.loops[index].reset(new ccu::loop(loops.loop_param_[index], *loops.body[index]));
+    }
+
+    return CCU_SUCCESS;
+}
+
+static void SetupLoopAddress(GroupCopyVar& var, ccu::local_addr& src, ccu::local_addr& dst, int index, ccu::variable size)
+{
+    var.loopSrc[index].addr_ = src.addr_;
+    var.loopSrc[index].token = src.token;
+    var.loopDst[index].addr_ = dst.addr_;
+    var.loopDst[index].token = dst.token;
+    var.loopLen[index] = size;
+}
+
+CcuResult GroupCopy(
+    CcuKernelCtxBase& ctx, ccu::local_addr dst, ccu::local_addr src, GroupOpSizeVars goSize, CcuVersion ccuVersion)
+{
+    // 实验构建仅支持 Ascend950 / CCU_V1（GetCcuVersion 已在入口拒绝 960 / V2）。
+    if (ccuVersion != CcuVersion::CCU_V1) {
+        HCCL_ERROR("GroupCopy: asccomm ccu dataplane only supports CCU_V1, ccuVersion[%u]", static_cast<uint32_t>(ccuVersion));
+        return CCU_E_NOT_SUPPORT;
+    }
+    HCCL_INFO("select GroupCopyV1");
+    return GroupCopyV1(ctx, dst, src, goSize);
+}
+
+CcuResult GroupCopyV1(CcuKernelCtxBase& ctx, ccu::local_addr dst, ccu::local_addr src, GroupOpSizeVars goSize)
+{
+    GroupCopyVar& var = ctx.GetGcVar();
+    ccu::variable loop_param_;
+    ccu::variable sliceSize;
+    ccu::variable paraCfg;
+    ccu::variable offsetCfg;
+    ccu::variable loopCfg0;
+    ccu::variable loopCfg1;
+    CCU_CHK_RET(CreateMultiOpCopyV1(ctx, var));
+    auto& loops = ctx.loopMap["localcopy"];
+
+    CCU_IF(goSize.addr_offset != 0)
+    {
+        loop_param_ = GetLoopParam(0, ctx.moConfig.memSlice * ctx.moConfig.loopCount, 0);
+        loop_param_ += goSize.loop_param_;
+        sliceSize = ctx.moConfig.memSlice;
+
+        SetupLoopAddress(var, src, dst, 0, sliceSize);
+
+        loops.loop_param_[0] = loop_param_;
+        paraCfg = GetParallelParam(ctx.moConfig.loopCount - 1, 0, 1, CcuVersion::CCU_V1);
+        offsetCfg = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, 1);
+        std::vector<ccu::loop> grpLoops{*loops.loops[0]};
+        ccu::loop_group group(paraCfg, offsetCfg, ctx.moConfig.loopCount, grpLoops);
+    }
+
+    CCU_IF(goSize.parallel_param != 0)
+    {
+        src.addr_ += goSize.addr_offset;
+        dst.addr_ += goSize.addr_offset;
+
+        SetupLoopAddress(var, src, dst, 0, goSize.residual);
+
+        src.addr_ += goSize.residual;
+        dst.addr_ += goSize.residual;
+        sliceSize = ctx.moConfig.memSlice;
+
+        SetupLoopAddress(var, src, dst, 1, sliceSize);
+
+        loopCfg0 = GetLoopParam(0, 0, 1);
+        loopCfg1 = GetLoopParam(0, 0, 1);
+        offsetCfg = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, 1);
+
+        loops.loop_param_[0] = loopCfg0;
+        loops.loop_param_[1] = loopCfg1;
+        std::vector<ccu::loop> grpLoops{*loops.loops[0], *loops.loops[1]};
+        ccu::loop_group group(goSize.parallel_param, offsetCfg, ctx.moConfig.loopCount, grpLoops);
+    }
+    return CCU_SUCCESS;
+}
+
+#else
+// ============================================================================
+// 基线构建：原 hcomm 数据面路径。
+// ============================================================================
+
 std::vector<uint64_t> CalGoSize(uint64_t size)
 {
     LoopGroupConfig config{};
@@ -1461,5 +1661,6 @@ CcuResult GroupLocalReduceV2(
     }
     return CCU_SUCCESS;
 }
+#endif // MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 
 } // namespace mc2_ops_hccl
