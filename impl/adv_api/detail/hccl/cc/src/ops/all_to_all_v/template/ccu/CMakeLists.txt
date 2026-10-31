@@ -9,14 +9,18 @@
 # ----------------------------------------------------------------------------------------------------------
 add_subdirectory(kernel)
 
-set(src_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh1d_multi_jetty.cc
-)
+if(NOT MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+    set(src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh_1D.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh_1D.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh1d_multi_jetty.cc
+    )
 
-target_sources(mc2_client PRIVATE
-    ${src_list}
-)
+    target_sources(mc2_client PRIVATE
+        ${src_list}
+    )
+else()
+    # 实验构建（asc-comm 数据面）：AllToAll/AllToAllV CCU 模板临时禁用。
+endif()

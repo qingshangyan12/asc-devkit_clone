@@ -11,17 +11,20 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "alg_data_trans_wrapper.h"
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）仅保留 AllGather Sole Mesh，其余算法模板头文件临时不引入。
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
-#include "kernel/ccu_kernel_kfc_server.h"
-#include "ccu_temp_kfc_server.h"
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 #include "ccu_launch_dl.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+#endif
+#include "kernel/ccu_kernel_kfc_server.h"
+#include "ccu_temp_kfc_server.h"
 
 namespace mc2_ops_hccl {
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
@@ -33,6 +36,7 @@ HcclResult InheritKfcServerKernelArg(
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         const auto* baseArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
         CHK_PTR_NULL(baseArg);
@@ -42,10 +46,12 @@ HcclResult InheritKfcServerKernelArg(
             kfcArg->algSubType != KFC_PARALLEL_ALL_GATHER_SUB_TYPE || !kfcArg->algArg,
             HCCL_ERROR("[ParallelAllGather] missing algorithm arguments"), HCCL_E_PARA);
     }
+#endif
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherKfc =
         srcName == "CcuKernelKfcAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
     const bool isAllGatherNhr =
         srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherSoleNhr =
@@ -134,8 +140,15 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (
-        isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce ||
-        (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)) {
+#else
+    if (
+#endif
+        isAllGather || isAllGatherKfc
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+        || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce ||
+        (isAllToAllV && ccuVersion == CcuVersion::CCU_V2)
+#endif
+    ) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;

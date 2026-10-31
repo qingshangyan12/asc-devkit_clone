@@ -12,7 +12,7 @@
 #include "ins_reduce_scatter_concurrent_executor.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 #include "topo_match_concurrent_v2.h"
@@ -418,7 +418,7 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterConcurMeshNHR, AlgEngine::AICPU, "concur[mesh,nhr]",
     COND_NONE, FLAG_UBX, 0);
 
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU && !defined(MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
 // KFC 并发 RS：mission0 = Mesh Mem2Mem 流，mission1 = NHR MultiJetty 流（kernelInfo 顺序须与 role 匹配）。
 // TopoMatchConcurrentV2 与 hccl 同语义：mesh 组与 clos 组为同一组 rank（mesh 与 clos 同在 layer0），
 // 区别于 TopoMatchUBX 的"layer0 mesh + layer1 同序号卡"两层结构。
