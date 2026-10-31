@@ -108,7 +108,7 @@ __aicore__ inline void SetAtomicAdd()
 <!-- npu="A3,910b" id20 -->
 <a id="npu_smi_saturation_mode"></a>
 
-- 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，整数类型和bfloat16_t数据类型的默认计算模式**均为非饱和模式**。原子累加的饱和模式无法通过[SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md)或[SetCtrlSpr](../special_register_access/SetCtrlSpr_ISASI.md)设置，需通过`npu-smi`命令在设备级进行配置，各命令的详细说明请参考Ascend HDK对应产品的《npu-smi命令参考》。CANN与Ascend HDK的对应关系，请参考[版本配套查询助手](https://www.hiascend.com/developer/download/compatibility)。
+- 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，整数类型和bfloat16_t数据类型的默认计算模式**均为非饱和模式**。原子累加的饱和模式无法通过[SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md)或[SetCtrlSpr](../special_register_access/SetCtrlSpr_ISASI.md)设置，需通过`npu-smi`命令在设备级进行配置，各命令的详细说明请参考Ascend HDK对应产品的[《npu-smi命令参考》](https://support.huawei.com/enterprise/zh/atlas-computing/ascend-hdk-pid-252764743?category=reference-guides&subcategory=command-reference)。CANN与Ascend HDK的对应关系，请参考[版本配套查询助手](https://www.hiascend.com/developer/download/compatibility)。
 
     - 整数类型：设置饱和模式（溢出值饱和为目标数据类型的最大值或最小值）或截断模式（即非饱和模式，溢出值保留低位、舍弃高位，默认为非饱和模式）。
 

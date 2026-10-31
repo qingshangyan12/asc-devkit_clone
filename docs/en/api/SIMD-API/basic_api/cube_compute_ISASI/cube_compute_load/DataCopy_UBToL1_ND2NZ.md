@@ -152,15 +152,15 @@ nd2nzParams.ndNum = 2;
 nd2nzParams.nValue = 2;
 // Each row is 24 half wide; any portion that is not 32B-aligned is padded with zeros at the destination.
 nd2nzParams.dValue = 24;
-// The start address interval between adjacent ND matrices on the source side is 9 DataBlocks, that is, 9 * 16 = 144 half.
+// The start address interval between adjacent ND matrices on the source side is 9 DataBlocks, that is, 9 * 16 = 144 half-type data elements.
 nd2nzParams.srcNdMatrixStride = 144;
-// The start address interval between adjacent rows of the same ND matrix on the source side is 3 DataBlocks, that is, 3 * 16 = 48 half.
+// The start address interval between adjacent rows of the same ND matrix on the source side is 3 DataBlocks, that is, 3 * 16 = 48 half-type data elements.
 nd2nzParams.srcDValue = 48;
 // In the destination NZ, the interval between adjacent C0 blocks split from the same source row is 11 DataBlocks.
 nd2nzParams.dstNzC0Stride = 11;
 // In the destination NZ, the start address interval after conversion of adjacent source rows is 2 DataBlocks.
 nd2nzParams.dstNzNStride = 2;
-// The start address interval between adjacent NZ matrices on the destination side is 6 DataBlocks, that is, 6 * 16 = 96 half.
+// The start address interval between adjacent NZ matrices on the destination side is 6 DataBlocks, that is, 6 * 16 = 96 half-type data elements.
 nd2nzParams.dstNzMatrixStride = 96;
 
 AscendC::DataCopy(dstLocal, srcLocal, nd2nzParams);
