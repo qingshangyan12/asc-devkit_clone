@@ -171,24 +171,28 @@ extern Mc2Result __attribute__((visibility("default"))) Mc2SetCcReduceType(void*
  * @param ccType MC2 operation type.
  * @param ccArgs Opaque argument object created by Mc2GetCcArgs.
  * @param ccResCtx Output pointer to store the allocated resource context.
- * @param ccResCtxSize Output size of the allocated resource context.
+ * @param ccResCtxSize Optional output size of the allocated resource context.
+ *        nullptr, the default, asks the implementation not to write the size.
  * @note The returned context is owned by the communication domain and should not be freed by the caller.
  *       The CCU path currently supports Ascend 950 only.
+ *       There is one extern "C" symbol. Omitting ccResCtxSize is the same call as passing nullptr.
  */
 extern Mc2Result __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
-    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize);
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize = nullptr);
 
 /**
  * @brief Launch MC2 builtin kernel from the prepared resource context.
  * @param stream Stream reserved for the AICPU launch path. It is ignored by the CCU path.
  * @param ccResCtx Device-side resource context returned by Mc2AcquireCcResCtx.
- * @param ccResCtxSize Size of the resource context.
+ * @param ccResCtxSize Lower bound of the resource context. 0, the default, selects sizeof(OpResCtx).
  * @note The launch path dispatches by commEngine in the OpParam referenced by the context.
  *       The CCU path currently supports Ascend 950 only and obtains its launch stream
  *       from the thread resource embedded in ccResCtx.
+ *       There is one extern "C" symbol. The context is read as sizeof(OpResCtx).
+ *       A non-zero ccResCtxSize smaller than that returns HCCL_E_PARA.
  */
 extern Mc2Result __attribute__((visibility("default"))) Mc2CcKernelLaunch(
-    void* stream, void* ccResCtx, uint32_t ccResCtxSize);
+    void* stream, void* ccResCtx, uint32_t ccResCtxSize = 0U);
 
 #ifdef __cplusplus
 }

@@ -78,5 +78,5 @@ if (checkRet == HCCL_E_RES_NOT_SUFFICIENT) {
     // 参数或内部异常处理
 }
 
-Mc2Result acquireRet = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx, &ccResCtxSize);
+Mc2Result acquireRet = Mc2AcquireCcResCtx(comm, ccType, ccArgs, &ccResCtx);
 ```
