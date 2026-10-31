@@ -12,6 +12,9 @@
 #define LEAKY_RELU_CUSTOM_TILING_H
 #include <cstdint>
 
+constexpr uint32_t LEAKY_RELU_TILE_LENGTH = 64;
+constexpr uint32_t LEAKY_RELU_BUFFER_NUM = 2;
+
 struct LeakyReluCustomTilingData {
     uint32_t totalLength;
     uint32_t tileNum;

@@ -11,9 +11,6 @@
 #include "kernel_operator.h"
 #include "leaky_relu_custom_tiling.h"
 
-constexpr int32_t BUFFER_NUM = 2;
-constexpr uint32_t STATIC_TILE_LENGTH = 64;
-
 template <uint32_t tileLength>
 class KernelLeakyRelu {
 public:
@@ -25,7 +22,7 @@ public:
         this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
         this->negativeSlope = static_cast<float>(negativeSlope);
-        uint32_t runtimeTileLength = this->blockLength / tileNum / BUFFER_NUM;
+        uint32_t runtimeTileLength = this->blockLength / tileNum / LEAKY_RELU_BUFFER_NUM;
         ascendc_assert(runtimeTileLength == tileLength, "runtime tileLength must match template tileLength.\n");
 
         xGm.SetGlobalBuffer((__gm__ float*)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
@@ -33,7 +30,7 @@ public:
     }
     __aicore__ inline void Process()
     {
-        int32_t loopCount = this->tileNum * BUFFER_NUM;
+        int32_t loopCount = this->tileNum * LEAKY_RELU_BUFFER_NUM;
 
         AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
         AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, tileLength>();
@@ -90,7 +87,7 @@ extern "C" __global__ __aicore__ void leaky_relu_custom(
     REGISTER_TILING_DEFAULT(LeakyReluCustomTilingData);
     GET_TILING_DATA(tiling_data, tiling);
 
-    KernelLeakyRelu<STATIC_TILE_LENGTH> op;
+    KernelLeakyRelu<LEAKY_RELU_TILE_LENGTH> op;
     op.Init(x, y, tiling_data.totalLength, tiling_data.tileNum, tiling_data.negativeSlope);
     op.Process();
 

@@ -119,6 +119,8 @@ where a is a scalar value.
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">leaky_relu_custom</td></tr>
   </table>
 
+LeakyRelu uses static tensors of 64 elements per tile. The host computes the tile count from the input size. This example requires a positive multiple of 2048 elements (8 blocks × 2 × 64).
+
 ## Code Implementation
 
 - Add</br>
