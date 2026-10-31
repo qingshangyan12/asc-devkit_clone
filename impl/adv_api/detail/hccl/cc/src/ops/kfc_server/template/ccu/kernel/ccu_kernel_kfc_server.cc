@@ -406,6 +406,20 @@ static void DispatchKfcSubKernel(
     }
 }
 
+#ifdef TIME_PROFILING
+// A dedicated event with one mask emits a recognizable burst at each boundary.
+// Record first so every Wait can complete without an external signal.
+static CcuResult KfcPerfBreakpoint(ccu::Event event)
+{
+    constexpr uint16_t mask = 1U;
+    for (uint32_t i = 0; i < 5U; ++i) {
+        CCU_CHK_RET(ccu::EventRecord(event, mask));
+        CCU_CHK_RET(ccu::EventWait(event, mask));
+    }
+    return CCU_SUCCESS;
+}
+#endif
+
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
@@ -440,10 +454,26 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
+#ifdef TIME_PROFILING
+    ccu::Event perfEvent;
+    HCCL_RUN_INFO("[MC2_CCU_KFC_PERF] markers=5 pairs_per_marker=5 mask=1");
+    CCU_CHK_RET(KfcPerfBreakpoint(perfEvent)); // before wait
+#endif
+
     CCU_WHILE(repeatCond == 0)
     {
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+
+#ifdef TIME_PROFILING
+        CCU_CHK_RET(KfcPerfBreakpoint(perfEvent)); // after wait
+#endif
+
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+
+#ifdef TIME_PROFILING
+        CCU_CHK_RET(KfcPerfBreakpoint(perfEvent)); // parameters loaded
+#endif
+
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
@@ -468,6 +498,11 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
             queueIdx = 0;
         }
     }
+
+    #ifdef TIME_PROFILING
+    CCU_CHK_RET(KfcPerfBreakpoint(perfEvent)); // before dispatch
+    #endif
+
     return CCU_SUCCESS;
 }
 

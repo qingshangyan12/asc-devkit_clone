@@ -19,7 +19,7 @@
 // after submission and clear enablement on exit. No KFC execution probes.
 namespace Mc2CcuPerfProbe {
 enum Metric { CTX_LOAD, PARAM_LOAD, KERNEL_SUBMIT, METRIC_COUNT };
-constexpr const char* NAMES[] = {"host_ctx_load", "host_param_load", "host_kernel_submit"};
+constexpr const char* NAMES[] = {"load_opresctx", "load_opparam", "launch_ccu_kernel"};
 struct Record {
     const char* metric;
     uint64_t begin;

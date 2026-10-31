@@ -8,7 +8,7 @@
 
 ```bash
 export MC2_PERF_ACCEPTANCE=1
-# 按 perf_acceptance/ccu/README.md 启动 server 模式测试
+# 按 perf_acceptance/ccu/README.md 启动 host 模式测试
 ```
 
 MPI 启动器需将该变量传给所有 rank。仅精确字符串 `1` 开启；未设置、`0`、空字符串及其他值均关闭。关闭示例：
@@ -17,7 +17,7 @@ MPI 启动器需将该变量传给所有 rank。仅精确字符串 `1` 开启；
 unset MC2_PERF_ACCEPTANCE
 ```
 
-沿用 AICPU 探针的总开关命名。变量在 Host 每次进入 `Mc2CcKernelLaunch` 时读取，不依赖 Device 进程继承 Host 环境变量。配套 suite 在 server 模式自动开启，在 client 模式显式关闭。
+沿用 AICPU 探针的总开关命名。变量在 Host 每次进入 `Mc2CcKernelLaunch` 时读取，不依赖 Device 进程继承 Host 环境变量。配套 suite 在 host 模式自动开启，在 client 模式显式关闭。
 
 - 关闭：保持原资源准备和提交路径，跳过探针读时钟、记录和日志输出。
 - 开启：初始化本次 launch 的线程局部状态，暂存三个 Host 区间的起止时间戳，返回前统一输出记录及 END。
@@ -32,13 +32,13 @@ unset MC2_PERF_ACCEPTANCE
 
 | metric | 区间 |
 | --- | --- |
-| host_ctx_load | Start 到 PollBegin，包含入口参数检查及 CopyOpResCtxToHost 上下文 D2H |
-| host_param_load | PollBegin 到 Parsed，包含设备类型检查、引擎分发及 CopyOpParamToHost 算子参数 D2H |
-| host_kernel_submit | Parsed 到 Submitted，包含参数加载结果检查、comm 提取和 LaunchCcuKernel（资源读取/反序列化、mission 检查及所有 HcommCcuKernelLaunch 提交） |
+| load_opresctx | Start 到 PollBegin，包含入口参数检查及 CopyOpResCtxToHost 上下文 D2H |
+| load_opparam | PollBegin 到 Parsed，包含设备类型检查、引擎分发及 CopyOpParamToHost 算子参数 D2H |
+| launch_ccu_kernel | Parsed 到 Submitted，包含参数加载结果检查、comm 提取和 LaunchCcuKernel（资源读取/反序列化、mission 检查及所有 HcommCcuKernelLaunch 提交） |
 
 基础接口沿用 `Mc2PerfProbe` 的命名与签名：`Enabled()`、`Get()`、`Now()`、`Add(metric, begin, end, status)`、`Start()`、`PollBegin()`、`Parsed()`、`Submitted(status)`、`Dump()` 和 `KernelScope(enabled)`。Host 调用点读取环境变量后传入 KernelScope，探针头文件不负责读取运行环境。
 
-`Parsed()` 对应 Host 参数加载完成边界：使用同一个时间戳结束 `host_param_load`，并作为 `host_kernel_submit` 的起点；`Submitted(status)` 记录终点和提交状态。其形式参照 AICPU 的 `Parsed()`/`Submitted()`，含义为 Host 参数加载完成。参数加载失败提前返回时保留已有记录，不生成提交区间，END 不会被判为完整。
+`Parsed()` 对应 Host 参数加载完成边界：使用同一个时间戳结束 `load_opparam`，并作为 `launch_ccu_kernel` 的起点；`Submitted(status)` 记录终点和提交状态。其形式参照 AICPU 的 `Parsed()`/`Submitted()`，含义为 Host 参数加载完成。参数加载失败提前返回时保留已有记录，不生成提交区间，END 不会被判为完整。
 
 关闭时仍有运行时分支和线程局部启用状态访问，不宣称零开销。开启时在 API 退出才打印记录；时间戳和记录操作的探针开销未扣除。launch 是线程局部的启用采集次数，不是 MPI iteration；需按实际 PID 和测试轮次映射。当前配套负载限定每 rank 单线程调用，不能直接用于同 PID 多线程 launch 的统计。
 
@@ -47,9 +47,9 @@ unset MC2_PERF_ACCEPTANCE
 日志示例（省略 HCCL 日志前缀）：
 
 ```text
-[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=host_ctx_load begin_ns=100 end_ns=200 cache=-1 status=0
-[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=host_param_load begin_ns=200 end_ns=500 cache=-1 status=0
-[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=host_kernel_submit begin_ns=500 end_ns=900 cache=-1 status=0
+[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=load_opresctx begin_ns=100 end_ns=200 cache=-1 status=0
+[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=load_opparam begin_ns=200 end_ns=500 cache=-1 status=0
+[MC2_CCU_PERF] schema=2 pid=123 launch=31 seq=0 metric=launch_ccu_kernel begin_ns=500 end_ns=900 cache=-1 status=0
 [MC2_CCU_PERF_END] schema=2 pid=123 launch=31 records=3 dropped=0 valid=7 status=0
 ```
 
@@ -57,7 +57,7 @@ valid 的 bit0/1/2 分别表示上述三个区间已经记录。成功结果要�
 
 Host 日志保存在 suite 设置的 `ASCEND_PROCESS_LOG_PATH` 下；启用 slog stdout 打印时也可能镜像到 MPI stdout。解析器检查逐段记录和 END 的完整性，合并轮转日志，并校验、去重 stdout 镜像。缺段、重复、错误 PID、溢出、失败状态或无 END 均判为不完整。
 
-配套框架另在 Host 程序测量 `host_resource_prepare`（HcclAllocComResourceByTiling 调用），不属于本探针的三个区间。正式结果按每卡每轮 30 次的均值汇总，p50/p99 为这些批次均值的分位数，不是单次执行尾延迟；详细定义见 [测试实现与统计口径](../../../hccl_api_test/perf_acceptance/ccu/docs/METHODOLOGY.md)。
+配套框架另在 Host 程序测量 `alloc_resource_by_tiling`（HcclAllocComResourceByTiling 调用），不属于本探针的三个区间。正式结果按每卡每轮 30 次的均值汇总，p50/p99 为这些批次均值的分位数，不是单次执行尾延迟；详细定义见 [测试实现与统计口径](../../../hccl_api_test/perf_acceptance/ccu/docs/METHODOLOGY.md)。
 
 ## 验证状态
 
@@ -75,6 +75,16 @@ python3 -m unittest discover -s tests/python -p test_mc2_ccu_perf_probe.py
 
 ## 当前采集范围
 
+配套 suite 使用 `--mode client,host`（默认）分别采集 Client 和 Host 指标。`--mode server` 通过 TIME_PROFILING 编译的事件标记和 msprof 采集 KFC 流水。
+
 当前仅保留 Client 的 Init/Prepare/Commit/Wait/Finalize 接口计时，以及 Host 的资源准备和三个提交区间计时。Client 计时位于配套测试程序的 AIC/AIV 算子中，Host 计时位于本探针及 Host 测试程序中。
 
-KFC 初始化、收到消息后的处理、SQE/cache 诊断及算法执行阶段计时不在本次采集范围内，后续单独设计。`PollBegin/Parsed/Submitted` 在此处仅表示 Host 资源上下文加载、参数加载和提交完成边界，不表示 KFC 内部执行阶段。`Receive()` 及消息序号/cache 状态占位已移除。
+Host 探针不记录 KFC 内部时间。独立的 server 模式使用 KFC 微码标记并保存流水；当前不自动计算 KFC 阶段耗时或导出 SQE/cache 诊断。`PollBegin/Parsed/Submitted` 在此处仅表示 Host 资源上下文加载、参数加载和提交完成边界，不表示 KFC 内部执行阶段。`Receive()` 及消息序号/cache 状态占位已移除。
+
+## KFC 流水标记
+
+复用已有的 `TIME_PROFILING` 宏，对应 CMake 开关默认 OFF，仅为 `ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc` 增加编译宏。开启后，在主 KFC 队列中分配一个专用 event，统一使用 mask=1，在每个边界通过 `for` 连续生成 5 对 EventRecord→EventWait，共五组标记：等待开始信号前、等待后、入参加载后、完整算法分发前、分发后。各组通过专用 CKE、连续事件和执行顺序识别，无需不同 mask。先置位再等待，不会自锁；终止消息只经过前三组。关闭宏时不分配该 event，也不生成标记指令。
+
+配套 suite 的 server 模式针对已配置的 asc-devkit 构建目录执行 `cmake -DTIME_PROFILING=ON` 并重编译 mc2_client，通过独立库路径用于 server case，再按 MPI rank 启动 msprof 并导出 JSON。原始 PROF 与导出文件均保存在 case 的 process_N/profiling/rank_N 中，具体配置与命令见配套 README。宏影响库中的微码生成代码，单独给测试算子加宏无效；无需修改 HCOMM。
+
+当前本地测试只能验证宏开关、标记顺序和采集/导出流程。完整库编译、硬件流水可见性及探针对执行的影响仍需配套 CANN/NPU 验证。
