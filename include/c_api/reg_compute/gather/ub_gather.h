@@ -283,7 +283,9 @@ __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ 
 
 __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90100000)
 __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index);
+#endif
 
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index);
 
