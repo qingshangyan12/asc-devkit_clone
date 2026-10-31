@@ -1,6 +1,5 @@
 # F32 Channel Split<a name="ZH-CN_TOPIC_0000002569070989"></a>
 
-<!-- npu="950,A3,910b" id5 -->
 ## 特性说明
 
 矩阵计算的搬出过程中对于目标类型为f32，如果开启了Channel Split（通道拆分），硬件就能够将16×16的分形矩阵转换为16×8的小z分形矩阵，此时每个16×16的分形矩阵将被拆分为2个独立的16×8的小z分形矩阵。
@@ -8,8 +7,8 @@
 对于DataCopy接口，可以通过配置**DataCopyCO12DstParams结构体参数**定义中channelSplit为true开启。
 
 对于Fixpipe接口，可以通过配置[Fixpipe搬运参数结构体说明](../cube_compute_store/Fixpipe_L0CToGM.md)中channelSplit为true开启。
-<!-- end id5 -->
 
+<!-- npu="950,A3,910b" id5 -->
 ## 特性约束
 
 <!-- npu="A3,910b" id1 -->
@@ -29,6 +28,7 @@
 <!-- npu="950" id4 -->
 - 针对Ascend 950PR&950DT系列产品，当Fixpipe指令的输入和输出数据类型都为float,NZ输出到GM，并且不开启NZ2ND、NZ2DN与unitFlag时，才能够开启Channel Split功能。当前搬出到L1 Buffer和Unified Buffer（UB）不支持该功能。
 <!-- end id4 -->
+<!-- end id5 -->
 
 ## 使用示例
 

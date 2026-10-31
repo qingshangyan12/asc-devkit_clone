@@ -172,7 +172,7 @@
 
 - GM -> VECIN/VECOUT配置示例<a name="li73127579197"></a>
 
-    下面通过三个示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制<!-- npu="950" id39 -->，示例3（仅Ascend 950PR&950DT系列产品支持）演示负stride实现重复搬运同一数据块的场景<!-- end id39 -->。
+    通过如下示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制<!-- npu="950" id39 -->，示例3（仅Ascend 950PR&950DT系列产品支持）演示负stride实现重复搬运同一数据块的场景<!-- end id39 -->。
 
     - 参数解释
         - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
