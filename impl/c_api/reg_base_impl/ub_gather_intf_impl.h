@@ -367,12 +367,14 @@ __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90100000)
 __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
         vgatherb(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
 {
@@ -451,6 +453,7 @@ __simd_callee__ inline void asc_gather_datablock(
         vgatherb(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -858,7 +861,6 @@ __simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(__ubuf__ fp8_e6m2_
     asc_gather_datablock(dst, src, index);
     return dst;
 }
-#endif
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
