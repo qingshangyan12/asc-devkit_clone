@@ -142,6 +142,9 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
     # ccu_runtime 是 asc-comm 的编译器侧 CCU runtime；作为 asc-devkit 子目录构建时，
     # asc-comm/experimental 下的独立 install 规则不会生效，因此由 asc-devkit 统一接管交付。
     if(TARGET ccu_runtime)
+        if(NOT TARGET ccu_runtime_build)
+            add_custom_target(ccu_runtime_build ALL DEPENDS ccu_runtime)
+        endif()
         install(TARGETS ccu_runtime
             LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64
             COMPONENT asc-devkit)
