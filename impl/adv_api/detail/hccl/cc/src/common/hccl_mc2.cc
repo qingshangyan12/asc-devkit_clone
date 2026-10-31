@@ -804,6 +804,7 @@ HcclResult Mc2AcquireCcResCtxAicpu(HcclComm comm, uint8_t ccType, void* ccArgs, 
     CHK_RET(LogHcclExit("Mc2AcquireCcResCtx", ctxTag.c_str(), startut));
     *ccResCtx = result;
     *ccResCtxSize = sizeof(OpResCtx);
+    HCCL_INFO("[Mc2AcquireCcResCtx] end, ccResCtx[%p], ccResCtxSize[%u].", *ccResCtx, *ccResCtxSize);
     return HCCL_SUCCESS;
 }
 
