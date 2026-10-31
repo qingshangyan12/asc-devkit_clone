@@ -6,7 +6,7 @@ When training and inferring models through the PyTorch framework, many operators
 
 -   Kernel function direct invocation: By adapting torch.library or Pybind to register custom operators, the PyTorch framework can invoke operator kernel function programs.
 -   Single-operator API invocation: For the adaptation plugin development process and specific examples in this mode, see [OpPlugin-Based Operator Adaptation Development](https://gitcode.com/Ascend/pytorch/blob/v2.14.0-26.2.0/docs/en/developer_notes/custom_operator_adaptation/opplugin_operator_adaptation/adaptation_overview_opplugin.md).
--   Graph mode invocation: For guidance on adapting custom operators in PyTorch graph mode, see [Custom Operator Graph Integration](https://gitcode.com/Ascend/torchair/blob/26.2.0/docs/en/custom_op_graph/overview.md).
+-   Graph mode invocation: For guidance on adapting custom operators in PyTorch graph mode, see [Custom Operator Graph Integration](https://gitcode.com/Ascend/torchair/blob/26.2.0/docs/zh/custom_op_graph/overview.md).
 
 **Figure 1**  PyTorch framework deployment methods<a name="fig1969201074516"></a>  
 ![](../../../figures/pytorch_deploy.png "PyTorch framework deployment methods")
