@@ -264,7 +264,7 @@ __global__ __launch_bounds__(128) void probe(int* flag, float* output, uint32_t 
         volatile int* vflag = flag;
         int32_t spins = 0;
         for (uint32_t i = 0; i < 1000u; ++i) {
-            spins += *vflag;                 // 每轮真实读GM，不被合并/省略
+            spins += *vflag;                 // 每轮真实读GM，不被合并、不被省略
         }
         output[0] = static_cast<float>(spins);
     }
@@ -702,7 +702,7 @@ template <int thread_num>          // 字面常量：编译通过
 __simt_vf__ __launch_bounds__(kNumThreads) inline void vf_func(__gm__ int* out, uint32_t count)
 {
     const int32_t warp_num = thread_num / warpSize;
-    const int warp_idx = threadIdx.x / warpSize;    // 函数体内使用warpSize：可用
+    const int32_t warp_idx = threadIdx.x / warpSize;    // 函数体内使用warpSize：可用
     out[threadIdx.x] = warp_num + warp_idx;
 }
 ```
