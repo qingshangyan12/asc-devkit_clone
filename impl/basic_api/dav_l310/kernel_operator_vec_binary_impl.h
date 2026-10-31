@@ -782,9 +782,9 @@ template <typename T>
 __simd_vf__ inline void SubReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t calCount)
 {
     static_assert(
-        SupportType<T, half, float, int16_t, uint64_t, int64_t>(),
+        SupportType<T, half, float, int16_t>(),
         "Failed to check dtype in SubRelu, "
-        "current api support dtype combination is src and dst both: half / float / int16_t / uint64_t / int64_t.");
+        "current api support dtype combination is src and dst both: half / float / int16_t.");
     uint32_t sreg = static_cast<uint32_t>(calCount);
     const T scalarValue = 0;
     if constexpr (sizeof(T) == 8) {

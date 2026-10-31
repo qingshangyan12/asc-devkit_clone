@@ -161,8 +161,7 @@ template <typename T, typename U, typename RegT, typename RegU>
 __simd_callee__ inline void Axpy(RegT& dstReg, RegU& srcReg, U scalarValue, Reg::MaskReg& mask)
 {
     if constexpr (SupportType<
-                      Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<uint64_t, uint64_t>,
-                      Tuple<int64_t, int64_t>>()) {
+                      Tuple<T, U>, Tuple<half, half>, Tuple<float, float>>()) {
         Reg::Axpy(dstReg, srcReg, scalarValue, mask);
     } else if constexpr (SupportType<Tuple<T, U>, Tuple<float, half>>()) {
         RegU tmpReg;
@@ -208,8 +207,7 @@ __aicore__ inline void AxpyImpl(__ubuf__ T* dst, __ubuf__ U* src, const U& scala
 {
     static_assert(
         SupportType<
-            Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>, Tuple<uint64_t, uint64_t>,
-            Tuple<int64_t, int64_t>>(),
+            Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
         "current data type is not supported on current device!");
     if constexpr (SupportBytes<T, 8>()) {
         constexpr auto func =
