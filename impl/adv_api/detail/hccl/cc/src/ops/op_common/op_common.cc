@@ -2422,11 +2422,9 @@ static HcclResult HcclGetCcuKernelDynamic(
 #endif
 
 #ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
-// 实验构建（asc-comm 数据面）：entity 查询模式。哨兵值为 8 字节对齐且 > UINT32_MAX 的地址，
-// hcomm 检测到后返回其持有的 HcommCcuInstanceEntity 稳定地址（借用，不转移所有权，
-// 不把 CcuInsHandle 直接当指针传给 asc-comm）。
-// 与 hcomm 侧 IsInstanceEntityQueryRequest 同口径回检：旧版 hcomm 不识别哨兵时返回小值实例
-// token，直接透传会触发 asc-comm 侧非法解引用；此处拦截并报 INTERNAL。
+// 实验构建（asc-comm 数据面）：entity 查询模式，对齐 asc-comm examples/common/ccu_instance.h
+// 的 QueryCcuInstance 做法：void* 请求地址由用户侧传入，hcomm 检测到哨兵后返回其持有的
+// HcommCcuInstanceEntity 稳定地址（借用，不转移所有权），不做额外实体校验，直接透传给 asc-comm。
 static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
 {
     CcuInsHandle insHandle = reinterpret_cast<CcuInsHandle>(&insEntity);
@@ -2437,14 +2435,6 @@ static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
         HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns failed, ret -> %d", queryRet), queryRet);
     CHK_PRT_RET(
         insNum != 1, HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
-        HCCL_E_INTERNAL);
-    const bool isEntityAddress = insHandle > static_cast<CcuInsHandle>(UINT32_MAX) &&
-                                 (insHandle % sizeof(void*)) == 0;
-    CHK_PRT_RET(
-        !isEntityAddress,
-        HCCL_ERROR("[QueryCcuInstanceEntity] hcomm returned a non-entity CcuInsHandle[%llu]; entity query mode "
-                   "requires a newer hcomm with sentinel detection",
-                   static_cast<unsigned long long>(insHandle)),
         HCCL_E_INTERNAL);
     insEntity = reinterpret_cast<void*>(insHandle);
     HCCL_INFO("[QueryCcuInstanceEntity] entity[%p].", insEntity);
