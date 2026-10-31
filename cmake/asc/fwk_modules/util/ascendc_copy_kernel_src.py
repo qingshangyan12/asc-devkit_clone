@@ -57,7 +57,7 @@ def copy_dir(src_dir, dst_dir, exclude_dir=None):
                 category=UserWarning,
             )
         if os.path.islink(src_dir):
-            src_dir = os.path.abspath(os.readlink(src_dir))
+            src_dir = os.path.realpath(src_dir)
         for dir_path, dirs, items in os.walk(src_dir):
             if exclude_dir is not None and is_subdirectory(dir_path, exclude_dir):
                 continue
