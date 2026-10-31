@@ -27,6 +27,11 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
+#include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
 #include "include/utils/common_types.h"
 
@@ -45,6 +50,21 @@ __aicore__ inline void ReduceDataBlock(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceDataBlock is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceDataBlock(
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
 template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "ReduceDataBlock is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -52,6 +72,21 @@ __aicore__ inline void ReduceDataBlock(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceDataBlock is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceDataBlock(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
 template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -59,12 +94,42 @@ __aicore__ inline void ReducePairElem(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
 
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReducePairElem(
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
 template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ReducePairElem(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReducePairElem(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
 
 template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
@@ -74,6 +139,21 @@ __aicore__ inline void ReduceRepeat(
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceRepeat is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceRepeat(
+    Operand0 dst, Operand1 src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
 template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
 __ASC_USE_RESERVED_UBUF__(
     3510, "ReduceRepeat is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -81,6 +161,21 @@ __aicore__ inline void ReduceRepeat(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
+template <
+    ReduceType reduceType, typename T = VectorOperand::DefaultType, typename U = VectorOperand::DefaultType,
+    bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceRepeat is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceRepeat(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
 
 /* **************************************** Reduce Interface ****************************************** */
 /*
@@ -99,6 +194,20 @@ __aicore__ inline void ReduceMax(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
 
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMax(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
 /*
  * @ingroup ReduceMin
  * @brief Index of the minimum value of all input elements
@@ -115,6 +224,20 @@ __aicore__ inline void ReduceMin(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
 
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMin(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
 /*
  * @ingroup ReduceSum
  * @brief sum all input elements
@@ -130,18 +253,74 @@ __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
     const int32_t repeatTime, const int32_t srcRepStride);
 
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceSum(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride);
+
 template <typename T>
 __aicore__ inline void ReduceMax(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMax(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
 template <typename T>
 __aicore__ inline void ReduceMin(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMin(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
 template <typename T>
 __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
     const int32_t repeatTime, const int32_t srcRepStride);
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceSum(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride);
 
 /*
  * @ingroup ReduceMin Level 2
@@ -157,6 +336,19 @@ __aicore__ inline void ReduceMin(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count,
     bool calIndex = 0);
 
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMin(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex = 0);
+
 /*
  * @ingroup ReduceMax Level 2
  * @brief Index of the maximum value of all input elements
@@ -171,6 +363,19 @@ __aicore__ inline void ReduceMax(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count,
     bool calIndex = 0);
 
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceMax(
+    Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count, bool calIndex = 0);
+
 /*
  * @ingroup ReduceSum Level 2
  * @brief sum all input elements
@@ -182,6 +387,19 @@ __aicore__ inline void ReduceMax(
 template <typename T, bool isSetMask = true>
 __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count);
+
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>() &&
+            VectorOperand::IsWritable<Operand2>(),
+        int>::type = 0>
+__aicore__ inline void ReduceSum(Operand0 dst, Operand1 src, Operand2 sharedTmpBuffer, const int32_t count);
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T& maxMinValue, T& maxMinIndex);

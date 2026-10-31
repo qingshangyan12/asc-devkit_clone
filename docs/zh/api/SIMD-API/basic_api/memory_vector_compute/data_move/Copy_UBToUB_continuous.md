@@ -54,21 +54,42 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
 
+### 指针与LocalTensor混合调用
+
+本接口增加以下指针重载。dst和src可独立选择`__ubuf__ T*`或LocalTensor，至少一个操作数为指针；全LocalTensor调用继续使用原接口。指针形式沿用本页的产品支持、数据类型、32字节对齐和地址重叠约束。调用者须保证指针所指缓冲区容量有效。
+
+```cpp
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__aicore__ inline __inout_pipe__(V) void Copy(Operand0 dst, Operand1 src, const uint32_t count);
+```
+
+模板参数T默认从目的操作数推导，显式指定时须与源、目的元素类型一致；目的操作数必须可写。Operand0/Operand1由实参推导，enable_if用于检查合法组合，无需调用者填写。其他参数及返回值与原形式一致。公共约束和完整核函数示例见[VECTOR Basic API指针接口](../vector_pointer.md)。
+
 ## 参数说明<a name="zh-cn_topic_0000002567699435_section16128134420472"></a>
 
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section42191353048181)。 |
+| T | 源操作数或者目的操作数的数据类型。指针形式默认从Operand0推导；显式指定时须与源、目的元素类型一致。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section42191353048181)。 |
 | isSetMask | 参数不生效，保持默认值true即可。 |
+| Operand0 | 仅用于指针重载，由dst推导。可为可写的UB指针或LocalTensor。 |
+| Operand1 | 仅用于指针重载，由src推导。可为UB指针或LocalTensor；Operand0与Operand1中至少一个为指针。 |
+| 未命名的enable_if参数 | 仅用于指针重载，检查指针参与、元素类型一致及目的操作数可写。默认值为0，调用者无需指定。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>源操作数的数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束；目的指针必须可写。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>源操作数的数据类型需要与目的操作数保持一致。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束。 |
 | count | 输入 | 参与搬运的元素个数。 |
 
 ## 数据类型<a name="zh-cn_topic_0000002567699435_section42191353048181"></a>
@@ -92,4 +113,18 @@ Ascend 950PR&950DT系列产品，支持的数据类型为：int8_t、uint8_t、f
 
 ```cpp
 AscendC::Copy(dstLocal, srcLocal, 512);
+```
+
+### 指针调用示例
+
+```cpp
+// dstLocal/srcLocal为按本页要求分配并同步的UB缓冲区，容量至少为64个float。
+__ubuf__ float* dstPtr = (__ubuf__ float*)dstLocal.GetPhyAddr();
+__ubuf__ float* srcPtr = (__ubuf__ float*)srcLocal.GetPhyAddr();
+// 三种组合为可选的独立调用示例。
+AscendC::Copy(dstPtr, srcLocal, uint32_t(64));
+AscendC::PipeBarrier<PIPE_V>();
+AscendC::Copy(dstLocal, srcPtr, uint32_t(64));
+AscendC::PipeBarrier<PIPE_V>();
+AscendC::Copy<float>(dstPtr, srcPtr, uint32_t(64));
 ```

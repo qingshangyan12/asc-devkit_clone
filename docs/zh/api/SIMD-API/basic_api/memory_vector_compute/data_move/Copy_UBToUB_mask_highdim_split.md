@@ -63,21 +63,56 @@
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
+### 指针与LocalTensor混合调用
+
+本接口增加以下指针重载。dst和src可独立选择`__ubuf__ T*`或LocalTensor，至少一个操作数为指针；全LocalTensor调用继续使用原接口。指针形式沿用本页的产品支持、数据类型、32字节对齐和地址重叠约束。调用者须保证指针所指缓冲区容量有效。
+
+```cpp
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, bool isSetMask = true, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline __inout_pipe__(V) void Copy(
+    Operand0 dst, Operand1 src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams);
+```
+
+模板参数T默认从目的操作数推导，显式指定时须与源、目的元素类型一致；目的操作数必须可写。Operand0/Operand1由实参推导，enable_if用于检查合法组合，无需调用者填写。其他参数及返回值与原形式一致。公共约束和完整核函数示例见[VECTOR Basic API指针接口](../vector_pointer.md)。
+
 ## 参数说明<a name="zh-cn_topic_0000002567699435_section16128134420472"></a>
 
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
+| T | 源操作数或者目的操作数的数据类型。指针形式默认从Operand0推导；显式指定时须与源、目的元素类型一致。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
+| Operand0 | 仅用于指针重载，由dst推导。可为可写的UB指针或LocalTensor。 |
+| Operand1 | 仅用于指针重载，由src推导。可为UB指针或LocalTensor；Operand0与Operand1中至少一个为指针。 |
+| 未命名的enable_if参数 | 仅用于指针重载，检查指针参与、元素类型一致及目的操作数可写。默认值为0，调用者无需指定。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。 |
-| src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束；目的指针必须可写。 |
+| src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD_compute/mask.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256字节数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD_compute/high_dim_split.md)。|
 | repeatParams | 输入 | 控制操作数地址步长的参数。<br>CopyRepeatParams类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。CopyRepeatParams参数说明请参考表3。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
@@ -223,3 +258,16 @@
 ```
 
 完整样例请参考[Copy样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)。
+
+### 指针调用示例
+
+```cpp
+// dstLocal/srcLocal为按本页要求分配并同步的UB缓冲区，容量至少为64个float。
+__ubuf__ float* dstPtr = (__ubuf__ float*)dstLocal.GetPhyAddr();
+__ubuf__ float* srcPtr = (__ubuf__ float*)srcLocal.GetPhyAddr();
+AscendC::CopyRepeatParams params{1, 1, 8, 8};
+AscendC::Copy(dstPtr, srcLocal, uint64_t(64), uint8_t(1), params);
+AscendC::PipeBarrier<PIPE_V>();
+uint64_t bits[2] = {0xFFFFFFFFFFFFFFFF, 0};
+AscendC::Copy(dstLocal, srcPtr, bits, uint8_t(1), params);
+```

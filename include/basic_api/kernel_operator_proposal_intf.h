@@ -27,6 +27,11 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
+#include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
 #include "kernel_struct_proposal.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -76,6 +81,21 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
  */
 template <typename T>
 __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& src, const MrgSort4Info& params);
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Source0, typename Source1, typename Source2,
+    typename Source3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
+__aicore__ inline void MrgSort(
+    Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& src, const MrgSort4Info& params);
 
 /* **************************************** Sort32 ****************************************** */
 /*
@@ -159,6 +179,22 @@ __aicore__ inline void MrgSort(
     const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4],
     uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime);
 
+template <
+    typename T = VectorOperand::DefaultType, bool isExhaustedSuspension = false, typename Operand0, typename Source0,
+    typename Source1, typename Source2, typename Source3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Source0, Source1, Source2, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Source3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type = 0>
+__aicore__ inline void MrgSort(
+    Operand0 dst, const MrgSortSrcList<T, Source0, Source1, Source2, Source3>& sortList,
+    const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime);
+
 /* ***************************************** Sort ****************************************** */
 /*
  * @ingroup Sort
@@ -173,6 +209,20 @@ template <typename T, bool isFullSort>
 __aicore__ inline void Sort(
     const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp,
     const int32_t repeatTime);
+
+template <
+    typename T = VectorOperand::DefaultType, bool isFullSort, typename Operand0, typename Operand1, typename Operand2,
+    typename Operand3,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2, Operand3>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand3>() &&
+            VectorOperand::IsWritable<Operand3>(),
+        int>::type = 0>
+__aicore__ inline void Sort(Operand0 dst, Operand1 concat, Operand2 index, Operand3 tmp, const int32_t repeatTime);
 
 /* **************************************** GetSortOffset ****************************************** */
 /*

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -1127,6 +1127,30 @@ __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t num, uint32_t len)
     return true;
 }
 #endif // defined(__NPU_ARCH__)
+} // namespace AscendC
+#endif
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+namespace AscendC {
+template <typename T, Hardware space = Hardware::UB>
+inline uint64_t GetAbsAddr(TPipe* tpipe, T* pointer)
+{
+    static_assert(space == Hardware::UB || space == Hardware::L1, "Only UB and L1 address translation is supported");
+    constexpr TPosition position = space == Hardware::UB ? TPosition::VECCALC : TPosition::A1;
+    const uint64_t address = reinterpret_cast<uint64_t>(pointer);
+    const uint64_t base = reinterpret_cast<uint64_t>(tpipe->GetBaseAddr(static_cast<int8_t>(position)));
+    const uint64_t limit = space == Hardware::UB ? TMP_UB_OFFSET : TOTAL_L1_SIZE;
+    ASCENDC_ASSERT((address >= base && address - base < limit), {
+        KERNEL_LOG(KERNEL_ERROR, "GetAbsAddr pointer is outside the selected hardware memory pool");
+    });
+    return address - base;
+}
+
+template <typename T, Hardware space>
+inline uint64_t TPipe::GetAbsAddr(T* pointer)
+{
+    return AscendC::GetAbsAddr<T, space>(this, pointer);
+}
+
 } // namespace AscendC
 #endif
 #endif // ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H

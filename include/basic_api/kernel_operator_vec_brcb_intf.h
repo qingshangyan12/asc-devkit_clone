@@ -27,6 +27,11 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
+#include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
 #include "kernel_struct_brcb.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -51,6 +56,16 @@ template <typename T>
 __aicore__ inline void Brcb(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t repeatTime,
     const BrcbRepeatParams& repeatParams);
+
+template <
+    typename T = VectorOperand::DefaultType, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type = 0>
+__aicore__ inline void Brcb(Operand0 dst, Operand1 src, const uint8_t repeatTime, const BrcbRepeatParams& repeatParams);
 } // namespace AscendC
 #pragma end_pipe
 

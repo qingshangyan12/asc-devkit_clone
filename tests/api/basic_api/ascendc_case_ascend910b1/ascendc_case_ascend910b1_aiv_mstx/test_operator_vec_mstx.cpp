@@ -2291,3 +2291,26 @@ TEST_P(UnarySimpleMstxTestsuite, UnarySimpleMstxTestCase)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+TEST_F(UnarySimpleMstxTestsuite, PointerAddReportsMixedOperandMetadata)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> dstBuffer, srcBuffer;
+    pipe.InitBuffer(dstBuffer, 256);
+    pipe.InitBuffer(srcBuffer, 256);
+    auto dst = dstBuffer.Get<float>();
+    auto src = srcBuffer.Get<float>();
+    auto dstPtr = reinterpret_cast<float*>(dst.GetPhyAddr());
+    auto srcPtr = reinterpret_cast<float*>(src.GetPhyAddr());
+
+    Add(dst, src, src, int32_t(64));
+    auto expected = g_vec_binary;
+    const uint64_t ubBase = reinterpret_cast<uint64_t>(GetBaseAddrCpu(static_cast<int8_t>(TPosition::VECCALC)));
+    expected.dst.size = (TOTAL_UB_SIZE - (reinterpret_cast<uint64_t>(dstPtr) - ubBase)) / sizeof(float);
+    expected.src0.size = (TOTAL_UB_SIZE - (reinterpret_cast<uint64_t>(srcPtr) - ubBase)) / sizeof(float);
+    g_vec_binary = {};
+    g_testRes = 1;
+    Add(dstPtr, srcPtr, src, int32_t(64));
+    CheckResult(expected, g_vec_binary);
+    EXPECT_EQ(g_testRes, 1);
+}

@@ -74,6 +74,34 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     CreateVecIndexCalc(dst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
 }
 
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    Operand0 dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to check "
+            "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");
+    });
+    CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#endif
+}
+#endif
+
 template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     LocalTensor<T>& dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
@@ -96,6 +124,34 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
     CreateVecIndexCalc(dst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
 }
 
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    Operand0 dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    ASCENDC_ASSERT((SupportType<VectorElementT, half, int16_t, float, int32_t>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to check "
+            "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");
+    });
+    CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+#endif
+}
+#endif
+
 template <typename T>
 __aicore__ inline __in_pipe__(S)
     __out_pipe__(V) void CreateVecIndex(LocalTensor<T> dst, const T& firstValue, uint32_t count)
@@ -110,6 +166,26 @@ __aicore__ inline __in_pipe__(S)
 #endif
     CreateVecIndexCalc(dst, firstValue, count);
 }
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(Operand0 dst, const T& firstValue, uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::CreateVecIndex<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst, firstValue, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    CreateVecIndexCalc(GetUnderlyingPtr(dst), firstValue, count);
+#endif
+}
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_INTF_IMPL_H__)

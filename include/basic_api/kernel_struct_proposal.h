@@ -56,25 +56,44 @@ struct MrgSort4Info {
     uint8_t repeatTimes = 1;
 };
 
-template <typename T>
+template <
+    typename T, typename Source1 = LocalTensor<T>, typename Source2 = LocalTensor<T>, typename Source3 = LocalTensor<T>,
+    typename Source4 = LocalTensor<T>>
 struct MrgSortSrcList {
     __aicore__ MrgSortSrcList() {}
 
     __aicore__ MrgSortSrcList(
-        const LocalTensor<T>& src1In, const LocalTensor<T>& src2In, const LocalTensor<T>& src3In,
-        const LocalTensor<T>& src4In)
+        const Source1& src1In, const Source2& src2In, const Source3& src3In, const Source4& src4In)
     {
-        src1 = src1In[0];
-        src2 = src2In[0];
-        src3 = src3In[0];
-        src4 = src4In[0];
+        src1 = src1In;
+        src2 = src2In;
+        src3 = src3In;
+        src4 = src4In;
     }
 
-    LocalTensor<T> src1;
-    LocalTensor<T> src2;
-    LocalTensor<T> src3;
-    LocalTensor<T> src4;
+    Source1 src1;
+    Source2 src2;
+    Source3 src3;
+    Source4 src4;
 };
+} // namespace AscendC
+
+// CPU_DEBUG tensor checks require the proposal types to be declared first.
+#if __has_include("basic_api/kernel_tensor.h")
+#include "basic_api/kernel_tensor.h"
+#else
+#include "kernel_tensor.h"
+#endif
+#if __has_include("impl/basic_api/utils/kernel_vector_operand.h")
+#include "impl/basic_api/utils/kernel_vector_operand.h"
+#else
+#include "../../impl/basic_api/utils/kernel_vector_operand.h"
+#endif
+
+namespace AscendC {
+template <typename Source1, typename Source2, typename Source3, typename Source4>
+__aicore__ MrgSortSrcList(Source1, Source2, Source3, Source4)
+    -> MrgSortSrcList<typename VectorOperand::Traits<Source1>::Element, Source1, Source2, Source3, Source4>;
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_PROPOSAL_H
 

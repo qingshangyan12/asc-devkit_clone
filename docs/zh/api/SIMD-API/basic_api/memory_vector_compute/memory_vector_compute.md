@@ -4,6 +4,8 @@
 
 -   **[SIMD计算说明](SIMD_compute/SIMD_compute.md)**
 
+-   **[VECTOR Basic API指针接口](vector_pointer.md)**
+
 -   **[基础算术](basic_arithmetic/basic_arithmetic.md)**
 
 -   **[逻辑计算](logical_compute/logical_compute.md)**

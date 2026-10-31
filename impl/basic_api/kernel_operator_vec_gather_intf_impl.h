@@ -86,6 +86,42 @@ __aicore__ inline void Gatherb(
 #endif
 }
 
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type>
+__aicore__ inline void Gatherb(
+    Operand0 dst, Operand1 src, Operand2 offset, const uint8_t repeatTime, const GatherRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugOffset = VectorOperand::ToDebugTensor<uint32_t>(offset);
+    return AscendC::Gatherb<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugOffset, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    GatherImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(offset), srcLength, repeatTime, repeatParams);
+#else
+    GatherbImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(offset), srcLength, repeatTime, repeatParams);
+#endif
+#endif
+}
+#endif
+
 /*
  * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
@@ -128,6 +164,37 @@ __aicore__ inline void Gather(
         (__ubuf__ uint32_t*)srcOffset.GetPhyAddr(), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
 }
 
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask,
+    const uint8_t repeatTime, const uint16_t dstRepStride)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, mask, repeatTime, dstRepStride);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
+    GatherImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
+#endif
+}
+#endif
+
 /*
  * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
@@ -169,6 +236,37 @@ __aicore__ inline void Gather(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)srcOffset.GetPhyAddr(), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
 }
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint64_t mask[],
+    const uint8_t repeatTime, const uint16_t dstRepStride)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, mask, repeatTime, dstRepStride);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    constexpr uint32_t srcLength = 0; // Unused by the 3510 backend.
+    GatherImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcLength, srcBaseOffset, mask, repeatTime, dstRepStride);
+#endif
+}
+#endif
 
 /*
  * @ingroup gather Level 2
@@ -278,6 +376,35 @@ __aicore__ inline void GatherDataCopy(
     GatherFromGlobalImpl(
         (__ubuf__ T*)dstLocal.GetPhyAddr(), (__gm__ T*)srcGlobal.GetPhyAddr(), (__ubuf__ U*)offsetLocal.GetPhyAddr(),
         gatherParam, gatherPadParam, cacheMode);
+}
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<uint32_t, Operand2>(),
+        int>::type>
+__aicore__ inline void Gather(
+    Operand0 dst, Operand1 src, Operand2 srcOffset, const uint32_t srcBaseOffset, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    auto debugSrcOffset = VectorOperand::ToDebugTensor<uint32_t>(srcOffset);
+    return AscendC::Gather<PrimT<VectorOperand::ElementT<T, Operand0>>>(
+        debugDst, debugSrc, debugSrcOffset, srcBaseOffset, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    GatherImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src),
+        (__ubuf__ uint32_t*)GetUnderlyingPtr(srcOffset), srcBaseOffset, count);
+#endif
 }
 #endif
 } // namespace AscendC

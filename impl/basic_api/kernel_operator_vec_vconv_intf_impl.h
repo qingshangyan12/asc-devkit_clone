@@ -118,6 +118,35 @@ __aicore__ inline void Cast(
         repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Cast(
+    Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Cast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, roundMode, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), roundMode, mask,
+        repeatTime, repeatParams);
+#endif
+}
+
 // Cast::Level 0 - mask count mode
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Cast(
@@ -155,6 +184,35 @@ __aicore__ inline void Cast(
     CastImpl<DstPrimType, SrcPrimType, isSetMask>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), roundMode, mask, repeatTime,
         repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Cast(
+    Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Cast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, roundMode, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), roundMode, mask,
+        repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -201,6 +259,39 @@ __aicore__ inline void Cast(
             KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to pass Cast count mode check."));
     }
     CastImpl((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), roundMode, count);
+}
+
+template <
+    typename T, typename U, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Cast(Operand0 dst, Operand1 src, const RoundMode& roundMode, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Cast<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc, roundMode, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    if constexpr (!(Std::is_same<DstPrimType, int4b_t>::value) && !(Std::is_same<SrcPrimType, int4b_t>::value)) {
+        ASCENDC_DEBUG_ASSERT(
+            CheckCastOverlappingHigh(
+                static_cast<uint64_t>(reinterpret_cast<uintptr_t>(GetUnderlyingPtr(dst))),
+                static_cast<uint64_t>(reinterpret_cast<uintptr_t>(GetUnderlyingPtr(src))), sizeof(DstPrimType),
+                sizeof(SrcPrimType), count),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to pass Cast count mode check."));
+    }
+    CastImpl(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), roundMode, count);
+#endif
 }
 
 #if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
@@ -259,6 +350,34 @@ __aicore__ inline void CastDequant(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), mask, repeatTime,
         repeatParams);
 }
+
+template <
+    typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDequant(
+    Operand0 dst, Operand1 src, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDequant<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask, isVecDeq,
+        halfBlock>(debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
+#endif
+}
 template <typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDequant(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, uint8_t repeatTime,
@@ -284,6 +403,34 @@ __aicore__ inline void CastDequant(
     CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), mask, repeatTime,
         repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDequant(
+    Operand0 dst, Operand1 src, const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDequant<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask, isVecDeq,
+        halfBlock>(debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
+#endif
 }
 
 // CastDeq has been updated, please use CastDequant instead.
@@ -315,6 +462,34 @@ __aicore__ inline void CastDeq(
     CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), mask, repeatTime,
         repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDeq(
+    Operand0 dst, Operand1 src, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDeq<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask, isVecDeq,
+        halfBlock>(debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
+#endif
 }
 
 // CastDeq has been updated, please use CastDequant instead.
@@ -349,6 +524,34 @@ __aicore__ inline void CastDeq(
         repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDeq(
+    Operand0 dst, Operand1 src, const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDeq<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask, isVecDeq,
+        halfBlock>(debugDst, debugSrc, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isSetMask, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
+#endif
+}
+
 /*
  * @ingroup CastDequant Level 2
  * @brief Dequant from int16_t to uint8_t/int8_t
@@ -379,6 +582,32 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), count);
 }
 
+template <
+    typename T, typename U, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDequant(Operand0 dst, Operand1 src, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDequant<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isVecDeq, halfBlock>(
+        debugDst, debugSrc, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), count);
+#endif
+}
+
 // CastDeq has been updated, please use CastDequant instead.
 template <typename T, typename U, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
@@ -400,6 +629,32 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
 #endif
     CastDeqImpl<DstPrimType, SrcPrimType, isVecDeq, halfBlock>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), count);
+}
+
+template <
+    typename T, typename U, bool isVecDeq, bool halfBlock, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void CastDeq(Operand0 dst, Operand1 src, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::CastDeq<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isVecDeq, halfBlock>(
+        debugDst, debugSrc, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    CastDeqImpl<DstPrimType, SrcPrimType, isVecDeq, halfBlock>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -452,6 +707,42 @@ __aicore__ inline void AddReluCast(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void AddReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    using DstPrimType = PrimT<VectorElementT>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    AddReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void AddReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
@@ -483,6 +774,42 @@ __aicore__ inline void AddReluCast(
     AddReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void AddReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    using DstPrimType = PrimT<VectorElementT>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    AddReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -517,6 +844,38 @@ __aicore__ inline void AddReluCast(
     AddReluCastImpl(
         (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),
         (__ubuf__ PrimT<U>*)src1.GetPhyAddr(), count);
+}
+
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void AddReluCast(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::AddReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    AddReluCastImpl(
+        (__ubuf__ PrimT<VectorElementT>*)GetUnderlyingPtr(dst), (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src0),
+        (__ubuf__ PrimT<VectorElementU>*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 /* **************************************************************************************************
@@ -569,6 +928,42 @@ __aicore__ inline void SubReluCast(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void SubReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::SubReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    SubReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
@@ -600,6 +995,42 @@ __aicore__ inline void SubReluCast(
     SubReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void SubReluCast(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::SubReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using SrcPrimType = PrimT<VectorElementU>;
+    using DstPrimType = PrimT<VectorElementT>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    SubReluCastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -636,6 +1067,40 @@ __aicore__ inline void SubReluCast(
     SubReluCastImpl(
         (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), count);
+}
+
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void SubReluCast(Operand0 dst, Operand1 src0, Operand2 src1, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src1);
+    return AscendC::SubReluCast<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc0, debugSrc1, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DstPrimType = PrimT<VectorElementT>;
+    using SrcPrimType = PrimT<VectorElementU>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    SubReluCastImpl(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), count);
+#endif
 }
 
 #pragma end_pipe
@@ -686,6 +1151,31 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
     SetDeqScaleImpl<T>(vdeq, vdeqInfo);
 }
 
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline void SetDeqScale(Operand0 vdeq, const VdeqInfo& vdeqInfo)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugVdeq = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(vdeq);
+    return AscendC::SetDeqScale<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugVdeq, vdeqInfo);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    SetDeqScaleImpl<PrimT<VectorElementT>>(GetUnderlyingPtr(vdeq), vdeqInfo);
+#endif
+}
+#endif
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 /*
@@ -706,6 +1196,37 @@ __aicore__ inline void Truncate(const LocalTensor<T>& dst, const LocalTensor<T>&
     });
     TruncateImpl<PrimType, roundMode>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+}
+
+template <
+    typename T, RoundMode roundMode, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type>
+__aicore__ inline void Truncate(Operand0 dst, Operand1 src, const uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::Truncate<PrimT<VectorOperand::ElementT<T, Operand0>>, roundMode>(debugDst, debugSrc, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    if constexpr (!VectorOperand::Traits<Operand0>::isPointer) {
+        CheckTensorPos<VectorElementT>(dst, Hardware::UB, "dst", "VECIN/VECCALC/VECOUT", "Truncate");
+    }
+    if constexpr (!VectorOperand::Traits<Operand1>::isPointer) {
+        CheckTensorPos<VectorElementT>(src, Hardware::UB, "src", "VECIN/VECCALC/VECOUT", "Truncate");
+    }
+    ASCENDC_ASSERT((VectorOperand::FitsCount(src, count) && VectorOperand::FitsCount(dst, count)), {
+        KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src", count);
+    });
+    TruncateImpl<PrimType, roundMode>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
+#endif
 }
 #endif
 #endif // defined(__NPU_ARCH__)

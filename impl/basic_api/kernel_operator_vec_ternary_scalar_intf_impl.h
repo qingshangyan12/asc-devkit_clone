@@ -90,6 +90,33 @@ __aicore__ inline void Axpy(
         (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Axpy(
+    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, scalarValue, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        mask, repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Axpy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, uint64_t mask[],
@@ -112,6 +139,33 @@ __aicore__ inline void Axpy(
 #endif
     AxpyImpl<T, U, isSetMask>(
         (__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Axpy(
+    Operand0 dst, Operand1 src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<
+        PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>, isSetMask>(
+        debugDst, debugSrc, scalarValue, mask, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    AxpyImpl<VectorElementT, VectorElementU, isSetMask>(
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        mask, repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -139,6 +193,30 @@ __aicore__ inline void Axpy(
     MstxTensor::GetMstxVecUnaryTenaryInfo<T, U, true>(dst, src, "Axpy", count);
 #endif
     AxpyImpl<T, U>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, count);
+}
+
+template <
+    typename T, typename U, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>(),
+        int>::type>
+__aicore__ inline void Axpy(Operand0 dst, Operand1 src, const U& scalarValue, const int32_t& count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(src);
+    return AscendC::Axpy<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSrc, scalarValue, count);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    AxpyImpl<VectorElementT, VectorElementU>(
+        (__ubuf__ VectorElementT*)GetUnderlyingPtr(dst), (__ubuf__ VectorElementU*)GetUnderlyingPtr(src), scalarValue,
+        count);
+#endif
 }
 } // namespace AscendC
 #pragma end_pipe

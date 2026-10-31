@@ -58,6 +58,39 @@
 
 #pragma begin_pipe(V)
 namespace AscendC {
+
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+// Shared pointer dispatch for scalar-source and vector-source Select forms.
+template <const BinaryConfig& config, typename D, typename M, typename A, typename B, typename... Args>
+__aicore__ inline void VectorSelectDispatch(D dst, M sel, A a, B b, SELMODE mode, Args... args)
+{
+    static_assert(VectorOperand::IsWritable<D>(), "Select destination must be writable");
+    static_assert(VectorOperand::AllOperands<M>(), "Select mask must be a UB operand");
+    using T = VectorOperand::Primitive<D>;
+    using U = VectorOperand::Primitive<M>;
+    auto pd = GetUnderlyingPtr(dst);
+    auto pm = GetUnderlyingPtr(sel);
+    if constexpr (VectorOperand::AllOperands<A, B>()) {
+        static_assert(VectorOperand::Matches<T, A>() && VectorOperand::Matches<T, B>());
+        if (mode == SELMODE::VSEL_TENSOR_SCALAR_MODE) {
+            VselImpl<T, U, config.scalarTensorIndex>(pd, pm, GetUnderlyingPtr(a), GetUnderlyingPtr(b), mode, args...);
+        } else {
+            VselImpl<T, U>(pd, pm, GetUnderlyingPtr(a), GetUnderlyingPtr(b), mode, args...);
+        }
+    } else if constexpr (VectorOperand::AllOperands<A>() && TypeUtils::IsInnerDefaultType<B>()) {
+        static_assert(VectorOperand::Matches<T, A>() && Std::is_same<T, B>::value);
+        VselImpl(pd, pm, GetUnderlyingPtr(a), b, mode, args...);
+    } else if constexpr (TypeUtils::IsInnerDefaultType<A>() && VectorOperand::AllOperands<B>()) {
+        static_assert(VectorOperand::Matches<T, B>() && Std::is_same<T, A>::value);
+        VselImpl(pd, pm, a, GetUnderlyingPtr(b), mode, args...);
+    } else {
+        static_assert(VectorOperand::AllOperands<A, B>(), "Select requires at least one vector source");
+    }
+}
+#endif
+
 /* **************************************************************************************************
  * Compare                                           *
  * ************************************************************************************************* */
@@ -102,6 +135,37 @@ __aicore__ inline void Compare(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), cmpMode, mask, repeatTime, repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void Compare(
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<
+        PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, mask, repeatTime, repeatParams);
+#else
+    using VectorElementU = VectorOperand::ElementT<U, Operand0>;
+    using VectorElementT = VectorOperand::ElementT<T, Operand1>;
+    using SrcPrimType = PrimT<VectorElementT>;
+    using DstPrimType = PrimT<VectorElementU>;
+    VcmpvImpl<SrcPrimType, DstPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, mask, repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
@@ -126,6 +190,37 @@ __aicore__ inline void Compare(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), cmpMode, mask, repeatTime, repeatParams);
 }
 
+template <
+    typename T, typename U, bool isSetMask, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void Compare(
+    Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<
+        PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>, isSetMask>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, mask, repeatTime, repeatParams);
+#else
+    using VectorElementU = VectorOperand::ElementT<U, Operand0>;
+    using VectorElementT = VectorOperand::ElementT<T, Operand1>;
+    using SrcPrimType = PrimT<VectorElementT>;
+    using DstPrimType = PrimT<VectorElementU>;
+    VcmpvImpl<SrcPrimType, DstPrimType, isSetMask>(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, mask, repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, bool isSetMask>
 __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[],
@@ -146,6 +241,30 @@ __aicore__ inline void Compare(
         (__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), cmpMode, mask, repeatParams);
 }
 
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type>
+__aicore__ inline void Compare(
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask[], const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugSrc0, debugSrc1, cmpMode, mask, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    VcmpImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), cmpMode, mask,
+        repeatParams);
+#endif
+}
+
 template <typename T, bool isSetMask>
 __aicore__ inline void Compare(
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask,
@@ -164,6 +283,30 @@ __aicore__ inline void Compare(
 #endif
     VcmpImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)src0.GetPhyAddr(), (__ubuf__ PrimType*)src1.GetPhyAddr(), cmpMode, mask, repeatParams);
+}
+
+template <
+    typename T, bool isSetMask, typename Operand0, typename Operand1,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>(),
+        int>::type>
+__aicore__ inline void Compare(
+    Operand0 src0, Operand1 src1, CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand0>>, isSetMask>(
+        debugSrc0, debugSrc1, cmpMode, mask, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    VcmpImpl<PrimType, isSetMask>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(src0), (__ubuf__ PrimType*)GetUnderlyingPtr(src1), cmpMode, mask,
+        repeatParams);
+#endif
 }
 
 /*
@@ -214,6 +357,43 @@ __aicore__ inline void Compare(
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), cmpMode, count);
 }
 
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand1>, Operand2>(),
+        int>::type>
+__aicore__ inline void Compare(Operand0 dst, Operand1 src0, Operand2 src1, CMPMODE cmpMode, uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand1>>>(src1);
+    return AscendC::Compare<PrimT<VectorOperand::ElementT<T, Operand1>>, PrimT<VectorOperand::ElementT<U, Operand0>>>(
+        debugDst, debugSrc0, debugSrc1, cmpMode, count);
+#else
+    using VectorElementU = VectorOperand::ElementT<U, Operand0>;
+    using VectorElementT = VectorOperand::ElementT<T, Operand1>;
+    using SrcPrimType = PrimT<VectorElementT>;
+    using DstPrimType = PrimT<VectorElementU>;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    ASCENDC_ASSERT(((count * sizeof(VectorElementT)) % ONE_REPEAT_BYTE_SIZE == 0), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to check count elements size in Compare, current size "
+            "is %u, should be an integer multiple of 256.",
+            count * sizeof(VectorElementT));
+    });
+#endif
+    VcmpvImpl(
+        (__ubuf__ DstPrimType*)GetUnderlyingPtr(dst), (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ SrcPrimType*)GetUnderlyingPtr(src1), cmpMode, count);
+#endif
+}
+
 template <typename T>
 __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 {
@@ -231,6 +411,30 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
     GetCmpMaskImpl((__ubuf__ PrimType*)dst.GetPhyAddr());
 }
 
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>(),
+        int>::type>
+__aicore__ inline void GetCmpMask(Operand0 dst)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    return AscendC::GetCmpMask<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugDst);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    GetCmpMaskImpl((__ubuf__ PrimType*)GetUnderlyingPtr(dst));
+#endif
+}
+
 template <typename T>
 __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 {
@@ -246,6 +450,29 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN/VECCALC/VECOUT", "SetCmpMask");
 #endif
     SetCmpMaskImpl((__ubuf__ PrimType*)src.GetPhyAddr());
+}
+
+template <
+    typename T, typename Operand0,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>(),
+        int>::type>
+__aicore__ inline void SetCmpMask(Operand0 src)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugSrc = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src);
+    return AscendC::SetCmpMask<PrimT<VectorOperand::ElementT<T, Operand0>>>(debugSrc);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    SetCmpMaskImpl((__ubuf__ PrimType*)GetUnderlyingPtr(src));
+#endif
 }
 
 /* **************************************************************************************************
@@ -531,6 +758,33 @@ __aicore__ inline void Select(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), repeatTime, repeatParams);
 }
 
+template <
+    typename T, SELMODE selMode, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Select(
+    Operand0 dst, Operand1 src0, Operand2 src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    auto debugSrc1 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src1);
+    return AscendC::Select<PrimT<VectorOperand::ElementT<T, Operand0>>, selMode>(
+        debugDst, debugSrc0, debugSrc1, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using PrimType = PrimT<VectorElementT>;
+    SelectCal<PrimType, selMode>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src0),
+        (__ubuf__ PrimType*)GetUnderlyingPtr(src1), repeatTime, repeatParams);
+#endif
+}
+
 template <typename T, typename U>
 __aicore__ inline void Select(
     const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime,
@@ -545,6 +799,35 @@ __aicore__ inline void Select(
     SelectCal<DataPrimType, MaskPrimType>(
         (__ubuf__ DataPrimType*)dst.GetPhyAddr(), (__ubuf__ MaskPrimType*)selMask.GetPhyAddr(),
         (__ubuf__ DataPrimType*)src0.GetPhyAddr(), repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, typename Operand0, typename Operand1, typename Operand2,
+    typename Std::enable_if<
+        VectorOperand::HasPointer<Operand0, Operand1, Operand2>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand0>() &&
+            VectorOperand::IsWritable<Operand0>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<U, Operand1>, Operand1>() &&
+            VectorOperand::Matches<VectorOperand::ElementT<T, Operand0>, Operand2>(),
+        int>::type>
+__aicore__ inline void Select(
+    Operand0 dst, Operand1 selMask, Operand2 src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    auto debugDst = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(dst);
+    auto debugSelMask = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<U, Operand1>>>(selMask);
+    auto debugSrc0 = VectorOperand::ToDebugTensor<PrimT<VectorOperand::ElementT<T, Operand0>>>(src0);
+    return AscendC::Select<PrimT<VectorOperand::ElementT<T, Operand0>>, PrimT<VectorOperand::ElementT<U, Operand1>>>(
+        debugDst, debugSelMask, debugSrc0, repeatTime, repeatParams);
+#else
+    using VectorElementT = VectorOperand::ElementT<T, Operand0>;
+    using VectorElementU = VectorOperand::ElementT<U, Operand1>;
+    using DataPrimType = PrimT<VectorElementT>;
+    using MaskPrimType = PrimT<VectorElementU>;
+    SelectCal<DataPrimType, MaskPrimType>(
+        (__ubuf__ DataPrimType*)GetUnderlyingPtr(dst), (__ubuf__ MaskPrimType*)GetUnderlyingPtr(selMask),
+        (__ubuf__ DataPrimType*)GetUnderlyingPtr(src0), repeatTime, repeatParams);
+#endif
 }
 
 /*
@@ -697,28 +980,56 @@ __aicore__ inline void CompareScalarCommon(
     const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, MaskType mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
-    static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
-    using ActualU = typename T2::PrimType;
-    if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
-        static_assert(Std::is_same<T3, T4>::value);
-        using ActualT = typename T3::PrimType;
-        static_assert(
-            (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
-        VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
-            (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, mask, repeatTime, repeatParams);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        using ActualT = typename T4::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, mask, repeatTime,
-            repeatParams);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        using ActualT = typename T3::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, mask, repeatTime,
-            repeatParams);
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(VectorOperand::Matches<uint8_t, T2>() && VectorOperand::IsWritable<T2>());
+
+        using ActualU = VectorOperand::Primitive<T2>;
+        if constexpr (VectorOperand::AllOperands<T3, T4>()) {
+            static_assert(VectorOperand::SameElement<T3, T4>());
+            using ActualT = VectorOperand::Primitive<T3>;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0),
+                (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode, mask, repeatTime, repeatParams);
+        } else if constexpr (VectorOperand::AllOperands<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = VectorOperand::Primitive<T4>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), src0, (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode,
+                mask, repeatTime, repeatParams);
+        } else if constexpr (VectorOperand::AllOperands<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = VectorOperand::Primitive<T3>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0), src1, cmpMode,
+                mask, repeatTime, repeatParams);
+        }
+    } else {
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+
+        using ActualU = typename T2::PrimType;
+        if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
+            static_assert(Std::is_same<T3, T4>::value);
+            using ActualT = typename T3::PrimType;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
+                (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, mask, repeatTime, repeatParams);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = typename T4::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, mask,
+                repeatTime, repeatParams);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = typename T3::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, mask,
+                repeatTime, repeatParams);
+        }
     }
 }
 
@@ -727,13 +1038,26 @@ __aicore__ inline void Compares(
     const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(
-            dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "Compares")) {
-        ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::MASK_BIT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
 #endif
-    CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(
+                dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "Compares")) {
+            ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::MASK_BIT_MODE);
+        }
+#endif
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    }
 }
 
 template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
@@ -741,13 +1065,26 @@ __aicore__ inline void Compares(
     const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(
-            dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "Compares")) {
-        ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::MASK_COUNT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
 #endif
-    CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(
+                dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "Compares")) {
+            ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::MASK_COUNT_MODE);
+        }
+#endif
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    }
 }
 
 // CompareScalar has been updated, please use Compares instead.
@@ -756,13 +1093,26 @@ __aicore__ inline void CompareScalar(
     const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(
-            dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "CompareScalar")) {
-        ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::MASK_BIT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
 #endif
-    CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(
+                dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "CompareScalar")) {
+            ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::MASK_BIT_MODE);
+        }
+#endif
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    }
 }
 
 // CompareScalar has been updated, please use Compares instead.
@@ -771,13 +1121,26 @@ __aicore__ inline void CompareScalar(
     const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(
-            dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "CompareScalar")) {
-        ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::MASK_COUNT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, mask, repeatTime, repeatParams);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
 #endif
-    CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(
+                dst, src0, src1, ONE_REPEAT_BYTE_SIZE / sizeof(T0), repeatTime, repeatParams, "CompareScalar")) {
+            ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::MASK_COUNT_MODE);
+        }
+#endif
+        CompareScalarCommon<isSetMask, config>(dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    }
 }
 
 /*
@@ -792,42 +1155,93 @@ __aicore__ inline void CompareScalar(
 template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
 __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, uint32_t count)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "Compares")) {
-        ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::CALCOUNT_MODE);
-    }
-#endif
-    static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
-    static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Compares<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, count);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
-    using ActualU = typename T2::PrimType;
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(VectorOperand::Matches<uint8_t, T2>() && VectorOperand::IsWritable<T2>());
+
+        using ActualU = VectorOperand::Primitive<T2>;
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+        ASCENDC_ASSERT(
+            ((count * sizeof(typename Std::conditional<
+                             VectorOperand::Traits<T3>::isOperand, VectorOperand::Primitive<T3>, T3>::type)) %
+                 ONE_REPEAT_BYTE_SIZE ==
+             0),
+            {
+                KERNEL_LOG(
+                    KERNEL_ERROR,
+                    "Failed to check count elements size in Compares, current size "
+                    "is %u, should be an integer multiple of 256.",
+                    count * sizeof(typename Std::conditional<
+                                   VectorOperand::Traits<T3>::isOperand, VectorOperand::Primitive<T3>, T3>::type));
+            });
+#endif
+        if constexpr (VectorOperand::AllOperands<T3, T4>()) {
+            static_assert(VectorOperand::SameElement<T3, T4>());
+            using ActualT = VectorOperand::Primitive<T3>;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0),
+                (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode, count);
+        } else if constexpr (VectorOperand::AllOperands<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = VectorOperand::Primitive<T4>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), src0, (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode,
+                count);
+        } else if constexpr (VectorOperand::AllOperands<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = VectorOperand::Primitive<T3>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0), src1, cmpMode,
+                count);
+        }
+#endif
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "Compares")) {
+            ASCENDC_REPORT_CHECK_ERROR("Compares", KernelFuncType::CALCOUNT_MODE);
+        }
+#endif
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+
+        using ActualU = typename T2::PrimType;
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
-    ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "Failed to check count elements size in Compares, current size "
-            "is %u, should be an integer multiple of 256.",
-            count * sizeof(T3));
-    });
+        ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check count elements size in Compares, current size "
+                "is %u, should be an integer multiple of 256.",
+                count * sizeof(T3));
+        });
 #endif
-    if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
-        static_assert(Std::is_same<T3, T4>::value);
-        using ActualT = typename T3::PrimType;
-        static_assert(
-            (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
-        VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
-            (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        using ActualT = typename T4::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        using ActualT = typename T3::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, count);
+        if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
+            static_assert(Std::is_same<T3, T4>::value);
+            using ActualT = typename T3::PrimType;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
+                (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = typename T4::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = typename T3::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, count);
+        }
     }
 }
 
@@ -835,41 +1249,91 @@ __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, C
 template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
 __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, uint32_t count)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "CompareScalar")) {
-        ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::CALCOUNT_MODE);
-    }
-#endif
-    static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
-    static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::CompareScalar<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(src0),
+            VectorOperand::ToDebugOperand(src1), cmpMode, count);
+#else
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
 
-    using ActualU = typename T2::PrimType;
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(VectorOperand::Matches<uint8_t, T2>() && VectorOperand::IsWritable<T2>());
+
+        using ActualU = VectorOperand::Primitive<T2>;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        ASCENDC_ASSERT(
+            ((count * sizeof(typename Std::conditional<
+                             VectorOperand::Traits<T3>::isOperand, VectorOperand::Primitive<T3>, T3>::type)) %
+                 ONE_REPEAT_BYTE_SIZE ==
+             0),
+            {
+                KERNEL_LOG(
+                    KERNEL_ERROR,
+                    "Failed to check count elements size in CompareScalar, current size "
+                    "is %u, should be an integer multiple of 256.",
+                    count * sizeof(typename Std::conditional<
+                                   VectorOperand::Traits<T3>::isOperand, VectorOperand::Primitive<T3>, T3>::type));
+            });
+#endif
+        if constexpr (VectorOperand::AllOperands<T3, T4>()) {
+            static_assert(VectorOperand::SameElement<T3, T4>());
+            using ActualT = VectorOperand::Primitive<T3>;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0),
+                (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode, count);
+        } else if constexpr (VectorOperand::AllOperands<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = VectorOperand::Primitive<T4>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), src0, (__ubuf__ ActualT*)GetUnderlyingPtr(src1), cmpMode,
+                count);
+        } else if constexpr (VectorOperand::AllOperands<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = VectorOperand::Primitive<T3>;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)GetUnderlyingPtr(dst), (__ubuf__ ActualT*)GetUnderlyingPtr(src0), src1, cmpMode,
+                count);
+        }
+#endif
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFuncVecBinaryScalarCmp<config>(dst, src0, src1, count, "CompareScalar")) {
+            ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::CALCOUNT_MODE);
+        }
+#endif
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(SupportType<T2, LocalTensor<uint8_t>>());
+
+        using ActualU = typename T2::PrimType;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
-    ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "Failed to check count elements size in CompareScalar, current size "
-            "is %u, should be an integer multiple of 256.",
-            count * sizeof(T3));
-    });
+        ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check count elements size in CompareScalar, current size "
+                "is %u, should be an integer multiple of 256.",
+                count * sizeof(T3));
+        });
 #endif
-    if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
-        static_assert(Std::is_same<T3, T4>::value);
-        using ActualT = typename T3::PrimType;
-        static_assert(
-            (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
-        VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
-            (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        using ActualT = typename T4::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        using ActualT = typename T3::PrimType;
-        VcmpvsImpl<ActualT, ActualU, isSetMask>(
-            (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, count);
+        if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
+            static_assert(Std::is_same<T3, T4>::value);
+            using ActualT = typename T3::PrimType;
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VcmpvsImpl<ActualT, ActualU, isSetMask, config.scalarTensorIndex>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(),
+                (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            using ActualT = typename T4::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), src0, (__ubuf__ ActualT*)src1.GetPhyAddr(), cmpMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            using ActualT = typename T3::PrimType;
+            VcmpvsImpl<ActualT, ActualU, isSetMask>(
+                (__ubuf__ ActualU*)dst.GetPhyAddr(), (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, cmpMode, count);
+        }
     }
 }
 
@@ -931,14 +1395,42 @@ __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Select")) {
-        ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::MASK_BIT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime,
+            repeatParams);
+#else
+        VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
 #endif
-    SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        MaskSetter::Instance().SetMask(isSetMask);
+        if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Select")) {
+            ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::MASK_BIT_MODE);
+        }
+#endif
+        SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+    }
 }
+#if __NPU_ARCH__ == 3510
+template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
+    uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, isSetMask, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime, repeatParams);
+#else
+    VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
+}
+#endif
 
 // select mode: 1
 template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
@@ -946,14 +1438,42 @@ __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-#if ASCENDC_CPU_DEBUG
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Select")) {
-        ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::MASK_COUNT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, isSetMask, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime,
+            repeatParams);
+#else
+        VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
 #endif
-    SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+    } else {
+#if ASCENDC_CPU_DEBUG
+        MaskSetter::Instance().SetMask(isSetMask);
+        if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, mask, repeatTime, repeatParams, "Select")) {
+            ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::MASK_COUNT_MODE);
+        }
+#endif
+        SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+    }
 }
+#if __NPU_ARCH__ == 3510
+template <typename T0, typename T1, bool isSetMask, const BinaryConfig& config, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
+    uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, isSetMask, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, mask, repeatTime, repeatParams);
+#else
+    VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
+#endif
+}
+#endif
 
 // select mode: 1
 /*
@@ -970,36 +1490,62 @@ template <typename T0, typename T1, const BinaryConfig& config, typename T2, typ
 __aicore__ inline void Select(
     const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
 {
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Select")) {
-        ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::CALCOUNT_MODE);
-    }
+    if constexpr (VectorOperand::HasPointer<T2, T3, T4>()) {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+        static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+        return AscendC::Select<T0, T1, config>(
+            VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask),
+            VectorOperand::ToDebugOperand(src0), VectorOperand::ToDebugOperand(src1), selMode, count);
+#else
+        VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, count);
 #endif
-    CheckTensorPos<T1>(selMask, Hardware::UB, "selMask", "VECIN/VECCALC/VECOUT", "Select");
-    static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
-    static_assert(TypeUtils::IsLocalTensorType<T2>(), "dst should be Tensor");
+    } else {
+#if ASCENDC_CPU_DEBUG
+        if (!CheckFunVecBinaryScalar<config>(dst, src0, src1, count, "Select")) {
+            ASCENDC_REPORT_CHECK_ERROR("Select", KernelFuncType::CALCOUNT_MODE);
+        }
+#endif
+        CheckTensorPos<T1>(selMask, Hardware::UB, "selMask", "VECIN/VECCALC/VECOUT", "Select");
+        static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
+        static_assert(TypeUtils::IsLocalTensorType<T2>(), "dst should be Tensor");
 
-    using ActualT = typename T2::PrimType;
-    if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
-        static_assert(Std::is_same<T3, T4>::value);
-        static_assert(Std::is_same<ActualT, typename T3::PrimType>::value);
-        static_assert(
-            (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
-        VselImpl<ActualT, T1, config.scalarTensorIndex>(
-            (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(),
-            (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), selMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        static_assert(Std::is_same<ActualT, typename T4::PrimType>::value);
-        VselImpl(
-            (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(), src0,
-            (__ubuf__ ActualT*)src1.GetPhyAddr(), selMode, count);
-    } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        static_assert(Std::is_same<ActualT, typename T3::PrimType>::value);
-        VselImpl(
-            (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(),
-            (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, selMode, count);
+        using ActualT = typename T2::PrimType;
+        if constexpr (TypeUtils::IsLocalTensorType<T3, T4>()) {
+            static_assert(Std::is_same<T3, T4>::value);
+            static_assert(Std::is_same<ActualT, typename T3::PrimType>::value);
+            static_assert(
+                (config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+            VselImpl<ActualT, T1, config.scalarTensorIndex>(
+                (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(),
+                (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), selMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
+            static_assert(Std::is_same<ActualT, typename T4::PrimType>::value);
+            VselImpl(
+                (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(), src0,
+                (__ubuf__ ActualT*)src1.GetPhyAddr(), selMode, count);
+        } else if constexpr (TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
+            static_assert(Std::is_same<ActualT, typename T3::PrimType>::value);
+            VselImpl(
+                (__ubuf__ ActualT*)dst.GetPhyAddr(), (__ubuf__ T1*)selMask.GetPhyAddr(),
+                (__ubuf__ ActualT*)src0.GetPhyAddr(), src1, selMode, count);
+        }
     }
 }
+#if __NPU_ARCH__ == 3510
+template <typename T0, typename T1, const BinaryConfig& config, typename T2, typename T3, typename T4>
+__aicore__ inline void Select(
+    const T2& dst, __ubuf__ T1* selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG) || defined(__MSTX_DFX_REPORT__)
+    static_assert(VectorOperand::IsWritable<T2>(), "Destination must be writable");
+    return AscendC::Select<T0, T1, config>(
+        VectorOperand::ToDebugOperand(dst), VectorOperand::ToDebugOperand(selMask), VectorOperand::ToDebugOperand(src0),
+        VectorOperand::ToDebugOperand(src1), selMode, count);
+#else
+    VectorSelectDispatch<config>(dst, selMask, src0, src1, selMode, count);
+#endif
+}
+#endif
 #endif
 } // namespace AscendC
 #pragma end_pipe

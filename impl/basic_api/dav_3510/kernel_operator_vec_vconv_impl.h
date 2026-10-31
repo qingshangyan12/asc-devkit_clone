@@ -3030,6 +3030,19 @@ __aicore__ inline void SetDeqScaleImpl(const LocalTensor<T>& vdeqTensor, const V
 }
 
 template <typename T>
+__aicore__ inline void SetDeqScaleImpl(__ubuf__ T* vdeq, const VdeqInfo& vdeqInfo)
+{
+    static_assert(SupportType<T, uint64_t>(), "SetDeqScale requires a writable uint64_t UB buffer");
+    if ASCEND_IS_AIC {
+        return;
+    }
+    for (uint8_t i = 0; i < VDEQ_TENSOR_SIZE; ++i) {
+        vdeq[i] = MakeDeqScaleConfig(vdeqInfo.vdeqScale[i], vdeqInfo.vdeqOffset[i], vdeqInfo.vdeqSignMode[i]);
+    }
+    Internal::g_deqScale = reinterpret_cast<uint64_t>(vdeq);
+}
+
+template <typename T>
 __aicore__ inline void SetDeqScaleImpl(T config)
 {
     Internal::g_deqValue = config;
