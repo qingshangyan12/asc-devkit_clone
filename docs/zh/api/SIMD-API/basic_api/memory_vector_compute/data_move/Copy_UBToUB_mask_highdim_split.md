@@ -101,15 +101,18 @@ __aicore__ inline __inout_pipe__(V) void Copy(
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
+| T | 源操作数或者目的操作数的数据类型。指针形式默认从Operand0推导；显式指定时须与源、目的元素类型一致。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
+| Operand0 | 仅用于指针重载，由dst推导。可为可写的UB指针或LocalTensor。 |
+| Operand1 | 仅用于指针重载，由src推导。可为UB指针或LocalTensor；Operand0与Operand1中至少一个为指针。 |
+| 未命名的enable_if参数 | 仅用于指针重载，检查指针参与、元素类型一致及目的操作数可写。默认值为0，调用者无需指定。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。 |
-| src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束；目的指针必须可写。 |
+| src | 输入 | 源操作数，类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD_compute/mask.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256字节数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD_compute/high_dim_split.md)。|
 | repeatParams | 输入 | 控制操作数地址步长的参数。<br>CopyRepeatParams类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。CopyRepeatParams参数说明请参考表3。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |

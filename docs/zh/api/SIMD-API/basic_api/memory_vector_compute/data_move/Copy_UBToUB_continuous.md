@@ -78,15 +78,18 @@ __aicore__ inline __inout_pipe__(V) void Copy(Operand0 dst, Operand1 src, const 
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section42191353048181)。 |
+| T | 源操作数或者目的操作数的数据类型。指针形式默认从Operand0推导；显式指定时须与源、目的元素类型一致。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section42191353048181)。 |
 | isSetMask | 参数不生效，保持默认值true即可。 |
+| Operand0 | 仅用于指针重载，由dst推导。可为可写的UB指针或LocalTensor。 |
+| Operand1 | 仅用于指针重载，由src推导。可为UB指针或LocalTensor；Operand0与Operand1中至少一个为指针。 |
+| 未命名的enable_if参数 | 仅用于指针重载，检查指针参与、元素类型一致及目的操作数可写。默认值为0，调用者无需指定。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。 |
-| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>源操作数的数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束；目的指针必须可写。 |
+| src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>源操作数的数据类型需要与目的操作数保持一致。<br>指针重载中也可传入UB指针，仍须满足本行的存储位置、对齐及类型约束。 |
 | count | 输入 | 参与搬运的元素个数。 |
 
 ## 数据类型<a name="zh-cn_topic_0000002567699435_section42191353048181"></a>
