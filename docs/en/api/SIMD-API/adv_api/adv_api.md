@@ -26,7 +26,7 @@
 
 -   **[HCCL Communication](HCCL_communication/HCCL_communication.md)**  
 
--   **[AIN Communication](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/zh/api/aicore/ain/README.md)**  
+-   **[AIN Communication](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/en/api/aicore/ain/README.md)**  
 
 -   **[Convolution Computation](convolution_compute/convolution_compute.md)**  
 

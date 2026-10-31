@@ -568,7 +568,7 @@ Where:
     >- If the developer uses the Device resource limiting feature, the numBlocks set for the operator must not exceed the number of cores returned by the APIs provided by [PlatformAscendC](../../../api/Utils-API/platform_info/PlatformAscendC/PlatformAscendC.md) for obtaining the number of cores (GetCoreNum/GetCoreNumAic/GetCoreNumAiv, etc.). For example, if aclrtSetStreamResLimit is used to set the number of Vector cores at the Stream level to 8, then the GetCoreNumAiv API returns 8, and the numBlocks set for a Vector operator must not exceed 8. Otherwise, resources of other Streams will be preempted, causing resource limiting to become ineffective.
 
 -   dynUBufSize: Dynamic UB Size, which configures the size of the space for UB dynamic memory allocation (UB only, excluding L1 and others), in bytes. The default value is 0;
--   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the device in the order in which they are called in the application code. The default value is nullptr. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+-   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the device in the order in which they are called in the application code. The default value is nullptr. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
 
 The following example shows how to declare and call a kernel.
 

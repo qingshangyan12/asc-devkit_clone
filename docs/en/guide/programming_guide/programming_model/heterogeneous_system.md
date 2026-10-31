@@ -16,4 +16,4 @@ The following figure illustrates the process in which the code running on the ho
 
 
 >[!NOTE] Note
-> For details about Runtime management such as Task and Stream, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+> For details about Runtime management such as Task and Stream, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).

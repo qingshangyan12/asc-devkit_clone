@@ -40,7 +40,7 @@
 
 - **[SIMT Instruction Theoretical Performance Summary](SIMT_instruction_theoretical_perf_summary.md)**
 
-- **[Reserved APIs](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/zh/api/reserve.md)**
+- **[Reserved APIs](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/en/api/reserve.md)**
 
 - **[Deprecated APIs](deprecated_interface.md)**
 

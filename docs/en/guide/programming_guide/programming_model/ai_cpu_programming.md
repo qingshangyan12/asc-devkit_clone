@@ -52,7 +52,7 @@ hello_world<<<numBlocks, nullptr, stream>>>(&args, sizeof(KernelArgs));
 
 -   numBlocks: The AI CPU device side does not support multi-core splitting, so calling multiple cores from the host side is meaningless. It is recommended to set this parameter to 1.
 -   l2ctrl: Reserved parameter, currently fixed to nullptr. Developers do not need to pay attention to it.
--   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the Device in the order in which they are called in the application code. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+-   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the Device in the order in which they are called in the application code. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
 
 >[!NOTE] Note 
 >When writing the call code, comply with the following rules:

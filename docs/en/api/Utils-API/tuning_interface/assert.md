@@ -125,7 +125,7 @@ None
 ### SIMD Programming Scenario
 
 - During CPU-domain debugging, a multi-parameter call only checks the assertion condition and does not print the custom error information specified by `fmt` and `args`, behaving the same as a single-parameter call.
-- The total amount of data printed by a single call to this API must not exceed the printing size limit, which is 30 KB by default. When the limit is exceeded, the assertion failure information will not be printed, but the API will still trigger an exception. You can configure this through the `simd_printf_fifo_size_per_core` field in the [aclInit API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit), with a configurable range of `[1 KB, 64 MB]`. This configuration is not supported in PyTorch calls and operator graph compilation scenarios.
+- The total amount of data printed by a single call to this API must not exceed the printing size limit, which is 30 KB by default. When the limit is exceeded, the assertion failure information will not be printed, but the API will still trigger an exception. You can configure this through the `simd_printf_fifo_size_per_core` field in the [aclInit API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/02_initialization_and_deinitialization.md#aclinit), with a configurable range of `[1 KB, 64 MB]`. This configuration is not supported in PyTorch calls and operator graph compilation scenarios.
 
 ### SIMT VF Programming Scenario
 

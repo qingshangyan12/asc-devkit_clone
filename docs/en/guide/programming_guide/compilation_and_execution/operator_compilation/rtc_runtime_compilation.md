@@ -13,7 +13,7 @@ The runtime compilation library provides the following core APIs:
 -   aclrtcGetLoweredName (optional): obtains the mangled name of the compiled kernel function, which is used to find the kernel function handle through aclrtBinaryGetFunction. This step can be skipped for non-template kernel functions.
 -   aclrtcDestroyProg: Destroys the given program after the compilation and execution process ends.
 
-After compilation, call the following APIs (only the core APIs are listed) to load and execute the kernel function. For the complete process and detailed API descriptions, see the "Kernel Function Loading and Execution" section in [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+After compilation, call the following APIs (only the core APIs are listed) to load and execute the kernel function. For the complete process and detailed API descriptions, see the "Kernel Function Loading and Execution" section in [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
 1.  Call aclInit, aclrtSetDevice, and other APIs to initialize the runtime environment and specify the device.
 2.  Parse the operator binary data obtained by aclrtcGetBinData through aclrtBinaryLoadFromData. When loading, you can specify the binary type through ACL_RT_BINARY_LOAD_OPT_MAGIC, such as ACL_RT_BINARY_MAGIC_ELF_AICORE.
 3.  Call aclrtBinaryGetFunction to obtain the kernel function handle.

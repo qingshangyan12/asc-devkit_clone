@@ -147,7 +147,7 @@ To meet the requirements of different scenarios, Ascend C builds a multi-level A
 </div>
 <div style="flex: 1; min-width: 200px;">
 <a href="../../api/api_list.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API Reference</a>
-<a href="https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime APIs</a>
+<a href="https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime APIs</a>
 </div>
 </div>
 </div>
