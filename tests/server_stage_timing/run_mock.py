@@ -28,7 +28,14 @@ with tempfile.TemporaryDirectory() as t:
 inline std::vector<std::string>& Logs() { static std::vector<std::string> v; return v; }
 #define HCCL_RUN_INFO(...) do { char text[1024]; std::snprintf(text,sizeof(text),__VA_ARGS__); Logs().push_back(text); } while(0)
 """)
-    (root / "test.cc").write_text("""#include "mc2_server_stage_timing.h"
+    (root / "test.cc").write_text("""#include <ctime>
+static unsigned clockCalls = 0;
+static int ProbeClock(clockid_t, timespec* ts) {
+    ++clockCalls; ts->tv_sec=1; ts->tv_nsec=clockCalls*10; return 0;
+}
+#define clock_gettime ProbeClock
+#include "mc2_server_stage_timing.h"
+#undef clock_gettime
 #include <cassert>
 #include <algorithm>
 #include <limits>
@@ -74,11 +81,70 @@ int main() {
     assert(Logs().size()==3);
     assert(Logs()[2].find("init_mean_ns=15.500000 msg_parse_mean_ns=31.000000 sq_expand_mean_ns=46.500000 cache=1 status=0")!=std::string::npos);
     assert(Logs()[2].find("init_top3_ns=30,29,28 msg_parse_top3_ns=60,58,56 sq_expand_top3_ns=90,87,84")!=std::string::npos);
+    // MC2_CACHE_DETAIL_DIAG BEGIN: disabled probes must not read clocks or touch detail buffers.
+    DetailTotals().ns[CACHE_POLICY]=123;
+    BackendTotals().words[0]=456;
+    Start(false);
+    const unsigned disabled=clockCalls;
+    { DetailScope timer(CACHE_POLICY); timer.Stop(); }
+    assert(clockCalls==disabled);
+    Start(true, 99, false);
+    const unsigned basic=clockCalls;
+    { DetailScope timer(CACHE_POLICY); timer.Stop(); }
+    assert(clockCalls==basic && DetailTotals().ns[CACHE_POLICY]==123 && BackendTotals().words[0]==456);
+    Start(true, 99, true);
+    assert(DetailTotals().ns[CACHE_POLICY]==0 && BackendTotals().words[0]==0);
+    const unsigned selected=clockCalls;
+    { DetailScopeFor<false> timer(CACHE_POLICY); timer.Stop(); }
+    assert(clockCalls==selected);
+    Logs().clear();
+    for (unsigned i=0; i<30; ++i) {
+        Start(true, 99, true);
+        { DetailScope timer(CACHE_POLICY); }
+        auto& sample=Get(); sample.entry=100; sample.poll=200; sample.parsed=500; sample.submitted=900;
+        sample.messages=1; sample.valid=VALID_ALL; Cache(true);
+        if (i==29) for (auto& word: BackendTotals().words) word=std::numeric_limits<uint64_t>::max();
+        Finish(0);
+        if (i<29) assert(Logs().empty());
+    }
+    assert(Logs().size()>1);
+    for (const auto& line: Logs()) {
+        assert(line.size()<1024 && line.find("[MC2_SERVER_PERF_PART]")==0);
+        std::printf("%s\\n", line.c_str());
+    }
+    assert(DetailTotals().calls[CACHE_POLICY]==0 && BackendTotals().words[0]==0);
+    DetailTotals().ns[CACHE_POLICY]=789;
+    Start(true, 99, false);
+    const unsigned switched=clockCalls;
+    { DetailScope timer(CACHE_POLICY); }
+    assert(clockCalls==switched && DetailTotals().ns[CACHE_POLICY]==789);
+    Start(true, 99, true);
+    assert(DetailTotals().ns[CACHE_POLICY]==0 && Totals().count==0);
+    // MC2_CACHE_DETAIL_DIAG END
 }
 """)
     subprocess.run(
         ["c++", "-std=c++14", "-O2", "-Wall", "-Wextra", "-Werror", str(root / "test.cc"), "-o", str(root / "test")],
         check=True,
     )
-    subprocess.run([str(root / "test")], check=True)
+    result = subprocess.run([str(root / "test")], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    import re
+
+    fragments = []
+    for line in result.stdout.splitlines():
+        match = re.fullmatch(
+            r"\[MC2_SERVER_PERF_PART\] first=(\d+) last=(\d+) part=(\d+) total=(\d+) bytes=(\d+) data=(.*)", line
+        )
+        assert match, line
+        first, last, part, total, size = map(int, match.groups()[:5])
+        assert len(match[6].encode()) == size <= 512
+        assert part == len(fragments)
+        fragments.append(match[6])
+    assert len(fragments) == total
+    record = "".join(fragments)
+    assert "detail_schema=2" in record and "backend_schema=3" in record
+    assert "sq_expand_top3_ns=400,400,400" in record
+    assert "detail_ns=" in record and "detail_calls=" in record
+
 print("Server timing mock contract passed; no target build/NPU validation.")

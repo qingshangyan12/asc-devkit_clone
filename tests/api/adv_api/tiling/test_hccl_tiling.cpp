@@ -43,6 +43,10 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
     uint32_t reduceType = 1;
     Mc2CcTilingConfig ccTilingConfig(groupName, opType, algConfig, reduceType);
     EXPECT_EQ(ccTilingConfig.SetDebugMode(1U), EXIT_SUCCESS);
+    // MC2_CACHE_DETAIL_DIAG BEGIN: temporary mode 5 contract.
+    EXPECT_EQ(ccTilingConfig.SetDebugMode(5U), EXIT_SUCCESS);
+    EXPECT_NE(ccTilingConfig.SetDebugMode(6U), EXIT_SUCCESS);
+    // MC2_CACHE_DETAIL_DIAG END
     EXPECT_EQ(ccTilingConfig.SetQueueNum(40U), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetCommBlockNum(48U), EXIT_SUCCESS);
     uint32_t ret = ccTilingConfig.GetTiling(initTilingInner);

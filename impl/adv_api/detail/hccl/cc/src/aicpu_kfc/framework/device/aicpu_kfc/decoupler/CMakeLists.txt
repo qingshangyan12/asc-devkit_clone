@@ -125,6 +125,7 @@ if(TARGET mc2_server)
     )
 
     target_include_directories(mc2_server_decoupler BEFORE PRIVATE
+        ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/aicpu
         ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_HCOMM_HEADER_DIR}/../
         ${OPEN_HCCL_SRC_ROOT}/common
