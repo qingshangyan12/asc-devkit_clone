@@ -31,6 +31,8 @@ add_executable(hashtable_lookup
     hashtable_lookup.asc
 )
 
+target_link_libraries(hashtable_lookup PRIVATE m)
+
 target_compile_definitions(hashtable_lookup PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
     LOAD_FACTOR=${LOAD_FACTOR}
