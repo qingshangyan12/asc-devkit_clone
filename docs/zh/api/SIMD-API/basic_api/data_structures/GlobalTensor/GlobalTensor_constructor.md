@@ -66,3 +66,11 @@ __aicore__ inline GlobalTensor<T>() {}
 ## 调用示例<a name="section17531157161314"></a>
 
 参考[调用示例](SetGlobalBuffer.md#section17531157161314)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSize](GetSize.md) | 获取GlobalTensor的元素个数。 |
+| [GetShapeInfo](GetShapeInfo.md) | 获取GlobalTensor的shape信息。 |
+| [SetShapeInfo](SetShapeInfo.md) | 设置GlobalTensor的shape信息。 |

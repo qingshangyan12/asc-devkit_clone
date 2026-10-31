@@ -268,3 +268,10 @@
     输入数据dstLocal：[1 2 3 ... 512]
     输出数据dstGlobal：[1 2 3 ... 512]
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GM与UB连续数据搬运）](DataCopy_GMAndUB_continuous.md) | 支持Global Memory与Unified Buffer（UB）之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

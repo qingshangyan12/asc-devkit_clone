@@ -103,3 +103,11 @@ __ubuf__ int32_t dst[256];
 __ubuf__ float src[256];
 asc_float2int32_rn(dst, src, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2int64](asc_float2int64.md) | 将float类型转化为int64_t类型，并支持多种舍入模式。 |
+| [asc_float2int16](asc_float2int16.md) | 将float类型数据转换为int16_t类型，支持多种舍入模式。 |
+| [asc_float2bfloat16](asc_float2bfloat16.md) | 将float类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |

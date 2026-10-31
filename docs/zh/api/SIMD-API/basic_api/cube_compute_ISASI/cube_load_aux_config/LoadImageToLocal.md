@@ -141,3 +141,9 @@ loadParams.sid = 0;
 AscendC::LoadImageToLocal(featureMapA1, loadParams);
 ```
 <!-- end id14 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetAippFunctions](SetAippFunctions.md) | 设置图片预处理（AIPP，AI Core pre-process）相关参数。 |

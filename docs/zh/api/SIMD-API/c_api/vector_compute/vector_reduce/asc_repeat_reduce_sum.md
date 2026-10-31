@@ -105,3 +105,10 @@ asc_repeat_reduce_sum(dst, src, repeat, dst_repeat_stride, src_block_stride, src
 输入数据src：[1, 1, 1, ..., 1]
 输出数据dst：[128, 128]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_repeat_reduce_max](asc_repeat_reduce_max.md) | 对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。 |
+| [asc_repeat_reduce_min](asc_repeat_reduce_min.md) | 对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index。 |

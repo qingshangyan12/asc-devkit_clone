@@ -118,3 +118,11 @@ constexpr uint16_t dst_nz_matrix_stride = 96;
 // src表示源操作数的起始地址
 asc_copy_gm2l1_nd2nz_sync(dst, src, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride, dst_nz_matrix_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_nd2nz_arch_2201](../cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_2201.md) | 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_copy_gm2l1_nd2nz_arch_3510（废弃）](asc_copy_gm2l1_nd2nz_deprecated.md) | 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中将源端按N维连续排布的ND格式数据转换为L1 Buffer侧的Nz分形排布，使其满足后续矩阵计算对分形列连续性的要求。 |

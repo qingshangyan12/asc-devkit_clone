@@ -253,3 +253,9 @@
         }
     }
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SyncAll](../sync_control/inter_core_sync/SyncAll.md) | SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能。 |

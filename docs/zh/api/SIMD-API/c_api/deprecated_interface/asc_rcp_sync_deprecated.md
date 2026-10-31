@@ -78,3 +78,10 @@ asc_rcp_sync(dst, src, total_length);    // dst = 1 / src
 // src [1, 2, 3, ..., 128]
 // dst [1, 0.5, 0.3333333, ..., 0.0078125]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_rcp](../vector_compute/vector_arith/asc_rcp.md) | 执行矢量的取倒数运算。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

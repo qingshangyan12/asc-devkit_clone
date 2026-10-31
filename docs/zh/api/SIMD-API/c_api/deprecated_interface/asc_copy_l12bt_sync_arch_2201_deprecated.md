@@ -74,3 +74,10 @@ __biasbuf__ half dst[256];
 uint64_t dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
 asc_copy_l12bt_sync(dst_addr, src, copy_size);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12bt_arch_2201](../cube_datamove/cube_compute_load/asc_copy_l12bt_arch_2201.md) | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

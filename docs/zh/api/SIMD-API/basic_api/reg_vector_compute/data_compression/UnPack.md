@@ -115,3 +115,9 @@ __simd_vf__ inline void UnPackVF(__ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint3
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |

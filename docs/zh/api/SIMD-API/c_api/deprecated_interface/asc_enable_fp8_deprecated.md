@@ -74,3 +74,11 @@ asc_mmad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width,
          unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 asc_sync();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_disable_hif8](../cube_compute/mmad_compute_aux_config/asc_disable_hif8.md) | 本接口用于设置Mmad计算关闭HiF8模式，其作用与asc_enable_hif8相反，两个接口不同时生效。 |
+| [asc_enable_hif8](../cube_compute/mmad_compute_aux_config/asc_enable_hif8.md) | 本接口用于启用矩阵乘加（Mmad）计算的HiF8模式。 |
+| [asc_mmad](../cube_compute/mmad_compute/asc_mmad.md) | 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其。 |

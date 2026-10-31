@@ -85,3 +85,11 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* xAddr, __ubuf__ T* yAddr, uint32_t
     AscendC::Reg::StoreUnAlignPost(yAddr, ureg);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Squeeze](../compare_and_select/Squeeze.md) | 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如图1所示。 |
+| [连续非对齐搬出（StoreUnAlign）](../reg_data_store/StoreUnAlign_continuous.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。 |
+| [ClearSpr](../../special_register_access/ClearSpr.md) | 对指定的特殊寄存器进行清零。当前支持表SpecialPurposeReg模板参数说明。 |

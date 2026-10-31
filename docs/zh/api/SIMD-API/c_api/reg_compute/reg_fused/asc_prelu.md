@@ -222,3 +222,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_leakyrelu](asc_leakyrelu.md) | 根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果通过函数返回值返回或写入目的矢量数据寄存器。 |
+| [asc_relu](asc_relu.md) | 根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。 |

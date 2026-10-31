@@ -84,3 +84,9 @@ vector_uint16_t index;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_scatter(src, dst, index, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_scatter](../reg_compute/scatter/asc_scatter.md) | 根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。 |

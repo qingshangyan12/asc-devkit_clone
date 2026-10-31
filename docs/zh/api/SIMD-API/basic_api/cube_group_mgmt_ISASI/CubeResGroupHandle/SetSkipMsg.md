@@ -87,3 +87,11 @@ AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图�
     handle.SetSkipMsg(skipNum);
 };
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Wait](Wait.md) | 在调用PostMessage或PostFakeMessage后，查询该消息是否已被AIC处理完。 |
+| [CubeResGroupHandle构造函数](CubeResGroupHandle_constructor.md) | 构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。 |
+| [AllocMessage](AllocMessage.md) | AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。 |

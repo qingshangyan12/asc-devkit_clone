@@ -151,3 +151,9 @@ AscendC::DataCopy(dstLocal, srcLocal, 512);
 输入数据srcLocal：[1 2 3 ... 512]
 输出数据dstLocal：[1 2 3 ... 512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（UBToUB高维切分数据搬运）](DataCopy_UBToUB_highdim_split.md) | 支持Unified Buffer（UB）内部的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |

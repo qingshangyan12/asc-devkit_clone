@@ -112,3 +112,10 @@ GroupBarrier对象实例。
 // 6个AIV等3个AIV Arrive后再开始后续业务，总共需要6*512B地址空间，起始地址为用户指定的startAddr。
 AscendC::GroupBarrier<AscendC::PipeMode::MTE3_MODE> barA(startAddr, 3, 6);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Arrive](Arrive.md) | 通知其他等待的AIV，本AIV已经完成其依赖的任务。 |
+| [Wait](Wait.md) | 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。 |

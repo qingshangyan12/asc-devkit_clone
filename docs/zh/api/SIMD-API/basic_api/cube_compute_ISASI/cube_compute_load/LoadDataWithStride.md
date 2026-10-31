@@ -126,3 +126,12 @@ AscendC::SetLoadDataRepeatWithStride(repeatParams);
 
 AscendC::LoadDataWithStride(a2Local, a1Local, loadDataParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（卷积数据搬运）](LoadData_3D.md) | LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |
+| [SetLoadDataRepeatWithStride](../cube_load_aux_config/SetLoadDataRepeatWithStride.md) | 用于设置LoadDataWithStride接口的repeat参数。 |
+| [SetFmatrix](../cube_load_aux_config/SetFmatrix.md) | 用于调用LoadData（卷积数据搬运）时设置FeatureMap的属性描述。 |
+| [SetLoadDataPaddingValue](../cube_load_aux_config/SetLoadDataPaddingValue.md) | 用于调用LoadData（卷积数据搬运）接口时设置Pad填充的数值。 |

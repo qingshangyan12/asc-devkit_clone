@@ -54,3 +54,11 @@ __aicore__ inline void Reset()
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[InitBufPool](InitBufPool.md)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TBufPool构造函数](TBufPool_constructor.md) | 创建TBufPool对象时，初始化数据成员。 |
+| [InitBuffer](InitBuffer.md) | 调用TBufPool::InitBuffer接口为TQue/TBuf进行内存分配。 |
+| [InitBufPool](InitBufPool.md) | 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。 |

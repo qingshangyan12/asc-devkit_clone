@@ -67,3 +67,9 @@ __aicore__ inline int64_t asc_get_block_num()
 ```cpp
 uint32_t blockLength = C_API_TOTAL_LENGTH / block_num;  // 获取当前任务配置的核数，替代 asc_get_block_num()
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetBlockNum](../../basic_api/tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |

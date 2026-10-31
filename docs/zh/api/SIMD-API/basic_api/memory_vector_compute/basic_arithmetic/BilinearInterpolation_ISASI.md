@@ -264,3 +264,14 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 输入数据(src0OffsetLocal,uint32_t): [0,32,64,...,992]
 输出数据(dstLocal,half): [389, 394, 399, 404, ...,4096]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Gatherb(ISASI)](../scatter_gather/Gatherb_ISASI.md) | Gatherb接口接受输入张量（src）、DataBlock偏移张量（offset），根据索引位置将输入张量按DataBlock（32字节）收集到结果张量（dst）中。 |
+| [Brcb](../data_padding/Brcb.md) | Brcb接口对输入数据，每一次取输入张量中的8个数进行填充操作，将每个数填充到结果张量的一个DataBlock（32字节）中。 |
+| [Mul](Mul.md) | Mul属于双目矢量类计算接口，负责将输入的两个tensor按元素求积。 |
+| [Add](Add.md) | Add属于双目矢量类计算接口，负责将输入的两个tensor按元素求和。 |
+| [Gather](../scatter_gather/Gather.md) | Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseOffset），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。 |
+| [Reduce](../../reg_vector_compute/reduction_compute/Reduce.md) | 归约指令根据ReduceType，将数据集合简化为单一值或者更小的集合。 |

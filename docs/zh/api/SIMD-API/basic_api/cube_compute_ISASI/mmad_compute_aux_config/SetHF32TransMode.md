@@ -59,3 +59,10 @@ __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 ```cpp
 AscendC::SetHF32TransMode(HF32TransMode::NEAREST_AWAY);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetHF32Mode](SetHF32Mode.md) | 用于设置Mmad计算是否开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

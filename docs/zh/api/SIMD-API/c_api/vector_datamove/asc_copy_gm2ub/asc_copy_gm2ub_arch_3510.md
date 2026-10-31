@@ -191,3 +191,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2ub](asc_copy_gm2ub.md) | 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。 |

@@ -74,3 +74,9 @@ vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_int4x22half(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int4x22half](../reg_compute/reg_convert/asc_int4x22half.md) | `int4x2_t`将两个连续的4bit有符号整数打包为一个8bit存储单元。 |

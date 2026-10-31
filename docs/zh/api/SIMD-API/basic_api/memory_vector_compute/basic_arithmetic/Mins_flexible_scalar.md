@@ -166,3 +166,10 @@ $dst_i = \operatorname{Min}(scalar, src_i)$
 // 标量在后，src1Local[0]作为标量
 输出数据(dstLocal): [1 2 2 ... 2]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Min](Min.md) | Min属于双目矢量类计算接口，负责将输入的两个tensor按元素求最小值。 |

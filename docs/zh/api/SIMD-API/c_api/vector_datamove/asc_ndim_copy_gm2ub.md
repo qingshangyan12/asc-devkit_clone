@@ -238,3 +238,12 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_ndim_loopi_stride](asc_set_ndim_loop_stride.md) | 用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。 |
+| [asc_set_ndim_pad_value](asc_set_ndim_pad_value.md) | 用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。 |
+| [asc_set_ndim_pad_count](asc_set_ndim_pad_count.md) | 本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。 |
+| [asc_ndim_copy_dci](asc_ndim_copy_dci.md) | 刷新NDDMA DataCache。 |

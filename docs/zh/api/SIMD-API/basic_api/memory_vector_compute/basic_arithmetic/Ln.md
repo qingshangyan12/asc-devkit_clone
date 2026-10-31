@@ -252,3 +252,9 @@ LnAlgo::INTRINSIC为默认算法。--cce-ftz=false时保留Subnormal；--cce-ftz
 输入数据srcLocal：[1 2 3 4 ...]
 输出数据dstLocal：[0 0.6931 1.0986 1.3863 ...]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

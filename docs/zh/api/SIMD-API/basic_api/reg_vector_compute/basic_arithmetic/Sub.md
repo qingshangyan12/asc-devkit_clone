@@ -154,3 +154,11 @@ $$
         }
     }
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SubC](SubC.md) | 该接口根据mask，对源操作数srcReg0、srcReg1及输入进位carrySrc进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry（存放进位的MaskReg寄存器）。 |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [MaskReg](../register_data_types/MaskReg.md) | MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度为的八分之一（VL/8）。 |

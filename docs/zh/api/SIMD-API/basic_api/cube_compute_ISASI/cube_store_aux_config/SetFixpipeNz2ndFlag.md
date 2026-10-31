@@ -124,3 +124,9 @@ uint16_t srcNdStride = 2;
 uint16_t dstNdStride = 1;
 AscendC::SetFixpipeNz2ndFlag(ndNum, srcNdStride, dstNdStride); // 设置FIX搬运NZ格式到ND格式转换的参数
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Fixpipe（L0C到GM数据搬运）](../cube_compute_store/Fixpipe_L0CToGM.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |

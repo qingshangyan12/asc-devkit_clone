@@ -86,3 +86,10 @@ constexpr uint16_t dst_gap = 1;
 __cb__ half dst[256];
 asc_copy_gm2l0b(dst, src, base_idx, repeat, src_stride, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l0a](asc_copy_gm2l0a.md) | 将数据从GM搬运到L0A Buffer。 |
+| [asc_copy_l12l0b](asc_copy_l12l0b.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |

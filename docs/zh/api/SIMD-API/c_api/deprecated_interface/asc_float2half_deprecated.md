@@ -120,3 +120,10 @@ vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_float2half_rn(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2half](../reg_compute/reg_convert/asc_float2half.md) | 将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

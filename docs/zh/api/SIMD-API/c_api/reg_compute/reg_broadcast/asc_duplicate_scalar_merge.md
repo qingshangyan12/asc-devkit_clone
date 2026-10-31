@@ -194,3 +194,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_duplicate_scalar](asc_duplicate_scalar.md) | 将标量`value`广播到目的操作数中。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |

@@ -102,3 +102,11 @@ __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 asc_max(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_min](asc_min.md) | 按元素求最小值。 |
+| [asc_max_scalar](asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。 |
+| [asc_min_scalar](asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。 |

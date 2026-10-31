@@ -124,3 +124,10 @@ __aicore__ inline TensorTrait(const LayoutType& t = {})
     Add(tensor3, tensor1, tensor2, tensor3.GetSize());
     ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MakeTensorTrait](MakeTensorTrait.md) | 生成TensorTrait实例化对象。 |
+| [SetLayout](SetLayout.md) | 设置Layout对象至TensorTrait结构中。 |
+| [GetLayout](GetLayout.md) | 获取Layout实例化对象。 |

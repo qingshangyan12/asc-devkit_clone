@@ -80,3 +80,9 @@ constexpr uint64_t total_length = 128;
 __ubuf__ half dst[total_length];
 asc_copy_gm2ub(dst, src, total_length * sizeof(half));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2ub](asc_copy_gm2ub.md) | 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。 |

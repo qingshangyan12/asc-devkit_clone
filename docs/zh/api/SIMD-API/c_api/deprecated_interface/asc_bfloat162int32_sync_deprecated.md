@@ -90,3 +90,10 @@ __ubuf__ bfloat16_t src[total_length];
 __ubuf__ int32_t dst[total_length];
 asc_bfloat162int32_rna_sync(dst, src, 128);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162int32](../vector_compute/vector_convert/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

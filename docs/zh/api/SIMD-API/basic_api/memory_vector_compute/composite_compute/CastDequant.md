@@ -274,3 +274,11 @@ $$
    0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 10 89  3 39 94 23 89 16
  23 60 71 42 46 58 65 90]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetDeqScale](../type_conversion_aux_config/SetDeqScale.md) | 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同。 |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

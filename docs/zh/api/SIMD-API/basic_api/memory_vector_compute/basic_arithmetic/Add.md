@@ -190,3 +190,9 @@ $dst_i = src0_i + src1_i$
 输入数据src1Local: [513 514 515 ... 1024]
 输出数据dstLocal: [514 516 518 ... 1536]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

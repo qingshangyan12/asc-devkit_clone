@@ -72,3 +72,9 @@ constexpr uint64_t relu_pre = 0;
 constexpr uint64_t quant_pre = 0x1000;// 假设量化操作有效地址为0x1000
 asc_set_l0c2gm_config(relu_pre, quant_pre, true);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_config](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md) | 本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置。 |

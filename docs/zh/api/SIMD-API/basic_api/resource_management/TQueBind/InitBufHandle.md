@@ -156,3 +156,11 @@ pipe.InitBufPool(tbufPool, 1024 * 2);
 tbufPool.InitBuffer(srcQue0, 1, 1024);
 tbufPool.InitBuffer(srcBuf1, 1024);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |
+| [TQueBind构造函数](TQueBind_constructor.md) | 创建TQueBind对象。 |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |

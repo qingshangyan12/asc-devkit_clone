@@ -75,3 +75,10 @@ if (id >= 0 && id < ARRIVE_NUM) {
   barA.Arrive(id);  // Arrive组中有2个AIV，分别为Block0、1，表示它们已完成任务。
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GroupBarrier构造函数](GroupBarrier_constructor.md) | 创建GroupBarrier对象，通过设置构造函数参数，确定Arrive组的Block个数和Wait组的Block个数。 |
+| [Wait](Wait.md) | 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。 |

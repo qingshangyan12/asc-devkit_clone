@@ -216,3 +216,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_scalar](../reg_arith/asc_mul_scalar.md) | 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。 |
+| [asc_float2half](../reg_convert/asc_float2half.md) | 将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。 |

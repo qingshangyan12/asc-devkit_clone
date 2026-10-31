@@ -83,3 +83,9 @@ __simd_vf__ inline void int162uint8_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ int1
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int162uint8](../reg_compute/reg_convert/asc_int162uint8.md) | `src`中int16_t类型的元素转换为uint8_t类型，并将结果写入dst。 |

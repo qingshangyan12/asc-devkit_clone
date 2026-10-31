@@ -211,3 +211,10 @@ $$
 输入数据src1Local: [1 3 -4 ... 5]
 输出数据dstLocal: [1 -6 -12 ... -30]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

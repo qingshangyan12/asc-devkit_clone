@@ -54,3 +54,9 @@ __aicore__ inline void Init()
 ## 调用示例<a name="section1234017553610"></a>
 
 请参考[调用示例](EXTERN_IMPL_BUFPOOL.md#section1234017553610)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [EXTERN_IMPL_BUFPOOL宏](EXTERN_IMPL_BUFPOOL.md) | 开发者可以通过TBufPool类手动管理Unified Buffer（UB）、L1 Buffer物理内存。 |

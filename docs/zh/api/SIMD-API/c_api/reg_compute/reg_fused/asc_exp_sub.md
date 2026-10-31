@@ -327,3 +327,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_exp](../reg_arith/asc_exp.md) | 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。 |
+| [asc_sub](../reg_arith/asc_sub.md) | 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。 |

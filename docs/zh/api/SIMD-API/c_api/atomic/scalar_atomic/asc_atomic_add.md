@@ -163,3 +163,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_dcci](../../cache_ctrl/asc_dcci.md) | 在AI Core内部，访问Global Memory（GM）与Unified Buffer（UB）的方式分为以下两种。 |

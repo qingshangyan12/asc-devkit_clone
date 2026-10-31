@@ -82,3 +82,10 @@ asc_duplicate_sync(dst, val, dst_length);
 ```
 输出数据dst：[18 18 18 ... 18]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_duplicate](../vector_compute/vector_broadcast/asc_duplicate.md) | 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

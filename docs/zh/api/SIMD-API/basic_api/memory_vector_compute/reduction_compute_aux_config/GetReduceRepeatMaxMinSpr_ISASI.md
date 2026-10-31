@@ -179,3 +179,11 @@
         ```
 
     <!-- end id19 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReduceRepeat](../reduction_compute/ReduceRepeat.md) | `ReduceRepeat`接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。 |
+| [ReduceMax](../reduction_compute/ReduceMax.md) | `ReduceMax`接口用于从所有输入数据中找出最大值和最大值索引。 |
+| [ReduceMin](../reduction_compute/ReduceMin.md) | `ReduceMin`接口用于从所有输入数据中找出最小值和最小值索引。 |

@@ -223,3 +223,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_ln](asc_ln.md) | 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。 |
+| [asc_log](asc_log.md) | 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。 |

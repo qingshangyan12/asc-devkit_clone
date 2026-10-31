@@ -72,3 +72,9 @@ extern "C" __global__ __aicore__ void example_kernel(...) {
     ...
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Destroy](Destroy.md) | 释放资源。 |

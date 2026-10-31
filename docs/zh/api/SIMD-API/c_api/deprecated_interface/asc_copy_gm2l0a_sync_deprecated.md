@@ -80,3 +80,10 @@ __ca__ half dst[256];
 // src表示源操作数的起始地址
 asc_copy_gm2l0a_sync(dst, src, 0, 1, 64, 64);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l0a](../cube_datamove/cube_compute_load/asc_copy_gm2l0a.md) | 将数据从GM搬运到L0A Buffer。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

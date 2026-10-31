@@ -305,3 +305,11 @@
     > 输入数据src_gm：[1. 1. 1. ... 1. 1. 1.]
     >
     > 输出数据dst_gm：[288.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [ReduceRepeat](ReduceRepeat.md) | `ReduceRepeat`接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。 |
+| [ReduceDataBlock](ReduceDataBlock.md) | `ReduceDataBlock`接口对输入数据以DataBlock为单位进行归约操作，根据模板参数`reduceType`，对每个DataBlock内的数据求和/求最大值/求最小值。 |

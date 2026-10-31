@@ -61,3 +61,10 @@ __aicore__ inline void ClearSpr()
 ## 调用示例<a name="section849174212202"></a>
 
 无
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSpr](GetSpr.md) | 获取指定特殊寄存器的值。当前支持表SpecialPurposeReg模板参数说明。 |
+| [ClearSpr](../reg_vector_compute/system_variable_access/ClearSpr.md) | 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。 |

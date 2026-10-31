@@ -138,3 +138,10 @@ CubeResGroupHandle对象实例。
 ```
 auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc, CubeMsgBody> (desc, BLOCKSTART, BLOCKSIZE, MSGQUEUESIZE, tilingGM);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetKfcWorkspace](../KfcWorkspace/GetKfcWorkspace.md) | 获取用于CubeResGroupHandle消息通信区的内存地址。 |
+| [UpdateKfcWorkspace](../KfcWorkspace/UpdateKfcWorkspace.md) | 更新用于CubeResGroupHandle消息通信区的内存地址。 |

@@ -76,3 +76,9 @@ int32_t offset = 64;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_storealign_pack_postupdate_v2(dst_align32b, src, offset, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_storealign_pack_quarter_postupdate](../reg_compute/store/asc_storealign_pack_quarter_postupdate.md) | 将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。 |

@@ -224,3 +224,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_uint162uint8](asc_uint162uint8.md) | 将`uint16_t`类型数据转换为`uint8_t`类型，无舍入模式，支持饱和/非饱和模式。 |
+| [asc_int162uint32](asc_int162uint32.md) | `src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。 |
+| [asc_uint82uint32](asc_uint82uint32.md) | 根据`mask`将`src`中参与计算的`uint8_t`类型元素转换为`uint32_t`类型，结果写入`dst`。 |

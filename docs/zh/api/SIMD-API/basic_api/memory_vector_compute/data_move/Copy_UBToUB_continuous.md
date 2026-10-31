@@ -93,3 +93,11 @@ Ascend 950PR&950DT系列产品，支持的数据类型为：int8_t、uint8_t、f
 ```cpp
 AscendC::Copy(dstLocal, srcLocal, 512);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（UBToUB连续数据搬运）](DataCopy_UBToUB_continuous.md) | 支持Unified Buffer（UB）内部的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [Copy（UBToUB掩码式高维数据搬运）](Copy_UBToUB_mask_highdim_split.md) | 支持Unified Buffer（UB）内部的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。 |
+| [DataCopy（UBToUB高维切分数据搬运）](DataCopy_UBToUB_highdim_split.md) | 支持Unified Buffer（UB）内部的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |

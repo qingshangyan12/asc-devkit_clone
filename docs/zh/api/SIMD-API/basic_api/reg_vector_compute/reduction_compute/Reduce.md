@@ -238,3 +238,11 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL1);
         }
     }
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [MaskReg](../register_data_types/MaskReg.md) | MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度为的八分之一（VL/8）。 |
+| [连续非对齐搬出（StoreUnAlign）](../reg_data_store/StoreUnAlign_continuous.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。 |

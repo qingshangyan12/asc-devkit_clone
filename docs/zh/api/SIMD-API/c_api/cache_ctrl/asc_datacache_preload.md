@@ -153,3 +153,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md) | 配置标量单元访问Global Memory时的L2 Cache管理策略。 |

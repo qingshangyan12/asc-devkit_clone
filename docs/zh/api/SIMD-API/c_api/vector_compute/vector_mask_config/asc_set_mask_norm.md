@@ -74,3 +74,9 @@ uint8_t src1_repeat_stride = 8;
 asc_add(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride,
     dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_vector_mask](asc_set_vector_mask.md) | 本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 |

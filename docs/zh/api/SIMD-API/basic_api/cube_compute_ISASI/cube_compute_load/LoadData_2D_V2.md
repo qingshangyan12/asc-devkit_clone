@@ -181,3 +181,9 @@ loadDataParams.dstStride = mStep;
 loadDataParams.ifTranspose = false;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（MX矩阵搬运）](LoadData_2D_MX.md) | 负责完成矩阵计算所需的左右矩阵数据和对应的左右量化系数矩阵数据的搬运。 |

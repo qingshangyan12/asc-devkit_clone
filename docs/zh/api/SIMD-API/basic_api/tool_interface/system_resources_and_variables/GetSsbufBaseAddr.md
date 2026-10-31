@@ -58,3 +58,9 @@ __aicore__ inline __ssbuf__ void*  GetSsbufBaseAddr()
  __ssbuf__ void* ssbuf = GetSsbufBaseAddr(); // NPU域中返回(void*) 0 ,CPU域中返回CPU模拟分配的地址
 AscendC::printf("Ssbuf基地址指针：%p\n", ssbuf); // %p为打印指针格式符，NPU环境中，将特殊的0指针值显示为nil
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetKfcWorkspace](../../cube_group_mgmt_ISASI/KfcWorkspace/GetKfcWorkspace.md) | 获取用于CubeResGroupHandle消息通信区的内存地址。 |

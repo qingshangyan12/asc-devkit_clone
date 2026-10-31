@@ -53,3 +53,10 @@ TensorDesc()
 
 参考[调用示例](GetDataPtr.md#zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section320753512363)。
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetIndex](GetIndex.md) | 获取TensorDesc在ListTensorDesc中对应的索引值。 |
+| [GetDim](GetDim.md) | 获取Tensor的维度。 |
+| [GetDataPtr](GetDataPtr.md) | 获取储存Tensor数据地址。 |

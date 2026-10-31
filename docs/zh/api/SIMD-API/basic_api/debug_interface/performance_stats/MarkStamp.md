@@ -85,3 +85,11 @@ vector_opt();
 MarkStamp<PIPE_V, 1>();
 mte3_opt();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mark_stamp](../../../../Utils-API/tuning_interface/asc_mark_stamp.md) | SIMD场景下，用户通过调用接口，用于在算子执行过程中标记特定位置，便于后期通过流水图分析代码执行路径与性能热点。 |
+| [MetricsProfStart](MetricsProfStart.md) | 推荐使用asc_prof_start接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。 |
+| [MetricsProfStop](MetricsProfStop.md) | 推荐使用asc_prof_stop接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。 |

@@ -188,3 +188,10 @@ tbufPool2.Reset();
 tbufPool0.Reset();
 pipe->Reset();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TBufPool构造函数](TBufPool_constructor.md) | 创建TBufPool对象时，初始化数据成员。 |
+| [InitBufPool](../TPipe/InitBufPool.md) | 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定Unified Buffer（UB）/L1内存资源复用的场景。 |

@@ -227,3 +227,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int8](asc_half2int8.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int8_t`类型，结果写入`dst`。 |
+| [asc_half2int16](asc_half2int16.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int16_t`类型，结果写入`dst`。 |
+| [asc_half2uint8](asc_half2uint8.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。 |

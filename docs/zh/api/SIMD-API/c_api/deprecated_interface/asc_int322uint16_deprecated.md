@@ -124,3 +124,9 @@ __simd_vf__ inline void int322uint16_vf(__ubuf__ int32_t* src_addr, __ubuf__ uin
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322uint16](../reg_compute/reg_convert/asc_int322uint16.md) | 根据`mask`将`src`中的每个`int32_t`类型元素转换为`uint16_t`类型，并支持不同的饱和模式，结果写入`dst`。 |

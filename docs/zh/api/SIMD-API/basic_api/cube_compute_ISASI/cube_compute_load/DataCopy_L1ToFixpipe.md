@@ -126,3 +126,10 @@ AscendC::SetFixPipeConfig(fbTensor);
 ```
 
 完整示例请参考[DataCopy（L1->Fixpipe Buffer数据搬运）](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)中场景2、4、6。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Fixpipe（L0C到GM数据搬运）](../cube_compute_store/Fixpipe_L0CToGM.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |
+| [Fixpipe（L0C到L1数据搬运）](../cube_compute_store/Fixpipe_L0CToL1.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。 |

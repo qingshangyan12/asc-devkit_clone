@@ -125,3 +125,10 @@ asc_half2hif8_rna_sat(dst, src, mask);     // ROUND舍入模式，饱和模式�
 asc_half2hif8_rna_v2(dst, src, mask);      // ROUND舍入模式，非饱和模式，写入dst索引为奇数的位置
 asc_half2hif8_rna_sat_v2(dst, src, mask);  // ROUND舍入模式，饱和模式，写入dst索引为奇数的位置
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2hif8](../reg_compute/reg_convert/asc_half2hif8.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

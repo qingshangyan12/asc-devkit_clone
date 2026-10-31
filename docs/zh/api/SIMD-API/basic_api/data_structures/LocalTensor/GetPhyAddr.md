@@ -80,3 +80,11 @@ uint64_t realAddr = (uint64_t)inputLocalCpuPtr - (uint64_t)(GetTPipePtr()->GetBa
 uint64_t realAddr = inputLocal.GetPhyAddr();
 #endif
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |
+| [GetLength](GetLength.md) | 获取LocalTensor数据长度。 |

@@ -84,3 +84,9 @@ __ubuf__ half dst[256];
 __ubuf__ half src[256];
 asc_log(dst, src, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_exp](asc_exp.md) | 按元素取自然指数。 |

@@ -97,3 +97,9 @@ AscendC::DataCopy(yLocal, yGlobal, DATA_SIZE);
 ```
 
 完整样例请参考[scalar_atomic_operations样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCacheCleanAndInvalid](../cache_control/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |

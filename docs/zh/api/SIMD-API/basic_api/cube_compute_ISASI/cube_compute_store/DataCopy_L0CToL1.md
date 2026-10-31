@@ -227,3 +227,14 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     AscendC::DataCopy(c1Local, c, dataCopyParams);
     ```
 <!-- end id25 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetFixPipeConfig](../cube_store_aux_config/SetFixPipeConfig.md) | DataCopy数据搬运（L0C Buffer->GM、L0C Buffer->L1 Buffer）过程中进行随路量化时，通过调用该接口设置量化的参数。 |
+| [SetFixpipePreQuantFlag](../cube_store_aux_config/SetFixpipePreQuantFlag.md) | DataCopy数据搬运（L0C Buffer->GM、L0C Buffer->L1 Buffer）过程中进行随路量化时，通过调用该接口设置scalar量化参数。 |
+| [SetFixpipeNz2ndFlag](../cube_store_aux_config/SetFixpipeNz2ndFlag.md) | DataCopy数据搬运（L0C Buffer->GM）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
+| [SetFixPipeClipRelu](../cube_store_aux_config/SetFixPipeClipRelu.md) | DataCopy数据搬运（L0C Buffer->GM）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。 |
+| [SetFixPipeAddr](../cube_store_aux_config/SetFixPipeAddr.md) | DataCopy数据搬运（L0C Buffer->GM）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。 |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

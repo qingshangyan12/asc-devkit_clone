@@ -80,3 +80,10 @@ vector_bool mask;
 mask = asc_create_mask_b32(PAT_ALL);
 asc_uint322uint16(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_uint322uint16](../reg_compute/reg_convert/asc_uint322uint16.md) | 将`uint32_t`类型转换为`uint16_t`类型，支持饱和/非饱和模式。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

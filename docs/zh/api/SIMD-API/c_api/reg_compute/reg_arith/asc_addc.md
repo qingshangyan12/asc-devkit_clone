@@ -269,3 +269,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_ctrl](../../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
+| [asc_add](asc_add.md) | 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。 |

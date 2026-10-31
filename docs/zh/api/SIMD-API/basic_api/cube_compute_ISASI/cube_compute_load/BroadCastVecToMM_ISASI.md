@@ -84,3 +84,9 @@ Atlas推理系列产品AI Core，支持的数据类型为：half、int32_t、flo
 // srcGap = 0，dstGap = 1，源操作数与目的操作数之间连续
 AscendC::BroadCastVecToMM(brcLocal, srcLocal, 1, 1, 0, 1);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

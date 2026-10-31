@@ -148,3 +148,13 @@ __cbuf__ half src[256];
 __cb__ half dst[256];
 asc_copy_l12l0b(dst, src, 1, 1, 1, 0);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l13d_fmatrix](../cube_load_aux_config/asc_set_l13d_fmatrix.md) | 本接口用于配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`false`的asc_copy_l12l0a（3D矩阵搬运）接口使用。 |
+| [asc_set_l13d_fmatrix_b](../cube_load_aux_config/asc_set_l13d_fmatrix_b.md) | 本接口用于配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`true`的asc_copy_l12l0b（3D矩阵搬运）接口使用。 |
+| [asc_set_l12l0a_3d_padding](../cube_load_aux_config/asc_set_l12l0a_3d_padding.md) | 用于调用asc_copy_l12l0a_arch_3510（3D矩阵搬运）时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。 |
+| [asc_set_l13d_size](../cube_load_aux_config/asc_set_l13d_size.md) | 设置asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_copy_l12l0b_trans_arch_2201](asc_copy_l12l0b_trans_arch_2201.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |

@@ -643,3 +643,10 @@ AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1
  1199654414 1206405188 1214203847 1165183076 1213745302 1208830102
  1209944118 1215121459]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [SetDeqScale](../type_conversion_aux_config/SetDeqScale.md) | 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同。 |

@@ -204,3 +204,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_fill_l0a](asc_fill_l0a.md) | 将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。 |
+| [asc_fill_l0b](asc_fill_l0b.md) | 将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。 |

@@ -264,3 +264,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322uint16](asc_int322uint16.md) | 根据`mask`将`src`中的每个`int32_t`类型元素转换为`uint16_t`类型，并支持不同的饱和模式，结果写入`dst`。 |
+| [asc_int322int64](asc_int322int64.md) | 根据`mask`将`src`中的每个`int32_t`类型元素转换为`int64_t`类型，结果写入`dst`。 |
+| [asc_int322uint8](asc_int322uint8.md) | 根据`mask`将`src`中参与计算的`int32_t`类型元素转换为`uint8_t`类型，结果写入`dst`。 |

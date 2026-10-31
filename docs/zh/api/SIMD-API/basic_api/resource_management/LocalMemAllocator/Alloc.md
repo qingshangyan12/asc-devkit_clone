@@ -155,3 +155,9 @@ auto layoutMake = AscendC::MakeLayout(shape, stride);
 auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
 auto tensor3 = allocator.Alloc<decltype(tensorTraitMake)>();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetCurAddr](GetCurAddr.md) | 返回当前物理位置空闲的起始地址。 |

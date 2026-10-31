@@ -241,3 +241,13 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_highdim_split_arch_3510](../cube_datamove/cube_compute_load/asc_copy_gm2l1_highdim_split_arch_3510.md) | 将数据从Global Memory搬运到L1 Buffer，数据搬运时格式和内容保持不变。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_gm2l1_padding](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_padding.md) | 用于设置asc_copy_gm2l1_arch_3510（高维切分数据搬运）接口搬运过程的padding模式使用的padding值。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

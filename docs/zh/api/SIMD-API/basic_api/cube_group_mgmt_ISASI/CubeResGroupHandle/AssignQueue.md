@@ -80,3 +80,11 @@ auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc
 auto queIdx = AscendC::GetBlockIdx();
 handle.AssignQueue(queIdx);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CubeResGroupHandle构造函数](CubeResGroupHandle_constructor.md) | 构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。 |
+| [AllocMessage](AllocMessage.md) | AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。 |
+| [PostMessage](PostMessage.md) | 通过AllocMessage接口获取到消息空间地址msg后，构造消息结构体CubeMsgType，发送该消息。 |

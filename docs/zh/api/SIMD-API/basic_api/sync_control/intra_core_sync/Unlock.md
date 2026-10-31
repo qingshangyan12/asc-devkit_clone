@@ -66,3 +66,9 @@ static __aicore__ inline void Unlock(MutexID id)
 ## 调用示例<a name="section123275308128"></a>
 
 Lock与Unlock必须严格配对使用，详细示例请参考[Lock调用示例](Lock.md#section123275308128)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Lock](Lock.md) | 根据MutexID获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同MutexID的Mutex都已经被Unlock释放。 |

@@ -227,3 +227,10 @@ nd2nzA1Params.dstNzNStride = 1;
 nd2nzA1Params.dstNzMatrixStride = 0;
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GMToL1随路转换-DN2NZ搬运）](DataCopy_GMToL1_DN2NZ.md) | 随路格式转换数据搬运，适用于在搬运时进行DN到NZ格式的转换。 |
+| [DataCopy（UBToL1随路转换-ND2NZ搬运）](DataCopy_UBToL1_ND2NZ.md) | > [!NOTE]说明 > 本接口为软件仿真实现，是在Matmul高阶API的基础上，利用Matmul高阶API中的workspace GM空间作为数据中转空间，数据先搬入GM，再搬入L1 Buffer。 |

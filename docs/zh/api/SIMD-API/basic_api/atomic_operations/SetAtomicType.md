@@ -80,3 +80,12 @@ __aicore__ inline void SetAtomicType()
 ## 调用示例<a name="section177231425115410"></a>
 
 根据约束说明可知，使用[SetAtomicAdd](SetAtomicAdd.md)、[SetAtomicMax](SetAtomicMax_ISASI.md)、[SetAtomicMin](SetAtomicMin_ISASI.md)时，已通过模板参数指定原子操作的数据类型，无需额外调用`SetAtomicType`接口，因此本接口不提供调用示例。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetAtomicAdd](SetAtomicAdd.md) | 对后续目的地址为GM的数据搬运开启原子累加。 |
+| [SetAtomicMax(ISASI)](SetAtomicMax_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。 |
+| [SetAtomicMin(ISASI)](SetAtomicMin_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |
+| [DisableDmaAtomic](DisableDmaAtomic.md) | 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。 |

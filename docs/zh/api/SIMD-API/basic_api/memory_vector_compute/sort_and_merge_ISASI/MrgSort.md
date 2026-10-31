@@ -121,3 +121,9 @@ AscendC::MrgSort<float>(dstLocal, srcList, params);
 outQueueDst.EnQue<float>(dstLocal);
 outQueueDst.FreeTensor(dstLocal);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Sort32](Sort32.md) | Sort32接口实现一次迭代内对32个数的降序排列操作。 |

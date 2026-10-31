@@ -151,3 +151,10 @@ Compute1();
 CopyOut1();
 tbufPool2.Reset();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBufPool](../TBufPool/InitBufPool.md) | 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。 |
+| [InitBuffer](../TBufPool/InitBuffer.md) | 调用TBufPool::InitBuffer接口为TQue/TBuf进行内存分配。 |

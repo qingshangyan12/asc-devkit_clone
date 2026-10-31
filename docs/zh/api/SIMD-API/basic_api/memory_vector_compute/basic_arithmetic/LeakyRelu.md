@@ -188,3 +188,9 @@ T和U支持的数据类型为：half、float。
 输入数据scalar = 0.001
 输出数据dstLocal：[-0.287 246. -0.438 177. 596. -0.950 -0.293 322. ... -0.900]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

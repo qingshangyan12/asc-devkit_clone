@@ -85,3 +85,9 @@ __cbuf__ half src[256];
 __fbuf__ half dst[256];
 asc_copy_l12fb(dst, src, n_burst, len_burst, src_gap_size, dst_gap_size);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md) | 本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置。 |

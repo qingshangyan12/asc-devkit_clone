@@ -80,3 +80,9 @@ __ubuf__ bfloat16_t src[total_length];
 __ubuf__ float dst[total_length];
 asc_bfloat162float(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2bfloat16](asc_float2bfloat16.md) | 将float类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |

@@ -76,3 +76,11 @@ int16_t offset = 2;
 bool sign_mode = false;
 asc_set_deq_scale(scale, offset, sign_mode);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_deq_int162b8](asc_deq_int162b8.md) | 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。 |
+| [asc_deq_int322half](asc_deq_int322half.md) | 对输入的int32_t类型的数据按元素做量化并转换为half类型。 |
+| [asc_vdeq_int162b8](asc_vdeq_int162b8.md) | 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |

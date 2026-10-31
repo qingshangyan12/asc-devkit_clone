@@ -71,3 +71,10 @@ __ubuf__ bfloat16_t src[total_length];
 __ubuf__ float dst[total_length];
 asc_bfloat162float_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162float](../vector_compute/vector_convert/asc_bfloat162float.md) | 将bfloat16_t类型数据转为float，无舍入模式。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

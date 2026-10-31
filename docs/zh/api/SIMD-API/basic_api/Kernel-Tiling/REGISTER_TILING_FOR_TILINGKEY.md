@@ -146,3 +146,8 @@ ge::graphStatus TilingFunc(gert::TilingContext* context)
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [REGISTER_TILING_DEFAULT](REGISTER_TILING_DEFAULT.md) | 用于在核函数（Kernel）侧注册用户使用标准C++语法自定义的默认TilingData结构体。 |

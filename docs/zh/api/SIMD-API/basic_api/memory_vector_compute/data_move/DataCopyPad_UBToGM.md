@@ -259,3 +259,11 @@ AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
 ```
 
 完整样例请参考[DataCopyPad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopyPad（GMToUB非对齐数据搬运）](DataCopyPad_GMToUB.md) | 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer（UB）的功能，可以根据开发者的需要自行填充数据。 |
+| [DataCopy（UBToGM随路转换NZ2ND搬运）](DataCopy_UBToGM_NZ2ND.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer（UB）到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
+| [DataCopy（GM与UB连续数据搬运）](DataCopy_GMAndUB_continuous.md) | 支持Global Memory与Unified Buffer（UB）之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |

@@ -114,3 +114,9 @@ mask = asc_create_mask_b16(PAT_ALL);
 asc_bfloat162float(dst, src, mask);     // 读取src索引为偶数的位置
 asc_bfloat162float_v2(dst, src, mask);  // 读取src索引为奇数的位置
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162float](../reg_compute/reg_convert/asc_bfloat162float.md) | 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`float`类型，结果写入`dst`。 |

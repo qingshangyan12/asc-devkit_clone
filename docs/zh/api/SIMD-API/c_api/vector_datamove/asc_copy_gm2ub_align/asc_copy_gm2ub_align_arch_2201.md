@@ -118,3 +118,12 @@ constexpr uint64_t total_length = 128;
 __ubuf__ uint8_t dst[total_length];
 asc_copy_gm2ub_align(dst, src, total_length * sizeof(uint8_t));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_copy_pad_val](../asc_set_copy_pad_val.md) | 该接口与asc_copy_gm2ub_align配合使用，用于设置连续搬运数据块左右两侧的填充值。 |
+| [asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md) | 本接口用于设置asc_copy_gm2ub_align使用循环搬运模式时的两层循环迭代次数。 |
+| [asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md) | 本接口用于设置asc_copy_gm2ub_align使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。 |
+| [asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md) | 本接口用于设置asc_copy_gm2ub_align使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。 |

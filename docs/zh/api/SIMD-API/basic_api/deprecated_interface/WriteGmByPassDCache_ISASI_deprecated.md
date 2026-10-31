@@ -130,3 +130,11 @@ if (blockIdx == 1) {
 ```
 
 完整样例请参考[DataSyncBarrier样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [WriteGmBypassDCache(ISASI)](../scalar_compute/WriteGmBypassDCache_ISASI.md) | 不经过DCache向GM地址上写数据。 |
+| [DataCacheCleanAndInvalid](../cache_control/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |
+| [DataSyncBarrier(ISASI)](../sync_control/intra_core_sync/DataSyncBarrier_ISASI.md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |

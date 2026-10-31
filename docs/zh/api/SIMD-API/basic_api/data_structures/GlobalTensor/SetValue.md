@@ -92,3 +92,9 @@ aGlobal.SetValue(2, val);
 //结果如下
 aGlobal数据 [1, 1, 0, 1, 1]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCacheCleanAndInvalid](../../cache_control/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |

@@ -86,3 +86,10 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_not(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_or](asc_or.md) | 每对元素按位或运算。 |
+| [asc_and](asc_and.md) | 执行矢量与运算。 |

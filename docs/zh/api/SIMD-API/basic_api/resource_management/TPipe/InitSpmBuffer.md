@@ -125,3 +125,10 @@ SPM Buffer供解决UB空间不足的特殊场景使用，性能较差，一般�
     int len = 1024; // 设置spm buffer为1024个类型为T的数据
     pipe.InitSpmBuffer(len * sizeof(T));
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReadSpmBuffer](ReadSpmBuffer.md) | 从SPM Buffer读回到local数据中。 |
+| [WriteSpmBuffer](WriteSpmBuffer.md) | 将因为Unified Buffer（UB）空间不足而需要溢出暂存的数据拷贝到SPM Buffer中。 |

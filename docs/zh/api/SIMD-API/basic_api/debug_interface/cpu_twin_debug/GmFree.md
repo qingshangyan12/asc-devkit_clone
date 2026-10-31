@@ -65,3 +65,9 @@ void GmFree(void *ptr)
 ```cpp
 AscendC::GmFree((void*)x);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GmAlloc](GmAlloc.md) | 进行核函数（Kernel）的CPU侧运行验证时，用于创建共享内存：在/tmp目录下创建一个共享文件，并返回该文件的映射指针。 |

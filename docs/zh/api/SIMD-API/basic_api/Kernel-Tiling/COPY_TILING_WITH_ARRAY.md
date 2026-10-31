@@ -106,3 +106,8 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GET_TILING_DATA_PTR_WITH_STRUCT](GET_TILING_DATA_PTR_WITH_STRUCT.md) | 在使用该宏时，开发者可以通过指定结构体名称来获取相应的Tiling信息，并将其填入对应的Tiling结构体中。 |

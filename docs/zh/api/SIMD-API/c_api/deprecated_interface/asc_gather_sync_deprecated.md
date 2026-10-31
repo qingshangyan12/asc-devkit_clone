@@ -84,3 +84,10 @@ asc_gather_sync(dst, src, src_offset, total_length);
 // src_offset [254, 252, 250, ..., 4, 2, 0]，对应src中每个元素的偏移量，基于src的起始基地址，单位为Bytes
 // dst [128, 127, 126, ..., 3, 2, 1]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gather](../vector_compute/vector_gather/asc_gather.md) | 将src按照src_offset给定的偏移按元素收集到dst中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -130,3 +130,10 @@ Fill(leftMatrix, {1, static_cast<uint16_t>(mLength * kLength * sizeof(float) / 3
 ```
 
 若接口用于对L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor清0使用，示例请参考：[Fill调用样例](../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Duplicate](../../memory_vector_compute/data_padding/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |
+| [SetLoadDataPaddingValue](SetLoadDataPaddingValue.md) | 用于调用LoadData（卷积数据搬运）接口时设置Pad填充的数值。 |

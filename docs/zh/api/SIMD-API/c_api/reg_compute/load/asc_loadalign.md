@@ -345,3 +345,14 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md) | 更新地址寄存器（addr_reg），用于迭代寻址。 |
+| [asc_loadalign_mask](asc_loadalign_mask.md) | 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。 |
+| [asc_loadalign_datablock_strided](asc_loadalign_datablock_strided.md) | 从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |
+| [asc_create_mask](../reg_mask/asc_create_mask.md) | 根据传入的pat_mode生成对应的掩码寄存器，支持b8、b16、b32三种位宽模式。 |
+| [asc_unpack](../reg_permute_sel/asc_unpack.md) | 将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回，支持。 |

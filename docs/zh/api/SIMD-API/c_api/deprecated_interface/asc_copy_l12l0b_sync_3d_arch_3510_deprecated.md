@@ -268,3 +268,18 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0b_3d_arch_3510](../cube_datamove/cube_compute_load/asc_copy_l12l0b_3d_arch_3510.md) | 3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，按卷积步长、卷积核大小、膨胀系数配置生成img2col二维矩阵，再从展开后的矩阵中选取指定数据块搬运到L0B Buffer，用于3D卷积场景的矩阵计算数据加载。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_l13d_fmatrix_b](../cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix_b.md) | 本接口用于配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`true`的asc_copy_l12l0b（3D矩阵搬运）接口使用。 |
+| [asc_set_l12l0b_3d_padding](../cube_datamove/cube_load_aux_config/asc_set_l12l0b_3d_padding.md) | 用于调用asc_copy_l12l0b_arch_3510（3D矩阵搬运）时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。 |
+| [asc_set_l3d_rpt_b](../cube_datamove/cube_load_aux_config/asc_set_l3d_rpt_b.md) | 本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的asc_copy_l12l0b（3D矩阵搬运）接口使用。 |
+| [asc_set_l13d_fmatrix](../cube_datamove/cube_load_aux_config/asc_set_l13d_fmatrix.md) | 本接口用于配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`false`的asc_copy_l12l0a（3D矩阵搬运）接口使用。 |
+| [asc_set_l12l0a_3d_padding](../cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md) | 用于调用asc_copy_l12l0a_arch_3510（3D矩阵搬运）时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。 |
+| [asc_set_l13d_rpt](../cube_datamove/cube_load_aux_config/asc_set_l13d_rpt.md) | 本接口用于配置3D img2col搬运模式下使用repeat模式搬运左矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`false`的asc_copy_l12l0a（3D矩阵搬运）接口使用。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

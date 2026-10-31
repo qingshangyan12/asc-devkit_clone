@@ -421,3 +421,10 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
   transposeParams.transposeType = transposeType; 
   AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
   ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TransDataTo5HD](TransDataTo5HD.md) | TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
+| [DataCopy（GMToUB多维数据搬运NDDMA）](../data_move/DataCopy_GMToUB_NDDMA.md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |

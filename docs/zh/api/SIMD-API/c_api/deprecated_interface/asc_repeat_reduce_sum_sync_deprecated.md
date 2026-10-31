@@ -88,3 +88,10 @@ asc_repeat_reduce_sum_sync(dst, src, total_length);
 输入数据src：[1, 1, 1, ..., 1]
 输出数据dst：[128, 128]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_repeat_reduce_sum](../vector_compute/vector_reduce/asc_repeat_reduce_sum.md) | 对每个Repeat内所有元素求和。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -83,3 +83,9 @@ $$
 int64_t preFetchLen = 2; // 预取指令长度。
 AscendC::ICachePreLoad(preFetchLen);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetICachePreloadStatus(ISASI)](GetICachePreloadStatus_ISASI.md) | GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。 |

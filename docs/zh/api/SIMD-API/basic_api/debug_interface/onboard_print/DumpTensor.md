@@ -198,3 +198,9 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
         [2.820312,2.835938,2.957031,2.398438,4.449219,0.516113,4.796875,0.786133],
         [-,-,-,-,-,-,-,-]]
         ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ShapeInfo](../../aux_data_structures/ShapeInfo.md) | ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。 |

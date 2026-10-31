@@ -150,3 +150,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md) | 该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。 |
+| [asc_set_ndim_pad_value](asc_set_ndim_pad_value.md) | 本接口用于设置asc_ndim_copy_gm2ub在常数填充模式下使用的填充值。 |

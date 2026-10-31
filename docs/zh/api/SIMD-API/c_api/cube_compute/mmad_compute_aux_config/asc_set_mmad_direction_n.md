@@ -158,3 +158,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad](../mmad_compute/asc_mmad.md) | 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其。 |
+| [asc_mmad_mx](../mmad_compute/asc_mmad_mx.md) | 本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。 |
+| [asc_set_mmad_direction_m](asc_set_mmad_direction_m.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。 |

@@ -37,3 +37,9 @@
 ICPU_SET_TILING_KEY(10086);
 ICPU_RUN_KF(sort_kernel0, coreNum, (uint8_t*)x, (uint8_t*)y);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ICPU_RUN_KF](ICPU_RUN_KF.md) | 进行核函数（Kernel）的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。 |

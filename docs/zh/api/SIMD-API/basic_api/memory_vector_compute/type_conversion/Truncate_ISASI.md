@@ -87,3 +87,9 @@ AscendC::Truncate<T, RoundMode::CAST_FLOOR>(dstLocal, srcLocal, 512);
 输入数据srcLocal：[-37.063736    64.17277    -33.448692 ... ]
 输出数据dstLocal：[-38  64 -34 ... ]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast](Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

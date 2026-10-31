@@ -234,3 +234,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_eq_scalar](asc_eq_scalar.md) | 根据`mask`将源操作数`src`按元素与标量`value`进行二进制比较，若$src_i = value$则计算结果对应位为1，否则为0。 |
+| [asc_lt_scalar](asc_lt_scalar.md) | 根据`mask`将源操作数`src`按元素与标量`value`进行二进制比较，若$src_i < value$则计算结果对应位为1，否则为0。 |
+| [asc_ge_scalar](asc_ge_scalar.md) | 根据`mask`将源操作数`src`按元素与标量`value`进行比较，若$src_i \geq value$，则对应结果位为1，否则为0。 |

@@ -83,3 +83,10 @@ uint8_t src0_repeat_stride = 8;
 uint8_t src1_repeat_stride = 8;
 asc_squeeze(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_select](asc_select.md) | 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。 |
+| [asc_eq](../vector_compare/asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。 |

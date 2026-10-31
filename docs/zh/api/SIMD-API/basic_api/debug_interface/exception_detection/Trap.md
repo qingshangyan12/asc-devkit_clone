@@ -68,3 +68,9 @@ if (src1Local[0] == 0) {    // 如果src1Local[0]为0，则程序终止。
     AscendC::Divs(dstLocal, src0Local, src1Local[0], count);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CheckLocalMemoryIA(ISASI)](CheckLocalMemoryIA_ISASI.md) | check设定范围内的Unified Buffer（UB）读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。 |

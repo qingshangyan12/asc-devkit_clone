@@ -75,3 +75,9 @@ AscendC::LocalTensor<float> maxUb = softmaxMaxBuf.template Get<float>();
 uint32_t shapeArray[] = {16, 1024};
 maxUb.SetShapeInfo(AscendC::ShapeInfo(2, shapeArray, AscendC::DataFormat::ND));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ShapeInfo](../../aux_data_structures/ShapeInfo.md) | ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。 |

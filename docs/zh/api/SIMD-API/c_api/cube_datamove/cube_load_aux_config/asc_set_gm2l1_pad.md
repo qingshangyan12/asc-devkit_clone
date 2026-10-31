@@ -101,3 +101,9 @@ __global__ __cube__ void Gm2L1AlignPadExample(__gm__ uint8_t* src)
     asc_copy_gm2l1_align(dst, src, N_BURST, LEN_BURST, 0, 0, true, L2_CACHE_MODE, LEN_BURST, DST_STRIDE);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_align](../cube_compute_load/asc_copy_gm2l1_align.md) | 将数据从Global Memory（GM）搬运到L1 Buffer，支持搬运长度不是32字节整数倍的数据，并在搬运过程中进行32字节对齐补齐。 |

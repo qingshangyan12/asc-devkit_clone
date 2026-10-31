@@ -127,3 +127,9 @@ Ascend 950PR&950DT系列产品，源操作数dst和目的操作数src支持的�
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local[0], src1Local, AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Select](Select.md) | 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。 |

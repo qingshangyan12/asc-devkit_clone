@@ -88,3 +88,10 @@ __ubuf__ int16_t src0[256];
 __ubuf__ int16_t src1[256];
 asc_or(dst, src0, src1, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_not](asc_not.md) | 按元素做按位取反。 |
+| [asc_and](asc_and.md) | 执行矢量与运算。 |

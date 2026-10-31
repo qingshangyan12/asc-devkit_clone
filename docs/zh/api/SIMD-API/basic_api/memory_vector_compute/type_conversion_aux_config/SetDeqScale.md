@@ -145,3 +145,11 @@
   // dst = src
   AscendC::CastDequant<int8_t, int16_t, true, true>(dstLocal, srcLocal, srcSize);
   ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AddDeqRelu](../composite_compute/AddDeqRelu.md) | 依次计算按元素求和、结果进行deq量化后再进行relu计算（结果和0对比取较大值）。 |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |
+| [CastDequant](../composite_compute/CastDequant.md) | 对输入做量化并进行精度转换，对输出结果的溢出采用饱和处理。 |

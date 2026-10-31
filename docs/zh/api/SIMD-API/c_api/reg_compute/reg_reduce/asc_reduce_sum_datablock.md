@@ -235,3 +235,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_reduce_max_datablock](asc_reduce_max_datablock.md) | 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。 |
+| [asc_reduce_min_datablock](asc_reduce_min_datablock.md) | 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。 |

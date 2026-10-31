@@ -203,3 +203,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md) | 本接口用于设置asc_copy_ub2gm_align使用循环搬运模式时的两层循环迭代次数。 |
+| [asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md) | 本接口用于设置asc_copy_ub2gm_align使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。 |
+| [asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md) | 本接口用于设置asc_copy_ub2gm_align使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。 |

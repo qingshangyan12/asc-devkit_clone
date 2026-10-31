@@ -98,3 +98,10 @@ AscendC::ExpSub(dstLocal, src0Local, src1Local, 512);
 输入数据src1Local：[1 1 2 ... 510]
 输出数据dstLocal：[1 2.71828 7.38905 ... 1]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Exp](../basic_arithmetic/Exp.md) | Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自然指数。 |
+| [Sub](../basic_arithmetic/Sub.md) | Sub属于双目矢量类计算接口，负责将输入的两个tensor按元素求差。 |

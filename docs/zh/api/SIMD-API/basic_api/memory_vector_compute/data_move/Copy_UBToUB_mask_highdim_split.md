@@ -223,3 +223,9 @@
 ```
 
 完整样例请参考[Copy样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

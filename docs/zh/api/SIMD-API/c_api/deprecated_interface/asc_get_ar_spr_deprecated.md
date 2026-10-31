@@ -57,3 +57,9 @@ PIPE_S
 ## 调用示例
 
 无
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_squeeze_status](../spr/asc_get_squeeze_status.md) | 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合asc_squeeze_and_storeunalign接口获取已连续搬出的有效数据量。 |

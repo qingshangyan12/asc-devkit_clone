@@ -79,3 +79,10 @@ __cbuf__ half dst[total_length];
 // 加载图片时的高度与宽度均为1，起始地址为(0,0)，源图片水平宽度为1，不做padding
 asc_load_image_to_cbuf_sync(dst, 1, 1, 0, 0, 1, 0, 0, 0, 0);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_load_image_to_cbuf](../cube_datamove/cube_load_aux_config/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

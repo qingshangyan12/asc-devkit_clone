@@ -196,3 +196,10 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322float](asc_int322float.md) | 根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，可通过引用参数或函数返回值输出结果。 |
+| [asc_float2e5m2](asc_float2e5m2.md) | 根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。 |

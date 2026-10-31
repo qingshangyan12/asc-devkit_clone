@@ -169,3 +169,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze_and_storeunalign_init](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md) | 对AR特殊寄存器进行清零操作。AR寄存器用于配合asc_squeeze_and_storeunalign及asc_squeeze_and_storeunalign_finalize使用：当调用asc_squeeze_and_storeunalign后，有效元素的总字节数会被存入AR寄存器用于asc_squeeze_and_storeunalign接口内自动地址偏移。 |
+| [asc_squeeze_with_status（废弃）](asc_squeeze_with_status_deprecated.md) | 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。 |

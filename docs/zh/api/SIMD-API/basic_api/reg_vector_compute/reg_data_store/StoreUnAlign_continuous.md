@@ -265,3 +265,13 @@ __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
     }
     ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [AddrReg](../register_data_types/AddrReg.md) | AddrReg是用于Reg矢量计算接口管理地址偏移量的专用寄存器。 |
+| [Squeeze](../compare_and_select/Squeeze.md) | 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如图1所示。 |
+| [MaskReg非对齐搬出（StoreUnAlign）](StoreUnAlign_MaskReg.md) | StoreUnAlign能够实现数据从MaskReg连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。 |
+| [UnalignRegForLoad & UnalignRegForStore](../register_data_types/UnalignRegForLoad-UnalignRegForStore.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，适用于从Unified Buffer（UB）向RegTensor非对齐搬运，或从RegTensor向UB非对齐搬运的场景。 |
+| [ClearSpr](../system_variable_access/ClearSpr.md) | 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。 |

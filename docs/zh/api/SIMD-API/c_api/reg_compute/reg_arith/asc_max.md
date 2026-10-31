@@ -247,3 +247,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_min](asc_min.md) | 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 |

@@ -113,3 +113,9 @@ __ubuf__ float src[total_length];
 __ubuf__ half dst[total_length];
 asc_float2half(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2float](asc_half2float.md) | 将half类型转化为float类型，无舍入模式。 |

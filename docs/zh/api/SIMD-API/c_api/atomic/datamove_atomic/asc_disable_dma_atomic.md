@@ -55,3 +55,11 @@ __aicore__ inline void asc_disable_dma_atomic()
 ## 调用示例
 
 asc_disable_dma_atomic与[asc_set_atomic_add](asc_set_atomic_add.md)等原子操作接口配合使用，调用示例请参见[asc_set_atomic_add的调用示例](asc_set_atomic_add.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_atomic_add](asc_set_atomic_add.md) | 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。 |
+| [asc_set_atomic_max](asc_set_atomic_max.md) | 原子取大过程：将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最大值写入GM。 |
+| [asc_set_atomic_min](asc_set_atomic_min.md) | 将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最小值写入GM。 |

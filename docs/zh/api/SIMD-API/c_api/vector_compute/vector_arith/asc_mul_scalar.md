@@ -98,3 +98,11 @@ __ubuf__ half dst[total_length];
 __ubuf__ half src[total_length];
 asc_mul_scalar(dst, src, scalar_val, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul](asc_mul.md) | 执行矢量乘法运算。 |
+| [asc_div](asc_div.md) | 执行矢量除法运算。 |
+| [asc_rcp](asc_rcp.md) | 执行矢量的取倒数运算。 |

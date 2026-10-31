@@ -143,3 +143,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_disable_dma_atomic](../datamove_atomic/asc_disable_dma_atomic.md) | 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。 |

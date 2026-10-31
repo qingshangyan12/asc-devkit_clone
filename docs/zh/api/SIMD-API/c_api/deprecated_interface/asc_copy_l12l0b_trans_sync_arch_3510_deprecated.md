@@ -162,3 +162,10 @@ uint16_t src_frac_gap = 8;
 
 asc_copy_l12l0b_trans_sync(dst, src, index_id, repeat, src_stride, dst_gap, dst_frac_gap, src_frac_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0b_trans_arch_3510](../cube_datamove/cube_compute_load/asc_copy_l12l0b_trans_arch_3510.md) | 将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

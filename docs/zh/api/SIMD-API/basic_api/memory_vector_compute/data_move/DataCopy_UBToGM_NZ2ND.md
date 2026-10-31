@@ -156,3 +156,11 @@ AscendC::DataCopy(dstGlobal, srcLocal, intriParams);
 输入数据(srcLocal): [1 2 3 ... 1024]
 输出数据(dstGlobal):[1 2 ... 15 16 513 514 ... 527 528 17 18 ... 31 32 529 530 ... 543 544 ...497 498 ...  511 512  1009 1010... 1023 1024]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GMToUB随路转换ND2NZ搬运）](DataCopy_GMToUB_ND2NZ.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer（UB）的数据搬运过程中进行ND到NZ格式的转换。 |
+| [DataCopyPad（UBToGM非对齐数据搬运）](DataCopyPad_UBToGM.md) | 该接口提供将数据从Unified Buffer（UB）非对齐搬运至Global Memory的功能。 |
+| [DataCopy（GM与UB连续数据搬运）](DataCopy_GMAndUB_continuous.md) | 支持Global Memory与Unified Buffer（UB）之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |

@@ -167,3 +167,26 @@ AscendC::ReleaseMutexID(mutexId1);
 ```
 
 完整样例请参考：[Mutex样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Unlock](Unlock.md) | 指定流水的前序指令执行完成后，根据MutexID释放对应Mutex。 |
+| [AllocMutexID (ISASI)](AllocMutexID_ISASI.md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。 |
+| [ReleaseMutexID (ISASI)](ReleaseMutexID_ISASI.md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
+| [InitBuffer](../../resource_management/TPipe/InitBuffer.md) | 用于为TQue等队列和TBuf分配内存。 |
+| [InitBufPool](../../resource_management/TPipe/InitBufPool.md) | 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定Unified Buffer（UB）/L1内存资源复用的场景。 |
+| [InitBuffer](../../resource_management/TBufPool/InitBuffer.md) | 调用TBufPool::InitBuffer接口为TQue/TBuf进行内存分配。 |
+| [InitBufPool](../../resource_management/TBufPool/InitBufPool.md) | 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。 |
+| [Reset](../../resource_management/TBufPool/Reset.md) | 在切换TBufPool资源池时使用，结束当前TbufPool资源池正在处理的相关事件。 |
+| [AllocTensor](../../resource_management/TQue/AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |
+| [FreeTensor](../../resource_management/TQue/FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [EnQue](../../resource_management/TQue/EnQue.md) | 将Tensor push到队列。 |
+| [DeQue](../../resource_management/TQue/DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |
+| [InitBufHandle](../../resource_management/TQueBind/InitBufHandle.md) | 为TQue、TBuf对象的内存块进行内存分配操作，包括设置内存块的大小，指向的地址等。 |
+| [AllocTensor](../../resource_management/TQueBind/AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |
+| [FreeTensor](../../resource_management/TQueBind/FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [EnQue](../../resource_management/TQueBind/EnQue.md) | 将Tensor push到队列。 |
+| [DeQue](../../resource_management/TQueBind/DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |
+| [PipeBarrier(ISASI)](PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

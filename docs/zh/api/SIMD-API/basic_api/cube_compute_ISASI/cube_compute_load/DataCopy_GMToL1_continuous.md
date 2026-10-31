@@ -143,3 +143,11 @@ AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, copyCount);
 // count = 128，表示搬运128个half元素，实际搬运字节数256B满足32B对齐约束。
 AscendC::DataCopy(dstLocal, srcGm, copyCount);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |
+| [CrossCoreSetFlag(ISASI)](../../sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。 |
+| [CrossCoreWaitFlag(ISASI)](../../sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考CrossCoreSetFlag功能说明。 |

@@ -84,3 +84,9 @@ asc_e5m22float_v2(dst, src, mask);    // 将src的第二部分转换成vector_fl
 asc_e5m22float_v3(dst, src, mask);    // 将src的第三部分转换成vector_float类型并写入dst
 asc_e5m22float_v4(dst, src, mask);    // 将src的第四部分转换成vector_float类型并写入dst
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_e5m22float](../reg_compute/reg_convert/asc_e5m22float.md) | 根据`mask`将`src`中参与计算的`fp8_e5m2_t`类型元素转换为`float`类型，结果写入`dst`。 |

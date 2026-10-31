@@ -65,3 +65,11 @@ tscm.EnQue(tensor1);
 tensor1 = tscm.DeQue<half>();
 tscm.FreeTensor(tensor1);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放TSCM中的指定Tensor。 |
+| [EnQue](EnQue.md) | 将tensor push到队列。 |
+| [DeQue](DeQue.md) | 将tensor从队列中取出，用于后续处理。 |

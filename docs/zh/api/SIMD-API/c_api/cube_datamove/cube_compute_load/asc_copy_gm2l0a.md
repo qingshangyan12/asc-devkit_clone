@@ -80,3 +80,10 @@ __ca__ half dst[256];
 // src表示源操作数的起始地址
 asc_copy_gm2l0a(dst, src, 0, 1, 64, 64);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l0b](asc_copy_gm2l0b.md) | 将矩阵数据从Global Memory搬运到L0B Buffer。 |
+| [asc_copy_l12l0a](asc_copy_l12l0a.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |

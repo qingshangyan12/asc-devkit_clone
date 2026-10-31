@@ -66,3 +66,9 @@ asc_sync_notify(PIPE_V, PIPE_S, 0); // 设置等待和同步信号
 asc_sync_wait(PIPE_V, PIPE_S, 0);
 int64_t result = asc_get_rsvd_count();  // 获取结果
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_reduce](asc_reduce.md) | 以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。 |

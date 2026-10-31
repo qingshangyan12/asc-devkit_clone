@@ -172,3 +172,9 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
      -20.67   59.56   35.72   -6.12  -39.4   -11.46   -7.066  30.23  -11.18
      -35.84  -40.88   60.9   -73.3    38.47 ]
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ProposalConcat](ProposalConcat.md) | 将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposals的对应位置里。 |

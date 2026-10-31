@@ -91,3 +91,11 @@ PIPE_MTE3
 - 当`n_burst`、`len_burst`中任意一个值为0时，该接口被视为NOP（空操作）。
 - 如果需要执行多条`asc_copy_ub2gm_align`指令，且`asc_copy_ub2gm_align`指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个`asc_copy_ub2gm_align`指令的串行化，防止出现异常数据。
 - 当`src_stride`不等于`len_burst`时，`src_stride`要求32字节对齐。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_ub2gm_align_arch_3510](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md) | 将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持搬运长度不是32字节整数倍的数据。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

@@ -417,3 +417,9 @@
 
     > 输出数据dst_gm：[0.999,  1.38e-05]
     > 1.38e-05使用reinterpret_cast方法转换后为索引值232
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReduceRepeat](ReduceRepeat.md) | `ReduceRepeat`接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。 |

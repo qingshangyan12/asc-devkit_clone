@@ -222,3 +222,10 @@ int main()
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze](asc_squeeze.md) | 将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。 |
+| [asc_unsqueeze](asc_unsqueeze.md) | 将dst中数据根据mask进行解压缩，或将解压缩结果通过函数返回值返回。 |
+| [asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md) | Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。 |

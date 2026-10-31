@@ -103,3 +103,11 @@ if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行�
 ```
 
 完整样例请参考[IBSet与IBWait核间同步样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/ib_set_wait)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [IBWait](IBWait.md) | 等待核间同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，等待核（消费者）在访问依赖数据前调用本接口。 |
+| [SetFlag/WaitFlag(ISASI)](../intra_core_sync/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
+| [GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |

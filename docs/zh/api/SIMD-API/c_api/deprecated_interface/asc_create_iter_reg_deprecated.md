@@ -78,3 +78,9 @@ PIPE_V
 ## 调用示例
 
 见[地址寄存器调用示例](../defs/type/data_type_definition.md#example4)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_update_addr_reg](../reg_compute/reg_addr_reg/asc_update_addr_reg.md) | 更新地址寄存器（addr_reg），用于迭代寻址。 |

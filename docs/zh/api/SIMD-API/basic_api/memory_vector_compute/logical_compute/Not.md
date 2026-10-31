@@ -170,3 +170,9 @@ $dst_i = \sim src_i$
 输入数据(srcLocal): [9 -2 8 ... 9 0]
 输出数据(dstLocal): [-10 1 -9 ... -10 -1]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

@@ -219,3 +219,9 @@
 
 SetAippFunctions需与[LoadImageToLocal](LoadImageToLocal.md)接口配合使用，完整调用示例（含搬运过程）请参考[LoadImageToLocal的调用示例](LoadImageToLocal.md#section22811728184217)。
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadImageToLocal](LoadImageToLocal.md) | 将图像数据从Global Memory搬运到Local Memory。 |

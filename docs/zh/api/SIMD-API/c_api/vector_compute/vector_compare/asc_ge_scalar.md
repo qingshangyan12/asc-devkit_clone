@@ -86,3 +86,11 @@ uint8_t src_repeat_stride = 8;
 asc_ge_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 …… // 同步操作
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_le_scalar](asc_le_scalar.md) | 按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。 |
+| [asc_eq_scalar](asc_eq_scalar.md) | 按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。 |
+| [asc_le](asc_le.md) | 按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。 |

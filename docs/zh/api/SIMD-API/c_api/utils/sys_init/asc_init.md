@@ -171,3 +171,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_vector_mask](../../vector_compute/vector_mask_config/asc_set_vector_mask.md) | 本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 |
+| [asc_disable_dma_atomic](../../atomic/datamove_atomic/asc_disable_dma_atomic.md) | 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。 |

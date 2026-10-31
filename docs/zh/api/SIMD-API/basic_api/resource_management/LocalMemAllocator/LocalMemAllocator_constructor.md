@@ -74,3 +74,10 @@ MAX };</pre>
 ## 约束说明<a name="section633mcpsimp"></a>
 
 同一个物理位置的LocalMemAllocator对象，在算子生命周期内只能存在1个。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Alloc](Alloc.md) | 根据用户指定的逻辑位置、数据类型、数据长度返回对应的LocalTensor对象。 |
+| [GetCurAddr](GetCurAddr.md) | 返回当前物理位置空闲的起始地址。 |

@@ -118,3 +118,9 @@ __simd_vf__ inline void int322int64_vf(__ubuf__ int32_t* src_addr, __ubuf__ int6
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322int64](../reg_compute/reg_convert/asc_int322int64.md) | 根据`mask`将`src`中的每个`int32_t`类型元素转换为`int64_t`类型，结果写入`dst`。 |

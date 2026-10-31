@@ -79,3 +79,11 @@ value = AscendC::is_layout<decltype(stride)>::value; //value = false
 value = AscendC::is_layout<decltype(layoutMake)>::value;//value = true
 value = AscendC::is_layout<decltype(layoutInit)>::value;//value = true
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MakeLayout](MakeLayout.md) | 将传入的Shape和Stride数据打包成Layout数据结构。 |
+| [Layout构造函数](Layout_constructor.md) | 根据输入的Shape和Stride对象，实例化Layout对象。 |
+| [layout](layout1.md) | 获取Layout实例化对象。 |

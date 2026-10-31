@@ -204,3 +204,9 @@ dst和src使用[TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.m
 输入数据scalar = 2
 输出数据dstLocal：[1 2 2 ... 2]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

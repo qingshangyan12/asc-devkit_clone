@@ -262,3 +262,9 @@ AscendC::TBuf<AscendC::TPosition::A1> buf; // 输出数据管理对象，TPositi
 uint32_t len = 128;
 pipe.InitBuffer(buf, len);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Reset](Reset.md) | 完成资源的释放与eventId等变量的初始化操作，恢复到TPipe的初始化状态。 |

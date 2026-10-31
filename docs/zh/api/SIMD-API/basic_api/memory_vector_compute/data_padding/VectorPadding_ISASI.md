@@ -148,3 +148,9 @@
 输出数据(dstLocal):
 [6.938 6.938 6.938 ... 6.938 6.938]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

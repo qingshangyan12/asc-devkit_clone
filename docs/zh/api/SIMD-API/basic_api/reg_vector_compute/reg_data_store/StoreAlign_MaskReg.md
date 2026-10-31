@@ -158,3 +158,9 @@ StoreAlign能够实现数据从[MaskReg](../register_data_types/MaskReg.md)搬�
     }
     ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MaskReg](../register_data_types/MaskReg.md) | MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度为的八分之一（VL/8）。 |
+| [AddrReg](../register_data_types/AddrReg.md) | AddrReg是用于Reg矢量计算接口管理地址偏移量的专用寄存器。 |

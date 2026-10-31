@@ -93,3 +93,10 @@ AscendC::AbsSub(dstLocal, src0Local, src1Local, 512);
 输入数据src1Local：[513 514 515 ... 1024]
 输出数据dstLocal：[512 512 512 ... 512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Abs](../basic_arithmetic/Abs.md) | Abs属于单目矢量类计算接口，负责将输入的tensor按元素取绝对值。 |
+| [Sub](../basic_arithmetic/Sub.md) | Sub属于双目矢量类计算接口，负责将输入的两个tensor按元素求差。 |

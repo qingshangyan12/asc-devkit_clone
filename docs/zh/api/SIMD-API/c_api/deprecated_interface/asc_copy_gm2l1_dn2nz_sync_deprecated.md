@@ -252,3 +252,13 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_dn2nz](../cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md) | 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_gm2l1_nz_para](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_nz_para.md) | 本接口用于配置从Global Memory搬运至L1 Buffer过程中，ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量、目的Nz矩阵中相邻行的步长、相邻Z矩阵的步长以及相邻Nz矩阵的步长。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

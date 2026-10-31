@@ -109,3 +109,10 @@ ge::graphStatus TilingFunc(gert::TilingContext* context)
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TILING_KEY_LIST](TILING_KEY_LIST.md) | TILING_KEY_LIST函数用于在核函数（Kernel）中判断当前执行的TilingKey是否与Host侧配置的指定TilingKey匹配，从而标识满足TilingKey == key1或TilingKey == key2条件的分支逻辑。 |
+| [REGISTER_TILING_DEFAULT](REGISTER_TILING_DEFAULT.md) | 用于在核函数（Kernel）侧注册用户使用标准C++语法自定义的默认TilingData结构体。 |
+| [GET_TILING_DATA](GET_TILING_DATA.md) | 用于获取算子核函数（Kernel）入口函数传入的Tiling信息，并填入注册的TilingData结构体中，此函数会以宏展开的方式进行编译。 |

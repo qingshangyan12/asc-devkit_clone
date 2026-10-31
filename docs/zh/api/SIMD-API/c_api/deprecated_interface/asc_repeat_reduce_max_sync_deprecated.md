@@ -99,3 +99,11 @@ asc_repeat_reduce_max_value_index_sync(dst, src, total_length);
 输出数据dst：[128, 7.6e-6, 256, 7.6e-6]
 输出说明：half类型7.6e-6的二进制是0x007F，重新解释为uint32后即为最大值索引127
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_repeat_reduce_max](../vector_compute/vector_reduce/asc_repeat_reduce_max.md) | 对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_get_reduce_max_cnt](../vector_compute/vector_reduce/asc_get_reduce_max_cnt.md) | 此接口用于获取执行asc_repeat_reduce_max操作后的最大值，以及第一个最大值时的索引。 |

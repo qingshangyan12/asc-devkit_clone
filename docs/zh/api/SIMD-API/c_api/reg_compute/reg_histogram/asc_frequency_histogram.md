@@ -206,3 +206,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_cumulative_histogram](asc_cumulative_histogram.md) | 对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。 |

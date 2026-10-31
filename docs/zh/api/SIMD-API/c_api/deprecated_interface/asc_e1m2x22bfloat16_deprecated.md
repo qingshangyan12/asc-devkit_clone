@@ -80,3 +80,9 @@ vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_e1m2x22bfloat16(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_e1m2x22bfloat16](../reg_compute/reg_convert/asc_e1m2x22bfloat16.md) | 根据`mask`将`src`中参与计算的`fp4x2_e1m2_t`类型元素转换为`bfloat16_t`类型，结果写入`dst`。 |

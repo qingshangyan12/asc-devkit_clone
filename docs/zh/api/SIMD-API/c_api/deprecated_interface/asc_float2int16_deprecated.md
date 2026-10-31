@@ -112,3 +112,10 @@ vector_bool mask;
 mask = asc_create_mask_b32(PAT_ALL);
 asc_float2int16_rn(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2int16](../reg_compute/reg_convert/asc_float2int16.md) | 将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

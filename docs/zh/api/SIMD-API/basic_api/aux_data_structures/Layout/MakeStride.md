@@ -74,3 +74,11 @@ using Stride = Std::tuple<Strides...>;
 ## 调用示例<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section320753512363"></a>
 
 参见[调用示例](MakeLayout.md#zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section320753512363)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MakeLayout](MakeLayout.md) | 将传入的Shape和Stride数据打包成Layout数据结构。 |
+| [MakeShape](MakeShape.md) | 将传入的数据打包成Shape数据结构。 |
+| [Layout构造函数](Layout_constructor.md) | 根据输入的Shape和Stride对象，实例化Layout对象。 |

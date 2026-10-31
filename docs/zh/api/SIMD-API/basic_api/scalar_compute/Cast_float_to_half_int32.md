@@ -103,3 +103,10 @@ intCeilOut = AscendC::Cast<float, int32_t, AscendC::RoundMode::CAST_CEIL>(valueI
 intFloorOut = AscendC::Cast<float, int32_t, AscendC::RoundMode::CAST_FLOOR>(valueIn); // 使用CAST_FLOOR模式，向下取整返回2
 intRintOut = AscendC::Cast<float, int32_t, AscendC::RoundMode::CAST_RINT>(valueIn);   // 使用CAST_RINT模式，2.5向临近偶数舍入返回2
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast（float转bfloat16_t）](Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
+| [Cast（多类型转float）](Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |

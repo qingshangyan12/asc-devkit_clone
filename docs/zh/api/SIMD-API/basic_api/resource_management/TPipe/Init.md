@@ -74,3 +74,9 @@ op.Init(x, z, srcSize, &tpipe);
 op.Process();
 tpipe.Destroy();  // 销毁tpipe管道资源
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Destroy](Destroy.md) | 释放资源。 |

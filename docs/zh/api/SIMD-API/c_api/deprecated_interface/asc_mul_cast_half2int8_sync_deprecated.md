@@ -79,3 +79,10 @@ __ubuf__ half src1[total_length];
 __ubuf__ int8_t dst[total_length];
 asc_mul_cast_half2int8_sync(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_cast_half2int8](../vector_compute/vector_fused/asc_mul_cast_half2int8.md) | 按元素求积，并将结果转换为int8_t类型。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -129,3 +129,10 @@ float fVal = 3.14159;
 bfloat16_t bVal = AscendC::Cast(fVal); // 返回3.140625
 fVal = AscendC::Cast(bVal);            // 返回3.140625
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast（float转bfloat16_t）](Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
+| [Cast（float转half/int32_t）](Cast_float_to_half_int32.md) | 对标量的数据类型进行转换。 |

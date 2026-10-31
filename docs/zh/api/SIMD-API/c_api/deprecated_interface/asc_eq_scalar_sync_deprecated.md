@@ -91,3 +91,10 @@ asc_eq_scalar_sync(dst, src, scalar, repeat, dst_block_stride, src_block_stride,
 // dst [0, 0, 8, ..., 0], dst[2] = 0b00001000
 …… // 同步操作
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_eq_scalar](../vector_compute/vector_compare/asc_eq_scalar.md) | 按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

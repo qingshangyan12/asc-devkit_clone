@@ -103,3 +103,9 @@ bool sign_mode = true;    // 量化结果带符号（dst为int8_t类型）
 asc_set_deq_scale(scale, offset, sign_mode);    // 计算公式为dst = src
 asc_deq_int162b8_h(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的高半块
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_deq_scale](asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

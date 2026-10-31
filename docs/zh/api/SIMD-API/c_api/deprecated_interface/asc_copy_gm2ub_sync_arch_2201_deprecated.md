@@ -73,3 +73,12 @@ constexpr uint64_t total_length = 128;
 __ubuf__ half dst[total_length];
 asc_copy_gm2ub_sync(dst, src, total_length * sizeof(half));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2ub_arch_2201](../vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md) | 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

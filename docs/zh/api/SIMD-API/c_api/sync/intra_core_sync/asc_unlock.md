@@ -139,3 +139,10 @@ PIPE_S
 ## 调用示例
 
 `asc_unlock`与`asc_lock`必须成对使用，调用示例请参见[asc_lock的调用示例](asc_lock.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_lock](asc_lock.md) | 与asc_unlock配对使用，用于实现核内异步流水指令之间的同步处理。 |
+| [asc_sync_pipe](asc_sync_pipe.md) | 完成同一流水内的同步控制，用于在同一流水内部约束执行顺序。 |

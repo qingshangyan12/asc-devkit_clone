@@ -97,3 +97,9 @@
     ```cpp
     AscendC::NumericLimits<int32_t>::Min(dstLocal, 256); // 返回256个int32_t类型的最小有限值
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Duplicate](../../memory_vector_compute/data_padding/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |

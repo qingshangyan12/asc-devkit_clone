@@ -79,3 +79,9 @@ __simd_vf__ inline void int162float_vf(__ubuf__ float* dst_addr, __ubuf__ int16_
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int162float](../reg_compute/reg_convert/asc_int162float.md) | `src`中int16_t类型的元素转换为float类型，并将结果写入dst。 |

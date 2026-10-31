@@ -95,3 +95,11 @@ AscendC::Add(dst0Local, src0Local, src1Local, 512);
 AscendC::PipeBarrier<PIPE_V>();
 AscendC::Mul(dst1Local, dst0Local, src2Local, 512);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Lock](Lock.md) | 根据MutexID获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同MutexID的Mutex都已经被Unlock释放。 |
+| [SetFlag/WaitFlag(ISASI)](SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
+| [TQueSync](TQueSync.md) | TQueSync类用于核内多流水间的同步。 |

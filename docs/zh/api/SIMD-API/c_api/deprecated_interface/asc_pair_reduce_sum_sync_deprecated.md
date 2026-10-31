@@ -83,3 +83,10 @@ asc_pair_reduce_sum_sync(dst, src, src_length);
 输入数据src：[1 2 3 ... 16 17 ... 32 ... 225... 256]
 输出数据dst：[3 7 ... 511]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_pair_reduce_sum](../vector_compute/vector_reduce/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -88,3 +88,10 @@ uint8_t src_repeat_stride = 8;
 asc_lt_scalar_sync(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 …… // 同步操作
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_lt_scalar](../vector_compute/vector_compare/asc_lt_scalar.md) | 执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

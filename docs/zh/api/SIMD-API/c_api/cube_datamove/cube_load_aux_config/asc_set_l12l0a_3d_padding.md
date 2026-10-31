@@ -292,3 +292,11 @@ int main()
 }
 
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0a_3d_arch_3510](../cube_compute_load/asc_copy_l12l0a_3d_arch_3510.md) | 3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |
+| [asc_set_gm2l1_padding](asc_set_gm2l1_padding.md) | 用于设置asc_copy_gm2l1_arch_3510（高维切分数据搬运）接口搬运过程的padding模式使用的padding值。 |
+| [asc_copy_gm2l1_highdim_split_arch_3510](../cube_compute_load/asc_copy_gm2l1_highdim_split_arch_3510.md) | 将数据从Global Memory搬运到L1 Buffer，数据搬运时格式和内容保持不变。 |

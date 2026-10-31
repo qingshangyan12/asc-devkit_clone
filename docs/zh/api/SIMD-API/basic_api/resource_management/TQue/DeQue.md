@@ -156,3 +156,11 @@ que.EnQue(tensor1);
 que.DeQue<half>(tensor1); // 将tensor从VECOUT的Queue中搬出
 que.FreeTensor<half>(tensor1);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [EnQue](EnQue.md) | 将Tensor push到队列。 |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |

@@ -82,3 +82,9 @@ vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr);  // src_addr是外部输入的Unified Buffer（UB）内存空间地址
 asc_muls(dst, src, value, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_scalar_float2half_rn](../reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md) | 根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。 |

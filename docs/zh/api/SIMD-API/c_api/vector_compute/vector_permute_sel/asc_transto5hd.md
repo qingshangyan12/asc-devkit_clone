@@ -254,3 +254,9 @@ int main()
     return matrix_passed && layout_passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_va_reg](asc_set_va_reg.md) | 用于设置转置的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。 |

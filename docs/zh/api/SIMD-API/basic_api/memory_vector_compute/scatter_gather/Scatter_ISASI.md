@@ -167,3 +167,10 @@ AscendC::Scatter(dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0, COUNT); // dst
 输出数据dstGlobal:
 [127 126 125 ... 2 1 0]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Gather](Gather.md) | Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseOffset），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。 |
+| [Gatherb(ISASI)](Gatherb_ISASI.md) | Gatherb接口接受输入张量（src）、DataBlock偏移张量（offset），根据索引位置将输入张量按DataBlock（32字节）收集到结果张量（dst）中。 |

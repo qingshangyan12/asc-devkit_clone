@@ -103,3 +103,9 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 AscendC::LocalTensor<int16_t> popBuffer;
 bool ret = AscendC::PopStackBuffer<int16_t, AscendC::TPosition::VECCALC>(popBuffer);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBuffer](TPipe/InitBuffer.md) | 用于为TQue等队列和TBuf分配内存。 |

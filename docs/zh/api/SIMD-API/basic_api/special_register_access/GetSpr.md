@@ -120,3 +120,10 @@ __aicore__ inline void Process()
 输入64个float的数据(yLocal): [1.0 1.0 1.0 ... ] // 数据为全1.0的数
 arNum的值为:256
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Squeeze](../reg_vector_compute/compare_and_select/Squeeze.md) | 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如图1所示。 |
+| [连续非对齐搬出（StoreUnAlign）](../reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。 |

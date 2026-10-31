@@ -109,3 +109,10 @@ __ubuf__ float dst[total_length];
 __ubuf__ int32_t src[total_length];
 asc_int322float(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322int16](asc_int322int16.md) | 将int32_t类型数据转换为int16_t类型。 |
+| [asc_int322int64](asc_int322int64.md) | 将int32_t类型数据转换为int64_t类型。 |

@@ -79,3 +79,9 @@ asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
 asc_set_saturation_strategy(old_strategy);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_saturation_strategy](asc_set_saturation_strategy.md) | 设置饱和控制策略，默认为开启全局饱和配置。 |

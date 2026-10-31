@@ -281,3 +281,9 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0a_3d_arch_3510](../cube_compute_load/asc_copy_l12l0a_3d_arch_3510.md) | 3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |

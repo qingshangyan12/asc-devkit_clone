@@ -148,3 +148,11 @@
     ```
 
 更多示例请参考[接口外设置Mask](../SIMD_compute/mask.md#接口外设置mask)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetMaskCount](SetMaskCount.md) | 设置Mask模式为Counter模式。 |
+| [SetMaskNorm](SetMaskNorm.md) | 设置Mask模式为Normal模式。 |
+| [ResetMask](ResetMask.md) | 恢复mask的值为默认值（全1），表示矢量计算中每次迭代内的所有元素都将参与运算。 |

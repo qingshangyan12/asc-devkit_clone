@@ -173,3 +173,17 @@ PIPE_M
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
   注意，应避免nan输入，否则可能会产生执行报错。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad_mx](../cube_compute/mmad_compute/asc_mmad_mx.md) | 本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_copy_l12l0a_mx](../cube_datamove/cube_compute_load/asc_copy_l12l0a_mx.md) | 负责完成MX矩阵计算过程中所需的左矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0A_MX Buffer。 |
+| [asc_copy_l12l0b_mx](../cube_datamove/cube_compute_load/asc_copy_l12l0b_mx.md) | 负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。 |
+| [asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md) | 完成同一流水内的同步控制，用于在同一流水内部约束执行顺序。 |
+| [asc_set_mmad_direction_n](../cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_n.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐行生成矩阵计算结果分形。 |
+| [asc_set_mmad_direction_m](../cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_m.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。 |
+| [asc_set_l0c2gm_config（废弃）](asc_set_l0c2gm_config_deprecated.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

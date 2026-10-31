@@ -74,3 +74,10 @@ KfcWorkspace对象实例。
 ```
 AscendC::KfcWorkspace desc(workspaceGM);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetKfcWorkspace](GetKfcWorkspace.md) | 获取用于CubeResGroupHandle消息通信区的内存地址。 |
+| [UpdateKfcWorkspace](UpdateKfcWorkspace.md) | 更新用于CubeResGroupHandle消息通信区的内存地址。 |

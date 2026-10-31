@@ -26,3 +26,9 @@
 
 - 这两个宏仅适用[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)。
 - 在AIC和AIV分离模式的融合算子中，AIC和AIV执行不同类型的指令。仅支持在AIC上执行的代码必须置于`ASC_IS_AIC`条件分支内；仅支持在AIV上执行的代码必须置于`ASC_IS_AIV`条件分支内。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Async](../../../basic_api/tool_interface/execution_mode/Async.md) | 通过模板函数封装AIC和AIV的代码隔离模式，用于在不同执行单元（AIC或AIV）下执行特定函数。 |

@@ -169,3 +169,9 @@ Ascend 950PR&950DT系列产品，目的操作数dst支持的数据类型为：ui
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

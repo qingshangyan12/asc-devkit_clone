@@ -184,3 +184,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy](asc_copy.md) | 将数据从Unified Buffer（UB）搬运到UB。 |

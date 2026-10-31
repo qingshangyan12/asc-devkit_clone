@@ -167,3 +167,13 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_ub2gm](../vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md) | 将数据从Unified Buffer（UB）搬运到Global Memory (GM)。 |
+| [asc_copy_gm2ub](../vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md) | 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。 |
+| [asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md) | 不经过DCache直接从GM地址读取整型数据。 |
+| [asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md) | 不经过DCache向GM地址上写数据。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

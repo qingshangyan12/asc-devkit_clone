@@ -69,3 +69,10 @@ uint64_t GetShape(uint32_t offset)
 
 参考[调用示例](GetDataPtr.md#zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section320753512363)。
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [构造和析构函数](constructor_and_destructor.md) | 创建与释放TensorDesc对象。 |
+| [SetShapeAddr](SetShapeAddr.md) | 配置用于储存shape信息的地址。 |
+| [GetDim](GetDim.md) | 获取Tensor的维度。 |

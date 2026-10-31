@@ -72,3 +72,9 @@ AscendC::ResetCtrlSpr<48, 48>();
 ```
 
 更多示例请参考[CtrlSpr样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/09_utils/ctrl_spr)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetCtrlSpr(ISASI)](SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

@@ -134,3 +134,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_popc](asc_popc.md) | 获取输入`uint64_t`数据的二进制表示中值为1的位数。 |

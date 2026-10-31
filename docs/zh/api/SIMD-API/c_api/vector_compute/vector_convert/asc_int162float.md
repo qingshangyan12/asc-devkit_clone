@@ -80,3 +80,9 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ float dst[total_length];
 asc_int162float(dst, src, total_length);    // 将src转换为float类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2int16](asc_float2int16.md) | 将float类型数据转换为int16_t类型，支持多种舍入模式。 |

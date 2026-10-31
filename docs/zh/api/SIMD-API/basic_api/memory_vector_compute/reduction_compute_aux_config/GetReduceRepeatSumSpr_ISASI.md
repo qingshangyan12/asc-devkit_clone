@@ -71,3 +71,9 @@ AscendC::LocalTensor<float> dst;
 AscendC::ReduceSum(dst, src, work, 128);
 float res = AscendC::GetReduceRepeatSumSpr<float>(); // 返回前128个数的和
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReduceSum](../reduction_compute/ReduceSum.md) | `ReduceSum`接口对所有输入数据进行求和。 |

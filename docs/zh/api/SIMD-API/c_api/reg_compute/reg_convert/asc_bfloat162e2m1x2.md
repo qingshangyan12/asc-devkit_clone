@@ -200,3 +200,11 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162e1m2x2](asc_bfloat162e1m2x2.md) | 根据`mask`将`src`中参与计算的`bfloat16_t`类型元素转换为`fp4x2_e1m2_t`类型，结果写入`dst`。 |
+| [asc_bfloat162float](asc_bfloat162float.md) | 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`float`类型，结果写入`dst`。 |
+| [asc_bfloat162half](asc_bfloat162half.md) | 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`half`类型，结果写入`dst`。 |

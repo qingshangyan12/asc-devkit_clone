@@ -58,3 +58,9 @@ GetTPipePtr()->InitBuffer(inQueueX, 2, this->tileLength * sizeof(float));
 GetTPipePtr()->InitBuffer(inQueueY, 2, this->tileLength * sizeof(float));
 GetTPipePtr()->InitBuffer(outQueueZ, 2, this->tileLength * sizeof(float));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TPipe构造函数](TPipe/TPipe_constructor.md) | 构造用来管理内存和同步的TPipe对象。 |

@@ -197,3 +197,11 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
      -98.7   0.      0.      0.
      ]
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Sort32](Sort32.md) | Sort32接口实现一次迭代内对32个数的降序排列操作。 |
+| [MrgSort4](MrgSort4.md) | 将已经排好序的最多4条Region Proposals队列，排列并合并成1条队列，结果按照score域由大到小排序。 |
+| [MrgSort](MrgSort.md) | 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。 |

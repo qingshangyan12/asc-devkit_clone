@@ -62,3 +62,10 @@ uint64_t offset = barA.GetWorkspaceLen(); // 返回barA所占用的GlobalMemory�
 占用的GlobalMemory空间(offset)的大小为: 3072
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GroupBarrier构造函数](GroupBarrier_constructor.md) | 创建GroupBarrier对象，通过设置构造函数参数，确定Arrive组的Block个数和Wait组的Block个数。 |
+| [Wait](Wait.md) | 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。 |
+| [Arrive](Arrive.md) | 通知其他等待的AIV，本AIV已经完成其依赖的任务。 |

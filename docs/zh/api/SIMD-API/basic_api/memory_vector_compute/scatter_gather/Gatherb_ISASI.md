@@ -175,3 +175,9 @@ AscendC::Gatherb<uint16_t>(y_buf, x_buf, offset_buf, repeatTime, params); // rep
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 ]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [BilinearInterpolation(ISASI)](../basic_arithmetic/BilinearInterpolation_ISASI.md) | BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。 |

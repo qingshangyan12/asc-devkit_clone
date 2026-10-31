@@ -193,3 +193,10 @@ Ascend 950PR&950DT系列产品支持的数据类型为：bool、int8_t、uint8_t
     ```
 
 完整样例请参考：[多维数据搬运样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [NdDmaDci](../data_move_aux_config/NdDmaDci.md) | 刷新NDDMA DataCache。 |
+| [Transpose](../data_layout_conversion/Transpose.md) | Transpose接口用于实现16\*16的二维矩阵数据块转置或者\[N,C,H,W\]与\[N,H,W,C\]数据格式互相转换。 |

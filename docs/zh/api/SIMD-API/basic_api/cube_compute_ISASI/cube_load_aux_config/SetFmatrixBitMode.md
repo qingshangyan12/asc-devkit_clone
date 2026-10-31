@@ -145,3 +145,10 @@ inQueueWeB2.EnQue<weight_T>(weightB2);
 inQueueFmA1.FreeTensor(featureMapA1);
 inQueueWeB1.FreeTensor(weightB1);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md) | LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |
+| [SetFmatrix](SetFmatrix.md) | 用于调用LoadData（卷积数据搬运）时设置FeatureMap的属性描述。 |

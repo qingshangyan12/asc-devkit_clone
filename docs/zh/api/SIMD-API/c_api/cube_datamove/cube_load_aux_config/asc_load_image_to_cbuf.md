@@ -82,3 +82,10 @@ __cbuf__ half dst[total_length];
 // 加载图片时的高度与宽度均为1，起始地址为(0,0)，源图片水平宽度为1，不做padding
 asc_load_image_to_cbuf(dst, 1, 1, 0, 0, 1, 0, 0, 0, 0);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0a_arch_2201](../cube_compute_load/asc_copy_l12l0a_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
+| [asc_copy_l12l0b_arch_2201](../cube_compute_load/asc_copy_l12l0b_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |

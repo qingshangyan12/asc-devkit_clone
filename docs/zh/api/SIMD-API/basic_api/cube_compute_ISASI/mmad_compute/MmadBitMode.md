@@ -187,3 +187,10 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 ## 调用示例
 
 样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mmad](Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |
+| [MmadMx](MmadMx.md) | MmadMx（全称Microscaling Mmad）为带有量化系数的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。 |

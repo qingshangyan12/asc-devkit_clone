@@ -77,3 +77,9 @@ PIPE_S
 // addr是外部输入的GM地址，类型为__gm__ int32_t*。
 int32_t value = asc_load_dev(addr);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_store_dev](../scalar_store/asc_store_dev.md) | 不经过DCache向GM地址上写数据。 |

@@ -64,3 +64,11 @@ tensor1 = que.DeQue<half>(); // 将tensor从VECOUT的Queue中搬出
 que.FreeTensor<half>(tensor1);
 que.FreeAllEvent();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [DeQue](DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |

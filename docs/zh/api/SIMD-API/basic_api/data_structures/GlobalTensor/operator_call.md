@@ -75,3 +75,9 @@ using PrimType = PrimT<T>;
 ## 约束说明<a name="section633mcpsimp"></a>
 
 无。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [operator\[\]](operator.md) | 根据输入的offset偏移返回新的GlobalTensor。 |

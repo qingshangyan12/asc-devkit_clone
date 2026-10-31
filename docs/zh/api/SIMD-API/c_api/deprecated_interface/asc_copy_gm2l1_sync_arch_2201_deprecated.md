@@ -145,3 +145,10 @@ constexpr uint16_t dst_gap = 1;
 __cbuf__ half dst[256];
 asc_copy_gm2l1_sync(dst, src, base_idx, repeat, src_stride, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_arch_2201](../cube_datamove/cube_compute_load/asc_copy_gm2l1_arch_2201.md) | 将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

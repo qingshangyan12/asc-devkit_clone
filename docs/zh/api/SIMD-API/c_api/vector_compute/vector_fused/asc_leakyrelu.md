@@ -94,3 +94,9 @@ __ubuf__ half dst[total_length];
 asc_leakyrelu(dst, src, alpha, total_length);
 asc_sync();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_relu](asc_relu.md) | 按元素做线性整流Relu。 |

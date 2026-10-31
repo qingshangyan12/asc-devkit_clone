@@ -54,3 +54,10 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 ```text
 Deprecated since 9.2.0, Will be removed after 2027/09/07, Use asc_mul_scalar_float2half_rn instead.
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_muls (废弃)](../../deprecated_interface/asc_muls_deprecated.md) | 对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。 |
+| [asc_mul_scalar_float2half_rn](../../reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md) | 根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。 |

@@ -58,3 +58,10 @@ MetricsProfStart();
 ... // 需要调优的核函数（Kernel）侧代码段。
 MetricsProfStop();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_prof_stop](../../../../Utils-API/tuning_interface/asc_prof_stop.md) | SIMD场景下，设置性能数据采集信号停止，和asc_prof_start配合使用。 |
+| [MetricsProfStart](MetricsProfStart.md) | 推荐使用asc_prof_start接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。 |

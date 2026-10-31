@@ -97,3 +97,10 @@ ge::graphStatus TilingFunc(gert::TilingContext* context)
     // 其他代码逻辑
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GET_TILING_DATA_WITH_STRUCT](GET_TILING_DATA_WITH_STRUCT.md) | 使用该接口指定结构体名称，可获取指定的tiling信息，并填入对应的Tiling结构体中，此函数会以宏展开的方式进行编译。 |
+| [REGISTER_NONE_TILING](REGISTER_NONE_TILING.md) | 在核函数（Kernel）侧使用标准C++语法自定义的TilingData结构体时，若用户不确定需要注册哪些结构体，可使用该接口告知框架侧需使用未注册的标准C++语法来定义TilingData，并配套GET_TILING_DATA_WITH_STRUCT，GET_TILING_DATA_MEMBER，GET_TILING_DATA_PTR_WITH_STRUCT来获取对应的TilingData。 |

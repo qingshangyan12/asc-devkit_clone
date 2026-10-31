@@ -94,3 +94,10 @@ __global__ __mix__(1,2) void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR A, GM_ADD
     AscendC::Async<AscendC::EngineType::AIV, vectorProcess>(op, a, b, A, B, c);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ASC_IS_AIC/ASC_IS_AIV](../../../c_api/defs/macro/asc_is_aic-asc_is_aiv.md) | `ASC_IS_AIC`和`ASC_IS_AIV`用于分离模式中对Cube Core（AIC）和Vector Core（AIV）的代码路径进行条件编译和运行，可作为`if`语句的条件。 |
+| [SetKernelMode](../../debug_interface/cpu_twin_debug/SetKernelMode.md) | 针对分离模式，CPU调测时，设置内核模式为单AIV模式，单AIC模式或者MIX模式，以分别支持单AIV矢量算子，单AIC矩阵算子，MIX混合算子的CPU调试。 |

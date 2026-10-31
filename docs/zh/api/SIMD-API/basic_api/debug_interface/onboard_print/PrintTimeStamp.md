@@ -84,3 +84,9 @@ AscendC::PrintTimeStamp(65577);
 // 一些框架内部的打点信息
 descId is 65577, rsv is 0, timeStamp is 13806084506158, pcPtr is 20619064414544, entry is 13806084502126.
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSystemCycle(ISASI)](../../tool_interface/system_resources_and_variables/GetSystemCycle_ISASI.md) | 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。 |

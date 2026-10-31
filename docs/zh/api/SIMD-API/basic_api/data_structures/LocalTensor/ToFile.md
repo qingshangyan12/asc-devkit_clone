@@ -74,3 +74,11 @@ int32_t ToFile(const std::string& fileName) const
 AscendC::LocalTensor<float> tmpTensor = softmaxMaxBuf.template Get<float>();
 tmpTensor.ToFile("tmpTensor.bin");
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [Print](Print.md) | 只限于CPU调试，在调试窗口中打印LocalTensor数据用于精度调试，每一行打印一个DataBlock（32字节）的数据。 |
+| [GetLength](GetLength.md) | 获取LocalTensor数据长度。 |

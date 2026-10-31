@@ -75,3 +75,9 @@ __aicore__ inline int64_t GetTaskRatio()
 int64_t ratio = AscendC::GetTaskRatio(); // 返回AIC或AIV与逻辑AI Core数量的比例
 AscendC::printf("task ratio is %ld", ratio);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [设置核函数（Kernel）类型](../../Kernel-Tiling/set_Kernel_type.md) | 用于用户自定义设置核函数（Kernel）类型，控制算子执行时只启动该类型的核，避免启动不需要工作的核，缩短核启动开销。 |

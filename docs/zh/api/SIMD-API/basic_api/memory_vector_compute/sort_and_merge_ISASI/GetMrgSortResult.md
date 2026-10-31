@@ -184,3 +184,10 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
     uint16_t mrgRes4 = 0;
     AscendC::GetMrgSortResult(mrgRes1, mrgRes2, mrgRes3, mrgRes4);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MrgSort](MrgSort.md) | 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。 |
+| [MrgSort4](MrgSort4.md) | 将已经排好序的最多4条Region Proposals队列，排列并合并成1条队列，结果按照score域由大到小排序。 |

@@ -101,3 +101,9 @@ asc_exp_sub(dst, src0, src1, mask);
 // 替代接口：显式指定源操作数读取位置。
 asc_exp_sub_half2float(dst, src0, src1, mask, ASC_POSITION_EVEN);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md) | 根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。 |

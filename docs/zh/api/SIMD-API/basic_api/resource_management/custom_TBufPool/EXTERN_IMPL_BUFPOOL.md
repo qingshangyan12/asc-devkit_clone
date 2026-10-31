@@ -129,3 +129,16 @@ public:
     EXTERN_IMPL_BUFPOOL(MyBufPool, AscendC::TPosition::VECCALC, 16);
 };
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBufPool](../TPipe/InitBufPool.md) | 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定Unified Buffer（UB）/L1内存资源复用的场景。 |
+| [Reset](Reset.md) | 完成自定义TbufPool资源的释放与eventId等变量的复位对消。 |
+| [Init](Init.md) | 完成自定义TbufPool资源与eventId等变量的初始化操作。 |
+| [GetBufHandle](GetBufHandle.md) | 根据offset取出自定义TBufPool中管理的内存块。 |
+| [SetCurAddr](SetCurAddr.md) | 设置自定义TBufPool已经被分配完的地址，比如初始化时一共申请了32k的内存大小，给某一个TQue分配了8K，则需要调用该接口以保证后续的内存块从8K开始分配。 |
+| [GetCurAddr](GetCurAddr.md) | 获取当前已经被自定义TBufPool分配的地址，用户可以从该地址值开始向后分配内存块。 |
+| [SetCurBufSize](SetCurBufSize.md) | 设置当前已经被自定义TBufPool分配的内存块个数。 |
+| [GetCurBufSize](GetCurBufSize.md) | 获取当前已经被自定义TBufPool分配的内存块个数。 |

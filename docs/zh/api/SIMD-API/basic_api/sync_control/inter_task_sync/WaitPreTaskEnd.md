@@ -95,3 +95,10 @@ AscendC::Add(dstLocal, src0Local, src1Local, TOTAL_LENGTH);
 ```
 
 完整样例请参考[TaskSync样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/task_sync)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CrossCoreSetFlag(ISASI)](../inter_core_sync/CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。 |
+| [CrossCoreWaitFlag(ISASI)](../inter_core_sync/CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考CrossCoreSetFlag功能说明。 |

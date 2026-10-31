@@ -96,3 +96,10 @@ for (uint32_t i = 0; i < desc.GetDim(); i++)
 }
 auto ptr = desc.GetDataPtr();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetShapeAddr](TensorDesc/SetShapeAddr.md) | 配置用于储存shape信息的地址。 |
+| [GetDataPtr](TensorDesc/GetDataPtr.md) | 获取储存Tensor数据地址。 |

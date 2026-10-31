@@ -94,3 +94,9 @@ if (blockIdx == 1) {
 ```
 
 完整样例请参考[DataSyncBarrier样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReadGmBypassDCache(ISASI)](../scalar_compute/ReadGmBypassDCache_ISASI.md) | 不经过DCache从GM地址上读数据。 |

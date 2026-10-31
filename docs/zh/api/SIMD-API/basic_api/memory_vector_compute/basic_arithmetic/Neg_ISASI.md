@@ -87,3 +87,9 @@ AscendC::Neg(dstLocal, srcLocal, 512);
 输入数据(srcLocal): [1 2 3 4 ...]
 输出数据(dstLocal): [-1 -2 -3 -4 ...]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Abs](Abs.md) | Abs属于单目矢量类计算接口，负责将输入的tensor按元素取绝对值。 |

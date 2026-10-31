@@ -91,3 +91,11 @@ $$
 ```
 
 完整样例请参考[sequential\_block\_sync示例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/sequential_block_sync)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [WaitPreBlock](WaitPreBlock.md) | 等待当前AIV核的所有前序核完成本轮操作。 |
+| [NotifyNextBlock](NotifyNextBlock.md) | 通知后序AIV核当前核已完成本轮操作。 |
+| [GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |

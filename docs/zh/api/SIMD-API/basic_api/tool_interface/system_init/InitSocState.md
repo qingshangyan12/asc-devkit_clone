@@ -131,3 +131,17 @@ __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z)
     op.Process();
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DisableDmaAtomic](../../atomic_operations/DisableDmaAtomic.md) | 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。 |
+| [SetDeqScale](../../memory_vector_compute/type_conversion_aux_config/SetDeqScale.md) | 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同。 |
+| [SetCtrlSpr(ISASI)](../../special_register_access/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
+| [SetStoreAtomicConfig(ISASI)](../../atomic_operations/SetStoreAtomicConfig_ISASI.md) | 设置原子操作开启位与原子操作类型。 |
+| [SetLoadDataPaddingValue](../../cube_compute_ISASI/cube_load_aux_config/SetLoadDataPaddingValue.md) | 用于调用LoadData（卷积数据搬运）接口时设置Pad填充的数值。 |
+| [SetLoadDataBoundary](../../cube_compute_ISASI/cube_load_aux_config/SetLoadDataBoundary.md) | 设置LoadData（卷积数据搬运）接口所需的L1 Buffer（TPosition: A1/B1）边界值。 |
+| [ResetLoopModePara](../../memory_vector_compute/data_move_aux_config/ResetLoopModePara.md) | 重置loop mode的参数。与SetLoopModePara搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。 |
+| [AddDeqRelu](../../memory_vector_compute/composite_compute/AddDeqRelu.md) | 依次计算按元素求和、结果进行deq量化后再进行relu计算（结果和0对比取较大值）。 |
+| [CastDequant](../../memory_vector_compute/composite_compute/CastDequant.md) | 对输入做量化并进行精度转换，对输出结果的溢出采用饱和处理。 |

@@ -74,3 +74,9 @@ for (uint32_t i = 0; i < desc.GetDim(); i++)
 }
 auto ptr = desc.GetDataPtr();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ListTensorDesc](../ListTensorDesc.md) | ListTensorDesc用来解析符合以下内存排布格式的数据，并在核函数（Kernel）侧根据索引获取储存对应数据的地址及shape信息。 |

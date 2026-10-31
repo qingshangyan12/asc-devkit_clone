@@ -292,3 +292,9 @@ DivAlgo::INTRINSIC为默认算法。--cce-ftz=false时保留Subnormal；--cce-ft
 输入数据src1Local：[2.0 2.0 2.0 ... 2.0]
 输出数据dstLocal：[0.5 1.0 1.5 ... 256.0]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

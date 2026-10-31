@@ -73,3 +73,10 @@ int32_t main(int32_t argc, char* argv[])
     return 0;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ICPU_RUN_KF](ICPU_RUN_KF.md) | 进行核函数（Kernel）的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。 |
+| [Async](../../tool_interface/execution_mode/Async.md) | 通过模板函数封装AIC和AIV的代码隔离模式，用于在不同执行单元（AIC或AIV）下执行特定函数。 |

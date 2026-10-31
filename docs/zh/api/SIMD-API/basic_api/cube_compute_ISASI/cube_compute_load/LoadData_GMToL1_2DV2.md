@@ -138,3 +138,9 @@ loadDataParams.sid = 0;
 
 AscendC::LoadData(dstLocal, srcGm, loadDataParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（GMToL1-2D矩阵搬运）](LoadData_GMToL1_2D.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |

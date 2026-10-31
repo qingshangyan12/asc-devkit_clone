@@ -74,3 +74,9 @@ auto blockCoordM = Std::Int<11>{};
 auto blockCoordN = Std::Int<12>{};
 auto coord = AscendC::MakeCoord(blockCoordM, blockCoordN);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Crd2Idx](Crd2Idx.md) | Crd2Idx函数用于将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index），这里的Layout包含了Shape和Stride信息。 |

@@ -69,3 +69,8 @@ __aicore__ inline void SetLayout(const LayoutType& t)
 
 参见[调用示例](TensorTrait_constructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363)。
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetLayout](GetLayout.md) | 获取Layout实例化对象。 |

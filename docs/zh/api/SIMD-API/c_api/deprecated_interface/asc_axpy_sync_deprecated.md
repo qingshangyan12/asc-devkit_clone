@@ -79,3 +79,10 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_axpy_sync(dst, src, value, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_axpy](../vector_compute/vector_fused/asc_axpy.md) | 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

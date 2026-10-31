@@ -258,3 +258,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_extract_mask](asc_extract_mask.md) | 从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。 |
+| [asc_mask](asc_mask.md) | 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置根据源/目的寄存器不同有不同的行为，最终通过函数返回值返回结果。 |

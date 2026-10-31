@@ -88,3 +88,9 @@ asc_set_deq_scale(2.0);
 …… // 数据搬运及同步操作
 asc_deq_int322half(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_deq_scale](asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

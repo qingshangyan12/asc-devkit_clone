@@ -76,3 +76,9 @@ __aicore__ inline bool GetSaturationFlag()
 ```cpp
 bool enableSat = AscendC::GetSaturationFlag<AscendC::SaturationMode::INT>();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetSaturationFlag(ISASI)](SetSaturationFlag_ISASI.md) | 设置不同数据类型的计算或精度转换时饱和模式的开启状态。 |

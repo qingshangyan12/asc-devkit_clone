@@ -238,3 +238,10 @@ int main()
     return 0;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gather](../ub_gather/asc_gather.md) | 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。 |
+| [asc_scatter](../scatter/asc_scatter.md) | 根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。 |

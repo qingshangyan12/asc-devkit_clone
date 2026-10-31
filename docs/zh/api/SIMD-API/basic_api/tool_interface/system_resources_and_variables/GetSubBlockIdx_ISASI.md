@@ -64,3 +64,9 @@ SubBlockIdx的取值范围为\[0, SubBlockNum\)，SubBlockNum可以通过[GetSub
 ```cpp
 int64_t subBlockID = AscendC::GetSubBlockIdx();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSubBlockNum(ISASI)](GetSubBlockNum_ISASI.md) | 在分离模式架构下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |

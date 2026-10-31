@@ -115,3 +115,9 @@ constexpr uint64_t total_length = 128;
 __ubuf__ uint8_t src[total_length];
 asc_copy_ub2gm_align(dst, src, total_length * sizeof(uint8_t));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_ub2gm_align](asc_copy_ub2gm_align.md) | 将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持搬运长度不是32字节整数倍的数据。 |

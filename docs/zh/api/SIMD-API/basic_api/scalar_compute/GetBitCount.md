@@ -75,3 +75,11 @@ int64_t oneCount = AscendC::GetBitCount<1>(valueIn); // 统计valueIn二进制�
 
 int64_t zeroCount = AscendC::GetBitCount<0>(valueIn); // 统计valueIn二进制格式中0的个数，二进制格式中有48个0
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSFFValue](GetSFFValue.md) | 查找uint64_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。 |
+| [CountBitsCntSameAsSignBit](CountBitsCntSameAsSignBit.md) | 统计int64_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。 |
+| [CountLeadingZero](CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |

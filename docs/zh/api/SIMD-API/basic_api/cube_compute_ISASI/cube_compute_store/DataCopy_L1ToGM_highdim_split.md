@@ -188,3 +188,9 @@ repeatParams.srcGap = 1;
 repeatParams.dstGap = 2;
 AscendC::DataCopy(dstGm, srcLocal, repeatParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（L1ToGM连续数据搬运）](DataCopy_L1ToGM_continuous.md) | 该接口能够将矩阵从L1 Buffer连续搬运至Global Memory，数据搬运时格式和内容保持不变。 |

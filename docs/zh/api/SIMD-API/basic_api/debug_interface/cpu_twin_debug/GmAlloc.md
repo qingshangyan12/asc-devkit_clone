@@ -69,3 +69,9 @@ uint32_t blockLength = 2048;    // 每个核分配的内存大小。
 size_t len = numBlocks * blockLength * sizeof(uint16_t);    // 共享内存大小。
 uint8_t* x = (uint8_t*)AscendC::GmAlloc(len);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GmFree](GmFree.md) | 进行核函数（Kernel）的CPU侧运行验证时，用于释放通过GmAlloc申请的共享内存。 |

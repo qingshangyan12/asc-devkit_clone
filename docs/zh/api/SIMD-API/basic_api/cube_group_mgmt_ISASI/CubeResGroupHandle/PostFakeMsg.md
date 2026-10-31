@@ -81,3 +81,9 @@ hanndle.AssignQueue(queIdx);
 auto msgPtr = handle.AllocMessage();        // 获取消息空间指针msgPtr
 auto offset = handle.PostFakeMsg(msgPtr);           // 在msgPtr指针位置，发送假消息
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocMessage](AllocMessage.md) | AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。 |

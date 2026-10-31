@@ -184,3 +184,9 @@ $dst_i = scalar \div src_i$
 输入数据src1Local：[2 2 2 ... 2]
 输出数据dstLocal：[512 512 512 ... 512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

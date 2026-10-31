@@ -81,3 +81,10 @@ __cbuf__ half src[256];
 // dst表示目的操作数的起始地址
 asc_copy_l12gm_sync(dst, src, n_burst, len_burst, src_gap, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12gm](../cube_datamove/cube_compute_store/asc_copy_l12gm.md) | 将数据从L1 Buffer搬运到Global Memory。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

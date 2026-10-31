@@ -80,3 +80,11 @@ AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
 
 AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MakeLayout](MakeLayout.md) | 将传入的Shape和Stride数据打包成Layout数据结构。 |
+| [layout](layout1.md) | 获取Layout实例化对象。 |
+| [GetStride](GetStride.md) | 返回描述内存访问步长的Stride对象，与Shape的维度信息一一对应。 |

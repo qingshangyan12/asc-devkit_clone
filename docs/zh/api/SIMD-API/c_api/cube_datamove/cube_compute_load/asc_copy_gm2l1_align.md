@@ -324,3 +324,12 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_gm2l1_pad](../cube_load_aux_config/asc_set_gm2l1_pad.md) | 用于设置asc_copy_gm2l1_align接口的常量填充值。 |
+| [asc_set_gm2l1_loop_size](../cube_load_aux_config/asc_set_gm2l1_loop_size.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式的内层和外层循环次数。 |
+| [asc_set_gm2l1_loop1_stride](../cube_load_aux_config/asc_set_gm2l1_loop1_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。 |
+| [asc_set_gm2l1_loop2_stride](../cube_load_aux_config/asc_set_gm2l1_loop2_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。 |

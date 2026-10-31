@@ -79,3 +79,10 @@ __cbuf__ half src[256];
 __ubuf__ half dst[256];
 asc_copy_l12ub_sync(dst, src, false, burst_count, burst_len, src_gap, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12ub](../cube_datamove/cube_compute_store/asc_copy_l12ub.md) | 将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源/目间隔实现连续与非连续搬运。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

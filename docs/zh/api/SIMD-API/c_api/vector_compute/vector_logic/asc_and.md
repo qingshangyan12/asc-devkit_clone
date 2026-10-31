@@ -90,3 +90,10 @@ __ubuf__ int16_t src1[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_and(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_or](asc_or.md) | 每对元素按位或运算。 |
+| [asc_not](asc_not.md) | 按元素做按位取反。 |

@@ -198,3 +198,11 @@ PIPE_S
 
   请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
 <!-- end id19 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_mask_count](asc_set_mask_count.md) | 设置Mask模式为Counter模式。 |
+| [asc_set_mask_norm](asc_set_mask_norm.md) | 设置Mask模式为Normal模式，该模式为系统默认模式。 |
+| [asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md) | 从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。 |

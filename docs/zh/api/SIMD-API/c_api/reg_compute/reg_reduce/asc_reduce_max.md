@@ -208,3 +208,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_reduce_min](asc_reduce_min.md) | 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。 |
+| [asc_reduce_sum](asc_reduce_sum.md) | 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。 |
+| [asc_pair_reduce_sum](asc_pair_reduce_sum.md) | 根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。 |

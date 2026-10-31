@@ -48,3 +48,10 @@ GlobalTensor<T> GetDataObj()
 
 无
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [构造和析构函数](constructor_and_destructor.md) | 创建与释放TensorDesc对象。 |
+| [GetDataPtr](GetDataPtr.md) | 获取储存Tensor数据地址。 |
+| [GetDim](GetDim.md) | 获取Tensor的维度。 |

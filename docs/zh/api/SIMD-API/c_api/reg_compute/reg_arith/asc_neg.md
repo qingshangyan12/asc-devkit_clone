@@ -225,3 +225,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_abs](asc_abs.md) | 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。 |

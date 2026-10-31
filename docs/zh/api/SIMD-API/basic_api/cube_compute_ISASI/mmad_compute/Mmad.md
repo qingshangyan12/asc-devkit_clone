@@ -352,3 +352,10 @@ Atlas A2系列产品
 
 矩阵乘的样例请参考[Mmad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad_res.md#id5 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |
+| [SetFixPipeConfig](../cube_store_aux_config/SetFixPipeConfig.md) | DataCopy数据搬运（L0C Buffer->GM、L0C Buffer->L1 Buffer）过程中进行随路量化时，通过调用该接口设置量化的参数。 |

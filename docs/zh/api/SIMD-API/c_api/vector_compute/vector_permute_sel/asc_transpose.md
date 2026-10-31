@@ -145,3 +145,9 @@ int main()
 }
 
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_transto5hd](asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |

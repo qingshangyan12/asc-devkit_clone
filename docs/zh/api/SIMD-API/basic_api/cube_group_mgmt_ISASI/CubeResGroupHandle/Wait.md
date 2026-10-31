@@ -100,3 +100,9 @@ auto msgFakePtr = handle.AllocMessage();
 offset = handle.PostFakeMsg(msgFakePtr);
 bool waitState = handle.template Wait<true>(offset); // 等待AIC处理完假消息msgFake
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PostMessage](PostMessage.md) | 通过AllocMessage接口获取到消息空间地址msg后，构造消息结构体CubeMsgType，发送该消息。 |

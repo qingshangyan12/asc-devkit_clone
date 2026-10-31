@@ -136,3 +136,12 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
         }
     }
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MaskReg](MaskReg.md) | MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度为的八分之一（VL/8）。 |
+| [UnalignRegForLoad & UnalignRegForStore](UnalignRegForLoad-UnalignRegForStore.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，适用于从Unified Buffer（UB）向RegTensor非对齐搬运，或从RegTensor向UB非对齐搬运的场景。 |
+| [Move](../MaskReg_compute/Move.md) | 将src中的元素复制到dst中的对应位置。 |
+| [Abs](../basic_arithmetic/Abs.md) | 对srcReg中的有效元素逐个取绝对值（实数类型）或取模（复数类型），并将结果写入dstReg对应位置。 |

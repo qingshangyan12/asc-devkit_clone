@@ -145,3 +145,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_ctrl](asc_get_ctrl.md) | 读取CTRL寄存器（控制寄存器）特定比特位上的值。 |

@@ -84,3 +84,11 @@ AscendC::LocalTensor<float> tmpBuffer1 = tempBmm2Queue.AllocTensor<float>();
 AscendC::LocalTensor<half> tmpHalfBuffer;
 tmpHalfBuffer.SetAddrWithOffset(tmpBuffer1, calcSize * 2);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [GetPhyAddr](GetPhyAddr.md) | 返回LocalTensor的地址或指定偏移量后的地址。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |

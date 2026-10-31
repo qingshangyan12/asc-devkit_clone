@@ -102,3 +102,10 @@ __aicore__ inline void Compute()
     inQueueY.FreeTensor(src1);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [连续对齐搬入（LoadAlign）](../reg_data_load/LoadAlign_continuous.md) | LoadAlign能够实现数据从Unified Buffer（UB）连续搬运至RegTensor。 |
+| [连续对齐搬出（StoreAlign）](../reg_data_store/StoreAlign_continuous.md) | StoreAlign能够实现数据从RegTensor连续搬运至Unified Buffer（UB），支持单搬出模式和双搬出模式。 |

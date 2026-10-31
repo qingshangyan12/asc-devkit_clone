@@ -220,3 +220,11 @@ $$
 输入数据src1Local：[0 0.5 4 ... 513]
 输出数据dstLocal：[1 2 0 ... 0]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Relu](../basic_arithmetic/Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

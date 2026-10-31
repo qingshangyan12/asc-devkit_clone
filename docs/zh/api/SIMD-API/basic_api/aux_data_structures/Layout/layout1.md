@@ -60,3 +60,11 @@ AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> l
 // 使用layout函数获取实例化对象 
 constexpr auto& layout = layoutInit.layout();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Layout构造函数](Layout_constructor.md) | 根据输入的Shape和Stride对象，实例化Layout对象。 |
+| [MakeLayout](MakeLayout.md) | 将传入的Shape和Stride数据打包成Layout数据结构。 |
+| [is_layout](is_layout.md) | 判断输入的数据结构是否为Layout数据结构，可通过检查其成员常量value的值来判断。 |

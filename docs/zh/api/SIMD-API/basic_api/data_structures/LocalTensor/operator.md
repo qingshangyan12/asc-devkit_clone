@@ -78,3 +78,10 @@ AscendC::Add(outputLocal[16], inputLocal[16], inputLocal2[16], M);
 // 输入数据(inputLocal2): [1 2 3 ... 66]
 // 输出数据(outputLocal): [... 117 118 119 ... 166]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetBufferLen](SetBufferLen.md) | 设置Buffer的元素个数。当用户调用operator\[\]函数创建新LocalTensor时，建议调用该接口设置新LocalTensor的元素个数，便于编译器对内存及同步进行自动优化。 |
+| [operator()](operator_call.md) | 获取本LocalTensor的第offset个变量的引用。 |

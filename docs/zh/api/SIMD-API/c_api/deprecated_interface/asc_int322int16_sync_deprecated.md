@@ -71,3 +71,10 @@ __ubuf__ int32_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_int322int16_sync(dst, src, total_length);    // 将src转换为int16_t类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322int16](../vector_compute/vector_convert/asc_int322int16.md) | 将int32_t类型数据转换为int16_t类型。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

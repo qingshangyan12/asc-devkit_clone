@@ -121,3 +121,9 @@ AscendC::MulsCast<BinaryDefaultType, BinaryDefaultType, config>(dstLocal, src0Lo
 输入数据src1Local：2
 输出数据dstLocal：[12 10 22 ... ]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

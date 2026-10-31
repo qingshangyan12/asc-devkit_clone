@@ -82,3 +82,10 @@ AscendC::printf("core version is %u", coreVersion);
 - Atlas训练系列产品：1001
 <!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetArchVersion_res.md#id2 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetUBSizeInBytes](GetUBSizeInBytes.md) | 获取Unified Buffer（UB）空间的大小，单位为Byte。 |
+| [GetDataBlockSizeInBytes](GetDataBlockSizeInBytes.md) | 获取当前芯片版本一个DataBlock的大小，单位为Byte。 |

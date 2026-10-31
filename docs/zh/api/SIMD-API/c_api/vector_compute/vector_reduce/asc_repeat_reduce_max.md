@@ -122,3 +122,9 @@ asc_repeat_reduce_max_value_index(dst, src, repeat, dst_repeat_stride, src_block
 输出数据dst：[128, 7.6e-6, 256, 7.6e-6]
 输出说明：half类型7.6e-6的二进制是0x007F，重新解释为uint32后即为最大值索引127
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_reduce_max_cnt](asc_get_reduce_max_cnt.md) | 此接口用于获取执行asc_repeat_reduce_max操作后的最大值，以及第一个最大值时的索引。 |

@@ -206,3 +206,9 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 ## 调用示例
 
 完整使用样例请参考[MmadMx最佳实践](../../../../../../../examples/01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_mxfp4_basic_api_high_performance)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mmad](Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

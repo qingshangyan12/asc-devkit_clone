@@ -96,3 +96,9 @@ __ubuf__ int16_t src[total_length];
 asc_vdeq_int162b8_h(dst, src, total_length);
 asc_vdeq_int162b8_l(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_deq_scale](asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

@@ -75,3 +75,9 @@ uint32_t post_m2 = (0<<18)|(124<<10)|0;
 uint64_t config = ((uint64_t)pre_m2<<13)|((uint64_t)post_m2<<45);
 asc_set_l0c2gm_relu_alpha(config);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_relu_alpha](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md) | 本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。 |

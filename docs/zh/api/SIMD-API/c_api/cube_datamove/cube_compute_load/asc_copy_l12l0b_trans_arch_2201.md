@@ -141,3 +141,10 @@ uint16_t dst_frac_gap = 0;
 // 搬运过程
 asc_copy_l12l0b_trans(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0b_arch_2201](asc_copy_l12l0b_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
+| [asc_copy_l12l0b_trans](asc_copy_l12l0b_trans.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |

@@ -73,3 +73,10 @@ __aicore__ inline void UpdateKfcWorkspace(uint32_t offset)
 AscendC::KfcWorkspace desc(workspaceGM);
 desc.UpdateKfcWorkspace(1024);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CubeResGroupHandle构造函数](../CubeResGroupHandle/CubeResGroupHandle_constructor.md) | 构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。 |
+| [CreateCubeResGroup](../CubeResGroupHandle/CreateCubeResGroup.md) | 快速创建CubeResGroupHandle对象，内部完成消息队列空间和同步事件分配。 |

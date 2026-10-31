@@ -90,3 +90,11 @@ __ubuf__ half src0[256];
 __ubuf__ half src1[256];
 asc_fma(dst, src0, src1, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_add_relu](asc_mul_add_relu.md) | 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。 |
+| [asc_axpy](asc_axpy.md) | 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。 |
+| [asc_add_relu](asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |

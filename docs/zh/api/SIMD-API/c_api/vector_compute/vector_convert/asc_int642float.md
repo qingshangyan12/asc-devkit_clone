@@ -94,3 +94,9 @@ __ubuf__ int64_t src[total_length];
 __ubuf__ float dst[total_length];
 asc_int642float_rn(dst, src, total_length);    // 将src转换为float类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2int64](asc_float2int64.md) | 将float类型转化为int64_t类型，并支持多种舍入模式。 |

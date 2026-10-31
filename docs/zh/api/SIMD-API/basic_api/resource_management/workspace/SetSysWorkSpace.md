@@ -109,3 +109,9 @@ __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Init(
     ...
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetUserWorkspace](GetUserWorkspace.md) | 获取用户使用的workspace指针。 |

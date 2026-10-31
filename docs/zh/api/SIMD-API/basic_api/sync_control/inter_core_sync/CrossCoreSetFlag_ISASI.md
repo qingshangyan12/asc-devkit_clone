@@ -197,3 +197,11 @@ CrossCoreSetFlag的模板参数`modeId`和`pipe`均**没有默认值**，其取�
 ```
 
 完整样例请参考[CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CrossCoreWaitFlag(ISASI)](CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考CrossCoreSetFlag功能说明。 |
+| [设置核函数（Kernel）类型](../../Kernel-Tiling/set_Kernel_type.md) | 用于用户自定义设置核函数（Kernel）类型，控制算子执行时只启动该类型的核，避免启动不需要工作的核，缩短核启动开销。 |
+| [SyncAll](SyncAll.md) | SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能。 |

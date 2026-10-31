@@ -212,3 +212,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_min_scalar](asc_min_scalar.md) | 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。 |

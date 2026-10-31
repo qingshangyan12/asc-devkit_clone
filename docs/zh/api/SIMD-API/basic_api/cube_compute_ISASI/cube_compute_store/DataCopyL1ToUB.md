@@ -104,3 +104,9 @@ intriParams.srcGap = 0; // 源操作数做连续搬运
 intriParams.dstGap = 0; // 目的操作数连续排布
 AscendC::DataCopyL1ToUB(dstLocal, srcLocal, intriParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

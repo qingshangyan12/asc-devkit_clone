@@ -83,3 +83,10 @@ AscendC::WaitFlag<AscendC::HardEvent::V_S>(eventID);
 GetTPipePtr()->ReleaseEventID<AscendC::HardEvent::V_S>(eventID); //释放scalar等vector的同步HardEvent的ID
 ......
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReleaseEventID](ReleaseEventID.md) | 用于释放HardEvent（硬件类型同步事件）的TEventID，通常与AllocEventID搭配使用。 |
+| [SetFlag/WaitFlag(ISASI)](../../sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |

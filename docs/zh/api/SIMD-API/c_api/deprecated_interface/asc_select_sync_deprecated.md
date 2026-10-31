@@ -79,3 +79,11 @@ asc_set_cmp_mask(sel_mask);
 asc_sync_pipe(PIPE_V);
 asc_select_sync(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_select](../vector_compute/vector_permute_sel/asc_select.md) | 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_cmp_mask](../vector_compute/vector_compare/asc_set_cmp_mask.md) | 为asc_select操作设置作用于选择的Mask掩码。 |

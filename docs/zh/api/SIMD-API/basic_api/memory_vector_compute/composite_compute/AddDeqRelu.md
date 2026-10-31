@@ -217,3 +217,12 @@ $$
 输入数据src1Local：[19 33 34 50 42  2 97 93 99 ...]
 输出数据dstLocal：[8.9 6.9 7.7 10.4 7.0 5.1 12.4 17.5 19.4 ...]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetDeqScale](../type_conversion_aux_config/SetDeqScale.md) | 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同。 |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Relu](../basic_arithmetic/Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |
+| [Cast](../type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |

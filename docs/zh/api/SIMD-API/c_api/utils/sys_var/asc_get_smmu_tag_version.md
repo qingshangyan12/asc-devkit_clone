@@ -138,3 +138,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_arch_ver](asc_get_arch_ver.md) | 获取当前AI处理器架构版本号。 |

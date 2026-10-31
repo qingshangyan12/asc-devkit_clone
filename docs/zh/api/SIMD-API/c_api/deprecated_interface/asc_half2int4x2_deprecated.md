@@ -146,3 +146,10 @@ vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_half2int4x2_rna(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int4x2](../reg_compute/reg_convert/asc_half2int4x2.md) | 根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

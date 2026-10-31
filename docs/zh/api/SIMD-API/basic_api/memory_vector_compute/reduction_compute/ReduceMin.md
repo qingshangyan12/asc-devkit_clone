@@ -283,3 +283,10 @@
 
     > 输出数据dst_gm：[0.00393,  4.3e-06]
     > 4.3e-06需要使用reinterpret_cast方法转换得到索引值72
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReduceRepeat](ReduceRepeat.md) | `ReduceRepeat`接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。 |
+| [ReduceMax](ReduceMax.md) | `ReduceMax`接口用于从所有输入数据中找出最大值和最大值索引。 |

@@ -84,3 +84,9 @@ AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, 512);
 输出数据dst0Local：[1 513 2 ... 768]
 输出数据dst1Local：[257 769 258 ... 1024]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DeInterleave](DeInterleave.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |

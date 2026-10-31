@@ -80,3 +80,10 @@ __ubuf__ int32_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_int322int16(dst, src, total_length);    // 将src转换为int16_t类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322int64](asc_int322int64.md) | 将int32_t类型数据转换为int64_t类型。 |
+| [asc_int322float](asc_int322float.md) | 将int32_t类型数据转换为float类型，支持多种舍入模式。 |

@@ -72,3 +72,9 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 用户使用workspace指针。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetSysWorkSpace](SetSysWorkSpace.md) | 框架需要使用的workspace称之为系统workspace。 |

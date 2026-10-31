@@ -189,3 +189,17 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
     AscendC::Cast(noSatDstLocal, srcLocal, AscendC::RoundMode::CAST_NONE, count);
     ```
 <!-- end id19 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSaturationFlag(ISASI)](GetSaturationFlag_ISASI.md) | 获取`mode`指定的全局饱和模式的开启状态，该状态通过SetSaturationFlag设置。 |
+| [Mmad](../cube_compute_ISASI/mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |
+| [MmadMx](../cube_compute_ISASI/mmad_compute/MmadMx.md) | MmadMx（全称Microscaling Mmad）为带有量化系数的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。 |
+| [Fixpipe（L0C到GM数据搬运）](../cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |
+| [Cast](../memory_vector_compute/type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |
+| [Truncate(ISASI)](../memory_vector_compute/type_conversion/Truncate_ISASI.md) | 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变。 |
+| [Cast](../reg_vector_compute/type_conversion/Cast.md) | Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现浮点转整数、浮点转浮点、整数转浮点、整数转整数的数据类型转换。 |
+| [Truncate](../reg_vector_compute/type_conversion/Truncate.md) | 将源操作数中的浮点数元素截断为整数值（保留原数据类型），并存入目的操作数。 |
+| [SetSaturationStrategy](SetSaturationStrategy.md) | 设置精度转换接口使用的饱和模式配置策略。 |

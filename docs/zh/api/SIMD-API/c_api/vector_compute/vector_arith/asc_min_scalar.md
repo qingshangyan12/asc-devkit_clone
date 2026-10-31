@@ -96,3 +96,11 @@ asc_min_scalar(dst, src, value, total_length);
 // value : 3
 // dst : [1, 2, 3, 3, ... , 3]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_max_scalar](asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。 |
+| [asc_max](asc_max.md) | 执行逐元素取最大值运算。 |
+| [asc_min](asc_min.md) | 按元素求最小值。 |

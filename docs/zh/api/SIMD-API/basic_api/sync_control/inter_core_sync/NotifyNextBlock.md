@@ -74,3 +74,11 @@ $$
 ## 调用示例<a name="section177231425115410"></a>
 
 完整样例请参考[InitDetermineComputeWorkspace调用示例](InitDetermineComputeWorkspace.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md) | InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化共享内存（`gmWorkspace`）的值，完成初始化后才可以调用WaitPreBlock和NotifyNextBlock。 |
+| [WaitPreBlock](WaitPreBlock.md) | 等待当前AIV核的所有前序核完成本轮操作。 |
+| [GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |

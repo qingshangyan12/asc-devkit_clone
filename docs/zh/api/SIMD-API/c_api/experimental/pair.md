@@ -89,3 +89,12 @@ struct asc_int32_t_int32_t_pair {
 
 - 使用该类结构体前，需要包含头文件：`#include "c_api/experimental/pair.h"`。
 - 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_add_carry](asc_add_carry.md) | 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。 |
+| [asc_deintlv](asc_deintlv.md) | 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。 |
+| [asc_intlv](asc_intlv.md) | 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。 |
+| [asc_loadalign_deintlv](asc_loadalign_deintlv.md) | 本接口为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。 |
