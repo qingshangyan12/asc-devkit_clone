@@ -36,6 +36,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
 __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
@@ -92,6 +93,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ub
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK4_B8);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src)
@@ -109,6 +111,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
@@ -165,6 +168,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src)
@@ -190,6 +194,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
@@ -197,6 +202,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf_
         vlds(dst, src, 0, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src)
@@ -246,6 +252,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
@@ -253,6 +260,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf_
         vlds(dst, src, 0, E2B_B16);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src)
@@ -278,6 +286,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
 __simd_callee__ inline void asc_loadalign_unpack_v2(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
@@ -304,6 +313,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK4_B8);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
 __simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
@@ -321,6 +331,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
 __simd_callee__ inline void asc_loadalign_unpack_v2(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
@@ -378,6 +389,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ 
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
@@ -395,6 +407,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ in
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -426,6 +439,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf_
         vld(dst, src, offset, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
@@ -443,6 +457,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
@@ -450,6 +465,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf_
         vld(dst, src, offset, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src, addr_reg offset)
@@ -499,6 +515,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
@@ -506,6 +523,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf_
         vld(dst, src, offset, E2B_B16);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src, addr_reg offset)
@@ -555,6 +573,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
 __simd_callee__ inline void asc_loadalign_unpack_v2(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
@@ -614,6 +633,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ub
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
@@ -631,6 +651,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -687,6 +708,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
@@ -712,6 +734,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
@@ -719,6 +742,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf_
         vlds(dst, src, offset, BLK);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
@@ -768,6 +792,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
@@ -775,6 +800,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf_
         vlds(dst, src, offset, E2B_B16);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
@@ -818,6 +844,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
@@ -882,6 +909,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
@@ -899,6 +927,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_uint8_t& dst,
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
@@ -963,6 +992,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BLK, POST_UPDATE);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -989,6 +1019,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_half& dst, __
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
@@ -997,6 +1028,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
@@ -1048,6 +1080,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_half& dst, __
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
@@ -1056,6 +1089,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)

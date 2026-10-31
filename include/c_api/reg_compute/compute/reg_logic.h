@@ -397,6 +397,7 @@ __simd_callee__ inline vector_int32_t asc_shiftright_scalar(vector_int32_t src, 
 #endif
 #endif
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask);
@@ -404,13 +405,16 @@ __simd_callee__ inline void asc_and(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);

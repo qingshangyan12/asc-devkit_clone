@@ -28,6 +28,7 @@ __simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, v
     return src2;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fma(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
@@ -36,6 +37,7 @@ __simd_callee__ inline vector_bfloat16_t asc_fma(
     }
     return src2;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
@@ -53,6 +55,7 @@ __simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, v
     return src2;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fms(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
@@ -61,6 +64,7 @@ __simd_callee__ inline vector_bfloat16_t asc_fms(
     }
     return src2;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
@@ -78,6 +82,7 @@ __simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, 
     return src2;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fnma(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
@@ -86,6 +91,7 @@ __simd_callee__ inline vector_bfloat16_t asc_fnma(
     }
     return src2;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
@@ -103,6 +109,7 @@ __simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, 
     return src2;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fnms(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
@@ -111,6 +118,7 @@ __simd_callee__ inline vector_bfloat16_t asc_fnms(
     }
     return src2;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_fnms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {

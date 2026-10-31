@@ -33,6 +33,7 @@ using vector_float = vector_f32;
 using vector_store_unalign = vector_align;
 using vector_load_unalign = vector_align;
 using addr_reg = vector_address;
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 using vector_bfloat16_t = vector_bf16;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
@@ -46,6 +47,7 @@ using vector_hifloat4x2_t = vector_hif4x2;
 #endif
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
+#endif
 
 // iter_reg has been deprecated, please use addr_reg instead.
 using iter_reg ASC_DEPRECATED(9.2.0, "2027/09/07", addr_reg) = addr_reg;

@@ -111,6 +111,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src)
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src)
 {
     if ASC_IS_AIV {
@@ -193,6 +194,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src
         vstas(ureg, dst_tmp, 0);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src, uint32_t count)
 {
@@ -275,6 +277,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src,
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, uint32_t count)
 {
     if ASC_IS_AIV {
@@ -349,6 +352,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src
         vstas(ureg, dst_tmp, 0);
     }
 }
+#endif
 
 #endif
 

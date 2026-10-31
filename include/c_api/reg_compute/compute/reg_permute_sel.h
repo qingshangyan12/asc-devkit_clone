@@ -31,6 +31,7 @@ __simd_callee__ inline void asc_select(vector_uint8_t& dst, vector_uint8_t src0,
 
 __simd_callee__ inline void asc_select(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_select(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask);
 
@@ -39,6 +40,7 @@ __simd_callee__ inline void asc_select(
 
 __simd_callee__ inline void asc_select(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_select(
     vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
@@ -47,8 +49,10 @@ __simd_callee__ inline void asc_select(vector_int16_t& dst, vector_int16_t src0,
 
 __simd_callee__ inline void asc_select(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_select(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_select(
     vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
@@ -63,12 +67,14 @@ __simd_callee__ inline vector_uint8_t asc_select(vector_uint8_t src0, vector_uin
 
 __simd_callee__ inline vector_int8_t asc_select(vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_select(
     vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_hifloat8_t asc_select(vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_fp8_e5m2_t asc_select(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_uint16_t asc_select(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
@@ -76,7 +82,9 @@ __simd_callee__ inline vector_int16_t asc_select(vector_int16_t src0, vector_int
 
 __simd_callee__ inline vector_half asc_select(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_select(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_uint32_t asc_select(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -116,6 +124,7 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 
 __simd_callee__ inline vector_float asc_squeeze(vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_squeeze(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_squeeze(vector_bfloat16_t src, vector_bool mask);
@@ -135,6 +144,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_squeeze(vector_fp8_e5m2_t src, vect
 __simd_callee__ inline void asc_squeeze(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
 __simd_callee__ inline vector_fp8_e8m0_t asc_squeeze(vector_fp8_e8m0_t src, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_init();
 
@@ -169,6 +179,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ float* dst_addr, vector_float& dst, vector_store_unalign& src0, vector_float src1,
     vector_bool squeeze_mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ bfloat16_t* dst_addr, vector_bfloat16_t& dst, vector_store_unalign& src0, vector_bfloat16_t src1,
     vector_bool squeeze_mask);
@@ -196,6 +207,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
     __ubuf__ int4b_t* dst_addr, vector_int4x2_t& dst, vector_store_unalign& src0, vector_int4x2_t src1,
     vector_bool squeeze_mask);
+#endif
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int8_t* dst, vector_store_unalign src);
 
@@ -254,6 +266,7 @@ __simd_callee__ inline void asc_intlv(vector_half& dst0, vector_half& dst1, vect
 
 __simd_callee__ inline void asc_intlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_intlv(
     vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
@@ -268,6 +281,7 @@ __simd_callee__ inline void asc_intlv(
 
 __simd_callee__ inline void asc_intlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask);
 
@@ -411,6 +425,7 @@ __simd_callee__ inline void asc_deintlv(
 __simd_callee__ inline void asc_deintlv(
     vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0, vector_uint8_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
 
@@ -425,6 +440,7 @@ __simd_callee__ inline void asc_deintlv(
 
 __simd_callee__ inline void asc_deintlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1);
 
@@ -518,11 +534,14 @@ __simd_callee__ inline void asc_intlv_half_low(vector_half& dst, vector_half src
 
 __simd_callee__ inline void asc_intlv_half_low(vector_float& dst, vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_intlv_half_low(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline void asc_intlv_half_low(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_intlv_half_low(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline void asc_intlv_half_low(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -530,6 +549,7 @@ __simd_callee__ inline void asc_intlv_half_low(vector_fp8_e5m2_t& dst, vector_fp
 __simd_callee__ inline void asc_intlv_half_low(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline void asc_intlv_half_low(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline vector_uint8_t asc_intlv_half_low(vector_uint8_t src0, vector_uint8_t src1);
 
@@ -547,10 +567,13 @@ __simd_callee__ inline vector_half asc_intlv_half_low(vector_half src0, vector_h
 
 __simd_callee__ inline vector_float asc_intlv_half_low(vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_intlv_half_low(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline vector_fp8_e6m2_t asc_intlv_half_low(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_hifloat8_t asc_intlv_half_low(vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_low(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -558,6 +581,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_low(vector_fp8_e5m2_t sr
 __simd_callee__ inline vector_fp8_e8m0_t asc_intlv_half_low(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline vector_bfloat16_t asc_intlv_half_low(vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline void asc_intlv_half_high(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
 
@@ -575,11 +599,14 @@ __simd_callee__ inline void asc_intlv_half_high(vector_half& dst, vector_half sr
 
 __simd_callee__ inline void asc_intlv_half_high(vector_float& dst, vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_intlv_half_high(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline void asc_intlv_half_high(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_intlv_half_high(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline void asc_intlv_half_high(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -587,6 +614,7 @@ __simd_callee__ inline void asc_intlv_half_high(vector_fp8_e5m2_t& dst, vector_f
 __simd_callee__ inline void asc_intlv_half_high(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline void asc_intlv_half_high(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline vector_uint8_t asc_intlv_half_high(vector_uint8_t src0, vector_uint8_t src1);
 
@@ -604,10 +632,13 @@ __simd_callee__ inline vector_half asc_intlv_half_high(vector_half src0, vector_
 
 __simd_callee__ inline vector_float asc_intlv_half_high(vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_intlv_half_high(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline vector_fp8_e6m2_t asc_intlv_half_high(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_hifloat8_t asc_intlv_half_high(vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_high(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -615,6 +646,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_high(vector_fp8_e5m2_t s
 __simd_callee__ inline vector_fp8_e8m0_t asc_intlv_half_high(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline vector_bfloat16_t asc_intlv_half_high(vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 //=================asc_deintlv_half (for 9201)==================
 __simd_callee__ inline void asc_deintlv_even_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
@@ -657,11 +689,14 @@ __simd_callee__ inline void asc_deintlv_even(vector_half& dst, vector_half src0,
 
 __simd_callee__ inline void asc_deintlv_even(vector_float& dst, vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_deintlv_even(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline void asc_deintlv_even(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_deintlv_even(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline void asc_deintlv_even(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -669,6 +704,7 @@ __simd_callee__ inline void asc_deintlv_even(vector_fp8_e5m2_t& dst, vector_fp8_
 __simd_callee__ inline void asc_deintlv_even(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline void asc_deintlv_even(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline vector_uint8_t asc_deintlv_even(vector_uint8_t src0, vector_uint8_t src1);
 
@@ -686,10 +722,13 @@ __simd_callee__ inline vector_half asc_deintlv_even(vector_half src0, vector_hal
 
 __simd_callee__ inline vector_float asc_deintlv_even(vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_deintlv_even(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline vector_fp8_e6m2_t asc_deintlv_even(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_hifloat8_t asc_deintlv_even(vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline vector_fp8_e5m2_t asc_deintlv_even(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -697,6 +736,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_deintlv_even(vector_fp8_e5m2_t src0
 __simd_callee__ inline vector_fp8_e8m0_t asc_deintlv_even(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline vector_bfloat16_t asc_deintlv_even(vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline void asc_deintlv_odd(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
 
@@ -714,11 +754,14 @@ __simd_callee__ inline void asc_deintlv_odd(vector_half& dst, vector_half src0, 
 
 __simd_callee__ inline void asc_deintlv_odd(vector_float& dst, vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_deintlv_odd(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline void asc_deintlv_odd(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_deintlv_odd(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline void asc_deintlv_odd(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
@@ -726,6 +769,7 @@ __simd_callee__ inline void asc_deintlv_odd(vector_fp8_e5m2_t& dst, vector_fp8_e
 __simd_callee__ inline void asc_deintlv_odd(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
 
 __simd_callee__ inline void asc_deintlv_odd(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 __simd_callee__ inline vector_uint8_t asc_deintlv_odd(vector_uint8_t src0, vector_uint8_t src1);
 
@@ -743,15 +787,19 @@ __simd_callee__ inline vector_half asc_deintlv_odd(vector_half src0, vector_half
 
 __simd_callee__ inline vector_float asc_deintlv_odd(vector_float src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_deintlv_odd(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+#endif
 
 __simd_callee__ inline vector_fp8_e6m2_t asc_deintlv_odd(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_hifloat8_t asc_deintlv_odd(vector_hifloat8_t src0, vector_hifloat8_t src1);
 
 __simd_callee__ inline vector_fp8_e5m2_t asc_deintlv_odd(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
 
 __simd_callee__ inline vector_fp8_e8m0_t asc_deintlv_odd(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+#endif
 
 __simd_callee__ inline vector_bfloat16_t asc_deintlv_odd(vector_bfloat16_t src0, vector_bfloat16_t src1);
 #endif
@@ -780,6 +828,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_half& dst, vector_hal
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_float& dst, vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -795,6 +844,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e5m2_t& dst, vect
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_v2(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
@@ -820,6 +870,7 @@ __simd_callee__ inline void asc_squeeze_v2(vector_half& dst, vector_half src, ve
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_v2(vector_float& dst, vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_v2(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -834,6 +885,7 @@ __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e5m2_t& dst, vector_fp8_e5
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_pack_to_low)
 __simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src);

@@ -41,6 +41,7 @@ __simd_callee__ inline vector_float asc_gather(vector_float src, vector_uint32_t
 
 __simd_callee__ inline vector_half asc_gather(vector_half src, vector_uint16_t index);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather(vector_bfloat16_t src, vector_uint16_t index);
 
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather(vector_fp8_e4m3fn_t src, vector_uint8_t index);
@@ -50,6 +51,7 @@ __simd_callee__ inline vector_hifloat8_t asc_gather(vector_hifloat8_t src, vecto
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather(vector_fp8_e5m2_t src, vector_uint8_t index);
 
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(vector_fp8_e8m0_t src, vector_uint8_t index);
+#endif
 
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src, vector_uint8_t index);
 
@@ -67,6 +69,7 @@ __simd_callee__ inline void asc_gather(vector_float& dst, vector_float src, vect
 
 __simd_callee__ inline void asc_gather(vector_half& dst, vector_half src, vector_uint16_t index);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index);
 
 __simd_callee__ inline void asc_gather(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_uint8_t index);
@@ -76,6 +79,7 @@ __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, vector_hifloat8_t
 __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_uint8_t index);
 
 __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_uint8_t index);
+#endif
 
 #endif
 

@@ -36,6 +36,7 @@ __simd_callee__ inline void asc_gather(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -53,6 +54,7 @@ __simd_callee__ inline void asc_gather(
         vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask)
@@ -100,6 +102,7 @@ __simd_callee__ inline void asc_gather(vector_float& dst, __ubuf__ float* src, v
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -140,6 +143,7 @@ __simd_callee__ inline void asc_gather(
         vgather2(dst, src, index, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
@@ -164,6 +168,7 @@ __simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vec
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -171,6 +176,7 @@ __simd_callee__ inline void asc_gather(
         vgather2_bc(dst, src, index, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather_datablock(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
@@ -252,6 +258,7 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -317,6 +324,7 @@ __simd_callee__ inline void asc_gather_datablock(
         vgatherb(dst, src, index, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
 {
@@ -367,12 +375,14 @@ __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90100000)
 __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
         vgatherb(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
 {
@@ -388,6 +398,7 @@ __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index)
 {
@@ -451,6 +462,7 @@ __simd_callee__ inline void asc_gather_datablock(
         vgatherb(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -508,6 +520,7 @@ __simd_callee__ inline vector_float asc_gather(__ubuf__ float* src, vector_uint3
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_bfloat16_t dst;
@@ -543,6 +556,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, ve
     asc_gather(dst, src, index, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -565,12 +579,14 @@ __simd_callee__ inline vector_half asc_gather(__ubuf__ half* src, vector_uint32_
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_gather(dst, src, index, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -633,6 +649,7 @@ __simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather_datablock(
     __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -696,6 +713,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     asc_gather_datablock(dst, src, index, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
 {
@@ -753,6 +771,7 @@ __simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather_datablock(__ubuf__ bfloat16_t* src, vector_uint32_t index)
 {
     vector_bfloat16_t dst;
@@ -808,6 +827,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_
     asc_gather_datablock(dst, src, index);
     return dst;
 }
+#endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90300000)
 __simd_callee__ inline void asc_gather(
@@ -819,6 +839,7 @@ __simd_callee__ inline void asc_gather(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -836,6 +857,7 @@ __simd_callee__ inline void asc_gather_datablock(
         vgatherb(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index);
     }
 }
+#endif
 
 __simd_callee__ inline vector_fp8_e6m2_t asc_gather(__ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
 {
