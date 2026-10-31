@@ -30,7 +30,7 @@ The following code uses add\_custom (the Add custom operator) as an example to d
 
 2.  Implement the custom operator on the NPU.
 
-    This includes the operator kernel function implementation, and uses the <<<\>\>\> API to call the operator kernel function to complete the specified computation. The [c10\_npu::getCurrentNPUStream](https://gitcode.com/Ascend/op-plugin/blob/26.2.0/docs/en/custom_APIs/cpp/%EF%BC%88beta%EF%BC%89c10_npu-getCurrentNPUStream.md) API in the sample is used to obtain the current NPU stream, and its return value type is NPUStream.
+    This includes the operator kernel function implementation, and uses the <<<\>\>\> API to call the operator kernel function to complete the specified computation. The [c10\_npu::getCurrentNPUStream](https://gitcode.com/Ascend/op-plugin/blob/26.2.0/docs/en/custom_APIs/cpp/(beta)c10_npu-getCurrentNPUStream.md) API in the sample is used to obtain the current NPU stream, and its return value type is NPUStream.
 
     Note that the memory for the inputs x and y in this sample is allocated in the outer Python call script.
 
@@ -96,7 +96,7 @@ The following code uses the add\_custom operator as an example to introduce the 
 
 2.  Implement the custom operator on the NPU.
 
-    This includes the operator kernel function implementation, and uses the <<<\>\>\> API to call the operator kernel function to complete the specified operation. The [c10\_npu::getCurrentNPUStream](https://gitcode.com/Ascend/op-plugin/blob/26.2.0/docs/en/custom_APIs/cpp/%EF%BC%88beta%EF%BC%89c10_npu-getCurrentNPUStream.md) API in the sample is used to obtain the current NPU stream, and the return value type is NPUStream.
+    This includes the operator kernel function implementation, and uses the <<<\>\>\> API to call the operator kernel function to complete the specified operation. The [c10\_npu::getCurrentNPUStream](https://gitcode.com/Ascend/op-plugin/blob/26.2.0/docs/en/custom_APIs/cpp/(beta)c10_npu-getCurrentNPUStream.md) API in the sample is used to obtain the current NPU stream, and the return value type is NPUStream.
 
     Note that the memory for the input x and y in this sample is allocated in the Python call script.
 
