@@ -16,7 +16,7 @@
 
 以下示例中，`DataCopyExtParams`的`blockLen`和`srcStride`、`LoopModeParams`的stride以及地址布局均以字节描述；`DataCopyExtParams`的`dstStride`以32B的dataBlock为单位，本例使用Compact模式时该参数无效并置为0；`DataCopyPadExtParams`的`leftPadding/rightPadding`和`LocalTensor`、`GlobalTensor`的`operator[]`偏移均以元素为单位。以下代码假定`T`为普通的按字节存储类型（如`float`、`half`或`int8_t`），并通过`sizeof(T)`将字节偏移转换为元素偏移；4bit打包类型需要单独处理。
 
-![](../../../figures/copy_opt.png)
+<img src="../../../figures/copy_opt.png" alt="" width="920px" height="130px">
 
 【反例】调用多次搬运接口进行搬运（以DataCopyPad为例）
 
@@ -59,7 +59,7 @@ __aicore__ inline void CopyIn3(){
 ```
 
 **图1**  使用多次DataCopyPad接口进行搬运<a name="fig345313593314"></a>  
-![](../../../figures/dcpad_api.png "使用多次DataCopyPad接口进行搬运")
+<img src="../../../figures/dcpad_api.png" alt="使用多次DataCopyPad接口进行搬运" width="920px" height="220px">
 
 【正例】使用Loop模式进行搬运
 
@@ -93,7 +93,7 @@ __aicore__ inline void CopyIn3(){
 ```
 
 **图2**  使用Loop模式进行搬运<a name="fig26533539233"></a>  
-![](../../../figures/loop_copy.png "使用Loop模式进行搬运")
+<img src="../../../figures/loop_copy.png" alt="使用Loop模式进行搬运" width="920px" height="291px">
 
 【总结】当数据块之间需要插入不同大小Padding时，使用Loop模式搬运代替多次的DataCopyPad能够减少搬运指令的使用，提升性能。
 
@@ -102,12 +102,12 @@ __aicore__ inline void CopyIn3(){
 【描述】假设我们希望以下图的方式搬运2个8B大小的数据块：
 
 **图3**  搬运前后数据<a name="fig20466223158"></a>  
-![](../../../figures/copy_data.png "搬运前后数据")
+<img src="../../../figures/copy_data.png" alt="搬运前后数据" width="920px" height="175px">
 
 【反例】使用多次DataCopyPad进行搬运
 
 **图4**  使用多次DataCopyPad进行搬运<a name="fig18188132522410"></a>  
-![](../../../figures/dcpad_copy.png "使用多次DataCopyPad进行搬运")
+<img src="../../../figures/dcpad_copy.png" alt="使用多次DataCopyPad进行搬运" width="920px" height="260px">
 
 ```
 __aicore__ inline void CopyIn5(){
@@ -161,6 +161,6 @@ __aicore__ inline void CopyIn6(){
 ```
 
 **图5**  搬运前后数据<a name="fig284018179396"></a>  
-![](../../../figures/copy_data_56.png "搬运前后数据-56")
+<img src="../../../figures/copy_data_56.png" alt="搬运前后数据-56" width="600px" height="207px">
 
 【总结】使用多维数据搬运在部分场景下能够减少搬运指令的条数，从而提升性能。

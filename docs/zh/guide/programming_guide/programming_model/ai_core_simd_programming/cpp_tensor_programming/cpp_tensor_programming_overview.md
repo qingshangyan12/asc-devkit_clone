@@ -206,7 +206,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 以`FRACTAL_Nz`为例，内存排布采用大N外部column major（列主序）+ 小z内部row major（行主序）存放：
 
-![FRACTAL_Nz内存排布示意图](../../../../figures/nz_layout.png)
+<img src="../../../../figures/nz_layout.png" alt="FRACTAL_Nz内存排布示意图" width="300px" height="314px">
 
 #### Bank冲突
 

@@ -106,7 +106,7 @@ Tiling参数如下：
 在没有矢量计算的算子场景下，可以跳过消息通信框架的机制，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
 
 **图2**  纯Cube模式的Matmul流程示意图<a name="fig20558182319127"></a>  
-![](../../../figures/cube_matmul.png "纯Cube模式的Matmul流程示意图")
+<img src="../../../figures/cube_matmul.png" alt="纯Cube模式的Matmul流程示意图" width="300px" height="232px">
 
 Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul)。开启纯Cube模式的主要步骤如下：
 

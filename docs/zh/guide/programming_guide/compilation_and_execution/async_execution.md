@@ -22,7 +22,7 @@
   8. 去初始化：aclFinalize。
 ```
 
-![](../../figures/npu_verify.png)
+<img src="../../figures/npu_verify.png" alt="" width="300px" height="675px">
 
 在这个过程中我们提到了Stream创建与销毁，内存申请与拷贝，异步调用与同步等待。在本节的其余部分，我们将解释这些CANN Runtime的元素和对应的API。
 

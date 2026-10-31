@@ -108,7 +108,7 @@
 
 同步控制流程如下图所示：
 
-![](../../../../figures/core_sync_final.png)
+<img src="../../../../figures/core_sync_final.png" alt="" width="920px" height="311px">
 
 上图中，ID1、ID2、ID3、ID4、ID5、ID6表示事件ID（EventID），每个EventID对应一块存储数据的搬运状态，确保数据操作的正确性和一致性。
 

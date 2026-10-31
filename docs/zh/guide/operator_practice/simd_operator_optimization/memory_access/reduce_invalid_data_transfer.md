@@ -42,7 +42,7 @@ __aicore__ inline void CopyIn(){
 ```
 
 **图1**  Normal模式搬运<a name="fig1316440112511"></a>  
-![](../../../figures/norm_copy.png "Normal模式搬运")
+<img src="../../../figures/norm_copy.png" alt="Normal模式搬运" width="920px" height="342px">
 
 如图所示，由于每块数据块为48B，非32B对齐，因此搬运每块数据块时需要插入16B大小的padding数据使得数据32B对齐，最终搬运192B大小的数据到UB，其中包含48B的无效数据。
 
@@ -76,7 +76,7 @@ __aicore__ inline void CopyIn(){
 ```
 
 **图2**  Compact模式搬运<a name="fig203951741467"></a>  
-![](../../../figures/compact_copy.png "Compact模式搬运")
+<img src="../../../figures/compact_copy.png" alt="Compact模式搬运" width="920px" height="274px">
 
 根据Compact模式搬运的示意图，最终搬运了160B大小的数据，其中包含16B的无效数据。
 

@@ -27,7 +27,7 @@
     如[图1](#zh-cn_topic_0000001265237150_zh-cn_topic_0228422146_zh-cn_topic_0187054064_fig146585121118)所示，以一张格式为RGB的图片为例，NCHW中，C排列在外层，实际存储的是“RRRRRRGGGGGGBBBBBB”，即同一通道的所有像素值顺序存储在一起；而NHWC中C排列在最内层，实际存储的则是“RGBRGBRGBRGBRGBRGB”，即多个通道的同一位置的像素值顺序存储在一起。
 
     **图1**  NCHW和NHWC存储示例<a name="zh-cn_topic_0000001265237150_zh-cn_topic_0228422146_zh-cn_topic_0187054064_fig146585121118"></a>  
-    ![](../../../figures/nchw_nhwc.png "NCHW和NHWC存储示例")
+    <img src="../../../figures/nchw_nhwc.png" alt="NCHW和NHWC存储示例" width="300px" height="56px">
 
     尽管存储的数据相同，但不同的存储顺序会导致数据的访问特性不一致，因此即便进行同样的运算，相应的计算性能也会不同。
 
@@ -35,7 +35,7 @@
 
     NDHWC和NCDHW是五维Tensor，较NHWC和NCHW多了一个D的维度，D代表特征深度（Depth），表示数据在深度方向上的扩展，如视频的时间步或医学图像的深度层，因此该类格式便于在时间维度上进行卷积操作。以NDHWC为例，其数据格式如下图所示：
 
-    ![](../../../figures/NCDHW.png)
+    <img src="../../../figures/NCDHW.png" alt="" width="300px" height="294px">
 
 ## 矩阵乘相关特殊格式<a name="section184471251122117"></a>
 
@@ -200,7 +200,7 @@
 
     \(K,  N\)大小的矩阵被分为K1 \* N1个分形，按照row major排布，形状如Z字形；每个分形内部有K0 \* N0个元素，按照column major排布，形状如N字形，所以这种数据格式称为ZN格式。其中，\(K0, N0\)表示一个分形的大小，分形shape为 \(32B / sizeof\(Datatype\)\) x 16，大小为512字节。
 
-    ![](../../../figures/zn_half.png)
+    <img src="../../../figures/zn_half.png" alt="" width="300px" height="312px">
 
     通过公式表达转换过程如下：
 
@@ -225,7 +225,7 @@
 
     NHWC/NCHW -\> NC1HWC0的转换过程为：将数据在C维度进行分割，变成C1份NHWC0/NC0HW，再将C1份NHWC0/NC0HW在内存中连续排列成NC1HWC0，其格式转换示意图如下图所示。
 
-    ![](../../../figures/nc1hwc0.png)
+    <img src="../../../figures/nc1hwc0.png" alt="" width="600px" height="380px">
 
     -   NHWC -\> NC1HWC0的转换公式如下：
 
@@ -271,7 +271,7 @@
 
     NDHWC -\> NDC1HWC0的转换过程为：将数据在C维度进行分割，变成C1份NDHWC0，再将C1份NDHWC0在内存中连续排列成NDC1HWC0，其格式转换示意图如下图所示。
 
-    ![](../../../figures/NDC1HWC0.png)
+    <img src="../../../figures/NDC1HWC0.png" alt="" width="600px" height="331px">
 
 -   **FRACTAL\_Z\_3D**
 
@@ -292,19 +292,19 @@
 
     输入一个NDHWC格式的Tensor，Shape大小为\(48, 2, 2, 2, 32\)：
 
-    ![](../../../figures/fig_3d_1.png)
+    <img src="../../../figures/fig_3d_1.png" alt="" width="300px" height="311px">
 
     转换后，得到FRACTAL\_Z\_3D格式如下所示：
 
-    ![](../../../figures/fig_3d_2.png)
+    <img src="../../../figures/fig_3d_2.png" alt="" width="300px" height="725px">
 
 ## Matmul高阶API相关格式<a name="section34223918570"></a>
 
 -   **BSH/SBH**：B：Batch，批处理的大小； S：sequence length，序列长度；H = N \* D，其中，N为head的数量，D为head的大小，此格式通常用于Matmul矩阵乘。数据排布格式如下图所示：
 
-    ![](../../../figures/skip_write.png)
+    <img src="../../../figures/skip_write.png" alt="" width="600px" height="255px">
 
-    ![](../../../figures/skip_write_27.png)
+    <img src="../../../figures/skip_write_27.png" alt="" width="920px" height="220px">
 
 -   **BMNK**：通用数据格式；B：Batch，批处理的大小；M、N、K为矩阵乘\[M, K\]\*\[K, N\]的矩阵维度；其数据排布格式如下：
 
@@ -327,13 +327,13 @@
 
     ND-\>ND\_ALIGN变换过程如下图所示，假设矩阵乘结果矩阵C的数据类型是int32\_t，输出到Unified Buffer（UB，VECOUT），原矩阵N方向没有32字节对齐，设置ND\_ALIGN后则在其后补0，将其对齐到32字节。
 
-    ![](../../../figures/nd2nz.png)
+    <img src="../../../figures/nd2nz.png" alt="" width="920px" height="591px">
 
 <a name="li51557161818"></a>
 -   **VECTOR**：VECTOR是[GEMV](../../../operator_practice/simd_operator_impl/matrix_advanced_api/feature_scenarios/matrix_vector_multiply.md)（矩阵向量乘，General Matrix-Vector Multiply）场景使用的一种数据格式，配置矩阵为VECTOR数据排布格式即代表输入数据是一个向量。
 
     **图2**  GEMV场景输入Vector格式的A矩阵示意图<a name="fig172015331814"></a>  
-    ![](../../../figures/gemv_vec_a.png "GEMV场景输入Vector格式的A矩阵示意图")
+    <img src="../../../figures/gemv_vec_a.png" alt="GEMV场景输入Vector格式的A矩阵示意图" width="600px" height="155px">
 
 ## COLUMN\_MAJOR<a name="section14365456143720"></a>
 
@@ -344,6 +344,6 @@ ND数据排布格式也称为ROW\_MAJOR（行优先），相应的有COLUMN\_MAJ
 
 两种数据排布格式的示意图如下所示。
 
-![](../../../figures/row_major.png)
+<img src="../../../figures/row_major.png" alt="" width="300px" height="165px">
 
-![](../../../figures/col_major.png)
+<img src="../../../figures/col_major.png" alt="" width="300px" height="166px">
