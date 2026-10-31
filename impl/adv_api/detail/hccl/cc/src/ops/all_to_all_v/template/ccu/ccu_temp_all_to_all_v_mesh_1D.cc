@@ -67,17 +67,19 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     } else if (!topoInfo->level0PcieMix) {
         // 对齐 hccl CcuTempAlltoAllVMesh1D::CalcChannelRes：非 pcieMix 的 MESH_1D_CLOS 走 MultiJetty
-        // 建链（mesh 链优先，无 mesh 链取端口对等 CLOS 链），与 CcuSchedAllToAllMesh1DMultiJetty 同款
+        // 建链（mesh 链优先，无 mesh 链取端口对等 CLOS 链），与 CcuSchedAllToAllMesh1DMultiJetty 同款。
+        // builder 自滤 UBC_CTP，无需协议校验（hccl 同分支亦无校验）
         CHK_RET(CalcChannelRequestMeshClosMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
     } else {
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
             comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
-    }
-    for (const auto& channel : channelDescs) {
-        CHK_PRT_RET(
-            channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
-            HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].", channel.channelProtocol),
-            HCCL_E_INTERNAL);
+        // 存量防御（a102ac5eea）：WithPriorityTopo 不滤协议，pcie 混插下可能选出非 CTP 链
+        for (const auto& channel : channelDescs) {
+            CHK_PRT_RET(
+                channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
+                HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].", channel.channelProtocol),
+                HCCL_E_INTERNAL);
+        }
     }
     CHK_PRT_RET(
         channelDescs.size() + 1U != tempRankSize_,
