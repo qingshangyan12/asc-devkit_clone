@@ -42,19 +42,9 @@
 
 ```cpp
 template <typename DstType,
-          const cast_options& opt = default_cast_ops,
+          const cast_options& opt,
           typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src)
-```
-
-默认配置为：
-
-```cpp
-constexpr cast_options default_cast_ops = {
-    cast_layout::zero,
-    cast_round_mode::rint,
-    cast_sat_mode::not_sat
-};
+__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src)
 ```
 
 ## 参数说明
@@ -64,7 +54,7 @@ constexpr cast_options default_cast_ops = {
 | 参数名 | 描述 |
 | --- | --- |
 | `DstType` | 目的元素类型，必须与`SrcType`不同。支持的数据类型组合请参考[数据类型](#数据类型)。 |
-| `opt` | `cast_options`类型的编译期常量，默认值为`default_cast_ops`。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
+| `opt` | 需显式指定的`cast_options`类型编译期常量。不同转换支持的配置组合请参考[数据类型](#数据类型)。 |
 | `SrcType` | 源元素类型，由函数实参自动推导，无需显式指定。 |
 
 **表2** 参数说明
@@ -77,12 +67,12 @@ constexpr cast_options default_cast_ops = {
 
 | 配置项 | 取值和说明 |
 | --- | --- |
-| `layout` | [cast_layout](../aux_data_types/cast_layout.md)类型，支持`cast_layout::zero`、`cast_layout::one`、`cast_layout::two`、`cast_layout::three`，分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由源、目的类型的位宽比决定；同位宽转换仅支持`zero`。 |
-| `round` | [cast_round_mode](../aux_data_types/cast_round_mode.md)类型，支持`cast_round_mode::rint`：舍入到最近值，正好位于中间值时舍入到偶数；`cast_round_mode::round`：舍入到最近值，正好位于中间值时远离0；`cast_round_mode::floor`：向负无穷方向舍入；`cast_round_mode::ceil`：向正无穷方向舍入；`cast_round_mode::trunc`：向0方向舍入。仅在转换可能损失精度且对应组合支持该模式时生效。 |
-| `sat` | [cast_sat_mode](../aux_data_types/cast_sat_mode.md)类型，支持`cast_sat_mode::not_sat`：非饱和模式，超出范围时按目标格式截断或保留该浮点格式支持的特殊值；`cast_sat_mode::sat`：饱和模式，超出范围时钳位到目的类型边界。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
+| `layout` | [cast_layout](../aux_data_types/cast_layout.md)类型，`zero`、`one`、`two`、`three`分别表示位宽较小的元素位于同组元素中的第0、1、2、3个位置。可用位置由位宽比决定；不需要选择位置的同位宽转换使用`unknown`。 |
+| `round` | [cast_round_mode](../aux_data_types/cast_round_mode.md)类型，`rint`表示舍入到最近偶数；`round`表示舍入到最近且中间值远离0；`floor`、`ceil`、`trunc`分别表示向负无穷、正无穷、0方向舍入；部分转换还支持`odd`或`hybrid`。无需选择舍入模式时使用`unknown`。 |
+| `sat` | [cast_sat_mode](../aux_data_types/cast_sat_mode.md)类型，`not_sat`表示非饱和模式，`sat`表示饱和模式；无需选择饱和模式时使用`unknown`。具体行为请参考[饱和与非饱和模式](#饱和与非饱和模式)。 |
 
 > [!NOTE]  
-> `default_cast_ops`仅表示接口的默认参数，不表示所有类型组合均支持该配置。若默认配置不在对应转换行的支持范围内，必须显式传入`cast_options`。
+> `cast_options{}`的三个字段默认为`unknown`，当前支持的转换均不接受三项同时为`unknown`,请根据类型组合设置对应字段。
 
 ## 数据类型
 
@@ -90,18 +80,20 @@ constexpr cast_options default_cast_ops = {
 
 | 源类型 → 目的类型 | `layout` | `round` | `sat` |
 | --- | --- | --- | --- |
-| `bfloat16_t → float`、`half → float`、`int16_t → float`、`int8_t → half`、`uint8_t → half`、`int16_t → int32_t`、`int32_t → int64_t`、`int8_t → int16_t`、`int16_t → uint32_t`、`uint16_t → uint32_t`、`uint8_t → uint16_t`、`hifloat8_t → half` | `zero`、`one` | `rint` | `not_sat` |
-| `int8_t → int32_t`、`uint8_t → uint32_t`、`hifloat8_t → float`、`int4x2_t → half`、`int4x2_t → int16_t`、`int4x2_t → bfloat16_t`、`fp4x2_e1m2_t → bfloat16_t`、`fp4x2_e2m1_t → bfloat16_t`、`fp8_e4m3fn_t → float`、`fp8_e5m2_t → float` | `zero`、`one`、`two`、`three` | `rint` | `not_sat` |
-| `int32_t → int16_t`、`int64_t → int32_t`、`int16_t → uint8_t`、`int32_t → uint16_t`、`uint32_t → int16_t`、`uint16_t → uint8_t`、`uint32_t → uint16_t` | `zero`、`one` | `rint` | `not_sat`、`sat` |
-| `float → bfloat16_t`、`bfloat16_t → int32_t`、`float → half`、`float → int16_t`、`float → int64_t`、`half → int8_t`、`half → uint8_t` | `zero`、`one` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
-| `int32_t → uint8_t`、`uint32_t → uint8_t`、`float → fp8_e4m3fn_t`、`float → fp8_e5m2_t` | `zero`、`one`、`two`、`three` | `rint` | `not_sat`、`sat` |
-| `half → bfloat16_t`、`int32_t → float`、`int16_t → half` | `zero` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat` |
-| `bfloat16_t → half`、`float → int32_t`、`half → int16_t` | `zero` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
-| `bfloat16_t → fp4x2_e1m2_t`、`bfloat16_t → fp4x2_e2m1_t` | `zero`、`one`、`two`、`three` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat` |
-| `int64_t → float`、`half → int32_t` | `zero`、`one` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat` |
-| `float → hifloat8_t` | `zero`、`one`、`two`、`three` | `round` | `not_sat`、`sat` |
-| `half → int4x2_t` | `zero`、`one`、`two`、`three` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
-| `half → hifloat8_t` | `zero`、`one` | `round` | `not_sat`、`sat` |
+| `bfloat16_t → float`、`half → float`、`int16_t → float`、`int8_t → half`、`uint8_t → half`、`int16_t → int32_t`、`int32_t → int64_t`、`int8_t → int16_t`、`int16_t → uint32_t`、`uint16_t → uint32_t`、`uint8_t → uint16_t`、`hifloat8_t → half` | `zero`、`one` | `unknown` | `unknown` |
+| `float → bfloat16_t`、`bfloat16_t → int32_t`、`float → int16_t`、`float → int64_t`、`half → int8_t`、`half → uint8_t` | `zero`、`one` | `floor`、`rint`、`round`、`ceil`、`trunc` | `not_sat`、`sat` |
+| `bfloat16_t → half`、`float → int32_t`、`half → int16_t` | `unknown` | `floor`、`rint`、`round`、`ceil`、`trunc` | `not_sat`、`sat` |
+| `half → bfloat16_t`、`int32_t → float`、`int16_t → half` | `unknown` | `floor`、`rint`、`round`、`ceil`、`trunc` | `unknown` |
+| `float → half` | `zero`、`one` | `floor`、`rint`、`round`、`ceil`、`trunc`、`odd` | `not_sat`、`sat` |
+| `int64_t → float`、`half → int32_t` | `zero`、`one` | `floor`、`rint`、`round`、`ceil`、`trunc` | `unknown` |
+| `int32_t → int16_t`、`int64_t → int32_t`、`int16_t → uint8_t`、`int32_t → uint16_t`、`uint32_t → int16_t`、`uint16_t → uint8_t`、`uint32_t → uint16_t` | `zero`、`one` | `unknown` | `not_sat`、`sat` |
+| `int8_t → int32_t`、`uint8_t → uint32_t`、`hifloat8_t → float`、`int4x2_t → half`、`int4x2_t → int16_t`、`fp4x2_e1m2_t → bfloat16_t`、`fp4x2_e2m1_t → bfloat16_t`、`int4x2_t → bfloat16_t`、`fp8_e4m3fn_t → float`、`fp8_e5m2_t → float` | `zero`、`one`、`two`、`three` | `unknown` | `unknown` |
+| `int32_t → uint8_t`、`uint32_t → uint8_t` | `zero`、`one`、`two`、`three` | `unknown` | `not_sat`、`sat` |
+| `float → hifloat8_t` | `zero`、`one`、`two`、`three` | `round`、`hybrid` | `not_sat`、`sat` |
+| `half → hifloat8_t` | `zero`、`one` | `round`、`hybrid` | `not_sat`、`sat` |
+| `half → int4x2_t` | `zero`、`one`、`two`、`three` | `floor`、`rint`、`round`、`ceil`、`trunc` | `not_sat`、`sat` |
+| `float → fp8_e4m3fn_t`、`float → fp8_e5m2_t` | `zero`、`one`、`two`、`three` | `rint` | `not_sat`、`sat` |
+| `bfloat16_t → fp4x2_e1m2_t`、`bfloat16_t → fp4x2_e2m1_t` | `zero`、`one`、`two`、`three` | `floor`、`rint`、`round`、`ceil`、`trunc` | `unknown` |
 
 `cast`支持的类型为寄存器元素类型，对于`int4x2_t`相关的转换，可以通过从UB中的元素类型为`int4b_t`的Tensor搬入后，使用返回的`reg_tensor<int4x2_t>`参与转换；`cast<int4x2_t>`的结果可通过`store`写入`int4b_t` Tensor。
 
@@ -122,7 +114,7 @@ constexpr cast_options default_cast_ops = {
 
 舍入模式只在转换可能损失精度时影响结果。例如，浮点转整数、宽浮点转窄浮点以及`int32_t`或`int64_t`转`float`可能需要舍入；精确扩宽转换虽然在类型表中以`rint`表示固定配置，但不会额外改变精确结果。必须使用[数据类型](#数据类型)表中对应转换支持的模式，不支持的模式会在编译期报错。
 
-`float`或`half`转换为`hifloat8_t`仅支持`cast_round_mode::round`，不支持其他舍入配置。
+`float`或`half`转换为`hifloat8_t`支持`cast_round_mode::round`和`cast_round_mode::hybrid`。
 
 ### cast_layout与位宽变化<a name="cast_layout与位宽变化"></a>
 
@@ -168,7 +160,7 @@ int4b_t在寄存器上以两个逻辑元素打包为一个字节，内存Tensor�
 constexpr asc::te::experimental::cast_options f16ToS32Options = {
     asc::te::experimental::cast_layout::zero,
     asc::te::experimental::cast_round_mode::floor,
-    asc::te::experimental::cast_sat_mode::not_sat
+    asc::te::experimental::cast_sat_mode::unknown
 };
 
 template <typename SrcTensor, typename DstTensor>
