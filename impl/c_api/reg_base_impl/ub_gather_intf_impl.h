@@ -318,6 +318,7 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
@@ -451,6 +452,7 @@ __simd_callee__ inline void asc_gather_datablock(
         vgatherb(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -697,6 +699,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
 {
     vector_int8_t dst;
@@ -808,6 +811,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_
     asc_gather_datablock(dst, src, index);
     return dst;
 }
+#endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90300000)
 __simd_callee__ inline void asc_gather(

@@ -29,6 +29,7 @@
 namespace AscendC {
 namespace Std {
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 #define STD_INT_NAMED_BINARY_FN(OP, CMP)                                                 \
     template <auto t, auto u>                                                            \
     ASCENDC_HOST_AICORE inline constexpr Int<(CMP ? t : u)> OP(Int<t>, Int<u>)           \
@@ -71,6 +72,7 @@ STD_INT_BINARY_FN(divide, (t / u));
 STD_INT_BINARY_FN(ceil_division, ((t + u - 1) / u));
 STD_INT_BINARY_FN(ceil_align, (((t + u - 1) / u) * u));
 #undef STD_INT_BINARY_FN
+#endif
 
 } // namespace Std
 } // namespace AscendC
