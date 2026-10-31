@@ -180,7 +180,7 @@
 
 | API Name | Description |
 | --- | --- |
-| [AIN Communication](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/zh/api/aicore/ain/README.md) | Orchestrates one-sided communication tasks on the AI Core. |
+| [AIN Communication](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/en/api/aicore/ain/README.md) | Orchestrates one-sided communication tasks on the AI Core. |
 
 ## Convolution Computation
 

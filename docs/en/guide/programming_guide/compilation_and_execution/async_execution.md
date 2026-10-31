@@ -65,4 +65,4 @@ The invocation of a kernel function is asynchronous. After the kernel function i
 |`aclrtSynchronizeStream()` |Blocks the current thread on the host until all operations in the specified stream are complete. |
 
 ## More Advanced Runtime Features
-For more Runtime programming methods and APIs, see [Application Development](https://gitcode.com/cann/docs/blob/9.2.0/docs/zh/app-dev/README.md).
+For more Runtime programming methods and APIs, see [Application Development](https://gitcode.com/cann/docs/blob/9.2.0/docs/en/app-dev/README.md).

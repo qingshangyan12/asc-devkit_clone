@@ -2262,7 +2262,7 @@
                 -   [SetHcclContext](SIMD-API/adv_api/HCCL_communication/HCCL-Context/SetHcclContext.md)
                 -   [GetHcclContext](SIMD-API/adv_api/HCCL_communication/HCCL-Context/GetHcclContext.md)
 
-        -   [AIN communication<a name="sub_menu"></a>](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/zh/api/aicore/ain/README.md)
+        -   [AIN communication<a name="sub_menu"></a>](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/en/api/aicore/ain/README.md)
 
         -   [Convolution Computation](SIMD-API/adv_api/convolution_compute/convolution_compute.md)
             -   [Conv3D Kernel-Side APIs](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3d_Kernel.md)
@@ -3462,7 +3462,7 @@
     -   [SIMT API Soft Simulation Summary](appendix/SIMT_interface_soft_simulation_summary.md)
     -   [SIMT API Precision Standard Summary](appendix/SIMT_interface_precision_standard_summary.md)
     -   [SIMT Instruction Theoretical Performance Summary](appendix/SIMT_instruction_theoretical_perf_summary.md)
-    -   [Reserved APIs](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/zh/api/reserve.md)
+    -   [Reserved APIs](https://gitcode.com/cann/asc-comm/blob/9.2.0/docs/en/api/reserve.md)
     -   [Deprecated APIs](appendix/deprecated_interface.md)
     -   [API Change Description](appendix/interface_change_description.md)
     -   [Release Notes](appendix/Release_Notes/release_notes.md)

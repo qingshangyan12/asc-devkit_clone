@@ -8,7 +8,7 @@
 
 The relationship between the number of thread blocks and the number of physical cores affects scheduling overhead: when the number of thread blocks ≤ the number of physical cores, all thread blocks can occupy all physical cores at once and execute in parallel, so fewer thread blocks need to be launched and scheduled, and the fixed overhead is limited. When the number of thread blocks > the number of physical cores, the thread blocks exceeding the number of physical cores must wait for the preceding thread blocks to finish execution before being scheduled. The number of thread blocks that need to be launched and scheduled continues to increase, the fixed overhead of launching and scheduling multiple thread blocks begins to accumulate noticeably, and the scheduling overhead rises as the number of thread blocks increases.
 
-The number of physical cores can be queried at runtime through [aclrtGetDeviceInfo](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/04_device_management.md#aclrtGetDeviceInfo).
+The number of physical cores can be queried at runtime through [aclrtGetDeviceInfo](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/04_device_management.md#aclrtGetDeviceInfo).
 > Note: In the following two scenarios, the measured number of physical cores is 64.
 
 After determining the number of physical cores, you also need to set the number of thread blocks based on the data size.

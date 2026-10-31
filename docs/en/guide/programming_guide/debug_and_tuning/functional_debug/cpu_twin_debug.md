@@ -6,7 +6,7 @@ This section describes the methods for CPU domain debugging: verifying kernel fu
 
 >[!NOTE] Note
 >During CPU debugging, configuring log-related environment variables can record the program execution process and exception information, which helps developers perform functional debugging.
->For usage constraints and detailed descriptions of environment variables, see the "Auxiliary Functions \> Logging" section in [Environment Variable Reference](https://gitcode.com/cann/docs/blob/9.2.0/docs/zh/env-vars/README.md).
+>For usage constraints and detailed descriptions of environment variables, see the "Auxiliary Functions \> Logging" section in [Environment Variable Reference](https://gitcode.com/cann/docs/blob/9.2.0/docs/en/env-vars/README.md).
 
 ## Verifying Kernel Functions on the CPU Side<a name="section1227643165914"></a>
 

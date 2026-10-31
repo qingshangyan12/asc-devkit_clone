@@ -65,7 +65,7 @@ The parameters in `<<<...>>>` are the execution configuration of the kernel func
 
 -   numBlocks: specifies the number of cores on which the kernel function will execute. For different hardware architectures and operator types, the setting rules of numBlocks differ. For details, see [Kernel Function Configuration](../../language_extension/simd_builtin_keywords.md#kernel-function-configuration). Each core that executes the kernel function is assigned a logical ID, that is, block\_idx, which can be obtained using the built-in variable [block_idx](../../language_extension/simd_builtin_keywords.md#built-in-variables) in the kernel function implementation. Note that when the `__mix__` function execution space qualifier is used, the block_idx values of the Vector Cores on the same core are the same. For details and examples, see [Built-in Variables](../../language_extension/simd_builtin_keywords.md#built-in-variables);
 -   dynUBufSize: Dynamic Unified Buffer (UB) Size, which configures the size of the space for UB dynamic memory allocation (UB only, excluding L1 Buffer and others), in bytes. The default value is 0;
--   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the device in the order in which they are called in the application code. The default value is nullptr. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+-   stream: of the aclrtStream type. stream is used to maintain the execution order of some asynchronous operations, ensuring that they are executed on the device in the order in which they are called in the application code. The default value is nullptr. For stream creation and other management APIs, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
 
 The following kernel function named add\_custom implements the addition of two vectors. The call example is as follows:
 
@@ -87,7 +87,7 @@ The call of a kernel function is asynchronous. After the call of the kernel func
 aclError aclrtSynchronizeStream(aclrtStream stream);
 ```
 
-For details about how to use aclrtSynchronizeStream, see [*Runtime API*](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+For details about how to use aclrtSynchronizeStream, see [*Runtime API*](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
 
 ## Blocks Index Built-in Variables
 

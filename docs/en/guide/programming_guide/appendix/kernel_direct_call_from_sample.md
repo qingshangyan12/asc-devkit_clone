@@ -172,7 +172,7 @@ The following code uses the add\_custom operator with a fixed shape as an exampl
     >```
     >- kernel\_name: name of the operator kernel function.
     >- numBlocks: specifies the number of cores on which the kernel function will be executed. Each core that executes the kernel function is assigned a logical ID, that is, block\_idx, which can be obtained by calling [GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md) in the kernel function implementation.
-    >- stream, of the aclrtStream type, is used to maintain the execution order of some asynchronous operations to ensure that they are executed on the device in the order in which they are called in the application program. For APIs for stream management such as stream creation, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md).
+    >- stream, of the aclrtStream type, is used to maintain the execution order of some asynchronous operations to ensure that they are executed on the device in the order in which they are called in the application program. For APIs for stream management such as stream creation, see [Runtime API](https://gitcode.com/cann/runtime/blob/9.2.0/docs/en/api_ref/README.md).
     >- argument list: parameter list, which must be consistent with the parameter list of the kernel function.
 
 ## Writing the CMake Compilation Configuration File<a name="section185111259496"></a>
