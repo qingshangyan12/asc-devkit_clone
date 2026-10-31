@@ -32,7 +32,7 @@ template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
 {
     static_assert(
-        SupportType<T, half>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half");
+        SupportType<T, half, int16_t>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half/int16_t");
     const Hardware eleWiseHWPos = GetPhyType((TPosition)eleWiseTensor.GetPosition());
     if (eleWiseHWPos != Hardware::L1) {
         ASCENDC_CHECK_TPOSITION(
@@ -74,7 +74,7 @@ __aicore__ inline void SetFixPipeConfigImpl(const LocalTensor<T>& preTensor, boo
     set_fpc(config);
 }
 
-__aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
+__aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
 {
     // ND_PARA[63:32], dst nd stride in unit of element
     // ND_PARA[31:16], src nd stride in uint of C0_SIZE
