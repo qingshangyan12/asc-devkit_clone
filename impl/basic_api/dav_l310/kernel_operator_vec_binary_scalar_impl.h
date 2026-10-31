@@ -759,7 +759,7 @@ __aicore__ inline void SubsImpl(
     __ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Subs not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Subs not support current datatype!");
     constexpr auto func = RegSubs::Subs<T, Reg::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(
         dst, src, scalarValue, mask, 0, repeatTime, repeatParams);
@@ -770,7 +770,7 @@ __aicore__ inline void SubsImpl(
     __ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Subs not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Subs not support current datatype!");
     constexpr auto func = RegSubs::Subs<T, Reg::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(
         dst, src, scalarValue, nullptr, mask, repeatTime, repeatParams);
@@ -781,7 +781,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void SubsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const int32_t& calCount)
 {
     static_assert(
-        (SupportType<T, half, bfloat16_t, float, int16_t, int32_t, int64_t, uint64_t>()),
+        (SupportType<T, half, float, int16_t, int32_t>()),
         "Subs not support current datatype!");
     if constexpr (SupportBytes<T, 8>()) {
         constexpr auto func = RegSubs::Subs<T, Reg::RegTensor<T, Reg::RegTraitNumTwo>>;
@@ -881,7 +881,7 @@ __aicore__ inline void DivsImpl(
 template <typename T, bool isSetMask = true>
 __aicore__ inline void DivsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const int32_t& calCount)
 {
-    static_assert((SupportType<T, half, float, int64_t, uint64_t>()), "Divs not support current datatype!");
+    static_assert((SupportType<T, half, float>()), "Divs not support current datatype!");
     if constexpr (SupportBytes<T, 8>()) {
         constexpr auto func = RegDivs::Divs<T, Reg::RegTensor<T, Reg::RegTraitNumTwo>>;
         Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
