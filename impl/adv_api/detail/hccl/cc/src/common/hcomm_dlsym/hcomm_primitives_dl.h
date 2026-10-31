@@ -96,6 +96,9 @@ DECL_WEAK_FUNC(
 DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
 
 bool Mc2HcommIsSupportAicpuTsTaskCache(void);
+bool Mc2HcommHasReplayV1(void);
+int32_t Mc2HcommReplayV1(
+    uint32_t action, void** handle, void** addrs, uint64_t* sizes, uint32_t count, uint64_t* bytes);
 int32_t Mc2HcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit);
 int32_t Mc2HcommAicpuTsTaskCacheStart(const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
 int32_t Mc2HcommAicpuTsTaskCacheEnd(const char* tag);

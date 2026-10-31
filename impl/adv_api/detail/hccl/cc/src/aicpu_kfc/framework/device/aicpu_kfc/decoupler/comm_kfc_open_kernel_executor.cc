@@ -176,12 +176,12 @@ HcclResult LaunchOpenOpParamDataImpl(
         static_cast<unsigned long long>(inputBegin + inputBytes), static_cast<unsigned long long>(outputBegin),
         static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather, static_cast<u32>(param->engine));
 
-    CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
-
     const bool useCannBridge = false;
     if (useCannBridge) {
-        HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
-            *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
+        HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
+            CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+            return mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+        });
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -191,13 +191,14 @@ HcclResult LaunchOpenOpParamDataImpl(
         return HCCL_SUCCESS;
     }
 
-    auto executor =
-        mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
-    CHK_SMART_PTR_NULL(executor);
-
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
-    HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(
-        *param, resCtx, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
+    HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(*param, resCtx, [&]() -> HcclResult {
+        CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+        auto executor =
+            mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
+        CHK_SMART_PTR_NULL(executor);
+        return executor->Orchestrate(*param, resCtx);
+    });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;
