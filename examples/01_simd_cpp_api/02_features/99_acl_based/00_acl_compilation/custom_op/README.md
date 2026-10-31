@@ -119,8 +119,6 @@ $$
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">leaky_relu_custom</td></tr>
   </table>
 
-LeakyRelu 使用每块 64 个元素的静态 Tensor，Host 根据输入元素总数计算分块次数。当前样例要求输入元素总数为 2048（8 个核 × 2 × 64）的正整数倍。
-
 ## 代码实现介绍
 
 - Add</br>
