@@ -100,6 +100,7 @@ def _configure(tmp_path, kernel_args, options="", binary_json=None):
 project(binary_json_test NONE)
 set(ASCEND_PYTHON_EXECUTABLE "python3")
 set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR.as_posix()}")
+set(CUSTOM_COMPILE_OPTIONS "custom_compile_options.ini")
 set(CUSTOM_OPC_OPTIONS "custom_opc_options.ini")
 file(MAKE_DIRECTORY "${{CMAKE_BINARY_DIR}}/autogen")
 file(WRITE "${{CMAKE_BINARY_DIR}}/autogen/custom_opc_options.ini" "")
@@ -150,6 +151,36 @@ def test_without_kernel_json_option_keeps_existing_path(tmp_path):
     assert (build_dir / "autogen/custom_opc_options.ini").read_text() == ""
 
 
+def test_auto_sync_log_path_is_kept_as_compile_option(tmp_path):
+    result, _, build_dir = _configure(
+        tmp_path,
+        "OP_TYPE AddCustomTemplate KERNEL_FILE kernel.cpp",
+        """npu_op_kernel_options(ascendc_kernels AddCustomTemplate
+    OPTIONS -g --cce-auto-sync-log=${CMAKE_CURRENT_BINARY_DIR}/room.log
+)""",
+    )
+
+    assert result.returncode == 0, result.stdout
+    assert (build_dir / "autogen/custom_compile_options.ini").read_text() == (
+        f"AddCustomTemplate,,-g;--cce-auto-sync-log={build_dir / 'room.log'}\n"
+    )
+
+
+def test_auto_sync_log_path_with_regular_filename(tmp_path):
+    result, _, build_dir = _configure(
+        tmp_path,
+        "OP_TYPE AddCustomTemplate KERNEL_FILE kernel.cpp",
+        """npu_op_kernel_options(ascendc_kernels AddCustomTemplate
+    OPTIONS -g --cce-auto-sync-log=${CMAKE_CURRENT_BINARY_DIR}/diag.log
+)""",
+    )
+
+    assert result.returncode == 0, result.stdout
+    assert (build_dir / "autogen/custom_compile_options.ini").read_text() == (
+        f"AddCustomTemplate,,-g;--cce-auto-sync-log={build_dir / 'diag.log'}\n"
+    )
+
+
 def test_custom_codegen_options_follow_current_configuration(tmp_path):
     opbuild = tmp_path / "cann/tools/opbuild/op_build"
     opbuild.parent.mkdir(parents=True)
@@ -158,6 +189,7 @@ def test_custom_codegen_options_follow_current_configuration(tmp_path):
     (tmp_path / "CMakeLists.txt").write_text(
         f'''cmake_minimum_required(VERSION 3.16)
 project(codegen_options NONE)
+find_program(TRUE_EXECUTABLE true REQUIRED)
 include("{FWK_MODULES_DIR / "func.cmake"}")
 set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR}")
 set(ASCEND_CANN_PACKAGE_PATH "{tmp_path}/cann")
@@ -165,13 +197,13 @@ set(CUSTOM_COMPILE_OPTIONS custom_compile_options.ini)
 set(CUSTOM_OPC_OPTIONS custom_opc_options.ini)
 set(custom_out "${{CMAKE_BINARY_DIR}}/custom autogen")
 file(MAKE_DIRECTORY "${{custom_out}}")
-set(ASCEND_PYTHON_EXECUTABLE /bin/true)
+set(ASCEND_PYTHON_EXECUTABLE "${{TRUE_EXECUTABLE}}")
 npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}")
 set(ASCEND_PYTHON_EXECUTABLE python3)
 if(OPTION_VALUE)
   npu_op_kernel_options(kernel ALL OPTIONS "-DVALUE=${{OPTION_VALUE}}" "--kernel-json-file=${{OPTION_VALUE}}.json")
 endif()
-set(ASCEND_PYTHON_EXECUTABLE /bin/true)
+set(ASCEND_PYTHON_EXECUTABLE "${{TRUE_EXECUTABLE}}")
 npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}/.")
 '''
     )
