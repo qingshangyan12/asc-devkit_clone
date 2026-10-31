@@ -2437,7 +2437,21 @@ static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
         insNum != 1, HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
         HCCL_E_INTERNAL);
     insEntity = reinterpret_cast<void*>(insHandle);
-    HCCL_INFO("[QueryCcuInstanceEntity] entity[%p].", insEntity);
+    // 诊断日志（非校验）：回显实体各 die 的资源空间视图，用于定位 XN 基址推导类问题。
+    const auto* entity = static_cast<const HcommCcuInstanceEntity*>(insEntity);
+    HCCL_INFO("[QueryCcuInstanceEntity] entity[%p], ccuDieNum[%u], ccuVersion[%u].", insEntity, entity->ccuDieNum,
+        entity->ccuVersion);
+    for (uint32_t dieIdx = 0; dieIdx < entity->ccuDieNum && dieIdx < 8U; dieIdx++) {
+        const auto& dieRes = entity->ccuDieReses[dieIdx];
+        if (dieRes.dieMetadata == nullptr) {
+            HCCL_INFO("[QueryCcuInstanceEntity] die[%u] disabled.", dieIdx);
+            continue;
+        }
+        const auto& rma = dieRes.dieMetadata->ccuResBuffer.bufferInfo.rma;
+        HCCL_INFO("[QueryCcuInstanceEntity] die[%u] enabled[%u] rmaAddr[0x%llx] rmaSize[0x%llx] loopCh[%u].", dieIdx,
+            dieRes.dieMetadata->enabled, static_cast<unsigned long long>(rma.addr),
+            static_cast<unsigned long long>(rma.size), dieRes.dieMetadata->loopChannelId);
+    }
     return HCCL_SUCCESS;
 }
 #endif
