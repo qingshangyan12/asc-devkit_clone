@@ -76,7 +76,7 @@ __simd_vf__ inline void MulCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ 
 {
     static_assert(
         SupportType<
-            Tuple<T, U>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int32_t, int64_t>, Tuple<float, int64_t>>(),
+            Tuple<T, U>, Tuple<int8_t, half>, Tuple<uint8_t, half>>(),
         "Failed to check dtype in MulCast, current api support dtype combination is src: "
         "half, dst: int8_t, uint8_t; src: int64_t, dst: int32_t / float.");
     uint32_t sreg = static_cast<uint32_t>(calCount);
