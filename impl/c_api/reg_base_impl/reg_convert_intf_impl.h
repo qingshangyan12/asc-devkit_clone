@@ -436,6 +436,7 @@ __simd_callee__ inline vector_half asc_float2half_rz_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_bfloat162half_rd(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -505,6 +506,7 @@ __simd_callee__ inline void asc_bfloat162half_rz_sat(vector_half& dst, vector_bf
         vcvt(dst, src, mask, RS_ENABLE, ROUND_Z, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_uint322int16(
     vector_int16_t& dst, vector_uint32_t src, vector_bool mask,
@@ -574,6 +576,7 @@ __simd_callee__ inline vector_int16_t asc_uint322int16_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_half2bfloat16_rd(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -768,6 +771,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn_sat(
     asc_float2e5m2_rn_sat(dst, src, mask, dst_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_half2float(
     vector_float& dst, vector_half src, vector_bool mask,
@@ -803,6 +807,7 @@ __simd_callee__ inline vector_float asc_half2float(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_e4m32float(
     vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -882,6 +887,7 @@ __simd_callee__ inline vector_float asc_e4m32float(
     asc_e4m32float(dst, src, mask, src_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_int162float(
     vector_float& dst, vector_int16_t src, vector_bool mask,
@@ -1145,6 +1151,7 @@ __simd_callee__ inline vector_uint8_t asc_int322uint8_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_bfloat162float(
     vector_float& dst, vector_bfloat16_t src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -1314,6 +1321,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat(
     asc_half2hif8_rna_sat(dst, src, mask, dst_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_half2int8_rd(
     vector_int8_t& dst, vector_half src, vector_bool mask,
@@ -1757,6 +1765,7 @@ __simd_callee__ inline vector_uint8_t asc_uint162uint8_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_hif82float(
     vector_float& dst, vector_hifloat8_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -1870,6 +1879,7 @@ __simd_callee__ inline vector_half asc_hif82half(
     asc_hif82half(dst, src, mask, src_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_uint82half(
     vector_half& dst, vector_uint8_t src, vector_bool mask,
@@ -2381,6 +2391,7 @@ __simd_callee__ inline vector_uint8_t asc_int162uint8_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_bfloat162int32_rn(
     vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -2720,6 +2731,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat(
     asc_bfloat162int32_rz_sat(dst, src, mask, src_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_half2int16_rn(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
@@ -3529,6 +3541,7 @@ __simd_callee__ inline vector_int16_t asc_float2int16_rz_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -4248,6 +4261,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat(
     asc_float2hif8_rna_sat(dst, src, mask, dst_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_ceil(vector_half& dst, vector_half src, vector_bool mask)
 {
@@ -4256,12 +4270,14 @@ __simd_callee__ inline void asc_ceil(vector_half& dst, vector_half src, vector_b
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ceil(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vtrc(dst, src, ROUND_C, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector_bool mask)
 {
@@ -4270,6 +4286,7 @@ __simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_e2m1x22bfloat16(
     vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -4349,6 +4366,7 @@ __simd_callee__ inline vector_bfloat16_t asc_e2m1x22bfloat16(
     asc_e2m1x22bfloat16(dst, src, mask, src_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_floor(vector_half& dst, vector_half src, vector_bool mask)
 {
@@ -4357,12 +4375,14 @@ __simd_callee__ inline void asc_floor(vector_half& dst, vector_half src, vector_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_floor(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vtrc(dst, src, ROUND_F, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_floor(vector_float& dst, vector_float src, vector_bool mask)
 {
@@ -4378,12 +4398,14 @@ __simd_callee__ inline void asc_rint(vector_half& dst, vector_half src, vector_b
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_rint(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vtrc(dst, src, ROUND_R, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_rint(vector_float& dst, vector_float src, vector_bool mask)
 {
@@ -4399,12 +4421,14 @@ __simd_callee__ inline void asc_round(vector_half& dst, vector_half src, vector_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_round(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vtrc(dst, src, ROUND_A, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_round(vector_float& dst, vector_float src, vector_bool mask)
 {
@@ -4420,12 +4444,14 @@ __simd_callee__ inline void asc_trunc(vector_half& dst, vector_half src, vector_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vtrc(dst, src, ROUND_Z, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask)
 {
@@ -4582,6 +4608,7 @@ __simd_callee__ inline vector_uint16_t asc_uint322uint16_sat(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_float2bfloat16_rd(
     vector_bfloat16_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
@@ -4921,6 +4948,7 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat(
     asc_float2bfloat16_rz_sat(dst, src, mask, dst_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_float2int64_rd(
     vector_int64_t& dst, vector_float src, vector_bool mask,
@@ -5432,6 +5460,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_e5m22float(
     vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -5671,6 +5700,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat(
     asc_float2e4m3_rn_sat(dst, src, mask, dst_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_int322int64(
     vector_int64_t& dst, vector_int32_t src, vector_bool mask,
@@ -5876,6 +5906,7 @@ __simd_callee__ inline vector_uint16_t asc_uint82uint16(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
@@ -6355,6 +6386,7 @@ __simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16(
     asc_e1m2x22bfloat16(dst, src, mask, src_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_int82int32(
     vector_int32_t& dst, vector_int8_t src, vector_bool mask,
@@ -6436,6 +6468,7 @@ __simd_callee__ inline vector_int32_t asc_int82int32(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rd(vector_half src, vector_bool mask)
 {
     vector_bfloat16_t dst;
@@ -6554,6 +6587,7 @@ __simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_i
         vcvt_s42bf16(dst, src, mask, PART_P0, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_int322float_rd(vector_float& dst, vector_int32_t src, vector_bool mask)
 {
@@ -6660,6 +6694,7 @@ __simd_callee__ inline vector_int16_t asc_half2int16_rz_sat(vector_half src, vec
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rd - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -6734,6 +6769,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector
         vcvt_f162s4(dst, src, mask, ROUND_A, RS_ENABLE, PART_P0, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
@@ -6770,12 +6806,14 @@ __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t s
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcvt_s42f16(dst, src, mask, PART_P0, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_float2int32_rd(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
@@ -6994,12 +7032,14 @@ __simd_callee__ inline vector_half asc_ceil(vector_half src, vector_bool mask)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_ceil(vector_bfloat16_t src, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_ceil(dst, src, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_ceil(vector_float src, vector_bool mask)
 {
@@ -7015,12 +7055,14 @@ __simd_callee__ inline vector_half asc_floor(vector_half src, vector_bool mask)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_floor(vector_bfloat16_t src, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_floor(dst, src, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_floor(vector_float src, vector_bool mask)
 {
@@ -7036,12 +7078,14 @@ __simd_callee__ inline vector_half asc_rint(vector_half src, vector_bool mask)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_rint(vector_bfloat16_t src, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_rint(dst, src, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_rint(vector_float src, vector_bool mask)
 {
@@ -7057,12 +7101,14 @@ __simd_callee__ inline vector_half asc_round(vector_half src, vector_bool mask)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_round(vector_bfloat16_t src, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_round(dst, src, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_round(vector_float src, vector_bool mask)
 {
@@ -7078,12 +7124,14 @@ __simd_callee__ inline vector_half asc_trunc(vector_half src, vector_bool mask)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_trunc(vector_bfloat16_t src, vector_bool mask)
 {
     vector_bfloat16_t dst;
     asc_trunc(dst, src, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_float asc_trunc(vector_float src, vector_bool mask)
 {
@@ -7092,6 +7140,7 @@ __simd_callee__ inline vector_float asc_trunc(vector_float src, vector_bool mask
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ==========vector_int4x2 position-aware conversion overloads==========
 __simd_callee__ inline void asc_half2int4x2_rd(
     vector_int4x2_t& dst, vector_half src, vector_bool mask,
@@ -8081,6 +8130,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rz_sat(
     asc_half2int4x2_rz_sat(dst, src, mask, dst_quarter_pos);
     return dst;
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_half& dst, vector_int16_t src, vector_bool mask,
@@ -8127,6 +8177,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_pos)
@@ -9074,6 +9125,7 @@ __simd_callee__ inline void asc_cast(
         vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P3, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_float& dst, vector_half src, vector_bool mask,
@@ -9093,6 +9145,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_pos)
@@ -9290,6 +9343,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_float& dst, vector_int16_t src, vector_bool mask,
@@ -9309,6 +9363,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_half& dst, vector_hifloat8_t src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -9326,6 +9381,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, PART_ODD, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_half& dst, vector_int8_t src, vector_bool mask,
@@ -9543,6 +9599,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_bfloat16_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
@@ -9807,6 +9864,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, ROUND_Z, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_float& dst, vector_int32_t src, vector_bool mask,
@@ -9953,6 +10011,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
@@ -10212,6 +10271,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, RS_ENABLE, ROUND_Z, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_half& dst, vector_float src, vector_bool mask,
@@ -10477,6 +10537,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_hifloat8_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode,
@@ -10740,6 +10801,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, ROUND_H, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_int16_t& dst, vector_float src, vector_bool mask,
@@ -11061,6 +11123,7 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
@@ -11280,6 +11343,7 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, ROUND_Z, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_cast(
     vector_int32_t& dst, vector_float src, vector_bool mask,

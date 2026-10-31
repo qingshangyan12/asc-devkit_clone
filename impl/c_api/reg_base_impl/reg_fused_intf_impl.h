@@ -199,6 +199,7 @@ __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vecto
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_madd(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -206,6 +207,7 @@ __simd_callee__ inline void asc_madd(
         vmadd(dst, src0, src1, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline vector_half asc_relu(vector_half src, vector_bool mask)
 {
@@ -303,6 +305,7 @@ __simd_callee__ inline void asc_mula(vector_half& dst, vector_half src0, vector_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_mula(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -310,6 +313,7 @@ __simd_callee__ inline void asc_mula(
         vmula(dst, src0, src1, mask, MODE_ZEROING);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_mula(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {

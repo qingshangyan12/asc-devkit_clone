@@ -84,6 +84,7 @@ __simd_callee__ inline void asc_squeeze_v2(vector_float& dst, vector_float src, 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_v2(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -123,6 +124,7 @@ __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e8m0_t& dst, vector_fp8_e8
         vsqz(dst, src, mask, MODE_STORED);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
@@ -188,6 +190,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_float& dst, vector_fl
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -227,6 +230,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e8m0_t& dst, vect
         vsqz(dst, src, mask, MODE_STORED);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_pack_to_low)
 __simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src)

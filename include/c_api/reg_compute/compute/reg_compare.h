@@ -53,9 +53,11 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_half src0, vector_ha
 
 __simd_callee__ inline vector_bool asc_ge(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_ge(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask);
 
@@ -75,7 +77,9 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_uint32_t src,
 
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask);
 
@@ -93,7 +97,9 @@ __simd_callee__ inline vector_bool asc_ge_scalar(vector_uint32_t src, uint32_t v
 
 __simd_callee__ inline vector_bool asc_ge_scalar(vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ge_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_bool asc_ge_scalar(vector_float src, float value, vector_bool mask);
 
@@ -129,9 +135,11 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_f
 
 __simd_callee__ inline vector_bool asc_le(vector_float src0, vector_float src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_le(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask);
 
@@ -165,9 +173,11 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_float src, fl
 
 __simd_callee__ inline vector_bool asc_le_scalar(vector_float src, float value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_le_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
@@ -189,9 +199,11 @@ __simd_callee__ inline void asc_eq(vector_bool& dst, vector_half src0, vector_ha
 
 __simd_callee__ inline vector_bool asc_eq(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_eq(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -225,9 +237,11 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_half src, hal
 
 __simd_callee__ inline vector_bool asc_eq_scalar(vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_eq_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
@@ -273,9 +287,11 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32_t src0, vector
 
 __simd_callee__ inline vector_bool asc_lt(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_lt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask);
 
@@ -285,9 +301,11 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int8_t src, i
 
 __simd_callee__ inline vector_bool asc_lt_scalar(vector_int8_t src, int8_t value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_lt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask);
 
@@ -345,15 +363,19 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector
 
 __simd_callee__ inline vector_bool asc_gt(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_gt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask);
 
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask);
 
@@ -371,7 +393,9 @@ __simd_callee__ inline vector_bool asc_gt_scalar(vector_uint8_t src, uint8_t val
 
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_int8_t src, int8_t value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
 
@@ -413,9 +437,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_half src0, vector_ha
 
 __simd_callee__ inline vector_bool asc_ne(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_bool asc_ne(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask);
 
@@ -437,7 +463,9 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_half src, hal
 
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_uint8_t src, uint8_t value, vector_bool mask);
 
@@ -455,7 +483,9 @@ __simd_callee__ inline vector_bool asc_ne_scalar(vector_half src, half value, ve
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_float src, float value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 #endif
 

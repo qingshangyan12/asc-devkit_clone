@@ -20,6 +20,7 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ==========asc_half2int4x2 merge mode conversion==========
 __simd_callee__ inline void asc_half2int4x2_rd_merge(
     vector_int4x2_t& dst, vector_half src, vector_bool mask,
@@ -389,6 +390,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_merge(
         vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P3, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_half2int8 merge mode conversion==========
 
@@ -564,6 +566,7 @@ __simd_callee__ inline void asc_half2int8_rz_sat_merge(
 
 // ==========asc_bfloat162e4m3 conversion==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rn - sat:dis/en
 __simd_callee__ inline void asc_bfloat162e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -791,9 +794,11 @@ __simd_callee__ inline vector_fp8_e6m2_t asc_bfloat162e6m2_rn(
     asc_bfloat162e6m2_rn(dst, src, mask, dst_pos);
     return dst;
 }
+#endif
 
 // ==========asc_bfloat162e8m0 conversion==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ru - sat:dis/en
 __simd_callee__ inline void asc_bfloat162e8m0_ru(
     vector_fp8_e8m0_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -921,9 +926,11 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_bfloat162e8m0_rz_sat(
     asc_bfloat162e8m0_rz_sat(dst, src, mask, dst_pos);
     return dst;
 }
+#endif
 
 // ==========asc_cast_merge half to int4x2==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rd - sat:dis/en
 __simd_callee__ inline void asc_cast_merge(
     vector_int4x2_t& dst, vector_half src, vector_bool mask,
@@ -1368,6 +1375,7 @@ __simd_callee__ inline void asc_cast_merge(
         vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P3, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_cast_merge half to int8==========
 
@@ -1598,6 +1606,7 @@ __simd_callee__ inline void asc_cast_merge(
 
 // ==========asc_cast/asc_cast_merge bfloat16 to e4m3==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rn - sat:dis/en
 __simd_callee__ inline void asc_cast(
     vector_fp8_e4m3fn_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -1686,9 +1695,11 @@ __simd_callee__ inline void asc_cast_merge(
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_cast/asc_cast_merge bfloat16 to e5m2==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rn - sat:dis/en
 __simd_callee__ inline void asc_cast(
     vector_fp8_e5m2_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -1777,9 +1788,11 @@ __simd_callee__ inline void asc_cast_merge(
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_cast bfloat16 to e6m2==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // rn - sat:dis
 __simd_callee__ inline void asc_cast(
     vector_fp8_e6m2_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -1800,9 +1813,11 @@ __simd_callee__ inline void asc_cast(
         vcvt_bf162e6m2(dst, src, mask, ROUND_R, PART_ODD, MODE_ZEROING);
     }
 }
+#endif
 
 // ==========asc_cast bfloat16 to e8m0==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ru - sat:dis/en
 __simd_callee__ inline void asc_cast(
     vector_fp8_e8m0_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -1892,6 +1907,7 @@ __simd_callee__ inline void asc_cast(
         vcvt_bf162e8m0(dst, src, mask, ROUND_Z, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
+#endif
 
 // ================asc_float2half_*_merge================
 __simd_callee__ inline void asc_float2half_rd_merge(
@@ -2375,6 +2391,7 @@ __simd_callee__ inline void asc_cast_merge(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ================asc_rcpe6m22bfloat16================
 __simd_callee__ inline void asc_rcpe6m22bfloat16(
     vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
@@ -3316,9 +3333,11 @@ __simd_callee__ inline void asc_float2hif8_rna_sat_merge(
         vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_P3, MODE_MERGING);
     }
 }
+#endif
 
 // ========== asc_cast_merge (9201 merging, void only) ==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ---------- asc_cast_merge PR-only overloads ----------
 __simd_callee__ inline void asc_cast_merge(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask,
@@ -4570,9 +4589,11 @@ __simd_callee__ inline void asc_e8m02bfloat16_v2(vector_bfloat16_t& dst, vector_
         vcvt_e8m02bf16(dst, src, mask, PART_ODD);
     }
 }
+#endif
 
 // ==========asc_cast/asc_cast_merge half to e4m3==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN>,
@@ -4660,9 +4681,11 @@ __simd_callee__ inline void asc_cast_merge(
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_cast/asc_cast_merge half to e5m2==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN>,
@@ -4750,9 +4773,11 @@ __simd_callee__ inline void asc_cast_merge(
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
     }
 }
+#endif
 
 // ==========asc_cast e6m2/e8m0 to bfloat16==========
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_cast(
     vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN>)
@@ -4788,6 +4813,7 @@ __simd_callee__ inline void asc_cast(
         vcvt_e8m02bf16(dst, src, mask, PART_ODD);
     }
 }
+#endif
 
 #endif
 

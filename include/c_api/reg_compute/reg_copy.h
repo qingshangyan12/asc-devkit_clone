@@ -41,7 +41,9 @@ __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, 
 
 __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask);
 
@@ -68,7 +70,9 @@ __simd_callee__ inline vector_uint32_t asc_mask(vector_uint32_t src, vector_bool
 
 __simd_callee__ inline vector_float asc_mask(vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_mask(vector_bfloat16_t src, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_bool asc_mask(vector_bool src, vector_bool mask);
 

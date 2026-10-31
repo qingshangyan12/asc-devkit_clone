@@ -52,6 +52,7 @@ __simd_callee__ inline void asc_storeunalign(
 __simd_callee__ inline void asc_storeunalign(
     __ubuf__ float* dst, vector_store_unalign& src0, vector_float src1, uint32_t count);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storeunalign(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1, uint32_t count);
 
@@ -75,6 +76,7 @@ __simd_callee__ inline void asc_storeunalign(
 
 __simd_callee__ inline void asc_storeunalign(
     __ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int8_t*& dst, vector_store_unalign& src0, vector_int8_t src1, uint32_t count);
@@ -103,6 +105,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ float*& dst, vector_store_unalign& src0, vector_float src1, uint32_t count);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_store_unalign& src0, vector_bfloat16_t src1, uint32_t count);
 
@@ -126,6 +129,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int4b_t*& dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint16_t*& dst, vector_store_unalign& src0, vector_bool src1);
@@ -160,6 +164,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ float* dst, vector_store_unalign& src0, vector_float src1, addr_reg& count);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1, addr_reg& count);
 
@@ -183,6 +188,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1, addr_reg& count);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src, int32_t offset);
 
@@ -349,6 +355,7 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ float* dst, vector_store_unalign& src0, vector_float src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1);
@@ -376,6 +383,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign_finalize)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src);

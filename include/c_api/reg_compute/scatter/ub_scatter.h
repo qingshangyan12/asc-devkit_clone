@@ -43,8 +43,10 @@ __simd_callee__ inline void asc_scatter(
 __simd_callee__ inline void asc_scatter(
     __ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_scatter(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask);
 
@@ -85,11 +87,13 @@ ASC_DEPRECATED(
 __simd_callee__ inline void asc_scatter(
     vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask);
+#endif
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask))

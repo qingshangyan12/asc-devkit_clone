@@ -85,6 +85,7 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(
     9.1.0, "2027/09/07",
     asc_scatter(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask))
@@ -95,6 +96,7 @@ __simd_callee__ inline void asc_scatter(
         vscatter(src, dst, index, mask);
     }
 }
+#endif
 
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask))

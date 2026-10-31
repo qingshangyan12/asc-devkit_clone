@@ -76,6 +76,7 @@ __simd_callee__ inline void asc_gather(vector_half& dst, vector_half src, vector
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index)
 {
     if ASC_IS_AIV {
@@ -110,6 +111,7 @@ __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t
         vselr(dst, src, index);
     }
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_gather(vector_int8_t src, vector_uint8_t index)
 {
@@ -167,6 +169,7 @@ __simd_callee__ inline vector_half asc_gather(vector_half src, vector_uint16_t i
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_gather(vector_bfloat16_t src, vector_uint16_t index)
 {
     vector_bfloat16_t dst;
@@ -201,6 +204,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather(vector_fp8_e8m0_t src, vecto
     asc_gather(dst, src, index);
     return dst;
 }
+#endif
 
 #endif
 
