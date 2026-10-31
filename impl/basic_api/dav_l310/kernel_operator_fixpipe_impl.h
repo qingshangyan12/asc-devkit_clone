@@ -268,14 +268,14 @@ __aicore__ inline void FixpipeL0cToL1(
         return copy_matrix_cc_to_cbuf_s4(
             (__cbuf__ void*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
+            static_cast<uint64_t>(intriParams.quantPre), 0, false, nz2ndEn,
             static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
             nz2dnEn);
     } else {
         return copy_matrix_cc_to_cbuf(
             (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
+            static_cast<uint64_t>(intriParams.quantPre), 0, false, nz2ndEn,
             static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
             nz2dnEn);
     }
@@ -316,14 +316,14 @@ __aicore__ inline void FixpipeL0cToUB(
         return copy_matrix_cc_to_ub_s4(
             (__ubuf__ void*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            static_cast<uint64_t>(intriParams.quantPre), 0,
             intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
             false, false, false, false, false, nz2dnEn);
     } else {
         return copy_matrix_cc_to_ub(
             (__ubuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            static_cast<uint64_t>(intriParams.quantPre), 0,
             intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
             false, false, false, false, false, nz2dnEn);
     }
@@ -402,14 +402,14 @@ __aicore__ inline void FixpipeL0cToOut(
         return copy_matrix_cc_to_gm_s4(
             (__gm__ void*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            static_cast<uint64_t>(intriParams.quantPre), 0,
             intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
             false, false, false, false, false, nz2dnEn);
     } else {
         return copy_matrix_cc_to_gm(
             (__gm__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            static_cast<uint64_t>(intriParams.quantPre), 0,
             intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
             false, false, false, false, false, nz2dnEn);
     }
