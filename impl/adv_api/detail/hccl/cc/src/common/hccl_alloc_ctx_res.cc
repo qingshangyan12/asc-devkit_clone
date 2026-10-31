@@ -299,6 +299,10 @@ HcclResult AllocWorkspaceMemory(HcclComm comm, const std::string& ctxTag, CommEn
     } else {
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), commEngine, memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+        if (commEngine == CommEngine::COMM_ENGINE_AICPU || commEngine == CommEngine::COMM_ENGINE_AICPU_TS) {
+            HcclApi::HcclMsgArea zeroMsgArea{};
+            CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagWorkSpace.c_str(), &zeroMsgArea, sizeof(zeroMsgArea), 0));
+        }
     }
     HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
     return HCCL_SUCCESS;
