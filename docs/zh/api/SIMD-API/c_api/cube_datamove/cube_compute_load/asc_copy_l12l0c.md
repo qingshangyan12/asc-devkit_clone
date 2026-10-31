@@ -94,3 +94,9 @@ __cbuf__ half src[256];
 __cc__ half dst[256];
 asc_copy_l12l0c(dst, src, n_burst, len_burst, src_gap, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad](../../cube_compute/mmad_compute/asc_mmad.md) | 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其。 |

@@ -89,3 +89,11 @@ AscendC::Mull(dst0Local, dst1Local, src0Local, src1Local, 512);
 输出数据dst0Local：[-1560359025   212356098  1219226939 ... ]
 输出数据dst1Local：[850752575   -6514620  699800065 ... ]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mul](Mul.md) | Mul属于双目矢量类计算接口，负责将输入的两个tensor按元素求积。 |
+| [Div](Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |
+| [Muls（灵活标量位置）](Muls_flexible_scalar.md) | Muls属于双目标量类计算接口，矢量内每个元素和标量间做乘法，支持标量在前和标量在后两种场景。 |

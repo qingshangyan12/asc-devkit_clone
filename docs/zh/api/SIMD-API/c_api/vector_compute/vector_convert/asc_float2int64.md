@@ -103,3 +103,9 @@ __ubuf__ int64_t dst[256];
 __ubuf__ float src[256];
 asc_float2int64_rn(dst, src, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int642float](asc_int642float.md) | 将int64_t类型数据转换为float类型。 |

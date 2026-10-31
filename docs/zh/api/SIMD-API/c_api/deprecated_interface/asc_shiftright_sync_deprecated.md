@@ -88,3 +88,10 @@ asc_shiftright_round_sync(dst, src, value, total_length);    // 对src中的每�
 // src[0] = 0b1010, dst[0] = 0b0101被舍入最后一位为0，不进1
 // src[0] = 0b1001, dst[0] = 0b0101被舍入最后一位为1，进1
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_shiftright](../vector_compute/vector_logic/asc_shiftright.md) | 对src中的每个元素执行右移，右移大小为value。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

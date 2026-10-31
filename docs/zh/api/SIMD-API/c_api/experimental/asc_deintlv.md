@@ -254,3 +254,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_deintlv](../reg_compute/reg_permute_sel/asc_deintlv.md) | 将src0和src1中的元素解交织存入dst0和dst1中，本接口提供矢量数据解交织和掩码解交织两种功能模式。 |
+| [双返回值结构体](pair.md) | 本结构体为试验接口，在后续版本中可能会调整或移除，不保证后续兼容性。 |

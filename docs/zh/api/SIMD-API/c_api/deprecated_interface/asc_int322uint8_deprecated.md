@@ -90,3 +90,9 @@ vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_int322uint8(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int322uint8](../reg_compute/reg_convert/asc_int322uint8.md) | 根据`mask`将`src`中参与计算的`int32_t`类型元素转换为`uint8_t`类型，结果写入`dst`。 |

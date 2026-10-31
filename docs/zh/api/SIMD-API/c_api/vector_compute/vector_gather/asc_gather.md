@@ -97,3 +97,9 @@ asc_gather(dst, src, src_offset, total_length);
 // src_offset [254, 252, 250, ..., 4, 2, 0]，对应src中每个元素的偏移量，基于src的起始基地址，单位为Bytes
 // dst [128, 127, 126, ..., 3, 2, 1]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gather_datablock](asc_gather_datablock.md) | 给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。 |

@@ -82,3 +82,10 @@ asc_mul_add_sync(dst, src0, src1, total_length);    // dst = (src0 * dst) + src1
 // 计算前dst [2, 2, 2, ..., 2]
 // 计算后dst [3, 5, 7, ..., 257]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_add](../vector_compute/vector_fused/asc_mul_add.md) | 执行矢量的乘加运算。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

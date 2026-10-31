@@ -65,3 +65,10 @@ __aicore__ inline void SetMaskCount()
 ## 调用示例<a name="section837496171220"></a>
 
 请参考[Counter模式调用示例](SetVectorMask.md#section837496171220)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [SetMaskNorm](SetMaskNorm.md) | 设置Mask模式为Normal模式。 |

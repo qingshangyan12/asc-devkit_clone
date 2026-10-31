@@ -206,3 +206,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mula](asc_mula.md) | 根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。 |
+| [asc_madd](asc_madd.md) | 根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。 |
+| [asc_fma](asc_fma.md) | 根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。 |

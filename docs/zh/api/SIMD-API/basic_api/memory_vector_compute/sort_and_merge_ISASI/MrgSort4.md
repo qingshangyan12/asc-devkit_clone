@@ -264,3 +264,9 @@ AscendC::MrgSort4(dstLocal, srcList, srcInfo);
 0.0       0.0       0.0       -95.6     0.0       0.0       0.0       0.0
 ]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetMrgSortResult](GetMrgSortResult.md) | GetMrgSortResult接口需与MrgSort接口配合使用。 |

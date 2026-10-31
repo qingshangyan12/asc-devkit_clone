@@ -67,3 +67,11 @@ AscendC::LocalTensor<half> tensor3 = que.AllocTensor<half>();
 AscendC::LocalTensor<half> tensor4 = que.AllocTensor<half>();
 ret = que.HasIdleBuffer(); // AllocTensor了四块内存，当前无空闲内存，返回值为false，继续AllocTensor会报错
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [TQueBind构造函数](TQueBind_constructor.md) | 创建TQueBind对象。 |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |

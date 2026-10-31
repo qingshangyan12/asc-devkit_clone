@@ -108,3 +108,10 @@ bool nz2nd_en = false;
 // 函数调用
 asc_copy_l0c2gm_sync(dst, src, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode, quant_pre, relu_pre, channel_split, nz2nd_en);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l0c2gm_arch_2201](../cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_2201.md) | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

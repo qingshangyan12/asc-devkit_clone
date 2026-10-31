@@ -87,3 +87,10 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_abs(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_relu](../vector_fused/asc_relu.md) | 按元素做线性整流Relu。 |
+| [asc_max_scalar](asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。 |

@@ -419,3 +419,16 @@ int main()
 ```
 
 更多场景使用样例请参考[asc_mmad样例](../../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_enable_hf32](../mmad_compute_aux_config/asc_enable_hf32.md) | 本接口用于设置Mmad计算开启HF32模式，开启该模式后，Mmad计算FP32数据的性能将得到提升，但会带来一定的精度损失。 |
+| [asc_disable_hf32](../mmad_compute_aux_config/asc_disable_hf32.md) | 本接口用于设置Mmad计算关闭HF32模式，其作用与asc_enable_hf32相反，两个接口不同时生效。 |
+| [asc_copy_l12bt_arch_3510](../../cube_datamove/cube_compute_load/asc_copy_l12bt_arch_3510.md) | 将L1 Buffer中的偏置数据搬运到BiasTable Buffer，供矩阵计算单元（Mmad）作为bias输入读取。 |
+| [asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md) | 完成同一流水内的同步控制，用于在同一流水内部约束执行顺序。 |
+| [asc_set_mmad_direction_n](../mmad_compute_aux_config/asc_set_mmad_direction_n.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐行生成矩阵计算结果分形。 |
+| [asc_set_mmad_direction_m](../mmad_compute_aux_config/asc_set_mmad_direction_m.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。 |
+| [asc_set_l0c_copy_config](../../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md) | 本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置。 |
+| [asc_set_ctrl](../../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

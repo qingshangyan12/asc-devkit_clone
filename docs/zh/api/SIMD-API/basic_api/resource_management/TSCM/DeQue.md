@@ -66,3 +66,11 @@ __aicore__ inline LocalTensor<T> DeQue()
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](AllocTensor.md#section642mcpsimp)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [EnQue](EnQue.md) | 将tensor push到队列。 |
+| [FreeTensor](FreeTensor.md) | 释放TSCM中的指定Tensor。 |
+| [AllocTensor](AllocTensor.md) | 从TSCM中分配tensor，tensor所占大小为InitBuffer时设置的每块内存长度。 |

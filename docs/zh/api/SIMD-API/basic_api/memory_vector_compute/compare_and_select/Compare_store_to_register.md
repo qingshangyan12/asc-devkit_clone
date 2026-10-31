@@ -167,3 +167,10 @@
 输出数据(cmpMask寄存器):
 [122  86 237  94 150   3 226 242]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetCmpMask(ISASI)](GetCmpMask_ISASI.md) | 此接口用于获取Compare（结果存入寄存器）指令的比较结果。 |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

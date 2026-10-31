@@ -156,3 +156,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_dcci](../../cache_ctrl/asc_dcci.md) | 在AI Core内部，访问Global Memory（GM）与Unified Buffer（UB）的方式分为以下两种。 |
+| [asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md) | 阻塞后续的指令执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。 |

@@ -57,3 +57,9 @@ LocalMemAllocator allocator;
 // 默认的物理位置为Unified Buffer（UB），由于从0地址开始分配，下面的打印结果为0
 AscendC::printf("current addr is %u\n", allocator.GetCurAddr());
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Alloc](Alloc.md) | 根据用户指定的逻辑位置、数据类型、数据长度返回对应的LocalTensor对象。 |

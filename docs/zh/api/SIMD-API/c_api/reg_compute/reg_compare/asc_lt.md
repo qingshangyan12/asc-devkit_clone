@@ -244,3 +244,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_le](asc_le.md) | le表示小于等于（less than or equal to），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i \leq src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。 |
+| [asc_gt](asc_gt.md) | gt表示大于（greater than），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i > src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。 |
+| [asc_ne](asc_ne.md) | ne表示不等于（not equal），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i \neq src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。 |

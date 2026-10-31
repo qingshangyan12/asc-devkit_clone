@@ -124,3 +124,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_update_mask](../../reg_compute/reg_mask/asc_update_mask.md) | 根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。 |
+| [asc_get_arch_ver](asc_get_arch_ver.md) | 获取当前AI处理器架构版本号。 |

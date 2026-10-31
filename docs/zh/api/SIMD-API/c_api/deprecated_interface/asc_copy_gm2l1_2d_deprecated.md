@@ -289,3 +289,11 @@ int main()
     return 0;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_2d_arch_3510](../cube_datamove/cube_compute_load/asc_copy_gm2l1_2d_arch_3510.md) | 将数据从Global Memory搬运到L1 Buffer。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

@@ -144,3 +144,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md) | 设置原子操作启用位与原子操作类型的值。 |
+| [asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md) | 设置原子操作启用位与原子操作类型的值。 |
+| [asc_atomic_add](asc_atomic_add.md) | 对Global Memory中`address`指向的单个元素执行原子加操作。 |

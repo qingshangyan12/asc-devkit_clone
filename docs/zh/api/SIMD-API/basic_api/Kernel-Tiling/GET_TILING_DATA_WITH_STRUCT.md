@@ -99,3 +99,8 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GET_TILING_DATA](GET_TILING_DATA.md) | 用于获取算子核函数（Kernel）入口函数传入的Tiling信息，并填入注册的TilingData结构体中，此函数会以宏展开的方式进行编译。 |

@@ -79,3 +79,11 @@ __cbuf__ half src[256];
 // dst表示目的操作数的起始地址
 asc_copy_l12gm(dst, src, n_burst, len_burst, src_gap, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12ub](asc_copy_l12ub.md) | 将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源/目间隔实现连续与非连续搬运。 |
+| [asc_copy_l0c2gm_arch_3510](asc_copy_l0c2gm_arch_3510.md) | 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。 |
+| [asc_copy_l0c2gm](asc_copy_l0c2gm.md) | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。 |

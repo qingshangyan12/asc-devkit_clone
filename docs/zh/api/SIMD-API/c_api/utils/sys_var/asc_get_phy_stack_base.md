@@ -128,3 +128,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_phy_buf_addr](asc_get_phy_buf_addr.md) | 基于偏移量offset获取片上实际物理地址，常用于在调试、地址推导或tiling数据地址计算场景下，把一个相对偏移量转换为可在硬件上直接使用的物理地址形式。 |
+| [asc_get_sys_virtual_base](asc_get_sys_virtual_base.md) | 读取系统虚拟基地址特殊寄存器的值并按`int64_t`返回，该寄存器为只读特殊寄存器，存储当前核上下文的系统虚拟基地址，由系统在核函数（Kernel）启动前按核配置完成。 |

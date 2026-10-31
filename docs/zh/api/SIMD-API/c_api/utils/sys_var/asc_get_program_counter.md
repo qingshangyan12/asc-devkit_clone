@@ -64,3 +64,9 @@ asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
 ## 调用示例
 
 获取PC后，可将其作为指令预加载起始地址，完整的预加载调用方式请参考[asc_icache_preload调用示例](../../cache_ctrl/asc_icache_preload.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_icache_preload](../../cache_ctrl/asc_icache_preload.md) | 开发者手动调用本接口，从调用本接口所在的Global Memory地址预加载指令到ICache（指令缓存）中，避免后续取指时出现ICache未命中。 |

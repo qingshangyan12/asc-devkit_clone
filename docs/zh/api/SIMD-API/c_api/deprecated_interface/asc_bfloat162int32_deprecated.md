@@ -121,3 +121,10 @@ asc_bfloat162int32_rd_sat(dst, src, mask);     // FLOOR舍入模式，饱和模�
 asc_bfloat162int32_rd_v2(dst, src, mask);      // FLOOR舍入模式，非饱和模式，读取src索引为奇数的位置
 asc_bfloat162int32_rd_sat_v2(dst, src, mask);  // FLOOR舍入模式，饱和模式，读取src索引为奇数的位置
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162int32](../reg_compute/reg_convert/asc_bfloat162int32.md) | 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

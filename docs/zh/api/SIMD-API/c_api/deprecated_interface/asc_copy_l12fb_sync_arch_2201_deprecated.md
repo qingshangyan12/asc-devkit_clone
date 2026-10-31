@@ -73,3 +73,10 @@ __cbuf__ half src[256];
 __fbuf__ half dst[256];
 asc_copy_l12fb_sync(dst, src, copy_size);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12fb_arch_2201](../cube_datamove/cube_compute_load/asc_copy_l12fb_arch_2201.md) | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

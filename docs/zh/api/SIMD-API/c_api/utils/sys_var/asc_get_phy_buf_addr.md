@@ -130,3 +130,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_phy_stack_base](asc_get_phy_stack_base.md) | 获取物理堆栈基地址。常用于调试时定位当前核的堆栈在物理内存中的位置。 |
+| [asc_get_sys_virtual_base](asc_get_sys_virtual_base.md) | 读取系统虚拟基地址特殊寄存器的值并按`int64_t`返回，该寄存器为只读特殊寄存器，存储当前核上下文的系统虚拟基地址，由系统在核函数（Kernel）启动前按核配置完成。 |

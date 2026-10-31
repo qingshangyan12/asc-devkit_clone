@@ -76,3 +76,10 @@ __ubuf__ int64_t src[total_length];
 __ubuf__ float dst[total_length];
 asc_int642float_rn_sync(dst, src, total_length);    // 将src转换为float类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int642float](../vector_compute/vector_convert/asc_int642float.md) | 将int64_t类型数据转换为float类型。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

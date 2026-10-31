@@ -166,3 +166,9 @@ $dst_i = scalar * src_i$
 // 标量在后，src1Local[0]作为标量
 输出数据dstLocal：[2 4 6 ... 1024]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

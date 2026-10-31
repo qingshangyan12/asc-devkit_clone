@@ -82,3 +82,9 @@ __aicore__ inline void DataSyncBarrier()
 ```
 
 完整样例请参考[DataSyncBarrier接口样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PipeBarrier(ISASI)](PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

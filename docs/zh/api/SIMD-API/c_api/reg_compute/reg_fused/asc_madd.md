@@ -217,3 +217,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mula](asc_mula.md) | 根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。 |
+| [asc_fma](asc_fma.md) | 根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。 |
+| [asc_axpy](asc_axpy.md) | 根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。 |

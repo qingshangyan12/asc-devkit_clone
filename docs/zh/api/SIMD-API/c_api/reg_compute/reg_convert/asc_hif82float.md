@@ -196,3 +196,9 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2hif8](asc_float2hif8.md) | 根据`mask`将`src`中参与计算的`float`类型元素转换为`hifloat8_t`类型，结果写入`dst`。 |

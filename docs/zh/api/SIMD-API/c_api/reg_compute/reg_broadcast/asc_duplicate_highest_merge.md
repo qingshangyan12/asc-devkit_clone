@@ -208,3 +208,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_duplicate_highest](asc_duplicate_highest.md) | 将源操作数`src`的最高位元素，即下标最大的元素，广播到目的操作数`dst`中被`mask`筛选的位置。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |

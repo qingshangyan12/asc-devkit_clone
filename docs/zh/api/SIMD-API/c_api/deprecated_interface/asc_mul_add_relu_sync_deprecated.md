@@ -79,3 +79,10 @@ __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 asc_mul_add_relu_sync(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_add_relu](../vector_compute/vector_fused/asc_mul_add_relu.md) | 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

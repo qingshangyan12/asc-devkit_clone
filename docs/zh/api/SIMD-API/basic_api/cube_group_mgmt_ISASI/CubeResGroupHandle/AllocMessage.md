@@ -81,3 +81,9 @@ auto queIdx = AscendC::GetBlockIdx();
 handle.AssignQueue(queIdx);
 auto msgPtr = handle.AllocMessage();        // 绑定队列后，从该队列中申请消息空间，消息空间地址为msgPtr。
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PostMessage](PostMessage.md) | 通过AllocMessage接口获取到消息空间地址msg后，构造消息结构体CubeMsgType，发送该消息。 |

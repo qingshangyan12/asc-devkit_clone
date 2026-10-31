@@ -222,3 +222,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int82half](asc_int82half.md) | 将`int8_t`类型数据转换为`half`类型。 |
+| [asc_int82int32](asc_int82int32.md) | 根据`mask`将`src`中参与计算的`int8_t`类型元素转换为`int32_t`类型，结果写入`dst`。 |
+| [asc_float2int16](asc_float2int16.md) | 将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。 |

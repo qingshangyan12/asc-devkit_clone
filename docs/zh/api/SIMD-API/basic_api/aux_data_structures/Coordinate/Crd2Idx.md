@@ -187,3 +187,9 @@ auto stride = AscendC::MakeStride(AscendC::MakeStride(basestrideM, basestrideM),
 
 auto index = AscendC::Crd2Idx(coord, shape, stride); // decltype(index)::value = 192
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [运算符重载](../Layout/operator_overloading.md) | 重载运算符()，内部实现为调用Crd2Idx接口，将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index）。 |

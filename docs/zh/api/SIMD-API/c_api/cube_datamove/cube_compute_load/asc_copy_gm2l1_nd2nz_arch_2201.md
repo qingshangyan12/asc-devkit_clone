@@ -118,3 +118,9 @@ constexpr uint16_t dst_nz_matrix_stride = 96;
 // src表示源操作数的起始地址
 asc_copy_gm2l1_nd2nz(dst, src, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride, dst_nz_matrix_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_nd2nz](asc_copy_gm2l1_nd2nz.md) | 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换。 |

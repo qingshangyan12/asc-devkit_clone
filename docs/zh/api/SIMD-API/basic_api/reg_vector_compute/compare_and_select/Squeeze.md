@@ -103,3 +103,12 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
      AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSpr](../../special_register_access/GetSpr.md) | 获取指定特殊寄存器的值。当前支持表SpecialPurposeReg模板参数说明。 |
+| [连续非对齐搬出（StoreUnAlign）](../reg_data_store/StoreUnAlign_continuous.md) | 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。 |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [MaskReg非对齐搬出（StoreUnAlign）](../reg_data_store/StoreUnAlign_MaskReg.md) | StoreUnAlign能够实现数据从MaskReg连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。 |

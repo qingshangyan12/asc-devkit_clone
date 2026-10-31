@@ -82,3 +82,10 @@ vector_uint16_t src;
 asc_pack(dst, src);    // 将src的低8位写入dst的低半部分
 asc_pack_v2(dst, src);    // 将src的低8位写入dst的高半部分
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_pack_to_low](../reg_compute/reg_permute_sel/asc_pack_to_low.md) | 将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）写入目的操作数的低半部分。 |
+| [asc_pack_to_high](../reg_compute/reg_permute_sel/asc_pack_to_high.md) | 将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。 |

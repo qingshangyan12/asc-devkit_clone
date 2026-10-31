@@ -80,3 +80,10 @@ __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 asc_add_sync(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_add](../vector_compute/vector_arith/asc_add.md) | 执行矢量加法运算。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

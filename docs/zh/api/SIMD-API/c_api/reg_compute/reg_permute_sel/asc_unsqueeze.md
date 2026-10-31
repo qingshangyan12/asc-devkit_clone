@@ -217,3 +217,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze](asc_squeeze.md) | 将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。 |
+| [asc_unpack](asc_unpack.md) | 将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回，支持。 |
+| [asc_select](asc_select.md) | 根据`mask`从源操作数`src0`、`src1`中选择元素，得到计算结果。 |

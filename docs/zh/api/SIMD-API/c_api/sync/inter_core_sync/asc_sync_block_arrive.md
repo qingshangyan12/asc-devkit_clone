@@ -201,3 +201,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sync_block_wait](asc_sync_block_wait.md) | 本接口与asc_sync_block_arrive配对使用，实现单AI Core内AIC与全部AIV之间的同步（四种核间同步模式中的模式2）。 |

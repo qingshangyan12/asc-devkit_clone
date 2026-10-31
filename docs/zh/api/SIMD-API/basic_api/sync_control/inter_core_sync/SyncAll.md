@@ -203,3 +203,12 @@ AscendC::SyncAll(syncGlobal, workLocal);
 ```
 
 完整样例请参考[SyncAll样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/sync_all)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CrossCoreSetFlag(ISASI)](CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。 |
+| [CrossCoreWaitFlag(ISASI)](CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考CrossCoreSetFlag功能说明。 |
+| [GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |
+| [GetTaskRatio](../../tool_interface/system_resources_and_variables/GetTaskRatio.md) | 分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。 |

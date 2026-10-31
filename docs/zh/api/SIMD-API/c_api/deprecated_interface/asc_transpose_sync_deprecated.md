@@ -73,3 +73,10 @@ __ubuf__ int16_t src[total_length];
 // dst指目的操作数的地址
 asc_transpose_sync(dst, src);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_transpose](../vector_compute/vector_permute_sel/asc_transpose.md) | 用于实现16*16的二维矩阵数据块转置。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

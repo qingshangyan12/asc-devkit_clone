@@ -546,3 +546,11 @@ qidB2_.EnQue(b2);
 qidB1_.FreeTensor(rightMatrix);
 ```
 <!-- end id20 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（2D矩阵搬运V2）](LoadData_2D_V2.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行，支持如下数据通路。 |
+| [LoadData（2D矩阵搬运）](LoadData_2D.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持如下数据通路的搬运。 |
+| [LoadData（BitMode 2D矩阵搬运）](LoadData_2D_BitMode.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。 |

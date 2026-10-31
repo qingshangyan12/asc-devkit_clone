@@ -249,3 +249,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_frequency_histogram](asc_frequency_histogram.md) | 对输入矢量数据寄存器中的元素进行频率统计，生成直方图。 |

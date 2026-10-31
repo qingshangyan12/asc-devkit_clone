@@ -77,3 +77,11 @@ inline uint8_t* GetBaseAddr(int8_t logicPos)
 ```cpp
 auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBuffer](InitBuffer.md) | 用于为TQue等队列和TBuf分配内存。 |
+| [TPipe构造函数](TPipe_constructor.md) | 构造用来管理内存和同步的TPipe对象。 |
+| [FetchEventID](FetchEventID.md) | 根据HardEvent（硬件类型的同步事件）获取相应可用的TEventID，此接口不会申请TEventID，仅提供可用的TEventID。 |

@@ -96,3 +96,11 @@ valueIn = 0x00FFULL;
 sffValue = AscendC::GetSFFValue<0>(valueIn); // 返回8
 sffValue = AscendC::GetSFFValue<1>(valueIn); // 返回0
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetBitCount](GetBitCount.md) | 统计uint64_t类型数值的二进制表示中指定比特值（0或1）的出现次数。 |
+| [CountBitsCntSameAsSignBit](CountBitsCntSameAsSignBit.md) | 统计int64_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。 |
+| [CountLeadingZero](CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |

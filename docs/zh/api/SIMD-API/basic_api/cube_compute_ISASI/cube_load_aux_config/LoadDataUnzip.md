@@ -67,3 +67,9 @@ AscendC::LocalTensor<int8_t> weightB1 = inQueueB1.AllocTensor<int8_t>();
 AscendC::LoadUnzipIndex(indexGlobal, numOfIndexTabEntry); // 加载索引数据，加载GM上的压缩索引表到内部寄存器
 AscendC::LoadDataUnzip(weightB1, weGlobal); // 根据内部寄存器里的索引表加载数据
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadUnzipIndex](LoadUnzipIndex.md) | 加载GM上的压缩索引表到内部寄存器。 |

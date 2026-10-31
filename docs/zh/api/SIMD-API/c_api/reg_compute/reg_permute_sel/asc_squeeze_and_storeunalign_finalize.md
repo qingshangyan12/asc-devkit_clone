@@ -224,3 +224,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md) | Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |

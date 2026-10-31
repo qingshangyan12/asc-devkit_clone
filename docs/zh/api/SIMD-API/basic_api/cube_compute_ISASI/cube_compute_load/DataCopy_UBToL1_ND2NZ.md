@@ -169,3 +169,9 @@ nd2nzParams.dstNzMatrixStride = 96;
 
 AscendC::DataCopy(dstLocal, srcLocal, nd2nzParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopyPad（UBToL1非对齐数据搬运）](DataCopyPad_UBToL1.md) | > [!NOTE]说明 > 本接口为软件仿真实现，是在Matmul高阶API的基础上，利用Matmul高阶API中的workspace GM空间作为数据中转空间，数据先搬入GM，再搬入L1 Buffer。 |

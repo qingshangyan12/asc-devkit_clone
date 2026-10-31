@@ -89,3 +89,9 @@ asc_relu(dst, src, total_length);
 // src : [6.938, -8.86, -0.2263, ..., 1.778]
 // dst : [6.938, 0, 0, ..., 1.778]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_leakyrelu](asc_leakyrelu.md) | 执行矢量Leaky Relu运算。 |

@@ -86,3 +86,10 @@ if (!cast_sat_enabled) {
 ```
 
 数据搬运与Reg cast模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_saturation_flag](asc_set_saturation_flag.md) | 按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。 |
+| [asc_set_saturation_strategy](asc_set_saturation_strategy.md) | 设置饱和控制策略，默认为开启全局饱和配置。 |

@@ -79,3 +79,9 @@ __simd_vf__ inline void hif82half_vf(__ubuf__ half* dst_addr, __ubuf__ hifloat8_
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_hif82half](../reg_compute/reg_convert/asc_hif82half.md) | `src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。 |

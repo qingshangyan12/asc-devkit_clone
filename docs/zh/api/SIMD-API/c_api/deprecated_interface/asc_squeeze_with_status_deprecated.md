@@ -85,3 +85,11 @@ asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB�
 vector_int8_t dst;
 asc_squeeze_with_status(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md) | Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。 |
+| [asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md) | 将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针或地址寄存器，便于硬件循环内连续多次调用时无需手动维护目的地址。 |
+| [asc_get_squeeze_status](../spr/asc_get_squeeze_status.md) | 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合asc_squeeze_and_storeunalign接口获取已连续搬出的有效数据量。 |

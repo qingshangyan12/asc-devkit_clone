@@ -96,3 +96,9 @@ ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。
 </tr>
 </tbody>
 </table>
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MakeTensorTrait](TensorTrait/MakeTensorTrait.md) | 生成TensorTrait实例化对象。 |

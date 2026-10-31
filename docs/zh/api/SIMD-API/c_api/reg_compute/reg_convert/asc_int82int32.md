@@ -196,3 +196,11 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int32](asc_half2int32.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。 |
+| [asc_bfloat162int32](asc_bfloat162int32.md) | 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。 |
+| [asc_int82int16](asc_int82int16.md) | 将`int8_t`类型数据转换为`int16_t`类型。 |

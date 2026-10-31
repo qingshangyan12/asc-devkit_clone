@@ -146,3 +146,11 @@ __cbuf__ half src[256];
 __cb__ half dst[256];
 asc_copy_l12l0b_sync(dst, src, 1, 1, 1, 0);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0b_arch_2201](../cube_datamove/cube_compute_load/asc_copy_l12l0b_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_copy_l12l0b_trans_arch_2201](../cube_datamove/cube_compute_load/asc_copy_l12l0b_trans_arch_2201.md) | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |

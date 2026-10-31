@@ -77,3 +77,10 @@ __ubuf__ half src0[256];
 __ubuf__ half src1[256];
 asc_fma_sync(dst, src0, src1, 256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_fma](../vector_compute/vector_fused/asc_fma.md) | 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

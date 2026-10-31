@@ -291,4 +291,9 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
         }
     KERNEL_CUBE_DATACOPY(half, int8_t, int8_t, int32_t, 128, 1, 1, QuantMode_t::DEQF16);
     ```
-    
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Fixpipe（L0C到GM数据搬运）](../cube_compute_store/Fixpipe_L0CToGM.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |

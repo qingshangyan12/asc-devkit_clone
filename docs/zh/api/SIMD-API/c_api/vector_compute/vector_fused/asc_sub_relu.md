@@ -110,3 +110,9 @@ __ubuf__ int16_t src1[total_length];
 __ubuf__ int8_t dst[total_length];
 asc_sub_relu(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_add_relu](asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |

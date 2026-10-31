@@ -62,3 +62,11 @@ AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
 que.EnQue(tensor1);// 将tensor加入VECOUT的Queue中
 int32_t numb = que.GetTensorCountInQue();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [EnQue](EnQue.md) | 将Tensor push到队列。 |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |

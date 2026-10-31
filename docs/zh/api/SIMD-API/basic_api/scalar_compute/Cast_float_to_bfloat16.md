@@ -69,3 +69,10 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 float m = 3.14159f;
 bfloat16_t n = AscendC::Cast(m);  // n = 3.140625  float到bfloat16_t进行了舍入
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast（float转half/int32_t）](Cast_float_to_half_int32.md) | 对标量的数据类型进行转换。 |
+| [Cast（多类型转float）](Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |

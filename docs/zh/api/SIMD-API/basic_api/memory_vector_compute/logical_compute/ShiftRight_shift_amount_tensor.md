@@ -99,3 +99,11 @@ AscendC::ShiftRight(dstLocal, srcLocal0, srcLocal1, 512);
 输入数据(srcLocal1): [2 2 2 ... 2]
 输出数据(dstLocal): [0 0 0 1 1 1 1 ... 128]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ShiftLeft（左移位数为Tensor）](ShiftLeft_shift_amount_tensor.md) | 对源操作数中的每个元素进行左移操作。 |
+| [ShiftRight](ShiftRight.md) | 对源操作数中的每个元素进行右移操作，右移的位数由标量scalarValue决定。 |
+| [ShiftLeft](ShiftLeft.md) | 对源操作数中的每个元素进行左移操作，左移的位数由标量scalarValue决定。 |

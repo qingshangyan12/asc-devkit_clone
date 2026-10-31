@@ -63,3 +63,11 @@ uint32_t len = 128;
 pipe.InitBuffer(que, num, len);
 pipe.DestroyWithoutPipeAll();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Destroy](Destroy.md) | 释放资源。 |
+| [InitBuffer](InitBuffer.md) | 用于为TQue等队列和TBuf分配内存。 |
+| [TPipe构造函数](TPipe_constructor.md) | 构造用来管理内存和同步的TPipe对象。 |

@@ -68,3 +68,9 @@ for (int i = 0; i < 2; i++) {
     pipe.Reset();
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetCtrlSpr(ISASI)](../../special_register_access/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

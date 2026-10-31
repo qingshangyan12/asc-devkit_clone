@@ -98,3 +98,9 @@ config.blk_num = total_length * sizeof(half) / 512;
 config.dst_gap = 0;
 asc_fill_l0a(dst1, value1, config);    // 将dst1中256个half类型的元素初始化为1
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_fill_l0b](asc_fill_l0b.md) | 将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。 |

@@ -226,3 +226,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_unlock](asc_unlock.md) | 与asc_lock配对使用，用于实现核内异步流水指令之间的同步处理。 |
+| [asc_sync_pipe](asc_sync_pipe.md) | 完成同一流水内的同步控制，用于在同一流水内部约束执行顺序。 |

@@ -164,3 +164,14 @@ asc_set_ndim_pad_count(pad_count_config);
 asc_ndim_copy_gm2ub(dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
     loop0_lp_count, loop0_rp_count, padding_mode, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md) | 该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。 |
+| [asc_set_ndim_loop_stride](../vector_datamove/asc_set_ndim_loop_stride.md) | 本接口用于设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。 |
+| [asc_set_ndim_pad_value](../vector_datamove/asc_set_ndim_pad_value.md) | 本接口用于设置asc_ndim_copy_gm2ub在常数填充模式下使用的填充值。 |
+| [asc_set_ndim_pad_count](../vector_datamove/asc_set_ndim_pad_count.md) | 本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

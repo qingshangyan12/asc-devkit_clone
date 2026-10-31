@@ -409,3 +409,15 @@ PIPE_M
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
   注意，应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad](../cube_compute/mmad_compute/asc_mmad.md) | 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md) | 完成同一流水内的同步控制，用于在同一流水内部约束执行顺序。 |
+| [asc_set_mmad_direction_n](../cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_n.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐行生成矩阵计算结果分形。 |
+| [asc_set_mmad_direction_m](../cube_compute/mmad_compute_aux_config/asc_set_mmad_direction_m.md) | 本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。 |
+| [asc_set_l0c2gm_config（废弃）](asc_set_l0c2gm_config_deprecated.md) | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

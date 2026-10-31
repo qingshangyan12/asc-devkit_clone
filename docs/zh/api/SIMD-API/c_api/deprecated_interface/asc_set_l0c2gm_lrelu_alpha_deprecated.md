@@ -65,3 +65,11 @@ PIPE_S
 half config = 0.5;
 asc_set_l0c2gm_lrelu_alpha(config);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_lrelu_alpha](../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md) | 本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。 |
+| [asc_copy_l0c2l1（废弃）](asc_copy_l0c2l1_deprecated.md) | 该接口用于将矩阵计算的结果从L0C Buffer搬运至L1 Buffer中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。 |
+| [asc_copy_l0c2gm（废弃）](asc_copy_l0c2gm_deprecated.md) | 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。 |

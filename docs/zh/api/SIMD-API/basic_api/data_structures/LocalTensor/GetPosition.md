@@ -61,3 +61,11 @@ if (srcPos == AscendC::TPosition::VECCALC) {
     // 处理逻辑3
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [GetLength](GetLength.md) | 获取LocalTensor数据长度。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |

@@ -54,3 +54,9 @@ __aicore__ inline int64_t GetProgramCounter()
 ```cpp
 int64_t pc = AscendC::GetProgramCounter(); // 获取程序计数器的值，保存到变量pc
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSystemCycle(ISASI)](GetSystemCycle_ISASI.md) | 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。 |

@@ -71,3 +71,9 @@ __aicore__ inline TBufPool();
 ## 约束说明<a name="zh-cn_topic_0000001935531088_zh-cn_topic_0000001339105488_section19165124931511"></a>
 
 无。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBufPool](InitBufPool.md) | 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。 |

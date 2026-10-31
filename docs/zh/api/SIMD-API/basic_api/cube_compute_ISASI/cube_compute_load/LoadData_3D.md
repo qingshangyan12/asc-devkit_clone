@@ -552,3 +552,12 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```
 
 关于如何使用LoadData（卷积数据搬运）进行2D数据搬运，请参考：[load_data_l12l0样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)中的对应场景。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetLoadDataRepeat](../cube_load_aux_config/SetLoadDataRepeat.md) | 用于设置LoadData（卷积数据搬运）接口的repeat参数。 |
+| [SetFmatrix](../cube_load_aux_config/SetFmatrix.md) | 用于调用LoadData（卷积数据搬运）时设置FeatureMap的属性描述。 |
+| [SetLoadDataPaddingValue](../cube_load_aux_config/SetLoadDataPaddingValue.md) | 用于调用LoadData（卷积数据搬运）接口时设置Pad填充的数值。 |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

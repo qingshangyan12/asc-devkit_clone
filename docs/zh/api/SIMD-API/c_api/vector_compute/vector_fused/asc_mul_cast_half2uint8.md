@@ -91,3 +91,9 @@ __ubuf__ half src1[total_length];
 __ubuf__ uint8_t dst[total_length];
 asc_mul_cast_half2uint8(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mul_cast_half2int8](asc_mul_cast_half2int8.md) | 按元素求积，并将结果转换为int8_t类型。 |

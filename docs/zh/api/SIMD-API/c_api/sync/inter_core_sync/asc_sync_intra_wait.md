@@ -88,3 +88,9 @@ PIPE_S
 ## 调用示例
 
 `asc_sync_intra_wait`需与`asc_sync_intra_arrive`配对使用，具体调用示例请参考[asc_sync_intra_arrive调用示例](asc_sync_intra_arrive.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sync_intra_arrive](asc_sync_intra_arrive.md) | 本接口与asc_sync_intra_wait配对使用，实现单AI Core内AIC与单个AIV之间的同步（四种核间同步模式中的模式4）。 |

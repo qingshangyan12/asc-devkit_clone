@@ -141,3 +141,9 @@
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[InitBufPool](InitBufPool.md)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitBufPool](../TPipe/InitBufPool.md) | 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定Unified Buffer（UB）/L1内存资源复用的场景。 |

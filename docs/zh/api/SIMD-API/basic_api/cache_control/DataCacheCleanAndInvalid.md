@@ -166,3 +166,9 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     // 刷新整个DCache，性能较差。
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::ENTIRE_DATA_CACHE, AscendC::DcciDst::CACHELINE_OUT>(global);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetCtrlSpr(ISASI)](../special_register_access/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

@@ -88,3 +88,9 @@ __ubuf__ uint16_t src1[total_length/16];
 __ubuf__ uint16_t dst[total_length];
 asc_reduce(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md) | 本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 |

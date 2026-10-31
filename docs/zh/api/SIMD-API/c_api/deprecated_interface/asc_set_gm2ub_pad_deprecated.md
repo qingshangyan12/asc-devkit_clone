@@ -69,3 +69,9 @@ asc_set_gm2ub_pad(0);
 asc_copy_gm2ub_align(dst, src, 2, 46 * sizeof(int8_t), 1, 1, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 48, 48); 
 asc_set_gm2ub_loop_size(1, 1); 
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_copy_pad_val](../vector_datamove/asc_set_copy_pad_val.md) | 该接口与asc_copy_gm2ub_align配合使用，用于设置连续搬运数据块左右两侧的填充值。 |

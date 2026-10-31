@@ -73,3 +73,9 @@ vector_int32_t src;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_storealign_pack_v2(dst_align32b, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md) | 将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB）。 |

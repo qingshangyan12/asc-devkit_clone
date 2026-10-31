@@ -108,3 +108,9 @@ __ubuf__ half dst[total_length];
 __ubuf__ int16_t src[total_length];
 asc_int162half(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int16](asc_half2int16.md) | 将half类型数据转换为int16_t，并支持多种舍入模式。 |

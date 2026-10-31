@@ -62,3 +62,10 @@ AscendC::GlobalTensor<uint64_t> srcGlobal;
 int64_t cacheOffset = 0;
 AscendC::DataCachePreload(srcGlobal, cacheOffset);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCacheCleanAndInvalid](DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |
+| [PRELOAD](PRELOAD.md) | 从当前指令所在的GM地址开始，将后续指令预加载到ICache中。 |

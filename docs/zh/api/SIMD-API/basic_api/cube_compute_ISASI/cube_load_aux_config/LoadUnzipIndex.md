@@ -73,3 +73,9 @@ __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOf
 indexGlobal.SetGlobalBuffer((__gm__ int8_t*)indexGm);
 AscendC::LoadUnzipIndex(indexGlobal, numOfIndexTabEntry);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadDataUnzip](LoadDataUnzip.md) | 将GM上的数据解压并搬运到L1 Buffer（A1/B1）或L0B Buffer（B2）上。 |

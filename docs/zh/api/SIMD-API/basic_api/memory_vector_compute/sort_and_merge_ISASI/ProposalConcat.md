@@ -194,3 +194,9 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
      38.47    0.      0.      0. 
      ]
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ProposalExtract](ProposalExtract.md) | 与ProposalConcat功能相反，从Region Proposals内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列。 |

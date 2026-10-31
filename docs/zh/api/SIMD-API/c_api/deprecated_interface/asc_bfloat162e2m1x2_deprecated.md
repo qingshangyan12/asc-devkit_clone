@@ -113,3 +113,9 @@ vector_fp4x2_e2m1_t dst;
 vector_bool mask;
 asc_bfloat162e2m1x2_rn(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162e2m1x2](../reg_compute/reg_convert/asc_bfloat162e2m1x2.md) | 根据`mask`将`src`中参与计算的`bfloat16_t`类型元素转换为`fp4x2_e2m1_t`类型，结果写入`dst`。 |

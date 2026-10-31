@@ -105,3 +105,11 @@ __ubuf__ float src[total_length];
 __ubuf__ float dst[total_length];
 asc_float2float_rn(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2half](asc_float2half.md) | 将float类型数据转换为half类型，支持多种舍入模式。 |
+| [asc_float2bfloat16](asc_float2bfloat16.md) | 将float类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |
+| [asc_float2int16](asc_float2int16.md) | 将float类型数据转换为int16_t类型，支持多种舍入模式。 |

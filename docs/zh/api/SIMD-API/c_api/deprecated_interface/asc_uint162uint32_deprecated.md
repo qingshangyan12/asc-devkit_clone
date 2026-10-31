@@ -72,3 +72,9 @@ vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_uint162uint32(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_uint162uint32](../reg_compute/reg_convert/asc_uint162uint32.md) | 将`uint16_t`类型数据转为`uint32_t`类型。 |

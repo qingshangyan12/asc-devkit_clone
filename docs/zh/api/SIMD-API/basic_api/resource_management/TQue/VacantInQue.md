@@ -77,3 +77,11 @@ que.EnQue(tensor3);// 将tensor3加入VECOUT的Queue中
 que.EnQue(tensor4);// 将tensor4加入VECOUT的Queue中
 ret = que.VacantInQue(); // 返回为false,继续入队操作（Enque）将报错
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [EnQue](EnQue.md) | 将Tensor push到队列。 |
+| [DeQue](DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |

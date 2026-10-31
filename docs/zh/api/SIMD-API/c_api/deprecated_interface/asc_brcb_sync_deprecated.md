@@ -81,3 +81,10 @@ asc_brcb_sync(dst, src, 1, 8, 2);
 输入数据src：[1 2 3 ... 16]
 输出数据dst：[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ... 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_brcb](../vector_compute/vector_broadcast/asc_brcb.md) | 给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

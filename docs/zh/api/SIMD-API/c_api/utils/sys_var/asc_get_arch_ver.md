@@ -133,3 +133,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_vf_len](asc_get_vf_len.md) | 此接口获取当前芯片的矢量寄存器长度VL（Vector Length），单位为字节。 |
+| [asc_get_smmu_tag_version](asc_get_smmu_tag_version.md) | 获取系统内存管理单元（System Memory Management Unit，SMMU）版本信息。 |

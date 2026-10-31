@@ -59,3 +59,8 @@ auto size = inputLocal.GetSize(); // 获取inputLocal的长度，size大小为in
 // size大小为srcLen，256。
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetSize](SetSize.md) | 设置当前LocalTensor Size大小。 |

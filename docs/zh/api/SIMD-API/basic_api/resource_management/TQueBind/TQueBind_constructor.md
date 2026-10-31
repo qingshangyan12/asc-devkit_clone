@@ -48,3 +48,11 @@ __aicore__ inline TQueBind()
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [AllocTensor](AllocTensor.md) | 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。 |
+| [DeQue](DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |

@@ -106,3 +106,9 @@ AscendC::CubeGroupMsgHead headA = {AscendC::CubeMsgState::VALID, 0};
 AscendC::CubeMsgBody msgA = {headA, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
 auto offset = handle.PostMessage(msgPtr, msgA);           // 在msgPtr指针位置，填充用户自定义的消息结构体，并发送
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocMessage](AllocMessage.md) | AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。 |

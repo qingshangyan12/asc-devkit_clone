@@ -344,3 +344,16 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_align](../cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md) | 将数据从Global Memory（GM）搬运到L1 Buffer，支持搬运长度不是32字节整数倍的数据，并在搬运过程中进行32字节对齐补齐。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_gm2l1_pad](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md) | 用于设置asc_copy_gm2l1_align接口的常量填充值。 |
+| [asc_set_gm2l1_loop_size](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop_size.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式的内层和外层循环次数。 |
+| [asc_set_gm2l1_loop1_stride](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop1_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。 |
+| [asc_set_gm2l1_loop2_stride](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop2_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。 |
+| [asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |
+| [asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md) | 与asc_sync_notify配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

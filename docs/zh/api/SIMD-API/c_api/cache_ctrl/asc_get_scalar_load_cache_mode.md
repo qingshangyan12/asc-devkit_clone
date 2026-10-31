@@ -57,3 +57,9 @@ PIPE_S
 ## 调用示例
 
 本接口用于保存标量load路径当前策略，完整调用示例请参考[asc_set_scalar_cache_mode的场景A](asc_set_scalar_cache_mode.md#asc_set_scalar_cache_mode_scenario_a)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md) | 配置标量单元访问Global Memory时的L2 Cache管理策略。 |

@@ -91,3 +91,11 @@ __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 asc_mul_add_relu(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_fma](asc_fma.md) | 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。 |
+| [asc_add_relu](asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
+| [asc_sub_relu](asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |

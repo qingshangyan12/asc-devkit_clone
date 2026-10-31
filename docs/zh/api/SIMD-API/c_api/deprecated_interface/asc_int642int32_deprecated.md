@@ -83,3 +83,10 @@ asc_int642int32_sat(dst, src, mask);
 asc_int642int32_v2(dst, src, mask);
 asc_int642int32_sat_v2(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int642int32](../reg_compute/reg_convert/asc_int642int32.md) | 将`int64_t`类型的源操作数转换成`int32_t`类型，并支持不同的饱和模式。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

@@ -64,3 +64,12 @@ __ubuf__ int8_t dst[total_length];
 ...     // 进行Compare操作
 asc_get_cmp_mask(dst);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_eq](asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。 |
+| [asc_ge](asc_ge.md) | Ge（greater than or equal to），逐元素比较src0 >= src1是否成立，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。 |
+| [asc_gt](asc_gt.md) | 按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [asc_le](asc_le.md) | 按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。 |

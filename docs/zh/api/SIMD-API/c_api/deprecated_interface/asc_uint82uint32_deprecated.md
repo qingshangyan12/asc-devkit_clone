@@ -79,3 +79,9 @@ vector_uint32_t dst;
 vector_bool mask;
 asc_uint82uint32(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_uint82uint32](../reg_compute/reg_convert/asc_uint82uint32.md) | 根据`mask`将`src`中参与计算的`uint8_t`类型元素转换为`uint32_t`类型，结果写入`dst`。 |

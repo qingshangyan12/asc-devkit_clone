@@ -74,3 +74,8 @@ auto layout = AscendC::MakeLayout(shape, stride);
 auto index = layout(coord);
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Crd2Idx](../Coordinate/Crd2Idx.md) | Crd2Idx函数用于将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index），这里的Layout包含了Shape和Stride信息。 |

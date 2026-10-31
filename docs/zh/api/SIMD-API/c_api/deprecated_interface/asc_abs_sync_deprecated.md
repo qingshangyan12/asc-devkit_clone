@@ -76,3 +76,10 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_abs_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_abs](../vector_compute/vector_arith/asc_abs.md) | 按元素取绝对值。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

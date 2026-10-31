@@ -117,3 +117,9 @@ mask = asc_create_mask_b16(PAT_ALL);
 asc_half2int32_rd(dst, src, mask);     // FLOOR舍入模式，读取src索引为偶数的位置
 asc_half2int32_rd_v2(dst, src, mask);  // FLOOR舍入模式，读取src索引为奇数的位置
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int32](../reg_compute/reg_convert/asc_half2int32.md) | 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。 |

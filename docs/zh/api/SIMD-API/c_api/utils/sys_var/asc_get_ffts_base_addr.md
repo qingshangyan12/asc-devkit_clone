@@ -127,3 +127,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_ffts_base_addr](asc_set_ffts_base_addr.md) | 在asc_sync_block_wait和asc_sync_block_arrive之前使用，设置核间同步寄存器的基地址。 |

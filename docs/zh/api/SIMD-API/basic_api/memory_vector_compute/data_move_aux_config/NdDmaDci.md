@@ -81,3 +81,9 @@ AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
 [ 0. 0. 0. 9. 10. 11. 12. 13. 14. 15. 16. 0. 0. 0. 0. 0.]
 [ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GMToUB多维数据搬运NDDMA）](../data_move/DataCopy_GMToUB_NDDMA.md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |

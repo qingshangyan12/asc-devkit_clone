@@ -78,3 +78,10 @@ EXPECT_EQ(AscendC::is_tensorTrait<decltype(layoutMake)>::value, false);
 EXPECT_EQ(AscendC::is_tensorTrait<decltype(tensorTraitMake)>::value, true);
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TensorTrait构造函数](TensorTrait_constructor.md) | 根据输入的Layout对象，实例化TensorTrait对象。 |
+| [MakeTensorTrait](MakeTensorTrait.md) | 生成TensorTrait实例化对象。 |
+| [SetLayout](SetLayout.md) | 设置Layout对象至TensorTrait结构中。 |

@@ -74,3 +74,9 @@ __aicore__ inline void SetBufferLen(uint32_t dataLen)
 AscendC::LocalTensor<float> tmpBuffer2 = tempBmm2Queue.AllocTensor<float>();
 tmpBuffer2.SetBufferLen(1024);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [operator\[\]](operator.md) | 获取距原LocalTensor起始地址偏移量为offset的新LocalTensor，注意offset不能超过原有LocalTensor的size大小。 |

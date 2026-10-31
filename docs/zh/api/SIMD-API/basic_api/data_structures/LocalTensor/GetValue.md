@@ -93,3 +93,9 @@ auto element = inputLocal(1); // 获取inputLocal中第i个位置的数值
 // 示例2结果如下：
 // element为100
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [operator()](operator_call.md) | 获取本LocalTensor的第offset个变量的引用。 |

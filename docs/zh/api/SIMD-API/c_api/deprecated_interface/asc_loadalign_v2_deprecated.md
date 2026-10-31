@@ -108,3 +108,12 @@ addr_reg offset = asc_update_addr_reg_b8(16);
 vector_int8_t dst;
 asc_loadalign_unpack_v2(dst, src, offset);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_loadalign_brc_datablock](../reg_compute/load/asc_loadalign_brc_datablock.md) | 从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。 |
+| [asc_loadalign_brc_elem2datablock](../reg_compute/load/asc_loadalign_brc_elem2datablock.md) | 从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。 |
+| [asc_loadalign_unpack4](../reg_compute/load/asc_loadalign_unpack4.md) | 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。 |
+| [asc_update_addr_reg](../reg_compute/reg_addr_reg/asc_update_addr_reg.md) | 更新地址寄存器（addr_reg），用于迭代寻址。 |

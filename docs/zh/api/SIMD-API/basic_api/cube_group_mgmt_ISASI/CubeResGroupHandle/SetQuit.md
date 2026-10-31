@@ -77,3 +77,9 @@ handle.AssignQueue(queIdx);
 auto msgPtr = a.AllocMessage();        // 获取消息空间指针msgPtr
 handle.SetQuit(msgPtr);              // 发送退出消息
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocMessage](AllocMessage.md) | AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。 |

@@ -250,3 +250,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_arange](../reg_index/asc_arange.md) | 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，Vector Length (VL)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。 |

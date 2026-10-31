@@ -141,3 +141,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_system_cycle](asc_get_system_cycle.md) | 读取当前系统cycle计数器，返回int64_t类型的当前计数值。 |

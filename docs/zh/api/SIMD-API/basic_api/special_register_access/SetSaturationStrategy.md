@@ -82,3 +82,12 @@ AscendC::SetSaturationStrategy<AscendC::OverrideStrategy::USE_GLOBAL>();
 AscendC::PipeBarrier<PIPE_ALL>();
 AscendC::Cast(globalDstLocal, srcLocal, AscendC::RoundMode::CAST_NONE, count);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Cast](../memory_vector_compute/type_conversion/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |
+| [Cast](../reg_vector_compute/type_conversion/Cast.md) | Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现浮点转整数、浮点转浮点、整数转浮点、整数转整数的数据类型转换。 |
+| [SetSaturationFlag(ISASI)](SetSaturationFlag_ISASI.md) | 设置不同数据类型的计算或精度转换时饱和模式的开启状态。 |
+| [GetSaturationStrategy](GetSaturationStrategy.md) | 获取精度转换接口当前使用的饱和模式配置策略。 |

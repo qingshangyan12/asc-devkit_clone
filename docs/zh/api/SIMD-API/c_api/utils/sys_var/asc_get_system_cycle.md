@@ -142,3 +142,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_system_clock](asc_get_system_clock.md) | 读取当前系统时钟计数器，返回`int64_t`类型的当前时间值（单位：微秒）。 |

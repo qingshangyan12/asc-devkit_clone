@@ -91,3 +91,9 @@ if (blockIdx == 1) {
 ```
 
 完整样例请参考[DataSyncBarrier样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCachePreload](../cache_control/DataCachePreload.md) | 从源地址所在的特定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。 |

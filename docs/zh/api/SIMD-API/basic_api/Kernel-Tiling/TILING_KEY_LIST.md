@@ -111,3 +111,10 @@ ge::graphStatus TilingFunc(gert::TilingContext* context)
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TILING_KEY_IS](TILING_KEY_IS.md) | 在核函数（Kernel）中判断本次执行时的tiling_key是否等于host侧运行时设置的某个key，从而标识tiling_key==key的一条核函数（Kernel）分支。 |
+| [REGISTER_TILING_FOR_TILINGKEY](REGISTER_TILING_FOR_TILINGKEY.md) | 用于在核函数（Kernel）侧注册与TilingKey相匹配的TilingData自定义结构体；该接口需提供一个逻辑表达式，逻辑表达式以字符串“TILING_KEY_VAR”代指实际TilingKey，表达TilingKey所满足的范围。 |
+| [REGISTER_TILING_DEFAULT](REGISTER_TILING_DEFAULT.md) | 用于在核函数（Kernel）侧注册用户使用标准C++语法自定义的默认TilingData结构体。 |

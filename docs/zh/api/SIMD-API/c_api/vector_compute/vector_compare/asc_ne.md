@@ -105,3 +105,10 @@ asc_get_cmp_mask(dst); // 读取结果
 // 结果输出到目标地址中
 asc_ne(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_cmp_mask](asc_get_cmp_mask.md) | 此接口用于获取Compare操作的比较结果。 |
+| [asc_set_cmp_mask](asc_set_cmp_mask.md) | 为asc_select操作设置作用于选择的Mask掩码。 |

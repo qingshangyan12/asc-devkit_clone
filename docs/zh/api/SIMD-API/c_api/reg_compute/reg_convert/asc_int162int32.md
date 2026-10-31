@@ -222,3 +222,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int162uint32](asc_int162uint32.md) | `src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。 |
+| [asc_int162uint8](asc_int162uint8.md) | `src`中int16_t类型的元素转换为uint8_t类型，并将结果写入dst。 |
+| [asc_int162float](asc_int162float.md) | `src`中int16_t类型的元素转换为float类型，并将结果写入dst。 |

@@ -67,3 +67,10 @@ PIPE_S
 constexpr uint64_t config = 0;
 asc_set_l13d_padding(config);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l12l0a_3d_padding](../cube_datamove/cube_load_aux_config/asc_set_l12l0a_3d_padding.md) | 用于调用asc_copy_l12l0a_arch_3510（3D矩阵搬运）时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。 |
+| [asc_copy_l12l0a](../cube_datamove/cube_compute_load/asc_copy_l12l0a.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |

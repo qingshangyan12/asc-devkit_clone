@@ -159,3 +159,9 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
     AscendC::SetVectorMask<float>(mask);
     AscendC::Select(dst, sel, src0, repeat, repeatParams);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Select](Select.md) | 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。 |

@@ -83,3 +83,9 @@ AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
 AscendC::CheckLocalMemoryIA({ 0, (uint32_t)(dstLocal.GetPhyAddr() / 32),(uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false, false, false, true, false, false,
 true });
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetPhyAddr](../../data_structures/LocalTensor/GetPhyAddr.md) | 返回LocalTensor的地址或指定偏移量后的地址。 |

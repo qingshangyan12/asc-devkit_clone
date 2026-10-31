@@ -74,3 +74,9 @@ __aicore__ inline void SetSize(const uint32_t size)
 AscendC::LocalTensor<float> tmpBuffer3 = tempBmm2Queue.AllocTensor<float>();
 tmpBuffer3.SetSize(256);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSize](GetSize.md) | 获取当前LocalTensor Size大小。 |

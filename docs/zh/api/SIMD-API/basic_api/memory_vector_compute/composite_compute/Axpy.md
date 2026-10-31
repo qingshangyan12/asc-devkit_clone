@@ -272,3 +272,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 进行Axpy计算后，输出数据(dstLocal):
 [2. 4. 6. 8. 10. 12. ... 1024.]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

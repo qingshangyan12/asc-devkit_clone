@@ -240,3 +240,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_gm2l1_padding](../cube_load_aux_config/asc_set_gm2l1_padding.md) | 用于设置asc_copy_gm2l1_arch_3510（高维切分数据搬运）接口搬运过程的padding模式使用的padding值。 |

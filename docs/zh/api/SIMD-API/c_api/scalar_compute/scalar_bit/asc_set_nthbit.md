@@ -136,3 +136,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_clear_nthbit](asc_clear_nthbit.md) | 对一个64位无符号整数执行位清除操作，将`bits`中第`idx`位清零，其余位保持不变。 |

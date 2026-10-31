@@ -112,3 +112,11 @@ __ubuf__ bfloat16_t src[total_length];
 __ubuf__ int32_t dst[total_length];
 asc_bfloat162int32_rna(dst, src, 128);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bfloat162float](asc_bfloat162float.md) | 将bfloat16_t类型数据转为float，无舍入模式。 |
+| [asc_float2int32](asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
+| [asc_half2int32](asc_half2int32.md) | 将half类型转化为int32_t类型，并支持多种舍入模式。 |

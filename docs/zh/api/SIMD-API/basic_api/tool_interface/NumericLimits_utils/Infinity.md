@@ -91,3 +91,9 @@
     ```cpp
     AscendC::NumericLimits<float>::Infinity(dstLocal, 256); // 返回256个float类型的正无穷大值
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Duplicate](../../memory_vector_compute/data_padding/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |

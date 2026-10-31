@@ -196,3 +196,9 @@ int main()
 }
 ```
 <!-- end id8 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2e4m3](asc_float2e4m3.md) | 根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。 |

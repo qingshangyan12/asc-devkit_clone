@@ -91,3 +91,9 @@ __aicore__ inline bool has_mte2_idle_slot()
     return asc_get_pipe_mte2_idle_slot_count() > 0;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_system_cycle](../utils/sys_var/asc_get_system_cycle.md) | 读取当前系统cycle计数器，返回int64_t类型的当前计数值。 |

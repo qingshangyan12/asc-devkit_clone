@@ -82,3 +82,10 @@ AscendC::TEventID eventIdVToS = GetTPipePtr()->FetchEventID(AscendC::HardEvent::
 AscendC::SetFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 AscendC::WaitFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [AllocEventID](AllocEventID.md) | 用于申请HardEvent（硬件类型同步事件）的TEventID，必须与ReleaseEventID搭配使用，调用该接口后，会占用申请的TEventID，直至调用ReleaseEventID释放。 |
+| [SetFlag/WaitFlag(ISASI)](../../sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |

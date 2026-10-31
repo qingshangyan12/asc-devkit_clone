@@ -61,3 +61,9 @@ PIPE_S
 ## 调用示例
 
 本接口需在调用[asc_icache_preload](./asc_icache_preload.md)后使用，完整调用示例请参考[asc_icache_preload的调用示例](./asc_icache_preload.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_icache_preload](asc_icache_preload.md) | 开发者手动调用本接口，从调用本接口所在的Global Memory地址预加载指令到ICache（指令缓存）中，避免后续取指时出现ICache未命中。 |

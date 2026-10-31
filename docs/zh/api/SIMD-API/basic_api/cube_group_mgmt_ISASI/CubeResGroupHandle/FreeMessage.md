@@ -86,3 +86,11 @@ __aicore__ inline static typename IsEqual<funcId, 1>::Type CubeGroupCallBack(
        auto tmpId = handle.FreeMessage(rcvMsg);
 };
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Wait](Wait.md) | 在调用PostMessage或PostFakeMessage后，查询该消息是否已被AIC处理完。 |
+| [CubeResGroupHandle构造函数](CubeResGroupHandle_constructor.md) | 构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。 |
+| [PostMessage](PostMessage.md) | 通过AllocMessage接口获取到消息空间地址msg后，构造消息结构体CubeMsgType，发送该消息。 |

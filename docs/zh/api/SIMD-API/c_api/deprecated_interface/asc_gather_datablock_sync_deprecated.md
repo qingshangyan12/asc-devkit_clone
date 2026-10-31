@@ -81,3 +81,10 @@ asc_gather_datablock_sync(dst, src, src_offset, 8, 1, 2);
 // src_offset [0, 32, 64, ..., 416, 448, 480]
 // dst [1, 2, 3, ..., 126, 127, 128]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gather_datablock](../vector_compute/vector_gather/asc_gather_datablock.md) | 给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -447,3 +447,9 @@
     ```
 
 完整样例请参考[DataCopyPad样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetPadValue(ISASI)](../data_move_aux_config/SetPadValue_ISASI.md) | DataCopyPad（GMToUB非对齐数据搬运）从Global Memory将数据非对齐搬运至Unified Buffer（UB）时，可根据开发者的需要自行填充数据。 |

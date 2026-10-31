@@ -52,3 +52,8 @@ uint64_t GetIndex()
 
 参考[调用示例](GetDataPtr.md#zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section320753512363)。
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ListTensorDesc](../ListTensorDesc.md) | ListTensorDesc用来解析符合以下内存排布格式的数据，并在核函数（Kernel）侧根据索引获取储存对应数据的地址及shape信息。 |

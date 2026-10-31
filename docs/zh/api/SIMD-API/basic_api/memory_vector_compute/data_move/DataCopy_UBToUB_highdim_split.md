@@ -256,3 +256,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     params.dstGap = 2;
     AscendC::DataCopy(dstLocal, srcLocal, params);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（UBToUB连续数据搬运）](DataCopy_UBToUB_continuous.md) | 支持Unified Buffer（UB）内部的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |

@@ -146,3 +146,10 @@
 ## 调用示例<a name="section642mcpsimp"></a>
 
 调用样例请参考[SPMBuffer调用示例](WriteSpmBuffer.md#section642mcpsimp)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitSpmBuffer](InitSpmBuffer.md) | 初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM Buffer上。 |
+| [WriteSpmBuffer](WriteSpmBuffer.md) | 将因为Unified Buffer（UB）空间不足而需要溢出暂存的数据拷贝到SPM Buffer中。 |

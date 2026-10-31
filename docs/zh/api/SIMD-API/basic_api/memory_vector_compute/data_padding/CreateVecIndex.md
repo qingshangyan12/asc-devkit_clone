@@ -166,3 +166,10 @@ def CreateVecIndex(dst, firstValue, count):
 输入数据（firstValue）：0
 输出数据（dstLocal）：[0 1 2 ... 127]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Gather](../scatter_gather/Gather.md) | Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseOffset），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。 |
+| [Duplicate](Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |

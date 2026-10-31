@@ -134,3 +134,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_zero_bits_cnt](asc_zero_bits_cnt.md) | 获取输入`uint64_t`数据的二进制表示中值为0的位数。 |

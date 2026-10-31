@@ -89,3 +89,11 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 ## 调用示例<a name="section177231425115410"></a>
 
 完整样例请参考[IBSet调用示例](IBSet.md#调用示例)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [IBSet](IBSet.md) | 设置核间同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，被等待核（生产者）在完成相关操作后调用本接口，将同步标志置为1，通知等待核（消费者）可以继续执行，从而避免因核间执行顺序不确定而产生数据读写错误。 |
+| [SetFlag/WaitFlag(ISASI)](../intra_core_sync/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
+| [GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |

@@ -90,3 +90,11 @@ asc_eq_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_
 // dst [0, 0, 8, ..., 0], dst[2] = 0b00001000
 …… // 同步操作
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_ge_scalar](asc_ge_scalar.md) | 按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。 |
+| [asc_le_scalar](asc_le_scalar.md) | 按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。 |
+| [asc_lt](asc_lt.md) | 按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。 |

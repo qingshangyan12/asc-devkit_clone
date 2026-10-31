@@ -82,3 +82,9 @@ uint16_t start_index = 1;
 uint8_t repeat = 8;
 asc_copy_l12l0b_sparse(dst, src, index, start_index, repeat);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad_sparse](../../cube_compute/mmad_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |

@@ -78,3 +78,10 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_copy_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy](../vector_datamove/asc_copy.md) | 将数据从Unified Buffer（UB）搬运到UB。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

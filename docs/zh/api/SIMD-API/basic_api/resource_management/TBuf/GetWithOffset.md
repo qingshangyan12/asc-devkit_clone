@@ -112,3 +112,10 @@ pipe.InitBuffer(calcBuf, byteLen);
 // 从calcBuf偏移64字节获取Tensor,Tensor为128个int32_t类型元素的内存大小，为512字节
 AscendC::LocalTensor<int32_t> tempTensor1 = calcBuf.GetWithOffset<int32_t>(128, 64);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Get](Get.md) | 从TBuf上获取指定长度的Tensor，或者获取全部长度的Tensor。 |
+| [TBuf构造函数](TBuf_constructor.md) | 创建TBuf对象时，初始化数据成员。 |

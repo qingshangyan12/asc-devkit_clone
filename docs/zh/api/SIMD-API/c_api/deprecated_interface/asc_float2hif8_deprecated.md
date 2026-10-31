@@ -105,3 +105,10 @@ vector_hifloat8_t dst;
 vector_bool mask;
 asc_float2hif8_rna(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2hif8](../reg_compute/reg_convert/asc_float2hif8.md) | 根据`mask`将`src`中参与计算的`float`类型元素转换为`hifloat8_t`类型，结果写入`dst`。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

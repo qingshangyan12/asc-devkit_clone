@@ -251,3 +251,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_pack_to_low](asc_pack_to_low.md) | 将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）写入目的操作数的低半部分。 |

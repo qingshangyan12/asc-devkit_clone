@@ -269,3 +269,14 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md) | 本接口用于在L0C Buffer搬出接口asc_copy_l0c2gm、asc_copy_l0c2l1、asc_copy_l0c2ub启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。 |
+| [asc_set_l0c_copy_channel_para](../cube_store_aux_config/asc_set_l0c_copy_channel_para.md) | 本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。 |
+| [asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md) | 本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。 |
+| [asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md) | 本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置。 |
+| [asc_set_l0c_copy_relu_alpha](../cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md) | 本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。 |
+| [asc_set_l0c_copy_lrelu_alpha](../cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md) | 本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。 |

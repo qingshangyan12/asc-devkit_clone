@@ -278,3 +278,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md) | 更新地址寄存器（addr_reg），用于迭代寻址。 |
+| [asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md) | 从Unified Buffer（UB）中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |

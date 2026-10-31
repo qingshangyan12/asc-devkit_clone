@@ -102,3 +102,11 @@ __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 asc_sub(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_add](asc_add.md) | 执行矢量加法运算。 |
+| [asc_add_scalar](asc_add_scalar.md) | 执行矢量加法运算。 |
+| [asc_sub_scalar](asc_sub_scalar.md) | 执行矢量和标量的减法运算。 |

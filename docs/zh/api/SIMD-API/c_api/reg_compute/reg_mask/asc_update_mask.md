@@ -223,3 +223,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_mask_spr](asc_get_mask_spr.md) | 从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。 |

@@ -80,3 +80,11 @@ __ubuf__ int64_t src[total_length];
 __ubuf__ int32_t dst[total_length];
 asc_int642int32(dst, src, total_length);    // 将src转换为int32_t类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int642float](asc_int642float.md) | 将int64_t类型数据转换为float类型。 |
+| [asc_bfloat162int32](asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
+| [asc_float2int32](asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |

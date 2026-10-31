@@ -84,3 +84,11 @@ __ubuf__ int16_t src[total_length];
 asc_vdeq_int162b8_h_sync(dst, src, total_length);
 asc_vdeq_int162b8_l_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_vdeq_int162b8](../vector_compute/vector_fused/asc_vdeq_int162b8.md) | 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_deq_scale](../vector_compute/vector_fused/asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

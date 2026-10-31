@@ -180,3 +180,9 @@ constexpr uint16_t dst_gap = 1;
 __cbuf__ half dst[256];
 asc_copy_gm2l1(dst, src, base_idx, repeat, src_stride, dst_gap);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1](asc_copy_gm2l1.md) | 将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式。 |

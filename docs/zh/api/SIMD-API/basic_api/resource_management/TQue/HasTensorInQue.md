@@ -67,3 +67,11 @@ int len = 1024;
 pipe.InitBuffer(que, num, len);
 bool ret = que.HasTensorInQue();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [EnQue](EnQue.md) | 将Tensor push到队列。 |
+| [GetTensorCountInQue](GetTensorCountInQue.md) | 查询Que中已入队的Tensor数量。 |

@@ -98,3 +98,11 @@ __ubuf__ half src[total_length];
 asc_sub_scalar(dst, src, scalar_val, total_length);
 asc_sync();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sub](asc_sub.md) | 执行矢量减法运算。 |
+| [asc_add](asc_add.md) | 执行矢量加法运算。 |
+| [asc_add_scalar](asc_add_scalar.md) | 执行矢量加法运算。 |

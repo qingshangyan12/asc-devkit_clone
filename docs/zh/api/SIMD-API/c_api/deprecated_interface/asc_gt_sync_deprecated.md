@@ -124,3 +124,12 @@ asc_get_cmp_mask(dst); // 读取结果
 // 结果输出到目标地址中
 asc_gt_sync(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gt](../vector_compute/vector_compare/asc_gt.md) | 按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_get_cmp_mask](../vector_compute/vector_compare/asc_get_cmp_mask.md) | 此接口用于获取Compare操作的比较结果。 |
+| [asc_set_cmp_mask](../vector_compute/vector_compare/asc_set_cmp_mask.md) | 为asc_select操作设置作用于选择的Mask掩码。 |

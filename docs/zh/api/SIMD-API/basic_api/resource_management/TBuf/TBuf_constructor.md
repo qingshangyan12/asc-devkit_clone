@@ -66,3 +66,10 @@ __aicore__ inline TBuf();
 ## 约束说明<a name="zh-cn_topic_0000001935531088_zh-cn_topic_0000001339105488_section19165124931511"></a>
 
 无。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Get](Get.md) | 从TBuf上获取指定长度的Tensor，或者获取全部长度的Tensor。 |
+| [GetWithOffset](GetWithOffset.md) | 以TBuf为基地址，向后偏移指定长度，将偏移后的地址作为起始地址，提取长度为指定值的Tensor。 |

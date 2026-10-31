@@ -95,3 +95,11 @@ asc_mul_add(dst, src0, src1, total_length);    // dst = (src0 * dst) + src1
 // 计算前dst [2, 2, 2, ..., 2]
 // 计算后dst [3, 5, 7, ..., 257]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_add_relu](asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
+| [asc_axpy](asc_axpy.md) | 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。 |
+| [asc_fma](asc_fma.md) | 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。 |

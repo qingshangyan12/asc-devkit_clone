@@ -95,3 +95,11 @@ asc_max_scalar(dst, src, value, total_length);
 // value : 3
 // dst : [3, 3, 3, 5, ... , 256]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_min_scalar](asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。 |
+| [asc_max](asc_max.md) | 执行逐元素取最大值运算。 |
+| [asc_min](asc_min.md) | 按元素求最小值。 |

@@ -98,3 +98,9 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_copy(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_ub2ub](asc_copy_ub2ub.md) | 将数据从Unified Buffer（UB）搬运到UB。 |

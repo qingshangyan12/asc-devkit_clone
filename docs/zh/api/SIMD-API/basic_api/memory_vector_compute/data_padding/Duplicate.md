@@ -232,3 +232,9 @@ scalar: 18.0
 srcLocal: [18.0 1.0 2.0 ... 254.0 255.0]
 dstLocal: [18.0 18.0 18.0 ... 18.0 18.0]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

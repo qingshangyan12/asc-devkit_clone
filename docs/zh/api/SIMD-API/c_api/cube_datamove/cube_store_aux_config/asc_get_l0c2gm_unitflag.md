@@ -59,3 +59,9 @@ PIPE_S
 ```cpp
 uint64_t unitflag_value = asc_get_l0c2gm_unitflag();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l0c_copy_config](asc_set_l0c_copy_config.md) | 本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置。 |

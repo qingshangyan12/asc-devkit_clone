@@ -250,3 +250,9 @@ ExpAlgo::INTRINSIC为默认算法。--cce-ftz=false时保留Subnormal；--cce-ft
 输入数据srcLocal：[0.0 1.0 2.0 3.0 ...]
 输出数据dstLocal：[1.0 2.719 7.391 20.08 ...]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

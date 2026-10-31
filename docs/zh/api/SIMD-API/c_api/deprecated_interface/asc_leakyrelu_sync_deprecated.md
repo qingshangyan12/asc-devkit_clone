@@ -83,3 +83,10 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_leakyrelu_sync(dst, src, alpha, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_leakyrelu](../vector_compute/vector_fused/asc_leakyrelu.md) | 执行矢量Leaky Relu运算。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

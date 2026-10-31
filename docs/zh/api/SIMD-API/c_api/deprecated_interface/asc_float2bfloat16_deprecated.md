@@ -124,3 +124,10 @@ asc_float2bfloat16_rd_sat(dst, src, mask);    // FLOOR舍入模式，饱和模�
 asc_float2bfloat16_rd_v2(dst, src, mask);    // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst奇数索引位置
 asc_float2bfloat16_rd_sat_v2(dst, src, mask);    // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst奇数索引位置
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2bfloat16](../reg_compute/reg_convert/asc_float2bfloat16.md) | 根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。 |
+| [asc_set_ctrl](../spr/asc_set_ctrl.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |

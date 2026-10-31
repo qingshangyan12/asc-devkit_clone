@@ -255,3 +255,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_pack_to_high](asc_pack_to_high.md) | 将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。 |

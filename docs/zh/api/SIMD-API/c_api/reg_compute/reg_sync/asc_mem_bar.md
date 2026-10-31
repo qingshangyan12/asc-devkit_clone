@@ -223,3 +223,14 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_storealign](../store/asc_storealign.md) | 将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。 |
+| [asc_loadalign](../load/asc_loadalign.md) | 从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。 |
+| [asc_gather](../ub_gather/asc_gather.md) | 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。 |
+| [asc_scatter](../scatter/asc_scatter.md) | 根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。 |
+| [asc_gather_datablock](../ub_gather/asc_gather_datablock.md) | 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
+| [asc_loadalign_brc_elem](../load/asc_loadalign_brc_elem.md) | 从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。 |

@@ -136,3 +136,9 @@ for (uint16_t i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
     AscendC::LoadData(a1Local[i * dstOffset], aGM[i * srcOffset], loadDataParams);
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（GMToL1-2D矩阵搬运V2）](LoadData_GMToL1_2DV2.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |

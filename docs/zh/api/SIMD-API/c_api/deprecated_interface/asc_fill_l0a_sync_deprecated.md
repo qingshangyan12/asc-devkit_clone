@@ -100,3 +100,10 @@ config.blk_num = total_length * sizeof(half) / 512;
 config.dst_gap = 0;
 asc_fill_l0a_sync(dst1, value1, config);    // 将dst1中256个half类型的元素初始化为1
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_fill_l0a](../cube_datamove/cube_load_aux_config/asc_fill_l0a.md) | 将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

@@ -300,3 +300,10 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     }
     ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [AddrReg](../register_data_types/AddrReg.md) | AddrReg是用于Reg矢量计算接口管理地址偏移量的专用寄存器。 |
+| [MaskReg搬入（LoadAlign）](LoadAlign_MaskReg.md) | LoadAlign能够实现数据从Unified Buffer（UB）搬运至MaskReg。 |

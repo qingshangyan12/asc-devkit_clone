@@ -83,3 +83,9 @@ asc_get_reduce_min_cnt(minValue, minIndex);
 minValue: 1.0
 minIndex: 255
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_repeat_reduce_min](asc_repeat_reduce_min.md) | 对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index。 |

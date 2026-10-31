@@ -62,3 +62,9 @@ uint16_t type = 0;       // 原子操作开启位
 uint16_t op = 0;         // 原子操作类型
 AscendC::GetStoreAtomicConfig(type, op);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetStoreAtomicConfig(ISASI)](SetStoreAtomicConfig_ISASI.md) | 设置原子操作开启位与原子操作类型。 |

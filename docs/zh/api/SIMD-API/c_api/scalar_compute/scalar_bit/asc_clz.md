@@ -134,3 +134,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_zero_bits_cnt](asc_zero_bits_cnt.md) | 获取输入`uint64_t`数据的二进制表示中值为0的位数。 |
+| [asc_popc](asc_popc.md) | 获取输入`uint64_t`数据的二进制表示中值为1的位数。 |
+| [asc_sflbits](asc_sflbits.md) | 对一个64位有符号整数，取其最高位（即符号位）作为参考位，统计从次高位（即最高数值位）开始与符号位相同的连续比特位的个数。 |

@@ -122,3 +122,12 @@ AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
 AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [TQueSync](TQueSync.md) | TQueSync类用于核内多流水间的同步。 |
+| [AllocEventID](../../resource_management/TPipe/AllocEventID.md) | 用于申请HardEvent（硬件类型同步事件）的TEventID，必须与ReleaseEventID搭配使用，调用该接口后，会占用申请的TEventID，直至调用ReleaseEventID释放。 |
+| [FetchEventID](../../resource_management/TPipe/FetchEventID.md) | 根据HardEvent（硬件类型的同步事件）获取相应可用的TEventID，此接口不会申请TEventID，仅提供可用的TEventID。 |
+| [PipeBarrier(ISASI)](PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

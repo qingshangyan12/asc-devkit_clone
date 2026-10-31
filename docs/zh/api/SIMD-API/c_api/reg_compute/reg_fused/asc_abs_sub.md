@@ -219,3 +219,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_abs](../reg_arith/asc_abs.md) | 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。 |
+| [asc_sub](../reg_arith/asc_sub.md) | 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。 |

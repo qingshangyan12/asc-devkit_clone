@@ -72,3 +72,10 @@ uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
 AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
 AscendC::PipeBarrier<PIPE_FIX>();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Fixpipe（L0C到GM数据搬运）](../cube_compute_store/Fixpipe_L0CToGM.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |
+| [Fixpipe（L0C到L1数据搬运）](../cube_compute_store/Fixpipe_L0CToL1.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。 |

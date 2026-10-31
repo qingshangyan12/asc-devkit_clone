@@ -130,3 +130,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_sub_block_num](asc_get_sub_block_num.md) | 在分离模式下读取当前AI Core上Cube Core（AIC）或Vector Core（AIV）的数量。 |
+| [asc_get_sub_block_id](asc_get_sub_block_id.md) | 在分离模式下获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |

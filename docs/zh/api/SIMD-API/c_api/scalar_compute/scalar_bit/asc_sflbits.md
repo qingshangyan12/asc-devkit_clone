@@ -142,3 +142,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_clz](asc_clz.md) | 计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。 |
+| [asc_popc](asc_popc.md) | 获取输入`uint64_t`数据的二进制表示中值为1的位数。 |
+| [asc_zero_bits_cnt](asc_zero_bits_cnt.md) | 获取输入`uint64_t`数据的二进制表示中值为0的位数。 |

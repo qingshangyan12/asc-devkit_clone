@@ -65,3 +65,9 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 ## 调用示例<a name="section1227835243314"></a>
 
 ResetLoopModePara需与[SetLoopModePara](SetLoopModePara.md)搭配使用，请参考[SetLoopModePara调用示例](SetLoopModePara.md#section1227835243314)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetLoopModePara](SetLoopModePara.md) | DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。 |

@@ -173,3 +173,9 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     ```
 
 完整样例请参考[DataCopyPad样例场景4、5、6](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ResetLoopModePara](ResetLoopModePara.md) | 重置loop mode的参数。与SetLoopModePara搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。 |

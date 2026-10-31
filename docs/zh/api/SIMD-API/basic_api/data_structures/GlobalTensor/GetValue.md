@@ -79,3 +79,9 @@ const uint16_t H = (uint16_t)tiling_global(1);
 // 示例结果如下：
 // C1 = 0，H = 100
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCacheCleanAndInvalid](../../cache_control/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |

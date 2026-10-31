@@ -88,3 +88,10 @@ AscendC::Prelu(dstLocal, src0Local, src1Local, 512);
 输入数据src1Local：[513 -514 515 ... 1]
 输出数据dstLocal：[1 1028 -1045 ... -512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Relu](Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |
+| [LeakyRelu](LeakyRelu.md) | LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。 |

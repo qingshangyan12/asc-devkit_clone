@@ -88,3 +88,10 @@ uint16_t src_repeat_stride = 8;
 asc_gt_scalar_sync(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 …… // 同步操作
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_gt_scalar](../vector_compute/vector_compare/asc_gt_scalar.md) | src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

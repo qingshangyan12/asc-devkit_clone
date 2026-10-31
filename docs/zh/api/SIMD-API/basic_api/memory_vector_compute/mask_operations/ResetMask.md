@@ -60,3 +60,9 @@ AscendC::ResetMask();
 ```
 
 更多示例请参考[接口外设置Mask](../SIMD_compute/mask.md#接口外设置mask)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

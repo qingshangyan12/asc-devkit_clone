@@ -68,3 +68,9 @@ uint16_t type = 1;
 uint16_t op = 2;
 asc_set_store_atomic_config_v2(type, op);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md) | 对Global Memory中`address`指向的单个元素执行原子加操作。 |

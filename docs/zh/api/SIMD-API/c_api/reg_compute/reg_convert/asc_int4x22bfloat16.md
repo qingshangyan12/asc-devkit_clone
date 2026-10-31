@@ -209,3 +209,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int4x22half](asc_int4x22half.md) | `int4x2_t`将两个连续的4bit有符号整数打包为一个8bit存储单元。 |
+| [asc_int4x22int16](asc_int4x22int16.md) | `int4x2_t`将两个连续的4bit有符号整数打包为一个8bit存储单元。 |

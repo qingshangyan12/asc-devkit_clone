@@ -76,3 +76,10 @@ addr_reg offset = asc_update_addr_reg_b32(0);
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_storealign_pack_v2(dst_align32b, src, offset, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md) | 将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB）。 |
+| [asc_update_addr_reg](../reg_compute/reg_addr_reg/asc_update_addr_reg.md) | 更新地址寄存器（addr_reg），用于迭代寻址。 |

@@ -173,3 +173,10 @@ Atlas推理系列产品AI Core，支持的数据类型为：int16_t、half、flo
 输入数据src1Local：[0 1 4 ... 513]
 输出数据dstLocal：[1 1 0 ... 0]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Relu](../basic_arithmetic/Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |

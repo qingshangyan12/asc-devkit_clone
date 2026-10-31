@@ -84,3 +84,10 @@ asc_min_scalar_sync(dst, src, value, total_length);
 // value : 3
 // dst : [1, 2, 3, 3, ... , 3]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_min_scalar](../vector_compute/vector_arith/asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

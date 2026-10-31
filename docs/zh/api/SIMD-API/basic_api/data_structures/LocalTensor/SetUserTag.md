@@ -74,3 +74,9 @@ __aicore__ inline void SetUserTag(const TTagType tag)
 AscendC::TTagType tag = 10;
 inputLocal.SetUserTag(tag); // 对LocalTensor设置tag信息。
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetUserTag](GetUserTag.md) | 获取指定Tensor块的Tag信息，用户可以根据Tag信息对Tensor进行不同操作。 |

@@ -210,3 +210,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2half](asc_float2half.md) | 将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。 |

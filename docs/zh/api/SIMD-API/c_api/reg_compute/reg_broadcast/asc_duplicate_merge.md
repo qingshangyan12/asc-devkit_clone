@@ -206,3 +206,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_duplicate](asc_duplicate.md) | 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。 |

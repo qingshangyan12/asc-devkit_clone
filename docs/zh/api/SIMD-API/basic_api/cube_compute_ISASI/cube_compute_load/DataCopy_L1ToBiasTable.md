@@ -175,3 +175,10 @@ __aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToBiasTable_res.md#id5 -->
 
 完整示例请参考[data_copy_gm2l1样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |
+| [DataCopy（L1ToFixpipe-Buffer数据搬运）](DataCopy_L1ToFixpipe.md) | DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buffer。 |

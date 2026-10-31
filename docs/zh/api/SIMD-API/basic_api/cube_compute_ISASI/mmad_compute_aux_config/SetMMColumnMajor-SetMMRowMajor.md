@@ -53,3 +53,10 @@ __aicore__ inline void SetMMRowMajor()   // 代表CUBE将首先通过N方向，�
 ```cpp
 AscendC::SetMMRowMajor();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Mmad](../mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |
+| [MmadWithSparse](../mmad_compute/MmadWithSparse.md) | MmadWithSparse接口负责完成特殊稀疏矩阵乘加操作。 |

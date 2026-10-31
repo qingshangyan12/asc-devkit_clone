@@ -95,3 +95,9 @@ asc_datablock_reduce_min(dst, src, 2, 1, 1, 8);
 输入数据src：[1 2 3 ... 16 17 ... 32 ... 225... 256]
 输出数据dst：[1 17 ... 225]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_datablock_reduce_max](asc_datablock_reduce_max.md) | 执行数据块内的求最大值规约（Reduce Max）操作。 |

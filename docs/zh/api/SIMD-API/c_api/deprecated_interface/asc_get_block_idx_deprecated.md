@@ -70,3 +70,10 @@ __aicore__ inline int64_t asc_get_block_idx()
 ```cpp
 int64_t blockIdx = block_idx * asc_get_sub_block_num() + asc_get_sub_block_id();  // 获取当前运行核的索引，替代 asc_get_block_idx()
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_get_sub_block_num](../utils/sys_var/asc_get_sub_block_num.md) | 在分离模式下读取当前AI Core上Cube Core（AIC）或Vector Core（AIV）的数量。 |
+| [asc_get_sub_block_id](../utils/sys_var/asc_get_sub_block_id.md) | 在分离模式下获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |

@@ -115,3 +115,10 @@ AscendC::KfcWorkspace desc(workspace); // 用户自行管理的workspace指针�
 AscendC::CubeResGroupHandle<CubeMsgBody> handle;
 handle = AscendC::CubeResGroupHandle<MatmulApiType, MyCallbackFunc, CubeMsgBody>(desc.GetMsgStart(), blockStart, blockSize, msgQueueSize, evtIDIn); 
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetKfcWorkspace](../KfcWorkspace/GetKfcWorkspace.md) | 获取用于CubeResGroupHandle消息通信区的内存地址。 |
+| [UpdateKfcWorkspace](../KfcWorkspace/UpdateKfcWorkspace.md) | 更新用于CubeResGroupHandle消息通信区的内存地址。 |

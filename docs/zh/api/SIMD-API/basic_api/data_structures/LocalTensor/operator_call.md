@@ -84,3 +84,11 @@ inputLocal(2) = 200;
 auto x = inputLocal(2);
 // x显示为200
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetValue](SetValue.md) | 设置LocalTensor中的某个值。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |
+| [operator\[\]](operator.md) | 获取距原LocalTensor起始地址偏移量为offset的新LocalTensor，注意offset不能超过原有LocalTensor的size大小。 |

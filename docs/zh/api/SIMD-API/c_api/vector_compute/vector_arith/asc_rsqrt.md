@@ -89,3 +89,10 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_rsqrt(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sqrt](asc_sqrt.md) | 按元素做开方。 |
+| [asc_rcp](asc_rcp.md) | 执行矢量的取倒数运算。 |

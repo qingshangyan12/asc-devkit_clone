@@ -79,3 +79,9 @@ __simd_vf__ inline void int162uint32_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ in
     }
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int162uint32](../reg_compute/reg_convert/asc_int162uint32.md) | `src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。 |

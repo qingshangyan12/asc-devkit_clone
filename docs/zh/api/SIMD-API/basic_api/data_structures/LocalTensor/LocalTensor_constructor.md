@@ -294,3 +294,11 @@ auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN
 uint32_t addr = 128;
 auto tensor1 = AscendC::LocalTensor<decltype(tensorTraitMake)>(addr);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetLength](GetLength.md) | 获取LocalTensor数据长度。 |
+| [SetValue](SetValue.md) | 设置LocalTensor中的某个值。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |

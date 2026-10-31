@@ -77,3 +77,11 @@
 // 从当前指令地址开始预加载4个单位的指令。
 PRELOAD(4);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ICachePreLoad(ISASI)](ICachePreLoad_ISASI.md) | 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。 |
+| [DataCachePreload](DataCachePreload.md) | 从源地址所在的特定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。 |
+| [GetICachePreloadStatus(ISASI)](GetICachePreloadStatus_ISASI.md) | GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。 |

@@ -90,3 +90,11 @@ bool sign_mode = true;    // 量化结果带符号（dst为int8_t类型）
 asc_set_deq_scale(scale, offset, sign_mode);    // 计算公式为dst = src
 asc_deq_int162b8_h_sync(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的高半块
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_deq_int162b8](../vector_compute/vector_fused/asc_deq_int162b8.md) | 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_deq_scale](../vector_compute/vector_fused/asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

@@ -162,3 +162,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md) | 该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。 |
+| [asc_set_ndim_pad_count](asc_set_ndim_pad_count.md) | 本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。 |

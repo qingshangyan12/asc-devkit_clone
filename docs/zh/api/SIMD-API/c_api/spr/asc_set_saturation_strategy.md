@@ -84,3 +84,9 @@ asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
 asc_set_saturation_strategy(old_strategy);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_saturation_flag](asc_set_saturation_flag.md) | 按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。 |

@@ -91,3 +91,9 @@ asc_set_cmp_mask(sel_mask);
 asc_sync_pipe(PIPE_V);
 asc_select(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_cmp_mask](../vector_compare/asc_set_cmp_mask.md) | 为asc_select操作设置作用于选择的Mask掩码。 |

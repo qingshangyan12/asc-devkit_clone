@@ -93,3 +93,11 @@ valueOut = AscendC::CountBitsCntSameAsSignBit(valueIn); // 返回62
 valueIn = 0x00F0000000000000LL;
 valueOut = AscendC::CountBitsCntSameAsSignBit(valueIn); // 返回7
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetBitCount](GetBitCount.md) | 统计uint64_t类型数值的二进制表示中指定比特值（0或1）的出现次数。 |
+| [GetSFFValue](GetSFFValue.md) | 查找uint64_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。 |
+| [CountLeadingZero](CountLeadingZero.md) | 统计uint64_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。 |

@@ -276,3 +276,10 @@ ReciprocalAlgo::INTRINSIC为默认算法。--cce-ftz=false时保留Subnormal；-
 输入数据srcLocal：[-7.152 -7.24 1.771 ... -1.339 4.473]
 输出数据dstLocal：[-0.1396 -0.1382 0.5645 ... -0.748 0.2231]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Div](Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |

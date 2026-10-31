@@ -65,3 +65,10 @@ PIPE_S
 uint64_t value = 1024;
 asc_set_l13d_size(value);    // 设置L1 Buffer的边界值为1024（单位：字节）
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0a_arch_2201](../cube_compute_load/asc_copy_l12l0a_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
+| [asc_copy_l12l0b_arch_2201](../cube_compute_load/asc_copy_l12l0b_arch_2201.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |

@@ -256,3 +256,11 @@ RsqrtAlgo::INTRINSIC为默认算法。--cce-ftz=false时保留Subnormal；--cce-
 输入数据srcLocal：[0.8335 2.2 2.672 ... 2.312 5.36]
 输出数据dstLocal：[1.094 0.676 0.6113 ... 0.6562 0.4316]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Div](Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |
+| [Sqrt](Sqrt.md) | Sqrt属于单目矢量类计算接口，负责将输入的tensor按元素做开方。 |

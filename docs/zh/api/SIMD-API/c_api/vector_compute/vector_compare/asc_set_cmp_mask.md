@@ -69,3 +69,9 @@ asc_set_cmp_mask(sel_mask);
 asc_sync_pipe(PIPE_V);
 asc_select(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_select](../vector_permute_sel/asc_select.md) | 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。 |

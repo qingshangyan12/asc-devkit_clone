@@ -67,3 +67,10 @@ PIPE_S
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
 asc_set_ffts_base_addr(config);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md) | 本接口与asc_sync_block_arrive配对使用，实现单AI Core内AIC与全部AIV之间的同步（四种核间同步模式中的模式2）。 |
+| [asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md) | 本接口与asc_sync_block_wait配对使用，实现单AI Core内AIC与全部AIV之间的同步（四种核间同步模式中的模式2）。 |

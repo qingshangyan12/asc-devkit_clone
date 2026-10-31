@@ -91,3 +91,10 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 ## 调用示例<a name="zh-cn_topic_0000002512171654_section088124295117"></a>
 
 本接口用于配合Sparse Mmad使用，完整示例请参考：[MmadWithSparse调用样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LoadData（2D矩阵搬运）](LoadData_2D.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持如下数据通路的搬运。 |
+| [MmadWithSparse](../mmad_compute/MmadWithSparse.md) | MmadWithSparse接口负责完成特殊稀疏矩阵乘加操作。 |

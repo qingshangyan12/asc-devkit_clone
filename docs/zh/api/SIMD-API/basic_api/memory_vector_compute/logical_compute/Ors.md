@@ -176,3 +176,9 @@ Ascend 950PR&950DT系列产品，目的操作数dst和源操作数src支持的�
 输入数据src1Local: [1 2 3 ... 512]
 输出数据dstLocal: [1 2 3 ... 512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

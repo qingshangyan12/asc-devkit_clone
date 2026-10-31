@@ -111,3 +111,11 @@ inputGlobal.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE); // 设置Glo
 AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
 AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GlobalTensor构造函数](GlobalTensor_constructor.md) | GlobalTensor构造函数。 |
+| [SetShapeInfo](SetShapeInfo.md) | 设置GlobalTensor的shape信息。 |
+| [SetValue](SetValue.md) | 设置GlobalTensor相应偏移位置的值。 |

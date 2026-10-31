@@ -72,3 +72,10 @@ __ubuf__ uint8_t src[size];
 __cbuf__ uint8_t dst[size];
 asc_copy_ub2l1_sync(dst, src, size);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_ub2l1](../vector_datamove/asc_copy_ub2l1.md) | 提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

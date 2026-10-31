@@ -167,3 +167,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_loadalign_downsample](asc_loadalign_downsample.md) | 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。 |
+| [asc_mem_bar](../reg_sync/asc_mem_bar.md) | Reg矢量计算内不同流水线之间的同步指令。 |

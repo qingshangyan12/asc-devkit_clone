@@ -76,3 +76,11 @@ __ubuf__ uint16_t src1[total_length/16];
 __ubuf__ uint16_t dst[total_length];
 asc_reduce_sync(dst, src0, src1, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_reduce](../vector_compute/vector_reduce/asc_reduce.md) | 以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_vector_mask](../vector_compute/vector_mask_config/asc_set_vector_mask.md) | 本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 |

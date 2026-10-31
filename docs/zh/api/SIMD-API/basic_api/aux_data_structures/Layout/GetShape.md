@@ -67,3 +67,11 @@ int value = AscendC::Std::get<0>(layoutMake.GetShape()); // value = 10
 value = AscendC::Std::get<1>(layoutMake.GetShape()); // value = 20
 value = AscendC::Std::get<2>(layoutMake.GetShape()); // value = 30
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Layout构造函数](Layout_constructor.md) | 根据输入的Shape和Stride对象，实例化Layout对象。 |
+| [MakeLayout](MakeLayout.md) | 将传入的Shape和Stride数据打包成Layout数据结构。 |
+| [GetStride](GetStride.md) | 返回描述内存访问步长的Stride对象，与Shape的维度信息一一对应。 |

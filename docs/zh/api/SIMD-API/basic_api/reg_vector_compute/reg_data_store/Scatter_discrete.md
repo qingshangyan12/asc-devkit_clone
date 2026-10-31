@@ -137,3 +137,10 @@ __simd_vf__ inline void ScatterVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ub
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [RegTensor](../register_data_types/RegTensor.md) | RegTensor寄存器是矢量计算基本单元，RegTensor位宽为VL（Vector Length），长度为256B。 |
+| [MaskReg](../register_data_types/MaskReg.md) | MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度为的八分之一（VL/8）。 |
+| [Scatter(ISASI)](../../memory_vector_compute/scatter_gather/Scatter_ISASI.md) | 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。 |

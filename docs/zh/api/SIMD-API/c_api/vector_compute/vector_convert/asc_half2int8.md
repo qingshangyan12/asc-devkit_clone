@@ -109,3 +109,9 @@ __ubuf__ half src[total_length];
 __ubuf__ int8_t dst[total_length];
 asc_half2int8_rn(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int82half](asc_int82half.md) | 将int8_t类型数据转换为half类型。 |

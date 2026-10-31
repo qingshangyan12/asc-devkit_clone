@@ -207,3 +207,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_prelu](asc_prelu.md) | 根据掩码对源操作数矢量数据寄存器`src0`中的元素执行PReLU（Parametric ReLU）运算，负半轴斜率由矢量数据寄存器`alpha`中的对应元素指定，并将结果通过函数返回值返回或写入目的操作数矢量数据寄存器。 |
+| [asc_relu](asc_relu.md) | 根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。 |

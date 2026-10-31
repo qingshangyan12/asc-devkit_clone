@@ -97,3 +97,9 @@ for (int32_t i = 0; i < srcLen; ++i) {
 // 示例2结果如下：
 // 数据(inputLocal): [99 99 99  ... 99]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [operator()](operator_call.md) | 获取本LocalTensor的第offset个变量的引用。 |

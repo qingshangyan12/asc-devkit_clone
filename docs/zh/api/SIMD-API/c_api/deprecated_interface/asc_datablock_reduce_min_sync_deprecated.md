@@ -82,3 +82,10 @@ asc_datablock_reduce_min_sync(dst, src, src_length);
 输入数据src：[1 2 3 ... 16 17 ... 32 ... 225... 256]
 输出数据dst：[1 17 ... 225]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_datablock_reduce_min](../vector_compute/vector_reduce/asc_datablock_reduce_min.md) | 执行数据块内的求最小值规约（Reduce Min）操作。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

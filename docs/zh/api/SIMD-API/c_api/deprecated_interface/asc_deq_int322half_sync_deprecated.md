@@ -78,3 +78,11 @@ asc_set_deq_scale(2.0);
 …… // 数据搬运及同步操作
 asc_deq_int322half_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_deq_int322half](../vector_compute/vector_fused/asc_deq_int322half.md) | 对输入的int32_t类型的数据按元素做量化并转换为half类型。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_set_deq_scale](../vector_compute/vector_fused/asc_set_deq_scale.md) | 设置DEQSCALE（量化参数）寄存器的值。 |

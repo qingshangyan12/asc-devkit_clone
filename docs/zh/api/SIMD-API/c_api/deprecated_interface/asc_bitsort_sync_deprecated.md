@@ -75,3 +75,10 @@ __ubuf__ half src0[256];
 __ubuf__ uint32_t src1[256];
 asc_bitsort_sync(dst, src0, src1, 8);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_bitsort](../vector_compute/vector_sort/asc_bitsort.md) | 本接口实现一次迭代内对32个数的降序排列操作。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

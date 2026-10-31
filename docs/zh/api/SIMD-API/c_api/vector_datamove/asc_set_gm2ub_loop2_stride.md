@@ -152,3 +152,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2ub_align](asc_copy_gm2ub_align/asc_copy_gm2ub_align.md) | 将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持搬运长度不是32字节整数倍的数据，并在搬运过程中进行32字节对齐补齐。 |
+| [asc_set_gm2ub_loop_size](asc_set_gm2ub_loop_size.md) | 本接口用于设置asc_copy_gm2ub_align使用循环搬运模式时的两层循环迭代次数。 |
+| [asc_set_gm2ub_loop1_stride](asc_set_gm2ub_loop1_stride.md) | 本接口用于设置asc_copy_gm2ub_align使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。 |

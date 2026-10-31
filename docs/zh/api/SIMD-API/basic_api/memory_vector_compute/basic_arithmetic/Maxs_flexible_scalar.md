@@ -166,3 +166,10 @@ $dst_i = \operatorname{Max}(scalar, src_i)$
 // 标量在后，src1Local[0]作为标量
 输出数据dstLocal：[2 2 3 ... 512]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
+| [Max](Max.md) | Max属于双目矢量类计算接口，负责将输入的两个tensor按元素求最大值。 |

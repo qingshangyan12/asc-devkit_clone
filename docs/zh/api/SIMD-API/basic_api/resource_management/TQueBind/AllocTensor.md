@@ -120,3 +120,11 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
     AscendC::LocalTensor<half> tensor1;
     que.AllocTensor<half>(tensor1); // AllocTensor分配Tensor长度为1024Bytes
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [FreeTensor](FreeTensor.md) | 释放Que中的指定Tensor。 |
+| [EnQue](EnQue.md) | 将Tensor push到队列。 |
+| [DeQue](DeQue.md) | 将Tensor从队列中取出，用于后续处理。 |

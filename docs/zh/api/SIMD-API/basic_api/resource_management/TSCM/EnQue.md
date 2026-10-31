@@ -90,3 +90,11 @@ __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](AllocTensor.md#section642mcpsimp)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DeQue](DeQue.md) | 将tensor从队列中取出，用于后续处理。 |
+| [FreeTensor](FreeTensor.md) | 释放TSCM中的指定Tensor。 |
+| [AllocTensor](AllocTensor.md) | 从TSCM中分配tensor，tensor所占大小为InitBuffer时设置的每块内存长度。 |

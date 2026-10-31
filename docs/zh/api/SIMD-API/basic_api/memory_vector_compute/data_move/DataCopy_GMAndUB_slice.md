@@ -230,3 +230,11 @@ AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
 ```
 
 完整样例请参考[切片数据搬运样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_slice)。srcSliceInfo、dstSliceInfo参数解析与结果示例请参考[图1](#fig1196816115710)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GMToUB随路转换ND2NZ搬运）](DataCopy_GMToUB_ND2NZ.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer（UB）的数据搬运过程中进行ND到NZ格式的转换。 |
+| [DataCopy（UBToGM随路转换NZ2ND搬运）](DataCopy_UBToGM_NZ2ND.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer（UB）到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
+| [DataCopyPad（UBToGM非对齐数据搬运）](DataCopyPad_UBToGM.md) | 该接口提供将数据从Unified Buffer（UB）非对齐搬运至Global Memory的功能。 |

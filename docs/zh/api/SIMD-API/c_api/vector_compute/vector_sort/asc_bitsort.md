@@ -200,3 +200,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mrgsort4](asc_mrgsort4.md) | 本接口实现将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序。 |

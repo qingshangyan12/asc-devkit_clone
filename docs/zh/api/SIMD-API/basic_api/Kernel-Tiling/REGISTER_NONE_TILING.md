@@ -122,3 +122,13 @@ __global__ __aicore__ void mul(GM_ADDR x1, GM_ADDR x2, GM_ADDR y, GM_ADDR worksp
 }
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GET_TILING_DATA_WITH_STRUCT](GET_TILING_DATA_WITH_STRUCT.md) | 使用该接口指定结构体名称，可获取指定的tiling信息，并填入对应的Tiling结构体中，此函数会以宏展开的方式进行编译。 |
+| [GET_TILING_DATA_MEMBER](GET_TILING_DATA_MEMBER.md) | 用于获取tiling结构体的成员变量。 |
+| [GET_TILING_DATA_PTR_WITH_STRUCT](GET_TILING_DATA_PTR_WITH_STRUCT.md) | 在使用该宏时，开发者可以通过指定结构体名称来获取相应的Tiling信息，并将其填入对应的Tiling结构体中。 |
+| [GET_TILING_DATA](GET_TILING_DATA.md) | 用于获取算子核函数（Kernel）入口函数传入的Tiling信息，并填入注册的TilingData结构体中，此函数会以宏展开的方式进行编译。 |
+| [REGISTER_TILING_DEFAULT](REGISTER_TILING_DEFAULT.md) | 用于在核函数（Kernel）侧注册用户使用标准C++语法自定义的默认TilingData结构体。 |
+| [REGISTER_TILING_FOR_TILINGKEY](REGISTER_TILING_FOR_TILINGKEY.md) | 用于在核函数（Kernel）侧注册与TilingKey相匹配的TilingData自定义结构体；该接口需提供一个逻辑表达式，逻辑表达式以字符串“TILING_KEY_VAR”代指实际TilingKey，表达TilingKey所满足的范围。 |

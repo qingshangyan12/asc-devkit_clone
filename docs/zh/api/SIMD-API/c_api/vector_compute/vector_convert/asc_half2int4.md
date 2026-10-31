@@ -111,3 +111,9 @@ offset += total_length * sizeof(half);
 __ubuf__ int4b_t* dst = (__ubuf__ int4b_t*)asc_get_phy_buf_addr(offset);
 asc_half2int4(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int42half](asc_int42half.md) | 将int4_t类型数据转换为half类型。 |

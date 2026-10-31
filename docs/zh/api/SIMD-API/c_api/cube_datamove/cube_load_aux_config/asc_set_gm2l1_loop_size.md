@@ -164,3 +164,11 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_gm2l1_align](../cube_compute_load/asc_copy_gm2l1_align.md) | 将数据从Global Memory（GM）搬运到L1 Buffer，支持搬运长度不是32字节整数倍的数据，并在搬运过程中进行32字节对齐补齐。 |
+| [asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。 |
+| [asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md) | 将数据从Global Memory（GM）搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。 |

@@ -196,3 +196,11 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 ```
 
 完整样例请参考[CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [CrossCoreSetFlag(ISASI)](CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。 |
+| [设置核函数（Kernel）类型](../../Kernel-Tiling/set_Kernel_type.md) | 用于用户自定义设置核函数（Kernel）类型，控制算子执行时只启动该类型的核，避免启动不需要工作的核，缩短核启动开销。 |
+| [SyncAll](SyncAll.md) | SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能。 |

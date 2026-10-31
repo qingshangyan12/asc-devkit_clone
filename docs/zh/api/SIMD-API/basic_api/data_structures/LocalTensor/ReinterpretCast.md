@@ -80,3 +80,11 @@ AscendC::LocalTensor<int16_t> interpreTensor = inputLocal.ReinterpretCast<int16_
 // inputLocal:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 // interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [GetPhyAddr](GetPhyAddr.md) | 返回LocalTensor的地址或指定偏移量后的地址。 |
+| [GetSize](GetSize.md) | 获取当前LocalTensor Size大小。 |

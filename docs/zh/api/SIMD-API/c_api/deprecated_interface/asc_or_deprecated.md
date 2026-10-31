@@ -93,3 +93,9 @@ vector_half src1;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_or(dst, src0, src1, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_or](../reg_compute/reg_logic/asc_or.md) | 根据`mask`对源操作数`src0`、`src1`执行按位或（&#124;）操作，将结果作为返回值返回或写入目的操作数`dst`。 |

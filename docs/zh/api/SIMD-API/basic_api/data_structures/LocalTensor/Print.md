@@ -80,3 +80,11 @@ inputLocal.Print();
 // 0000: 0 1 2 3 4 5 6 7 8
 // 0008: 9 10 11 12 13 14 15
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [ToFile](ToFile.md) | 只限于CPU调试，将LocalTensor数据Dump到文件中，用于精度调试，文件保存在执行目录。 |
+| [GetLength](GetLength.md) | 获取LocalTensor数据长度。 |

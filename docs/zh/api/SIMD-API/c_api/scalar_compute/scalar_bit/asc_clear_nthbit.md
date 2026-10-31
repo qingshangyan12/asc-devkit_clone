@@ -134,3 +134,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_nthbit](asc_set_nthbit.md) | 将`uint64_t`数据的指定二进制位置为1，其余位保持不变。 |

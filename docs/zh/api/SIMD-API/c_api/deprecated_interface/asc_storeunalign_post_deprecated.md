@@ -103,3 +103,10 @@ PIPE_V
     asc_storeunalign_postupdate(dst, ureg, src);
     asc_storeunalign_post(dst, ureg);
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md) | Reg计算数据搬运接口，用于结束一组asc_squeeze_and_storeunalign连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。 |
+| [asc_storeunalign_postupdate（废弃）](asc_storeunalign_postupdate_deprecated.md) | reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的场景。 |

@@ -94,3 +94,9 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_shiftleft(dst, src, distance, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_shiftright](asc_shiftright.md) | 对src中的每个元素执行右移，右移大小为value。 |

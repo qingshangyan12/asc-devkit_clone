@@ -226,3 +226,10 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_div](asc_div.md) | 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。 |
+| [asc_mul](asc_mul.md) | 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。 |

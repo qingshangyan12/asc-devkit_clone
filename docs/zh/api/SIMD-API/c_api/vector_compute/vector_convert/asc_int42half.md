@@ -83,3 +83,9 @@ offset += total_length / 2;    // int4b_t的一个元素占半个字节
 __ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
 asc_int42half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_half2int4](asc_half2int4.md) | 将half类型数据转换为int4类型，支持多种舍入模式。 |

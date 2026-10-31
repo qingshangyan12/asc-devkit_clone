@@ -181,3 +181,10 @@
     ...
     pipe.ReadSpmBuffer(writeLocal, dataSize, offset); // 当UB空间足够时，将暂存在SPM Buffer的数据读回到UB
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [InitSpmBuffer](InitSpmBuffer.md) | 初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM Buffer上。 |
+| [ReadSpmBuffer](ReadSpmBuffer.md) | 从SPM Buffer读回到local数据中。 |

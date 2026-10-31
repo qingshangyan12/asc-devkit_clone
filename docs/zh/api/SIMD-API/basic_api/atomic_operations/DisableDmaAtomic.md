@@ -70,3 +70,11 @@ AscendC::DisableDmaAtomic();
 ```
 
 完整样例请参考[DataMovementWithAtomicOperations样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetAtomicAdd](SetAtomicAdd.md) | 对后续目的地址为GM的数据搬运开启原子累加。 |
+| [SetAtomicMax(ISASI)](SetAtomicMax_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。 |
+| [SetAtomicMin(ISASI)](SetAtomicMin_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |

@@ -242,3 +242,9 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_float2int64](asc_float2int64.md) | 将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。 |

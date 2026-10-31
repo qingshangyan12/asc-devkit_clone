@@ -112,3 +112,13 @@ Src1: [2,2,2,2,2,...,2] // 256个2
 ```
 
 完整样例请参考[DataMovementWithAtomicOperations样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DisableDmaAtomic](DisableDmaAtomic.md) | 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。 |
+| [SetAtomicType](SetAtomicType.md) | 通过设置模板参数来设定原子操作不同的数据类型。 |
+| [SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md) | 设置精度转换接口使用的饱和模式配置策略。 |
+| [SetCtrlSpr(ISASI)](../special_register_access/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
+| [SetAtomicAdd](SetAtomicAdd.md) | 对后续目的地址为GM的数据搬运开启原子累加。 |

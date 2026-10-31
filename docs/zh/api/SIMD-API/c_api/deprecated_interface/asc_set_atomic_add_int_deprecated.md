@@ -59,3 +59,10 @@ PIPE_S
 ## 调用示例
 
 请参考[asc_set_atomic_add](../atomic/datamove_atomic/asc_set_atomic_add.md)的调用示例。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_atomic_add](../atomic/datamove_atomic/asc_set_atomic_add.md) | 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。 |
+| [asc_disable_dma_atomic](../atomic/datamove_atomic/asc_disable_dma_atomic.md) | 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。 |

@@ -96,3 +96,9 @@ inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t *>(src_gm), dataSize
 AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
 AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetSize](GetSize.md) | 获取GlobalTensor的元素个数。 |

@@ -57,3 +57,10 @@ uint32_t len = inputLocal.GetLength();
 // len: 64
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [LocalTensor构造函数](LocalTensor_constructor.md) | LocalTensor构造函数。 |
+| [GetValue](GetValue.md) | 获取LocalTensor指定索引的数值。 |
+| [GetShapeInfo](GetShapeInfo.md) | 获取LocalTensor的Shape信息。 |

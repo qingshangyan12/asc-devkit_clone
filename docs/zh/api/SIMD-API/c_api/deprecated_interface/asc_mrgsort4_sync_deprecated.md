@@ -114,3 +114,11 @@ dst = dst_workspace;
 valid_bit = 3;
 asc_mrgsort4_sync(dst, src, 1, 4 * element_length, 4 * element_length, 0, 0, false, valid_bit);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mrgsort4](../vector_compute/vector_sort/asc_mrgsort4.md) | 本接口实现将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
+| [asc_bitsort](../vector_compute/vector_sort/asc_bitsort.md) | 本接口实现一次迭代内对32个数的降序排列操作。 |

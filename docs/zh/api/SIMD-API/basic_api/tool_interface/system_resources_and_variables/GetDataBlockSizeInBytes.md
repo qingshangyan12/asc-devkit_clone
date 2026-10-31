@@ -71,3 +71,10 @@ uint8_t repeatTime = 512 / mask;
 // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
 AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, { 1, 1, 1, 8, 8, 8 });
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetUBSizeInBytes](GetUBSizeInBytes.md) | 获取Unified Buffer（UB）空间的大小，单位为Byte。 |
+| [GetRuntimeUBSize](GetRuntimeUBSize.md) | 获取运行时Unified Buffer（UB）空间的大小，单位为Byte。 |

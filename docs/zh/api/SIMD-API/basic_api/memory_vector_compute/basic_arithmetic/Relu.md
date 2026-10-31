@@ -180,3 +180,9 @@ $dst_i = \max(0, src_i)$
 输入数据srcLocal: [6.938 -8.86 -0.2263 ... 1.971 1.778]
 输出数据dstLocal: [6.938 0 0 ... 1.971 1.778]
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

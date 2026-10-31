@@ -114,3 +114,9 @@ outQueueDst.EnQue<float>(dstLocal);
 inQueueSrc0.FreeTensor(srcLocal0);
 inQueueSrc1.FreeTensor(srcLocal1);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [MrgSort](MrgSort.md) | 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。 |

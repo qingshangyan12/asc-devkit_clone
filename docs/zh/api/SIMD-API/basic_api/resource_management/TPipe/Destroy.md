@@ -61,3 +61,10 @@ uint32_t len = 128;
 pipe.InitBuffer(que, num, len);
 pipe.Destroy();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [Init](Init.md) | 用于内存和同步流水事件EventID的初始化。 |
+| [TPipe构造函数](TPipe_constructor.md) | 构造用来管理内存和同步的TPipe对象。 |

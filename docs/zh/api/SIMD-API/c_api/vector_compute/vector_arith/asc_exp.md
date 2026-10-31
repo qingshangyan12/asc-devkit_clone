@@ -88,3 +88,9 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_exp(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_log](asc_log.md) | 按元素取自然对数。 |

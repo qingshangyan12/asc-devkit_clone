@@ -177,3 +177,9 @@
     输入数据dstLocal：[1 2 3 ... 512]
     输出数据dstGlobal：[1 2 3 ... 512]
     ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) | 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。 |

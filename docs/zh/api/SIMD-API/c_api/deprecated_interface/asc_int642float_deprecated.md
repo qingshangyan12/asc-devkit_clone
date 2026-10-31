@@ -91,3 +91,9 @@ vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_int642float_rn(dst, src, mask);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_int642float](../reg_compute/reg_convert/asc_int642float.md) | 将`int64_t`类型数据转换为`float`，并支持多种舍入模式。 |

@@ -55,3 +55,9 @@ int64\_t类型，0表示ICache的PreLoad已完成，1表示ICache的PreLoad未�
 // 获取ICache预加载状态，0表示已完成，1表示未完成。
 int64_t cachePreloadStatus = AscendC::GetICachePreloadStatus();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ICachePreLoad(ISASI)](ICachePreLoad_ISASI.md) | 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。 |

@@ -56,3 +56,11 @@ MutexID有数量限制，使用结束后应立即调用[ReleaseMutexID](ReleaseM
 ## 调用示例<a name="section837496171220"></a>
 
 示例请参考[Lock调用示例](Lock.md#section123275308128)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ReleaseMutexID (ISASI)](ReleaseMutexID_ISASI.md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
+| [Lock](Lock.md) | 根据MutexID获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同MutexID的Mutex都已经被Unlock释放。 |
+| [Unlock](Unlock.md) | 指定流水的前序指令执行完成后，根据MutexID释放对应Mutex。 |

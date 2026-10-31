@@ -158,3 +158,18 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
     ```
 
 更多示例请参考[CtrlSpr样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/09_utils/ctrl_spr)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCacheCleanAndInvalid](../cache_control/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |
+| [Cast](../reg_vector_compute/type_conversion/Cast.md) | Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现浮点转整数、浮点转浮点、整数转浮点、整数转整数的数据类型转换。 |
+| [SetSaturationFlag(ISASI)](SetSaturationFlag_ISASI.md) | 设置不同数据类型的计算或精度转换时饱和模式的开启状态。 |
+| [GetSaturationFlag(ISASI)](GetSaturationFlag_ISASI.md) | 获取`mode`指定的全局饱和模式的开启状态，该状态通过SetSaturationFlag设置。 |
+| [SetAtomicType](../atomic_operations/SetAtomicType.md) | 通过设置模板参数来设定原子操作不同的数据类型。 |
+| [DisableDmaAtomic](../atomic_operations/DisableDmaAtomic.md) | 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。 |
+| [SetAtomicAdd](../atomic_operations/SetAtomicAdd.md) | 对后续目的地址为GM的数据搬运开启原子累加。 |
+| [SetAtomicMax(ISASI)](../atomic_operations/SetAtomicMax_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。 |
+| [SetAtomicMin(ISASI)](../atomic_operations/SetAtomicMin_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |
+| [Mmad](../cube_compute_ISASI/mmad_compute/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |

@@ -89,3 +89,9 @@ PIPE_S
 ## 调用示例
 
 本接口需与[asc_sync_notify](asc_sync_notify.md)配对使用，调用示例请参考[asc_sync_notify](asc_sync_notify.md)中的“调用示例”章节。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_sync_notify](asc_sync_notify.md) | 与asc_sync_wait配对使用，用于实现AI Core内部不同流水之间的同步控制。 |

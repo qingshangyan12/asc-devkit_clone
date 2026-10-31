@@ -61,3 +61,10 @@ uint32_t orgShape3 = maxShapeInfo.originalShape[3];
 // 获取现有的shape的2维的值
 uint32_t shape2 = maxShapeInfo.shape[2];
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [ShapeInfo](../../aux_data_structures/ShapeInfo.md) | ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。 |
+| [SetShapeInfo](SetShapeInfo.md) | 设置GlobalTensor的shape信息。 |

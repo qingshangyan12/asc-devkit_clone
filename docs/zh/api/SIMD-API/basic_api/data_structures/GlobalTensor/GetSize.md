@@ -56,3 +56,8 @@ AscendC::PopStackBuffer<uint8_t, AscendC::TPosition::LCM>(stackBuffer);
 uint32_t stackBufferSize = stackBuffer.GetSize();
 ```
 
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetGlobalBuffer](SetGlobalBuffer.md) | 传入全局数据地址，初始化GlobalTensor。 |

@@ -226,3 +226,9 @@ $dst_i = |src_i|$
     输出数据dstLocal：[2.236 3.605 ...]
     ```
 <!-- end id24 -->
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetVectorMask](../mask_operations/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |

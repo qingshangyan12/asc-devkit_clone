@@ -188,3 +188,11 @@ padParams.paddingValue = static_cast<int8_t>(0);
 
 AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(dstLocal, srcGm, copyParams, padParams);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [DataCopy（GMToL1连续数据搬运）](DataCopy_GMToL1_continuous.md) | 该接口能够将矩阵从Global Memory连续搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
+| [DataCopy（GMToL1高维切分数据搬运）](DataCopy_GMToL1_highdim_split.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
+| [DataCopy（GMToL1随路转换-ND2NZ搬运）](DataCopy_GMToL1_ND2NZ.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），并支持在数据搬运时进行ND到NZ格式的转换。 |

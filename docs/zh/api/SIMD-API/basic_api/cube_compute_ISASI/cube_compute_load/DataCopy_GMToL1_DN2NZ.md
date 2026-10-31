@@ -184,3 +184,9 @@ dn2nzA1Params.dstNzMatrixStride = 0;
 AscendC::DataCopy(a1Local, aGM, dn2nzA1Params);
 
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [SetL2CacheHint](../../data_structures/GlobalTensor/SetL2CacheHint.md) | 设置GlobalTensor是否启用L2 Cache，默认启用L2 Cache。 |

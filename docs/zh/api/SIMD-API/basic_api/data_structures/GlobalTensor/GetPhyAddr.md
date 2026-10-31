@@ -86,3 +86,11 @@ __aicore__ inline void CopyIn(const AscendC::GlobalTensor<T>& input)
     // ...
 }
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GlobalTensor构造函数](GlobalTensor_constructor.md) | GlobalTensor构造函数。 |
+| [SetGlobalBuffer](SetGlobalBuffer.md) | 传入全局数据地址，初始化GlobalTensor。 |
+| [operator()](operator_call.md) | 获取某个索引位置的元素的引用。 |

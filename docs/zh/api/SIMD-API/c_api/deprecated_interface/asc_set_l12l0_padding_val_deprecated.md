@@ -72,3 +72,9 @@ PIPE_S
 uint64_t config = 0;
 asc_set_l12l0_padding_val(config);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_set_l12l0b_3d_padding](../cube_datamove/cube_load_aux_config/asc_set_l12l0b_3d_padding.md) | 用于调用asc_copy_l12l0b_arch_3510（3D矩阵搬运）时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。 |

@@ -65,3 +65,9 @@ __aicore__ inline void SetStoreAtomicConfig()
 // 设置原子操作为求和操作，支持的数据类型为half
 AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [GetStoreAtomicConfig(ISASI)](GetStoreAtomicConfig_ISASI.md) | 获取原子操作开启位与原子操作类型的值，详细说明见表1。 |

@@ -203,3 +203,9 @@ bool c_matrix_source = true;
 bool c_matrix_init_val = true;
 asc_mmad_sparse(c, a, b, m, k, n, unit_flag_mode, c_matrix_source, c_matrix_init_val);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_copy_l12l0b_sparse](../../cube_datamove/cube_compute_load/asc_copy_l12l0b_sparse.md) | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |

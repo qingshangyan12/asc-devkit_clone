@@ -76,3 +76,10 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_not_sync(dst, src, total_length);
 ```
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_not](../vector_compute/vector_logic/asc_not.md) | 按元素做按位取反。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |

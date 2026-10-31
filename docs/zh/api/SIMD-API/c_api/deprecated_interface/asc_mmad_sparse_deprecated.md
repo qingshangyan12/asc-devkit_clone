@@ -88,3 +88,10 @@ PIPE_M
 - 原始稀疏矩阵B每4个元素中最多包含2个非零元素；如果存在3个或更多非零元素，则仅使用前2个非零元素。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
 - 稀疏矩阵的数据准备、稠密算法及其他约束请参见[asc_mmad_sparse](../cube_compute/mmad_compute/asc_mmad_sparse.md)。
+
+## 参见
+
+| 接口 | 描述 |
+| --- | --- |
+| [asc_mmad_sparse](../cube_compute/mmad_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |
+| [asc_sync](../sync/intra_core_sync/asc_sync.md) | 用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。 |
