@@ -159,7 +159,7 @@ class DFXSectionGenerator:
     def _set_level_1_input_output_dfx_info(self, param_info):
         parameter: DFXArgInfo = self.get_param(param_info["param_name"])
         parameter.param_size = (
-            reduce(lambda x, y: x * y, param_info.get("shape")) * INPUT_OUTPUT_DTYPE_LEN[(param_info.get("dtype"))]
+            reduce(lambda x, y: x * y, param_info.get("shape"), 1) * INPUT_OUTPUT_DTYPE_LEN[(param_info.get("dtype"))]
         )
         parameter.param_dim = len(param_info.get("shape"))
         parameter.param_shape = param_info.get("shape")
