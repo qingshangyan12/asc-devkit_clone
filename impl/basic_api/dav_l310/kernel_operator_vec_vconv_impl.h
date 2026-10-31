@@ -1367,8 +1367,7 @@ template <typename T1, typename T2>
 __simd_vf__ inline void AddReluCastImpl(__ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint32_t calCount)
 {
     static_assert(
-        SupportType<
-            Tuple<T1, T2>, Tuple<half, float>, Tuple<int8_t, half>, Tuple<int8_t, int16_t>>(),
+        SupportType<Tuple<T1, T2>, Tuple<half, float>, Tuple<int8_t, half>, Tuple<int8_t, int16_t>>(),
         "Failed to check dtype in AddReluCast, current api "
         "support dtype combination is src: float, dst: half; src: half, dst: int8_t; src: int16_t, dst: int8_t; ");
     uint32_t sreg = static_cast<uint32_t>(calCount);
@@ -1479,8 +1478,7 @@ template <typename T1, typename T2>
 __simd_vf__ inline void SubReluCastImpl(__ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint32_t calCount)
 {
     static_assert(
-        SupportType<
-            Tuple<T1, T2>, Tuple<half, float>, Tuple<int8_t, half>, Tuple<int8_t, int16_t>>(),
+        SupportType<Tuple<T1, T2>, Tuple<half, float>, Tuple<int8_t, half>, Tuple<int8_t, int16_t>>(),
         "Failed to check dtype in SubReluCast, current api support "
         "dtype combination is src: float, dst: half; src: half, dst: int8_t; src: int16_t, dst: int8_t.");
     uint32_t sreg = static_cast<uint32_t>(calCount);
