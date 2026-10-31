@@ -2425,8 +2425,9 @@ static HcclResult HcclGetCcuKernelDynamic(
 // 实验构建（asc-comm 数据面）：entity 查询模式。哨兵值为 8 字节对齐且 > UINT32_MAX 的地址，
 // hcomm 检测到后返回其持有的 HcommCcuInstanceEntity 稳定地址（借用，不转移所有权，
 // 不把 CcuInsHandle 直接当指针传给 asc-comm）。
-// 与 hcomm 侧 IsInstanceEntityQueryRequest 同口径回检：旧版 hcomm 不识别哨兵时返回小值实例
-// token，直接透传会触发 asc-comm 侧非法解引用；此处拦截并报 INTERNAL。
+// 返回值不能用 ">UINT32_MAX" 判定：低地址布局进程（brk 堆）的堆地址低于 4GB，会把合法
+// 实体误判为 token。先用对齐加最小阈值排除旧版 hcomm 的自增小值 token（避免解引用非法地址），
+// 再按实体 ABI 头校验（与 asc-comm is_instance_header_valid 同口径）；校验不过在此拦截报 INTERNAL。
 static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
 {
     CcuInsHandle insHandle = reinterpret_cast<CcuInsHandle>(&insEntity);
@@ -2438,13 +2439,24 @@ static HcclResult QueryCcuInstanceEntity(HcclComm comm, void*& insEntity)
     CHK_PRT_RET(
         insNum != 1, HCCL_ERROR("[QueryCcuInstanceEntity] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
         HCCL_E_INTERNAL);
-    const bool isEntityAddress = insHandle > static_cast<CcuInsHandle>(UINT32_MAX) &&
-                                 (insHandle % sizeof(void*)) == 0;
+    // mmap_min_addr 语义下限：任何合法用户态指针 >= 64KB；旧版 hcomm 的自增 token 远小于该值。
+    constexpr CcuInsHandle MIN_ENTITY_HANDLE = 0x10000ULL;
     CHK_PRT_RET(
-        !isEntityAddress,
+        (insHandle % alignof(HcommCcuInstanceEntity)) != 0 || insHandle < MIN_ENTITY_HANDLE,
         HCCL_ERROR("[QueryCcuInstanceEntity] hcomm returned a non-entity CcuInsHandle[%llu]; entity query mode "
                    "requires a newer hcomm with sentinel detection",
                    static_cast<unsigned long long>(insHandle)),
+        HCCL_E_INTERNAL);
+    const HcommCcuInstanceEntity* entity = reinterpret_cast<const HcommCcuInstanceEntity*>(insHandle);
+    CHK_PRT_RET(
+        entity->header.version != HCOMM_CCU_INSTANCE_ENTITY_ABI_VERSION ||
+            entity->header.magicWord != HCOMM_CCU_INSTANCE_ENTITY_MAGIC_WORD ||
+            entity->header.size != sizeof(HcommCcuInstanceEntity) || entity->header.reserved != 0 ||
+            entity->reserved != 0,
+        HCCL_ERROR("[QueryCcuInstanceEntity] entity ABI header mismatch, handle[%llu], magicWord[0x%x], version[%u], "
+                   "size[%u]; entity query mode requires a newer hcomm with sentinel detection",
+                   static_cast<unsigned long long>(insHandle), entity->header.magicWord, entity->header.version,
+                   entity->header.size),
         HCCL_E_INTERNAL);
     insEntity = reinterpret_cast<void*>(insHandle);
     HCCL_INFO("[QueryCcuInstanceEntity] entity[%p].", insEntity);
