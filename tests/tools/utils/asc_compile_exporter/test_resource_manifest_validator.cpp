@@ -182,8 +182,7 @@ TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 TEST_F(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
 {
     ExpectInvalid("source_file has wrong type", [](Json& manifest) { manifest["source_file"] = 1U; });
-    ExpectInvalid(
-        "source_file contains a directory", [](Json& manifest) { manifest["source_file"] = "src/kernel.cpp"; });
+    ExpectInvalid("source_file is absolute", [](Json& manifest) { manifest["source_file"] = "/src/kernel.cpp"; });
     ExpectInvalid("source_file traverses", [](Json& manifest) { manifest["source_file"] = "../kernel.cpp"; });
     ExpectInvalid("resource_path has wrong type", [](Json& manifest) { manifest["resource_path"] = 1U; });
     ExpectInvalid("resource_path is absolute", [](Json& manifest) { manifest["resource_path"] = "/resources"; });
@@ -197,6 +196,14 @@ TEST_F(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
     ExpectInvalid("common_compile contains common marker", [](Json& manifest) {
         manifest["options"]["common_compile"] = Json::array({"${options:common_compile}"});
     });
+}
+
+TEST_F(ResourceManifestValidatorTest, AcceptsPackageRelativeSourceFile)
+{
+    Json manifest = MakeValidManifest();
+    manifest["source_file"] = "op_impl/ai_core/tbe/impl/add/kernel.cpp";
+    manifest["options"]["common_compile"].push_back("-I${source_file_path}/../../common");
+    EXPECT_TRUE(Validate(manifest));
 }
 
 TEST_F(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
@@ -254,8 +261,6 @@ TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
 {
     ExpectInvalid(
         "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "constant"; });
-    ExpectInvalid(
-        "struct must not contain byte_size", [](Json& manifest) { Constant(manifest)["arg_type"] = "struct"; });
     ExpectInvalid(
         "constant file lacks resource prefix", [](Json& manifest) { Constant(manifest)["file"] = "resources/x"; });
     ExpectInvalid("constant file is outside resource_path", [](Json& manifest) {

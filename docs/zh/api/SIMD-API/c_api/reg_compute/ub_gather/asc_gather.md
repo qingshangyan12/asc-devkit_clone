@@ -34,7 +34,7 @@
 
 **图 1**  UB源收集模式
 
-![UB源收集模式](../../figures/asc_gather_ub.png)
+![UB源收集模式](../../../../figures/asc_gather_ub.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -134,7 +134,7 @@ __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src,
 
 - 当`src`与`dst`数据类型一致，但是与`index`数据类型不一致时，数据写入`dst`索引为偶数的位置，奇数索引位置置零。例如`src`为`int8_t`数据类型，`index`为`uint16_t`数据类型时，适用场景如下图：
 
-![](../../figures/asc_gather_different_type.png)
+![](../../../../figures/asc_gather_different_type.png)
 
 ## 调用示例
 

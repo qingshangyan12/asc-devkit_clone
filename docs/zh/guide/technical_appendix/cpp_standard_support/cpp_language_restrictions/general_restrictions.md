@@ -86,7 +86,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 
 ### 指针运算与字节重解释
 
-不支持不同地址空间的指针不支持大小比较和`reinterpret_cast`字节重解释，只支持同一地址空间内的指针大小比较、`reinterpret_cast`字节重解释，使用示例如下：
+指针的大小比较和`reinterpret_cast`字节重解释仅支持在同一地址空间内进行，不同地址空间之间的指针不支持这两种操作。同一地址空间内的用法如下：
 
 ```cpp
 __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)

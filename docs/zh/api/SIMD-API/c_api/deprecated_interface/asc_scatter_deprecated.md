@@ -32,7 +32,7 @@
 
 该指令会根据索引值index将源操作数src中的元素分散到目的操作数dst中。分散过程如下图所示：
 
-![scatter功能说明](../figures/reg_scatter.png)
+![scatter功能说明](../../../figures/reg_scatter_c_api.png)
 
 ## 函数原型
 

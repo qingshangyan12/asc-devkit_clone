@@ -55,7 +55,7 @@
 
 **图1**  掩码寄存器
 
-![掩码寄存器](../../figures/capi_mask.png)
+![掩码寄存器](../../../../figures/capi_mask.png)
 
 `b64`操作数的每个元素对应8 bit掩码，且仅最低有效位有效。由于掩码创建接口不支持`b64`模式，需要先通过[asc_create_mask_b32](../../reg_compute/reg_mask/asc_create_mask.md)创建`b32`掩码，再通过[asc_unpack_lower](../../reg_compute/reg_permute_sel/asc_unpack.md)将其展开为`b64`掩码。例如，创建所有`b64`元素均有效的掩码：
 

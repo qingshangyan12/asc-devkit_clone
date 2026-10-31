@@ -141,9 +141,9 @@ const std::unordered_map<std::string, std::vector<platformconf::DPLATFORM>> soc_
     {KirinDev0001, {platformconf::DPLATFORM::KIRIN_DEV_0001}},
     {KirinDev0002, {platformconf::DPLATFORM::KIRIN_DEV_0002}},
     {KirinDev0003, {platformconf::DPLATFORM::KIRIN_DEV_0003}},
-    {MC32DM11AA, {platformconf::DPLATFORM::MC32DM11A}},
-    {MC32DM11AB, {platformconf::DPLATFORM::MC32DM11A}},
-    {MC32DM11AC, {platformconf::DPLATFORM::MC32DM11A}},
+    {MC32DM11AA, {platformconf::DPLATFORM::MC62}},
+    {MC32DM11AB, {platformconf::DPLATFORM::MC62}},
+    {MC32DM11AC, {platformconf::DPLATFORM::MC62}},
 };
 }
 } // namespace tvm

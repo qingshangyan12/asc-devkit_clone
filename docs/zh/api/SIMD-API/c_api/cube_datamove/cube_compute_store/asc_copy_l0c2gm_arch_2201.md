@@ -1,4 +1,4 @@
-# asc_copy_l0c2gm
+# asc_copy_l0c2gm（NPU架构版本2201）
 
 ## 产品支持情况
 

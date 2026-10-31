@@ -146,8 +146,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
     };
 
     uint32_t channelId = 0;
-    const CcuVersion ccuVersion = GetCcuVersion();
-    if (ctx.loadFromMem || ccuVersion == CcuVersion::CCU_V2) {
+    if (ctx.loadFromMem) {
         HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             const uint32_t eventIdx = r / A2A_BITS_PER_EVENT;
@@ -168,6 +167,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
                 channelId++;
             }
         }
+        HCCL_INFO("[KFC][Alltoall][Kernel]Run groupCopy for alltoall.");
         GroupCopy(ctx, localDst, src[ctx.rankId], ctx.goSize, GetCcuVersion());
         // 本 rank 位无需等待（GroupCopy 同步完成），只收远端位
         for (uint32_t eventIdx = 0; eventIdx < events.size(); eventIdx++) {

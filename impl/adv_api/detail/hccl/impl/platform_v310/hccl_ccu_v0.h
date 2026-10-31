@@ -237,6 +237,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         if (opResCtx->version == static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION)) {
             newCcuFlag_ = true;
             version = HcclTilingVersion::CONTEXT_DECOUPLE_VERSION;
+            ccuProtocolVersion_ = GetArchCcuProtocolVersion();
         }
     }
     InitInner(context, version);

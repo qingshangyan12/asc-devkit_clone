@@ -30,6 +30,8 @@ namespace asc {
 namespace te {
 namespace detail {
 
+constexpr int decimal_base = 10;
+
 template <typename T>
 struct is_print_char_pointer : Std::false_type {};
 
@@ -46,8 +48,8 @@ __aicore__ inline int num_digits(long long x)
 {
     unsigned long long value = x < 0 ? 0ULL - static_cast<unsigned long long>(x) : static_cast<unsigned long long>(x);
     int digits = x < 0 ? 2 : 1;
-    while (value >= 10) {
-        value /= 10;
+    while (value >= decimal_base) {
+        value /= decimal_base;
         ++digits;
     }
     return digits;

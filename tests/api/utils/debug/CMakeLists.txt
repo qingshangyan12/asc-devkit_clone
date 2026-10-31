@@ -1,4 +1,3 @@
-#!/bin/bash
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -8,32 +7,29 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+project(ascendc_utils_debug_tests)
+cmake_minimum_required(VERSION 3.16.0)
+set(CMAKE_CXX_STANDARD 17)
 
-set -euo pipefail
+add_executable(ascendc_ut_debug_api
+    ${ASCENDC_DIR}/tests/main.cpp
+    test_check_condition.cpp
+)
 
-CASE_REL=02_simd_c_api/00_introduction/01_add/c_api_sync_add
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../../../_case_entry.sh"
-presmoke_case_init "$CASE_REL"
+target_include_directories(ascendc_ut_debug_api PRIVATE
+    ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}
+)
 
-case_build() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
-}
+target_compile_options(ascendc_ut_debug_api PRIVATE
+    -Werror
+)
 
-case_run() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./c_api_add_example)
-}
+target_link_libraries(ascendc_ut_debug_api PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+)
 
-case_verify() {
-    mkdir -p "$BUILD_DIR"
-    :
-}
-
-case_clean() {
-    presmoke_default_clean
-}
-
-presmoke_case_main "$@"
+run_llt_test(
+    TARGET ascendc_ut_debug_api
+    TASK_NUM 1
+)

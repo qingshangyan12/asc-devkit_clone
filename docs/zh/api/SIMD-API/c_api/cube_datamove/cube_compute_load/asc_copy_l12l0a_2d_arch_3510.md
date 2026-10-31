@@ -1,4 +1,4 @@
-# asc_copy_l12l0a_arch_3510（2D矩阵搬运）
+# asc_copy_l12l0a（NPU架构版本3510，2D矩阵搬运）
 
 ## 产品支持情况
 

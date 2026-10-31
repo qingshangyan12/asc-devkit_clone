@@ -10,9 +10,11 @@ The sample covers seven conversion scenarios (numbered 1–7) between floating-p
 y[i] = convert<To>(x[i])
 ```
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR&950DT products | >= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -112,7 +114,7 @@ y[i] = convert<To>(x[i])
   - Key Kernel Steps
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and a one-dimensional layout with `make_shape(512)` and `make_stride(1)` to construct the GM and UB tensors.
-    2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
+    2. Wrap the MTE2 pipeline with `asc::te::mutex`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::experimental::update_mask` to set the valid-element mask.
     4. Use normal `load/store` for equal-width conversions, `unpack` or `unpack4` for widening loads, and use `deinterleave` to compact narrowing results before a normal `store`.
     5. Call the current C API conversion overloads with `ASC_POSITION_EVEN` or `ASC_DISPERSE_FIRST_QUARTER`.
@@ -135,7 +137,7 @@ y[i] = convert<To>(x[i])
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/set_env.sh

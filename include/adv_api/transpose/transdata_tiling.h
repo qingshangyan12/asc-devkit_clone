@@ -53,8 +53,8 @@ struct TransDataConfig {
  * \param [in] dstShape, src tensor shape
  * \param [in] dataType, actual data type of the input
  * \param [in] config, transdata config
- * \param [out] maxValue, maximum temporary space required
- * \param [out] minValue, minimum temporary space required
+ * \param [out] maxValue, maximum temporary space required, in bytes
+ * \param [out] minValue, minimum temporary space required, in bytes
  * \return whether get the max/min value successfully
  */
 bool GetTransDataMaxMinTmpSize(

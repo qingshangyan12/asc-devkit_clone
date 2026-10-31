@@ -76,7 +76,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 
 | CTRL寄存器比特位 | 功能 | 默认值 | 配合使用的API |
 | --- | --- | --- | --- |
-| CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式，由CTRL[48]直接决定。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull;Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型。；<br>&bull;浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
+| CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式，由CTRL[48]直接决定。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull;Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型。<br>&bull;浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
 
 **注：针对Atlas A3系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag_ISASI.md)和[GetSaturationFlag](./GetSaturationFlag_ISASI.md)来设置和获取CTRL[48]以控制饱和模式。**
 
@@ -88,7 +88,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 
 | CTRL寄存器比特位 | 功能 | 默认值 | 配合使用的API |
 | --- | --- | --- | --- |
-| CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式，由CTRL[48]直接决定。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull;Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型；<br>&bull;浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
+| CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式，由CTRL[48]直接决定。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull;Vector侧浮点数计算支持half、bfloat16_t数据类型，Cube侧Mmad类浮点计算支持对应接口支持的所有浮点数据类型。<br>&bull;浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
 
 **注：针对Atlas A2系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag_ISASI.md)和[GetSaturationFlag](./GetSaturationFlag_ISASI.md)来设置和获取CTRL[48]以控制饱和模式。**
 

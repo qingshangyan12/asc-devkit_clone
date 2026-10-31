@@ -36,7 +36,7 @@
 
 **图1** asc_update_mask更新流程
 
-![asc_update_mask更新流程](../../figures/capi_update_mask.png)
+![asc_update_mask更新流程](../../../../figures/capi_update_mask.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

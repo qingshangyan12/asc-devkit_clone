@@ -199,6 +199,73 @@ __aicore__ inline void TestDiv()
 }
 
 template <typename T>
+__aicore__ inline void TestSoftwareDivDefault()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::div(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+__aicore__ inline void TestSoftwareDivModes()
+{
+    reg_type<float> src0{};
+    reg_type<float> src1{};
+    src0.mask = all_mask<float>().reg;
+    src1.mask = none_mask<float>().reg;
+
+    auto default_dst = asc::te::experimental::div(src0, src1);
+    auto precise_dst = asc::te::experimental::div<true>(src0, src1);
+    auto ftz_dst =
+        asc::te::experimental::div<true, asc::te::experimental::div_algo::PRECISION_0ULP_FTZ_TRUE>(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(default_dst), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(precise_dst), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(ftz_dst), reg_type<float>>);
+    EXPECT_EQ(default_dst.mask, src0.mask);
+    EXPECT_EQ(precise_dst.mask, src0.mask);
+    EXPECT_EQ(ftz_dst.mask, src0.mask);
+}
+
+template <typename T, bool precisionMode, div_algo algo>
+__aicore__ inline void TestExplicitDivMode()
+{
+    for (auto mask : {all_mask<T>(), none_mask<T>()}) {
+        reg_type<T> src0{};
+        reg_type<T> src1{};
+        src0.mask = mask.reg;
+        src1.mask = none_mask<T>().reg;
+        auto dst = asc::te::experimental::div<precisionMode, algo>(src0, src1);
+        static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+        EXPECT_EQ(dst.mask, src0.mask);
+    }
+}
+
+TEST(test_tensor_api_basic_arithmetic, ExplicitDivAlgorithms)
+{
+    static_assert(static_cast<int>(div_algo::INTRINSIC) == 0);
+    static_assert(static_cast<int>(div_algo::PRECISION_0ULP_FTZ_TRUE) == 1);
+    TestExplicitDivMode<float, false, div_algo::DIFF_COMPENSATION>();
+    TestExplicitDivMode<float, true, div_algo::DIFF_COMPENSATION>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_0ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_0ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_0ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_0ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<half, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<half, false, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<int16_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<uint16_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<int32_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<uint32_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+}
+
+template <typename T>
 __aicore__ inline void TestMin()
 {
     reg_type<T> src0{};
@@ -263,6 +330,17 @@ BASIC_ARITHMETIC_TEST(Div, half)
 BASIC_ARITHMETIC_TEST(Div, int32_t)
 BASIC_ARITHMETIC_TEST(Div, uint32_t)
 BASIC_ARITHMETIC_TEST(Div, float)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, int16_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, uint16_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, half)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, int32_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, uint32_t)
+BASIC_ARITHMETIC_TEST(SoftwareDivDefault, float)
+TEST(test_tensor_api_basic_arithmetic, SoftwareDivModes_float)
+{
+    TestSoftwareDivModes();
+    SUCCEED();
+}
 BASIC_ARITHMETIC_TEST(Min, int8_t)
 BASIC_ARITHMETIC_TEST(Min, uint8_t)
 BASIC_ARITHMETIC_TEST(Min, int16_t)

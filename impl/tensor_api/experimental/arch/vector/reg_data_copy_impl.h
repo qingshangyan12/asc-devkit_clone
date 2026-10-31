@@ -9,6 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/vector/reg_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/experimental/arch/vector/reg_data_copy.h\"\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_COPY_IMPL_H
 #endif
@@ -41,13 +43,21 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src)
 }
 
 template <typename T>
-__simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> move(reg_tensor<T>& dst, const reg_tensor<T>& src)
 {
     static_assert(
-        detail::is_move_support_type<T>, "move only supports bool, uint8_t, int8_t, uint16_t,"
+        detail::is_move_support_type<T>, "move with dst input only supports uint8_t, int8_t, uint16_t,"
                                          "int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     asc_copy(dst.reg, src.reg, src.mask);
+    return dst;
+}
+
+__simd_callee__ inline reg_tensor<bool> move(const reg_tensor<bool>& src)
+{
+    reg_tensor<bool> dst;
+    asc_copy(dst.reg, src.reg, src.mask);
     dst.mask = src.mask;
+    return dst;
 }
 } // namespace experimental
 } // namespace te

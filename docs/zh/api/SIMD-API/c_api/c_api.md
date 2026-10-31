@@ -494,7 +494,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_madd](reg_compute/reg_fused/asc_madd.md)|madd（multiply-add），对源操作数执行逐元素乘法和加法。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_mul_scalar_float2half_rn](reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)|将float类型源操作数逐元素乘以标量后，按照RINT舍入模式转换为half类型。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_mula](reg_compute/reg_fused/asc_mula.md)|根据掩码将两个源寄存器按元素相乘，并与目的寄存器累加。|`c_api/reg_compute/compute/reg_fused.h`|
-|[asc_prelu](reg_compute/reg_fused/asc_prelu.md)|源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_prelu](reg_compute/reg_fused/asc_prelu.md)|源操作数src0大于等于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_relu](reg_compute/reg_fused/asc_relu.md)|逐元素执行ReLU运算。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_exp_sub](reg_compute/reg_fused/asc_exp_sub.md)|根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数。|`c_api/reg_compute/compute/reg_fused.h`|
 

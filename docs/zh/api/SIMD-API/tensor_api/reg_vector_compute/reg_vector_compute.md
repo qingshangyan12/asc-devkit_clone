@@ -1,5 +1,6 @@
 # reg矢量计算（Tensor API）
 
+- **[辅助数据类型](aux_data_types/aux_data_types.md)**
 - **[矢量计算的搬入](vector_compute_load/vector_compute_load.md)**
 - **[矢量计算的搬出](vector_compute_store/vector_compute_store.md)**
 - **[寄存器reg_tensor](reg_tensor/reg_tensor_list.md)**

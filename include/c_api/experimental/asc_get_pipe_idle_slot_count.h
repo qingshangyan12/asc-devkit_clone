@@ -27,7 +27,7 @@
 
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/experimental/asc_get_pipe_idle_slot_count_intf_impl.h"
 #endif
 

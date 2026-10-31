@@ -72,9 +72,9 @@ struct asc_<dtype0>_<dtype1>_pair {
 ### 结构体典型示例
 
 ```c
-struct asc_<int32_t>_<int32_t>_pair {
-    vector_<int32_t> first;
-    vector_<int32_t> second;
+struct asc_int32_t_int32_t_pair {
+    vector_int32_t first;
+    vector_int32_t second;
 };
 ```
 

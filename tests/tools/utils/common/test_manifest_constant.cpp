@@ -47,6 +47,26 @@ TEST(ManifestConstantTest, ResolvesDefaultAndExplicitStructSizes)
     }
 }
 
+TEST(ManifestConstantTest, StructIgnoresManifestByteSizeAndUsesArgumentSize)
+{
+    const uint8_t data[] = {1, 2, 3};
+    const void* addresses[] = {nullptr, nullptr, data};
+    const uint64_t sizes[] = {0U, 0U, sizeof(data)};
+    for (bool explicitType : {false, true}) {
+        Json input = MakeConstant();
+        input["byte_size"] = 8;
+        if (explicitType) {
+            input["arg_type"] = "struct";
+        }
+        ManifestConstant constant;
+        ASSERT_TRUE(constant.ParseDefinition(input));
+        ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+        EXPECT_EQ(constant.GetBoundData(), data);
+        EXPECT_EQ(constant.GetBoundByteSize(), sizeof(data));
+        EXPECT_FALSE(constant.BindArgument(3U, addresses, nullptr));
+    }
+}
+
 TEST(ManifestConstantTest, PreservesSignedAndUnsignedPointerSizeBoundaries)
 {
     for (const Json& size : std::vector<Json>{1, int64_t{4}, std::numeric_limits<uint64_t>::max()}) {
@@ -64,6 +84,34 @@ TEST(ManifestConstantTest, PreservesSignedAndUnsignedPointerSizeBoundaries)
         ASSERT_TRUE(constant.BindArgument(1U, addresses, nullptr));
         EXPECT_EQ(constant.GetBoundByteSize(), size.get<uint64_t>());
     }
+}
+
+TEST(ManifestConstantTest, PointerConstantRespectsProvidedHostBufferCapacity)
+{
+    Json input = MakeConstant();
+    input.update({{"arg_type", "pointer"}, {"byte_size", 8}});
+    ManifestConstant constant;
+    ASSERT_TRUE(constant.ParseDefinition(input));
+    const uint8_t data[16] = {};
+    const uint8_t otherData[8] = {};
+    const void* addresses[] = {nullptr, nullptr, data};
+    uint64_t sizes[] = {0U, 0U, sizeof(data)};
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+    EXPECT_EQ(constant.GetBoundData(), data);
+    EXPECT_EQ(constant.GetBoundByteSize(), 8U);
+    sizes[2] = 8U;
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+    addresses[2] = otherData;
+    for (uint64_t capacity : {7U, 0U}) {
+        sizes[2] = capacity;
+        EXPECT_FALSE(constant.BindArgument(3U, addresses, sizes));
+        EXPECT_EQ(constant.GetBoundData(), data);
+        EXPECT_EQ(constant.GetBoundByteSize(), 8U);
+    }
+    // Omitting argsBytes retains the Manifest-only size contract for pointer constants.
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, nullptr));
+    EXPECT_EQ(constant.GetBoundData(), otherData);
+    EXPECT_EQ(constant.GetBoundByteSize(), 8U);
 }
 
 TEST(ManifestConstantTest, RejectsInvalidFieldsWithoutChangingParsedConstant)
@@ -88,8 +136,6 @@ TEST(ManifestConstantTest, RejectsInvalidFieldsWithoutChangingParsedConstant)
              {{"arg_type", nullptr}},
              {{"arg_type", "other"}},
              {{"extra", 1}},
-             {{"byte_size", 4}},
-             {{"arg_type", "struct"}, {"byte_size", 4}},
              {{"arg_type", "pointer"}},
              {{"arg_type", "pointer"}, {"byte_size", 0}},
              {{"arg_type", "pointer"}, {"byte_size", -1}},

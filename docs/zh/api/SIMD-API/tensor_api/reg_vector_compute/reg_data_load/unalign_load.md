@@ -108,7 +108,7 @@ __simd_vf__ inline void CopyOneVector(SrcTensor src, DstTensor dst)
     asc::te::experimental::unalign_store storer;
     loader.prepare(src);
     auto value = loader.load(src);
-    constexpr uint32_t count = asc_get_vf_len() / sizeof(uint8_t);
+    constexpr uint32_t count = asc::te::get_vf_len() / sizeof(uint8_t);
     storer.store(dst, value, count);
     storer.flush(dst, static_cast<int32_t>(count));
 }

@@ -18,6 +18,7 @@
 
 #include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
@@ -423,6 +424,23 @@ __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_ten
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic
+ * @brief Returns element-wise quotients with the selected precision mode.
+ *
+ * @override_id te_experimental_div__const_reg_tensor_T_R_const_reg_tensor_T_R__template_precisionMode_algo_T
+ * @archs 3510
+ * @param [in] src0 Dividend.
+ * @param [in] src1 Divisor.
+ * @note Supports the basic Div algorithms. The 0-ULP algorithms and precisionMode=true support float only;
+ * PRECISION_1ULP_FTZ_FALSE supports half/float. INTRINSIC and DIFF_COMPENSATION follow --cce-ftz.
+ * With precisionMode=false, explicit FTZ algorithms select their paths independently of --cce-ftz.
+ * With precisionMode=true, explicit 0-ULP algorithms select FTZ; other algorithms follow --cce-ftz, as in Reg::Div.
+ * Only src0.mask selects active lanes. Unselected elements are zeroed and the result preserves src0.mask.
+ */
+template <bool precisionMode = false, div_algo algo = div_algo::INTRINSIC, typename T>
+__simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.basic_arithmetic
