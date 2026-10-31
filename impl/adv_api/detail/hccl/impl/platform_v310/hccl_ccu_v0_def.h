@@ -44,7 +44,9 @@ enum class AlgorithmType : uint8_t {
     CcuSchedAllToAllMesh1DMultiJetty = 157,
     // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
     CcuSchedReduceScatterSoleNHR = 158,
-    CcuSchedAllGatherSoleNHR = 159
+    CcuSchedAllGatherSoleNHR = 159,
+    // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（160，AllToAllV MESH_1D_CLOS MultiJetty）
+    CcuSchedAllToAllVSoleMeshMultiJetty = 160
 };
 
 template <const auto& config>

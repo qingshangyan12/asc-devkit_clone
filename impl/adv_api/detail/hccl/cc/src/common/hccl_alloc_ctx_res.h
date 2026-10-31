@@ -113,6 +113,8 @@ enum class AlgorithmType {
     // 与设备侧 hccl_ccu_v0_def.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
     CcuSchedReduceScatterSoleNHR = 158,
     CcuSchedAllGatherSoleNHR = 159,
+    // AllToAllV MESH_1D_CLOS MultiJetty（显式赋值防并行迁移撞值，段内 159+1）
+    CcuSchedAllToAllVSoleMeshMultiJetty = 160,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
@@ -124,6 +126,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuSchedReduceScatterSoleMeshPeerOnly", AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly},
     {"CcuSchedAllToAllSoleMesh", AlgorithmType::CcuSchedAllToAllSoleMesh},
     {"CcuSchedAllToAllVSoleMesh", AlgorithmType::CcuSchedAllToAllVSoleMesh},
+    {"CcuSchedAllToAllVSoleMeshMultiJetty", AlgorithmType::CcuSchedAllToAllVSoleMeshMultiJetty},
     {"CcuSchedAllToAllSoleMeshConcurrent", AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent},
     {"CcuSchedAllToAllMesh1DMultiJetty", AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty},
     {"CcuSchedAllReduceSoleMesh", AlgorithmType::CcuAllReduceMeshMem2Mem1D},
