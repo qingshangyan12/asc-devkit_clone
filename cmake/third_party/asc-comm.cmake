@@ -148,11 +148,6 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
         install(TARGETS ccu_runtime
             LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64
             COMPONENT asc-devkit)
-        if(EXISTS "${ASC_COMM_SOURCE_PATH}/include/ccu/experimental/ccu_runtime.h")
-            install(FILES ${ASC_COMM_SOURCE_PATH}/include/ccu/experimental/ccu_runtime.h
-                DESTINATION ${INSTALL_LIBRARY_DIR}/pkg_inc/ccu/experimental
-                COMPONENT asc-devkit)
-        endif()
     endif()
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
