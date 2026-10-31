@@ -7,20 +7,24 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-set(src_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.cc
-    # Legacy direct-launch CCU kernels are retained but use APIs unavailable in the KFC-only mc2_client.
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_nhr1d_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d_2die_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
-    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh2die.cc
-)
+if(NOT MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+    set(src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.cc
+        # Legacy direct-launch CCU kernels are retained but use APIs unavailable in the KFC-only mc2_client.
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_nhr1d_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh1d_2die_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
+        # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_reduce_scatter_mesh2die.cc
+    )
 
-target_sources(mc2_client PRIVATE
-    ${src_list}
-)
+    target_sources(mc2_client PRIVATE
+        ${src_list}
+    )
+else()
+    # 实验构建（asc-comm 数据面）：ReduceScatter CCU kernel 临时禁用。
+endif()

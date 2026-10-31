@@ -125,19 +125,36 @@ if(PRODUCT_SIDE STREQUAL "host")
         DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" COMPONENT asc-devkit
     )
 
-    target_sources(mc2_compat PRIVATE
+    set(MC2_COMPAT_SRC_LIST
         hccl_rank_graph_dl.cc
         hccl_res_dl.cc
         hcomm_primitives_dl.cc
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
-        ccu_primitives_impl_dl.cc
         ccu_res_dl.cc
         hccl_ccu_res_dl.cc
         hccl_res_expt_dl.cc
         hccl_host_comm_dl.cc
-        ccu_launch_dl.cc
+    )
+    if(NOT MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE)
+        # 基线构建：hcomm 数据面 dlsym wrapper 参与编译。
+        list(APPEND MC2_COMPAT_SRC_LIST
+            ccu_primitives_impl_dl.cc
+            ccu_launch_dl.cc
+        )
+    else()
+        # 实验构建（asc-comm 数据面）：CCU 数据面/注册 launch 的手抄 dlsym wrapper 不进入活跃编译。
+        # 宏必须同步下发到 mc2_compat：hcomm_dlsym.cc 编译进本目标而非 mc2_client，
+        # 缺少该宏时其 #ifndef 守卫失效，会对已移除的 CcuLaunchDlInit/CcuPrimitivesImplDlInit
+        # 产生强引用；本目标链接带 -z now（BIND_NOW），运行期 dlopen 即失败。
+        target_compile_definitions(mc2_compat PRIVATE
+            MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+        )
+    endif()
+
+    target_sources(mc2_compat PRIVATE
+        ${MC2_COMPAT_SRC_LIST}
     )
 endif()
 
