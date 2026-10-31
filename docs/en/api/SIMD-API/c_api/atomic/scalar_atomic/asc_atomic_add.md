@@ -1,0 +1,167 @@
+# asc_atomic_add
+
+<!-- md-trans-meta sourceCommit=c891f0c5d5b2ac25c5683ff40810fa381d654ece translatedAt=2026-10-28T13:22:56.264Z pushedAt=2026-10-29T02:01:15.719Z nl=2 -->
+
+## Applicable Products
+
+<!-- npu="950" id1 -->
+- Ascend 950PR&950DT products: Supported
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 products: Not supported
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 products: Not supported
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 inference products: Not supported
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas inference product AI Core: Not supported
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas inference product Vector Core: Not supported
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas training products: Not supported
+<!-- end id7 -->
+
+## Description
+
+The header file path is `"c_api/atomic/scalar_atomic.h"`.
+
+Performs an atomic add operation on a single element pointed to by `address` in Global Memory. It reads the old value `old_value` of the element, writes `old_value + val` back to the address, and returns `old_value`. The entire read, compute, and write-back process is atomic.
+
+## Prototype
+
+```c
+__aicore__ inline <dtype> asc_atomic_add(__gm__ <dtype>* address,
+                                         <dtype> val)
+```
+
+### Data Types Supported by dtype
+
+dtype supports the following data types: `int32_t`, `uint32_t`, `float`, `int64_t`, and `uint64_t`.
+
+### Prototype Example
+
+```c
+// Example: int32_t type.
+__aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address,
+                                         int32_t val)
+```
+
+## Parameters
+
+**Table 1** Parameter description
+
+| Parameter | Input/Output | Description |
+| --- | --- | --- |
+| address | Input | Address in Global Memory. |
+| val | Input | Source operand. |
+
+## Return Value
+
+The original data at the `address` before the computation.
+
+## Pipeline Type
+
+PIPE_S
+
+## Constraints
+
+- With compiler automatic synchronization enabled, the compiler can automatically insert synchronization between PIPE_MTE2/PIPE_MTE3 and PIPE_S. However, asc_atomic_add is a scalar computation. When reading from or writing to GM, if there is a data dependency with the transfer units (MTE2/MTE3), the compiler cannot automatically insert synchronization, and you need to manually insert synchronization as appropriate.
+- Scalar atomic operations bypass DCache. You need to call the [asc_dcci](../../cache_ctrl/asc_dcci.md) API to ensure consistency between GM and DCache.
+- For the float type, the API performance depends on whether the return value is used, as follows:
+    - When the API return value is used, the API is implemented through software emulation, and the API performance for the float type is lower than that of other data types.
+    - When the API return value is not used, the API performance for the float type is the same as that of other data types.
+
+    The sample code is as follows:
+
+    ```cpp
+    // Use the API return value.
+    float old = asc_atomic_add(dst_float, 1.0f);
+
+    // Do not use the API return value.
+    asc_atomic_add(dst_float, 1.0f);
+    ```
+
+## Examples
+
+After saving the code as `example.asc`, you can compile and run it using the `bisheng` command, where the `--npu-arch` parameter must specify the corresponding NPU architecture based on the actual product model. For the mapping between specific products and NPU architectures, see [\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch).
+
+<!-- npu="950" id8 -->
+Taking the Ascend 950PR&950DT products (whose corresponding NPU architecture is `dav-3510`) as an example, the compile and run command is as follows:
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
+```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_atomic_add_kernel(__gm__ uint32_t* output)
+{
+    asc_init();
+    // Ensure that data in the target cache line is written back before Atomic accesses GM.
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    const uint32_t old_value = asc_atomic_add(output, 5U);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    // Atomic bypasses DCache. Before a normal Scalar write, invalidate the old copy in the target cache line.
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    output[1] = old_value;
+    // Write back the dirty cache line generated by a normal Scalar write to GM.
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint32_t> input = {10, 0};
+    std::vector<uint32_t> golden = {15, 10};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<uint32_t> output(ELEMENTS, 0xffffffffU);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint32_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(uint32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(uint32_t), input.data(), input.size() * sizeof(uint32_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_atomic_add_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), output_device, output.size() * sizeof(uint32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_atomic_add passed." : "[Failed] asc_atomic_add failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```

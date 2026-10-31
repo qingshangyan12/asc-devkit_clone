@@ -1,0 +1,83 @@
+# \_\_float2half\_rna\_sat
+
+<!-- md-trans-meta sourceCommit=754fb95859dead826727a591e674261c6a829a08 translatedAt=2026-10-21T06:57:54.498Z pushedAt=2026-10-21T07:12:04.358Z nl=2 -->
+
+## Applicable Products
+
+<!-- npu="950" id1 -->
+- Ascend 950PR&950DT products: Supported
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 products: Not supported
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 products: Not supported
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 inference products: Not supported
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas inference products AI Core: Not supported
+- Atlas inference products Vector Core: Not supported
+<!-- end id5 -->
+<!-- npu="910" id6 -->
+- Atlas training products: Not supported
+<!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/half_type/half_precision_conversion_functions/__float2half_rna_sat_res.md#id1 -->
+
+## Description
+
+The header file path is `"simt_api/asc_fp16.h"`.
+
+In saturation mode, converts a floating-point value to half-precision floating-point according to the CAST\_ROUND mode, and returns the converted value.
+
+## Prototype
+
+```cpp
+inline half __float2half_rna_sat(const float x)
+```
+
+## Parameters
+
+**Table 1**  Parameters
+
+| Parameter | Input/Output | Description |
+| --- | --- | --- |
+| x | Input | Source operand. |
+
+## Return Value
+
+Returns the half-precision floating-point number converted from the input following the CAST\_ROUND mode. Special values are as follows:
+
+| x Value | Return Value |
+| --- | --- |
+| 0 | 0 |
+| -0 | -0 |
+| nan | 0 |
+| inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+
+## Constraints
+
+Before using this interface, set the CTRL\[60\] register to 0; otherwise, the saturation mode does not take effect. For the setting method, see [Controlling the Saturation Behavior](../../data_type_conversion/overview.md#section1194916101549).
+
+In SIMT programming scenarios, the CTRL register cannot be set, so the saturation mode of this API does not take effect.
+
+## Examples
+
+- SIMD and SIMT hybrid programming scenario:
+
+    ```cpp
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half_rna_sat(__gm__ half* dst, __gm__ float* x, uint32_t total_length)
+    {
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
+        dst[idx] = __float2half_rna_sat(x[idx]);
+    }
+    ```
