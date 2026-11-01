@@ -19,6 +19,7 @@ import unittest
 from pathlib import Path
 
 from presmoke.orchestrate_report import load_pipeline_stage_seconds, shard_examples, write_timings_tsv
+from presmoke.scheduler import load_pipeline_stage_seconds as load_scheduler_stage_seconds
 
 
 class OrchestrateShardingTest(unittest.TestCase):
@@ -48,6 +49,8 @@ class OrchestrateShardingTest(unittest.TestCase):
             from_tsv = load_pipeline_stage_seconds(timings)
             self.assertEqual(from_json["case/multiple"], (5.1, 5.0, 0.5))
             self.assertEqual(from_tsv, from_json)
+            self.assertEqual(load_scheduler_stage_seconds(report), from_json)
+            self.assertEqual(load_scheduler_stage_seconds(timings), from_json)
 
     def test_custom_op_dependents_and_parallel_package_stay_on_one_card(self) -> None:
         dependency_group = [

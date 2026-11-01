@@ -225,6 +225,19 @@ class SchedulerTest(unittest.TestCase):
         self.assertEqual([item.example.rel_path for item in scheduled], ["a", "b", "c"])
         self.assertIsInstance(scheduled[0], Cell)
 
+    def test_build_desc_sums_repeated_tsv_build_steps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "ALL_CASE_TIMINGS.tsv"
+            report.write_text(
+                "example\tsteps\na\tbuild:2s; build:3s\nb\tbuild:4s\n",
+                encoding="utf-8",
+            )
+            cells = [cell(root, "b"), cell(root, "a")]
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report))
+
+        self.assertEqual([item.example.rel_path for item in scheduled], ["a", "b"])
+
     def test_frontload_build_desc_keeps_rest_in_original_order(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
