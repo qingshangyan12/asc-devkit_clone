@@ -40,11 +40,11 @@ def asc_int322int16(dst, src, mask):
         else:
             dst[2 * i] = 0
     for i in range(64):
-        dst[2 * i + 1] = 0               # 奇数索引置零
+        dst[2 * i + 1] = 0               # 奇数索引清零
 
 def asc_int322int16_v2(dst, src, mask):
     for i in range(64):
-        dst[2 * i] = 0                   # 偶数索引置零
+        dst[2 * i] = 0                   # 偶数索引清零
         if mask[i]:
             dst[2 * i + 1] = int16(src[i])  # int32 -> int16，写入奇数索引
         else:
@@ -106,7 +106,7 @@ __simd_callee__ inline void asc_int322int16(vector_int16_t& dst,
 ## 约束说明
 
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

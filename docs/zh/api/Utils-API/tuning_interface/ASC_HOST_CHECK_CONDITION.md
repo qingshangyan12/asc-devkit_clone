@@ -57,15 +57,13 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。本示例使用`asc_add`接口仅在[NPU架构版本2201](../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)下支持，因此编译命令中的`--npu-arch`参数固定为`dav-2201`。
 
-<!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+bisheng example.asc -o main --npu-arch=dav-2201 && ./main
 ```
-<!-- end id8 -->
 
 ```cpp
 #include <iostream>

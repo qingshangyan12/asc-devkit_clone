@@ -38,7 +38,7 @@ def asc_reduce_sum(dst, src, mask):
                   for i in range(0, len(values), 2)]
     dst[0] = values[0]                  # 求和值
     for i in range(1, len(dst)):
-        dst[i] = 0                      # 其余位置置0
+        dst[i] = 0                      # 其余位置清零
 ```
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
@@ -96,7 +96,7 @@ __simd_callee__ inline void asc_reduce_sum(vector_float& dst,
 ## 约束说明
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- 指令内累加顺序采用二叉树累加方式，结果连续写入到目的操作数，目的操作数中的其它元素置0。
+- 指令内累加顺序采用二叉树累加方式，结果连续写入到目的操作数，目的操作数中的其它元素清零。
 - 当所有元素均不参与计算（`mask`全为0）时，将0写入目的操作数对应位置（特别的，对于浮点数为+0）。
 - 对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。
 

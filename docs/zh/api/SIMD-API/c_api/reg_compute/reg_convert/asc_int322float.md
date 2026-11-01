@@ -36,7 +36,7 @@ def asc_int322float_rn(dst, src, mask):
         if mask[i]:
             dst[i] = float(src[i])       # int32 -> float，RINT舍入
         else:
-            dst[i] = 0.0                 # mask未选中，置零
+            dst[i] = 0.0                 # mask未选中，清零
 ```
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
@@ -94,7 +94,7 @@ __simd_callee__ inline vector_float asc_int322float_rn(vector_int32_t src,
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- 掩码位为0时，`dst`对应元素置0。
+- 掩码位为0时，`dst`对应元素清零。
 - 当`int32_t`的绝对值大于$2^{24}$时，按函数后缀指定的舍入模式进行舍入。
 
 ## 调用示例

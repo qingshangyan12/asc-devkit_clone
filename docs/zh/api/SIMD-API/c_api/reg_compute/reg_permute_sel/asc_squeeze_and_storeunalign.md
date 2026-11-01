@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
 
-Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。压缩后的元素按其在`src1`中的顺序从`dst`的低位开始连续排列，`dst`中的剩余元素置0。
+Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。压缩后的元素按其在`src1`中的顺序从`dst`的低位开始连续排列，`dst`中的剩余元素清零。
 
 本接口使用AR特殊寄存器记录当前连续搬出的有效数据总字节数。首次调用本接口前，需调用[asc_squeeze_and_storeunalign_init](asc_squeeze_and_storeunalign_init.md)清零AR寄存器。接口执行前，AR寄存器中的值表示相对于`dst_addr`的写入偏移，单位为字节；接口执行后，本次选中元素的总字节数会累加到AR寄存器中。连续调用本接口并保持`dst_addr`和`src0`不变，可将多组筛选结果连续写入UB，无需手动更新地址。AR寄存器中的值可通过[asc_get_squeeze_status](../../spr/asc_get_squeeze_status.md)接口获取。
 
@@ -67,7 +67,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ float* dst_add
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst_addr | 输出 | 目的操作数在UB上的起始地址。地址不要求32B对齐，但需按`sizeof(dtype)`字节对齐。连续搬出时，实际写入位置为`dst_addr`加AR寄存器记录的字节偏移。接口不会修改`dst_addr`的值。 |
-| dst | 输出 | 目的操作数（矢量数据寄存器），通过引用返回压缩结果。被选中的元素连续排列在低位，剩余元素置0。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器），通过引用返回压缩结果。被选中的元素连续排列在低位，剩余元素清零。 |
 | src0 | 输入、输出 | 非对齐寄存器，长度为32B，用于暂存未满32B的尾块。连续搬出及收尾时需使用同一个寄存器；首次调用无需预先初始化该寄存器。 |
 | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
 | squeeze_mask | 输入 | 源操作数掩码（掩码寄存器）。对应位置为1时选择该元素，为0时不选择该元素。 |

@@ -34,7 +34,7 @@ $$
 dst_i = round\_to\_half(src_i \times value)
 $$
 
-由于源操作数（float，32位）与目的操作数（half，16位）的位宽比为2:1，一个`vector_float`的数据转换后会填满一个`vector_half`。通过`dst_pos`参数指定结果写入`dst`中索引为偶数或奇数的位置，未写入的位置置0。
+由于源操作数（float，32位）与目的操作数（half，16位）的位宽比为2:1，一个`vector_float`的数据转换后会填满一个`vector_half`。通过`dst_pos`参数指定结果写入`dst`中索引为偶数或奇数的位置，未写入的位置清零。
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -78,7 +78,7 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(vector_half& dst,
 | src | 输入 | 源操作数（矢量数据寄存器，float类型）。 |
 | value | 输入 | 源操作数（标量，float类型）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| dst_pos | 输入 | 数据写入位置模式，取值为`ASC_POSITION_EVEN`（偶数位置）或`ASC_POSITION_ODD`（奇数位置）。选择偶数位置时，奇数位置置0；选择奇数位置时，偶数位置置0。 |
+| dst_pos | 输入 | 数据写入位置模式，取值为`ASC_POSITION_EVEN`（偶数位置）或`ASC_POSITION_ODD`（奇数位置）。选择偶数位置时，奇数位置清零；选择奇数位置时，偶数位置清零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -90,8 +90,8 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(vector_half& dst,
 ## 约束说明
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- `mask`掩码位为0时，结果对应元素置0。
-- 当`dst_pos`为`ASC_POSITION_EVEN`时，结果写入`dst`的偶数索引位置，奇数索引位置置0；当`dst_pos`为`ASC_POSITION_ODD`时，结果写入`dst`的奇数索引位置，偶数索引位置置0。
+- `mask`掩码位为0时，结果对应元素清零。
+- 当`dst_pos`为`ASC_POSITION_EVEN`时，结果写入`dst`的偶数索引位置，奇数索引位置清零；当`dst_pos`为`ASC_POSITION_ODD`时，结果写入`dst`的奇数索引位置，偶数索引位置清零。
 
 ## 调用示例
 

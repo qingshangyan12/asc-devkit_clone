@@ -102,7 +102,7 @@ __simd_callee__ inline void asc_bfloat162float(vector_float& dst,
 - 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 
