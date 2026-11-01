@@ -229,10 +229,7 @@ class SchedulerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             report = root / "ALL_CASE_TIMINGS.tsv"
-            report.write_text(
-                "example\tsteps\na\tbuild:2s; build:3s\nb\tbuild:4s\n",
-                encoding="utf-8",
-            )
+            report.write_text("example\tsteps\na\tbuild:2s; build:3s\nb\tbuild:4s\n", encoding="utf-8")
             cells = [cell(root, "b"), cell(root, "a")]
             scheduled = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report))
 
