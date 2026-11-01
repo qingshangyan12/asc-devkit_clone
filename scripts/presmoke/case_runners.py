@@ -110,11 +110,38 @@ def load_runner_info(context: CaseRunnerContext, runner_dir: Path, manifest: dic
 def append_skip_result(context: CaseRunnerContext, info: RunnerInfo) -> bool:
     if not info.skip:
         return False
+    if context.arch not in info.supported_archs:
+        context.suggestions.append(
+            Suggestion(
+                info.rel_path,
+                "case-runner",
+                "info",
+                f"Excluded on unsupported arch {context.arch}",
+                f"Supported archs: {', '.join(info.supported_archs)}",
+            )
+        )
+        return True
+    skipped_any = False
     for mode in context.modes:
+        if mode not in info.supported_modes:
+            context.suggestions.append(
+                Suggestion(
+                    info.rel_path,
+                    "case-runner",
+                    "info",
+                    f"Excluded on unsupported mode {mode}",
+                    f"Supported modes: {', '.join(info.supported_modes)}",
+                )
+            )
+            continue
         context.skipped.append(
             RunResult(info.rel_path, context.arch, mode, "SKIP", info.skip_reason, duration_s=0, source="case-runner")
         )
-    context.suggestions.append(Suggestion(info.rel_path, "case-runner", "info", "Explicitly skipped", info.skip_reason))
+        skipped_any = True
+    if skipped_any:
+        context.suggestions.append(
+            Suggestion(info.rel_path, "case-runner", "info", "Explicitly skipped", info.skip_reason)
+        )
     return True
 
 

@@ -63,12 +63,16 @@ def build_cells_with_skips(
                 )
                 continue
             rewritten = [rewrite_command(command, arch, mode, werror=werror) for command in spec.commands]
-            if not any(command.raw and command.kind != "skip" for command in rewritten):
+            if not has_runnable_commands(rewritten):
                 skipped.append(RunResult(spec.rel_path, arch, mode, "SKIP", "no runnable commands", source=spec.source))
                 continue
             build_dir = spec.path / f"build_{mode}"
             cells.append(Cell(spec, arch, mode, rewritten, build_dir))
     return cells, suggestions, skipped
+
+
+def has_runnable_commands(commands: Iterable[Command]) -> bool:
+    return any(command.raw and command.kind != "skip" for command in commands)
 
 
 def rewrite_command(command: Command, arch: str, mode: str, werror: bool = False) -> Command:

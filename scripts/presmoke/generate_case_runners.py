@@ -25,7 +25,7 @@ from typing import Iterable, List
 from presmoke.discover import discover_examples
 from presmoke.model import Cell, Command, ExampleSpec
 from presmoke.planner import is_cmake_configure
-from presmoke.planner import build_cells, rewrite_command
+from presmoke.planner import build_cells, has_runnable_commands, rewrite_command
 from presmoke.readme_spec import parse_readme
 
 
@@ -86,6 +86,7 @@ class _SkipContext:
     skip_reason: str
     custom_op_package_case: bool
     custom_op_dependency: bool
+    empty_commands: bool
 
 
 @dataclass
@@ -551,12 +552,18 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
     custom_op_package_case = source_rel == CUSTOM_OP_PACKAGE_CASE
     custom_op_dependency = requires_custom_op_package(source_rel)
     skip_reason, skip_modes, skip_archs = explicit_skip_config(source_rel, cell.arch)
+    custom_runner = source_rel in {CUSTOM_OP_PACKAGE_CASE, PARALLEL_OPS_PACKAGE_CASE, TILING_SINK_PROGRAMMING_CASE}
+    empty_commands = not custom_runner and not has_runnable_commands(cell.commands)
+    if empty_commands:
+        skip_reason = f"no runnable commands; {skip_reason}" if skip_reason else "no runnable commands"
+        skip_modes = list(cell.example.modes)
     all_modes_skipped = skip_reason and all(mode in skip_modes for mode in cell.example.modes)
     skip_ctx = _SkipContext(
         all_modes_skipped=all_modes_skipped,
         skip_reason=skip_reason,
         custom_op_package_case=custom_op_package_case,
         custom_op_dependency=custom_op_dependency,
+        empty_commands=empty_commands,
     )
     result = _apply_skip_resolution(skip_ctx, confidence, reasons, (build_cmds, run_cmds, verify_cmds))
     return (
@@ -585,9 +592,9 @@ def _apply_skip_resolution(
 ) -> _SkipResult:
     build_cmds, run_cmds, verify_cmds = stage_cmds
     if ctx.all_modes_skipped:
-        reasons.append("explicit_skip")
+        reasons.append("no_runnable_commands" if ctx.empty_commands else "explicit_skip")
         noop_build, noop_run, noop_verify = noop_stage_commands()
-        return _SkipResult("high", reasons, noop_build, noop_run, noop_verify)
+        return _SkipResult(confidence if ctx.empty_commands else "high", reasons, noop_build, noop_run, noop_verify)
     if ctx.skip_reason:
         reasons.append("partial_mode_skip")
         return _SkipResult("high", reasons, build_cmds, run_cmds, verify_cmds)
