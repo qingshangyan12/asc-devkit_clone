@@ -243,8 +243,8 @@ __aicore__ inline void FixpipeL0cToL1(
     static_assert(
         SupportType<
             Tuple<SrcT, DstT>, Tuple<half, int4b_t>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>,
+            Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     // Loop1_src_stride in unit of C0_size
@@ -291,8 +291,8 @@ __aicore__ inline void FixpipeL0cToUB(
     static_assert(
         SupportType<
             Tuple<SrcT, DstT>, Tuple<half, int4b_t>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>,
+            Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     // Loop1_src_stride in unit of C0_size
@@ -316,16 +316,16 @@ __aicore__ inline void FixpipeL0cToUB(
         return copy_matrix_cc_to_ub_s4(
             (__ubuf__ void*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), 0,
-            intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
-            false, false, false, false, false, nz2dnEn);
+            static_cast<uint64_t>(intriParams.quantPre), 0, intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
+            nz2dnEn);
     } else {
         return copy_matrix_cc_to_ub(
             (__ubuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), 0,
-            intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
-            false, false, false, false, false, nz2dnEn);
+            static_cast<uint64_t>(intriParams.quantPre), 0, intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
+            nz2dnEn);
     }
 }
 
@@ -372,8 +372,8 @@ __aicore__ inline void FixpipeL0cToOut(
     static_assert(
         SupportType<
             Tuple<SrcT, DstT>, Tuple<half, int4b_t>, Tuple<half, int8_t>, Tuple<half, uint8_t>, Tuple<half, int16_t>,
-            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>,
-            Tuple<int32_t, uint8_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
+            Tuple<half, half>, Tuple<int32_t, int4b_t>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>,
+            Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, half>>(),
         "Failed to check dtype in Fixpipe");
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
@@ -402,16 +402,16 @@ __aicore__ inline void FixpipeL0cToOut(
         return copy_matrix_cc_to_gm_s4(
             (__gm__ void*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), 0,
-            intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
-            false, false, false, false, false, nz2dnEn);
+            static_cast<uint64_t>(intriParams.quantPre), 0, intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
+            nz2dnEn);
     } else {
         return copy_matrix_cc_to_gm(
             (__gm__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
             intriParams.dstStride, intriParams.srcStride, 0, intriParams.unitFlag,
-            static_cast<uint64_t>(intriParams.quantPre), 0,
-            intriParams.isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0,
-            false, false, false, false, false, nz2dnEn);
+            static_cast<uint64_t>(intriParams.quantPre), 0, intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
+            nz2dnEn);
     }
 
     ASCENDC_DEBUG_ASSERT(

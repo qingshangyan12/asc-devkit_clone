@@ -35,8 +35,8 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 {
     static_assert(
         SupportType<
-            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
-            float, int32_t, uint32_t>(),
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half,
+            bfloat16_t, float, int32_t, uint32_t>(),
         "LoadData 2dv2 only support int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -117,7 +117,8 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 {
     static_assert(
         SupportType<T, int4b_t, uint8_t, uint16_t, int8_t, int16_t, hifloat8_t, half, bfloat16_t>(),
-        "LoadData 2dv2 only support int4b_t, uint8_t, uint16_t, int8_t, int16_t, hifloat8_t, half, bfloat16_t on current device!");
+        "LoadData 2dv2 only support int4b_t, uint8_t, uint16_t, int8_t, int16_t, hifloat8_t, half, bfloat16_t on "
+        "current device!");
 
     if constexpr (IsSameType<T, int4b_t>::value) {
         load_cbuf_to_cb_s4(

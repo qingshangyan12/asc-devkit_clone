@@ -32,8 +32,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
     static_assert(
-        SupportType<
-            T, uint8_t, int8_t, bfloat16_t, half>(),
+        SupportType<T, uint8_t, int8_t, bfloat16_t, half>(),
         "LoadData 2dv2 only support uint8_t, int8_t, bfloat16_t, half on current device!");
     if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca_transpose(
@@ -63,9 +62,9 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
     static_assert(
-        SupportType<
-            T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
-        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on current device!");
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on "
+        "current device!");
     if constexpr (SupportType<T, int4b_t> == sizeof(T)) {
         load_cbuf_to_ca_s4(
             (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
@@ -97,8 +96,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
     static_assert(
-        SupportType<
-            T, int4b_t, uint8_t, int8_t, bfloat16_t, half>(),
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half>(),
         "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half on current device!");
     if constexpr (SupportType<T, int4b_t> == sizeof(T)) {
         load_cbuf_to_cb_transpose_s4(
@@ -129,9 +127,9 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
     static_assert(
-        SupportType<
-            T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
-        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on current device!");
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on "
+        "current device!");
     if constexpr (SupportType<T, int4b_t> == sizeof(T)) {
         load_cbuf_to_cb_s4(
             (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
