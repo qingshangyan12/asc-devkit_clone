@@ -123,15 +123,7 @@ __aicore__ inline void BilinearInterpolationCalc(
     const LocalTensor<T>& src1Local, uint64_t mask, uint8_t hRepeat, bool repeatMode, uint16_t dstBlkStride,
     uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
-    using PrimType = PrimT<T>;
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported BilinearInterpolation"); });
-
-    __ubuf__ PrimType* dst = (__ubuf__ PrimType*)dstLocal.GetPhyAddr();
-    __ubuf__ PrimType* src0 = (__ubuf__ PrimType*)src0Local.GetPhyAddr();
-    __ubuf__ uint32_t* src0Offset = (__ubuf__ uint32_t*)src0OffsetLocal.GetPhyAddr();
-    __ubuf__ PrimType* src1 = (__ubuf__ PrimType*)src1Local.GetPhyAddr();
-    Internal::VecBilinearInterpolationLevel0Template<false>(
-        dst, src0, src0Offset, src1, nullptr, mask, hRepeat, vRepeat, repeatMode, dstBlkStride, vROffset);
 }
 
 // BilinearInterpolation level-0 bitwise
@@ -141,15 +133,7 @@ __aicore__ inline void BilinearInterpolationCalc(
     const LocalTensor<T>& src1Local, uint64_t mask[], uint8_t hRepeat, bool repeatMode, uint16_t dstBlkStride,
     uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
-    using PrimType = PrimT<T>;
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported BilinearInterpolation"); });
-
-    __ubuf__ PrimType* dst = (__ubuf__ PrimType*)dstLocal.GetPhyAddr();
-    __ubuf__ PrimType* src0 = (__ubuf__ PrimType*)src0Local.GetPhyAddr();
-    __ubuf__ uint32_t* src0Offset = (__ubuf__ uint32_t*)src0OffsetLocal.GetPhyAddr();
-    __ubuf__ PrimType* src1 = (__ubuf__ PrimType*)src1Local.GetPhyAddr();
-    Internal::VecBilinearInterpolationLevel0Template<true>(
-        dst, src0, src0Offset, src1, mask, 0, hRepeat, vRepeat, repeatMode, dstBlkStride, vROffset);
 }
 } // namespace AscendC
 #pragma end_pipe
