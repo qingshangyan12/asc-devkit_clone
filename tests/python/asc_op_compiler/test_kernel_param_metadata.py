@@ -20,7 +20,7 @@ import unittest
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools/build"))
-from asc_op_compile_base.asc_op_compiler import ascendc_compile_dfx as metadata
+from asc_op_compile_base.asc_op_compiler import kernel_param_metadata as metadata
 from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import CommonUtility, CompileInfo
 from asc_op_compile_base.asc_op_compiler.ascendc_constants import CompileOptionTuple, KernelMetaType
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator

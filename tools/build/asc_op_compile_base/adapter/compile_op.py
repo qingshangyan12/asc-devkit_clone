@@ -58,14 +58,8 @@ from .ascendc_common_utility import (
     convert_customized_config_to_inferchannel,
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
-from .ascendc_compile_dfx import (
-    DFXParamType,
-    DFXPointType,
-    DFXArgInfo,
-    DFXSectionGenerator,
-    build_kernel_param_metadata_from_formals,
-    generate_param_metadata,
-)
+from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
+from .kernel_param_metadata import build_kernel_param_metadata_from_formals, generate_param_metadata
 from .ascendc_compile_v220 import (
     _get_compile_cmd_and_section_content,
     get_v220_kernel_type_mix_flag,
