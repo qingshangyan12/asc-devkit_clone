@@ -75,7 +75,7 @@ python3 -m unittest discover -s tests/python -p test_mc2_ccu_perf_probe.py
 
 ## 当前采集范围
 
-配套 suite 使用 `--mode client,host`（默认）分别采集 Client 和 Host 指标。`--mode server` 通过常态生成的事件标记和 msprof 采集 KFC 流水。
+配套 suite 使用 `--mode client,host`（默认）分别采集 Client 和 Host 指标。`--mode server` 通过常态生成的事件标记和程序内 ACL profiling 采集 KFC 原始数据。
 
 当前仅保留 Client 的 Init/Prepare/Commit/Wait/Finalize 接口计时，以及 Host 的资源准备和三个提交区间计时。Client 计时位于配套测试程序的 AIC/AIV 算子中，Host 计时位于本探针及 Host 测试程序中。
 
@@ -85,6 +85,6 @@ Host 探针不记录 KFC 内部时间。独立的 server 模式使用 KFC 微码
 
 `ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc` 中的 KFC 标记常态生成，无需编译宏。主 KFC 队列分配一个专用 event，统一使用 mask=1，每个边界通过 `for` 连续生成 5 对 EventRecord→EventWait。当前四处位置为：主队列循环前、等待开始信号后、入参加载后、主队列循环结束后。循环前后两组每次队列执行各经过一次，循环内两组随每条消息执行，也覆盖终止消息。各组通过专用 CKE、连续事件和执行顺序识别。先置位再等待，不依赖外部信号。
 
-配套 suite 的 server 模式直接使用已安装的 asc-devkit 库，不重新编译、不要求源码构建目录。采集前检查实际加载的 mc2_client 库中是否包含标记，然后按 MPI rank 启动 msprof 并导出 JSON。原始 PROF 与导出文件均保存在 case 的 process_N/profiling/rank_N 中，具体配置与命令见配套 README。安装包需要包含库中的微码标记代码；无需修改 HCOMM。
+配套 suite 的 server 模式直接使用已安装的 asc-devkit 库，不重新编译、不要求源码构建目录。采集前检查实际加载的 mc2_client 库中是否包含标记，然后在各 rank 的测试程序中调用 aclprofInit/CreateConfig/Start，并在全部采样同步完成后调用 Stop/DestroyConfig/Finalize。采集使用 ACL_PROF_TASK_TIME 和 HCCL Trace 等配置，不依赖 msprof 命令。原始 PROF 数据保存在 case 的 process_N/profiling/rank_N 中，当前不自动导出 JSON，具体配置与命令见配套 README。安装包需要包含库中的微码标记代码；无需修改 HCOMM。
 
-当前本地测试只能验证标记顺序和采集/导出流程。完整库编译、硬件流水可见性及探针对执行的影响仍需配套 CANN/NPU 验证。
+当前本地测试只能验证标记顺序和采集审计流程。完整库编译、硬件流水可见性及探针对执行的影响仍需配套 CANN/NPU 验证。
