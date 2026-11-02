@@ -1535,7 +1535,7 @@ def get_tiling_info_v2(
     """get tiling define v2
 
     Args:
-        optype (str): operator type
+        op_info (OpInfo): operator info
         tiling_key_list (list): tiling_key used by developer
         default_tiling_struct (str): default tiling struct
         tiling_struct_expr_map (dict): map of (tiling, tiling_struct)
@@ -1762,7 +1762,7 @@ def get_tiling_info(
     """get tiling define and tiling data registered by operator developer
 
     Args:
-        optype (str): operator type
+        op_info (OpInfo): operator info
         tiling_key_list (list): tiling_key_list of op
         value_depends (list): value_depends info of op
         enable_vd : is support value depends

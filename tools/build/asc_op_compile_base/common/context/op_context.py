@@ -275,7 +275,7 @@ class OpContext:
 
         :param name:
         :param size:
-        :param type:
+        :param addr_type:
         :return:
         """
         self._workspaces.append((name, size, addr_type))
