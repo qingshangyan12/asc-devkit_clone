@@ -169,6 +169,120 @@ __aicore__ inline void DumpAccChkPoint(
     return;
 }
 
+/*
+ * Definitions of the raw-pointer GM dump overloads declared in the interface header.  The GM
+ * address is re-wrapped as the GlobalTensor view it denotes and handed to the Tensor overload
+ * above, so the dump FIFO and the entity selection are exactly the Tensor path's.
+ */
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize)
+{
+    GlobalTensor<T> tmp;
+    tmp.SetGlobalBuffer(tensor);
+    DumpTensor<T>(tmp, desc, dumpSize);
+}
+
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+    GlobalTensor<T> tmp;
+    tmp.SetGlobalBuffer(tensor);
+    DumpTensor<T>(tmp, desc, dumpSize, shapeInfo);
+}
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+    GlobalTensor<T> tmp;
+    // A raw pointer carries no element count, so the extent declared here is the window this call
+    // touches: countOff .. countOff + dumpSize.  The Tensor body rejects a countOff beyond the
+    // declared extent; with the window declared, that check still evaluates against a truthful
+    // lower bound instead of being defeated by an unbounded sentinel.
+    tmp.SetGlobalBuffer(tensor, static_cast<uint64_t>(countOff) + dumpSize);
+    DumpAccChkPoint<T>(tmp, index, countOff, dumpSize);
+}
+
+/* ---- DumpTensor / DumpAccChkPoint with a raw on-chip address -----------------
+ *
+ * DumpTensorLocal2GMImpl selects the entity from the operand position, branching on
+ * GetPhyType(GetPosition()) to asc_dump_ubuf / asc_dump_l1buf / asc_dump_cbuf / asc_dump(BIAS) /
+ * asc_dump(FIXBUF) (dav_3510/kernel_operator_dump_tensor_impl.h:48-71).  The pointer overloads
+ * below take that position as a template argument, build the LocalTensor view the impl needs, and
+ * forward to the same Tensor overload the LocalTensor form reaches.  No address is recomputed and
+ * no parameter is reinterpreted.
+ *
+ * The view is built through TBuffAddr rather than LocalTensor(TPosition, offset, length): on the
+ * device that constructor takes a buffer offset, which a raw GetPhyAddr() is, but under
+ * ASCENDC_CPU_DEBUG GetPhyAddr() returns an absolute host address and the constructor would add the
+ * platform base a second time.  Each build is given the one field its own GetPhyAddr() reads --
+ * bufferAddr on device, absAddr under ASCENDC_CPU_DEBUG -- the same construction
+ * CubePtrOverload::LocalTensorFromPtr / ::UbTensorOver already use for ReadSpmBuffer and the
+ * synchronisation APIs.
+ *
+ * The extent question: a raw pointer carries no element count, and DumpAccChkPoint is the one that
+ * reads one (the Tensor body rejects a countOff beyond input.GetSize()).  Both forms therefore
+ * declare the window the call touches -- DumpTensor its dumpSize, DumpAccChkPoint countOff +
+ * dumpSize -- rather than an unbounded extent, so that check keeps a truthful bound to compare
+ * against.
+ */
+namespace DumpPtrOverload {
+template <TPosition position, typename T, typename Ptr>
+__aicore__ inline LocalTensor<T> LocalViewOver(Ptr ptr, uint32_t lenHintBytes)
+{
+    TBuffAddr addr;
+    addr.logicPos = static_cast<uint8_t>(position);
+    addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uint64_t>(ptr));
+    addr.bufferHandle = nullptr;
+    addr.dataLen = lenHintBytes;
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    // GetPhyAddr() reads absAddr on the host and bufferAddr on the device.  The two sibling
+    // helpers named above fill whichever one applies; this view has to do the same, or the
+    // host build would carry a view whose address is not the one GetPhyAddr() reads.
+    addr.absAddr = reinterpret_cast<uint8_t*>(ptr);
+#endif
+    LocalTensor<T> tensor;
+    tensor.SetAddr(addr);
+    return tensor;
+}
+
+// Byte extent of the window an on-chip pointer call touches: countOff .. countOff + dumpSize.  It is
+// a lower bound on the caller's buffer, so the Tensor body's countOff check still evaluates against
+// something truthful; a window whose byte length would not fit the uint32 length is clamped.
+template <typename T>
+__aicore__ inline uint32_t WindowExtentBytes(uint32_t countOff, uint32_t dumpSize)
+{
+    const uint64_t bytes = (static_cast<uint64_t>(countOff) + dumpSize) * sizeof(PrimT<T>);
+    return bytes > ~static_cast<uint32_t>(0) ? ~static_cast<uint32_t>(0) : static_cast<uint32_t>(bytes);
+}
+} // namespace DumpPtrOverload
+
+template <
+    TPosition position, typename T, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void DumpTensor(DstPtr tensor, uint32_t desc, uint32_t dumpSize)
+{
+    DumpTensor<T>(DumpPtrOverload::LocalViewOver<position, T>(tensor, dumpSize * sizeof(PrimT<T>)), desc, dumpSize);
+}
+
+template <
+    TPosition position, typename T, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void DumpTensor(DstPtr tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+    DumpTensor<T>(
+        DumpPtrOverload::LocalViewOver<position, T>(tensor, dumpSize * sizeof(PrimT<T>)), desc, dumpSize, shapeInfo);
+}
+
+template <
+    TPosition position, typename T, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void DumpAccChkPoint(DstPtr tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+    DumpAccChkPoint<T>(
+        DumpPtrOverload::LocalViewOver<position, T>(tensor, DumpPtrOverload::WindowExtentBytes<T>(countOff, dumpSize)),
+        index, countOff, dumpSize);
+}
+
 // only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202

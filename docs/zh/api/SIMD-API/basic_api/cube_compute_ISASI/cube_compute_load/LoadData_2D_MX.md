@@ -61,6 +61,18 @@ template <typename T, typename U>
 __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
 ```
 
+**裸指针形（与上面的 tensor 形逐项对应）：**
+
+<!-- npu="950" id10 -->
+- 仅 Ascend 950PR&950DT系列产品支持裸指针形。
+
+```cpp
+template <typename DstPtr, typename SrcPtr, typename SrcMxPtr, typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, SrcMxPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, SrcMxPtr srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+```
+<!-- end id10 -->
+
+> 上述为裸指针形，参数含义与上面的 tensor 形逐项对应，区别仅在于实参直接传地址而不是 tensor；操作数的地址空间由指针实参本身区分。
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
@@ -80,6 +92,8 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 | srcMx | 输入 | 源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2。具体参考表[LoadData（2D矩阵搬运V2）](LoadData_2D_V2.md)中的LoadData2DParamsV2结构体内参数说明。 <br>**本结构体用于控制左右矩阵数据的搬运。**  <br>|
 | loadMxDataParams | 输入 | LoadData参数结构体，类型为LoadData2DMxParams。具体参考[表3](#table15901153712305)。<br>**本结构体用于控制左右量化系数矩阵的搬运。**  <br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
+
+裸指针形的 `dst`、`src`、`srcMx` 分别与上表同名 tensor 形参语义一致，实参为对应地址空间的裸指针。
 
 **表 3** LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
 
@@ -115,6 +129,7 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 ## 约束说明<a id="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 裸指针形下，`dst` 必须为 L0A（`__ca__`）或 L0B（`__cb__`）上的裸指针，`src`、`srcMx` 必须为 L1（`__cbuf__`）上的裸指针。
 
 ## 关键特性说明
 
