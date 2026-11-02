@@ -31,6 +31,10 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, bfloat16_t, half>(),
+        "LoadData 2dv2 only support uint8_t, int8_t, bfloat16_t, half on current device!");
     if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca_transpose(
             (__ca__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
@@ -38,10 +42,6 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
     } else if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca_transpose(
             (__ca__ half*)dst, (__cbuf__ half*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
-    } else if constexpr (B32_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_ca_transpose(
-            (__ca__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
@@ -84,17 +84,21 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
-    if constexpr (B8_BYTE_SIZE == sizeof(T)) {
+    static_assert(
+        SupportType<
+            T, int4b_t, uint8_t, int8_t, bfloat16_t, half>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half on current device!");
+    if constexpr (SupportType<T, int4b_t> == sizeof(T)) {
+        load_cbuf_to_cb_transpose_s4(
+            (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
+    } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb_transpose(
             (__cb__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb_transpose(
             (__cb__ half*)dst, (__cbuf__ half*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
-    } else if constexpr (B32_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_cb_transpose(
-            (__cb__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
