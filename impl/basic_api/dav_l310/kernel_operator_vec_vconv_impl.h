@@ -1346,9 +1346,7 @@ __aicore__ inline void AddReluCastImpl(
     __ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint64_t mask, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    CheckAddReluCastSupportType<T1, T2>();
-    constexpr auto func = RegAddReluCast::AddReluCast<T1, T2, Reg::RegTensor<T1>, Reg::RegTensor<T2>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddReluCast Level 0 is not supported on current device!"); });
 }
 
 // AddReluCast::Level 0 - mask bit mode
@@ -1357,9 +1355,7 @@ __aicore__ inline void AddReluCastImpl(
     __ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint64_t mask[], uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    CheckAddReluCastSupportType<T1, T2>();
-    constexpr auto func = RegAddReluCast::AddReluCast<T1, T2, Reg::RegTensor<T1>, Reg::RegTensor<T2>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddReluCast Level 0 is not supported on current device!"); });
 }
 
 // AddReluCast::Level 2
@@ -1457,9 +1453,7 @@ __aicore__ inline void SubReluCastImpl(
     __ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint64_t mask, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    CheckSubReluCastSupportType<T1, T2>();
-    constexpr auto func = RegSubReluCast::SubReluCast<T1, T2, Reg::RegTensor<T1>, Reg::RegTensor<T2>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubReluCast Level 0 is not supported on current device!"); });
 }
 
 // SubReluCast::Level 0 - mask bit mode
@@ -1468,9 +1462,7 @@ __aicore__ inline void SubReluCastImpl(
     __ubuf__ T1* dst, __ubuf__ T2* src0, __ubuf__ T2* src1, const uint64_t mask[], uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    CheckSubReluCastSupportType<T1, T2>();
-    constexpr auto func = RegSubReluCast::SubReluCast<T1, T2, Reg::RegTensor<T1>, Reg::RegTensor<T2>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubReluCast Level 0 is not supported on current device!"); });
 }
 
 // SubReluCast::Level 2
