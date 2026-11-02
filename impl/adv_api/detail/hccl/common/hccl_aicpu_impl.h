@@ -156,7 +156,7 @@ template <const auto& config>
 template <HcclCMDType cmdType>
 __aicore__ inline uint64_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
     uint16_t queId, const CommonPrepareParam& param, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling,
-    bool compactExt, uint64_t extCtrl, uint64_t extXor)
+    bool compactExt, uint32_t extCtrl, uint32_t extXor)
 {
 #if __NPU_ARCH__ == 3510
     (void)queId;
@@ -237,7 +237,7 @@ __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-    const AlltoAllVParamExt& param, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor)
+    const AlltoAllVParamExt& param, uint32_t rankNum, bool compactExt, uint32_t& extCtrl, uint32_t& extXor)
 {
     if (!workingFlag_) {
         return;
@@ -377,8 +377,8 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     uint64_t tiling = 0UL;
     uint32_t rankNum = 0U;
     bool compactExt = false;
-    uint64_t extCtrl = 0UL;
-    uint64_t extXor = 0UL;
+    uint32_t extCtrl = 0U;
+    uint32_t extXor = 0U;
     const bool paramValid = CheckCommonPrepareParamValid<cmdType>(param, tiling, rankNum);
     ASCENDC_HCCL_API_ASSERT(
         paramValid, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param invalid.",

@@ -70,9 +70,9 @@ __aicore__ inline void AssembleHcclMsgExt(const AlltoAllVParamExt& param, uint32
 // in 32 bits before this function is selected; callers must fall back to the
 // legacy 64-bit arrays when any value exceeds 32 bits.
 __aicore__ inline void AssembleHcclMsgExtCompact(
-    const AlltoAllVParamExt& param, uint32_t rankDim, __gm__ HcclMsgExt* dst, uint64_t& extCtrl, uint64_t& extXor)
+    const AlltoAllVParamExt& param, uint32_t rankDim, __gm__ HcclMsgExt* dst, uint32_t& extCtrl, uint32_t& extXor)
 {
-    uint64_t xorCheck = HCCL_MSG_EXT_COMPACT_CTRL;
+    uint32_t xorCheck = HCCL_MSG_EXT_COMPACT_CTRL;
     __gm__ uint64_t* const dstSend = reinterpret_cast<__gm__ uint64_t*>(dst->sendCounts);
     __gm__ uint64_t* const dstRecv = reinterpret_cast<__gm__ uint64_t*>(dst->recvCounts);
     const uint64_t* const srcSendCounts = param.sendCounts;
@@ -84,8 +84,10 @@ __aicore__ inline void AssembleHcclMsgExtCompact(
         const uint64_t recvValue = ((srcRecvCounts[i] << 32U) | srcRecvOffsets[i]);
         dstSend[i] = sendValue;
         dstRecv[i] = recvValue;
-        xorCheck ^= sendValue;
-        xorCheck ^= recvValue;
+        xorCheck ^= static_cast<uint32_t>(sendValue >> 32U);
+        xorCheck ^= static_cast<uint32_t>(sendValue);
+        xorCheck ^= static_cast<uint32_t>(recvValue >> 32U);
+        xorCheck ^= static_cast<uint32_t>(recvValue);
     }
     extCtrl = HCCL_MSG_EXT_COMPACT_CTRL;
     extXor = xorCheck;
@@ -181,7 +183,7 @@ __aicore__ inline void AssembleHcclMsgV2(
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 __aicore__ inline void AssembleHcclMsgV2Compact(const CommonPrepareParam& param, HcclTilingVersion ver,
-    HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst, uint64_t extCtrl, uint64_t extXor)
+    HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst, uint32_t extCtrl, uint32_t extXor)
 {
     HcclMsg tmp{};
     tmp.commType.msgType = param.commType.msgType;

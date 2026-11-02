@@ -108,10 +108,10 @@ private:
 
     template <HcclCMDType cmdType>
     __aicore__ inline uint64_t SendMsgToServer(uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID,
-        HcclHandle srcHandleID, uint64_t tiling, bool compactExt, uint64_t extCtrl, uint64_t extXor);
+        HcclHandle srcHandleID, uint64_t tiling, bool compactExt, uint32_t extCtrl, uint32_t extXor);
 
     __aicore__ inline void SendMsgToServer(
-        const AlltoAllVParamExt& para, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor);
+        const AlltoAllVParamExt& para, uint32_t rankNum, bool compactExt, uint32_t& extCtrl, uint32_t& extXor);
 
     __aicore__ inline bool CanUseExtCompact(const AlltoAllVParamExt& para, uint32_t rankNum);
 
