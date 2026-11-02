@@ -214,30 +214,8 @@ __aicore__ inline uint64_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, conf
 }
 
 template <const auto& config>
-__aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::CanUseExtCompact(
-    const AlltoAllVParamExt& param, uint32_t rankNum)
-{
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-    if (rankNum > HCCL_MAX_RANK_NUM_V2) {
-        return false;
-    }
-    for (uint32_t i = 0U; i < rankNum; ++i) {
-        if (param.sendCounts[i] > 0xFFFFFFFFULL || param.sdispls[i] > 0xFFFFFFFFULL ||
-            param.recvCounts[i] > 0xFFFFFFFFULL || param.rdispls[i] > 0xFFFFFFFFULL) {
-            return false;
-        }
-    }
-    return true;
-#else
-    (void)param;
-    (void)rankNum;
-    return false;
-#endif
-}
-
-template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-    const AlltoAllVParamExt& param, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor)
+    const AlltoAllVParamExt& param, uint32_t rankNum, uint64_t& extCtrl, uint64_t& extXor, bool& compactExt)
 {
     if (!workingFlag_) {
         return;
@@ -249,9 +227,34 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
     KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    compactExt = (rankNum <= HCCL_MAX_RANK_NUM_V2);
     if (compactExt) {
-        AssembleHcclMsgExtCompact(param, rankNum, hcclSendMsg, extCtrl, extXor);
-    } else {
+        uint64_t xorCheck = HCCL_MSG_EXT_COMPACT_CTRL;
+        __gm__ uint64_t* const dstSend = reinterpret_cast<__gm__ uint64_t*>(hcclSendMsg->sendCounts);
+        __gm__ uint64_t* const dstRecv = reinterpret_cast<__gm__ uint64_t*>(hcclSendMsg->recvCounts);
+        for (uint32_t i = 0U; i < rankNum; ++i) {
+            const uint64_t sendCount = param.sendCounts[i];
+            const uint64_t sendOffset = param.sdispls[i];
+            const uint64_t recvCount = param.recvCounts[i];
+            const uint64_t recvOffset = param.rdispls[i];
+            if (sendCount > 0xFFFFFFFFULL || sendOffset > 0xFFFFFFFFULL ||
+                recvCount > 0xFFFFFFFFULL || recvOffset > 0xFFFFFFFFULL) {
+                compactExt = false;
+                break;
+            }
+            const uint64_t sendValue = (sendCount << 32U) | sendOffset;
+            const uint64_t recvValue = (recvCount << 32U) | recvOffset;
+            dstSend[i] = sendValue;
+            dstRecv[i] = recvValue;
+            xorCheck ^= sendValue;
+            xorCheck ^= recvValue;
+        }
+        if (compactExt) {
+            extCtrl = HCCL_MSG_EXT_COMPACT_CTRL;
+            extXor = xorCheck;
+        }
+    }
+    if (!compactExt) {
         AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
     }
 #else
@@ -263,10 +266,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     if (compactExt) {
         // The compact representation stores packed send/recv words in the first two
         // array regions. Publish only the cachelines that contain those words.
+        AscendC::Barrier();
+        __asm__("NOP");
         for (uint32_t i = 0U; i < rankNum; i += MAX_DCCI_CNT / sizeof(uint64_t)) {
-            FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendCounts + i));
-            FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->recvCounts + i));
+            dcci(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendCounts + i),
+                static_cast<uint64_t>(cache_line_t::SINGLE_CACHE_LINE), static_cast<uint64_t>(dcci_dst_t::CACHELINE_OUT));
+            dcci(reinterpret_cast<__gm__ void*>(hcclSendMsg->recvCounts + i),
+                static_cast<uint64_t>(cache_line_t::SINGLE_CACHE_LINE), static_cast<uint64_t>(dcci_dst_t::CACHELINE_OUT));
         }
+        DataSyncBarrier<MemDsbT::ALL>();
         return;
     }
     for (uint32_t i = 0U; i < rankNum; i += MAX_DCCI_CNT / sizeof(uint64_t)) {
@@ -392,8 +400,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
         "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
         static_cast<int32_t>(cmdType), handleId + 1, HCCL_MAX_HANDLE_ID);
     if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        compactExt = CanUseExtCompact(param.paramExt, rankNum);
-        SendMsgToServer(param.paramExt, rankNum, compactExt, extCtrl, extXor);
+        SendMsgToServer(param.paramExt, rankNum, extCtrl, extXor, compactExt);
     }
 #if __NPU_ARCH__ == 3510
     constexpr uint16_t queId = 0U;
