@@ -167,9 +167,7 @@ __aicore__ inline void DuplicateImpl(
     __ubuf__ T* dstLocal, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
     const uint8_t dstRepeatStride)
 {
-    CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, false>(
-        dstLocal, scalarValue, nullptr, mask, repeatTime, dstBlockStride, dstRepeatStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 // level 0, mask bit mode
@@ -178,9 +176,7 @@ __aicore__ inline void DuplicateImpl(
     __ubuf__ T* dstLocal, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
     const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
-    CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, true>(
-        dstLocal, scalarValue, mask, 0, repeatTime, dstBlockStride, dstRepeatStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 }
 
 template <typename T, bool hasUnalign = true>
