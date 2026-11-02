@@ -116,12 +116,12 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
 {
     static_assert(
-        SupportType<T, int4b_t, uint8_t, int8_t, fp8_e4m3fn_t, half>(),
-        "LoadData 2dv2 only support int4b_t/uint8_t/int8_t/fp8_e4m3fn_t/half on current device!");
+        SupportType<T, int4b_t, uint8_t, uint16_t, int8_t, int16_t, hifloat8_t, half, bfloat16_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, uint16_t, int8_t, int16_t, hifloat8_t, half, bfloat16_t on current device!");
 
     if constexpr (IsSameType<T, int4b_t>::value) {
         load_cbuf_to_cb_s4(
-            (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParams.mStartPosition, loadDataParams.kStartPosition,
+            (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParams.mStartPosition, loadDataParams.kStartPosition,
             loadDataParams.mStep, loadDataParams.kStep, loadDataParams.srcStride, loadDataParams.dstStride, false);
     } else if (loadDataParams.ifTranspose) {
         load_cbuf_to_cb(

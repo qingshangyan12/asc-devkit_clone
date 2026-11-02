@@ -433,12 +433,8 @@ __aicore__ inline void matmul(
         (IsSameType<Src0T, float8_e4m3_t>::value && IsSameType<Src1T, float8_e4m3_t>::value) ||
         (IsSameType<Src0T, float8_e4m3_t>::value && IsSameType<Src1T, int8_t>::value)) {
         matmul_to_cbuf(dst, left, right, bias, btBias, config);
-    } else if constexpr (IsSameType<Src0T, float8_e4m3_t>::value) {
-        matmul_to_cbuf_e4m3s4(dst, left, (__cb__ void*)right, bias, btBias, config);
-    } else if constexpr (IsSameType<Src0T, int8_t>::value) {
-        matmul_to_cbuf_s8s4(dst, left, (__cb__ void*)right, bias, btBias, config);
     } else {
-        matmul_to_cbuf_s4s4(dst, (__cbuf__ void*)left, (__cb__ void*)right, bias, btBias, config);
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "datatype is not supported!"); });
     }
 }
 
