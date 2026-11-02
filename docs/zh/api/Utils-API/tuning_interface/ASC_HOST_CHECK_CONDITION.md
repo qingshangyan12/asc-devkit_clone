@@ -55,9 +55,9 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 - 在CMake工程的Release模式下，默认定义`NDEBUG`。此时`assert`不会检查条件，接口输出诊断信息后返回，调用方后续代码会继续执行。
 - 接口内部使用已经求值的条件触发断言，条件表达式只求值一次。
 
+<!-- npu="A3,910b" id8 -->
 ## 调用示例
 
-<!-- npu="A3,910b" id8 -->
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。本示例使用`asc_add`接口仅在[NPU架构版本2201](../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)下支持，因此编译命令中的`--npu-arch`参数固定为`dav-2201`。
 
 编译运行命令如下：
