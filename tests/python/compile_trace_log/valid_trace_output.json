@@ -755,6 +755,132 @@
       "ts": 5901653360.432533,
       "pid": 309540,
       "tid": 309540
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "AddCustomUnalign   compile op",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901640659.711706,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "AddCustomUnalign   compile op",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901655085.010966,
+      "pid": 309551,
+      "tid": 309551
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "preprocess",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901640659.808002,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "preprocess",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901643213.051578,
+      "pid": 309551,
+      "tid": 309551
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "generate tiling",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901643213.223313,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "generate tiling",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901650623.351638,
+      "pid": 309551,
+      "tid": 309551
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "generate kernel stub",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901650623.633621,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "generate kernel stub",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901650628.767402,
+      "pid": 309551,
+      "tid": 309551
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "compile kernel",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901650628.96789,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "compile kernel",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901654939.924961,
+      "pid": 309551,
+      "tid": 309551
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "link kernel",
+      "cat": "compile_op",
+      "ph": "B",
+      "ts": 5901654940.161743,
+      "pid": 309551,
+      "tid": 309551,
+      "args": {
+        "tiling_key": "['1']"
+      }
+    },
+    {
+      "optype": "AddCustomUnalign",
+      "name": "link kernel",
+      "cat": "compile_op",
+      "ph": "E",
+      "ts": 5901655082.188866,
+      "pid": 309551,
+      "tid": 309551
     }
   ]
 }

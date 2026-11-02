@@ -9,8 +9,10 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+import json
 import os
 import sys
+import tempfile
 import unittest
 import filecmp
 
@@ -31,6 +33,43 @@ class TestCompileTrace(unittest.TestCase):
     def tearDown(self):
         # 每个测试用例执行之后做操作
         print("---------------------tear down case-------------------------------")
+
+    def compile_rows_in_isolation(self, rows):
+        with tempfile.TemporaryDirectory(dir=FILE_PATH) as temp_dir:
+            input_file = os.path.join(temp_dir, "input.txt")
+            output_file = os.path.join(temp_dir, "trace.json")
+            with open(input_file, "w", encoding="utf-8") as log_file:
+                log_file.writelines(rows)
+
+            previous_dir = os.getcwd()
+            try:
+                os.chdir(temp_dir)
+                compile_trace(input_file, output_file)
+            finally:
+                os.chdir(previous_dir)
+
+            with open(output_file, "r", encoding="utf-8") as trace_file:
+                trace_events = json.load(trace_file)["traceEvents"]
+            check_info_file = os.path.join(temp_dir, "check_info.txt")
+            has_incomplete_diagnostic = os.path.exists(check_info_file) and os.path.getsize(check_info_file) > 0
+            return trace_events, has_incomplete_diagnostic
+
+    def test_final_complete_compile_block_is_included(self):
+        input_file = os.path.join(FILE_PATH, "valid.txt")
+        with open(input_file, "r", encoding="utf-8") as log_file:
+            rows = [line for line in log_file if "[INFO] ASC(" in line]
+
+        trace_events, _ = self.compile_rows_in_isolation(rows[-12:])
+        self.assertEqual(len(trace_events), 12)
+
+    def test_incomplete_final_compile_block_is_rejected(self):
+        input_file = os.path.join(FILE_PATH, "valid.txt")
+        with open(input_file, "r", encoding="utf-8") as log_file:
+            rows = [line for line in log_file if "[INFO] ASC(" in line]
+
+        trace_events, has_incomplete_diagnostic = self.compile_rows_in_isolation(rows[:23])
+        self.assertEqual(len(trace_events), 12)
+        self.assertTrue(has_incomplete_diagnostic)
 
     def test_compile_trace(self):
         a = 0

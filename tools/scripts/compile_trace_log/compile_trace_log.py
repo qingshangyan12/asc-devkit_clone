@@ -211,10 +211,9 @@ def extract_lines_with_condition(txtlist, result):
         if "compile op start ," in line:
             listline.append(line_num)
 
-    # 遍历相邻行号对，检查差值是否为12
-    for i in range(len(listline) - 1):
-        a = listline[i]
-        b = listline[i + 1]
+    # 检查所有编译段，包括从最后一个起始点到输入末尾的段。
+    for i, a in enumerate(listline):
+        b = listline[i + 1] if i + 1 < len(listline) else len(result)
 
         if b - a == 12:
             txtlist.extend(line.strip() for line in result[a:b])
