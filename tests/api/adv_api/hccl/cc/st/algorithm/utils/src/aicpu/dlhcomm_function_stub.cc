@@ -11,6 +11,10 @@
 #include "dlhcomm_function.h"
 
 namespace mc2_ops_hccl {
+// This Host simulator has no asccomm command backend; retain the legacy cache tests.
+bool Mc2AsccommCommandCacheSupported() { return false; }
+HcclResult ClearAsccommCommandCache(void*) { return HCCL_SUCCESS; }
+
 DlHcommFunction& DlHcommFunction::GetInstance()
 {
     static DlHcommFunction hcclDlHcommFunction;

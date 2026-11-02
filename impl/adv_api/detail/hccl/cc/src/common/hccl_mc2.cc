@@ -473,10 +473,14 @@ HcclResult AllocComResourceByTilingAicpu(
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
+    // Serialize the Host decision; Device worker TLS is a different instance.
+    const bool commandCacheEnabled = GetExternalInputHcclAicpuCacheEnable() != 0U;
+    ctxTag += commandCacheEnabled ? ":asccomm-cache-on" : ":asccomm-cache-off";
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         CHK_RET(
             GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+        opParamVec[i].aicpuCacheEnable = commandCacheEnabled;
     }
 
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));

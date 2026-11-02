@@ -9,6 +9,7 @@
  */
 #include "mc2_server_stage_timing.h"
 #include "comm_kfc_aicpu_server.h"
+#include "task_cache/mc2_aicpu_task_cache.h"
 #include <algorithm>
 #include <cstddef>
 #include <limits>
@@ -357,8 +358,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
                 "[MC2_SQ_DIAG][ServerRes] group %u commName[%s] opParamKey[%#llx] threadNum[%zu] mainThread[%llu] "
                 "unfoldThread[%llu].",
                 groupIdx_, execCtx.commName.c_str(), static_cast<unsigned long long>(execCtx.opParamKey),
-                execCtx.resCtxHolder->threads.size(),
-                static_cast<unsigned long long>(execCtx.mainThread),
+                execCtx.resCtxHolder->threads.size(), static_cast<unsigned long long>(execCtx.mainThread),
                 static_cast<unsigned long long>(execCtx.resCtxHolder->unfoldThread));
         } else {
 #ifdef MC2_SERVER_ONLY
@@ -434,8 +434,8 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
             static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(waitAddr),
             ReadAicpuOrderDfxValue(waitAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum, static_cast<u32>(isLast));
-        CHK_RET(static_cast<HcclResult>(asccomm_addr_notify_wait_on_thread(
-            execCtx.mainThread, waitAddr, valueAddr, static_cast<uint8_t>(isLast))));
+        CHK_RET(static_cast<HcclResult>(
+            asccomm_addr_notify_wait_on_thread(execCtx.mainThread, waitAddr, valueAddr, static_cast<uint8_t>(isLast))));
         HCCL_INFO(
             "[AICPU_ORDER_DFX][Ccore] WaitNextDone group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
             "waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -470,8 +470,8 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
             static_cast<unsigned long long>(execCtx.mainThread), static_cast<unsigned long long>(recordAddr),
             ReadAicpuOrderDfxValue(recordAddr), static_cast<unsigned long long>(valueAddr),
             ReadAicpuOrderDfxValue(valueAddr), turnNum);
-        CHK_RET(static_cast<HcclResult>(
-            asccomm_addr_notify_record_on_thread(execCtx.mainThread, recordAddr, valueAddr)));
+        CHK_RET(
+            static_cast<HcclResult>(asccomm_addr_notify_record_on_thread(execCtx.mainThread, recordAddr, valueAddr)));
         HCCL_INFO(
             "[AICPU_ORDER_DFX][Ccore] PostNextDone group[%u], commName[%s], opParamKey[%#llx], mainThread[%#llx], "
             "recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -647,7 +647,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        {
+            mc2_ops_hccl::Mc2CommandResourceScope resourceScope(execCtx->resCtxHolder);
+            ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        }
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -897,8 +900,7 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
         }
         if (threadEntity->sqContextAddr == nullptr) {
             MC2_TIMEOUT_LOG(
-                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] comm %s, sqContextAddr is null.",
-                execCtx.commName.c_str());
+                isHardTimeout, "[MC2_OPEN_TIMEOUT][Rtsq] comm %s, sqContextAddr is null.", execCtx.commName.c_str());
             continue;
         }
         const auto& rtsq = threadEntity->sqContextAddr->contextInfo.RtsqContext;

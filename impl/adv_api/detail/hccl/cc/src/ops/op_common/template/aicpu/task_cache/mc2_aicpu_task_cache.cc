@@ -69,6 +69,8 @@ public:
         }
     }
 
+    const std::string& ExactBytes() const { return exactBytes_; }
+
     std::string Finish() const
     {
         const uint64_t first = Avalanche(first_ ^ length_);
@@ -92,6 +94,7 @@ private:
 
     void AddBytes(const void* data, size_t size)
     {
+        exactBytes_.append(static_cast<const char*>(data), size);
         const auto* bytes = static_cast<const uint8_t*>(data);
         for (size_t i = 0; i < size; ++i) {
             first_ ^= static_cast<uint64_t>(bytes[i]);
@@ -106,6 +109,7 @@ private:
         length_ += static_cast<uint64_t>(size);
     }
 
+    std::string exactBytes_;
     uint64_t first_ = 0xcbf29ce484222325ULL;
     uint64_t second_ = 0x6a09e667f3bcc909ULL;
     uint64_t length_ = 0U;
@@ -544,19 +548,19 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
 } // namespace
 
 HcclResult BuildMc2AicpuTaskCachePlan(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan, bool asccommBackend)
 {
     plan = Mc2AicpuTaskCachePlan{};
-    if (GetExternalInputHcclAicpuCacheEnable() == 0U) {
+    if (asccommBackend ? !param.aicpuCacheEnable : GetExternalInputHcclAicpuCacheEnable() == 0U) {
         SetBypass(plan, "AICPU_CacheDisable");
         return HCCL_SUCCESS;
     }
-    if (!Mc2HcommIsSupportAicpuTsTaskCache()) {
-        SetBypass(plan, "hcomm task cache symbols incomplete");
+    if (asccommBackend ? !Mc2AsccommCommandCacheSupported() : !Mc2HcommIsSupportAicpuTsTaskCache()) {
+        SetBypass(plan, "asccomm command cache unavailable or disabled");
         return HCCL_SUCCESS;
     }
-    if (!IsSupportedOp(param.opType) ||
-        (param.engine != CommEngine::COMM_ENGINE_AICPU_TS && param.engine != CommEngine::COMM_ENGINE_CCU)) {
+    if (!IsSupportedOp(param.opType) || (param.engine != CommEngine::COMM_ENGINE_AICPU_TS &&
+                                         (asccommBackend || param.engine != CommEngine::COMM_ENGINE_CCU))) {
         SetBypass(plan, "unsupported op or engine");
         return HCCL_SUCCESS;
     }
@@ -568,7 +572,7 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         SetBypass(plan, "AICPU reduction work is not represented by cached tasks");
         return HCCL_SUCCESS;
     }
-    if (param.supportSymmetricMemory) {
+    if (param.supportSymmetricMemory || (asccommBackend && param.isZeroCopy)) {
         SetBypass(plan, "symmetric-memory peer addresses are not replayable");
         return HCCL_SUCCESS;
     }
@@ -612,6 +616,11 @@ HcclResult BuildMc2AicpuTaskCachePlan(
 
     plan.tag = std::string(CACHE_TAG_PREFIX) + ":" + std::to_string(static_cast<uint32_t>(param.opType)) + ":" +
                shape.Finish() + ":" + resource.Finish();
+    // Stage one does not relocate captured command addresses. Any input/output
+    // base change causes a miss; exact bytes also disambiguate digest collisions.
+    shape.AddPointer(param.inputPtr);
+    shape.AddPointer(param.outputPtr);
+    plan.exactKey = shape.ExactBytes() + resource.ExactBytes();
     plan.enabled = true;
     HCCL_INFO(
         "[MC2_TASK_CACHE][Plan] tag[%s], input[%p,%llu], output[%p,%llu].", plan.tag.c_str(), plan.addrs[0],
@@ -718,6 +727,7 @@ void Mc2AicpuTaskCacheManager::Unregister(void* comm, const std::string& tag)
 
 HcclResult Mc2AicpuTaskCacheManager::Evict(void* comm)
 {
+    CHK_RET(ClearAsccommCommandCache(comm));
     std::unordered_set<std::string> tags;
     {
         std::lock_guard<std::mutex> lock(mutex_);
