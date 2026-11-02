@@ -84,22 +84,28 @@ static_assert(sizeof(CommAbiHeader) == 16, "thread entity ABI header layout mism
 static_assert(offsetof(ThreadEntityV0, compatThreadHandle) == 80, "thread entity compat handle offset mismatch");
 static_assert(sizeof(ThreadEntityV0) == 256, "thread entity size mismatch");
 
-// device 侧把 HCOMM 发布的 ThreadEntity 句柄还原为 AICPU Thread 对象地址；version/magic 均不匹配才视为旧句柄。
+// device 侧把 HCOMM 发布的 ThreadEntity 句柄还原为 AICPU Thread 对象地址；magic 不匹配即视为旧句柄。
 HcclResult UnwrapThreadHandle(ThreadHandle& handle)
 {
     CHK_PRT_RET(handle == 0U, HCCL_ERROR("Main thread handle is null."), HCCL_E_PTR);
-    const auto* entity = reinterpret_cast<const ThreadEntityV0*>(handle);
-    if (entity->abiHeader.magicWord != THREAD_ENTITY_MAGIC_WORD && entity->abiHeader.version != THREAD_ENTITY_VERSION) {
+    const auto* base = reinterpret_cast<const uint8_t*>(static_cast<uintptr_t>(handle));
+    CommAbiHeader abiHeader{};
+    CHK_SAFETY_FUNC_RET(memcpy_s(&abiHeader, sizeof(abiHeader), base, sizeof(abiHeader)));
+    if (abiHeader.magicWord != THREAD_ENTITY_MAGIC_WORD) {
         return HCCL_SUCCESS; // 旧句柄即 Thread 对象地址，无需解包。
     }
     CHK_PRT_RET(
-        entity->abiHeader.version != THREAD_ENTITY_VERSION || entity->abiHeader.size < sizeof(ThreadEntityV0),
+        abiHeader.version != THREAD_ENTITY_VERSION || abiHeader.size < sizeof(ThreadEntityV0),
         HCCL_ERROR(
-            "Invalid thread entity ABI, magicWord[%#x], version[%u], size[%u].", entity->abiHeader.magicWord,
-            entity->abiHeader.version, entity->abiHeader.size),
+            "Invalid thread entity ABI, magicWord[%#x], version[%u], size[%u].", abiHeader.magicWord, abiHeader.version,
+            abiHeader.size),
         HCCL_E_PARA);
-    CHK_PRT_RET(entity->compatThreadHandle == 0U, HCCL_ERROR("Thread entity compat handle is null."), HCCL_E_INTERNAL);
-    handle = entity->compatThreadHandle;
+    ThreadHandle compatThreadHandle = 0U;
+    CHK_SAFETY_FUNC_RET(memcpy_s(
+        &compatThreadHandle, sizeof(compatThreadHandle), base + offsetof(ThreadEntityV0, compatThreadHandle),
+        sizeof(compatThreadHandle)));
+    CHK_PRT_RET(compatThreadHandle == 0U, HCCL_ERROR("Thread entity compat handle is null."), HCCL_E_INTERNAL);
+    handle = compatThreadHandle;
     return HCCL_SUCCESS;
 }
 
@@ -112,7 +118,7 @@ HcclResult GetNextThreadAndStream(const ServerExecCtx& execCtx, hccl::Thread*& t
         HCCL_E_PARA);
     ThreadHandle rawThread = execCtx.mainThread;
     CHK_RET(UnwrapThreadHandle(rawThread));
-    thread = reinterpret_cast<hccl::Thread*>(rawThread);
+    thread = reinterpret_cast<hccl::Thread*>(static_cast<uintptr_t>(rawThread));
     CHK_PTR_NULL(thread);
     streamLite = static_cast<Hccl::StreamLite*>(thread->GetStreamLitePtr());
     CHK_PTR_NULL(streamLite);
@@ -1035,7 +1041,7 @@ void CommKfcAicpuServer::DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const
         if (UnwrapThreadHandle(rawThread) != HCCL_SUCCESS) {
             continue;
         }
-        auto* thread = reinterpret_cast<hccl::Thread*>(rawThread);
+        auto* thread = reinterpret_cast<hccl::Thread*>(static_cast<uintptr_t>(rawThread));
         if (thread == nullptr) {
             MC2_TIMEOUT_LOG(
                 isHardTimeout, "[MC2_OPEN_TIMEOUT][Thread] group %u, commName[%s], thread is nullptr.", groupIdx_,
