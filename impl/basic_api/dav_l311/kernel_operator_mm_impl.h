@@ -265,9 +265,9 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
 {
     static_assert(
         SupportType<
-            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
             float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+        "LoadData 2dv2 only support int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if (loadDataParam.GetIfTranspose()) {
@@ -283,10 +283,10 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
     if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
         if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_ca_s4(
-                (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
         } else {
             load_cbuf_to_ca_s4(
-                (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
         }
     } else {
         if (loadDataParam.GetIfTranspose()) {
@@ -303,9 +303,9 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 {
     static_assert(
         SupportType<
-            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
             float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+        "LoadData 2dv2 only support int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if (loadDataParam.GetIfTranspose()) {
@@ -321,10 +321,10 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
     if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
         if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_cb_s4(
-                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
         } else {
             load_cbuf_to_cb_s4(
-                (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
         }
     } else {
         if (loadDataParam.GetIfTranspose()) {
