@@ -68,7 +68,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
     if constexpr (SupportType<T, int4b_t>) {
         load_cbuf_to_ca_s4(
             (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
+            loadDataParam.srcStride, loadDataParam.dstGap, 0, false, inc);
     } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca(
             (__ca__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
@@ -133,7 +133,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
     if constexpr (SupportType<T, int4b_t>) {
         load_cbuf_to_cb_s4(
             (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
+            loadDataParam.srcStride, loadDataParam.dstGap, 0, false, inc);
     } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb(
             (__cb__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
