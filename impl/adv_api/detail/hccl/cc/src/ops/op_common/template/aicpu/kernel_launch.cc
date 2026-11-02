@@ -350,6 +350,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_DEBUG(
             "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
             CUSTOM_TIMEOUT);
+        // 等 host 门铃：槽位布局见 HcclGetThread——maxNotifyNum 为 host 门铃（EntranceLaunch record
+        // 用读回槽数-2 = maxNotifyNum）与执行体 wait 的配对槽（原语义不变，仅同步注释）。
         CHK_RET(static_cast<HcclResult>(asccomm_thread_notify_wait_on_thread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
 
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
@@ -369,12 +371,15 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
-        constexpr u32 DEFAULT_NOTIFY_IDX = 0;
+        // pr_923 槽位隔离：执行体完成通知改用主线程尾部专属槽 maxNotifyNum+1（与 host 完成
+        // wait 配对，读回槽数-1 = maxNotifyNum+1），不再与算法模板区槽 0 共用——双 record
+        // 源同槽在置位/清零语义下互吃（Notify 多打一），槽位布局详见 HcclGetThread。
+        const u32 EXECUTOR_DONE_NOTIFY_IDX = maxNotifyNum + 1;
         HCCL_DEBUG(
             "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
-            exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
+            exportedAicpuTsThread, EXECUTOR_DONE_NOTIFY_IDX);
         CHK_RET(static_cast<HcclResult>(
-            asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+            asccomm_thread_notify_record_on_thread(thread, exportedAicpuTsThread, EXECUTOR_DONE_NOTIFY_IDX)));
 
         // 上报主流和最后一个task 在notify之后
         if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
