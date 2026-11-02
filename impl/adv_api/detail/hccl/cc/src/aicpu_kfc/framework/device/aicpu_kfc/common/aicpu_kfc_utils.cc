@@ -645,20 +645,18 @@ HcclResult AicpuKfcUtils::ReadMsgFromMemory(HcclMsgExt* src, u32 rankSize, HcclM
 HcclResult AicpuKfcUtils::ReadCompactExtFromMemory(
     HcclMsgExt* src, u32 rankSize, const HcclMsg& msg, HcclMsgExt& dst)
 {
-    if (rankSize > HCCL_MSG_EXT_COMPACT_MAX) {
+    if (rankSize > HCCL_MAX_RANK_NUM_V2) {
         return HCCL_E_PARA;
     }
 
-    const u32 ctrl = static_cast<u32>(msg.strideCount);
+    const u64 ctrlXor = msg.strideCount;
+    const u32 ctrl = static_cast<u32>(ctrlXor >> 32U);
     if (ctrl != HCCL_MSG_EXT_COMPACT_CTRL) {
         return HCCL_E_PARA;
     }
-    // The compact XOR is carried in normal HcclMsg.addMsg.v1Msg.xorCheck's upper bits
-    // by the client. Keep this read function independent of normal-message checksum
-    // by deriving the same value from the message block.
-    const u32 xorCheck = msg.addMsg.v1Msg.xorCheck ^ HCCL_MSG_EXT_COMPACT_CTRL;
+    const u32 xorCheck = static_cast<u32>(ctrlXor & 0xFFFFFFFFU);
 
-    u64 actualXor = HCCL_MSG_EXT_COMPACT_CTRL;
+    u32 actualXor = HCCL_MSG_EXT_COMPACT_CTRL;
     const u64* send = reinterpret_cast<const u64*>(src->sendCounts);
     const u64* recv = reinterpret_cast<const u64*>(src->recvCounts);
     for (u32 i = 0; i < rankSize; ++i) {
@@ -668,12 +666,13 @@ HcclResult AicpuKfcUtils::ReadCompactExtFromMemory(
         dst.sendOffset[i] = sendValue & 0xFFFFFFFFU;
         dst.recvCounts[i] = recvValue >> 32U;
         dst.recvOffset[i] = recvValue & 0xFFFFFFFFU;
-        actualXor ^= sendValue;
-        actualXor ^= recvValue;
+        actualXor ^= static_cast<u32>(sendValue >> 32U);
+        actualXor ^= static_cast<u32>(sendValue);
+        actualXor ^= static_cast<u32>(recvValue >> 32U);
+        actualXor ^= static_cast<u32>(recvValue);
     }
     if (UNLIKELY(actualXor != xorCheck)) {
-        HCCL_RUN_INFO("Compact extended data is modified, modified_xor:%llu, origin_xor:%u.",
-            static_cast<unsigned long long>(actualXor), xorCheck);
+        HCCL_RUN_INFO("Compact extended data is modified, modified_xor:%u, origin_xor:%u.", actualXor, xorCheck);
         return HCCL_E_AGAIN;
     }
 
