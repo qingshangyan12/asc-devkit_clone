@@ -75,7 +75,7 @@ python3 -m unittest discover -s tests/python -p test_mc2_ccu_perf_probe.py
 
 ## 当前采集范围
 
-配套 suite 使用 `--mode client,host`（默认）分别采集 Client 和 Host 指标。`--mode server` 通过 TIME_PROFILING 编译的事件标记和 msprof 采集 KFC 流水。
+配套 suite 使用 `--mode client,host`（默认）分别采集 Client 和 Host 指标。`--mode server` 通过常态生成的事件标记和 msprof 采集 KFC 流水。
 
 当前仅保留 Client 的 Init/Prepare/Commit/Wait/Finalize 接口计时，以及 Host 的资源准备和三个提交区间计时。Client 计时位于配套测试程序的 AIC/AIV 算子中，Host 计时位于本探针及 Host 测试程序中。
 
@@ -83,8 +83,8 @@ Host 探针不记录 KFC 内部时间。独立的 server 模式使用 KFC 微码
 
 ## KFC 流水标记
 
-复用已有的 `TIME_PROFILING` 宏，对应 CMake 开关默认 OFF，仅为 `ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc` 增加编译宏。开启后，在主 KFC 队列中分配一个专用 event，统一使用 mask=1，在每个边界通过 `for` 连续生成 5 对 EventRecord→EventWait，共五组标记：等待开始信号前、等待后、入参加载后、完整算法分发前、分发后。各组通过专用 CKE、连续事件和执行顺序识别，无需不同 mask。先置位再等待，不会自锁；终止消息只经过前三组。关闭宏时不分配该 event，也不生成标记指令。
+`ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc` 中的 KFC 标记常态生成，无需编译宏。主 KFC 队列分配一个专用 event，统一使用 mask=1，每个边界通过 `for` 连续生成 5 对 EventRecord→EventWait。当前四处位置为：主队列循环前、等待开始信号后、入参加载后、主队列循环结束后。循环前后两组每次队列执行各经过一次，循环内两组随每条消息执行，也覆盖终止消息。各组通过专用 CKE、连续事件和执行顺序识别。先置位再等待，不依赖外部信号。
 
-配套 suite 的 server 模式针对已配置的 asc-devkit 构建目录执行 `cmake -DTIME_PROFILING=ON` 并重编译 mc2_client，通过独立库路径用于 server case，再按 MPI rank 启动 msprof 并导出 JSON。原始 PROF 与导出文件均保存在 case 的 process_N/profiling/rank_N 中，具体配置与命令见配套 README。宏影响库中的微码生成代码，单独给测试算子加宏无效；无需修改 HCOMM。
+配套 suite 的 server 模式直接使用已安装的 asc-devkit 库，不重新编译、不要求源码构建目录。采集前检查实际加载的 mc2_client 库中是否包含标记，然后按 MPI rank 启动 msprof 并导出 JSON。原始 PROF 与导出文件均保存在 case 的 process_N/profiling/rank_N 中，具体配置与命令见配套 README。安装包需要包含库中的微码标记代码；无需修改 HCOMM。
 
-当前本地测试只能验证宏开关、标记顺序和采集/导出流程。完整库编译、硬件流水可见性及探针对执行的影响仍需配套 CANN/NPU 验证。
+当前本地测试只能验证标记顺序和采集/导出流程。完整库编译、硬件流水可见性及探针对执行的影响仍需配套 CANN/NPU 验证。

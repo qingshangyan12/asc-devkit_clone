@@ -9,11 +9,6 @@
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
-option(TIME_PROFILING "Emit KFC event markers for server profiling" OFF)
-if(TIME_PROFILING)
-    set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc
-        APPEND PROPERTY COMPILE_DEFINITIONS TIME_PROFILING)
-endif()
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
