@@ -916,57 +916,50 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
     // the first octant, so the magnitudes are reduced first and the octant is restored afterwards.
     float ay = __fabsf(y);
     float ax = __fabsf(x);
-
-    // Order the magnitudes so the ratio lo / hi never exceeds 1, which is the polynomial's valid range.
     bool y_gt_x = ay > ax;
     float hi = y_gt_x ? ay : ax;
     float lo = y_gt_x ? ax : ay;
+    bool nz = hi != 0.0f;
 
-    float a = 0.0f;
-    if (hi != 0.0f) {
-        // The ratio lies in [0, 1]. atan is odd, so with z = r^2 the tail is even in r:
-        //   atan(r) = r + r^3 * P(z), P(z) = -0.33333197 + 0.19993925 z - 0.14207722 z^2 + 0.10640416 z^3
-        //             - 0.074792981 z^4 + 0.042200752 z^5 - 0.015681878 z^6 + 0.0027380611 z^7
-        // P is minimax-fitted, not a Taylor truncation (leading term -0.33333197, not -1/3): the error is
-        // flattened across all of [0, 1], so the coefficients cannot be extended by a series rule.
-        float r = lo / hi;
-        float z = r * r;
-        float p = 0.0027380611281841993332f;
-        p = __fma(z, p, -0.015681877732276916504f);
-        p = __fma(z, p, 0.042200751602649688721f);
-        p = __fma(z, p, -0.074792981147766113281f);
-        p = __fma(z, p, 0.10640415549278259277f);
-        p = __fma(z, p, -0.14207722246646881104f);
-        p = __fma(z, p, 0.19993925094604492188f);
-        p = __fma(z, p, -0.33333197236061096191f);
-        // Assemble r + r^3 * P(z). r is the dominant term, so passing it as the fma addend keeps it exact
-        // and confines rounding to the correction.
-        float t = __fma(z * p, r, r);
+    // Safe denominator: 1 instead of 0 keeps the shared path free of the 0/0 NaN; the garbage
+    // result on that route is discarded by the tail select.
+    float safe_hi = nz ? hi : 1.0f;
+    float r = lo / safe_hi;
+    float z = r * r;
 
-        // Rebuild the full-circle angle from the octant. |y| == |x| is special-cased so the diagonals come
-        // out as the exactly rounded pi/4 and 3pi/4, and because inf/inf above makes r NaN.
-        if (ay == ax) {
-            a = signbit(x) ? 2.35619449615478515625f : 0.78539818525314331055f;
-        } else if (y_gt_x) {
-            // Steeper than the diagonal: the ratio r = ax/ay is the reciprocal of y/x, so
-            // atan(y/x) = pi/2 - atan(x/y) = pi/2 - t. A negative x lies in the second quadrant, so pi/2 + t.
-            float pio2 = 1.57079637050628662109f;
-            a = signbit(x) ? (pio2 + t) : (pio2 - t);
-        } else {
-            // Shallow angles need no reflection; a negative x mirrors the first octant into the second.
-            a = signbit(x) ? (3.14159274101257324219f - t) : t;
-        }
-    } else {
-        // Both arguments are zero. Sign of x picks pi or 0, matching atan2(+-0, -0) == +-pi.
-        a = signbit(x) ? 3.14159274101257324219f : 0.0f;
-    }
-    float result = signbit(y) ? -a : a;
-    // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
+    // atan(r) = r + r^3 * P(r^2), P minimax-fitted on [0, 1].
+    float p = 0.0027380611281841993332f;
+    p = __fma(z, p, -0.015681877732276916504f);
+    p = __fma(z, p, 0.042200751602649688721f);
+    p = __fma(z, p, -0.074792981147766113281f);
+    p = __fma(z, p, 0.10640415549278259277f);
+    p = __fma(z, p, -0.14207722246646881104f);
+    p = __fma(z, p, 0.19993925094604492188f);
+    p = __fma(z, p, -0.33333197236061096191f);
+    float t = __fma(z * p, r, r);
+
+    // The only NaN source left is inf/inf; pi/4 makes the affine formula below produce every
+    // diagonal answer (0 + pi/4 = pi/4, pi - pi/4 = 3pi/4) with no special case.
+    t = (t != t) ? 0.78539818525314331055f : t;
+
+    // Quadrant restore: every octant bucket is base + sgn*t, so the three-way select of the
+    // reference implementation is two bucket picks plus a single fma.
+    bool xneg = __float_as_uint(x) >> 31; // 31: sign-bit offset of fp32
+    float base = y_gt_x ? 1.57079637050628662109f : (xneg ? 3.14159274101257324219f : 0.0f);
+    float sgn = (y_gt_x != xneg) ? -1.0f : 1.0f;
+    float a_main = __fma(sgn, t, base);
+
+    // hi == 0: sign of x picks pi or 0 (atan2(+-0, -0) == +-pi); nonzero lo is the y-axis (pi/2).
+    float a0 = xneg ? 3.14159274101257324219f : 0.0f;
+    a0 = ((hi == 0.0f) && (lo != 0.0f)) ? 1.57079637050628662109f : a0;
+    float a = nz ? a_main : a0;
+
+    // Odd in y: apply the sign (including -0.0) bit-wise, then let a NaN argument win.
+    float result = __float_as_uint(y) >> 31 ? -a : a; // 31: sign-bit offset of fp32
     float sum = ax + ay;
     if (__isnan(sum)) {
         result = sum;
     }
-    // atan2 is odd in y, so the sign of y (including -0.0) is reapplied last.
     return result;
 }
 
@@ -4299,12 +4292,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     const float abs_b = fabsf(b);
     const float abs_c = fabsf(c);
     const float abs_d = fabsf(d);
-    if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c) || isinf(abs_d)) {
-        return 0.0f;
-    }
-    if (isnan(abs_a) || isnan(abs_b) || isnan(abs_c) || isnan(abs_d)) {
-        return ASCRT_NAN_F;
-    }
 
     const float max_ab = (abs_a > abs_b) ? abs_a : abs_b;
     const float max_cd = (abs_c > abs_d) ? abs_c : abs_d;
@@ -4319,16 +4306,25 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     const float t_c = abs_c * scale;
     const float t_d = abs_d * scale;
     float square_sum = fmaf(t_a, t_a, fmaf(t_b, t_b, fmaf(t_c, t_c, t_d * t_d)));
-    // Zero norm means the reciprocal norm is infinite.
-    if (square_sum == 0.0f) {
-        return ASCRT_INF_F;
-    }
 
     // Compute an approximate reciprocal norm and refine it with one Newton step.
     float inv_norm = 1.0f / __sqrtf(square_sum);
     inv_norm = inv_norm * fmaf(-0.5f * square_sum, inv_norm * inv_norm, 1.5f);
     // Restore the outer scale factor.
-    return scale * inv_norm;
+    float result = scale * inv_norm;
+
+    // Zero norm means the reciprocal norm is infinite.
+    if (square_sum == 0.0f) {
+        result = ASCRT_INF_F;
+    }
+    if (isnan(abs_a) || isnan(abs_b) || isnan(abs_c) || isnan(abs_d)) {
+        result = ASCRT_NAN_F;
+    }
+    if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c) || isinf(abs_d)) {
+        result = 0.0f;
+    }
+
+    return result;
 }
 
 /**

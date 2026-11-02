@@ -29,6 +29,14 @@ namespace te {
 namespace detail {
 
 #if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
+constexpr uint32_t bits_per_byte = 8U;
+constexpr uint32_t bits_per_byte_shift = 3U;
+constexpr uint32_t bits_per_byte_mask = 7U;
+constexpr uint32_t bytes_per_word_shift = 2U;
+constexpr uint32_t bytes_per_word_mask = 3U;
+constexpr uint32_t uint64_bits = 64U;
+constexpr uint32_t b4_element_bits = 4U;
+
 constexpr uint32_t DEBUG_BUS_MAX_WAIT_COUNT = 5U;
 constexpr uint32_t DEBUG_BUS_READY_MASK = 0x80000000U;
 constexpr uint64_t DEBUG_BUS_WAIT_CYCLES = 100U;
@@ -40,6 +48,11 @@ constexpr uint32_t DEBUG_BUS_DATA_OFFSET = 0x110U;
 constexpr uint32_t DEBUG_BUS_BUSY_OFFSET = 0x130U;
 constexpr uint32_t DEBUG_BUS_UNLOCK_VALUE = 0x19101920U;
 constexpr uint32_t DEBUG_BUS_READ_MASK = 0x2U;
+
+constexpr uint32_t DEBUG_BUS_BIAS_FIXBUF_LOOP_STEPLEN = 8U;
+constexpr uint32_t DEBUG_BUS_DEFAULT_LOOP_STEPLEN = 32U;
+constexpr uint32_t DEBUG_BUS_L1_LOCAL_ADDR_SHIFT = 5U;
+constexpr uint32_t DEBUG_BUS_DATA_WORD_STRIDE = 4U;
 
 template <AscendC::Hardware Hardware>
 __aicore__ inline constexpr uint32_t get_debug_bus_model_base()
@@ -59,6 +72,14 @@ __aicore__ inline constexpr uint32_t get_debug_bus_model_base()
     }
 }
 
+constexpr uint32_t DEBUG_BUS_WORD0_INDEX = 0U;
+constexpr uint32_t DEBUG_BUS_WORD1_INDEX = 1U;
+constexpr uint32_t DEBUG_BUS_WORD2_INDEX = 2U;
+constexpr uint32_t DEBUG_BUS_WORD3_INDEX = 3U;
+constexpr uint32_t DEBUG_BUS_WORD4_INDEX = 4U;
+constexpr uint32_t DEBUG_BUS_WORD5_INDEX = 5U;
+constexpr uint32_t DEBUG_BUS_WORD6_INDEX = 6U;
+
 struct debug_bus_chunk {
     uint32_t word0 = 0U;
     uint32_t word1 = 0U;
@@ -72,19 +93,19 @@ struct debug_bus_chunk {
     __aicore__ inline uint32_t word(uint32_t index) const
     {
         switch (index) {
-            case 0:
+            case DEBUG_BUS_WORD0_INDEX:
                 return word0;
-            case 1:
+            case DEBUG_BUS_WORD1_INDEX:
                 return word1;
-            case 2:
+            case DEBUG_BUS_WORD2_INDEX:
                 return word2;
-            case 3:
+            case DEBUG_BUS_WORD3_INDEX:
                 return word3;
-            case 4:
+            case DEBUG_BUS_WORD4_INDEX:
                 return word4;
-            case 5:
+            case DEBUG_BUS_WORD5_INDEX:
                 return word5;
-            case 6:
+            case DEBUG_BUS_WORD6_INDEX:
                 return word6;
             default:
                 return word7;
@@ -94,15 +115,17 @@ struct debug_bus_chunk {
     __aicore__ inline uint64_t bits(uint32_t bit_offset, uint32_t bit_count) const
     {
         uint64_t value = 0U;
-        uint32_t byte_offset = bit_offset >> 3;
-        uint32_t byte_count = (bit_count + 7U) >> 3;
+        uint32_t byte_offset = bit_offset >> bits_per_byte_shift;
+        uint32_t byte_count = (bit_count + bits_per_byte_mask) >> bits_per_byte_shift;
         for (uint32_t i = 0; i < byte_count; ++i) {
             uint32_t byte_index = byte_offset + i;
-            uint32_t byte_value = (word(byte_index >> 2) >> ((byte_index & 3U) << 3)) & 0xFFU;
-            value |= static_cast<uint64_t>(byte_value) << (i << 3);
+            uint32_t byte_value = (word(byte_index >> bytes_per_word_shift) >>
+                                   ((byte_index & bytes_per_word_mask) << bits_per_byte_shift)) &
+                                  0xFFU;
+            value |= static_cast<uint64_t>(byte_value) << (i << bits_per_byte_shift);
         }
-        return (value >> (bit_offset & 7U)) &
-               (bit_count == 64U ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
+        return (value >> (bit_offset & bits_per_byte_mask)) &
+               (bit_count == uint64_bits ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
     }
 };
 
@@ -110,9 +133,9 @@ template <AscendC::Hardware Hardware>
 __aicore__ inline constexpr uint64_t get_debug_bus_loop_steplen()
 {
     if constexpr (Hardware == AscendC::Hardware::BIAS || Hardware == AscendC::Hardware::FIXBUF) {
-        return 8U;
+        return DEBUG_BUS_BIAS_FIXBUF_LOOP_STEPLEN;
     } else {
-        return 32U;
+        return DEBUG_BUS_DEFAULT_LOOP_STEPLEN;
     }
 }
 
@@ -120,7 +143,7 @@ template <AscendC::Hardware Hardware>
 __aicore__ inline constexpr uint32_t get_debug_bus_local_addr_shift()
 {
     if constexpr (Hardware == AscendC::Hardware::L1) {
-        return 5U;
+        return DEBUG_BUS_L1_LOCAL_ADDR_SHIFT;
     } else {
         return 0U;
     }
@@ -181,14 +204,20 @@ template <AscendC::Hardware Hardware>
 __aicore__ inline void read_debug_bus_data(uint64_t debug_bus_address, debug_bus_chunk& chunk)
 {
     chunk.word0 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET);
-    chunk.word1 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 4U);
-    if constexpr (get_debug_bus_loop_steplen<Hardware>() == 32U) {
-        chunk.word2 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 8U);
-        chunk.word3 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 12U);
-        chunk.word4 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 16U);
-        chunk.word5 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 20U);
-        chunk.word6 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 24U);
-        chunk.word7 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 28U);
+    chunk.word1 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + DEBUG_BUS_DATA_WORD_STRIDE);
+    if constexpr (get_debug_bus_loop_steplen<Hardware>() == DEBUG_BUS_DEFAULT_LOOP_STEPLEN) {
+        chunk.word2 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 2U * DEBUG_BUS_DATA_WORD_STRIDE);
+        chunk.word3 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 3U * DEBUG_BUS_DATA_WORD_STRIDE);
+        chunk.word4 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 4U * DEBUG_BUS_DATA_WORD_STRIDE);
+        chunk.word5 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 5U * DEBUG_BUS_DATA_WORD_STRIDE);
+        chunk.word6 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 6U * DEBUG_BUS_DATA_WORD_STRIDE);
+        chunk.word7 =
+            tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 7U * DEBUG_BUS_DATA_WORD_STRIDE);
     }
 }
 
@@ -245,11 +274,12 @@ struct debug_bus_tensor_reader {
     template <typename Coord>
     __aicore__ inline void emit(print_session& session, const Coord& coord)
     {
-        constexpr uint32_t ELEMENT_BITS = is_b4_type<Data> ? 4U : sizeof(Data) * 8U;
+        constexpr uint32_t ELEMENT_BITS = is_b4_type<Data> ? b4_element_bits : sizeof(Data) * bits_per_byte;
         constexpr uint64_t CHUNK_BYTES = get_debug_bus_loop_steplen<Hardware>();
         uint64_t element_index = static_cast<uint64_t>(tensor.layout()(coord));
-        uint64_t bit_address = reinterpret_cast<uint64_t>(tensor.data().get()) * 8U + element_index * ELEMENT_BITS;
-        uint64_t chunk_address = (bit_address >> 3) & ~(CHUNK_BYTES - 1U);
+        uint64_t bit_address =
+            reinterpret_cast<uint64_t>(tensor.data().get()) * bits_per_byte + element_index * ELEMENT_BITS;
+        uint64_t chunk_address = (bit_address >> bits_per_byte_shift) & ~(CHUNK_BYTES - 1U);
         if (chunk_address != cached_chunk_address) {
             read_succeeded = read_debug_bus_chunk<Hardware>(chunk_address, chunk);
             cached_chunk_address = chunk_address;
@@ -258,7 +288,7 @@ struct debug_bus_tensor_reader {
             print_fragment(session, (__gm__ const char*)"?  ");
             return;
         }
-        uint32_t bit_offset = static_cast<uint32_t>(bit_address - chunk_address * 8U);
+        uint32_t bit_offset = static_cast<uint32_t>(bit_address - chunk_address * bits_per_byte);
         emit_element_as<Data>(session, debug_value_from_bits<Data>(chunk.bits(bit_offset, ELEMENT_BITS)));
     }
 };

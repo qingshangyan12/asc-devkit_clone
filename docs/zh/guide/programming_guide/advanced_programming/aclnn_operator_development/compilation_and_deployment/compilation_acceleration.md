@@ -240,6 +240,15 @@ __global__ __aicore__ void add_custom_template(GM_ADDR x, GM_ADDR y, GM_ADDR z,
 npu_op_kernel_options(ascendc_kernels AddCustomTemplate COMPUTE_UNIT Ascendxxyy OPTIONS --kernel-template-input="D_T_X=half;D_T_Y=10;D_T_Z=half")
 ```
 
+设置以下环境变量后，可在编译时通过INFO日志查看传入的模板参数和最终选择编译的TilingKey清单：
+
+```bash
+export ASCEND_GLOBAL_LOG_LEVEL=1
+export ASCEND_SLOG_PRINT_TO_STDOUT=1
+```
+
+日志中的`Parameter "kernel-template-input" has been set to`记录传入的模板参数，`Filtered tilingkey list is`记录最终选择编译的TilingKey清单。部分模板参数可匹配多个TilingKey；使用[ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL](../../../../../api/Utils-API/Tiling_template_programming/template_params_definition.md#zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section75395119104)配置共享核函数（Kernel）时，清单仅列出实际参与编译的代表TilingKey，不展开其共享的其他TilingKey。
+
 ### 收窄芯片范围
 
 `ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`配置了多少个芯片型号，核函数（Kernel）侧通常就会按芯片型号分别编译。开发阶段如果只在当前机器上验证，可修改CMakeLists.txt中的任一配置保留当前SOC，或者在CMake配置阶段临时只构建某个SOC。以下示例只构建ascendxxx SOC的示例：

@@ -163,7 +163,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 以`Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
 
-![Nz内存排布示意图](../../../../figures/nz_layout.png)
+<img src="../../../../figures/nz_layout.png" alt="Nz内存排布示意图" width="300px" height="314px">
 
 #### Bank冲突
 

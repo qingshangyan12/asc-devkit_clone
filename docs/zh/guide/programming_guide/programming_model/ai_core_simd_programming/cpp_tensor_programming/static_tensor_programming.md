@@ -6,7 +6,7 @@
 
 两种编程方式的对比如下：
 
-![](../../../../figures/op_flow.png)
+<img src="../../../../figures/op_flow.png" alt="" width="920px" height="410px">
 
 >[!NOTE]说明
 >- 静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
@@ -19,7 +19,7 @@
 
 下图是一个典型矢量算子的示意图，开发者首先根据业务计算量进行数据分块处理，之后根据核内的数据依赖关系完成同步事件的插入：
 
-![](../../../../figures/mem_mgmt_5.png)
+<img src="../../../../figures/mem_mgmt_5.png" alt="" width="920px" height="600px">
 
 ## 内存管理<a name="section626154143513"></a>
 
@@ -166,9 +166,9 @@
 
 以下为不开启DoubleBuffer和开启DoubleBuffer的流水示意图。多数情况下，采用DoubleBuffer能有效提升Vector的时间利用率，缩减算子执行时间，详细内容可参考[DoubleBuffer](../../../../technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)。
 
-![](../../../../figures/op_flow_6.png)
+<img src="../../../../figures/op_flow_6.png" alt="" width="920px" height="295px">
 
-![](../../../../figures/op_flow_7.png)
+<img src="../../../../figures/op_flow_7.png" alt="" width="920px" height="312px">
 
 ## 使用约束和限制<a name="section19853161834615"></a>
 

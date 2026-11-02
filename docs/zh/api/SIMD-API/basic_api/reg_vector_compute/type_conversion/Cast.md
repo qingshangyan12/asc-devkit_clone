@@ -307,13 +307,13 @@ tmp2[15 : 0] = f16_src_data[i][15 : 0];
 Ev = tmp2[14 : 10] - 5'b01111, thr = {tmp2[0], 1’b1};
 if (Ev == 16 && tmp2[9 : 0] != 10'b0) then
     tmp3[7 : 0] = HiF8NAN(8'b10000000);
-else if (Ev == 16 && tmp2[9:0] == 10'b0) && (Ev > 15) then
-    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+inf(8'b01101111) : HiF8-inf(8'b11101111);
+else if ((Ev == 16 && tmp2[9 : 0] == 10'b0) || (Ev > 15)) then
+    tmp3[7 : 0] = (tmp2[15] == 1'b0) ? HiF8+inf(8'b01101111) : HiF8-inf(8'b11101111);
 else if (Ev < -23) then
     tmp3[7 : 0] = HiF8ZERO(8'b00000000);
 else if (Ev == -23) then
     if ((Half To Away Round) || (Hybrid Round && {1’b1, tmp2[9]} >= thr)) then
-        tmp3[7 : 0] = (tmp2[31] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
+        tmp3[7 : 0] = (tmp2[15] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
     else
         tmp3[7 : 0] = HiF8ZERO(8'b00000000);
     end if

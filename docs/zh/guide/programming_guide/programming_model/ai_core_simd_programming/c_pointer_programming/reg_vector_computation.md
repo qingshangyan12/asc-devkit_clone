@@ -75,7 +75,7 @@ AIV的内存层级如下：
 
 1. **矢量计算寄存器**：参与矢量计算的主要寄存器，单个寄存器宽度定义为Vector Length（以下简称VL），可以通过DMA单元与UB进行数据交换。
 2. **掩码寄存器**：用于控制参与矢量计算的有效元素或者代表单bit元素参与计算等，单个寄存器宽度定义为VL/8，可以通过DMA单元与UB进行数据交换。
-3. **地址寄存器**：辅助Reg矢量搬运单元完成矢量计算寄存器和UB数据交换，用于存储UB地址的偏移，单个寄存器宽度为32bis，不能直接与UB进行数据交换。
+3. **地址寄存器**：辅助Reg矢量搬运单元完成矢量计算寄存器和UB数据交换，用于存储UB地址的偏移，单个寄存器宽度为32bit，不能直接与UB进行数据交换。
 4. **搬入非对齐寄存器**：辅助Reg矢量搬运单元将UB数据搬入到矢量计算寄存器，用于临时存储包含源非对齐UB地址数据的，起始对齐UB地址的1个DataBlock长度的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将UB数据搬入非对齐寄存器。
 5. **搬出非对齐寄存器**：辅助Reg矢量搬运单元将矢量计算寄存器数据搬出到UB，用于临时存储包含需写出非对齐UB地址的对应的矢量寄存器的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将搬出非对齐寄存器数据搬出到UB。
 
@@ -309,7 +309,7 @@ asc_load(vreg1, ub_addr);
 
 **图5** 流水线同步示意
 
-![](../../../../figures/sync_pipe_1.png "流水线同步")
+<img src="../../../../figures/sync_pipe_1.png" alt="流水线同步" width="920px" height="677px">
 
 > 📌 **提示**：在`asc_vf_call`调用VF函数后，外层无需关注PIPE_V的Barrier；VF函数退出时，所有内部Reg矢量指令均已执行完成。
 
@@ -425,44 +425,44 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 **图6** 非对齐搬入预期
 
-![](../../../../figures/reg_read_1.png "Reg非对齐读1")
+<img src="../../../../figures/reg_read_1.png" alt="Reg非对齐读1" width="300px" height="84px">
 
 1. 先使用非对齐的UB地址初始化`vector_load_unalign`，会将UB地址截断到32B对齐地址32，再将一个DataBlock 32B数据搬入到`vector_load_unalign`.
 
    **图7**  初始化`vector_load_unalign`
 
-   ![](../../../../figures/reg_read_2.png "Reg非对齐读2")
+   <img src="../../../../figures/reg_read_2.png" alt="Reg非对齐读2" width="300px" height="58px">
 
 2. 调用`asc_loadunalign`搬运数据，从原非对齐UB地址向上对齐到32B后，搬入240B数据，与`vector_load_unalign`中的部分数据拼接成预期读入256B数据后，写入矢量数据寄存器。同时将`vector_load_unalign`内的数据更新为下一次读取UB地址非对齐对应的DataBlock 32B.
 
    **图8**  读入预期数据
 
-   ![](../../../../figures/reg_read_4.png "Reg非对齐读4")
+   <img src="../../../../figures/reg_read_4.png" alt="Reg非对齐读4" width="600px" height="235px">
 
 **非对齐搬出**由[`asc_storeunalign`](../../../../../api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md)和[`asc_storeunalign_post`](../../../../../api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
 例如在[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)，当想要搬出如下UB地址为48开始的512Bytes数据时：
 
 **图9** 非对齐搬出预期
 
-![](../../../../figures/reg_write_0.png "Reg非对齐写0")
+<img src="../../../../figures/reg_write_0.png" alt="Reg非对齐写0" width="300px" height="84px">
 
 1. 先使用`asc_storeunalign`，首次循环时：将尾部对齐到32B的长度为240B的矢量数据寄存器数据写入UB，同时将剩余的16B写入`vector_store_unalign`; 
 
    **图10** 第一次写出预期数据
 
-   ![](../../../../figures/reg_write_1.png "Reg非对齐写1")
+   <img src="../../../../figures/reg_write_1.png" alt="Reg非对齐写1" width="300px" height="160px">
 
 2. 当第二次循环时：将暂存在`vector_store_unalign`中的16B数据，与本次循环需要写出的矢量数据寄存器中的240B拼接成256B数据后，写出到UB。同时将本次循环中剩余的16B更新写入`vector_store_unalign`; 
 
    **图11** 第二次写出预期数据
 
-   ![](../../../../figures/reg_write_2.png "Reg非对齐写2")
+   <img src="../../../../figures/reg_write_2.png" alt="Reg非对齐写2" width="600px" height="265px">
 
 3. 调用`asc_storeunalign_post`将`vector_store_unalign`缓存中尚未写出的尾部数据刷回UB.
 
    **图12** 剩余数据写出
 
-   ![](../../../../figures/reg_write_3.png "Reg非对齐写3")
+   <img src="../../../../figures/reg_write_3.png" alt="Reg非对齐写3" width="600px" height="164px">
 
 推荐写法是把初始化和后处理放在循环外，循环体内只保留连续搬运和计算：
 

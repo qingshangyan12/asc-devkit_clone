@@ -8,10 +8,10 @@
 >本性能优化手段仅针对Atlas A2系列产品生效。
 
 **图1**  反例数据流图<a name="fig1775910202351"></a>  
-![](../../../figures/bad_flow_78.png "反例数据流图-78")
+<img src="../../../figures/bad_flow_78.png" alt="反例数据流图-78" width="920px" height="330px">
 
 **图2**  正例数据流图<a name="fig14909105811118"></a>  
-![](../../../figures/good_dataflow_79.png "正例数据流图-79")
+<img src="../../../figures/good_dataflow_79.png" alt="正例数据流图-79" width="920px" height="217px">
 
 【反例】
 

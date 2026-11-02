@@ -115,7 +115,7 @@ AddKernelInvocationNeo
 4.  NPU侧运行验证。完成算子核函数（Kernel）NPU侧运行验证的步骤如下：
 
     **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
-    ![](../../figures/npu_verify.png "NPU侧运行验证步骤")
+    <img src="../../figures/npu_verify.png" alt="NPU侧运行验证步骤" width="300px" height="675px">
 
     ```
         // 初始化

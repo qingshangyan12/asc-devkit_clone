@@ -71,7 +71,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
         **图1**  非对齐数据搬入<a name="fig638414472320"></a>  
         
-        ![](../../../../figures/unaligned_in_77.png)
+        <img src="../../../../figures/unaligned_in_77.png" alt="" width="600px" height="251px">
 
 -   **非对齐数据搬出**
 
@@ -84,7 +84,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
     **图2**  非对齐数据搬出（ureg为空）<a name="fig34750199610"></a>  
     
-    ![](../../../../figures/unaligned_out_0.png)
+    <img src="../../../../figures/unaligned_out_0.png" alt="" width="600px" height="201px">
 
     **场景二：ureg不为空**
 
@@ -93,7 +93,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
     **图3**  非对齐数据搬出（ureg不为空）<a name="fig579119300430"></a>  
     
-    ![](../../../../figures/unaligned_out_1.png)
+    <img src="../../../../figures/unaligned_out_1.png" alt="" width="600px" height="200px">
 
 -   **MaskReg连续非对齐数据搬出**
 
@@ -111,7 +111,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
     **图4**  MaskReg连续非对齐数据搬出<a name="fig18974124104813"></a>  
     
-    ![](../../../../figures/mask_reg_out.png)
+    <img src="../../../../figures/mask_reg_out.png" alt="" width="600px" height="355px">
 
 -   **连续非对齐搬入搬出示例**
 
@@ -148,4 +148,4 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
     **图5**  连续非对齐搬入搬出<a name="fig98921837195710"></a>  
     
-    ![](../../../../figures/unaligned_io.png)
+    <img src="../../../../figures/unaligned_io.png" alt="" width="920px" height="389px">

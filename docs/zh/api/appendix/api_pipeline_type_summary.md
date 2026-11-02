@@ -59,7 +59,7 @@
 | 逻辑计算 | Ands | AIV | PIPE_V |
 | 逻辑计算 | Ors | AIV | PIPE_V |
 | 逻辑计算 | ShiftLeft（左移位数为Tensor） | AIV | PIPE_V |
-| 逻辑计算 | ShiftRights（左移位数为Tensor） | AIV | PIPE_V |
+| 逻辑计算 | ShiftRight（右移位数为Tensor） | AIV | PIPE_V |
 | 复合计算 | Axpy | AIV | PIPE_V |
 | 复合计算 | MulAddDst | AIV | PIPE_V |
 | 复合计算 | MulCast | AIV | PIPE_V |

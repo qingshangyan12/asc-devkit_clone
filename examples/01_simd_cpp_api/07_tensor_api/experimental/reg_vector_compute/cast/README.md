@@ -34,13 +34,17 @@ y[i] = convert<To>(x[i])
 
   | SCENARIO_NUM | 输入类型 | 输出类型 | Layout | Round | Sat | 转换说明 |
   | --- | --- | --- | --- | --- | --- | --- |
-  | 1 | `half` | `int32_t` | `zero` | `floor` | `not_sat` | 向下取整后转换为32位有符号整数 |
+  | 1 | `half` | `int32_t` | `zero` | `floor` | `unknown` | 向下取整后转换为32位有符号整数 |
   | 2 | `float` | `int16_t` | `zero` | `rint` | `sat` | 舍入到最近整数并饱和到 `int16_t` 范围 |
-  | 3 | `int8_t` | `int32_t` | `zero` | `rint` | `not_sat` | 8位有符号整数扩展为32位有符号整数 |
-  | 4 | `int32_t` | `uint8_t` | `zero` | `rint` | `sat` | 饱和到 `[0, 255]` 后转换为8位无符号整数 |
-  | 5 | `bfloat16_t` | `float` | `zero` | `rint` | `not_sat` | `bfloat16_t` 扩展为 `float` |
+  | 3 | `int8_t` | `int32_t` | `zero` | `unknown` | `unknown` | 8位有符号整数扩展为32位有符号整数 |
+  | 4 | `int32_t` | `uint8_t` | `zero` | `unknown` | `sat` | 饱和到 `[0, 255]` 后转换为8位无符号整数 |
+  | 5 | `bfloat16_t` | `float` | `zero` | `unknown` | `unknown` | `bfloat16_t` 扩展为 `float` |
   | 6 | `float` | `bfloat16_t` | `zero` | `rint` | `not_sat` | `float` 舍入为 `bfloat16_t` |
-  | 7 | UB：`int4b_t`，寄存器：`int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | 直接加载512个`int4b_t`，通过四种 layout 分别转换每组4字节中的对应字节，每次得到128个 half，并按 layout 顺序分段写回。|
+  | 7 | UB：`int4b_t`，寄存器：`int4x2_t` | `half` | `zero/one/two/three` | `unknown` | `unknown` | 直接加载512个`int4b_t`，通过四种 layout 分别转换每组4字节中的对应字节，每次得到128个 half，并按 layout 顺序分段写回。|
+
+  每次调用 `cast` 都必须显式传入编译期 `cast_options`。表中的 `unknown` 表示该转换不提供对应模式选择，并不表示可以替换为 `rint` 或 `not_sat`。支持的完整配置组合请参考 [cast API资料](../../../../../../docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/type_conversion/cast.md)。
+
+  Kernel在SIMD VF外保存CTRL，清零 `CTRL[60]` 以采用单指令饱和配置，并在计算及搬出完成后同步全部流水、恢复原CTRL，避免依赖全局饱和配置。场景2的数据包含舍入中间值和超出 `int16_t` 范围的数值；场景4包含负数、255附近的边界值及 `int32_t` 的极值，用于校验饱和转换。
 
 - 样例规格：
 
@@ -112,14 +116,19 @@ y[i] = convert<To>(x[i])
     核心转换代码如下：
 
     ```cpp
-    auto src_reg = asc::te::experimental::load(src, coord);
+    constexpr asc::te::experimental::cast_options widening_cast_ops = {
+        asc::te::experimental::cast_layout::zero,
+        asc::te::experimental::cast_round_mode::unknown,
+        asc::te::experimental::cast_sat_mode::unknown};
+
+    auto src_reg = asc::te::experimental::load<asc::te::experimental::load_sideband_mode::unpack4>(src, coord);
     src_reg = src_reg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    auto dst_reg = asc::te::experimental::cast<int32_t>(src_reg);
+    auto dst_reg = asc::te::experimental::cast<int32_t, widening_cast_ops>(src_reg);
     asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
-    窄化转换使用 layout zero 生成寄存器结果：2倍窄化通过一级 `deinterleave` 提取偶数位置，4倍窄化通过两级 `deinterleave` 提取每四个位置中的第一个元素，再使用普通 `store` 写入连续的目标数据。
+    上述片段以场景3的 `int8_t → int32_t` 为例，`WiderT` 为 `int32_t`，采用 `unpack4` 搬入。窄化转换使用 layout zero 生成寄存器结果：2倍窄化通过一级 `deinterleave` 提取偶数位置，4倍窄化通过两级 `deinterleave` 提取每四个位置中的第一个元素，再使用普通 `store` 写入连续的目标数据。
 
 ## 编译运行
 

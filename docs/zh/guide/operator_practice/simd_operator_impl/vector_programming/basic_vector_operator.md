@@ -143,7 +143,7 @@
 -   任务间交互使用到的内存、临时变量的内存统一使用[Pipe内存管理对象](../../../../api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)进行管理。
 
 **图3**  Add算子实现流程<a name="zh-cn_topic_0000002201157438_fig4134406304"></a>  
-![](../../../figures/add_op.png "Add算子实现流程")
+<img src="../../../figures/add_op.png" alt="Add算子实现流程" width="920px" height="394px">
 
 算子类中主要实现上述流程，包含对外开放的初始化Init函数和核心处理函数Process，Process函数中会对上图中的三个基本任务进行调用；同时包括一些算子实现中会用到的私有成员，比如上图中的GlobalTensor（xGm、yGm、zGm）和UB（VECIN/VECOUT）队列等。KernelAdd算子类具体成员如下：
 

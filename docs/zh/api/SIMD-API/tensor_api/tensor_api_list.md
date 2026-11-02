@@ -126,6 +126,7 @@
 | [store](reg_vector_compute/reg_data_store/store.md) | 将`reg_tensor`中的数据搬出到UB，支持多种数据排列方式。 |
 | [store_scatter](reg_vector_compute/reg_data_store/store_scatter.md) | 根据索引将`reg_tensor`中的有效元素分散写入UB Tensor。 |
 | [unalign_store](reg_vector_compute/reg_data_store/unalign_store.md) | 将`reg_tensor`中的指定数量元素连续搬出到非32字节对齐的UB地址，并提供收尾操作。 |
+| [舍入模式与饱和模式](reg_vector_compute/type_conversion/rounding_mode.md) | 介绍寄存器类型转换的舍入规则、饱和与非饱和行为以及配置方法。 |
 | [cast](reg_vector_compute/type_conversion/cast.md) | 转换寄存器数据类型，支持配置数据排布、舍入和饱和模式。 |
 | [trunc](reg_vector_compute/type_conversion/trunc.md) | 将Mask选中的浮点元素向零取整，并保留原数据类型。 |
 | [abs](reg_vector_compute/basic_arithmetic/abs.md) | 对源操作数逐元素计算绝对值。 |
