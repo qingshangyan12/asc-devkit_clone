@@ -84,11 +84,17 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
 
 ## 约束说明<a name="section837496171220"></a>
 
+<!-- npu="950,A3,910b,310b" id14 -->
 需与MrgSort接口配合使用，且MrgSort接口中的ifExhaustedSuspension参数必须设置为true。
+<!-- end id14 -->
+<!-- npu="310p" id15 -->
+需与MrgSort4接口配合使用，且MrgSort4接口中的MrgSort4Info.ifExhaustedSuspension参数必须设置为true。
+<!-- end id15 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/GetMrgSortResult_res.md#id2 -->
 
 ## 调用示例<a name="section837496171220"></a>
 
+<!-- npu="950,A3,910b,310b" id16 -->
 - 配合[MrgSort指令](MrgSort.md)使用示例。
 
     ```cpp
@@ -158,6 +164,9 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
        2.   0.   1.   0.]
     ```
 
+<!-- end id16 -->
+
+<!-- npu="310p" id17 -->
 - 配合[MrgSort4指令](MrgSort4.md)使用示例。
 
     ```cpp
@@ -184,3 +193,4 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
     uint16_t mrgRes4 = 0;
     AscendC::GetMrgSortResult(mrgRes1, mrgRes2, mrgRes3, mrgRes4);
     ```
+<!-- end id17 -->

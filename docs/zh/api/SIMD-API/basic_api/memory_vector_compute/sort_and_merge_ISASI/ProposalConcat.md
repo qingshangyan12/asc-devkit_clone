@@ -32,7 +32,12 @@
 
 **Region Proposal说明：**
 
+<!-- npu="910" id11 -->
+目前仅支持half数据类型。
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
 目前仅支持两种数据类型：half、float。
+<!-- end id12 -->
 
 每个Region Proposal占用连续8个half/float类型的元素，约定其格式：
 
@@ -46,11 +51,13 @@
 
 ![](../../../../figures/image_0000001820284977.png)
 
+<!-- npu="310p" id10 -->
 对于数据类型float，每一个Region Proposal占32Bytes，Byte\[31:24\]是无效数据，Byte\[23:0\]包含6个float类型的元素，其中Byte\[23:20\]定义为label，Byte\[19:16\]定义为score，Byte\[15:12\]定义为y2，Byte\[11:8\]定义为x2，Byte\[7:4\]定义为y1，Byte\[3:0\]定义为x1。
 
 如下图所示，总共包含16个Region Proposals。
 
 ![](../../../../figures/image_0000001820324937.png)
+<!-- end id10 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -73,8 +80,12 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
 <tbody><tr id="zh-cn_topic_0000001429830437_row1835857145817"><td class="cellrowborder" valign="top" width="13.58%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000001429830437_p5835457165816"><a name="zh-cn_topic_0000001429830437_p5835457165816"></a><a name="zh-cn_topic_0000001429830437_p5835457165816"></a>T</p>
 </td>
 <td class="cellrowborder" valign="top" width="86.42%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001429830437_p168351657155818"><a name="zh-cn_topic_0000001429830437_p168351657155818"></a><a name="zh-cn_topic_0000001429830437_p168351657155818"></a>操作数数据类型。</p>
+<!-- npu="910" id8 -->
 <p id="p7265124521915"><a name="p7265124521915"></a><a name="p7265124521915"></a><span id="ph194756336178"><a name="ph194756336178"></a><a name="ph194756336178"></a><term id="zh-cn_topic_0000001312391781_term71949488213_1"><a name="zh-cn_topic_0000001312391781_term71949488213_1"></a><a name="zh-cn_topic_0000001312391781_term71949488213_1"></a>Atlas训练系列产品</term></span>，支持的数据类型为：half</p>
+<!-- end id8 -->
+<!-- npu="310p" id9 -->
 <p id="p12659457192"><a name="p12659457192"></a><a name="p12659457192"></a><span id="ph750620211814"><a name="ph750620211814"></a><a name="ph750620211814"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas推理系列产品</term>AI Core</span>，支持的数据类型为：half/float</p>
+<!-- end id9 -->
 </td>
 </tr>
 </tbody>
