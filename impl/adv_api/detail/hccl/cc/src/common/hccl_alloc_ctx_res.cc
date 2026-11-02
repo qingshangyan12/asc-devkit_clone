@@ -12,6 +12,7 @@
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 #include "mc2_comm_info_reporter.h"
+#include "adapter_acl.h"
 
 #include <limits>
 
@@ -300,6 +301,21 @@ HcclResult AllocWorkspaceMemory(HcclComm comm, const std::string& ctxTag, CommEn
         CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), commEngine, memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
         if (commEngine == CommEngine::COMM_ENGINE_AICPU || commEngine == CommEngine::COMM_ENGINE_AICPU_TS) {
+            HcclApi::HcclMsgArea beforeClear{};
+            HcclResult readRet = haclrtMemcpy(
+                &beforeClear, sizeof(beforeClear), workSpacePtr, sizeof(beforeClear), ACL_MEMCPY_DEVICE_TO_HOST);
+            if (readRet == HCCL_SUCCESS) {
+                HCCL_INFO(
+                    "[SEQDBG][WorkspaceBeforeClear] tag[%s], addr[%p], msg0Valid[%#x], msg0Seq[%u], ctrlSeq[%u], "
+                    "commit0[%u], finish0[%u].",
+                    tagWorkSpace.c_str(), workSpacePtr, beforeClear.commMsg.singleMsg.sendMsgs[0].addMsg.v0Msg.valid,
+                    beforeClear.commMsg.singleMsg.sendMsgs[0].addMsg.v1Msg.seqNum,
+                    beforeClear.controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX],
+                    beforeClear.commMsg.singleMsg.commitTurnCnt[0].cnt,
+                    beforeClear.commMsg.singleMsg.finishedTurnCnt[0].cnt);
+            } else {
+                HCCL_WARNING("[SEQDBG][WorkspaceBeforeClear] read failed, ret[%d].", readRet);
+            }
             HcclApi::HcclMsgArea zeroMsgArea{};
             CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagWorkSpace.c_str(), &zeroMsgArea, sizeof(zeroMsgArea), 0));
         }
