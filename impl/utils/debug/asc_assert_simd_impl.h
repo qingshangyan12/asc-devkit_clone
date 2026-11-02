@@ -34,7 +34,7 @@ __simd_callee__ inline void __trap()
     __asm__ volatile("send");
 }
 
-__ASC_USE_RESERVED_UBUF__(3510, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, 9201, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 static __attribute__((noinline)) __simd_callee__ void __assert_fail(
     __ubuf__ const char* assertion, __ubuf__ const char* file, unsigned int line,
     __ubuf__ const char* function) noexcept
@@ -45,7 +45,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail(
 }
 
 template <typename... Args>
-__ASC_USE_RESERVED_UBUF__(3510, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, 9201, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 static __attribute__((noinline)) __simd_callee__ void __assert_fail_msg(
     __ubuf__ const char* assertion, __ubuf__ const char* file, unsigned int line, __ubuf__ const char* function,
     __ubuf__ const char* fmt, Args&&... args) noexcept

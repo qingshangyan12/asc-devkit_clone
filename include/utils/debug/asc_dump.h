@@ -27,7 +27,7 @@
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201
 #include "impl/utils/debug/asc_simd_dump_impl.h"
 #endif
 

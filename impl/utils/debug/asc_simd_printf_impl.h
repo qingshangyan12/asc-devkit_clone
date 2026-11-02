@@ -260,7 +260,7 @@ __simd_callee__ inline void printf_impl_assert_msg(
 }
 
 template <class... Args>
-__ASC_USE_RESERVED_UBUF__(3510, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, 9201, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);

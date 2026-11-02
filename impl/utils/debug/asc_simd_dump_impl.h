@@ -146,7 +146,7 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
 
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(
-    3510, "asc_dump_reg is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    3510, 9201, "asc_dump_reg is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -157,7 +157,7 @@ __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_
 
 template <typename T>
 __ASC_USE_RESERVED_UBUF__(
-    3510, "asc_dump_ubuf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    3510, 9201, "asc_dump_ubuf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -167,7 +167,7 @@ __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint
 }
 
 template <typename T, typename U>
-__ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, 9201, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -177,7 +177,7 @@ __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size
 }
 
 template <typename T>
-__ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, 9201, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -227,7 +227,7 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 }
 } // namespace __asc_simd_vf
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201
 namespace __asc_aicore {
 // CPU debug exposes unqualified debug APIs through this namespace; bridge the SIMD-only register overloads.
 template <typename T, typename U>

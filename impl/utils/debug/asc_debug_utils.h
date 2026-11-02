@@ -321,7 +321,7 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     init_printf_ubuf_addr_aicore(asc_debug_get_block_idx());
 #endif
 }
@@ -329,7 +329,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 __aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     __asc_simd_vf::asc_finish_flag();
 #endif
 }
@@ -337,7 +337,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
 __aicore__ static __attribute__((noinline)) bool AscVFDebugTransferUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
         return asc_vf_debug_ub2gm();
     }
