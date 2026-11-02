@@ -158,7 +158,7 @@ ccache --show-stats -v
 |------|---------|---------|------|
 | `--tiling_key=1,2` | TilingKey编程算子，仅调试特定分支。 | `npu_op_kernel_options`的OPTIONS参数。 | 只编译指定TilingKey的核函数（Kernel），跳过其余。 |
 | `--kernel-template-input="D_T_X=float"` | 模板编程算子，仅调试特定模板参数组合。 | `npu_op_kernel_options`的OPTIONS参数。 | 只编译指定模板参数组合的核函数（Kernel）。 |
-| `ASCEND_SOC_SERIES`收窄 | 开发阶段只跑当前SOC。 | 修改`CMakePresets.json`或CMake配置参数。 | 跳过其他芯片的核函数（Kernel）编译。 |
+| `ASCEND_SOC_SERIES`收窄 | 开发阶段只跑当前SOC。 | CMakeLists.txt或CMake命令。 | 跳过其他芯片的核函数（Kernel）编译。 |
 | `ENABLE_BINARY_PACKAGE=False` | 源码发布模式，不需要核函数（Kernel）二进制。 | CMakeLists.txt或cmake参数。 | 跳过核函数（Kernel） `.o`生成，保留核函数（Kernel）源码和必要配置。 |
 
 ### TilingKey选择编译

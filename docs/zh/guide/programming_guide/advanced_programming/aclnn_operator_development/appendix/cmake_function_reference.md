@@ -4,7 +4,7 @@
 
 ## 概述
 
-自定义算子工程的CMakeLists.txt由开发者直接编写。为便于开发者组织编译脚本，CANN软件包中将算子工程编译所需的cmake脚本打包为cmake modules，开发者可通过`find_package(ASC REQUIRED)`查找并使用这些函数。
+自定义算子工程的CMakeLists.txt由开发者直接编写。为便于开发者组织编译脚本，CANN软件包中将算子工程编译所需的CMake脚本打包为CMake modules，开发者可通过`find_package(ASC REQUIRED)`查找并使用这些函数。
 
 本文说明算子工程编译过程中使用的8个CMake函数，按用途分为**Package类**、**Library类**、**其他**三类。
 
