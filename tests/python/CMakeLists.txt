@@ -24,6 +24,14 @@ add_custom_target(install_adapter_api_ut ALL
 )
 
 run_python_llt_test(
+    TARGET ascendc_pyut_ascendc_gen_static_library_link_error
+    SRC_FILES_DIR ${ASCENDC_DIR}/cmake/asc/fwk_modules/util
+    TEST_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ascendc_cmake_util/test_ascendc_gen_static_library_link_error.py
+    PRE_TEST_COMMAND
+    COVERAGERC_DIR
+)
+
+run_python_llt_test(
     TARGET ascendc_pyut_aclrt_launch_kernel
     SRC_FILES_DIR ${ASCENDC_DIR}/cmake/
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/aclrt_launch_kernel/
