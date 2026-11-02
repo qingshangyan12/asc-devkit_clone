@@ -357,8 +357,8 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSoleMeshMultiJetty, InsV2AlltoAllVSoleExecutor, TopoMatchUBX,
     InsTempUBXAllToAllVMesh1D);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSoleMeshMultiJetty, AlgEngine::AICPU, "sole[mesh.multi_channel]", COND_NONE,
-    FLAG_UBX, 0);
+    HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSoleMeshMultiJetty, AlgEngine::AICPU, "sole[mesh.multi_channel]",
+    COND_NONE, FLAG_UBX, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
