@@ -106,10 +106,14 @@ private:
     template <bool sync>
     __aicore__ inline void SendFinalizeMsg();
 
-    __aicore__ inline void SendMsgToServer(
-        uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling);
+    template <HcclCMDType cmdType>
+    __aicore__ inline uint64_t SendMsgToServer(uint16_t queId, const CommonPrepareParam& para, int8_t srcGroupID,
+        HcclHandle srcHandleID, uint64_t tiling, bool compactExt, uint64_t extCtrl, uint64_t extXor);
 
-    __aicore__ inline void SendMsgToServer(const AlltoAllVParamExt& para, uint32_t rankNum);
+    __aicore__ inline void SendMsgToServer(
+        const AlltoAllVParamExt& para, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor);
+
+    __aicore__ inline bool CanUseExtCompact(const AlltoAllVParamExt& para, uint32_t rankNum);
 
     __aicore__ inline uint16_t GetStepSizeByHandle(HcclHandle handle);
 
