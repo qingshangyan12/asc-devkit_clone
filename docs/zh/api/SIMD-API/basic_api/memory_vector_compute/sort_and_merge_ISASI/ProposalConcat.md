@@ -33,10 +33,10 @@
 **Region Proposal说明：**
 
 <!-- npu="910" id11 -->
-目前仅支持half数据类型。
+针对Atlas训练系列产品，仅支持half数据类型。
 <!-- end id11 -->
 <!-- npu="310p" id12 -->
-目前仅支持两种数据类型：half、float。
+针对Atlas推理系列产品AI Core，支持两种数据类型：half、float。
 <!-- end id12 -->
 
 每个Region Proposal占用连续8个half/float类型的元素，约定其格式：
@@ -52,7 +52,7 @@
 ![](../../../../figures/image_0000001820284977.png)
 
 <!-- npu="310p" id10 -->
-对于数据类型float，每一个Region Proposal占32Bytes，Byte\[31:24\]是无效数据，Byte\[23:0\]包含6个float类型的元素，其中Byte\[23:20\]定义为label，Byte\[19:16\]定义为score，Byte\[15:12\]定义为y2，Byte\[11:8\]定义为x2，Byte\[7:4\]定义为y1，Byte\[3:0\]定义为x1。
+针对Atlas推理系列产品AI Core，对于数据类型float，每一个Region Proposal占32Bytes，Byte\[31:24\]是无效数据，Byte\[23:0\]包含6个float类型的元素，其中Byte\[23:20\]定义为label，Byte\[19:16\]定义为score，Byte\[15:12\]定义为y2，Byte\[11:8\]定义为x2，Byte\[7:4\]定义为y1，Byte\[3:0\]定义为x1。
 
 如下图所示，总共包含16个Region Proposals。
 
