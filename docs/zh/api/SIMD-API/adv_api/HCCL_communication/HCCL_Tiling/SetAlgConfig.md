@@ -116,3 +116,23 @@ uint32_t SetAlgConfig(const std::string& algConfig)
 ## 调用示例
 
 本接口的调用示例请见[调用示例](SetOpType.md#调用示例)。
+
+<!-- npu="950" id6 -->
+针对Ascend 950PR&950DT系列产品，支持通过外部算法名配置通信算法（语法与各通信任务可用取值见[参数说明](#参数说明)），配置方式如下：
+
+```cpp
+const char* groupName = "testGroup";
+uint32_t opType = HCCL_CMD_ALLGATHER;
+std::string algConfig = "parallel[mesh, nhr]"; // 外部算法名可在构造时传入
+AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
+mc2CcTilingConfig.GetTiling(tiling->mc2InitTiling);
+mc2CcTilingConfig.GetTiling(tiling->allGatherTiling);
+
+// 也可通过SetAlgConfig接口设置外部算法名
+mc2CcTilingConfig.SetOpType(HCCL_CMD_ALLREDUCE);
+mc2CcTilingConfig.SetAlgConfig("sole[mesh.two_shot]"); // 设置通信算法
+mc2CcTilingConfig.GetTiling(tiling->allReduceTiling);
+```
+
+不指定算法时，将`algConfig`置空或传入`"default"`，通信库根据实际组网拓扑自动选择算法，推荐优先使用该方式。
+<!-- end id6 -->
