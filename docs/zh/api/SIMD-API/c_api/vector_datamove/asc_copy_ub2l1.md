@@ -37,14 +37,14 @@
     将一段连续数据从UB搬运到L1 Buffer，如图1所示。
 
     **图1**  连续搬运示意图
-    ![](../figures/asc_copy_ub2l1_continuous.png "连续搬运示意图")
+    ![](../../../figures/asc_copy_ub2l1_continuous.png "连续搬运示意图")
 
 - 高维切分数据搬运
 
     将多个连续传输数据块从UB搬运到L1 Buffer。每个数据块的长度以及相邻数据块之间的间隔均以DataBlock（32字节）为单位指定，如图2所示。
 
     **图2**  高维切分搬运示意图
-    ![](../figures/asc_copy_ub2l1_highdim_split.png "高维切分搬运示意图")
+    ![](../../../figures/asc_copy_ub2l1_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 

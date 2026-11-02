@@ -35,7 +35,7 @@
 
 **图1** 上采样搬入掩码寄存器
 
-![](../../figures/capi_loadalign_mask_upsample.png)
+![](../../../../figures/capi_loadalign_mask_upsample.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 

@@ -34,4 +34,4 @@ enum class cast_round_mode {
 | odd | 向最近的奇数舍入。当前`cast`接口暂不支持。 |
 | hybrid | 随机舍入。当前`cast`接口暂不支持。 |
 
-具体类型组合支持的舍入方式请参考[cast的数据类型说明](../type_conversion/cast.md#数据类型)。
+舍入模式的具体行为和类型组合支持范围请参考[舍入模式与饱和模式](../type_conversion/rounding_mode.md)以及[cast的数据类型说明](../type_conversion/cast.md#数据类型)。

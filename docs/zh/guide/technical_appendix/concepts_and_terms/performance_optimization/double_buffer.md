@@ -7,7 +7,7 @@
 如[图1](#fig994415385460)所示，考虑一个完整的数据搬运和计算过程，CopyIn过程将数据从Global Memory搬运到Local Memory，Vector计算单元完成计算后，经过CopyOut过程将计算结果搬回Global Memory。
 
 **图1**  数据搬运与Vector计算过程<a name="fig994415385460"></a>  
-![](../../../figures/data_vec.png "数据搬运与Vector计算过程")
+<img src="../../../figures/data_vec.png" alt="数据搬运与Vector计算过程" width="600px" height="427px">
 
 在此过程中，数据搬运与Vector计算串行执行，Vector计算单元无可避免存在资源闲置问题。举例而言，若CopyIn、Compute、CopyOut三阶段分别耗时_t_，则Vector的时间利用率仅为1/3，等待时间过长，Vector利用率严重不足。
 
@@ -16,7 +16,7 @@
 总体来说，Double Buffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏数据搬运时间并降低Vector指令的等待时间，最终提高Vector单元的利用效率。具体实现请参见[开启Double Buffer](../../../operator_practice/simd_operator_optimization/pipeline_scheduling/enable_double_buffer.md)。
 
 **图2**  Double Buffer机制<a name="fig189541246194710"></a>  
-![](../../../figures/dbuf.png "Double Buffer机制")
+<img src="../../../figures/dbuf.png" alt="Double Buffer机制" width="300px" height="200px">
 
 **需要注意**：
 

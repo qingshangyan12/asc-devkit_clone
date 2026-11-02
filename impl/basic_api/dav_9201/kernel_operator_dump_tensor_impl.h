@@ -48,6 +48,14 @@ __aicore__ inline void DumpTensorLocal2GMImpl(
             if ASCEND_IS_AIC {
                 __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
             }
+        } else if (position == Hardware::L0A) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump_abuf((__ca__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+            }
+        } else if (position == Hardware::L0B) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump_bbuf((__cb__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+            }
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_AIC {
                 __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);

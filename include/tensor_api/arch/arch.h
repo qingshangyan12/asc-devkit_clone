@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_INCLUDE_TENSOR_API_ARCH_ARCH_H
 #endif
 
 /*!
@@ -23,10 +23,18 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/cube_copy_op.h"
 #include "tensor_api/arch/vector/vector_copy_op.h"
+#include "tensor_api/arch/vector/set_copy_pad_val.h"
+#include "tensor_api/arch/sync/block_sync.h"
+#include "tensor_api/arch/sync/sync_pipe.h"
+#include "tensor_api/arch/sync/data_barrier.h"
+#include "tensor_api/arch/sync/mutex.h"
+#include "tensor_api/arch/atomic/dma_atomic.h"
+#include "tensor_api/arch/cache_control/cache_control.h"
+#include "tensor_api/arch/cube/data_fill/data_fill.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_INCLUDE_TENSOR_API_ARCH_ARCH_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_INCLUDE_TENSOR_API_ARCH_ARCH_H
 #endif

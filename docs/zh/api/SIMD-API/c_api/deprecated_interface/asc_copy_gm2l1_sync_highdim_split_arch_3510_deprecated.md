@@ -1,4 +1,4 @@
-# asc_copy_gm2l1_sync_highdim_split_arch_3510（废弃）
+# asc_copy_gm2l1_sync（NPU架构版本3510，高维切分数据搬运，废弃）
 
 ## 产品支持情况
 

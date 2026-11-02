@@ -342,7 +342,7 @@
 | [floorf](../SIMT-API/math_functions/float_math_functions/floorf.md) | float | float | 64 |
 | [ceilf](../SIMT-API/math_functions/float_math_functions/ceilf.md) | float | float | 64 |
 
-对于expf、sqrf接口，上表中数据为非高精度模式下的理论性能。
+对于expf、sqrtf接口，上表中数据为非高精度模式下的理论性能。
 
 ### 数据类型转换
 

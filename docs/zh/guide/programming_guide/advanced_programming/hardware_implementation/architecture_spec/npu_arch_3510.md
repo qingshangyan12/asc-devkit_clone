@@ -57,10 +57,10 @@
 -   在本架构版本中，高维切分接口中的传入的掩码值会被转化为MaskReg传入Vector计算单元，而在[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md#npu-arch)中，掩码值从特殊的掩码寄存器中读取。
 
     **图1**  NPU架构版本2201高维切分<a name="fig7285103215410"></a>
-    ![](../../../../figures/npu_arch_2201_high_dim_split.png "NPU架构版本2201高维切分")
+    <img src="../../../../figures/npu_arch_2201_high_dim_split.png" alt="NPU架构版本2201高维切分" width="920px" height="445px">
 
     **图2**  本架构版本高维切分<a name="fig7787845174216"></a>  
-    ![](../../../../figures/high_dim_split.png "本架构版本高维切分")
+    <img src="../../../../figures/high_dim_split.png" alt="本架构版本高维切分" width="920px" height="436px">
 
 **Cube计算单元**
 
@@ -186,21 +186,21 @@
 
         若单个数据块长度为32B对齐，则无需插入Padding，可通过多次Repeat搬运多组数据块。
 
-        ![](../../../../figures/loop_normal.png)
+        <img src="../../../../figures/loop_normal.png" alt="" width="920px" height="251px">
 
         若单个数据块长度不为32B对齐，则需在每个数据块后插入Padding，使其32B对齐后再进行搬运。
 
-        ![](../../../../figures/forloop.png)
+        <img src="../../../../figures/forloop.png" alt="" width="920px" height="264px">
 
     -   单次Loop以Compact模式搬运
 
         Compact可以一次搬运一组数据块，当这些数据块的总长度为32B对齐的时候，则无需在最后插入Padding。
 
-        ![](../../../../figures/loop_normal_19.png)
+        <img src="../../../../figures/loop_normal_19.png" alt="" width="920px" height="251px">
 
         当一组数据块的长度不是32B对齐，需要在这组数据块后插入padding，使总长度32B对齐。
 
-        ![](../../../../figures/loop_comact.png)
+        <img src="../../../../figures/loop_comact.png" alt="" width="920px" height="228px">
 
 **支持Fixpipe硬件化加速**
 
@@ -257,7 +257,7 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
 
 该架构支持AIC: AIV为1:1和1:2的核间通信，核间通信通过SSBuf进行，这一点和NPU220架构有所不同，NPU220架构中核间通信通过GM来完成。
 
-![](../../../../figures/fig_1b2.png)
+<img src="../../../../figures/fig_1b2.png" alt="" width="600px" height="331px">
 
 ## 同步控制<a name="section41753664816"></a>
 
@@ -277,7 +277,7 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
 
     同步控制流程如下图所示：
 
-    ![](../../../../figures/core_sync_final_23.png)
+    <img src="../../../../figures/core_sync_final_23.png" alt="" width="920px" height="311px">
 
     上图中，ID1、ID2、ID3、ID4、ID5、ID6表示事件ID（EventID），每个EventID对应一块存储数据的搬运状态，确保数据操作的正确性和一致性。
 
@@ -305,7 +305,7 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
     -   模式2：AI Core内部，AIC与AIV之间的同步控制（1:2）。在AIC核执行CrossCoreSetFlag之后，两个AIV上CrossCoreWaitFlag后续的指令才会继续执行；两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
     -   模式4：AI Core内部，AIC与AIV之间的同步控制（1:1）。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后， AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
 
-    ![](../../../../figures/inter_core_sync.png)
+    <img src="../../../../figures/inter_core_sync.png" alt="" width="920px" height="223px">
 
     下面以模式2为例说明AIC与同一AI Core内AIV之间的同步过程：AIC将L0C的计算结果搬运到GM后，调用`CrossCoreSetFlag<0x2, PIPE_FIX>(ID1)`；两个AIV通过`CrossCoreWaitFlag<0x2, PIPE_MTE2>(ID1)`等待同步标记，再将GM的数据搬运到UB。其中，`0x2`表示模式2，`PIPE_FIX`和`PIPE_MTE2`表示流水类型，`ID1`为同步标记ID。CrossCoreSetFlag之前PIPE_FIX流水的指令完成后，CrossCoreWaitFlag后续MTE2流水的指令才能执行，其他流水不受阻塞。
 

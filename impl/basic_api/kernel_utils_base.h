@@ -45,22 +45,26 @@ public:
 
     __aicore__ static inline int32_t GetC0Size() { return DEFAULT_C0_SIZE; }
 
+#if (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     __aicore__ static inline void InitCoupledArchSpr()
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5162)
+#else
+        set_mask_norm();
         set_padding(static_cast<uint64_t>(0));
-        set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
-        uint64_t loopSizePara = (1uL << 21) | 1uL;
-        set_loop_size_ubtoout(loopSizePara);
-        set_loop_size_outtoub(loopSizePara);
         set_st_atomic_cfg(0b00100100);
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+#endif
+        Internal::g_deqValue = static_cast<half>(1);
+        uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
+        uint64_t val = 0x1000000000000008 | prevCtrl;
+        set_ctrl(val);
+
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         uint64_t loopSizePara = (1uL << 21) | 1uL;
         set_loop_size_ubtoout(loopSizePara);
         set_loop_size_outtoub(loopSizePara);
-#endif
     }
+#endif
 
     __aicore__ static inline void InitSocStateImpl()
     {
@@ -98,20 +102,15 @@ public:
         Internal::g_deqValue = static_cast<half>(1);
 #endif
 #else
-#if defined(__NPU_ARCH__) &&                                                                         \
-    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-     __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if (                                                                                               \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+    __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 #else
         set_atomic_none();
 #endif
-#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
-        set_mask_norm();
-        Internal::g_deqValue = static_cast<half>(1);
-        uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
-        uint64_t val = 0x1000000000000008 | prevCtrl;
-        set_ctrl(val);
+#if (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
         InitCoupledArchSpr();
-#elif __NPU_ARCH__ == 3002
+#elif (__NPU_ARCH__ == 3002)
         set_padding(static_cast<uint64_t>(0));
 #endif
 #endif

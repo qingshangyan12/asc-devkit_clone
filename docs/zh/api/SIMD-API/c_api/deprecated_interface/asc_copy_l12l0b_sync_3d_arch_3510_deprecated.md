@@ -1,4 +1,4 @@
-# asc_copy_l12l0b_sync_3d_arch_3510（废弃）
+# asc_copy_l12l0b_sync（NPU架构版本3510，3D矩阵搬运，废弃）
 
 ## 产品支持情况
 

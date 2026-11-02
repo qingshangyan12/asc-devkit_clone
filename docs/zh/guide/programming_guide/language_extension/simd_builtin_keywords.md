@@ -290,7 +290,7 @@
 
     -   mode = 1 : batch mode，在下发核函数（Kernel）时先进行判断，若空闲物理核数无法满足当前核函数（Kernel）的需要，则等待至空闲物理核数满足该核函数（Kernel）所需要的所有物理核时，同时下发执行，OP1和OP2的执行被切分（split）开，不会出现交叠执行的情况。
 
-    ![](../../figures/batchmode.png)
+    <img src="../../figures/batchmode.png" alt="" width="600px" height="626px">
 
     在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间同步接口时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
 
@@ -542,6 +542,18 @@ $$
 | 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
 
 更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
+
+使用内置数据类型时需要导入对应的头文件：
+
+**表6**  内置数据类型的头文件
+
+| 提供层级 | 数据类型 | 需要包含的头文件 |
+| --- | --- | --- |
+| 语言扩展层C API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double | c_api/asc_simd.h |
+| 基础API | int4b_t、bool、int4x2_t、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64 | kernel_operator.h |
+
+> [!NOTE]说明  
+> `c_api/asc_simd.h`属于语言扩展层C API，面向底层硬件能力，而complex32和complex64是基础API在硬件能力之上提供的C++复合类型，因此并未放入`c_api/asc_simd.h`中。
 
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 

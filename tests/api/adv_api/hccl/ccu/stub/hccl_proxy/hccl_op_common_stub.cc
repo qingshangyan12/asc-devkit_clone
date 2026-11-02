@@ -167,6 +167,39 @@ HcclResult CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNet
     return HCCL_SUCCESS;
 }
 
+// 本目标不编 channel.cc，external_alg_rules.cc 的 COND_PEER_ONLY 复刻建链查询引用
+// 此符号；与产品 GetProtocolByEngine（channel.cc）逐分支同源复制（纯函数，无外部依赖）
+HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& protocols)
+{
+    protocols.clear();
+    switch (param.engine) {
+        case CommEngine::COMM_ENGINE_AICPU:
+        case CommEngine::COMM_ENGINE_AICPU_TS:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
+            break;
+        case CommEngine::COMM_ENGINE_CCU:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
+            break;
+        case CommEngine::COMM_ENGINE_CPU:
+            // level 1到level n-1使用UB协议，server内建联，最外层使用网卡建联
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
+            break;
+        case CommEngine::COMM_ENGINE_CPU_TS:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
+            break;
+        default:
+            HCCL_WARNING(
+                "[GetProtocolByEngine] Unknown engine[%d], set protocol to RESERVED", static_cast<int>(param.engine));
+            break;
+    }
+    return HCCL_SUCCESS;
+}
+
 ExecuteSelector::ExecuteSelector() {}
 
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const

@@ -57,7 +57,7 @@ AIC0中在执行`asc_sync_inter_wait`后，此时AIC0 `flag_id=0`的计数器为
 AIC1的`asc_sync_inter_arrive`执行完后，此时调度模块感知到2个AIC均已执行完`asc_sync_inter_arrive`，因此所有AIC各自的`flag_id=0`的计数器值增加为1。AIC0和AIC1检测到各自对应的`flag_id=0`的计数器变为1，都解除PIPE_FIX流水后续指令的阻塞，继续执行后续指令，并且将计数器值减去1。
 
 **图2**  模式0：多AI Core中AIC全核同步<a id="multi_ai_core_aic_full_sync"></a>    
-![](../../figures/inter_core_aic_all_sync.png "多AI_Core中AIC全核同步")
+![](../../../../figures/inter_core_aic_all_sync_c_api.png "多AI_Core中AIC全核同步")
 <!-- end id1 -->
 
 <!-- npu="A3,910b" id2 -->
@@ -94,7 +94,7 @@ AIV0-0中在执行`asc_sync_subblock_wait`后，此时AIV0-0 `flag_id=0`的计�
 AIV0-1的`asc_sync_subblock_arrive`执行完后，此时调度模块感知到2个AIV均已执行完`asc_sync_subblock_arrive`，因此将AIV0-0和AIV0-1各自的`flag_id=0`的计数器值增加为1。AIV0-0和AIV0-1检测到各自对应的`flag_id=0`的计数器变为1，都解除所有流水后续指令的阻塞，继续执行后续指令，并且将计数器值减去1。
 
 **图3**  模式1：单个AI Core中AIV全核同步<a id="single_ai_core_aiv_full_sync_diagram"></a>    
-![](../../figures/single_core_aiv_all_sync.png "单AI_Core中AIV全核同步")
+![](../../../../figures/single_core_aiv_all_sync_c_api.png "单AI_Core中AIV全核同步")
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
@@ -145,7 +145,7 @@ AIC0中在执行`asc_sync_block_wait`后，此时AIC0 `flag_id=0`的计数器为
 当AIV0-0的Vector指令1、2全部执行完毕后，前置PIPE\_V的指令全部完成，`asc_sync_block_arrive`生效。此时调度模块感知到2个AIV均已执行完`asc_sync_block_arrive`，因此将AIC0 `flag_id=0`的计数器值增加为1。AIC0检测到对应的`flag_id=0`的计数器变为1，则AIC0核解除PIPE_MTE2流水后续指令的阻塞，继续执行后续指令Matrix指令2，并且将计数器值减去1。
 
 **图4**  模式2：单个AI Core中AIC与AIV全核同步（AIV进行asc_sync_block_arrive）<a id="single_ai_core_aic_aiv_full_sync_diagram"></a>    
-![](../../figures/single_core_aic_aiv_sync_aiv_setflag.png "单AI_Core中AIC与AIV全核同步（AIV进行asc_sync_block_arrive）")
+![](../../../../figures/single_core_aic_aiv_sync_aiv_setflag_c_api.png "单AI_Core中AIC与AIV全核同步（AIV进行asc_sync_block_arrive）")
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
@@ -192,5 +192,5 @@ AIC0中在执行`asc_sync_intra_wait`后，此时AIC0 `sync_id=16`的计数器�
 - AIV0-1的PIPE_MTE3指令全部执行完毕后，`asc_sync_intra_arrive`生效。此时调度模块感知1个AIV已执行完`asc_sync_intra_arrive`，因此将AIC0 `sync_id=16`的计数器值增加为1。AIC0检测到对应的`sync_id=16`的计数器变为1，则AIC0核解除由`pipe`参数指定的流水后续指令的阻塞，继续执行后续PIPE_FIX的指令，并且将计数器值减去1。
 
 **图5**  模式4：单个AI Core中AIC与单个AIV同步（AIV进行asc_sync_intra_arrive）<a id="single_ai_core_aic_single_aiv_sync_diagram"></a>    
-![](../../figures/single_ai_core_aic_single_aiv_sync.png "单AI_Core中AIC与单个AIV同步（AIV进行asc_sync_intra_arrive）")
+![](../../../../figures/single_ai_core_aic_single_aiv_sync_c_api.png "单AI_Core中AIC与单个AIV同步（AIV进行asc_sync_intra_arrive）")
 <!-- end id4 -->

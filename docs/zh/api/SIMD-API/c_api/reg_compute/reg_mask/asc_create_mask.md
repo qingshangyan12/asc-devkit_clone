@@ -37,7 +37,7 @@
 
 **图1** asc_create_mask原理
 
-![asc_create_mask原理](../../figures/capi_create_mask.png)
+![asc_create_mask原理](../../../../figures/capi_create_mask.png)
 
 本接口为Reg数据类型定义接口，仅在AIV上生效。
 

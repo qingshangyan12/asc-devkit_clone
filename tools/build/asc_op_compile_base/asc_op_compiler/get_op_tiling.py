@@ -1340,8 +1340,9 @@ def get_tiling_data_func_head():
 def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
-    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || \
-        __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)) || defined(__GET_CODE_CHANNEL__)\n"
+    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
+        (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || \
+        (__NPU_ARCH__ == 9202) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size(
         "all_bytes",
@@ -1413,7 +1414,7 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-    if short_soc_version in ["Ascend950", "Ascend960DT", "Ascend960PR", "MC62", "MC32DM11A"]:
+    if short_soc_version in ["Ascend950", "Ascend960DT", "Ascend960PR", "MC62"]:
         # use __AUX__ to create a new struct to reduce running time. __AUX__ name does not matter
         # original: initialize, then write value    use __AUX__: write value, then interpret_cast to needed struct
         class_body += _get_tiling_data_without_time_stamp(class_name)

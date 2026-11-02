@@ -8,7 +8,7 @@ AI Core采用分层存储架构。计算单元包括Cube、Vector和Scalar；存
 
 **图1** NPU架构版本2201下的AI Core硬件架构
 
-![NPU架构版本2201下的AI Core硬件架构](../../figures/atlas_a2_a3_architecture.png "NPU架构版本2201下的AI Core硬件架构")
+![NPU架构版本2201下的AI Core硬件架构](../../../../figures/atlas_a2_a3_architecture.png "NPU架构版本2201下的AI Core硬件架构")
 
 [NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的内部结构如图2所示。与图1相比，数据通路主要有以下变化：
 
@@ -20,7 +20,7 @@ AI Core采用分层存储架构。计算单元包括Cube、Vector和Scalar；存
 
 **图2** NPU架构版本3510下的AI Core硬件架构与同步关系
 
-![NPU架构版本3510下的AI Core硬件架构与同步关系](../../figures/npu_3510_hw_arch_sync.png "NPU架构版本3510下的AI Core硬件架构与同步关系")
+![NPU架构版本3510下的AI Core硬件架构与同步关系](../../../../figures/npu_3510_hw_arch_sync.png "NPU架构版本3510下的AI Core硬件架构与同步关系")
 
 本导览后续接口选择均以Ascend 950PR&950DT系列产品（NPU架构版本3510）为准。其他产品的数据通路和接口支持情况应以对应接口文档的产品支持表为准。
 

@@ -29,6 +29,7 @@ def section(text, start, end):
 def test_2002_sender():
     source = SOURCE.read_text()
     types = (ROOT / "impl/utils/debug/asc_debug_types.h").read_text()
+    dump_types = section(types, "enum class DumpType : uint8_t {", "struct DebugBlockHeadInfo {")
     structs = section(types, "struct DebugBlockHeadInfo {", "struct TimeStampTlv {")
     copies = section(
         source,
@@ -41,7 +42,8 @@ def test_2002_sender():
         "template <template <typename> class Tensor, typename T>\n__aicore__ inline void DumpTensorRingBufImpl(\n    const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)\n{",
         "__aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo& shapeInfo)\n{",
     )
-    code = PRELUDE + structs + STUBS + copies + sender + entry + MAIN
+    code = PRELUDE + dump_types + "\nnamespace __asc_aicore {\nusing ::DumpType;\n"
+    code += structs + STUBS + copies + sender + entry + MAIN
     with tempfile.TemporaryDirectory(prefix="dump-2002-") as directory:
         cpp = Path(directory) / "sender.cpp"
         binary = Path(directory) / "sender"
@@ -81,11 +83,7 @@ constexpr uint32_t ONE_BLK_SIZE=32, ONE_DUMP_BACKUP_SIZE=1024, K_MAX_SHAPE_DIM=8
 constexpr int PIPE_ALL=0;
 enum class Hardware {GM, UB, L1, L0C, MAX};
 enum class TPosition {VECIN};
-enum class DumpType {DUMP_BUFI=1,DUMP_BUFO=2,DUMP_SKIP=3,DUMP_SCALAR=4,DUMP_TENSOR=5,DUMP_SHAPE=6,
-                     DUMP_SUPER_TENSOR=11,DUMP_SUPER_TENSOR_BODY=12};
 namespace Internal {enum class DumpTensorDataType {ACL_UINT32=4, ACL_MAX=99};}
-namespace __asc_aicore {
-using ::DumpType;
 """
 STUBS = r"""
 }
@@ -167,14 +165,14 @@ void verify(const std::vector<uint32_t>& src,uint32_t count,Hardware pos){
   uint32_t header,size,span;uint64_t total,off;
   if(offset==0){
    __asc_aicore::DumpSuperTensorTlv h;memcpy(&h,&collected[cursor],sizeof(h));
-   assert(h.type==11&&h.desc==17&&h.position==static_cast<uint16_t>(pos)&&h.blockIdx==7);
+   assert(h.type==12&&h.desc==17&&h.position==static_cast<uint16_t>(pos)&&h.blockIdx==7);
    assert(h.dim==8&&h.shape[0]==count&&h.shape[7]==1);
    assert(h.tensorAddr==static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.data())));
    assert(h.dataType==4);
    header=sizeof(h);size=h.dumpSize;span=h.length+8;total=h.tensorLength;off=h.tensorOffset;
   }else{
    __asc_aicore::DumpSuperTensorBodyTlv h;memcpy(&h,&collected[cursor],sizeof(h));
-   assert(h.type==12);header=sizeof(h);size=h.dumpSize;span=h.length+8;total=h.tensorLength;off=h.tensorOffset;
+   assert(h.type==13);header=sizeof(h);size=h.dumpSize;span=h.length+8;total=h.tensorLength;off=h.tensorOffset;
   }
   assert(total==uint64_t(count)*4&&off==offset&&size>0&&header+size<=span);
   result.insert(result.end(),collected.begin()+cursor+header,collected.begin()+cursor+header+size);

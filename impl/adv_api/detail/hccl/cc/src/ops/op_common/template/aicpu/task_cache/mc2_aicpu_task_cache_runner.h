@@ -10,6 +10,7 @@
 #ifndef MC2_AICPU_TASK_CACHE_RUNNER_H
 #define MC2_AICPU_TASK_CACHE_RUNNER_H
 
+#include "mc2_server_stage_timing.h"
 #include "hcomm_primitives.h"
 #include "log.h"
 #include "mc2_aicpu_task_cache.h"
@@ -95,6 +96,7 @@ HcclResult RunWithMc2TaskCache(
         return endRet;
     }
 
+    Mc2ServerStageTiming::Cache(isHit);
     if (isHit) {
         const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
         const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));

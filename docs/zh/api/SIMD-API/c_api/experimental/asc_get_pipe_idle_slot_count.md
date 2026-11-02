@@ -75,7 +75,7 @@ PIPE_S。
 
 ## 约束说明
 
-- 使用本接口前，需要包含头文件：`#include "c_api/composite/loadunalign_composite.h"`。
+- 使用本接口前，需要包含头文件：`c_api/experimental/asc_get_pipe_idle_slot_count.h`。
 - 使用前需要增加编译选项`-DCANN_ASC_USE_EXPERIMENTAL`开启试验特性。
 - 各接口仅支持[表1 接口、流水线与最大值对应关系](#table1)所列的AI Core类型。在不支持的AI Core类型上调用时，接口返回0。此时无法区分发射队列没有空闲槽位和当前AI Core类型不支持该接口这两种情况。
 

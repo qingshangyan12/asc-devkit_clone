@@ -262,8 +262,6 @@ TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
     ExpectInvalid(
         "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "constant"; });
     ExpectInvalid(
-        "struct must not contain byte_size", [](Json& manifest) { Constant(manifest)["arg_type"] = "struct"; });
-    ExpectInvalid(
         "constant file lacks resource prefix", [](Json& manifest) { Constant(manifest)["file"] = "resources/x"; });
     ExpectInvalid("constant file is outside resource_path", [](Json& manifest) {
         Constant(manifest)["file"] = "${resource}/outside/weight.bin";

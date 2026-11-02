@@ -474,7 +474,7 @@ Total bit width cannot be greater than 64!"
             if tpl_type == TilingParamType.TPL_FORMAT and matched_param.param_type == TilingParamType.TPL_DATAFORMAT:
                 raise RuntimeError(
                     "[Error] Not support both used custom FORMAT and native FORMAT, "
-                    "please check {} in ASCENDC_TPL_FORMAT_DECL.".format(name, tiling_param.get_param_type_str())
+                    "please check {} in ASCENDC_TPL_{}_DECL.".format(name, tiling_param.get_param_type_str())
                 )
             else:
                 raise RuntimeError(

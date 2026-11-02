@@ -44,7 +44,7 @@ $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \sim src1_i\} + 33'b1
 $$
 
-![](../../figures/asc_sub.png)
+![](../../../../figures/asc_sub.png)
 
 输出`carry`适用场景请参考[asc_subc功能说明](asc_subc.md#功能说明)。
 

@@ -42,7 +42,7 @@ $$
 
 **图 1** asc_mull计算示意图
 
-![](../../figures/asc_mull.png)
+![](../../../../figures/asc_mull.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

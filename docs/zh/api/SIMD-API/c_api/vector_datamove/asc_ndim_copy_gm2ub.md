@@ -52,19 +52,19 @@
 以下以2维的例子，介绍几个典型使用场景。
 
 - 2D Padding场景，使用固定值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
 
 - 2D Padding场景，使用最近值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_nearest.png "2D Padding场景，使用最近值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_nearest.png "2D Padding场景，使用最近值填充方式")
 
 - 2D Transpose场景
-![](../figures/asc_ndim_copy_gm2ub_2d_transpose.png "2D Transpose场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_transpose.png "2D Transpose场景")
 
 - 2D Slice场景
-![](../figures/asc_ndim_copy_gm2ub_2d_slice.png "2D Slice场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_slice.png "2D Slice场景")
 
 - 2D Broadcast场景
-![](../figures/asc_ndim_copy_gm2ub_2d_broadcast.png "2D Broadcast场景")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_broadcast.png "2D Broadcast场景")
 
 本接口仅在AIV上生效。
 
@@ -147,7 +147,7 @@ PIPE_MTE2
 ## 调用示例
 
 2D Padding场景，使用固定值填充方式
-![](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
+![](../../../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png "2D Padding场景，使用固定值填充方式")
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
