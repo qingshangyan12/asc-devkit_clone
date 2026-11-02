@@ -78,7 +78,8 @@ Result CaptureAllToAllMjKernel(void* kernelArg)
     const CcuResult result = mc2_ops_hccl::CcuAllToAllMesh1DMultiJettyKernel(
         arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
         arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], config.channels.data(),
-        static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.jettyNum);
+        static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.jettyNum,
+        arguments[13]);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
@@ -97,7 +98,8 @@ std::vector<uint64_t> PrepareAllToAllMjTaskArgs(const AllToAllMjLaunchConfig& co
         config.goSize[2],
         config.goSize[3],
         config.sliceSizePerJetty,
-        config.lastSliceSizePerJetty};
+        config.lastSliceSizePerJetty,
+        config.turnEndAddress};
 }
 
 ScenarioData BuildMjScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
@@ -135,6 +137,10 @@ ScenarioData BuildMjScenario(const CcuStScenario& scenario, const std::vector<Ke
         AllToAllMjLaunchConfig& config = mjConfigs[rank];
         config.inputAddress = memory.InputAddress() + sourceBaseOffset;
         config.outputAddress = memory.OutputAddress();
+        // D3 提前 turn-end 落点：专用控制面槽（与 kfc server adapter 的 CKE 区同思路），
+        // 不占用数据区，避免污染输出校验。
+        memory.parameter.assign(1U, 0U);
+        config.turnEndAddress = memory.ParameterAddress();
         config.token = 0x1000U + rank;
         config.sliceSize = sliceSize;
         config.srcStride = sliceSize;

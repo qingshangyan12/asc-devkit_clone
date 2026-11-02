@@ -210,14 +210,21 @@ CcuResult LoadFuncParamFromMemory(
     return CCU_SUCCESS;
 }
 
-// SoleNHR AG kernel 在内部（末步同步后、PostSync 前）提前写 turn-end，server 侧跳过
-// 本轮 SetTurnEndSig（D3）。判断须与 DispatchKfcSubKernel 的 SoleNHR AG 分支严格一致
-// （opType+role，二者由 algName 唯一决定，不会交叉）。不可对同一 WAIT 槽二次置位：
-// AIV 检测清零后残留的 1 会在 64 轮槽位回绕时造成假完成信号。
+// SoleNHR AG / A2A MultiJetty kernel 在内部（末步同步后、PostSync 前）提前写 turn-end，
+// server 侧跳过本轮 SetTurnEndSig（D3）。判断须与 DispatchKfcSubKernel 中实际传入
+// turnEndAddr 的分支严格一致（opType+role，二者由 algName 唯一决定，不会交叉）。
+// 不可对同一 WAIT 槽二次置位：AIV 检测清零后残留的 1 会在 64 轮槽位回绕时造成假完成信号。
 static bool KernelEmitsEarlyTurnEnd(const KfcServerContext& ctx)
 {
-    return ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER &&
-           ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR;
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+        return ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR;
+    }
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        return ctx.arg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY ||
+               ctx.arg->role == KfcServerRole::ALL_TO_ALL_MESH ||
+               ctx.arg->role == KfcServerRole::ALL_TO_ALL_CLOS;
+    }
+    return false;
 }
 
 // turnEndAddr：本轮完成信号的 HBM 地址（WAIT 槽 CKE），仅 SoleNHR AG 分支消费（D3）；
@@ -403,7 +410,7 @@ static void DispatchKfcSubKernel(
                 param[KFC_A2A_MJ_GO_SIZE_0], param[KFC_A2A_MJ_GO_SIZE_1], param[KFC_A2A_MJ_GO_SIZE_2],
                 param[KFC_A2A_MJ_GO_SIZE_3], param[KFC_A2A_MJ_SLICE_SIZE_PER_JETTY],
                 param[KFC_A2A_MJ_LAST_SLICE_SIZE_PER_JETTY], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum);
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum, turnEndAddr);
         } else if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MESH) {
             CcuAllToAllMesh1DMultiJettyKernel(
                 param[KFC_CONCURRENT_A2A_MESH_INPUT], param[KFC_CONCURRENT_A2A_MESH_OUTPUT], ctx.token,
@@ -413,7 +420,7 @@ static void DispatchKfcSubKernel(
                 param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_2], param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_3],
                 param[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE_PER_JETTY],
                 param[KFC_CONCURRENT_A2A_MESH_LAST_SLICE_SIZE_PER_JETTY], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum);
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum, turnEndAddr);
         } else if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_CLOS) {
             CcuAllToAllMesh1DMultiJettyKernel(
                 param[KFC_CONCURRENT_A2A_CLOS_INPUT], param[KFC_CONCURRENT_A2A_CLOS_OUTPUT], ctx.token,
@@ -423,7 +430,7 @@ static void DispatchKfcSubKernel(
                 param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_2], param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_3],
                 param[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE_PER_JETTY],
                 param[KFC_CONCURRENT_A2A_CLOS_LAST_SLICE_SIZE_PER_JETTY], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum);
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum, turnEndAddr);
         } else {
             CcuAlltoAllMesh1DKernel(
                 param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
@@ -477,16 +484,25 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
+        { ccu::Event testEvt;
+        for (int i = 0; i < 8; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+        { ccu::Event testEvt;
+        for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
+            { ccu::Event testEvt;
+            for (int i = 0; i < 8; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
             CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
             DispatchKfcSubKernel(param, ctx, recordAddr);
             CCU_CHK_RET(MissionPostSync(ctx));
-            // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
-            // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
+            { ccu::Event testEvt;
+            for (int i = 0; i < 5; i ++) { ccu::EventRecord(testEvt, 1); ccu::EventWait(testEvt, 1); } }
+            // D3：SoleNHR AG / A2A MultiJetty kernel 已在末步同步后、PostSync 前写 turn-end
+            // （AIV 提前返回），其余角色维持 dispatch 后统一发放。条件为宿主侧常量，
+            // 不产生运行时分支指令。
             if (!KernelEmitsEarlyTurnEnd(ctx)) {
                 CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
             }
@@ -534,7 +550,8 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
-            // turnEndAddr 仅 SoleNHR AG 消费；slave 不会以该角色 dispatch（死代码路径，保持编译）。
+            // turnEndAddr 由 SoleNHR AG / A2A MultiJetty kernel 消费；slave 主循环不写
+            // turn-end（死代码路径，保持编译）。
             DispatchKfcSubKernel(param, ctx, ctx.recordAddr);
             CCU_CHK_RET(MissionPostSync(ctx));
         }
