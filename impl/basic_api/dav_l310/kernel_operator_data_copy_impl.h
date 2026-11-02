@@ -118,8 +118,11 @@ __aicore__ inline void DataCopyGM2UBImpl(__ubuf__ T* dst, __gm__ T* src, const D
 template <typename T>
 __aicore__ inline void DataCopyGM2L1Impl(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
-    CopyGmToCbufAlign<T, false>(
-        dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride, intriParams.dstStride);
+    uint32_t burstLength = intriParams.blockLen * BYTE_32_ALIGN;
+    uint32_t actSrcStride = intriParams.srcStride * BYTE_32_ALIGN;
+    copy_gm_to_cbuf_align(
+        (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, intriParams.blockCount, burstLength, 0, 0, actSrcStride,
+        intriParams.dstStride);
 }
 
 template <typename T>
@@ -199,25 +202,66 @@ __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2L1ND2NZImplB16(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2L1ND2NZImplBase(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
+    const uint16_t ndNum = intriParams.ndNum;
+    const uint16_t nValue = intriParams.nValue;
+    const uint16_t dValue = intriParams.dValue;
+    const uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    const uint16_t srcDValue = intriParams.srcDValue;
+    const uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;
+    const uint16_t dstNzNStride = intriParams.dstNzNStride;
+    const uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride;
+    if (ndNum == 0 || nValue == 0 || dValue == 0) {
+        return;
+    }
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
     }
-    copy_gm_to_cbuf_multi_nd2nz_b16(
-        (__cbuf__ T*)dst, (__gm__ T*)src, 0, intriParams.ndNum, intriParams.nValue, intriParams.dValue,
-        intriParams.srcNdMatrixStride, intriParams.srcDValue, intriParams.dstNzC0Stride, intriParams.dstNzNStride,
-        intriParams.dstNzMatrixStride);
+
+    ASCENDC_DEBUG_ASSERT(
+        ((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "srcNdMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(
+        ((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "dstNzMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0), "dstNzC0Stride should be greater than 0 \n");
+    ASCENDC_DEBUG_ASSERT((dstNzNStride > 0), "dstNzNStride should be greater than 0 \n");
+
+    const uint32_t elementsPerBlock = ONE_BLK_SIZE / sizeof(T);
+    const uint32_t dTotalBytes = static_cast<uint32_t>(dValue * sizeof(T));
+    const uint32_t dBlockNum = (dTotalBytes + ONE_BLK_SIZE - 1) / ONE_BLK_SIZE;
+    if (dTotalBytes % ONE_BLK_SIZE != 0) {
+        set_pad_val_outtol1(GetScalarBitcodeValue(static_cast<T>(0)));
+    }
+
+    for (uint32_t ndIdx = 0; ndIdx < ndNum; ++ndIdx) {
+        __gm__ T* srcMatrix = src + static_cast<uint64_t>(ndIdx) * srcNdMatrixStride;
+        const uint32_t mBlkStride = static_cast<uint32_t>(dstNzMatrixStride) * sizeof(T) / ONE_BLK_SIZE;
+        __cbuf__ T* dstMatrix = dst + static_cast<uint64_t>(ndIdx) * mBlkStride * (ONE_BLK_SIZE / sizeof(T));
+        for (uint32_t blkIdx = 0; blkIdx < dBlockNum; ++blkIdx) {
+            uint32_t blockBytes = dTotalBytes - blkIdx * ONE_BLK_SIZE;
+            if (blockBytes > ONE_BLK_SIZE) {
+                blockBytes = ONE_BLK_SIZE;
+            }
+            const bool isTailBlock = blockBytes < ONE_BLK_SIZE;
+            const uint8_t tailPadCount = static_cast<uint8_t>((ONE_BLK_SIZE - blockBytes) / sizeof(T));
+            CopyGmToCbufAlignV1(
+                dstMatrix + static_cast<uint64_t>(blkIdx) * dstNzC0Stride * elementsPerBlock,
+                srcMatrix + blkIdx * elementsPerBlock, nValue, blockBytes, 0, tailPadCount, isTailBlock,
+                static_cast<uint32_t>(srcDValue * sizeof(T) - blockBytes), static_cast<uint32_t>(dstNzNStride - 1),
+                true);
+        }
+    }
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1ND2NZImplB16(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+{
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ half* dst, __gm__ half* src, const Nd2NzParams& intriParams)
-{
-    DataCopyGM2L1ND2NZImplB16(dst, src, intriParams);
-}
-
-__aicore__ inline void DataCopyGM2L1ND2NZImpl(
-    __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, const Nd2NzParams& intriParams)
 {
     DataCopyGM2L1ND2NZImplB16(dst, src, intriParams);
 }
@@ -237,7 +281,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB32(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported b32 data copy from gm to l1 nz2nd"); });
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ float* dst, __gm__ float* src, const Nd2NzParams& intriParams)
@@ -260,14 +304,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB8(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-    }
-    copy_gm_to_cbuf_multi_nd2nz_b8(
-        (__cbuf__ T*)dst, (__gm__ T*)src, 0, intriParams.ndNum, intriParams.nValue, intriParams.dValue,
-        intriParams.srcNdMatrixStride, intriParams.srcDValue, intriParams.dstNzC0Stride, intriParams.dstNzNStride,
-        intriParams.dstNzMatrixStride);
+    DataCopyGM2L1ND2NZImplBase(dst, src, intriParams);
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ int8_t* dst, __gm__ int8_t* src, const Nd2NzParams& intriParams)
@@ -281,32 +318,39 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
     DataCopyGM2L1ND2NZImplB8(dst, src, intriParams);
 }
 
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImplBase(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImpl(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version"); });
+}
+
 template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
-    uint16_t ndNum = intriParams.ndNum;                         // nd矩阵数据
-    uint16_t nValue = intriParams.nValue;                       // nd矩阵行数
-    uint16_t dValue = intriParams.dValue;                       // nd矩阵列数，要求32B对齐
-    uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride; // 源操作数相邻nd矩阵起始地址间的偏移，要求32B对齐
-    uint16_t srcDValue =
-        intriParams.srcDValue; // 源操作数同一nd矩阵的相邻行起始地址间的偏移 (切分场景，行地址不连续)，要求32B对齐
-    uint16_t dstNzC0Stride =
-        intriParams.dstNzC0Stride; // 目的nz矩阵中，来自源操作数同一行的多行数据相邻行起始地址间的偏移, 单位：block
-    uint16_t dstNzNStride = intriParams.dstNzNStride; // 目的nz矩阵中，Z型矩阵相邻行起始地址之间的偏移，单位：block
-    uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride; // 目的nz矩阵中，相邻nz矩阵起始地址间的偏移，要求32B对齐
+    uint16_t ndNum = intriParams.ndNum;
+    uint16_t nValue = intriParams.nValue;
+    uint16_t dValue = intriParams.dValue;
+    uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    uint16_t srcDValue = intriParams.srcDValue;
+    uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;
+    uint16_t dstNzNStride = intriParams.dstNzNStride;
+    uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride;
 
+    ASCENDC_DEBUG_ASSERT(((dValue * sizeof(T)) % BYTE_32_ALIGN == 0), "dValue should be 32B aligned \n");
     ASCENDC_DEBUG_ASSERT(
-        ((dValue * sizeof(T)) % BYTE_32_ALIGN == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dValue should be 32B aligned \n"));
+        ((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "srcNdMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
     ASCENDC_DEBUG_ASSERT(
-        ((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "srcNdMatrixStride should be 32B aligned \n"));
-    ASCENDC_DEBUG_ASSERT(
-        ((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dValue should be 32B aligned \n"));
-    ASCENDC_DEBUG_ASSERT(
-        ((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dValue should be 32B aligned \n"));
+        ((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "dstNzMatrixStride should be 32B aligned \n");
 
     uint32_t elementsPerBlock = ONE_BLK_SIZE / sizeof(T);
     uint32_t NBlockSize = dValue / elementsPerBlock;
@@ -315,10 +359,11 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
             uint32_t offsetDst = ndIdx * dstNzMatrixStride + i * elementsPerBlock * dstNzC0Stride;
             uint32_t offsetSrc = ndIdx * srcNdMatrixStride + i * elementsPerBlock;
             copy_ubuf_to_cbuf(
-                dst + offsetDst, src + offsetSrc, 0, nValue, 1, (srcDValue / elementsPerBlock - 1), (dstNzNStride - 1));
+                dst + offsetDst, src + offsetSrc, 0, nValue, 1, srcDValue / elementsPerBlock - 1, dstNzNStride - 1);
         }
     }
 }
+
 
 template <typename T>
 __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
@@ -814,73 +859,68 @@ __aicore__ inline bool IsSupportQuantMode(QuantMode_t quantPre)
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams, uint8_t cacheMode)
+__aicore__ inline void DataCopyL0C2GMImpl(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
-    if ASCEND_IS_AIC {
-        static_assert(
-            (SupportType<
-                Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
-                Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
-                Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
-            "Failed to check dtype in "
-            "DataCopy from CO1 to GM, current api support dtype combination is "
-            "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
-            "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
-        if (IsSupportQuantMode(intriParams.quantPre)) {
-            uint32_t dstStride = intriParams.dstStride;
-            if (!intriParams.nz2ndEn) {
-                dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
-            }
-            return copy_matrix_cc_to_gm(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-                cacheMode, 0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
-        } else {
-            ASCENDC_ASSERT(false, {
-                KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
-                    "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
-            });
+    static_assert(
+        (SupportType<
+            Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
+            Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
+            Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
+        "Failed to check dtype in "
+        "DataCopy from CO1 to GM, current api support dtype combination is "
+        "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
+        "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
+    if (IsSupportQuantMode(intriParams.quantPre)) {
+        uint32_t dstStride = intriParams.dstStride;
+        if (!intriParams.nz2ndEn) {
+            dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
+        return copy_matrix_cc_to_gm(
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
+    } else {
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check quantPre value in DataCopy from CO1 "
+                "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
+                "VQF322B8_PRE / REQ8 / VREQ8.");
+        });
     }
 }
 
 template <typename T, typename U>
 __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
-    if ASCEND_IS_AIC {
-        static_assert(
-            (SupportType<
-                Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
-                Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
-                Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
-            "Failed to check dtype in "
-            "DataCopy from CO1 to A1 / B1, current api support dtype combination is "
-            "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
-            "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
-        if (IsSupportQuantMode(intriParams.quantPre)) {
-            uint32_t dstStride = intriParams.dstStride;
-            if (!intriParams.nz2ndEn) {
-                dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
-            }
-            return copy_matrix_cc_to_cbuf(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0, 0,
-                intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
-        } else {
-            ASCENDC_ASSERT(false, {
-                KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
-                    "to A1 / B1, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
-            });
+    static_assert(
+        (SupportType<
+            Tuple<U, T>, Tuple<float, float>, Tuple<float, half>, Tuple<float, bfloat16_t>, Tuple<float, int8_t>,
+            Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
+            Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
+        "Failed to check dtype in "
+        "DataCopy from CO1 to A1 / B1, current api support dtype combination is "
+        "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
+        "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
+    if (IsSupportQuantMode(intriParams.quantPre)) {
+        uint32_t dstStride = intriParams.dstStride;
+        if (!intriParams.nz2ndEn) {
+            dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
         }
+        return copy_matrix_cc_to_cbuf(
+            dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0,
+            intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+            intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
+            false);
+    } else {
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check quantPre value in DataCopy from CO1 "
+                "to A1 / B1, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
+                "VQF322B8_PRE / REQ8 / VREQ8.");
+        });
     }
 }
 
