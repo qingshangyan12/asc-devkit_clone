@@ -32,10 +32,7 @@ protected:
     }
 };
 
-void DuplicateDivBits(vector_uint32_t& dst, uint32_t value, vector_bool, Literal)
-{
-    dst.fill(value);
-}
+void DuplicateDivBits(vector_uint32_t& dst, uint32_t value, vector_bool, Literal) { dst.fill(value); }
 
 void AndDivBits(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool, Literal)
 {
@@ -44,20 +41,11 @@ void AndDivBits(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1
     }
 }
 
-void CompareDivBits(vector_bool& dst, vector_uint32_t, vector_uint32_t, vector_bool mask)
-{
-    dst = mask;
-}
+void CompareDivBits(vector_bool& dst, vector_uint32_t, vector_uint32_t, vector_bool mask) { dst = mask; }
 
-void SelectDivSource(vector_float& dst, vector_float, vector_float src, vector_bool)
-{
-    dst = src;
-}
+void SelectDivSource(vector_float& dst, vector_float, vector_float src, vector_bool) { dst = src; }
 
-vector_float PreserveDivSource(vector_float src, vector_bool)
-{
-    return src;
-}
+vector_float PreserveDivSource(vector_float src, vector_bool) { return src; }
 
 TEST_F(tensor_api_div_ftz_3510, FlushSubnormalIntrinsicArguments)
 {
