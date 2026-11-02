@@ -21,18 +21,15 @@
 <!-- npu="910" id6 -->
 - Atlas训练系列产品：不支持
 <!-- end id6 -->
-<!-- npu="9050" id12 -->
-- Kirin9050处理器系列产品：支持
-<!-- end id12 -->
-<!-- npu="kirin1" id13 -->
+<!-- npu="kirin1" id12 -->
 - KirinDev0001处理器系列产品：支持
-<!-- end id13 -->
-<!-- npu="kirin2" id14 -->
+<!-- end id12 -->
+<!-- npu="kirin2" id13 -->
 - KirinDev0002处理器系列产品：支持
-<!-- end id14 -->
-<!-- npu="kirin3" id15 -->
+<!-- end id13 -->
+<!-- npu="kirin3" id14 -->
 - KirinDev0003处理器系列产品：支持
-<!-- end id15 -->
+<!-- end id14 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/WelfordUpdate_res.md#id1 -->
 
 ## 功能说明
