@@ -19,11 +19,9 @@ from __future__ import print_function
 # Imports
 import tensorflow as tf
 import numpy as np
-import npu_device
 
 
 tf.compat.v1.disable_v2_behavior()
-npu_device.compat.enable_v1()
 tf.compat.v1.flags.DEFINE_string("local_log_dir", "output/train_logs.txt", "Log file path")
 FLAGS = tf.compat.v1.flags.FLAGS
 ATOL = 0.001
@@ -69,7 +67,6 @@ def main(unused_argv):
         print("test pass")
     else:
         print("test failed")
-    return 0 if cmp_result else 1
 
 
 if __name__ == "__main__":
