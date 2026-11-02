@@ -133,7 +133,6 @@ struct alignas(64) HcclMsgExt {
 // 64-bit words, so eight ranks fit in two cache lines instead of four.
 constexpr uint32_t HCCL_MSG_EXT_COMPACT_MAX = 8U;
 constexpr uint32_t HCCL_MSG_EXT_COMPACT_CTRL = 0xA5A5C0DEU;
-constexpr uint32_t HCCL_MSG_EXT_UNIFORM_CTRL = 0xA5A55555U;
 constexpr bool CanUseHcclMsgExtCompact(uint64_t count)
 {
     return count <= 0xFFFFFFFFULL;
