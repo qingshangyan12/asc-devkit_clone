@@ -15,7 +15,7 @@ if (NOT SCENARIO_NUM MATCHES "^[12]$")
     message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2")
 endif()
 
-set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201 or dav-3510")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510 or dav-9201")
 
 find_package(ASC REQUIRED)
 
@@ -29,8 +29,10 @@ if(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
     set(NPU_ARCH_ID 2201)
 elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
     set(NPU_ARCH_ID 3510)
+elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-9201")
+    set(NPU_ARCH_ID 9201)
 else()
-    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201 and dav-3510 are supported")
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201, dav-3510 and dav-9201 are supported")
 endif()
 
 target_compile_definitions(demo PRIVATE
