@@ -21,6 +21,12 @@
 <!-- npu="910" id6 -->
 - Atlas训练系列产品：不支持
 <!-- end id6 -->
+<!-- npu="9050,kirin1,kirin2,kirin3" id7 -->
+- Kirin9050处理器系列产品：支持
+- KirinDev0001处理器系列产品：支持
+- KirinDev0002处理器系列产品：支持
+- KirinDev0003处理器系列产品：支持
+<!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/Normalize_res.md#id1 -->
 
 ## 功能说明
