@@ -186,9 +186,7 @@ __aicore__ inline void DuplicateImpl(
     __ubuf__ T* dstLocal, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
     const uint8_t dstRepeatStride)
 {
-    CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, false>(
-        dstLocal, scalarValue, nullptr, mask, repeatTime, dstBlockStride, dstRepeatStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DuplicateImpl is not supported on current device!"); });
 }
 
 // level 0, mask bit mode
@@ -197,9 +195,7 @@ __aicore__ inline void DuplicateImpl(
     __ubuf__ T* dstLocal, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
     const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
 {
-    CheckDuplicateL0SupportedType<T>();
-    Internal::VecDupLevel0Template<isSetMask, true>(
-        dstLocal, scalarValue, mask, 0, repeatTime, dstBlockStride, dstRepeatStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DuplicateImpl is not supported on current device!"); });
 }
 
 template <typename T, bool hasUnalign = true>
@@ -257,91 +253,18 @@ __simd_vf__ inline void InterleaveImplNormal(
     }
 }
 
-template <typename T, bool hasUnalign = true>
-__simd_vf__ inline void InterleaveImplB64(
-    __ubuf__ T* dst0Local, __ubuf__ T* dst1Local, __ubuf__ T* src0Local, __ubuf__ T* src1Local, const int32_t calCount)
-{
-    Reg::RegTensor<T, Reg::RegTraitNumTwo> src0Reg, src1Reg, dst0Reg, dst1Reg;
-    uint32_t halfCount = static_cast<uint32_t>(calCount) / 2;
-    Reg::MaskReg preg;
-
-    uint32_t sregLower = static_cast<uint32_t>(VECTOR_REG_WIDTH * 2 / sizeof(T));
-    uint16_t repeatTime = CeilDivision(halfCount, sregLower);
-    uint32_t sreg = calCount;
-    // first process dst0Local
-    for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + i * sregLower);
-        Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-        preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower, dst0Reg, preg);
-        preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
-    }
-    // second process dst1Local, second element num is same as first element num
-    sreg = calCount;
-    if constexpr (!hasUnalign) {
-        for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + halfCount + i * sregLower);
-            Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-            preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
-            preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
-        }
-    } else {
-        Reg::UnalignReg ureg;
-        Reg::RegTensor<T> src0RegTmp0, src0RegTmp1, src1RegTmp0, src1RegTmp1;
-        for (uint16_t i = 0; i < repeatTime; ++i) {
-            // unalign process, copy element is sregLower
-            Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src0RegTmp0, ureg, src0Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlign(
-                src0RegTmp1, ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlign(src1RegTmp0, ureg, src1Local + halfCount + i * sregLower);
-            Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            Reg::DataCopyUnAlign(
-                src1RegTmp1, ureg, src1Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            // simulate dual intlv to combine two regs
-            Reg::DeInterleave(
-                (Reg::RegTensor<uint32_t>&)src0Reg.reg[0], (Reg::RegTensor<uint32_t>&)src0Reg.reg[1],
-                (Reg::RegTensor<uint32_t>&)src0RegTmp0, (Reg::RegTensor<uint32_t>&)src0RegTmp1);
-            Reg::DeInterleave(
-                (Reg::RegTensor<uint32_t>&)src1Reg.reg[0], (Reg::RegTensor<uint32_t>&)src1Reg.reg[1],
-                (Reg::RegTensor<uint32_t>&)src1RegTmp0, (Reg::RegTensor<uint32_t>&)src1RegTmp1);
-            // dual intlv
-            Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-            preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
-            preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst1Local + i * 2 * sregLower + sregLower, dst1Reg, preg);
-        }
-    }
-}
-
 template <typename T>
 __aicore__ inline void InterleaveImpl(
     __ubuf__ T* dst0Local, __ubuf__ T* dst1Local, __ubuf__ T* src0Local, __ubuf__ T* src1Local, const int32_t calCount)
 {
     static_assert(
-        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
+        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
-    if constexpr (sizeof(T) != 8) {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
-            InterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        } else {
-            InterleaveImplNormal<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        }
+    if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
+        InterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
     } else {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
-            InterleaveImplB64<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        } else {
-            InterleaveImplB64<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        }
+        InterleaveImplNormal<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
     }
 }
 
@@ -408,103 +331,6 @@ __simd_vf__ inline void DeInterleaveImplNormal(
     }
 }
 
-template <typename T, bool hasUnalign = true, bool hasSrc1 = true>
-__simd_vf__ inline void DeInterleaveImplB64(
-    __ubuf__ T* dst0Local, __ubuf__ T* dst1Local, __ubuf__ T* src0Local, __ubuf__ T* src1Local, const int32_t calCount)
-{
-    Reg::RegTensor<T, Reg::RegTraitNumTwo> src0Reg, src1Reg, dst0Reg, dst1Reg;
-    uint32_t halfCount = static_cast<uint32_t>(calCount) / 2;
-    Reg::MaskReg b64Preg;
-
-    constexpr uint32_t sregLower = static_cast<uint32_t>(VECTOR_REG_WIDTH * 2 / sizeof(T));
-    uint16_t repeatTime = CeilDivision(halfCount, sregLower);
-    // first process src0Local
-    uint32_t sreg = halfCount;
-    for (uint16_t i = 0; i < repeatTime; ++i) {
-        Reg::DataCopy(src0Reg, src0Local + i * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src0Local + i * 2 * sregLower + sregLower);
-        Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-        b64Preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-        Reg::DataCopy(dst0Local + i * sregLower, dst0Reg, b64Preg);
-        Reg::DataCopy(dst1Local + i * sregLower, dst1Reg, b64Preg);
-    }
-    if constexpr (!hasSrc1) {
-        return;
-    }
-    // second process src1Local
-    if constexpr (!hasUnalign) {
-        sreg = halfCount;
-        for (uint16_t i = 0; i < repeatTime; ++i) {
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
-            Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-            b64Preg = Reg::UpdateMask<T, Reg::RegTraitNumTwo>(sreg);
-            Reg::DataCopy(dst0Local + halfCount + i * sregLower, dst0Reg, b64Preg);
-            Reg::DataCopy(dst1Local + halfCount + i * sregLower, dst1Reg, b64Preg);
-        }
-    } else {
-        Reg::UnalignReg ureg;
-        // split main and tail
-        Reg::RegTensor<T> dst0RegTmp0, dst0RegTmp1, dst1RegTmp0, dst1RegTmp1;
-        for (uint16_t i = 0; i < repeatTime - 1; ++i) {
-            // main block process
-            Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
-            Reg::DataCopy(src1Reg, src1Local + i * 2 * sregLower + sregLower);
-            // dual deintlv
-            Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-            __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + i * sregLower;
-            __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + i * sregLower;
-            // simulate dual intlv to combine two regs
-            Reg::Interleave(
-                (Reg::RegTensor<uint32_t>&)dst0RegTmp0, (Reg::RegTensor<uint32_t>&)dst0RegTmp1,
-                (Reg::RegTensor<uint32_t>&)dst0Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst0Reg.reg[1]);
-            Reg::Interleave(
-                (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
-                (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
-            // unalign process, copy element is sregLower / 2
-            Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-            Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
-            Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-        }
-        // tail block process, because dst copy element is different with main block
-        // vld dual src
-        Reg::DataCopy(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
-        Reg::DataCopy(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
-        // dual deintlv
-        Reg::DeInterleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-        uint32_t tailNum = halfCount - (repeatTime - 1) * sregLower;
-        uint16_t tailNumMain = tailNum;
-        uint16_t tailNumRemain = 0;
-        // cal tail main and remain
-        if (tailNum > VECTOR_REG_WIDTH / sizeof(T)) {
-            tailNumMain = VECTOR_REG_WIDTH / sizeof(T);
-            tailNumRemain = tailNum - tailNumMain;
-        }
-        // cal dst unalign addr
-        __ubuf__ T* dst0LocalTmp = dst0Local + halfCount + (repeatTime - 1) * sregLower;
-        __ubuf__ T* dst1LocalTmp = dst1Local + halfCount + (repeatTime - 1) * sregLower;
-        // simulate dual intlv to combine two regs
-        Reg::Interleave(
-            (Reg::RegTensor<uint32_t>&)dst0RegTmp0, (Reg::RegTensor<uint32_t>&)dst0RegTmp1,
-            (Reg::RegTensor<uint32_t>&)dst0Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst0Reg.reg[1]);
-        Reg::Interleave(
-            (Reg::RegTensor<uint32_t>&)dst1RegTmp0, (Reg::RegTensor<uint32_t>&)dst1RegTmp1,
-            (Reg::RegTensor<uint32_t>&)dst1Reg.reg[0], (Reg::RegTensor<uint32_t>&)dst1Reg.reg[1]);
-        // unalign vst dst0 and dst1 same time and split main and remain
-        Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, tailNumMain);
-        Reg::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, tailNumRemain);
-        Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-        Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, tailNumMain);
-        Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, tailNumRemain);
-        Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-    }
-}
-
 template <typename T>
 __aicore__ inline void DeInterleaveImpl(
     __ubuf__ T* dst0Local, __ubuf__ T* dst1Local, __ubuf__ T* src0Local, __ubuf__ T* src1Local, const int32_t calCount)
@@ -513,18 +339,10 @@ __aicore__ inline void DeInterleaveImpl(
         SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
-    if constexpr (sizeof(T) != 8) {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
-            DeInterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        } else {
-            DeInterleaveImplNormal<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        }
+    if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
+        DeInterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
     } else {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
-            DeInterleaveImplB64<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        } else {
-            DeInterleaveImplB64<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
-        }
+        DeInterleaveImplNormal<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
     }
 }
 
@@ -533,15 +351,11 @@ __aicore__ inline void DeInterleaveImpl(
     __ubuf__ T* dst0Local, __ubuf__ T* dst1Local, __ubuf__ T* srcLocal, const int32_t srcCount)
 {
     static_assert(
-        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
+        SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((srcCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "srcCount % 2 = 0!"); });
     // no unalign problem
-    if constexpr (sizeof(T) != 8) {
-        DeInterleaveImplNormal<T, false, false>(dst0Local, dst1Local, srcLocal, nullptr, srcCount);
-    } else {
-        DeInterleaveImplB64<T, false, false>(dst0Local, dst1Local, srcLocal, nullptr, srcCount);
-    }
+    DeInterleaveImplNormal<T, false, false>(dst0Local, dst1Local, srcLocal, nullptr, srcCount);
 }
 
 } // namespace AscendC

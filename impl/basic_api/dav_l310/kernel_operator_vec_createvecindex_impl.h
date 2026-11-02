@@ -104,11 +104,7 @@ __aicore__ inline void CreateVecIndexCalc(
     LocalTensor<T>& dstLocal, const T firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride,
     uint8_t dstRepStride)
 {
-    CheckCreateVecIndexApi0SupportedType<T>();
-
-    __ubuf__ T* dst = (__ubuf__ T*)dstLocal.GetPhyAddr();
-    Internal::VecCreateVecIndexLevel0Template<false>(
-        dst, firstValue, nullptr, mask, repeatTime, dstBlkStride, dstRepStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "CreateVecIndexCalc is not supported on current device!"); });
 }
 
 // VCI level-0 bitwise
@@ -117,35 +113,14 @@ __aicore__ inline void CreateVecIndexCalc(
     LocalTensor<T>& dstLocal, const T firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
     uint8_t dstRepStride)
 {
-    CheckCreateVecIndexApi0SupportedType<T>();
-
-    __ubuf__ T* dst = (__ubuf__ T*)dstLocal.GetPhyAddr();
-    Internal::VecCreateVecIndexLevel0Template<true>(dst, firstValue, mask, 0, repeatTime, dstBlkStride, dstRepStride);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "CreateVecIndexCalc is not supported on current device!"); });
 }
 
 // VCI level-2
 template <typename T>
 __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T firstValue, uint32_t calCount)
 {
-    CheckCreateVecIndexApi2SupportedType<T>();
-
-    __ubuf__ T* dstLocalAddr = (__ubuf__ T*)dstLocal.GetPhyAddr();
-    uint32_t sreg = (uint32_t)calCount;
-    int32_t sregLower = (int32_t)(VECTOR_REG_WIDTH / sizeof(T));
-    uint16_t repeatTimes = CeilDivision(calCount, sregLower);
-
-    __VEC_SCOPE__
-    {
-        RegTensor<T> vreg0;
-        MaskReg preg = CreatePredicate<T>(sreg);
-        CreateVecIndex(vreg0, firstValue);
-        DataCopy(dstLocalAddr, vreg0, 0, preg);
-        for (uint16_t i = 1; i < (uint16_t)repeatTimes; ++i) {
-            preg = CreatePredicate<T>(sreg);
-            Adds(vreg0, vreg0, sregLower, preg);
-            DataCopy(dstLocalAddr, vreg0, i * sregLower, preg);
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "CreateVecIndexCalc is not supported on current device!"); });
 }
 
 } // namespace AscendC
