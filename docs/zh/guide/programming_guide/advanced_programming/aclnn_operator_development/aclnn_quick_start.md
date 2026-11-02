@@ -44,9 +44,9 @@ source /usr/local/Ascend/cann/set_env.sh
 |------|------|
 | 步骤1 | 算子分析 |
 | 步骤2 | 创建工程目录 |
-| 步骤3 | 编写核函数（Kernel）侧代码 |
-| 步骤4 | 编写Host侧原型、推导函数和Tiling实现 |
-| 步骤5 | 编写共享Tiling数据结构 |
+| 步骤3 | 编写共享Tiling数据结构 |
+| 步骤4 | 编写核函数（Kernel）侧代码 |
+| 步骤5 | 编写Host侧原型、推导函数和Tiling实现 |
 | 步骤6 | 编写三个CMakeLists.txt |
 | 步骤7 | 编译与部署 |
 | 步骤8 | 创建调用工程并验证算子 |
@@ -81,6 +81,24 @@ AddCustom
     ├── add_custom.cpp        // [待创建] 算子代码实现
     ├── add_custom_tiling.h   // [待创建] Tiling数据结构定义
     └── CMakeLists.txt        // [待创建]
+```
+
+### 编写共享Tiling数据结构<a id="修改tiling与host侧实现"></a>
+
+Tiling负责将Host侧的调度信息（如数据总量、分块数）传递到核函数（Kernel）侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和核函数（Kernel）共同引用。
+
+创建`op_kernel/add_custom_tiling.h`，使用标准C++语法定义TilingData结构体：
+
+```cpp
+#ifndef ADD_CUSTOM_TILING_H
+#define ADD_CUSTOM_TILING_H
+#include <cstdint>
+
+struct AddCustomTilingData {
+    uint32_t totalLength;  // 总计算数据量
+    uint32_t tileNum;      // 总数据分块数量
+};
+#endif // ADD_CUSTOM_TILING_H
 ```
 
 ### 编写核函数（Kernel）侧代码<a name="修改kernel侧代码"></a>
@@ -234,7 +252,7 @@ public:
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
         this->AICore()
             .SetTiling(optiling::TilingFunc)
-            .AddConfig("ascend910b");  // 与下文CMake中的构建目标对应
+            .AddConfig("ascend910b");  // 声明算子在该芯片上生效，与CMake的ASCEND_SOC_SERIES需保持一致
     }
 };
 OP_ADD(AddCustom);
@@ -242,24 +260,6 @@ OP_ADD(AddCustom);
 ```
 
 > 以上代码分别展示了[Host侧Tiling实现](./design_and_implementation/host_tiling_implementation.md)中Tiling函数的基本写法，以及[算子原型定义](./design_and_implementation/operator_prototype_definition.md)中`OpDef`的注册方法。
-
-### 编写共享Tiling数据结构<a id="修改tiling与host侧实现"></a>
-
-Tiling负责将Host侧的调度信息（如数据总量、分块数）传递给核函数（Kernel）侧执行。Tiling数据结构定义放在`op_kernel/add_custom_tiling.h`，供Host和核函数（Kernel）共同引用。
-
-创建`op_kernel/add_custom_tiling.h`，使用标准C++语法定义TilingData结构体：
-
-```cpp
-#ifndef ADD_CUSTOM_TILING_H
-#define ADD_CUSTOM_TILING_H
-#include <cstdint>
-
-struct AddCustomTilingData {
-    uint32_t totalLength;  // 总计算数据量
-    uint32_t tileNum;      // 总数据分块数量
-};
-#endif // ADD_CUSTOM_TILING_H
-```
 
 ### 编写CMakeLists.txt
 

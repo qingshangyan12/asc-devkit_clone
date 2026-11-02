@@ -181,7 +181,7 @@ source /usr/local/Ascend/cann/set_env.sh
 
 > **路径关系说明**：默认安装场景下，算子包部署到`$ASCEND_OPP_PATH/vendors/<vendor_name>`。安装脚本会将当前vendor写入`$ASCEND_OPP_PATH/vendors/config.ini`的`load_priority`配置项，框架按照该配置加载默认路径中的算子包。
 
-**表3** 默认安装与指定目录安装对比。
+**表1** 默认安装与指定目录安装对比。
 
 | 安装方式 | 安装命令 | 安装路径 | 自定义算子包安装后是否需要用户自行source自定义算子包的环境变量 | 优先级 |
 |---------|---------|---------|----------------|--------|
@@ -620,7 +620,7 @@ npu_op_package_add(${package_name}
 npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | SOC_SERIES <series>...] OPTIONS ...)
 ```
 
-**表4** 参数说明。
+**表2** 参数说明。
 
 | 参数名称 | 可选/必选 | 参数描述 |
 |---------|----------|---------|
