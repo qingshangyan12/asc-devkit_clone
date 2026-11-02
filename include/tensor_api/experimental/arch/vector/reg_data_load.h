@@ -54,6 +54,35 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
 
 /**
  * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @brief Loads packed mask bits from a UB tensor at the specified coordinate.
+ *
+ * @override_id te_experimental_load__const_Tensor_R_const_Coord_R__template_RegDataType_Tensor_Coord
+ * @archs 3510
+ * @return A Boolean register tensor containing the loaded mask bits in its reg member.
+ * @param [in] tensor Source uint32_t tensor located in UB.
+ * @param [in] coord Coordinate of the first source word.
+ * @note RegDataType must be bool. The effective source address must be
+ * 32-byte aligned, and the full mask-register load must remain within the source buffer.
+ */
+template <typename RegDataType, typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @brief Loads packed mask bits from the beginning of a UB tensor.
+ *
+ * @override_id te_experimental_load__const_Tensor_R__template_RegDataType_Tensor
+ * @archs 3510
+ * @return A Boolean register tensor containing the loaded mask bits in its reg member.
+ * @param [in] tensor Source uint32_t tensor located in UB.
+ * @note RegDataType must be bool. The source address must be 32-byte aligned,
+ * and the full mask-register load must remain within the source buffer.
+ */
+template <typename RegDataType, typename Tensor>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor);
+
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
  * @brief Loads and broadcasts data from a UB tensor at the specified coordinate.
  *
  * @override_id te_experimental_load_broadcast__const_Tensor_R_const_Coord_R__template_brc_mode_Tensor_Coord

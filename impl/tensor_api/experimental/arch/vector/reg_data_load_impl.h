@@ -113,10 +113,20 @@ struct load_from_ptr_impl<load_sideband_mode::deintlv> {
     }
 };
 
-template <load_sideband_mode sideband_mode, typename DataType, typename Pointer>
+template <load_sideband_mode sideband_mode, typename DataType, typename RegDataType = void, typename Pointer>
 __simd_callee__ inline decltype(auto) load_from_ptr(Pointer src)
 {
-    return load_from_ptr_impl<sideband_mode>::template run<get_reg_data_type<DataType>>(src);
+    if constexpr (Std::is_same_v<RegDataType, void>) {
+        return load_from_ptr_impl<sideband_mode>::template run<get_reg_data_type<DataType>>(src);
+    } else {
+        static_assert(Std::is_same_v<RegDataType, bool>, "load with an explicit register type only supports bool");
+        static_assert(sideband_mode == load_sideband_mode::direct, "load mask only supports direct mode");
+        static_assert(Std::is_same_v<DataType, uint32_t>, "load mask only supports uint32_t source tensors");
+
+        reg_tensor<bool> dst;
+        dst.reg = asc_loadalign_mask(src);
+        return dst;
+    }
 }
 
 template <broadcast_mode brc_mode>
@@ -170,10 +180,8 @@ __simd_callee__ inline reg_tensor<get_reg_data_type<DataType>> load_broadcast_fr
     return load_broadcast_from_ptr_impl<brc_mode>::template run<get_reg_data_type<DataType>>(src);
 }
 
-} // namespace detail
-
-template <load_sideband_mode sideband_mode, typename Tensor, typename Coord>
-__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
+template <typename RegDataType, load_sideband_mode sideband_mode, typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load_impl(const Tensor& tensor, const Coord& coord)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -182,18 +190,46 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& co
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
 
     auto src_engine = tensor.engine() + tensor.layout()(coord);
-    return detail::load_from_ptr<sideband_mode, data_type>(src_engine.begin().get());
+    return load_from_ptr<sideband_mode, data_type, RegDataType>(src_engine.begin().get());
 }
 
-template <load_sideband_mode sideband_mode, typename Tensor>
-__simd_callee__ inline decltype(auto) load(const Tensor& tensor)
+template <typename RegDataType, load_sideband_mode sideband_mode, typename Tensor>
+__simd_callee__ inline decltype(auto) load_impl(const Tensor& tensor)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
     static_assert(
         Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load only supports tensors located in UB");
 
-    return detail::load_from_ptr<sideband_mode, data_type>(tensor.engine().begin().get());
+    return load_from_ptr<sideband_mode, data_type, RegDataType>(tensor.engine().begin().get());
+}
+
+} // namespace detail
+
+template <load_sideband_mode sideband_mode, typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
+{
+    return detail::load_impl<void, sideband_mode>(tensor, coord);
+}
+
+template <load_sideband_mode sideband_mode, typename Tensor>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor)
+{
+    return detail::load_impl<void, sideband_mode>(tensor);
+}
+
+template <typename RegDataType, typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
+{
+    static_assert(Std::is_same_v<RegDataType, bool>, "load with an explicit register type only supports bool");
+    return detail::load_impl<RegDataType, load_sideband_mode::direct>(tensor, coord);
+}
+
+template <typename RegDataType, typename Tensor>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor)
+{
+    static_assert(Std::is_same_v<RegDataType, bool>, "load with an explicit register type only supports bool");
+    return detail::load_impl<RegDataType, load_sideband_mode::direct>(tensor);
 }
 
 template <broadcast_mode brc_mode, typename Tensor, typename Coord>
