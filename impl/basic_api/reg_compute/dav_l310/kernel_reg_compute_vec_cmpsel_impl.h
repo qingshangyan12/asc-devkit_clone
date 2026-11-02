@@ -56,8 +56,7 @@ __simd_callee__ inline void CompareScalarImpl(MaskReg& dstMask, RegT& srcReg, Sc
     using ActualT = typename RegT::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
         "current data type is not supported on current device!");
     if constexpr (sizeof(ActualT) < 8) {
         if constexpr (mode == CMPMODE::EQ) {
