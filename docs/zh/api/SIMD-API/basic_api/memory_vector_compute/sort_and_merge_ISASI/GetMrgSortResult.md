@@ -85,8 +85,24 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
 ## 约束说明<a name="section837496171220"></a>
 
 <!-- npu="950,A3,910b,310b" id14 -->
-针对Ascend 950PR&950DT系列产品、Atlas A3系列产品、Atlas A2系列产品和Atlas 200I/500 A2推理产品，需与MrgSort接口配合使用，且MrgSort接口中的ifExhaustedSuspension参数必须设置为true。
+针对如下产品型号：
+
+<!-- npu="950" id18 -->
+- Ascend 950PR&950DT系列产品
+<!-- end id18 -->
+<!-- npu="A3" id19 -->
+- Atlas A3系列产品
+<!-- end id19 -->
+<!-- npu="910b" id20 -->
+- Atlas A2系列产品
+<!-- end id20 -->
+<!-- npu="310b" id21 -->
+- Atlas 200I/500 A2推理产品
+<!-- end id21 -->
+
+需与MrgSort接口配合使用，且MrgSort接口中的ifExhaustedSuspension参数必须设置为true。
 <!-- end id14 -->
+
 <!-- npu="310p" id15 -->
 针对Atlas推理系列产品AI Core，需与MrgSort4接口配合使用，且MrgSort4接口中的MrgSort4Info.ifExhaustedSuspension参数必须设置为true。
 <!-- end id15 -->
@@ -95,7 +111,20 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
 ## 调用示例<a name="section837496171220"></a>
 
 <!-- npu="950,A3,910b,310b" id16 -->
-- 针对Ascend 950PR&950DT系列产品、Atlas A3系列产品、Atlas A2系列产品和Atlas 200I/500 A2推理产品，配合[MrgSort指令](MrgSort.md)使用示例。
+- 配合[MrgSort指令](MrgSort.md)使用示例，适用于如下产品型号：
+
+    <!-- npu="950" id22 -->
+    - Ascend 950PR&950DT系列产品
+    <!-- end id22 -->
+    <!-- npu="A3" id23 -->
+    - Atlas A3系列产品
+    <!-- end id23 -->
+    <!-- npu="910b" id24 -->
+    - Atlas A2系列产品
+    <!-- end id24 -->
+    <!-- npu="310b" id25 -->
+    - Atlas 200I/500 A2推理产品
+    <!-- end id25 -->
 
     ```cpp
     
