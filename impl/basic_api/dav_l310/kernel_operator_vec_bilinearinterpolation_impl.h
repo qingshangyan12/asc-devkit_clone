@@ -124,7 +124,7 @@ __aicore__ inline void BilinearInterpolationCalc(
     uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     using PrimType = PrimT<T>;
-    static_assert(SupportType<PrimType, half>(), "BilinearInterpolation api only support half on current device");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 
     __ubuf__ PrimType* dst = (__ubuf__ PrimType*)dstLocal.GetPhyAddr();
     __ubuf__ PrimType* src0 = (__ubuf__ PrimType*)src0Local.GetPhyAddr();
@@ -142,7 +142,7 @@ __aicore__ inline void BilinearInterpolationCalc(
     uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     using PrimType = PrimT<T>;
-    static_assert(SupportType<PrimType, half>(), "BilinearInterpolation api only support half on current device");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
 
     __ubuf__ PrimType* dst = (__ubuf__ PrimType*)dstLocal.GetPhyAddr();
     __ubuf__ PrimType* src0 = (__ubuf__ PrimType*)src0Local.GetPhyAddr();
