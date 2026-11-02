@@ -27,7 +27,7 @@
 namespace AscendC {
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)    
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     (void)(config);
     ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeClipRelu");
 #else

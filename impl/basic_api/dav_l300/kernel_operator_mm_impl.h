@@ -31,6 +31,9 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
+    static_assert(
+        SupportType<T, uint8_t, int8_t, bfloat16_t, half>(),
+        "LoadData 2dv2 only support uint8_t, int8_t, bfloat16_t, half on current device!");
     if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca_transpose(
             (__ca__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
@@ -38,10 +41,6 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
     } else if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca_transpose(
             (__ca__ half*)dst, (__cbuf__ half*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
-    } else if constexpr (B32_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_ca_transpose(
-            (__ca__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
@@ -62,7 +61,15 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
-    if constexpr (B8_BYTE_SIZE == sizeof(T)) {
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t on "
+        "current device!");
+    if constexpr (SupportType<T, int4b_t>) {
+        load_cbuf_to_ca_s4(
+            (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, 0, false, inc);
+    } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_ca(
             (__ca__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
@@ -84,17 +91,20 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
-    if constexpr (B8_BYTE_SIZE == sizeof(T)) {
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half on current device!");
+    if constexpr (SupportType<T, int4b_t> == sizeof(T)) {
+        load_cbuf_to_cb_transpose_s4(
+            (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
+    } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb_transpose(
             (__cb__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else if constexpr (B16_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb_transpose(
             (__cb__ half*)dst, (__cbuf__ half*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
-    } else if constexpr (B32_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_cb_transpose(
-            (__cb__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
@@ -112,7 +122,15 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
-    if constexpr (B8_BYTE_SIZE == sizeof(T)) {
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t on "
+        "current device!");
+    if constexpr (SupportType<T, int4b_t>) {
+        load_cbuf_to_cb_s4(
+            (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+            loadDataParam.srcStride, loadDataParam.dstGap, 0, false, inc);
+    } else if constexpr (B8_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb(
             (__cb__ uint8_t*)dst, (__cbuf__ uint8_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
@@ -195,85 +213,13 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
 {
-    static_assert(
-        SupportType<
-            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
-            float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
-         half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 1);
-        } else {
-            load_cbuf_to_ca(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 0);
-        }
-#else
-        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca_s4(
-                    (__ca__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        } else {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        }
-#endif
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData 2dbitmode is not supported!"); });
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
 {
-    static_assert(
-        SupportType<
-            T, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
-            float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
-         half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_cb(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 1);
-        } else {
-            load_cbuf_to_cb(
-                dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(),
-                loadDataParam.GetMStep(), loadDataParam.GetKStep(), loadDataParam.GetSrcStride(),
-                loadDataParam.GetDstStride(), 0);
-        }
-#else
-        if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb_s4(
-                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_cb_s4(
-                    (__cb__ T*)dst, (__cbuf__ T*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        } else {
-            if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
-            } else {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
-            }
-        }
-#endif
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData 2dbitmode is not supported!"); });
 }
 
 /* **************************************************************************************************

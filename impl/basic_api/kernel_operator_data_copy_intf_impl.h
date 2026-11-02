@@ -578,12 +578,12 @@ __aicore__ inline void DataCopy(
                 Std::is_same<PrimDstType, PrimSrcType>::value ||
                 (Std::is_same<PrimSrcType, bfloat16_t>::value && Std::is_same<PrimDstType, float>::value)) {
 #else
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
             if constexpr (
                 Std::is_same<PrimDstType, int32_t>::value &&
                 (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
-                 Std::is_same<PrimSrcType, int32_t>::value)) {
+                 Std::is_same<PrimSrcType, bfloat16_t>::value)) {
                 DataCopyL12BTImpl(
                     (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(),
                     static_cast<uint16_t>(Std::is_same<PrimDstType, PrimSrcType>::value ? 0 : 2), repeatParams);
