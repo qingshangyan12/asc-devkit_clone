@@ -172,10 +172,10 @@ template <typename T>
 __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& src, const MrgSort4Info& params)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+    ASCENDC_ASSERT((SupportType<PrimType, half>()), {
         KERNEL_LOG(
             KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
-                          "src and dst both: half / float");
+                          "src and dst both: half");
     });
     for (int8_t i = 0; i < MRG_SORT_ELEMENT_LEN; ++i) {
         ASCENDC_CHECK_VALUE_RANGE(params.elementLengths[i], 0, 4095, "elementLengths", "MrgSort");
@@ -230,10 +230,10 @@ __aicore__ inline void Sort32(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src1, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+    ASCENDC_ASSERT((SupportType<PrimType, half>()), {
         KERNEL_LOG(
             KERNEL_ERROR, "Failed to check dtype in Sort32, current api support dtype combination is "
-                          "src and dst both: half / float");
+                          "src and dst both: half");
     });
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Sort32");
 #if ASCENDC_CPU_DEBUG
@@ -443,10 +443,10 @@ __aicore__ inline void MrgSort(
         return;
     }
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+    ASCENDC_ASSERT((SupportType<PrimType, half>()), {
         KERNEL_LOG(
             KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
-                          "src and dst both: half / float");
+                          "src and dst both: half");
     });
     MrgSort4Info mrgSortInfo(elementCountList, isExhaustedSuspension, validBit, (uint16_t)repeatTime);
 #if defined(__NPU_ARCH__) &&                                                                                 \
@@ -494,10 +494,10 @@ __aicore__ inline void Sort(
     const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {
+    ASCENDC_ASSERT((SupportType<PrimType, half>()), {
         KERNEL_LOG(
             KERNEL_ERROR, "Failed to check dtype in Sort, current "
-                          "api support dtype combination is src and dst both: half / float");
+                          "api support dtype combination is src and dst both: half");
     });
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Sort");
 #if ASCENDC_CPU_DEBUG
