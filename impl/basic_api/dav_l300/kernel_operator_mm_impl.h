@@ -81,10 +81,6 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
         load_cbuf_to_ca(
             (__ca__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
-    } else if constexpr (B64_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_ca(
-            (__ca__ int64_t*)dst, (__cbuf__ int64_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
@@ -145,10 +141,6 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
     } else if constexpr (B32_BYTE_SIZE == sizeof(T)) {
         load_cbuf_to_cb(
             (__cb__ uint32_t*)dst, (__cbuf__ uint32_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
-            loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
-    } else if constexpr (B64_BYTE_SIZE == sizeof(T)) {
-        load_cbuf_to_cb(
-            (__cb__ int64_t*)dst, (__cbuf__ int64_t*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, 0, inc);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
