@@ -153,27 +153,38 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 }
 
 template <const auto& config>
-__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-    uint16_t queId, const CommonPrepareParam& param, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling)
+template <HcclCMDType cmdType>
+__aicore__ inline uint64_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
+    uint16_t queId, const CommonPrepareParam& param, int8_t srcGroupID, HcclHandle srcHandleID, uint64_t tiling,
+    bool compactExt, uint64_t extCtrl, uint64_t extXor)
 {
 #if __NPU_ARCH__ == 3510
     (void)queId;
     (void)srcGroupID;
     (void)srcHandleID;
     if (!workingFlag_) {
-        return;
+        return 0UL;
     }
     __gm__ HcclMsg* hcclSendMsg = hcclMsgArea_->commMsg.singleMsg.sendMsgs + curMsgPosition_[0U];
     do {
-        HCCL_CHECK_RESTART(hcclMsgArea_, return);
+        HCCL_CHECK_RESTART(hcclMsgArea_, return 0UL);
         FlushDataCache(hcclSendMsg);
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[0U]);
-    AssembleHcclMsgV2(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+    if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        if (!compactExt) {
+            AssembleHcclMsgV2(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+        } else {
+            AssembleHcclMsgV2Compact(param, curVersion_, curHandleId_, tiling, hcclSendMsg, extCtrl, extXor);
+        }
+    } else {
+        AssembleHcclMsgV2(param, curVersion_, curHandleId_, tiling, hcclSendMsg, &hcclMsgArea_->controlMsg);
+    }
     FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg));
+    return ((extCtrl << 32U) | extXor);
 #else
     if (!workingFlag_ && queueNum_ == 0U) {
-        return;
+        return 0UL;
     }
     __gm__ HcclMsg* hcclSendMsg;
     if (queueNum_ == 0U) {
@@ -184,7 +195,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     }
 
     do {
-        HCCL_CHECK_RESTART(hcclMsgArea_, return);
+        HCCL_CHECK_RESTART(hcclMsgArea_, return 0UL);
         FlushDataCache(hcclSendMsg);
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[queId]);
@@ -199,11 +210,34 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     }
     FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg));
 #endif
+    return 0UL;
+}
+
+template <const auto& config>
+__aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::CanUseExtCompact(
+    const AlltoAllVParamExt& param, uint32_t rankNum)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (rankNum > HCCL_MSG_EXT_COMPACT_MAX) {
+        return false;
+    }
+    for (uint32_t i = 0U; i < rankNum; ++i) {
+        if (!CanUseHcclMsgExtCompact(param.sendCounts[i]) || !CanUseHcclMsgExtCompact(param.sdispls[i]) ||
+            !CanUseHcclMsgExtCompact(param.recvCounts[i]) || !CanUseHcclMsgExtCompact(param.rdispls[i])) {
+            return false;
+        }
+    }
+    return true;
+#else
+    (void)param;
+    (void)rankNum;
+    return false;
+#endif
 }
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SendMsgToServer(
-    const AlltoAllVParamExt& param, uint32_t rankNum)
+    const AlltoAllVParamExt& param, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor)
 {
     if (!workingFlag_) {
         return;
@@ -214,7 +248,18 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         FlushDataCache(hcclSendMsg);
     } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
     KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (compactExt) {
+        AssembleHcclMsgExtCompact(param, rankNum, hcclSendMsg, extCtrl, extXor);
+    } else {
+        AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
+    }
+#else
+    (void)compactExt;
+    (void)extCtrl;
+    (void)extXor;
     AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
+#endif
     for (uint32_t i = 0U; i < rankNum; i += MAX_DCCI_CNT / sizeof(uint64_t)) {
         FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendCounts + i));
         FlushDataCache(reinterpret_cast<__gm__ void*>(hcclSendMsg->sendOffset + i));
@@ -324,6 +369,9 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
 #endif
     uint64_t tiling = 0UL;
     uint32_t rankNum = 0U;
+    bool compactExt = false;
+    uint64_t extCtrl = 0UL;
+    uint64_t extXor = 0UL;
     const bool paramValid = CheckCommonPrepareParamValid<cmdType>(param, tiling, rankNum);
     ASCENDC_HCCL_API_ASSERT(
         paramValid, { return INVALID_HANDLE_ID; }, "Call Prepare[%d] failed, param invalid.",
@@ -335,14 +383,15 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
         "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
         static_cast<int32_t>(cmdType), handleId + 1, HCCL_MAX_HANDLE_ID);
     if constexpr (cmdType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        SendMsgToServer(param.paramExt, rankNum);
+        compactExt = CanUseExtCompact(param.paramExt, rankNum);
+        SendMsgToServer(param.paramExt, rankNum, compactExt, extCtrl, extXor);
     }
 #if __NPU_ARCH__ == 3510
     constexpr uint16_t queId = 0U;
 #else
     const uint16_t queId = (queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType));
 #endif
-    SendMsgToServer(queId, param, -1, INVALID_HANDLE_ID, tiling);
+    SendMsgToServer<cmdType>(queId, param, -1, INVALID_HANDLE_ID, tiling, compactExt, extCtrl, extXor);
     handleIdMsgPosition_[handleId] = curMsgPosition_[queId];
     handleIdRepeat_[handleId] = param.repeat;
     handleId2CmdType_[handleId] = static_cast<uint8_t>(cmdType);
@@ -383,7 +432,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         KERNEL_LOG(
             KERNEL_INFO, "Only block idx[%ld] write sendMsgList[%u] when Finalize.", GetBlockIdx(),
             curMsgPosition_[idx]);
-        SendMsgToServer(idx, param, -1, INVALID_HANDLE_ID, 0UL);
+        SendMsgToServer<HcclCMDType::HCCL_CMD_INVALID>(idx, param, -1, INVALID_HANDLE_ID, 0UL, false, 0UL, 0UL);
         if constexpr (!sync) {
             ++(curMsgPosition_[idx]);
             ASCENDC_HCCL_API_ASSERT(
