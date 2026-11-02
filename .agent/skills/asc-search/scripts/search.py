@@ -23,6 +23,8 @@ PLATFORMS = {"a2": ("2201", "910b"), "a3": ("2201", "A3"), "950": ("3510", "950"
 
 
 def search(args):
+    if args.gap is not None and args.keywords:
+        raise ValueError("--gap cannot be combined with --keywords; use the --gap query keyword")
     root = args.root.resolve()
     index_dir = args.index_dir
     if index_dir is None:

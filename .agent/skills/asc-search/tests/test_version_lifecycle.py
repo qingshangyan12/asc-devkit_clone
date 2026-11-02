@@ -1,5 +1,6 @@
 """First support, scoped overload lifecycles and deprecation are independent."""
 import json
+import itertools
 from pathlib import Path
 import sys
 import tempfile
@@ -11,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import build_index
 import query
 from derive import gate
+from derive.versioning import deprecation
 
 
 class LifecycleTests(unittest.TestCase):
@@ -93,6 +95,31 @@ class LifecycleTests(unittest.TestCase):
             self.assertEqual('9.3.0-beta.1', gate.detect_cann_version(None, self.root))
         with self.assertRaises(ValueError):
             gate.detect_cann_version('not-a-version', self.root)
+
+    def test_prerelease_with_hyphens_is_preserved_from_path_and_cmake(self):
+        for version in ('9.3.0-beta-1', '9.3.0-beta.1', '9.3.0'):
+            with self.subTest(version=version):
+                with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': f'/opt/cann-{version}/toolkit'}):
+                    self.assertEqual(version, gate.detect_cann_version(None, self.root))
+                (self.root/'version.cmake').write_text(f'set(VERSION "{version}")\n')
+                with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': ''}):
+                    self.assertEqual(version, gate.detect_cann_version(None, self.root))
+
+    def test_deprecation_is_order_independent_and_uses_precise_earliest_evidence(self):
+        signature = {'override_id': 'asc_sync_vec__z', 'deprecated': None}
+        events = [dict(since='9.0.0',kind='deprecated',scope='page',scope_basis='resolved'),
+                  dict(since='9.5.0',kind='deprecated',scope='overload:asc_sync_vec__z'),
+                  dict(since='9.4.0',kind='deprecated',scope='overload:asc_sync_vec__z'),
+                  dict(since='9.6.0',kind='deprecated',scope='overload:asc_sync_vec__z@3510')]
+        for order in itertools.permutations(events):
+            self.assertEqual(deprecation(signature,order,'9.7.0','3510')['version'],'9.6.0')
+            self.assertEqual(deprecation(signature,order,'9.7.0','2201')['version'],'9.4.0')
+            self.assertEqual(deprecation(signature,order,'9.3.0','3510')['version'],'9.0.0')
+        signature['deprecated'] = {'version': '9.2.0', 'replacement': 'asc_other', 'date': '2026-01-01'}
+        self.assertEqual(deprecation(signature,events,'9.7.0','3510'),signature['deprecated'])
+        self.assertEqual(deprecation(signature,events,'9.1.0','3510')['version'],'9.0.0')
+        self.assertIsNone(deprecation(signature,[dict(since='9.0.0',kind='deprecated',scope='page',
+                                                    scope_basis='fallback')],'9.1.0','3510'))
 
     def test_version_query_tracks_prerelease_and_lifecycle(self):
         removed = dict(since='9.3.0', kind='removed', scope='page', scope_basis='kind_default')

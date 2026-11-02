@@ -1,9 +1,9 @@
 # OKF Search README
 
-当前能力已拆分：`asc-search` 接受 Agent 的关键词/结构化条件，返回 JSON；
-相邻 `asc-devkit-search` 负责自然语言澄清和人类答案。两者共享同一引擎。
+`asc-search` 接受 Agent 整理的关键词/结构化条件，返回机器可读 JSON。
+自然语言澄清和最终答案组织由调用方负责，本 skill 不依赖人类入口。
 外部资源使用显式 `--root` 和独立 `--index-dir`，不会依赖安装目录所在仓库的数据。
-下方问答演示由人类入口承担，底层命令契约以各自 SKILL.md 为准。
+命令契约见 [SKILL.md](SKILL.md)。
 
 ## 快速开始
 
@@ -38,19 +38,14 @@ python3 .agent/skills/asc-search/scripts/install.py --scope project
 python3 -m pip install PyYAML
 ```
 
-安装后重启或重新加载智能体，在对话中输入：
-
-> 使用 asc-search，帮我找 3510 架构上对 float 向量逐元素取绝对值的接口。
-
-skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选接口及文档路径。请保留该仓库；
-仓库移动后，需要移除旧安装软链并重新运行安装命令。仓库更新后，安装入口会同步使用更新后的 skill。
+安装后重启或重新加载智能体，使其发现机器检索入口。保留原 devkit checkout；移动仓库后需要重新安装软链。
 
 ## 1. 这个 skill 是干什么的
 
 ### 1.1 背景
 
 写 Ascend C 算子要用 C API 时，面对的是 800 多篇文档，凭记忆按目录翻很慢。`asc-search` 把这些
-文档整理成一个能检索的库：你把需求说给 AI，它返回候选接口文档的路径和用途。
+文档整理成一个能检索的库：调用方提供关键词和结构化条件，获得候选及来源定位。
 
 ### 1.2 它靠什么工作
 
@@ -70,7 +65,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 1. **建立索引**：三类头 → 按适用条件筛选的持久索引（CANN 版本 × 架构 × 层级）。索引是纯派生数据，
    校验不过不出索引，同样输入两次构建结果字节一致。
-2. **使用索引（检索）**：理解需求 → 保障索引就绪 → 多轮查询 → 给出分阶段候选文档。
+2. **使用索引（检索）**：接收结构化条件 → 检查索引新鲜度 → 查询 → 返回 JSON 候选。
 
 ### 1.4 边界
 
@@ -78,142 +73,18 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 - 当前只覆盖 C API（`docs/zh/api/SIMD-API/c_api/`）；其他层级会如实标注"范围外"。
 - 不改文档、不改索引构建产物。
 
-## 2. 怎么用（skill 使用方法）
+## 2. 机器检索接口
 
-### 2.1 接入方式
-
-按前面的[快速开始](#快速开始)安装到智能体的 skill 目录。`asc-search` 的源码统一放在
-`.agent/skills/asc-search/`，安装入口通过软链访问它。若工具不支持自动加载，在对话里补一句
-"按 `.agent/skills/asc-search/SKILL.md` 的流程帮我找……"。
-
-### 2.2 直接提问
-
-把需求用自然语言说给 AI 即可，例如：
-
-- "把 GM 上的数据搬到 UB，用哪个接口？"
-- "想把 half 转成 fp8，有哪些接口？"
-- "asc_xxx 这个接口要搭配什么接口一起用？"
-- "CANN 9.2.0 支持哪些拷贝接口？"
-
-一句话里可以同时带上阶段、数据类型、版本、产品、行为约束（如非对齐、填充），说得越具体候选越准。
-
-示例：你说"在 3510 架构上想对 float 向量逐元素取绝对值"，AI 会先按 3510 架构准备索引，
-再按"操作=absolute、类型=float"查询，返回
-`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md` 及一句话用途；如果需求有歧义，它会先反问你。
-
-### 2.3 skill 给什么结果
-
-回答包含候选接口、文档路径和用途，以及适用条件和待确认事项。
-信息不足时会先澄清；未检索到时会如实说明，不把空结果当成“仓库不支持”。正式检索的输出结构为：
-
-```text
-## 候选
-- 路径: docs/zh/api/SIMD-API/c_api/xxx/yyy.md | API: asc_yyy | 用途: 一句话
-```
-
-返回多个候选且无法确认已覆盖当前需求的全部适用接口时，会在候选列表后注明：
-
-> **候选仅供参考，不代表全量接口。**
-
-下面四张问答卡片来自实际检索与候选文档核对，按 **CANN 9.2.0 × 3510 × C API** 整理。
-卡片将候选压成表格，表中路径相对于检索数据根目录。换版本或架构后，应重新检索，结果可能不同。
-
-<details>
-<summary>问答 1：把 GM 上的数据搬到 UB，用哪个接口？</summary>
-
-**回答来源：** cannbot glm5.3（独立检索后经候选文档核对、整理）。
-
-**答：** 先看 `asc_copy_gm2ub`；搬运长度不是 32 字节整数倍，或需要填充、多维搬运时，再看对应候选。
-
-**候选**
-
-| 接口与文档 | 用途与选择条件 |
-| --- | --- |
-| asc_copy_gm2ub（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md`） | GM→UB，支持连续搬运和高维切分搬运；目的 UB 地址须 32 字节对齐，长度非 32 字节整数倍时需要为 UB 侧补齐写入预留空间。 |
-| asc_copy_gm2ub_align（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md`） | GM→UB，支持搬运长度不是 32 字节整数倍的数据，并补齐至 32 字节对齐；长度仍需满足数据类型的字节对齐要求，起始地址要求见参数说明。填充方式和循环搬运配置按所选原型与参数确定。 |
-| asc_ndim_copy_gm2ub（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md`） | 最多 5 维、各维独立步长的 GM→UB 搬运，支持随路 Padding。 |
-
-以上接口仅在 AIV 上生效。具体选择还需确认数据类型、搬运维度、对齐和填充要求。
-如果本指令与其他指令存在数据依赖，需要插入同步指令（`docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md`），保证多个指令串行化，防止出现异常数据。
-
-</details>
-
-<details>
-<summary>问答 2：想把 half 转成 fp8，有哪些接口？</summary>
-
-**回答来源：** cannbot glm5.3（独立检索后经候选文档核对、整理；饱和配置已按功能接口更新）。
-
-**答：** 当前范围没有检出 half→`fp8_e4m3fn_t` / `fp8_e5m2_t` 的单步转换接口。
-可以继续核对“half→float→fp8”的分步转换候选：
-
-**候选**
-
-| 接口与文档 | 用途 |
-| --- | --- |
-| asc_half2float（`docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md`） | 将 half 矢量寄存器元素转换为 float，作为中间步骤。 |
-| asc_float2e4m3_rn / asc_float2e4m3_rn_sat（`docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md`） | 将 float 转为 `fp8_e4m3fn_t`，分别对应非饱和与饱和形式。 |
-| asc_float2e5m2_rn / asc_float2e5m2_rn_sat（`docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md`） | 将 float 转为 `fp8_e5m2_t`，分别对应非饱和与饱和形式。 |
-
-分步转换前，需要确定目标 fp8 类型、是否采用饱和模式，以及结果的数据布局。
-`asc_half2float` 按位置标签读取源寄存器中的偶数或奇数位置，float→fp8 接口则按位置标签将结果写入目的寄存器中每隔 4 个元素的位置。
-因此，两步转换不会自动得到连续排列的 fp8 数据，需要根据目标布局处理位置选择和结果重排。
-
-如需配置全局饱和模式，使用
-asc_set_saturation_strategy（`docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md`） 选择策略，使用
-asc_set_saturation_flag（`docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md`） 设置对应模式的开关。
-开启 `FLOAT8` 饱和时，应先将策略设为 `USE_GLOBAL`，再依次开启 `FLOAT` 和 `FLOAT8` 饱和。
-转换时还需根据所选接口的文档，确认其饱和或非饱和形式与全局配置的生效条件。
-
-</details>
-
-<details>
-<summary>问答 3：asc_xxx 这个接口要搭配什么接口一起用？</summary>
-
-**回答来源：** cannbot glm5.3（独立检索后经候选文档核对、整理）。
-
-**答：** 请把 `asc_xxx` 换成完整接口名，也可以提供接口文档路径。
-不同接口的配置、同步与条件依赖不同，明确名称后才能检索配套关系。
-
-**补充提问示例：** “asc_ndim_copy_gm2ub 要搭配什么接口一起用？”
-
-如果本指令与其他指令存在数据依赖，需要插入同步指令（`docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md`），保证多个指令串行化，防止出现异常数据。
-
-**候选**
-
-| 配套接口与文档 | 何时使用 |
-| --- | --- |
-| asc_set_ndim_loop0_stride 至 asc_set_ndim_loop4_stride（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md`） | 搬运前配置各维源、目的步长，单位为元素个数。 |
-| asc_set_ndim_pad_count（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md`） | 配置 loop1 至 loop4 的左右填充数；loop0 填充数由搬运接口参数设置。 |
-| asc_set_ndim_pad_value（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md`） | `padding_mode=true` 时，搬运前配置与数据类型一致的常数填充值。 |
-| asc_ndim_copy_dci（`docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md`） | 多核可能读取同一 GM 地址，且数据可能被其他核更新时，搬运前刷新 NDDMA DataCache。 |
-| asc_lock（`docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md`）、asc_unlock（`docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md`） | 核内不同流水存在数据依赖时，3510 架构优先使用这组接口。每组调用须使用相同的 `pipe`、`mutex_id` 和 `mode`，先 lock 后 unlock，且相同 `mutex_id` 的组合不得嵌套。 |
-| asc_sync_notify（`docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md`）、asc_sync_wait（`docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md`） | 通过事件实现核内不同流水之间的同步时，配对发送和等待同一事件。 |
-
-配套关系有各自的触发条件，并非每次搬运都需要调用表中的全部接口。
-
-</details>
-
-<details>
-<summary>问答 4：CANN 9.2.0 支持哪些拷贝接口？</summary>
-
-**答：** 先按目标架构与 CANN 9.2.0 准备索引，再按版本可用性和拷贝操作查询：
+调用方明确数据根、目标版本与架构，先构建独立索引，再进行只读查询：
 
 ```bash
-python3 .agent/skills/asc-search/scripts/ensure_index.py --arch 3510 --cann-version 9.2.0 --json
-python3 .agent/skills/asc-search/scripts/query.py --version 9.2.0 --operation copy
+python3 .agent/skills/asc-search/scripts/build_index.py --root <devkit-root> --out <index-dir> --arch 3510 --cann-version 9.2.0
+python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> --platform 950 --version 9.2.0 --api asc_abs --dtype float
 ```
 
-文档标为 `>=9.0.0`、`>=9.1.0`、`>=9.2.0` 的接口都可以命中，只要目标架构与生命周期条件允许。
-标为 `>=9.3.0` 或已在 9.2.0 移除的接口不命中；已废弃但尚未移除的接口仍返回，需核对其替代接口。
-具体重载的新增、参数和返回值变化仍需结合 `version_changes` 核对。
-
-`--version` 接收目标版本，兼容旧写法 `--version '>=9.2.0'`（同样表示目标 9.2.0）。
-查询版本与索引版本不一致时会报错，须先准备对应版本的索引。
-若要查“9.2.0 有哪些变更”，使用 `--changed-in 9.2.0`。
-
-> **候选仅供参考，不代表全量接口。**
-
-</details>
+非 Git 快照传入 `--source-commit <commit>`；未提供时来源为 `unversioned`，不使用外层仓库 HEAD。
+短关键词与结构化条件求交，输出为 `asc-search-results/1` JSON；候选包含版本上下文、文档、声明和样例位置。
+`--gap` 是独立的缺口登记查询，不与 `--keywords` 组合。查询不联网、不重建索引；索引缺失或过期时返回错误，交由调用方处理。
 
 ## 3. 三类头的标准格式与真实示例
 

@@ -1,6 +1,6 @@
 ---
 name: asc-search
-description: Ascend C API 的 Agent 底层检索。接受短关键词和 API、operation、dtype、版本、产品等结构化条件，返回带文档、声明和样例定位的 JSON 中间结果。面向人的自然语言检索使用 asc-devkit-search。
+description: Ascend C API 的 Agent 底层检索。接受短关键词和 API、operation、dtype、版本、产品等结构化条件，返回带文档、声明和样例定位的 JSON 中间结果。
 ---
 
 # Ascend C API Agent 检索
@@ -14,13 +14,13 @@ description: Ascend C API 的 Agent 底层检索。接受短关键词和 API、o
 无法确认产品或版本时返回 `needs_context`，不能默认 3510，也不能以 2201 猜 A2/A3。
 本机探测每轮上下文复用；不覆盖远端任务目标。
 
-知识仓调用先通过相邻 `asc-devkit-prepare` 准备插件、资源和索引。devkit 内可直接构建：
+调用方负责准备数据和索引；构建入口为：
 
 ```bash
 python3 <skill>/scripts/build_index.py --root <devkit-root> --out <index-dir> --arch <arch> --cann-version <version>
 ```
 
-非 Git 数据快照传 `--source-commit <commit>`。索引按来源提交、目标版本、架构分别存储。
+非 Git 数据快照传 `--source-commit <commit>`。未提供时标记 `unversioned`，不会继承外层仓库提交。索引按来源提交、目标版本、架构分别存储。
 查询只检查新鲜度，不联网、不写索引。原 `ensure_index.py` 仅供显式准备/维护使用，可指定
 `--root`、`--index-root`、`--source-commit`。
 
@@ -34,6 +34,7 @@ python3 <skill>/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
 短关键词以空格分隔，各词 AND，匹配 title/description/family/tags；结构化维度间 AND，
 逗号值内 OR。维度包括 `--stage`、`--operation`、`--category`、`--api-class`、`--dtype`、
 `--convert`、`--feature`、`--kw`、`--api`、`--deps-of`、`--param`、`--enum`、`--changed-in`、`--gap`。
+`--gap` 使用自身查询词，不与 `--keywords` 或文档过滤维度组合。
 CLI 细节见 [index.md](references/index.md)，三类头推导见 [契约](references/index_derivation_contract.md)。
 
 `--version 9.2.0` 匹配首次支持 ≤ 目标版本及生命周期允许的接口，`>=9.0.0` 可命中。
@@ -47,6 +48,6 @@ CLI 细节见 [index.md](references/index.md)，三类头推导见 [契约](refe
 成功含零命中退出 0；缺参、索引缺失或 stale 等错误退出 2。旧 `query.py` 保留内部过滤接口和兼容 CLI。
 
 结果仅为候选。消费 Agent 按需阅读实际文档/声明/样例，保留版本和条件，不能将空结果解释为能力不存在。
-不写文档、注释或样例；增强失败由 knowledge-query 保留原查询结果。
+不写文档、注释或样例；查询失败的回退策略由调用方负责。
 
 维护参考：[目录导航](references/README.md)、[索引结构](references/index-structure.md)、[Agent 查询组合](references/retrieve.md)。

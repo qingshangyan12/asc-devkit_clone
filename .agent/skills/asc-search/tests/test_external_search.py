@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -25,6 +26,7 @@ import build_index  # noqa: E402
 import detect_context  # noqa: E402
 import ensure_index  # noqa: E402
 import search  # noqa: E402
+import query  # noqa: E402
 
 
 def fixture(root):
@@ -127,6 +129,34 @@ class ExternalSearchTests(unittest.TestCase):
                                      index_root=self.index.parent, source_commit='b'*40)
         self.assertTrue(result['actions'])
         self.assertEqual(json.loads((self.index/'index.json').read_text())['meta']['source_commit'], 'b'*40)
+
+    def test_nested_snapshot_never_inherits_enclosing_repository_commit(self):
+        outer = Path(self.temp.name)
+        subprocess.run(['git', 'init', '-q', str(outer)], check=True)
+        subprocess.run(['git', '-C', str(outer), '-c', 'user.name=Fixture', '-c',
+                        'user.email=fixture@example.test', 'commit', '--allow-empty', '-qm', 'fixture'], check=True)
+        commit = subprocess.check_output(['git', '-C', str(outer), 'rev-parse', 'HEAD'], text=True).strip()
+        self.assertEqual(build_index.source_identity(outer, None)[0], commit)
+        self.assertEqual(build_index.source_identity(self.root, None), ('unversioned', ''))
+        self.assertEqual(build_index.source_identity(self.root, 'b'*40), ('b'*40, ''))
+
+    def test_gap_keyword_combination_returns_actionable_json_error(self):
+        import contextlib
+        import io
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = search.main(['--root', str(self.root), '--index-dir', str(self.index),
+                                '--gap', 'copy', '--keywords', 'copy'])
+        self.assertEqual(code, 2)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result['status'], 'error')
+        self.assertIn('--gap cannot be combined with --keywords', result['error'])
+        args = self.args('--gap', 'copy')
+        with mock.patch.object(query, 'load', return_value=(
+                json.loads((self.index/'index.json').read_text()),
+                {'scope_out_gaps': [{'id': 'copy', 'conclusion': 'copy elsewhere',
+                                    'keywords': ['copy'], 'hints': []}], 'relation_gaps': []})):
+            self.assertEqual(search.search(args)['results'][0]['gap_id'], 'copy')
 
     def test_external_dependency_checked_against_data_root(self):
         # Previously this check accidentally read the engine checkout.

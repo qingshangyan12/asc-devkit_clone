@@ -16,8 +16,9 @@
 
 ## 维护规则
 
-- asc-devkit 是 asc-search 与 asc-devkit-search 的规范源；cannbot-knowledge 分发同一核心。
-  交付前运行 `scripts/check_mirrors.py --target <knowledge-repo>`，两个目录（排除运行缓存）须字节一致。
+- asc-devkit 是机器检索 asc-search 的规范源；cannbot-knowledge 分发同一核心，人类包装由知识仓维护。
+  交付前运行 `scripts/check_mirrors.py --source <devkit-repo> --target <knowledge-repo>`，asc-search（排除运行缓存）须字节一致。
+  目录或 manifest 缺失、源和目标指向同一目录时返回错误，不能当作一致。
   运行时自动同步由知识仓前置 skill 管理，不能覆盖本地未提交修改，不自动提交或推送。
 - 推导规则只在《index_derivation_contract.md》维护；流程文档只引用，不复述推导规则。
 - 构建与前置保障只依赖三类头与本 skill `config/`，不得引用其他 skill 的文件。

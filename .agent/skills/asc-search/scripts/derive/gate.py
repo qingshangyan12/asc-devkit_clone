@@ -78,13 +78,14 @@ def detect_cann_version(explicit: str | None, repo_root: Path) -> str:
         return explicit
     home = os.environ.get("ASCEND_HOME_PATH", "")
     if home:
-        match = re.search(r"cann-(\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.]+)?)", home)
+        match = re.search(r"cann-(\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.-]+)?)(?=/|$)", home)
         if match:
             return match.group(1)
     cmake = repo_root / "version.cmake"
     if cmake.is_file():
-        match = re.search(r"VERSION\s+\"(\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.]+)?)\"", cmake.read_text(encoding="utf-8"))
+        match = re.search(r'VERSION\s+"([^"\n]+)"', cmake.read_text(encoding="utf-8"))
         if match:
+            version_key(match.group(1))
             return match.group(1)
     raise ValueError("cannot detect local CANN version; pass --cann-version explicitly")
 

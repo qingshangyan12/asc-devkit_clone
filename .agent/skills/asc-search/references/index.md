@@ -3,7 +3,7 @@
 Agent 公共入口为 `scripts/search.py --root <data-root> --index-dir <instance> --platform <id>`，
 支持 `--keywords <词...>` 与现有维度组合，统一 JSON 输出。数据根与 skill 根独立，
 非 Git 快照构建时传 `--source-commit`；`ensure_index.py --index-root` 仅用于显式准备，
-查询不自动建索引。自然语言交互由相邻 asc-devkit-search 负责。
+查询不自动建索引。自然语言交互由调用方负责。
 
 把已打标文档构建为持久索引，支撑检索流程（[retrieve.md](retrieve.md)）。索引是三类头的
 **纯派生数据**：文档 slim 头（语义）+ include Doxygen/声明（结构）+ examples marker（关联），

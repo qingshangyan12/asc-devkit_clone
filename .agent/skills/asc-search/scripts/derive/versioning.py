@@ -32,12 +32,19 @@ def signature_available(signature: dict[str, Any], events: list[dict[str, Any]],
 
 def deprecation(signature: dict[str, Any], events: list[dict[str, Any]], target: str, arch: str) -> Any:
     value = signature.get("deprecated")
-    if value and value.get("version") and version_key(value["version"]) > version_key(target):
-        value = None
+    if value and (not value.get("version") or version_key(value["version"]) <= version_key(target)):
+        return value
+    candidates = []
     for event in events:
-        if event["kind"] == "deprecated" and version_key(event["since"]) <= version_key(target):
-            if event_applies(event, signature["override_id"], arch) or (
-                event["scope"] == "page" and event.get("scope_basis") != "fallback"
-            ):
-                value = {"version": event["since"], "replacement": (value or {}).get("replacement", "")}
-    return value
+        if event["kind"] != "deprecated" or version_key(event["since"]) > version_key(target):
+            continue
+        if event_applies(event, signature["override_id"], arch):
+            specificity = 0 if "@" in event["scope"] else 1
+        elif event["scope"] == "page" and event.get("scope_basis") != "fallback":
+            specificity = 2
+        else:
+            continue
+        candidates.append((specificity, version_key(event["since"]), event["since"]))
+    if not candidates:
+        return None
+    return {"version": min(candidates)[2], "replacement": ""}

@@ -606,6 +606,8 @@ def source_identity(root: Path, source_commit: str | None) -> tuple[str, str]:
     if source_commit:
         return source_commit, ""
     try:
+        if Path(git_output(["rev-parse", "--show-toplevel"], root)).resolve() != root.resolve():
+            return "unversioned", ""
         return git_output(["rev-parse", "HEAD"], root), git_output(["log", "-1", "--format=%cI"], root)
     except (subprocess.CalledProcessError, OSError):
         return "unversioned", ""
