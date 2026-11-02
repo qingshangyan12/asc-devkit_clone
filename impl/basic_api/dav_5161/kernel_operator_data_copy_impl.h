@@ -299,7 +299,7 @@ __aicore__ inline void DataCopyL12BTImpl(
     if constexpr (std::is_same<T, half>::value) {
         fixVal = intriParams.fixShiftVal == 0 ? FIX_VAL : intriParams.fixShiftVal;
     }
-    if constexpr (std::is_same<T, float>::value || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
+    if constexpr (std::is_same<T, bfloat16_t>::value || std::is_same<T, float>::value || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
         // the destination gap size must be even.
         uint16_t dstStrideAlign = AlignUp(intriParams.dstStride, 2);
         copy_cbuf_to_bt(
