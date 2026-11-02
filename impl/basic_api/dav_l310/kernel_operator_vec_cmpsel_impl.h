@@ -866,86 +866,7 @@ __aicore__ inline void VcmpvsImpl(
     __ubuf__ U* dst, __ubuf__ T* src0, const T src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        __ubuf__ uint64_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
-        switch (cmpMode) {
-            case CMPMODE::LT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::GT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::EQ: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::LE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::GE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::NE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
-                    dst, src0, src1, mask[0], tempBuf, repeatParams);
-                break;
-            }
-            default:
-                break;
-        }
-        AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
-    } else {
-        if constexpr (isSetMask) {
-            SetVectorMask<T>(mask[1], mask[0]);
-        }
-        switch (cmpMode) {
-            case CMPMODE::LT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::GT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::EQ: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::LE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::GE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::NE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, true, isSetMask>(
-                    dst, src0, src1, 0, repeatTime, repeatParams);
-                break;
-            }
-            default:
-                break;
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Compares Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U, bool isSetMask = true>
@@ -953,83 +874,7 @@ __aicore__ inline void VcmpvsImpl(
     __ubuf__ U* dst, __ubuf__ T* src0, const T src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        __ubuf__ uint64_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
-        switch (cmpMode) {
-            case CMPMODE::LT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::GT: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::EQ: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::LE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::GE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            case CMPMODE::NE: {
-                CompareScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
-                    dst, src0, src1, mask, tempBuf, repeatParams);
-                break;
-            }
-            default:
-                break;
-        }
-        AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
-    } else {
-        switch (cmpMode) {
-            case CMPMODE::LT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LT, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::GT: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GT, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::EQ: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::EQ, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::LE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::LE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::GE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::GE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            case CMPMODE::NE: {
-                CompareScalarLevel0NormalMode<T, U, CMPMODE::NE, false, isSetMask>(
-                    dst, src0, src1, mask, repeatTime, repeatParams);
-                break;
-            }
-            default:
-                break;
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Compares Level 0 is not supported on current device!"); });
 }
 
 // CompareScalar::Level 2
@@ -1668,23 +1513,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-            VF_CALL<SelectMode0Level0<T, U, false, true>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            VF_CALL<SelectMode2Level0<T, U, false, true>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        }
-    } else {
-        if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-            VF_CALL<SelectMode0Level0<T, U, false, false>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            VF_CALL<SelectMode2Level0<T, U, false, false>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U>
@@ -1692,24 +1521,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    SetVectorMask<T>(mask[1], mask[0]);
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-            VF_CALL<SelectMode0Level0<T, U, true, true>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            VF_CALL<SelectMode2Level0<T, U, true, true>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        }
-    } else {
-        if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-            VF_CALL<SelectMode0Level0<T, U, true, false>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            VF_CALL<SelectMode2Level0<T, U, true, false>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 // ============ select mode: 1 ============
 // ================Level0====================
@@ -1824,15 +1636,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, const uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        VF_CALL<SelectMode1Level0<T, U, false, true>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-    } else {
-        VF_CALL<SelectMode1Level0<T, U, false, false>>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U>
@@ -1840,16 +1644,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, const uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    SetVectorMask<T>(mask[1], mask[0]);
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        VF_CALL<SelectMode1Level0<T, U, true, true>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-    } else {
-        VF_CALL<SelectMode1Level0<T, U, true, false>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 // ===============  Src0 Scalar =====================
@@ -1951,15 +1746,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        SelectSrc0ScalarMode1Level0<T, U, false, true>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-    } else {
-        SelectSrc0ScalarMode1Level0<T, U, false, false>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U>
@@ -1967,16 +1754,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    SetVectorMask<T>(mask[1], mask[0]);
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        SelectSrc0ScalarMode1Level0<T, U, true, true>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-    } else {
-        SelectSrc0ScalarMode1Level0<T, U, true, false>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 // both src0 / src1 are tensor
@@ -2149,27 +1927,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        if constexpr (sizeof(T) == 2) {
-            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B16, true>(
-                dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        } else if constexpr (sizeof(T) == 4) {
-            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B32, true>(
-                dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        }
-    } else {
-        if constexpr (sizeof(T) == 2) {
-            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B16, false>(
-                dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        } else if constexpr (sizeof(T) == 4) {
-            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B32, false>(
-                dst, sel, src0, src1, mask, repeatTime, repeatParams);
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U, uint8_t scalarIdx>
@@ -2177,28 +1935,7 @@ __aicore__ inline void VselImpl(
     __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask[],
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(), "current data type is not supported!");
-    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
-    SetVectorMask<T>(mask[1], mask[0]);
-    bool isCounterMode = Internal::IsCounterMode();
-    if (isCounterMode) {
-        if constexpr (sizeof(T) == 2) {
-            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B16, true>(
-                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        } else if constexpr (sizeof(T) == 4) {
-            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B32, true>(
-                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        }
-    } else {
-        if constexpr (sizeof(T) == 2) {
-            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B16, false>(
-                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        } else if constexpr (sizeof(T) == 4) {
-            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B32, false>(
-                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
-        }
-    }
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Select Level 0 is not supported on current device!"); });
 }
 
 // ============ select mode: 1 ============

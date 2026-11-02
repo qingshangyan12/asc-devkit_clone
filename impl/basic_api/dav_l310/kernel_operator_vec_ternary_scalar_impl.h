@@ -180,11 +180,7 @@ __aicore__ inline void AxpyImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
-        "current data type is not supported on current device!");
-    constexpr auto func = RegAxpy::Axpy<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
-    Internal::VecAxpyImplTemplate<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Axpy Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U, bool isSetMask = true>
@@ -192,12 +188,7 @@ __aicore__ inline void AxpyImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
-        "current data type is not supported on current device!");
-    constexpr auto func = RegAxpy::Axpy<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
-    Internal::VecAxpyImplTemplate<func, isSetMask, false>(
-        dst, src, scalarValue, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Axpy Level 0 is not supported on current device!"); });
 }
 
 // Axpy::Level 2

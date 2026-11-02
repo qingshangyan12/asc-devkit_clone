@@ -383,8 +383,7 @@ __aicore__ inline void AddDeqReluImpl(
     __ubuf__ half* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    constexpr auto func = RegAddDeqRelu::AddDeqRelu<float, Reg::RegTensor<int32_t>, Reg::RegTensor<half>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddDeqRelu Level 0 is not supported on current device!"); });
 }
 
 template <bool isSetMask = true>
@@ -392,8 +391,7 @@ __aicore__ inline void AddDeqReluImpl(
     __ubuf__ half* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    constexpr auto func = RegAddDeqRelu::AddDeqRelu<float, Reg::RegTensor<int32_t>, Reg::RegTensor<half>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddDeqRelu Level 0 is not supported on current device!"); });
 }
 
 /* **************************************************************************************************
@@ -426,16 +424,7 @@ __aicore__ inline void MulAddDstImpl(
     __ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint64_t mask[2], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
-        "Failed to "
-        "check dtype in MulAddDst, current api support dtype combination is src: half, dst: half / float; src: float, "
-        "dst: float.");
-    Reg::RegTensor<half> fp16RegTemp;
-    Reg::RegTensor<float> castReg1, castReg2;
-    constexpr auto func = RegMulAddDst::MulAddDst<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MulAddDst Level 0 is not supported on current device!"); });
 }
 
 template <typename T, typename U, bool isSetMask>
@@ -443,14 +432,7 @@ __aicore__ inline void MulAddDstImpl(
     __ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<float, half>>(),
-        "Failed to "
-        "check dtype in MulAddDst, current api support dtype combination is src: half, dst: half / float; src: float, "
-        "dst: float.");
-    constexpr auto func = RegMulAddDst::MulAddDst<T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MulAddDst Level 0 is not supported on current device!"); });
 }
 
 /* **************************************************************************************************
@@ -519,11 +501,7 @@ __aicore__ inline void AddReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float, int16_t>(), "Failed to check dtype in AddRelu, current api support "
-                                                "dtype combination is src and dst both: half / float / int16_t.");
-    constexpr auto func = RegAddRelu::AddRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddRelu Level 0 is not supported on current device!"); });
 }
 
 template <typename T, bool isSetMask = true>
@@ -531,11 +509,7 @@ __aicore__ inline void AddReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float, int16_t>(), "Failed to check dtype in AddRelu, current api support "
-                                                "dtype combination is src and dst both: half / float / int16_t.");
-    constexpr auto func = RegAddRelu::AddRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddRelu Level 0 is not supported on current device!"); });
 }
 
 // AddRelu::Level 2
@@ -586,12 +560,7 @@ __aicore__ inline void FusedMulAddImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[], const uint8_t repeatTimes,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
-                                       "combination is src and dst both: half/float.");
-    constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, mask, 0, repeatTimes, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulAdd Level 0 is not supported on current device!"); });
 }
 
 template <typename T, bool isSetMask = true>
@@ -599,12 +568,7 @@ __aicore__ inline void FusedMulAddImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTimes,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float>(), "Failed to check dtype in FusedMulAdd, current api support dtype "
-                                       "combination is src and dst both: half/float.");
-    constexpr auto func = Reg::FusedMulDstAdd<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, nullptr, mask, repeatTimes, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulAdd Level 0 is not supported on current device!"); });
 }
 
 template <typename T, bool isSetMask = true>
@@ -666,12 +630,7 @@ __aicore__ inline void FusedMulAddReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float>(), "Failed to check dtype in FusedMulAddRelu, current api support dtype "
-                                       "combination is src and dst both: half / float.");
-    constexpr auto func = RegFusedMulAddRelu::FusedMulAddRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulAddRelu Level 0 is not supported on current device!"); });
 }
 
 template <typename T, bool isSetMask = true>
@@ -679,12 +638,7 @@ __aicore__ inline void FusedMulAddReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float>(), "Failed to check dtype in FusedMulAddRelu, current api support dtype "
-                                       "combination is src and dst both: half / float.");
-    constexpr auto func = RegFusedMulAddRelu::FusedMulAddRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false, Internal::BinaryFuncMode::DST_SRC_INPUT>(
-        dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulAddRelu Level 0 is not supported on current device!"); });
 }
 
 /* **************************************************************************************************
@@ -755,11 +709,7 @@ __aicore__ inline void SubReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[], const uint8_t repeatTimes,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float, int16_t>(), "Failed to check dtype in SubRelu, current api support dtype "
-                                                "combination is src and dst both: half / float / int16_t.");
-    constexpr auto func = RegSubRelu::SubRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTimes, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubRelu Level 0 is not supported on current device!"); });
 }
 
 template <typename T, bool isSetMask = true>
@@ -767,11 +717,7 @@ __aicore__ inline void SubReluImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTimes,
     const BinaryRepeatParams& repeatParams)
 {
-    static_assert(
-        SupportType<T, half, float, int16_t>(), "Failed to check dtype in SubRelu, current api support dtype "
-                                                "combination is src and dst both: half / float / int16_t.");
-    constexpr auto func = RegSubRelu::SubRelu<T, Reg::RegTensor<T>>;
-    Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTimes, repeatParams);
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubRelu Level 0 is not supported on current device!"); });
 }
 
 /* **************************************************************************************************
