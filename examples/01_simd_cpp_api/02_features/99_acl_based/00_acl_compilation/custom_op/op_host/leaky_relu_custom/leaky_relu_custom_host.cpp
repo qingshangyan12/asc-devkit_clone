@@ -13,18 +13,21 @@
 
 namespace optiling {
 const uint32_t NUM_BLOCKS = 8;
-const uint32_t TILE_NUM = 16;
 
 static ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     LeakyReluCustomTilingData* tiling = context->GetTilingData<LeakyReluCustomTilingData>();
     uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+    constexpr uint32_t tileGroupLength = NUM_BLOCKS * LEAKY_RELU_TILE_LENGTH * LEAKY_RELU_BUFFER_NUM;
+    if (totalLength == 0 || totalLength % tileGroupLength != 0) {
+        return ge::GRAPH_FAILED;
+    }
     const gert::RuntimeAttrs* attrs = context->GetAttrs();
     const float* negativeSlope = attrs->GetAttrPointer<float>(0);
 
     context->SetSimdNumBlocks(NUM_BLOCKS);
     tiling->totalLength = totalLength;
-    tiling->tileNum = TILE_NUM;
+    tiling->tileNum = totalLength / tileGroupLength;
     tiling->negativeSlope = *negativeSlope;
     size_t* currentWorkspace = context->GetWorkspaceSizes(1);
     currentWorkspace[0] = 0;

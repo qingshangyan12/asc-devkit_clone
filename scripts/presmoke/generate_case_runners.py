@@ -39,6 +39,7 @@ SPECIAL_PREFIXES = (
 )
 
 CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
+ONNX_PLUGIN_CASE = "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin"
 PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
 TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming"
 TILING_SINK_GENERATE_TASK_PATTERN_PREFIX = (
@@ -729,13 +730,21 @@ def render_runner(spec: RunnerRenderSpec) -> str:
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
     inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
+    run_lines = [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]
+    verify_lines = indent_commands(spec.verify_cmds, default_cd_build=True)
+    if spec.rel == ONNX_PLUGIN_CASE:
+        run_lines = ["    (", *("    " + line for line in run_lines), '    ) 2>&1 | tee "$BUILD_DIR/run.log"']
+        verify_lines = [
+            '    grep -Fxq "test pass" "$BUILD_DIR/run.log"',
+            r'    ! grep -Eq "^\[ERROR\]|^test failed" "$BUILD_DIR/run.log"',
+        ]
     lines = [
         *runner_header(spec),
         *runner_function(
             "case_build", [*build_prefix, *indent_commands(spec.build_cmds, inject_cmake_arch=inject_cmake_arch)]
         ),
-        *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
-        *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
+        *runner_function("case_run", run_lines),
+        *runner_function("case_verify", verify_lines),
         "case_clean() {",
         "    presmoke_default_clean",
         "}",

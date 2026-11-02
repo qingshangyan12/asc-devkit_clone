@@ -18,13 +18,14 @@
 #include "acl/acl_mdl.h"
 #include "acl/acl_rt.h"
 
-#define CHECK_ACL(expr)                                                                                 \
-    do {                                                                                                \
-        auto __ret = (expr);                                                                            \
-        int32_t __code = static_cast<int32_t>(__ret);                                                   \
-        if (__code != 0) {                                                                              \
-            fprintf(stderr, "[ERROR] %s failed at %s:%d, ret=%d\n", #expr, __FILE__, __LINE__, __code); \
-        }                                                                                               \
+#define CHECK_ACL(expr)                                                                               \
+    do {                                                                                              \
+        auto ret = (expr);                                                                            \
+        int32_t code = static_cast<int32_t>(ret);                                                     \
+        if (code != 0) {                                                                              \
+            fprintf(stderr, "[ERROR] %s failed at %s:%d, ret=%d\n", #expr, __FILE__, __LINE__, code); \
+            return 1;                                                                                 \
+        }                                                                                             \
     } while (0)
 
 int32_t main(int32_t argc, char** argv)
@@ -82,7 +83,7 @@ int32_t main(int32_t argc, char** argv)
 
     bool pass = true;
     for (int64_t i = 0; i < elementCount; ++i) {
-        if (std::fabs(output0HostData[i] - goldenData[i]) > 1e-5f) {
+        if (!std::isfinite(output0HostData[i]) || std::fabs(output0HostData[i] - goldenData[i]) > 1e-5f) {
             printf(
                 "test failed at index %ld, output0HostData[i] = %.6f, goldenData[i] = %.6f\n", i, output0HostData[i],
                 goldenData[i]);
@@ -103,5 +104,5 @@ int32_t main(int32_t argc, char** argv)
     CHECK_ACL(aclrtDestroyStream(stream));
     CHECK_ACL(aclrtResetDevice(deviceId));
     CHECK_ACL(aclFinalize());
-    return 0;
+    return pass ? 0 : 1;
 }

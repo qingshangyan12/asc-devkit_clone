@@ -27,12 +27,15 @@ case_build() {
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./execute_leaky_relu_op)
+    (
+        (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./execute_leaky_relu_op)
+    ) 2>&1 | tee "$BUILD_DIR/run.log"
 }
 
 case_verify() {
     mkdir -p "$BUILD_DIR"
-    :
+    grep -Fxq "test pass" "$BUILD_DIR/run.log"
+    ! grep -Eq "^\[ERROR\]|^test failed" "$BUILD_DIR/run.log"
 }
 
 case_clean() {
