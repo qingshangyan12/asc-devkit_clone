@@ -1380,6 +1380,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sin(half2 x)
     return x;
 }
 
+#if (__NPU_ARCH__ == 9201)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp(half x)
+{
+    half y = __float2half_rn(__expf(__half2float(x)));
+
+    // Two inputs need a -1 ULP correction: 0.007297515869140625 (half bits 0x1F79) and
+    // 0.0226898193359375 (half bits 0x25CF). Both results land in [1, 2), where 1 ULP = 2^-10.
+    half tmp = 0;
+    if (x == static_cast<half>(0.007297515869140625f) || x == static_cast<half>(0.0226898193359375f)) {
+        tmp = static_cast<half>(-0.0009765625f);
+    }
+
+    return __fma(y, static_cast<half>(1.0f), tmp);
+}
+#else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp(half x)
 {
     half y = __expf(x);
@@ -1393,6 +1408,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp(half x)
 
     return __fma(y, static_cast<half>(1.0f), tmp);
 }
+#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp(half2 x)
 {
