@@ -649,14 +649,12 @@ HcclResult AicpuKfcUtils::ReadCompactExtFromMemory(
         return HCCL_E_PARA;
     }
 
-    const u32 ctrl = static_cast<u32>(msg.strideCount);
+    const u64 ctrlXor = msg.strideCount;
+    const u32 ctrl = static_cast<u32>(ctrlXor >> 32U);
     if (ctrl != HCCL_MSG_EXT_COMPACT_CTRL) {
         return HCCL_E_PARA;
     }
-    // The compact XOR is carried in normal HcclMsg.addMsg.v1Msg.xorCheck's upper bits
-    // by the client. Keep this read function independent of normal-message checksum
-    // by deriving the same value from the message block.
-    const u32 xorCheck = msg.addMsg.v1Msg.xorCheck ^ HCCL_MSG_EXT_COMPACT_CTRL;
+    const u32 xorCheck = static_cast<u32>(ctrlXor & 0xFFFFFFFFU);
 
     u64 actualXor = HCCL_MSG_EXT_COMPACT_CTRL;
     const u64* send = reinterpret_cast<const u64*>(src->sendCounts);
