@@ -57,6 +57,7 @@ ASC_HOST_CHECK_CONDITION(condition, violation_message)
 
 ## 调用示例
 
+<!-- npu="A3,910b" id8 -->
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。本示例使用`asc_add`接口仅在[NPU架构版本2201](../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)下支持，因此编译命令中的`--npu-arch`参数固定为`dav-2201`。
 
 编译运行命令如下：
@@ -143,3 +144,4 @@ int main()
 - `src0_device is nullptr.`：由宏参数`violation_message`得到，即调用方传入的自定义错误信息。
 - `example.asc`：发生条件检查的源文件。
 - `46`：调用`ASC_HOST_CHECK_CONDITION`的源代码行号。假设将以上代码块保存为`example.asc`，并以第一行`#include`作为第1行，则第一次调用位于第46行；代码增删后行号会相应变化。
+<!-- end id8 -->
