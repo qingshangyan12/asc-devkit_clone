@@ -135,7 +135,11 @@ __aicore__ inline bool Load3DBitModeParam::GetFilterSizeH() const { return confi
 __aicore__ inline bool Load3DBitModeParam::GetTranspose() const { return config1BitMode.GetTranspose(); };
 __aicore__ inline bool Load3DBitModeParam::GetFMatrixCtrl() const { return config1BitMode.GetFMatrixCtrl(); };
 __aicore__ inline uint16_t Load3DBitModeParam::GetChannelSize() const { return config1BitMode.GetChannelSize(); };
+#endif
 
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || \
+     __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 __aicore__ inline SetFMatrixBitModeParams::SetFMatrixBitModeParams() { config0 = 0; };
 template <typename T>
 __aicore__ inline SetFMatrixBitModeParams::SetFMatrixBitModeParams(const LoadData3DParamsV2<T>& loadData3DParams_)
