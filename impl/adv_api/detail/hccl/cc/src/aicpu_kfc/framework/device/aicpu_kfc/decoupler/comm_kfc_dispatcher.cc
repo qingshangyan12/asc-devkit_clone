@@ -79,24 +79,10 @@ HcclResult GetCurrentMsg(AscCommServerInfo& server)
 
     if (static_cast<HcclCMDType>(server.msg.commType.prepareType) == HCCL_CMD_ALLTOALLV) {
         const u32 rankNum = server.serverIns.GetRankNum();
-        const u32 extCtrl = static_cast<u32>(server.msg.strideCount);
+        const u32 extCtrl = static_cast<u32>(server.msg.strideCount >> 32U);
         if (extCtrl == HCCL_MSG_EXT_COMPACT_CTRL) {
             ret = AicpuKfcUtils::ReadCompactExtFromMemory(
                 msgBaseAddr.paramExtMsgList + server.msgPos, rankNum, server.msg, *(server.extMsg));
-        } else if (extCtrl == HCCL_MSG_EXT_UNIFORM_CTRL) {
-            if (server.msg.dataCnt == 0UL || server.msg.dataCnt > 0xFFFFFFFFULL) {
-                ret = HCCL_E_PARA;
-            } else {
-                HcclMsgExt& ext = *(server.extMsg);
-                const u64 count = server.msg.dataCnt;
-                for (u32 i = 0; i < rankNum; ++i) {
-                    ext.sendCounts[i] = count;
-                    ext.sendOffset[i] = count * i;
-                    ext.recvCounts[i] = count;
-                    ext.recvOffset[i] = count * i;
-                }
-                ret = HCCL_SUCCESS;
-            }
         } else {
             ret = AicpuKfcUtils::ReadMsgFromMemory(
                 msgBaseAddr.paramExtMsgList + server.msgPos, rankNum, *(server.extMsg));

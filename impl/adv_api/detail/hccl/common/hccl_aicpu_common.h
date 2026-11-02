@@ -180,36 +180,6 @@ __aicore__ inline void AssembleHcclMsgV2(
 }
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-// Uniform A5 fast path: count/offsets are derived from one count value, so
-// AlltoAllV can reuse the normal AlltoAll-style message without ext publication.
-__aicore__ inline void AssembleHcclMsgV2Uniform(const CommonPrepareParam& param, HcclTilingVersion ver,
-    HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst, uint64_t uniformCount)
-{
-    HcclMsg tmp{};
-    tmp.commType.msgType = param.commType.msgType;
-    tmp.opType = param.op;
-    tmp.sendBuffer = reinterpret_cast<uint64_t>(param.sendBuf);
-    tmp.recvBuffer = reinterpret_cast<uint64_t>(param.recvBuf);
-    tmp.dataCnt = uniformCount;
-    tmp.strideCount = HCCL_MSG_EXT_UNIFORM_CTRL;
-    if (ver == HcclTilingVersion::DEPRECATED_TILING_VERSION) {
-        tmp.addMsg.v0Msg.hcclDataType = param.dataType;
-        tmp.addMsg.v0Msg.repeatCnt = param.repeat;
-        tmp.addMsg.v0Msg.selfHandleID = handle;
-        tmp.addMsg.v0Msg.seqNum = static_cast<uint8_t>(handle);
-        tmp.addMsg.v0Msg.version = ver;
-    } else {
-        tmp.addMsg.v1Msg.ccOpTilingData = tiling;
-        tmp.addMsg.v1Msg.hcclDataType = param.dataType;
-        tmp.addMsg.v1Msg.repeatCnt = param.repeat;
-        tmp.addMsg.v1Msg.selfHandleID = handle;
-        tmp.addMsg.v1Msg.seqNum = static_cast<uint8_t>(handle);
-        tmp.addMsg.v1Msg.version = ver;
-    }
-    tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;
-    CopyHcclMsg(reinterpret_cast<const uint8_t*>(&tmp), dst);
-}
-
 __aicore__ inline void AssembleHcclMsgV2Compact(const CommonPrepareParam& param, HcclTilingVersion ver,
     HcclHandle handle, uint64_t tiling, __gm__ HcclMsg* dst, uint64_t extCtrl, uint64_t extXor)
 {
@@ -234,7 +204,7 @@ __aicore__ inline void AssembleHcclMsgV2Compact(const CommonPrepareParam& param,
         tmp.addMsg.v1Msg.seqNum = static_cast<uint8_t>(handle);
         tmp.addMsg.v1Msg.version = ver;
     }
-    tmp.strideCount = HCCL_MSG_EXT_COMPACT_CTRL;
+    tmp.strideCount = (extCtrl << 32U) | extXor;
     tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;
     CopyHcclMsg(reinterpret_cast<const uint8_t*>(&tmp), dst);
 }

@@ -129,11 +129,10 @@ struct alignas(64) HcclMsgExt {
     uint64_t xorCheck;     // set by api, checked by server to ensure msg integrity
 };
 
-// A5 compact layout for common small AllToAllV parameters. Each rank uses two
-// 64-bit words, so eight ranks fit in two cache lines instead of four.
-constexpr uint32_t HCCL_MSG_EXT_COMPACT_MAX = 8U;
+// A5 compact layout for common small AllToAllV parameters. Each rank uses one
+// packed send word and one packed recv word, halving both writes and cacheline
+// publication compared with the legacy four-array layout.
 constexpr uint32_t HCCL_MSG_EXT_COMPACT_CTRL = 0xA5A5C0DEU;
-constexpr uint32_t HCCL_MSG_EXT_UNIFORM_CTRL = 0xA5A55555U;
 constexpr bool CanUseHcclMsgExtCompact(uint64_t count)
 {
     return count <= 0xFFFFFFFFULL;
