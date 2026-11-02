@@ -526,7 +526,7 @@ OpParam MakeResolveParam(HcclCMDType cmd, CommEngine engine)
 }
 } // namespace
 
-// golden：36 个 (引擎×op×外部名) 组合的定名全覆盖，期望值与注册现场 sidecar 表逐行核对
+// golden：45 个 (引擎×op×外部名) 组合的定名全覆盖，期望值与注册现场 sidecar 表逐行核对
 // （grep REGISTER_ALG_META 可复核）
 TEST(ExtAlgResolver, GoldenAllEngines)
 {
@@ -578,7 +578,7 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "AicpuAllToAllVSoleMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh.pairwise]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllVSolePairwise"},
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllVSoleMeshMultiJetty"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllVSoleMeshConcurrent"},
@@ -754,9 +754,10 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：33 个 (op,外部名) 键（54 行归并；MultiLink
-    // 外部名修正为 sole[nhr.multi_channel] 后自 AG sole[nhr] 键分立，新增该键）；
-    // 43 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 覆盖数锚（限 5 个集合通信 CMD）：34 个 (op,外部名) 键（55 行归并；MultiLink
+    // 外部名修正为 sole[nhr.multi_channel]、MultiJetty 修正为 sole[mesh.multi_channel]
+    // 后各自从原裸名键分立，新增这两个键）；
+    // 44 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
     const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
     size_t keyCount = 0;
@@ -774,8 +775,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         }
         comboCount += engines.size();
     }
-    EXPECT_EQ(keyCount, 33U);
-    EXPECT_EQ(comboCount, 43U);
+    EXPECT_EQ(keyCount, 34U);
+    EXPECT_EQ(comboCount, 44U);
 }
 
 TEST(ExtAlgResolver, SpecificityOrdering)
