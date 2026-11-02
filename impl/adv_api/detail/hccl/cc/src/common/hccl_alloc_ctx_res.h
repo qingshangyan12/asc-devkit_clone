@@ -50,6 +50,7 @@ constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
 constexpr uint32_t RES_IDX_CCL_BUFFER_ADDR = 3U;
 constexpr uint32_t RES_IDX_CCL_BUFFER_SIZE = 4U;
+
 struct Mc2ServerCfg {
     uint32_t version;
     uint8_t debugMode;

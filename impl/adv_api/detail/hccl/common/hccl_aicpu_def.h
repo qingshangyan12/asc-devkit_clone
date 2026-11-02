@@ -111,9 +111,7 @@ private:
         HcclHandle srcHandleID, uint64_t tiling, bool compactExt, uint64_t extCtrl, uint64_t extXor);
 
     __aicore__ inline void SendMsgToServer(
-        const AlltoAllVParamExt& para, uint32_t rankNum, bool compactExt, uint64_t& extCtrl, uint64_t& extXor);
-
-    __aicore__ inline bool CanUseExtCompact(const AlltoAllVParamExt& para, uint32_t rankNum);
+        const AlltoAllVParamExt& para, uint32_t rankNum, uint64_t& extCtrl, uint64_t& extXor, bool& compactExt);
 
     __aicore__ inline uint16_t GetStepSizeByHandle(HcclHandle handle);
 

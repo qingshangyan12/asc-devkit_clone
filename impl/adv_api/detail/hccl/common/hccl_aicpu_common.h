@@ -38,28 +38,11 @@ __aicore__ inline void CopyHcclMsg(const uint8_t* src, __gm__ HcclMsg* dst)
 __aicore__ inline void AssembleHcclMsgExt(const AlltoAllVParamExt& param, uint32_t rankDim, __gm__ HcclMsgExt* dst)
 {
     uint64_t xorCheck = 0U;
-    // Keep one index for all four rank-indexed arrays; the final GM layout is unchanged.
-    __gm__ uint64_t* const dstSendCounts = dst->sendCounts;
-    __gm__ uint64_t* const dstSendOffsets = dst->sendOffset;
-    __gm__ uint64_t* const dstRecvCounts = dst->recvCounts;
-    __gm__ uint64_t* const dstRecvOffsets = dst->recvOffset;
-    const uint64_t* const srcSendCounts = param.sendCounts;
-    const uint64_t* const srcSendOffsets = param.sdispls;
-    const uint64_t* const srcRecvCounts = param.recvCounts;
-    const uint64_t* const srcRecvOffsets = param.rdispls;
     for (uint32_t i = 0U; i < rankDim; ++i) {
-        const uint64_t sendCount = srcSendCounts[i];
-        const uint64_t sendOffset = srcSendOffsets[i];
-        const uint64_t recvCount = srcRecvCounts[i];
-        const uint64_t recvOffset = srcRecvOffsets[i];
-        dstSendCounts[i] = sendCount;
-        dstRecvCounts[i] = recvCount;
-        dstSendOffsets[i] = sendOffset;
-        dstRecvOffsets[i] = recvOffset;
-        xorCheck ^= sendCount;
-        xorCheck ^= sendOffset;
-        xorCheck ^= recvCount;
-        xorCheck ^= recvOffset;
+        xorCheck ^= dst->sendCounts[i] = param.sendCounts[i];
+        xorCheck ^= dst->sendOffset[i] = param.sdispls[i];
+        xorCheck ^= dst->recvCounts[i] = param.recvCounts[i];
+        xorCheck ^= dst->recvOffset[i] = param.rdispls[i];
     }
     dst->xorCheck = (xorCheck ^ HCCL_MSG_VALID_MASK);
     dst->valid = HCCL_MSG_VALID_MASK;
@@ -75,17 +58,9 @@ __aicore__ inline void AssembleHcclMsgExtCompact(
     uint64_t xorCheck = HCCL_MSG_EXT_COMPACT_CTRL;
     __gm__ uint64_t* const dstSend = reinterpret_cast<__gm__ uint64_t*>(dst->sendCounts);
     __gm__ uint64_t* const dstRecv = reinterpret_cast<__gm__ uint64_t*>(dst->recvCounts);
-    const uint64_t* const srcSendCounts = param.sendCounts;
-    const uint64_t* const srcSendOffsets = param.sdispls;
-    const uint64_t* const srcRecvCounts = param.recvCounts;
-    const uint64_t* const srcRecvOffsets = param.rdispls;
     for (uint32_t i = 0U; i < rankDim; ++i) {
-        const uint64_t sendValue = ((srcSendCounts[i] << 32U) | srcSendOffsets[i]);
-        const uint64_t recvValue = ((srcRecvCounts[i] << 32U) | srcRecvOffsets[i]);
-        dstSend[i] = sendValue;
-        dstRecv[i] = recvValue;
-        xorCheck ^= sendValue;
-        xorCheck ^= recvValue;
+        xorCheck ^= dstSend[i] = ((param.sendCounts[i] << 32U) | param.sdispls[i]);
+        xorCheck ^= dstRecv[i] = ((param.recvCounts[i] << 32U) | param.rdispls[i]);
     }
     extCtrl = HCCL_MSG_EXT_COMPACT_CTRL;
     extXor = xorCheck;
