@@ -440,6 +440,13 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
+    // 诊断插帧（用完必删）：零时长 Wait 标记。profile 上按"单次=算法开始（唤醒/参数加载结束）、
+    // 连续两次=算法结束（kernel 指令流全部完成）"辨认；双 mission 两 server 实例各有一组标记，
+    // 聚合读法取本轮最早单次标记与最晚连续双击标记。PostSync 边界另用本轮最后一组
+    // 连续 channel NotifyWait 读出。
+    ccu::Event diagEvent;
+    constexpr uint16_t DIAG_MARKER_MASK = 1U;
+
     CCU_WHILE(repeatCond == 0)
     {
         CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
@@ -448,8 +455,16 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            // 诊断插帧（用完必删）：算法开始标记
+            CCU_CHK_RET(ccu::EventRecord(diagEvent, DIAG_MARKER_MASK));
+            CCU_CHK_RET(ccu::EventWait(diagEvent, DIAG_MARKER_MASK));
             DispatchKfcSubKernel(param, ctx, recordAddr);
             MissionPostSync(ctx);
+            // 诊断插帧（用完必删）：算法结束标记（连续两次）
+            CCU_CHK_RET(ccu::EventRecord(diagEvent, DIAG_MARKER_MASK));
+            CCU_CHK_RET(ccu::EventWait(diagEvent, DIAG_MARKER_MASK));
+            CCU_CHK_RET(ccu::EventRecord(diagEvent, DIAG_MARKER_MASK));
+            CCU_CHK_RET(ccu::EventWait(diagEvent, DIAG_MARKER_MASK));
             // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
             // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
             if (!KernelEmitsEarlyTurnEnd(ctx)) {
