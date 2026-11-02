@@ -249,8 +249,7 @@ __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src
             reinterpret_cast<__gm__ float*>(dst) + copiedBytes / sizeof(float),
             reinterpret_cast<__cc__ float*>(src) + copiedBytes / sizeof(float), 0, n, m, m * blockCube, m, 0, 0, 0,
             static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false,
-            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true, false, false,
-            false);
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true, false, false, false);
         copiedBytes += chunkBytes;
     }
     return 0;

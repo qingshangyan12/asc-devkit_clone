@@ -16,7 +16,9 @@
 
 // Use the device debug utilities with the existing CPU instruction stubs.
 struct float4_e2m1x2_t;
-namespace __cce_scalar { using ::copy_ubuf_to_ubuf; }
+namespace __cce_scalar {
+using ::copy_ubuf_to_ubuf;
+}
 #pragma push_macro("ASCENDC_CPU_DEBUG")
 #undef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
@@ -77,11 +79,14 @@ protected:
 
 TEST_F(TestDumpTensorCopy, L0CConvertsBytesToB32Fractals)
 {
-    struct CopyCase { uint32_t bytes; uint16_t n; };
+    struct CopyCase {
+        uint32_t bytes;
+        uint16_t n;
+    };
     float source[1] = {};
     float destination[1] = {};
-    for (const auto& test : {CopyCase{32U, 16U}, CopyCase{1024U, 16U},
-                            CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
+    for (const auto& test :
+         {CopyCase{32U, 16U}, CopyCase{1024U, 16U}, CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
         SCOPED_TRACE(test.bytes);
         ResetCapture(destination, source);
         EXPECT_EQ(dump_copy_test::__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, test.bytes), 0U);
@@ -108,8 +113,7 @@ TEST_F(TestDumpTensorCopy, L0CSplitsPayloadsPastTheNSizeCeiling)
 
     // One fractal past the ceiling is the smallest payload that needs two copies.
     ResetCapture(destination, source);
-    EXPECT_EQ(
-        dump_copy_test::__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, ceilingBytes + 1024U), 0U);
+    EXPECT_EQ(dump_copy_test::__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, ceilingBytes + 1024U), 0U);
     ASSERT_EQ(copiedN.size(), 2U);
     EXPECT_EQ(copiedN[0], ceilingN);
     EXPECT_EQ(copiedN[1], 16U);
@@ -120,8 +124,7 @@ TEST_F(TestDumpTensorCopy, L0CSplitsPayloadsPastTheNSizeCeiling)
 
     // Whatever the payload, every chunk stays inside the 12-bit nSize field.
     ResetCapture(destination, source);
-    EXPECT_EQ(
-        dump_copy_test::__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, 4U * 1024U * 1024U), 0U);
+    EXPECT_EQ(dump_copy_test::__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, 4U * 1024U * 1024U), 0U);
     EXPECT_EQ(copiedN.size(), 17U);
     for (size_t i = 0; i < copiedN.size(); ++i) {
         SCOPED_TRACE(i);

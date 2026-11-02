@@ -16,7 +16,9 @@
 
 // Use the device debug utilities with the existing CPU instruction stubs.
 struct float4_e2m1x2_t;
-namespace __cce_scalar { using ::copy_ubuf_to_ubuf; }
+namespace __cce_scalar {
+using ::copy_ubuf_to_ubuf;
+}
 #pragma push_macro("ASCENDC_CPU_DEBUG")
 #undef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
@@ -31,8 +33,8 @@ std::vector<ptrdiff_t> copiedSrcOffsets;
 int32_t* dstBase;
 int32_t* srcBase;
 template <typename... Args>
-void CheckMatrixCopy(int32_t* dst, int32_t* src, uint8_t sid, uint16_t n, uint16_t m,
-    uint32_t dstStride, uint16_t srcStride, Args...)
+void CheckMatrixCopy(
+    int32_t* dst, int32_t* src, uint8_t sid, uint16_t n, uint16_t m, uint32_t dstStride, uint16_t srcStride, Args...)
 {
     EXPECT_EQ(sid, 0U);
     EXPECT_EQ(m, 16U);
@@ -59,11 +61,14 @@ void ResetCapture(int32_t* destination, int32_t* source)
 
 TEST(TestDumpTensorCopy, L0CConvertsBytesToB32Fractals)
 {
-    struct CopyCase { uint32_t bytes; uint16_t n; };
+    struct CopyCase {
+        uint32_t bytes;
+        uint16_t n;
+    };
     int32_t source[1] = {};
     int32_t destination[1] = {};
-    for (const auto& test : {CopyCase{32U, 16U}, CopyCase{1024U, 16U},
-                            CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
+    for (const auto& test :
+         {CopyCase{32U, 16U}, CopyCase{1024U, 16U}, CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
         SCOPED_TRACE(test.bytes);
         ResetCapture(destination, source);
         EXPECT_EQ(__asc_aicore::mem_copy_cbuf_to_gm_impl(destination, source, test.bytes), 0U);

@@ -14,7 +14,9 @@
 
 // Use the device debug utilities with the existing CPU instruction stubs.
 struct float4_e2m1x2_t;
-namespace __cce_scalar { using ::copy_ubuf_to_ubuf; }
+namespace __cce_scalar {
+using ::copy_ubuf_to_ubuf;
+}
 #pragma push_macro("ASCENDC_CPU_DEBUG")
 #undef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
@@ -43,7 +45,10 @@ TEST(TestDumpTensorCopy, UbConvertsBytesTo32ByteBlocks)
 {
     uint8_t source[8192] = {};
     uint8_t destination[8192] = {};
-    struct CopyCase { uint32_t bytes; uint32_t blocks; };
+    struct CopyCase {
+        uint32_t bytes;
+        uint32_t blocks;
+    };
     for (const auto& test : {CopyCase{32U, 1U}, CopyCase{1056U, 33U}, CopyCase{8192U, 256U}}) {
         SCOPED_TRACE(test.bytes);
         copyCalls = 0U;

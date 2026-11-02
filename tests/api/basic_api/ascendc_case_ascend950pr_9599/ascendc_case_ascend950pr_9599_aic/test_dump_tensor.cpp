@@ -20,7 +20,9 @@
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #undef DumpType
 struct float4_e2m1x2_t;
-namespace __cce_scalar { using ::copy_ubuf_to_ubuf; }
+namespace __cce_scalar {
+using ::copy_ubuf_to_ubuf;
+}
 using namespace __asc_aicore;
 #pragma push_macro("ASCENDC_CPU_DEBUG")
 #undef ASCENDC_CPU_DEBUG
@@ -92,8 +94,7 @@ TEST_P(TestDumpTensorPayload, OrdinaryL0CReservesTheWholeCopy)
 {
     const auto test = GetParam();
     // Check the byte length handed to the architecture implementation.
-    MOCKER(mem_copy_cbuf_to_gm_impl<uint32_t>).expects(once())
-        .will(invoke(RecordPayload));
+    MOCKER(mem_copy_cbuf_to_gm_impl<uint32_t>).expects(once()).will(invoke(RecordPayload));
     MOCKER(sync_all).stubs();
     asc_dump_impl<Hardware::L0C, uint32_t>(source.data(), 17U, test.count, nullptr, 0U);
 
@@ -108,9 +109,9 @@ TEST_P(TestDumpTensorPayload, OrdinaryL0CReservesTheWholeCopy)
     EXPECT_EQ(fifo.writer.packIdx, 1U);
 }
 
-INSTANTIATE_TEST_SUITE_P(L0CBoundaries, TestDumpTensorPayload,
-    testing::Values(DumpPayloadCase{8U, 1024U}, DumpPayloadCase{256U, 1024U},
-                    DumpPayloadCase{264U, 2048U}));
+INSTANTIATE_TEST_SUITE_P(
+    L0CBoundaries, TestDumpTensorPayload,
+    testing::Values(DumpPayloadCase{8U, 1024U}, DumpPayloadCase{256U, 1024U}, DumpPayloadCase{264U, 2048U}));
 
 TEST_F(TestDumpTensorPayload, GmKeeps32ByteReservationAndActualLength)
 {

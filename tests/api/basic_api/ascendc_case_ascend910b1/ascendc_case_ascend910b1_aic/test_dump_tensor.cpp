@@ -15,7 +15,9 @@
 
 // Use the device debug utilities with the existing CPU instruction stubs.
 struct float4_e2m1x2_t;
-namespace __cce_scalar { using ::copy_ubuf_to_ubuf; }
+namespace __cce_scalar {
+using ::copy_ubuf_to_ubuf;
+}
 #pragma push_macro("ASCENDC_CPU_DEBUG")
 #undef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
@@ -27,8 +29,7 @@ namespace {
 using namespace __asc_aicore;
 
 uint16_t copiedBlocks;
-void RecordL1Copy(void*, void*, uint8_t sid, uint16_t bursts, uint16_t blocks,
-    uint16_t srcStride, uint16_t dstStride)
+void RecordL1Copy(void*, void*, uint8_t sid, uint16_t bursts, uint16_t blocks, uint16_t srcStride, uint16_t dstStride)
 {
     EXPECT_EQ(sid, 0U);
     EXPECT_EQ(bursts, 1U);
@@ -48,7 +49,10 @@ TEST_F(TestDumpTensorCopy, L1ConvertsBytesTo32ByteBlocks)
     uint8_t destination[8192] = {};
     using CopyL1 = void (*)(void*, void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t);
     MOCKER(copy_cbuf_to_gm, CopyL1).stubs().will(invoke(RecordL1Copy));
-    struct CopyCase { uint32_t bytes; uint16_t blocks; };
+    struct CopyCase {
+        uint32_t bytes;
+        uint16_t blocks;
+    };
     for (const auto& test : {CopyCase{32U, 1U}, CopyCase{1056U, 33U}, CopyCase{8192U, 256U}}) {
         SCOPED_TRACE(test.bytes);
         copiedBlocks = 0U;
@@ -59,9 +63,12 @@ TEST_F(TestDumpTensorCopy, L1ConvertsBytesTo32ByteBlocks)
 
 TEST_F(TestDumpTensorCopy, L0CConvertsBytesToB32Fractals)
 {
-    struct CopyCase { uint32_t bytes; uint16_t expectedN; };
-    for (const auto& test : {CopyCase{32U, 16U}, CopyCase{1024U, 16U},
-                            CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
+    struct CopyCase {
+        uint32_t bytes;
+        uint16_t expectedN;
+    };
+    for (const auto& test :
+         {CopyCase{32U, 16U}, CopyCase{1024U, 16U}, CopyCase{1056U, 32U}, CopyCase{131072U, 2048U}}) {
         SCOPED_TRACE(test.bytes);
         uint16_t n, m, dstStride, srcStride;
         get_matrix_copy_param(test.bytes, n, m, dstStride, srcStride);

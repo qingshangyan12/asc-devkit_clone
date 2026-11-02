@@ -33,8 +33,7 @@ __aicore__ inline void CheckSuperTensorDumpInstantiation(__gm__ __asc_aicore::De
     __asc_aicore::asc_dump_super_tensor_impl<Hardware::FIXBUF, uint32_t>(
         static_cast<__fbuf__ uint32_t*>(nullptr), 0, 64, nullptr, 0, blockInfo);
 #endif
-    __asc_aicore::asc_dump_impl<Hardware::L0C, uint32_t>(
-        static_cast<__cc__ uint32_t*>(nullptr), 0, 8, nullptr, 0);
+    __asc_aicore::asc_dump_impl<Hardware::L0C, uint32_t>(static_cast<__cc__ uint32_t*>(nullptr), 0, 8, nullptr, 0);
 #endif
 }
 #endif
