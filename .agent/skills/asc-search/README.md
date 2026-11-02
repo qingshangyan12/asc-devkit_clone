@@ -86,6 +86,37 @@ python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-
 短关键词与结构化条件求交，输出为 `asc-search-results/1` JSON；候选包含版本上下文、文档、声明和样例位置。
 `--gap` 是独立的缺口登记查询，不与 `--keywords` 组合。查询不联网、不重建索引；索引缺失或过期时返回错误，交由调用方处理。
 
+### 2.1 检索实测示例
+
+以下结果在本地完整标注数据根（带三类头的独立 asc-devkit checkout）上构建 9.2.0 × 3510 索引后，
+直接运行 `search.py` 得到，用于直观核对检索效果。数据根的三类头来自 C API OKF 元数据
+（文档头、include Doxygen 注解与样例 marker，见关联 PR #6813）；`master` 尚未包含这些标注时，
+真实语料用例会按预期跳过。
+
+```bash
+python3 .agent/skills/asc-search/scripts/build_index.py \
+  --root /path/to/annotated/asc-devkit --out /tmp/asc-search-idx --arch 3510 --cann-version 9.2.0
+```
+
+实测索引规模：主文档 602 篇、导航页 14 篇、按架构过滤 243 篇、按版本过滤 0 篇，
+范围内无缺 slim 头的文档。
+
+以下查询统一带 `--platform 950 --version 9.2.0`，`--limit` 未指定时默认 20。命中数为实际匹配总数，
+返回条数超过 `--limit` 时会被截断；代表候选路径相对数据根，省略 `docs/zh/api/SIMD-API/c_api/` 前缀。
+
+| 场景 | 命令 | 命中 | 代表候选 |
+| --- | --- | ---: | --- |
+| 绝对操作 | `--operation absolute` | 2 | `reg_compute/reg_arith/asc_abs.md`、`reg_compute/reg_fused/asc_abs_sub.md` |
+| 搬入（GM→UB、GM→L1/L0 等） | `--operation copy --stage in` | 25 | `vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md` 等 |
+| 类型转换 | `--convert float fp8_e4m3fn` | 2 | `reg_compute/reg_convert/asc_float2e4m3.md`（同族仍返回 `asc_float2e4m3_deprecated.md` 废弃变体） |
+| 配置反向依赖 | `--deps-of asc_copy_gm2ub_align --kind configures --reverse` | 1 | `vector_datamove/asc_set_copy_pad_val.md` |
+| 参数反查 | `--param asc_load_l2_cache_mode` | 13 | `cache_ctrl/asc_set_scalar_cache_mode.md`、`cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md` 等 |
+| 版本变更 | `--changed-in 9.2.0` | 270 | `atomic/datamove_atomic/asc_set_atomic_add.md`、`atomic/scalar_atomic/asc_atomic_add.md` 等 |
+
+`--gap` 与 `--version` 等过滤维度组合会返回明确的 JSON 参数错误（缺口是范围外登记，不与文档维度求交）。
+每条候选同时携带 `version_context`、`signatures`、`header_locations` 与 `example_locations`，
+调用方据此打开实际文档、声明和样例位置核对。完整数据回归命令见文末。
+
 ## 3. 三类头的标准格式与真实示例
 
 三类头分别描述 API 的语义、具体重载的结构和源码调用范围。本章以 3510 架构的 `asc_abs`
