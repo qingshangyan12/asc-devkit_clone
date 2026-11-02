@@ -780,9 +780,7 @@ __aicore__ inline void SubsImpl(
 template <typename T, bool isSetMask = true>
 __aicore__ inline void SubsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const int32_t& calCount)
 {
-    static_assert(
-        (SupportType<T, half, float, int16_t, int32_t>()),
-        "Subs not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Subs not support current datatype!");
     if constexpr (SupportBytes<T, 8>()) {
         constexpr auto func = RegSubs::Subs<T, Reg::RegTensor<T, Reg::RegTraitNumTwo>>;
         Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
