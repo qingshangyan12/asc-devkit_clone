@@ -104,6 +104,7 @@ constexpr int32_t g_coreType = AscendC::MIX;
 // report a clear unsupported-architecture error even when reserved UBUF disabling is off.
 #define __ASC_RESERVED_UBUF_ARCH_2201 __ASC_RESERVED_UBUF_PROBE__()
 #define __ASC_RESERVED_UBUF_ARCH_3510 __ASC_RESERVED_UBUF_PROBE__()
+#define __ASC_RESERVED_UBUF_ARCH_9201 __ASC_RESERVED_UBUF_PROBE__()
 #define __ASC_RESERVED_UBUF_IS_SUPPORTED_ARCH__(arch) \
     __ASC_RESERVED_UBUF_IS_PROBE__(__ASC_RESERVED_UBUF_CAT__(__ASC_RESERVED_UBUF_ARCH_, arch))
 
@@ -111,7 +112,7 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define __ASC_RESERVED_UBUF_UNSUPPORTED_ARCH_ERROR__() \
     __ASC_RESERVED_UBUF_PRAGMA__(                      \
         GCC error                                      \
-        "unsupported chip architecture in __ASC_USE_RESERVED_UBUF__; supported architectures are 2201 and 3510")
+        "unsupported chip architecture in __ASC_USE_RESERVED_UBUF__; supported architectures are 2201, 3510 and 9201")
 
 #if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #define __ASC_USE_RESERVED_UBUF_2201(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
@@ -123,6 +124,12 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define __ASC_USE_RESERVED_UBUF_3510(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #else
 #define __ASC_USE_RESERVED_UBUF_3510(msg)
+#endif
+
+#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#define __ASC_USE_RESERVED_UBUF_9201(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
+#else
+#define __ASC_USE_RESERVED_UBUF_9201(msg)
 #endif
 
 // Dispatch one architecture: unsupported chips fail fast, supported chips expand to the
