@@ -47,7 +47,7 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
 }
 
 template <typename T = DefaultType, typename U>
-__simd_callee__ inline void CopyImpl(RegT& dstReg, RegT& srcReg)
+__simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg)
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
