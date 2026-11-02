@@ -115,7 +115,7 @@ constexpr bool IsValidHcclMsgRankSize(uint64_t rankSize)
     return (rankSize > 0U) && (rankSize <= HCCL_MAX_RANK_NUM_V2);
 }
 
-struct HcclMsgExt {
+struct alignas(64) HcclMsgExt {
     // sendCounts[i] represents the data count sent to rank i by this rank.
     uint64_t sendCounts[HCCL_MAX_RANK_NUM_V2];
     // sendOffset[i] represents the offset count of the data sent to rank i by this rank relative to sendBuf.
@@ -128,6 +128,15 @@ struct HcclMsgExt {
     uint64_t valid;        // set by api, reset by server
     uint64_t xorCheck;     // set by api, checked by server to ensure msg integrity
 };
+
+// A5 compact layout for common small AllToAllV parameters. Each rank uses two
+// 64-bit words, so eight ranks fit in two cache lines instead of four.
+constexpr uint32_t HCCL_MSG_EXT_COMPACT_MAX = 8U;
+constexpr uint32_t HCCL_MSG_EXT_COMPACT_CTRL = 0xA5A5C0DEU;
+constexpr bool CanUseHcclMsgExtCompact(uint64_t count)
+{
+    return count <= 0xFFFFFFFFULL;
+}
 
 struct AlltoAllVParamExt {
     uint64_t* sendCounts;
