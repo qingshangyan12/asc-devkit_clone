@@ -62,8 +62,8 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
     static_assert(
-        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
-        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on "
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t on "
         "current device!");
     if constexpr (SupportType<T, int4b_t>) {
         load_cbuf_to_ca_s4(
@@ -123,8 +123,8 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
     static_assert(
-        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t>(),
-        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t, uint64_t on "
+        SupportType<T, int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, bfloat16_t, half, float, uint32_t, int32_t on "
         "current device!");
     if constexpr (SupportType<T, int4b_t>) {
         load_cbuf_to_cb_s4(
