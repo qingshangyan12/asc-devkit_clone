@@ -13,6 +13,7 @@
 
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 #include "alg_data_trans_wrapper.h"
+#include "asccomm_primitives.h"
 #include "template_utils.h"
 
 namespace mc2_ops_hccl {
@@ -227,8 +228,8 @@ HcclResult InsTempAllReduceAicpuReduceNHR::RunReduce(
     const DataSlice dstSlice(buffInfo.outputPtr, buffInfo.outBuffBaseOff, sliceSize, count_);
     CHK_RET(static_cast<HcclResult>(LocalCopy(thread_, srcSlice, dstSlice)));
 
-    CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(algTag.c_str())));
-    CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(algTag.c_str())));
+    CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(algTag.c_str())));
+    CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(algTag.c_str())));
     CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread_, CUSTOM_TIMEOUT)));
 
     for (u32 idx = 0; idx < subCommRanks_.at(0).size(); ++idx) {

@@ -182,6 +182,7 @@ target_include_directories(
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/toolchain
+    $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 
 target_compile_options(

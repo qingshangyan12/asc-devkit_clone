@@ -508,7 +508,8 @@ HcclResult HcclExecOp(
     hcclDfxOpInfo.root = param.root;
     hcclDfxOpInfo.engine = param.engine;
     hcclDfxOpInfo.cpuTsThread = cpuTsThread;
-    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
+    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX; // 仅 DFX 字段；实际完成等待槽位
+    // 为读回槽数-1（pr_923 隔离后，见 HcclAicpuKernelEntranceLaunch），此处无槽数上下文保持历史值。
     hcclDfxOpInfo.inputMemAddr = reinterpret_cast<uint64_t>(param.inputPtr);
     hcclDfxOpInfo.inputMemSize = param.inputSize;
     hcclDfxOpInfo.outputMemAddr = reinterpret_cast<uint64_t>(param.outputPtr);
@@ -628,9 +629,10 @@ HcclResult HcclAicpuKernelEntranceLaunch(
         CHK_RET(static_cast<HcclResult>(HcclTaskRegister(comm, param.algTag, HcclLaunchDPUKernel)));
     }
 
-    // Host stream通知Device主thread，使用主流上idx最大的notify
+    // Host stream通知Device主thread。槽位布局见 HcclGetThread：读回槽数 = maxNotifyNum+2，
+    // 门铃用倒数第 2 个槽（= maxNotifyNum，与 kernel_launch.cc 展开执行体的 wait 配对）。
     CHK_RET(static_cast<HcclResult>(
-        HcommThreadNotifyRecordOnThread(cpuTsThread, exportedCpuTsThread, notifyNumOnMainThread - 1)));
+        HcommThreadNotifyRecordOnThread(cpuTsThread, exportedCpuTsThread, notifyNumOnMainThread - 2)));
     // AicpuKernel report
     uint64_t beginTime = HcommGetProfilingSysCycleTime();
     HcclResult launchRet = AicpuKernelLaunch(comm, param, unfoldThread);
@@ -648,10 +650,12 @@ HcclResult HcclAicpuKernelEntranceLaunch(
             beginTime, kernelNameCStr, ret);
         return ret;
     }
-    // Host stream等待Device的通知
+    // Host stream等待Device的完成通知。pr_923 槽位隔离：完成对使用主线程尾部专属槽
+    // （读回槽数的最后一个 = maxNotifyNum+1，与 kernel_launch.cc 执行体完成 record 配对），
+    // 不再与算法模板区槽 0 共用——双 record 源同槽会在置位/清零语义下互吃（Notify 多打一）。
     u16 NOTIFY_WAIT_TIME = 27 * 68;
     CHK_RET(static_cast<HcclResult>(
-        HcommThreadNotifyWaitOnThread(cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, NOTIFY_WAIT_TIME)));
+        HcommThreadNotifyWaitOnThread(cpuTsThread, notifyNumOnMainThread - 1, NOTIFY_WAIT_TIME)));
 
     HCCL_INFO(
         "[asc][AlgoExecute][HcclAicpuKernelEntranceLaunch] end, opType[%d], algName[%s], algTag[%s].", param.opType,
@@ -1133,9 +1137,14 @@ HcclResult HcclGetThread(
         }
         u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
-        // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
-        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
+        // 槽位布局（主线程 notify 槽，下标 0..槽数-1）：
+        //   0..maxNotifyNum-1          算法模板区（模板主从线程间同步，如 all_reduce 的 NotifyIdx[0]）
+        //   maxNotifyNum               host 门铃（EntranceLaunch record）↔ 展开执行体 wait（kernel_launch.cc）配对
+        //   maxNotifyNum+1             展开执行体完成 record ↔ host 完成 wait 配对（pr_923 槽位隔离）
+        // maxNotifyNum 需要 +1 用于 host-device 门铃同步，再 +1 隔离完成通知——
+        // 完成通知不得与算法模板区槽 0 共用（置位/清零语义下双 record 源会互吃，Notify 多打一）。
+        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 2, threads.data()));
+        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 2));
         // MC2 and HCCL share the communication-domain unfold thread. Resource preparation is serialized.
         const auto unfoldRet = GetUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread);
         if (unfoldRet == HCCL_E_NOT_FOUND) {

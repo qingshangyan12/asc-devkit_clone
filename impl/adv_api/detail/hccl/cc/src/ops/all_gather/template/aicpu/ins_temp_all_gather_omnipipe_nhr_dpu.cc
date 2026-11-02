@@ -10,6 +10,7 @@
 
 #include "ins_temp_all_gather_omnipipe_nhr_dpu.h"
 #include "alg_data_trans_wrapper.h"
+#include "asccomm_primitives.h"
 #include "dpu_alg_data_trans_wrapper.h"
 #include "channel.h"
 #include "alg_v2_template_register.h"
@@ -37,7 +38,7 @@ HcclResult InsTempAllGatherOmniPipeNHRDPU::KernelRun(
     }
 
     // 转换成eager-mode，保障AICPU指令下发执行完成
-    if (HcommBatchModeEnd(param.algTag) != HCCL_SUCCESS) {
+    if (asccomm_batch_mode_end(param.algTag) != HCCL_SUCCESS) {
         HCCL_ERROR("[InsTempAllGatherOmniPipeNHRDPU] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }
@@ -79,7 +80,7 @@ HcclResult InsTempAllGatherOmniPipeNHRDPU::KernelRun(
     }
 
     // 将执行模式转换回到batch
-    if (HcommBatchModeStart(param.algTag) != HCCL_SUCCESS) {
+    if (asccomm_batch_mode_start(param.algTag) != HCCL_SUCCESS) {
         HCCL_ERROR("[InsTempAllGatherOmniPipeNHRDPU] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }

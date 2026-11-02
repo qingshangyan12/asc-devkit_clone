@@ -28,6 +28,22 @@ endif()
 set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/src)
 set(TESTCASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/testcase)
 
+if(NOT DEFINED ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR})
+    foreach(_asc_comm_candidate
+        "${ASCENDC_DIR}/asc-comm"
+        "${ASCENDC_DIR}/../asc-comm"
+        "${ASCENDC_DIR}/../asc/asc-comm"
+        "${ASCENDC_DIR}/../../asc-comm"
+        "${ASCENDC_DIR}/../../asc/asc-comm"
+        "${ASCENDC_DIR}/../../../asc-comm"
+        "${ASCENDC_DIR}/../../../asc/asc-comm")
+        if(EXISTS "${_asc_comm_candidate}/include/aicpu/hcomm/asccomm_primitives.h")
+            set(ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR} "${_asc_comm_candidate}/include/aicpu/hcomm")
+            break()
+        endif()
+    endforeach()
+endif()
+
 set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${UT_COMMON_INCLUDE_LIST}
     ${CANN_3RD_LIB_PATH}/gtest/include

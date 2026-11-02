@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterAicpuReduceNHR::InsTempReduceScatterAicpuReduceNHR(
@@ -64,8 +65,8 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::KernelRun(
         CHK_RET(RunAllGather(templateResource.threads));
 
         // 必须确保所有通信任务完成，因为接下来的 AICPU Reduce 运行在 CPU 上，不感知任务队列同步
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
-        CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_end(param.algTag)));
+        CHK_RET(static_cast<HcclResult>(asccomm_batch_mode_start(param.algTag)));
         for (const auto& thread : templateResource.threads) {
             CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
         }

@@ -290,6 +290,7 @@ target_include_directories(${HCCL_EXTERNAL_ALG_TARGET} PRIVATE
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/kernel
+    $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 
 target_compile_options(${HCCL_EXTERNAL_ALG_TARGET} PRIVATE
