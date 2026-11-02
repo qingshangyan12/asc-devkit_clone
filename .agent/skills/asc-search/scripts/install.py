@@ -81,7 +81,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.agent != "all":
         targets = {args.agent: targets[args.agent]}
     try:
-        install(SKILL_ROOT, targets, args.dry_run)
+        sources = [SKILL_ROOT]
+        human_skill = SKILL_ROOT.parent / "asc-devkit-search"
+        if (human_skill / "SKILL.md").is_file():
+            sources.append(human_skill)
+        if len(sources) > 1:
+            # Preflight the entire bundle before creating either link.
+            for source in sources:
+                install(source, targets, True)
+        for source in sources:
+            install(source, targets, args.dry_run)
     except (OSError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
