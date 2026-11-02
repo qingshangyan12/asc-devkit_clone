@@ -101,6 +101,7 @@ __simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src)
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
@@ -185,6 +186,7 @@ __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src)
     }
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_load(__ubuf__ int8_t* src)
 {
@@ -208,6 +210,7 @@ __simd_callee__ inline vector_uint8_t asc_load(__ubuf__ uint8_t* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_load(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -273,6 +276,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_load(__ubuf__ fp8_e4m3fn_t* src)
     }
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_load(__ubuf__ int16_t* src)
 {
@@ -307,6 +311,7 @@ __simd_callee__ inline vector_half asc_load(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_load(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
@@ -317,6 +322,7 @@ __simd_callee__ inline vector_bfloat16_t asc_load(__ubuf__ bfloat16_t* src)
     }
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_load(__ubuf__ int32_t* src)
 {

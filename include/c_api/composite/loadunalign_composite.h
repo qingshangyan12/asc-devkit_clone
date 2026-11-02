@@ -25,14 +25,17 @@
 #include "impl/c_api/reg_base_impl/loadunalign_composite_intf_impl.h"
 #endif
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ========== return-value load APIs ==========
 // ========== asc_load ==========
 __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src);
+#endif
 
 __simd_callee__ inline vector_int8_t asc_load(__ubuf__ int8_t* src);
 
 __simd_callee__ inline vector_uint8_t asc_load(__ubuf__ uint8_t* src);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_load(__ubuf__ fp4x2_e2m1_t* src);
 
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_load(__ubuf__ fp4x2_e1m2_t* src);
@@ -44,6 +47,7 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_load(__ubuf__ fp8_e8m0_t* src);
 __simd_callee__ inline vector_fp8_e5m2_t asc_load(__ubuf__ fp8_e5m2_t* src);
 
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_load(__ubuf__ fp8_e4m3fn_t* src);
+#endif
 
 __simd_callee__ inline vector_int16_t asc_load(__ubuf__ int16_t* src);
 
@@ -51,7 +55,9 @@ __simd_callee__ inline vector_uint16_t asc_load(__ubuf__ uint16_t* src);
 
 __simd_callee__ inline vector_half asc_load(__ubuf__ half* src);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_load(__ubuf__ bfloat16_t* src);
+#endif
 
 __simd_callee__ inline vector_int32_t asc_load(__ubuf__ int32_t* src);
 
@@ -77,6 +83,7 @@ __simd_callee__ inline void asc_load(vector_float& dst, __ubuf__ float* src);
 
 __simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src);
 
 __simd_callee__ inline void asc_load(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
@@ -92,6 +99,7 @@ __simd_callee__ inline void asc_load(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2
 __simd_callee__ inline void asc_load(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
 
 __simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
+#endif
 
 #endif
 

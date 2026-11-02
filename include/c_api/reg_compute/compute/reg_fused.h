@@ -69,8 +69,10 @@ __simd_callee__ inline void asc_madd(vector_half& dst, vector_half src0, vector_
 
 __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_madd(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float alpha, vector_bool mask);
 
@@ -119,8 +121,10 @@ __simd_callee__ inline void asc_mula(
 
 __simd_callee__ inline void asc_mula(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_mula(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_mula(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -132,8 +136,10 @@ __simd_callee__ inline void asc_mula(vector_float& dst, vector_float src0, vecto
 //=================asc_fma==================
 __simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fma(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask);
 
@@ -141,24 +147,30 @@ __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1
 //=================asc_fms==================
 __simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, vector_half src2, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fms(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask);
 
 //=================asc_fnma==================
 __simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fnma(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask);
 
 //=================asc_fnms==================
 __simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, vector_half src2, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_fnms(
     vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_float asc_fnms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask);
 #endif

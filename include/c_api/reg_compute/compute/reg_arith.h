@@ -35,7 +35,9 @@ __simd_callee__ inline vector_int16_t asc_sub(vector_int16_t src0, vector_int16_
 
 __simd_callee__ inline vector_half asc_sub(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_sub(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_uint32_t asc_sub(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -53,8 +55,10 @@ __simd_callee__ inline void asc_sub(vector_int16_t& dst, vector_int16_t src0, ve
 
 __simd_callee__ inline void asc_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_sub(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_sub(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -90,7 +94,9 @@ __simd_callee__ inline vector_uint32_t asc_min(vector_uint32_t src0, vector_uint
 
 __simd_callee__ inline vector_half asc_min(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_min(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_float asc_min(vector_float src0, vector_float src1, vector_bool mask);
 
@@ -108,8 +114,10 @@ __simd_callee__ inline void asc_min(vector_uint32_t& dst, vector_uint32_t src0, 
 
 __simd_callee__ inline void asc_min(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_min(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
@@ -278,7 +286,9 @@ __simd_callee__ inline vector_uint16_t asc_mul(vector_uint16_t src0, vector_uint
 
 __simd_callee__ inline vector_half asc_mul(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_mul(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_int32_t asc_mul(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -292,8 +302,10 @@ __simd_callee__ inline void asc_mul(vector_uint16_t& dst, vector_uint16_t src0, 
 
 __simd_callee__ inline void asc_mul(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_mul(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_mul(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -329,7 +341,9 @@ __simd_callee__ inline vector_int32_t asc_add(vector_int32_t src0, vector_int32_
 
 __simd_callee__ inline vector_uint32_t asc_add(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_add(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_int16_t asc_mul_scalar(vector_int16_t src, int16_t value, vector_bool mask);
 
@@ -359,8 +373,10 @@ __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, ve
 
 __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_add(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_add(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
@@ -392,7 +408,9 @@ __simd_callee__ inline vector_float asc_max(vector_float src0, vector_float src1
 
 __simd_callee__ inline vector_half asc_max(vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_max(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_max(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
@@ -410,8 +428,10 @@ __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector
 
 __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_max(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
@@ -429,8 +449,10 @@ __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, 
 
 __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_min_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_half asc_exp(vector_half src, vector_bool mask);
 
@@ -452,7 +474,9 @@ __simd_callee__ inline vector_float asc_min_scalar(vector_float src, float value
 
 __simd_callee__ inline vector_half asc_min_scalar(vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_min_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bool mask);
 
@@ -468,8 +492,10 @@ __simd_callee__ inline void asc_add_scalar(vector_uint16_t& dst, vector_uint16_t
 
 __simd_callee__ inline void asc_add_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_add_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_add_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
@@ -487,7 +513,9 @@ __simd_callee__ inline vector_uint16_t asc_add_scalar(vector_uint16_t src, uint1
 
 __simd_callee__ inline vector_half asc_add_scalar(vector_half src, half value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_add_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_int32_t asc_add_scalar(vector_int32_t src, int32_t value, vector_bool mask);
 
@@ -543,8 +571,10 @@ __simd_callee__ inline void asc_max_scalar(vector_half& dst, vector_half src, ha
 
 __simd_callee__ inline void asc_max_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_max_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 __simd_callee__ inline vector_int8_t asc_max_scalar(vector_int8_t src, int8_t value, vector_bool mask);
 
@@ -562,7 +592,9 @@ __simd_callee__ inline vector_half asc_max_scalar(vector_half src, half value, v
 
 __simd_callee__ inline vector_float asc_max_scalar(vector_float src, float value, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_max_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+#endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90300000)
 __simd_callee__ inline void asc_max_merge(
@@ -586,8 +618,10 @@ __simd_callee__ inline void asc_max_merge(vector_float& dst, vector_float src0, 
 
 __simd_callee__ inline void asc_max_merge(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_max_merge(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_add_merge(
     vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
@@ -610,8 +644,10 @@ __simd_callee__ inline void asc_add_merge(
 __simd_callee__ inline void asc_add_merge(
     vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_add_merge(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_min_merge(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
@@ -632,8 +668,10 @@ __simd_callee__ inline void asc_min_merge(
 
 __simd_callee__ inline void asc_min_merge(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_min_merge(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_min_merge(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 #endif

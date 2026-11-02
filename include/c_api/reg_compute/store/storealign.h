@@ -41,6 +41,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ half* dst, vector_half src, 
 
 __simd_callee__ inline void asc_storealign(__ubuf__ float* dst, vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, vector_bool mask);
@@ -56,6 +57,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ fp4x2_e2m1_t* dst, vector_fp
 __simd_callee__ inline void asc_storealign(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_storealign(__ubuf__ int4b_t* dst, vector_int4x2_t src, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst, vector_int8_t src);
 
@@ -73,6 +75,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst, vector_half s
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst, vector_float src);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src);
@@ -88,6 +91,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst, vecto
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst, vector_int4x2_t src);
+#endif
 
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst, vector_int16_t src, vector_bool mask);
 
@@ -105,7 +109,9 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ half* dst, vector_half 
 
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ float* dst, vector_float src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst, vector_int8_t src0, vector_int8_t src1);
 
@@ -121,6 +127,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ uint32_t* dst, vector_
 
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ half* dst, vector_half src0, vector_half src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
 
@@ -143,6 +150,7 @@ __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src0, vector_fp4x2_e1m2_t src1);
 
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int4b_t* dst, vector_int4x2_t src0, vector_int4x2_t src1);
+#endif
 
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst, vector_int8_t src, int32_t offset, vector_bool mask);
 
@@ -162,6 +170,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ half* dst, vector_half src, 
 
 __simd_callee__ inline void asc_storealign(__ubuf__ float* dst, vector_float src, int32_t offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
 
@@ -185,6 +194,7 @@ __simd_callee__ inline void asc_storealign(
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ int4b_t* dst, vector_int4x2_t src, int32_t offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst, vector_int8_t src, int32_t offset);
 
@@ -202,6 +212,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst, vector_half s
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst, vector_float src, int32_t offset);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, int32_t offset);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, int32_t offset);
@@ -217,6 +228,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst, vecto
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, int32_t offset);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst, vector_int4x2_t src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ int16_t* dst, vector_int16_t src, int32_t offset, vector_bool mask);
@@ -241,8 +253,10 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ half* dst, vector_half 
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ float* dst, vector_float src, int32_t offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ int8_t* dst, vector_int8_t src0, vector_int8_t src1, int32_t offset);
@@ -265,6 +279,7 @@ __simd_callee__ inline void asc_storealign_intlv(
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ half* dst, vector_half src0, vector_half src1, int32_t offset);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src0, vector_bfloat16_t src1, int32_t offset);
 
@@ -288,6 +303,7 @@ __simd_callee__ inline void asc_storealign_intlv(
 
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ int4b_t* dst, vector_int4x2_t src0, vector_int4x2_t src1, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ int8_t*& dst, vector_int8_t src, int32_t offset, vector_bool mask);
@@ -313,8 +329,10 @@ __simd_callee__ inline void asc_storealign_postupdate(
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ float*& dst, vector_float src, int32_t offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ int8_t*& dst, vector_int8_t src, int32_t offset);
 
@@ -332,8 +350,10 @@ __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ half*& dst, v
 
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ float*& dst, vector_float src, int32_t offset);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_1st_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_bfloat16_t src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storealign_pack_postupdate(
     __ubuf__ int16_t*& dst, vector_int16_t src, int32_t offset, vector_bool mask);
@@ -359,8 +379,10 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(
 __simd_callee__ inline void asc_storealign_pack_postupdate(
     __ubuf__ float*& dst, vector_float src, int32_t offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_pack_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst, vector_int8_t src, addr_reg offset, vector_bool mask);
 
@@ -383,6 +405,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ half* dst, vector_half src, 
 
 __simd_callee__ inline void asc_storealign(__ubuf__ float* dst, vector_float src, addr_reg offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, addr_reg offset, vector_bool mask);
 
@@ -406,6 +429,7 @@ __simd_callee__ inline void asc_storealign(
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ int4b_t* dst, vector_int4x2_t src, addr_reg offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst, vector_int8_t src, addr_reg offset);
 
@@ -423,6 +447,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ half* dst, vector_half s
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ float* dst, vector_float src, addr_reg offset);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, addr_reg offset);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, addr_reg offset);
@@ -438,6 +463,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t* dst, vecto
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, addr_reg offset);
 
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst, vector_int4x2_t src, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ int16_t* dst, vector_int16_t src, addr_reg offset, vector_bool mask);
@@ -462,8 +488,10 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ half* dst, vector_half 
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ float* dst, vector_float src, addr_reg offset, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, addr_reg offset, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ int8_t* dst, vector_int8_t src0, vector_int8_t src1, addr_reg offset);
@@ -486,6 +514,7 @@ __simd_callee__ inline void asc_storealign_intlv(
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ half* dst, vector_half src0, vector_half src1, addr_reg offset);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src0, vector_bfloat16_t src1, addr_reg offset);
 
@@ -509,6 +538,7 @@ __simd_callee__ inline void asc_storealign_intlv(
 
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ int4b_t* dst, vector_int4x2_t src0, vector_int4x2_t src1, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ int8_t* dst, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
@@ -528,6 +558,7 @@ __simd_callee__ inline void asc_storealign(
 __simd_callee__ inline void asc_storealign(
     __ubuf__ uint32_t* dst, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
@@ -543,6 +574,7 @@ __simd_callee__ inline void asc_storealign(
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ half* dst, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
@@ -568,6 +600,7 @@ __simd_callee__ inline void asc_storealign_postupdate(
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ uint32_t*& dst, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
@@ -583,6 +616,7 @@ __simd_callee__ inline void asc_storealign_postupdate(
 
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ fp8_e8m0_t*& dst, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
+#endif
 
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ half*& dst, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);

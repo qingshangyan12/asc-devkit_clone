@@ -77,6 +77,7 @@ struct asc_float_float_pair {
     vector_float second;
 };
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 struct asc_fp8_e8m0_t_fp8_e8m0_t_pair {
     vector_fp8_e8m0_t first;
     vector_fp8_e8m0_t second;
@@ -101,12 +102,14 @@ struct asc_bfloat16_t_bfloat16_t_pair {
     vector_bfloat16_t first;
     vector_bfloat16_t second;
 };
+#endif
 
 struct asc_bool_bool_pair {
     vector_bool first;
     vector_bool second;
 };
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 struct asc_fp4x2_e2m1_t_fp4x2_e2m1_t_pair {
     vector_fp4x2_e2m1_t first;
     vector_fp4x2_e2m1_t second;
@@ -121,6 +124,7 @@ struct asc_int4x2_t_int4x2_t_pair {
     vector_int4x2_t first;
     vector_int4x2_t second;
 };
+#endif
 
 #endif
 

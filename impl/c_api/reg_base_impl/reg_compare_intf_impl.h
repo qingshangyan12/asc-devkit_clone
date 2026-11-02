@@ -69,12 +69,14 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_half src0, vector_ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
@@ -132,12 +134,14 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_half src, hal
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_ge(dst, src, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
 {
@@ -202,12 +206,14 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_f
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -265,12 +271,14 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_float src, fl
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_le(dst, src, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -328,12 +336,14 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_lt(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -349,12 +359,14 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int8_t src, i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_lt(dst, src, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
@@ -454,12 +466,14 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_gt(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -475,12 +489,14 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_gt(dst, src, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
@@ -580,12 +596,14 @@ __simd_callee__ inline void asc_eq(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_eq(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint8_t src0, uint8_t value, vector_bool mask)
 {
@@ -601,12 +619,14 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int8_t src0, 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_eq(dst, src0, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint16_t src0, uint16_t value, vector_bool mask)
 {
@@ -699,12 +719,14 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_half src0, vector_ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
@@ -769,12 +791,14 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_float src, fl
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_ne(dst, src, value, mask);
     }
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_lt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -832,12 +856,14 @@ __simd_callee__ inline vector_bool asc_lt(vector_int32_t src0, vector_int32_t sr
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_lt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_lt(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_lt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -853,12 +879,14 @@ __simd_callee__ inline vector_bool asc_lt_scalar(vector_int8_t src, int8_t value
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_lt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_lt_scalar(dst, src, value, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_lt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
 {
@@ -951,12 +979,14 @@ __simd_callee__ inline vector_bool asc_ge(vector_half src0, vector_half src1, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ge(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_ge(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_ge(vector_float src0, vector_float src1, vector_bool mask)
 {
@@ -1014,12 +1044,14 @@ __simd_callee__ inline vector_bool asc_ge_scalar(vector_half src, half value, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ge_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_ge_scalar(dst, src, value, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_ge_scalar(vector_float src, float value, vector_bool mask)
 {
@@ -1084,12 +1116,14 @@ __simd_callee__ inline vector_bool asc_le(vector_float src0, vector_float src1, 
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_le(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_le(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_le_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -1147,12 +1181,14 @@ __simd_callee__ inline vector_bool asc_le_scalar(vector_float src, float value, 
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_le_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_le_scalar(dst, src, value, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_gt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -1210,12 +1246,14 @@ __simd_callee__ inline vector_bool asc_gt(vector_int32_t src0, vector_int32_t sr
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_gt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_gt(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -1231,12 +1269,14 @@ __simd_callee__ inline vector_bool asc_gt_scalar(vector_int8_t src, int8_t value
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_gt_scalar(dst, src, value, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_gt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
 {
@@ -1315,12 +1355,14 @@ __simd_callee__ inline vector_bool asc_eq(vector_half src0, vector_half src1, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_eq(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_eq(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_eq(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
@@ -1378,12 +1420,14 @@ __simd_callee__ inline vector_bool asc_eq_scalar(vector_half src0, half value, v
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_eq_scalar(vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_eq_scalar(dst, src0, value, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_eq_scalar(vector_int32_t src0, int32_t value, vector_bool mask)
 {
@@ -1455,12 +1499,14 @@ __simd_callee__ inline vector_bool asc_ne(vector_half src0, vector_half src1, ve
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ne(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bool dst;
     asc_ne(dst, src0, src1, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_bool asc_ne(vector_float src0, vector_float src1, vector_bool mask)
 {
@@ -1525,12 +1571,14 @@ __simd_callee__ inline vector_bool asc_ne_scalar(vector_float src, float value, 
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
     asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
+#endif
 
 #endif
 

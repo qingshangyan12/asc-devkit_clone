@@ -38,6 +38,7 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -87,6 +88,7 @@ __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hiflo
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -109,12 +111,14 @@ __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src)
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -172,6 +176,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -221,6 +226,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ h
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -243,12 +249,14 @@ __simd_callee__ inline void asc_loadalign_brc(vector_half& dst, __ubuf__ half* s
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -285,6 +293,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -334,6 +343,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubu
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, US_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -356,12 +366,14 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst, __ubuf__ ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, US_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src)
 {
@@ -384,6 +396,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -433,6 +446,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __u
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, DS_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -455,12 +469,14 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, DS_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src)
 {
@@ -483,6 +499,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -532,6 +549,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -554,12 +572,14 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -596,6 +616,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -645,6 +666,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK4_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
@@ -660,6 +682,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -709,6 +732,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_hifloat8_t& dst, 
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -731,12 +755,14 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -780,12 +806,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst, _
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -822,6 +850,7 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -871,6 +900,7 @@ __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hiflo
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -893,12 +923,14 @@ __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src, 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -956,6 +988,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1005,6 +1038,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ h
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1027,12 +1061,14 @@ __simd_callee__ inline void asc_loadalign_brc(vector_half& dst, __ubuf__ half* s
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -1069,6 +1105,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1118,6 +1155,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubu
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, US_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1140,12 +1178,14 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst, __ubuf__ ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, US_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
@@ -1168,6 +1208,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -1220,6 +1261,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __u
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DS_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1242,12 +1284,14 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, DS_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
@@ -1270,6 +1314,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1319,6 +1364,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf_
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1341,12 +1387,14 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -1383,6 +1431,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1432,6 +1481,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -1447,6 +1497,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -1502,6 +1553,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -1524,6 +1576,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
@@ -1531,6 +1584,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vlds(dst, src, offset, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -1575,6 +1629,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst, _
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
@@ -1582,6 +1637,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
         vlds(dst, src, offset, E2B_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -1661,6 +1717,7 @@ __simd_callee__ inline void asc_loadalign(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -1732,6 +1789,7 @@ __simd_callee__ inline void asc_loadalign(
         vsldb(dst, src, (block_stride << 16u | repeat_stride & 0xFFFFU), mask);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(
     vector_half& dst, __ubuf__ half* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -1749,6 +1807,7 @@ __simd_callee__ inline void asc_loadalign(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1770,6 +1829,7 @@ __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -1785,6 +1845,7 @@ __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* s
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1812,6 +1873,7 @@ __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e
         vld(dst, src, offset, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -1827,12 +1889,14 @@ __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t*
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, NORM);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
 {
@@ -1883,6 +1947,7 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1904,6 +1969,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -1919,6 +1985,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1946,6 +2013,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ f
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -1961,12 +2029,14 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int16_t& dst, __ubuf__ int1
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -1996,6 +2066,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2019,6 +2090,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf_
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, US_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2034,6 +2106,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2062,6 +2135,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubu
         vld(dst, src, offset, US_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2077,12 +2151,14 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_int16_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, US_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -2098,6 +2174,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ ui
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2121,6 +2198,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubu
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, DS_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2136,6 +2214,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf_
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2164,6 +2243,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __u
         vld(dst, src, offset, DS_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2179,12 +2259,14 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_int16_t& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, DS_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -2200,6 +2282,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2221,6 +2304,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ 
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2236,6 +2320,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ in
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2263,6 +2348,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf_
         vld(dst, src, offset, UNPK_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2285,12 +2371,14 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_half& dst, __ubuf__ half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
 {
@@ -2313,6 +2401,7 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2334,6 +2423,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, UNPK4_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2349,6 +2439,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ i
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2400,6 +2491,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -2415,6 +2507,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ub
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2446,6 +2539,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2461,6 +2555,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int16_t& dst, __u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
@@ -2468,6 +2563,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(
         vld(dst, src, offset, BLK);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -2513,6 +2609,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
@@ -2520,6 +2617,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
         vld(dst, src, offset, E2B_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -2565,6 +2663,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_u
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src)
 {
@@ -2624,6 +2723,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             reinterpret_cast<__ubuf__ uint8_t*>(src), 0, DINTLV_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src)
 {
@@ -2646,6 +2746,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_half& dst0, vector_half
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src)
 {
@@ -2653,6 +2754,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, 0, DINTLV_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t* src)
 {
@@ -2675,6 +2777,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2700,6 +2803,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             DINTLV_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src, addr_reg offset)
@@ -2717,6 +2821,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -2749,6 +2854,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src, addr_reg offset)
@@ -2766,6 +2872,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
@@ -2773,6 +2880,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_half& dst0, vector_half& dst1, __ubuf__ half* src, addr_reg offset)
@@ -2822,6 +2930,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
@@ -2882,6 +2991,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
             reinterpret_cast<__ubuf__ uint8_t*>(src), offset, DINTLV_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src, int32_t offset)
@@ -2907,6 +3017,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src, int32_t offset)
 {
@@ -2914,6 +3025,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vlds(dst0, dst1, src, offset, DINTLV_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t* src, int32_t offset)
@@ -2953,6 +3065,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_uint8_t& dst, __ubuf
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3006,6 +3119,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_hifloat8_t& dst, __u
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, NORM, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3028,12 +3142,14 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_half& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, NORM, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_postupdate(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
 {
@@ -3091,6 +3207,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_uint8_t& dst, __
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3147,6 +3264,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3169,6 +3287,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_half& dst, __ubu
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -3176,6 +3295,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(
         vlds(dst, src, offset, BRC_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
 {
@@ -3213,6 +3333,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3270,6 +3391,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, US_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -3294,6 +3416,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(vector_half& dst, 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -3301,6 +3424,7 @@ __simd_callee__ inline void asc_loadalign_upsample_postupdate(
         vlds(dst, src, offset, US_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
@@ -3325,6 +3449,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3382,6 +3507,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, DS_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -3406,6 +3532,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_half& dst
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -3413,6 +3540,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(
         vlds(dst, src, offset, DS_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(
     vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
@@ -3436,6 +3564,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_uint8_t& dst,
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3493,6 +3622,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, UNPK_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
@@ -3516,6 +3646,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_half& dst, __
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -3523,6 +3654,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate(
         vlds(dst, src, offset, UNPK_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_unpack_postupdate(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
 {
@@ -3562,6 +3694,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -3623,6 +3756,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
             DINTLV_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t*& src, int32_t offset)
@@ -3648,6 +3782,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -3655,6 +3790,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
         vlds(dst0, dst1, src, offset, DINTLV_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t*& src, int32_t offset)
@@ -3738,6 +3874,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -3809,6 +3946,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(
             POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_half& dst, __ubuf__ half*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -3840,6 +3978,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -3889,6 +4028,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubu
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
@@ -3911,12 +4051,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_half& dst, __ubuf__ ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
@@ -3953,6 +4095,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -4002,6 +4145,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubu
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -4024,12 +4168,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_half& dst, __ubuf__ ha
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
@@ -4052,6 +4198,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_float& dst, __ubuf__ f
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -4075,6 +4222,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf_
         vld(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
@@ -4090,6 +4238,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int8_t& dst, __ubuf__ 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
@@ -4118,6 +4267,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubu
         vld(dst, src, offset, BRC_B8);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -4133,12 +4283,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_int16_t& dst, __ubuf__
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BRC_B16);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
@@ -4183,6 +4335,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4240,6 +4393,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BRC_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -4264,6 +4418,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(vector_half& dst, 
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -4271,6 +4426,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
         vlds(dst, src, offset, BRC_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(
     vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
@@ -4310,6 +4466,7 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4367,6 +4524,7 @@ __simd_callee__ inline void asc_loadalign_unpack4_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, UNPK4_B8, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
@@ -4384,6 +4542,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
@@ -4441,6 +4600,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(reinterpret_cast<vector_uint8_t&>(dst), src_tmp, offset, BLK, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
@@ -4466,6 +4626,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -4473,6 +4634,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(
     vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
@@ -4522,6 +4684,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
@@ -4529,6 +4692,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
+#endif
 
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
@@ -4554,12 +4718,14 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int4x2_t asc_loadalign(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign(__ubuf__ int8_t* src)
 {
@@ -4575,6 +4741,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign(__ubuf__ uint8_t* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -4616,6 +4783,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign(__ubuf__ fp8_e4m3fn_t* 
     asc_loadalign(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign(__ubuf__ int16_t* src)
 {
@@ -4638,12 +4806,14 @@ __simd_callee__ inline vector_half asc_loadalign(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
     asc_loadalign(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign(__ubuf__ int32_t* src)
 {
@@ -4666,12 +4836,14 @@ __simd_callee__ inline vector_float asc_loadalign(__ubuf__ float* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_brc_datablock(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_brc_datablock(__ubuf__ int8_t* src)
 {
@@ -4687,6 +4859,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_brc_datablock(__ubuf__ uint8
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_brc_datablock(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -4728,6 +4901,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_brc_datablock(__ubuf__ 
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_brc_datablock(__ubuf__ int16_t* src)
 {
@@ -4750,12 +4924,14 @@ __simd_callee__ inline vector_half asc_loadalign_brc_datablock(__ubuf__ half* sr
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_brc_datablock(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
     asc_loadalign_brc_datablock(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign_brc_datablock(__ubuf__ int32_t* src)
 {
@@ -4778,12 +4954,14 @@ __simd_callee__ inline vector_float asc_loadalign_brc_datablock(__ubuf__ float* 
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_brc_elem(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_brc_elem(__ubuf__ int8_t* src)
 {
@@ -4799,6 +4977,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_brc_elem(__ubuf__ uint8_t* s
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_brc_elem(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -4840,6 +5019,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_brc_elem(__ubuf__ fp8_e
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_brc_elem(__ubuf__ int16_t* src)
 {
@@ -4862,12 +5042,14 @@ __simd_callee__ inline vector_half asc_loadalign_brc_elem(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_brc_elem(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
     asc_loadalign_brc(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign_brc_elem(__ubuf__ int32_t* src)
 {
@@ -4911,12 +5093,14 @@ __simd_callee__ inline vector_half asc_loadalign_brc_elem2datablock(__ubuf__ hal
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_brc_elem2datablock(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
     asc_loadalign_brc_elem2datablock(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign_brc_elem2datablock(__ubuf__ int32_t* src)
 {
@@ -4939,12 +5123,14 @@ __simd_callee__ inline vector_float asc_loadalign_brc_elem2datablock(__ubuf__ fl
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_downsample(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_downsample(__ubuf__ int8_t* src)
 {
@@ -4960,6 +5146,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_downsample(__ubuf__ uint8_t*
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_downsample(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -5001,6 +5188,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_downsample(__ubuf__ fp8
     asc_loadalign_downsample(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_downsample(__ubuf__ int16_t* src)
 {
@@ -5023,6 +5211,7 @@ __simd_callee__ inline vector_half asc_loadalign_downsample(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_downsample(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
@@ -5036,6 +5225,7 @@ __simd_callee__ inline vector_int4x2_t asc_loadalign_unpack(__ubuf__ int4b_t* sr
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_unpack(__ubuf__ int8_t* src)
 {
@@ -5051,6 +5241,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_unpack(__ubuf__ uint8_t* src
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_unpack(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -5092,6 +5283,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_unpack(__ubuf__ fp8_e4m
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_unpack(__ubuf__ int16_t* src)
 {
@@ -5114,12 +5306,14 @@ __simd_callee__ inline vector_half asc_loadalign_unpack(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_unpack(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
     asc_loadalign_unpack(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign_unpack(__ubuf__ int32_t* src)
 {
@@ -5142,12 +5336,14 @@ __simd_callee__ inline vector_float asc_loadalign_unpack(__ubuf__ float* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_int4x2_t asc_loadalign_unpack4(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
     asc_loadalign_unpack4(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_unpack4(__ubuf__ int8_t* src)
 {
@@ -5163,6 +5359,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_unpack4(__ubuf__ uint8_t* sr
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_unpack4(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -5211,6 +5408,7 @@ __simd_callee__ inline vector_int4x2_t asc_loadalign_upsample(__ubuf__ int4b_t* 
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_upsample(__ubuf__ int8_t* src)
 {
@@ -5226,6 +5424,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_upsample(__ubuf__ uint8_t* s
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_upsample(__ubuf__ fp4x2_e2m1_t* src)
 {
     vector_fp4x2_e2m1_t dst;
@@ -5267,6 +5466,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_upsample(__ubuf__ fp8_e
     asc_loadalign_upsample(dst, src);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_upsample(__ubuf__ int16_t* src)
 {
@@ -5289,6 +5489,7 @@ __simd_callee__ inline vector_half asc_loadalign_upsample(__ubuf__ half* src)
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_upsample(__ubuf__ bfloat16_t* src)
 {
     vector_bfloat16_t dst;
@@ -5303,6 +5504,7 @@ __simd_callee__ inline vector_int4x2_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int8_t asc_loadalign_datablock_strided(
     __ubuf__ int8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -5320,6 +5522,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_datablock_strided(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_datablock_strided(
     __ubuf__ fp4x2_e2m1_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5367,6 +5570,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int16_t asc_loadalign_datablock_strided(
     __ubuf__ int16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -5392,6 +5596,7 @@ __simd_callee__ inline vector_half asc_loadalign_datablock_strided(
     return dst;
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_datablock_strided(
     __ubuf__ bfloat16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
@@ -5399,6 +5604,7 @@ __simd_callee__ inline vector_bfloat16_t asc_loadalign_datablock_strided(
     asc_loadalign(dst, src, block_stride, repeat_stride, mask);
     return dst;
 }
+#endif
 
 __simd_callee__ inline vector_int32_t asc_loadalign_datablock_strided(
     __ubuf__ int32_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)

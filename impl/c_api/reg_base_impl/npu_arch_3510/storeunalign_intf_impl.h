@@ -114,6 +114,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
     }
 }
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1)
@@ -177,6 +178,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
         vstur(src0, *reinterpret_cast<vector_fp4x2_e1m2_t*>(&src1), dst_tmp, POST_UPDATE);
     }
 }
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign_finalize)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src)

@@ -111,6 +111,7 @@ __simd_callee__ inline void asc_loadunalign(vector_float& dst, vector_load_unali
 
 __simd_callee__ inline void asc_loadunalign(vector_int64_t& dst, vector_load_unalign& src0, __ubuf__ int64_t* src1);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadunalign(
     vector_bfloat16_t& dst, vector_load_unalign& src0, __ubuf__ bfloat16_t* src1);
 
@@ -133,6 +134,7 @@ __simd_callee__ inline void asc_loadunalign(
     vector_fp4x2_e1m2_t& dst, vector_load_unalign& src0, __ubuf__ fp4x2_e1m2_t* src1);
 
 __simd_callee__ inline void asc_loadunalign(vector_int4x2_t& dst, vector_load_unalign& src0, __ubuf__ int4b_t* src1);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t*& src1, uint32_t count);
@@ -161,6 +163,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_int64_t& dst, vector_load_unalign& src0, __ubuf__ int64_t*& src1, uint32_t count);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_bfloat16_t& dst, vector_load_unalign& src0, __ubuf__ bfloat16_t*& src1, uint32_t count);
 
@@ -184,6 +187,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(
 
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_fp8_e8m0_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e8m0_t*& src1, uint32_t count);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t* src1, addr_reg& offset, uint32_t inc);
@@ -212,6 +216,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_int64_t& dst, vector_load_unalign& src0, __ubuf__ int64_t* src1, addr_reg& offset, uint32_t inc);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_bfloat16_t& dst, vector_load_unalign& src0, __ubuf__ bfloat16_t* src1, addr_reg& offset, uint32_t inc);
 
@@ -235,6 +240,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(
 
 __simd_callee__ inline void asc_loadunalign_postupdate(
     vector_fp8_e8m0_t& dst, vector_load_unalign& src0, __ubuf__ fp8_e8m0_t* src1, addr_reg& offset, uint32_t inc);
+#endif
 
 #endif
 
