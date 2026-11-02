@@ -123,6 +123,9 @@ class InstallTests(unittest.TestCase):
         (repo / "include/c_api").mkdir(parents=True)
         user_home = self.root / "user"
         config_home = self.root / "config"
+        human = self.source.parent / 'asc-devkit-search'
+        human.mkdir()
+        (human / 'SKILL.md').write_text('local human workflow')
         with mock.patch.object(install, "SKILL_ROOT", self.source), mock.patch.object(
             Path, "home", return_value=user_home
         ), mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": str(config_home)}):
@@ -134,6 +137,7 @@ class InstallTests(unittest.TestCase):
             self.assertEqual(install.main([]), 0)
             for directory in targets.values():
                 self.assertEqual((directory / "asc-search").resolve(), self.source)
+                self.assertFalse((directory / 'asc-devkit-search').exists())
 
 
 if __name__ == "__main__":
