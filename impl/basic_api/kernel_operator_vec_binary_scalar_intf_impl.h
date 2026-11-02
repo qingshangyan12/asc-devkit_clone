@@ -1750,7 +1750,7 @@ __aicore__ inline void SubsCommon(
 {
     static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Subs API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
-    static_assert(SupportType<typename U::PrimType, half, int16_t, float, int32_t>());
+    static_assert(SupportType<typename U::PrimType, half, bfloat16_t, int16_t, float, int32_t, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
     if constexpr (TypeUtils::IsLocalTensorType<S, V>()) {
         static_assert(Std::is_same<S, V>::value);
@@ -1845,7 +1845,7 @@ __aicore__ inline void DivsCommon(
 {
     static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Divs API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
-    static_assert(SupportType<typename U::PrimType, half, float>());
+    static_assert(SupportType<typename U::PrimType, half, float, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
     if constexpr (TypeUtils::IsLocalTensorType<S, V>()) {
         static_assert(Std::is_same<S, V>::value);
