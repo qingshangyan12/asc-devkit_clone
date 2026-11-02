@@ -5,10 +5,10 @@
 【描述】算子中进行带bias的矩阵乘计算时，可将bias数据搬运至Bias Table Buffer（C2）上，调用一次Mmad接口实现矩阵乘加bias的计算，或者直接调用Matmul高阶API完成功能。相比于先将矩阵乘的结果从L0C Buffer（CO1）搬运到GM上，再搬运到Unified Buffer（UB）上进行加bias的过程，减少了数据搬运的次数，可提升内存使用效率。数据流图对比如下：
 
 **图1**  反例数据流图<a name="fig1598718171213"></a>  
-![](../../../figures/bad_flow.png "反例数据流图")
+<img src="../../../figures/bad_flow.png" alt="反例数据流图" width="600px" height="200px">
 
 **图2**  正例数据流图<a name="fig12618184193220"></a>  
-![](../../../figures/good_dataflow.png "正例数据流图")
+<img src="../../../figures/good_dataflow.png" alt="正例数据流图" width="600px" height="147px">
 
 【反例】
 

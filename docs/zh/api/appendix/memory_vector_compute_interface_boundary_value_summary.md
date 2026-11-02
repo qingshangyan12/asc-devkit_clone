@@ -1201,7 +1201,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/half | CMPMODE::GE | +inf | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/1/1/1/0/1/1 | 1/1/1/1/0/1/1 |
 | half/half | CMPMODE::GE | -inf | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/1 | 0/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/1 | 0/0/0/0/0/0/1 |
-| half/half | CMPMODE::GT | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/1/1/0/0/1 | /0/1/1/0/0/1 |
+| half/half | CMPMODE::GT | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/1/1/0/0/1 | 1/0/1/1/0/0/1 |
 | half/half | CMPMODE::GT | +0 | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/0/0/0/0/1 | 1/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | -0 | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/0/0/0/0/1 | 1/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | nan | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/0 | 0/0/0/0/0/0/0 |
@@ -1302,7 +1302,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/half | CMPMODE::GE | +inf | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/1/1/1/0/1/1 | 1/1/1/1/0/1/1 |
 | half/half | CMPMODE::GE | -inf | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/1 | 0/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/1 | 0/0/0/0/0/0/1 |
-| half/half | CMPMODE::GT | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/1/1/0/0/1 | /0/1/1/0/0/1 |
+| half/half | CMPMODE::GT | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/1/1/0/0/1 | 1/0/1/1/0/0/1 |
 | half/half | CMPMODE::GT | +0 | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/0/0/0/0/1 | 1/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | -0 | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 1/0/0/0/0/0/1 | 1/0/0/0/0/0/1 |
 | half/half | CMPMODE::GT | nan | -65504.0（MIN）/65504.0（MAX）/+0/-0/nan/+inf/-inf | 0/0/0/0/0/0/0 | 0/0/0/0/0/0/0 |

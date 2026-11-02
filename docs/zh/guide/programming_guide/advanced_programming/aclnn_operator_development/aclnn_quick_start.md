@@ -2,7 +2,7 @@
 
 本文是基础内容，通过一个完整的AddCustom算子示例，帮助您在5分钟内跑通从创建工程、补充算子实现、编译部署到单算子API调用验证的端到端流程。
 
-![](../../../figures/end_to_end_operator_development_process.png)
+<img src="../../../figures/end_to_end_operator_development_process.png" alt="" width="600px" height="225px">
 
 ## 前置环境准备
 

@@ -174,7 +174,7 @@ __aicore__ inline void ringbuf_wait_rts_sync_impl()
 
 __aicore__ inline uint32_t asc_debug_get_core_idx_impl()
 {
-    constexpr uint32_t dumpCoreNums = 108;
+    constexpr uint32_t dumpCoreNums = 140;
     return get_coreid() % dumpCoreNums;
 }
 

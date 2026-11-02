@@ -55,6 +55,12 @@ HcclResult CreateChannelRequestByRankId(
 HcclResult CalcChannelRequestMesh1DOnDie(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, u32 expectedDieId);
+// 对齐 hccl CalcChannelRequestMesh1DFullMesh：在 level0 每个对端均有链路的首个网络层上建链，
+// 每对端每 die 取首条协议匹配链路。产出通道集可跨 die，
+// 调用方须归一到单 die 后再注册（单 kernel 全 channel 须同 die）。
+HcclResult CalcChannelRequestMesh1DFullMesh(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels);
 HcclResult CalcChannelRequestMesh1DWithPriorityTopo(
     HcclComm comm, const OpParam& param, const TopoInfo* topoInfo, const std::vector<std::vector<u32>>& subcommInfo,
     std::vector<HcclChannelDesc>& channels, CommTopo priorityTopo);

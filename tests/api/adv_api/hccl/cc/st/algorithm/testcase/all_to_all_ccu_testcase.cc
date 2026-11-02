@@ -245,4 +245,39 @@ TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_alltoallv_pcie_mix_all_connected_over_rank_li
     // 模板 CalcRes 的 CCU_MAX_RANK_SIZE=16 守卫同样生效，selector 需一致前置拒绝
     EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
 }
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_pcie_mix_all_connected_selects_sole_mesh)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.level0PcieMix = true;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {4U}; // 全连通 1DMESH
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
+    std::string algName;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "CcuSchedAllToAllSoleMesh");
+}
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_pcie_mix_all_connected_over_rank_limit_never_matches_ccu)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(17U); // pcieMix 全连通但超 rank 上限
+    topo.level0PcieMix = true;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {17U};
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
+    std::string algName;
+    // 与单级 MESH_1D 分支命中同一算法/模板，rank 上限契约一致，前置拒绝（V 版同款）
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
+}
+
+TEST_F(ST_ALL_TO_ALL_CCU_TEST, ccu_pcie_mix_not_all_connected_never_matches_ccu)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(4U);
+    topo.level0PcieMix = true;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {2U}; // 1DMESH 未覆盖全 rank
+    OpParam param = MakeCcuParam(HCCL_CMD_ALLTOALL);
+    std::string algName;
+    EXPECT_TRUE(CcuNotMatched(selector.Select(param, &topo, algName), algName));
+}
 } // namespace checker

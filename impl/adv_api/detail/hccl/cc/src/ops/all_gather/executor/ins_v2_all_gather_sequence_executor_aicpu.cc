@@ -111,6 +111,8 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     dataCount_ = param.DataDes.count;
     dataTypeSize_ = SIZE_TABLE[param.DataDes.dataType];
     dataSize_ = dataCount_ * dataTypeSize_;
+    strideCount_ = param.DataDes.strideCount;
+    HCCL_DEBUG("[InsV2AllGatherSequenceExecutorAicpu][Orchestrate] strideCount[%lu]", strideCount_);
     dataType_ = param.DataDes.dataType;
     algHierarchyInfo_ = resCtx.algHierarchyInfo;
     threads_ = resCtx.threads;
@@ -177,6 +179,8 @@ void InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, InsAlgTe
     TemplateDataParams& intraTempDataParams, const u64 processedDataCount, const u64 currDataCount,
     const u64 loop) const
 {
+    const u64 rankStrideBytes = (strideCount_ == 0) ? dataSize_ : strideCount_ * dataTypeSize_;
+
     intraTempDataParams.count = currDataCount;
     intraTempDataParams.buffInfo.inBuffBaseOff = 0;
     intraTempDataParams.buffInfo.outBuffBaseOff = processedDataCount * dataTypeSize_;
@@ -185,11 +189,11 @@ void InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, InsAlgTe
     intraTempDataParams.sliceSize = currDataCount * dataTypeSize_;
     intraTempDataParams.tailSize = intraTempDataParams.sliceSize;
     intraTempDataParams.inputSliceStride = 0;
-    intraTempDataParams.outputSliceStride = dataSize_;
+    intraTempDataParams.outputSliceStride = rankStrideBytes;
 
     intraTempDataParams.repeatNum = rankSizeLevel1_;
     intraTempDataParams.inputRepeatStride = currDataCount * dataTypeSize_;
-    intraTempDataParams.outputRepeatStride = dataSize_ * rankSizeLevel0_;
+    intraTempDataParams.outputRepeatStride = rankStrideBytes * rankSizeLevel0_;
 
     HCCL_INFO(
         "[InsV2AllGatherSequenceExecutorAicpu] loop[%llu] intraTempDataParams.inputSliceStride[%llu] "

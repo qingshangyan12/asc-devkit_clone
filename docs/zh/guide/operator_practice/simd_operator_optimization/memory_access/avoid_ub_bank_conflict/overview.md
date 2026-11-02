@@ -8,7 +8,7 @@
 
 -   针对[NPU架构版本2201](../../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)
 
-    ![](../../../../figures/mat_pos_65.png)
+    <img src="../../../../figures/mat_pos_65.png" alt="" width="920px" height="497px">
 
     UB总大小为192KB，包含16个bank group，每个bank group包含3个bank。每个bank大小为4KB，由128行组成，每行长度为32B。
 
@@ -18,7 +18,7 @@
 
 -   针对[NPU架构版本3510](../../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)
 
-    ![](../../../../figures/mat_pos_66.png)
+    <img src="../../../../figures/mat_pos_66.png" alt="" width="920px" height="670px">
 
     UB总大小为256KB，包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B。
 
