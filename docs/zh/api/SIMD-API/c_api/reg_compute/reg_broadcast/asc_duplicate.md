@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_broadcast.h"`。
 
-将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置清零。
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -69,7 +69,7 @@ __simd_callee__ inline void asc_duplicate(vector_int8_t& dst,
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。 |
 | src | 输入 | 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中清零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 

@@ -77,7 +77,7 @@ __simd_callee__ inline void asc_ln(vector_half& dst,
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `dst`与`src`的数据类型需要保持一致。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

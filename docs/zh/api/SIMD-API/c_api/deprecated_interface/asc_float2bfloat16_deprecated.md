@@ -41,11 +41,11 @@ def asc_float2bfloat16_rn(dst, src, mask):
         else:
             dst[2 * i] = 0
     for i in range(64):
-        dst[2 * i + 1] = 0                  # 奇数索引置零
+        dst[2 * i + 1] = 0                  # 奇数索引清零
 
 def asc_float2bfloat16_rn_v2(dst, src, mask):
     for i in range(64):
-        dst[2 * i] = 0                      # 偶数索引置零
+        dst[2 * i] = 0                      # 偶数索引清零
         if mask[i]:
             dst[2 * i + 1] = bfloat16(src[i])  # float -> bfloat16，RINT舍入，写入奇数索引
         else:
@@ -108,8 +108,8 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 ## 约束说明
 
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
-- 结果写入`dst`的奇数索引位置时，偶数索引位置置0；结果写入偶数索引位置时，奇数索引位置置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
+- 结果写入`dst`的奇数索引位置时，偶数索引位置清零；结果写入偶数索引位置时，奇数索引位置清零。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../spr/asc_set_ctrl.md)。
 
 ## 调用示例

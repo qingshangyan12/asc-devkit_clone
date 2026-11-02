@@ -40,11 +40,11 @@ def asc_half2uint8_rd(dst, src, mask):
         else:
             dst[2 * i] = 0
     for i in range(128):
-        dst[2 * i + 1] = 0               # 奇数索引置零
+        dst[2 * i + 1] = 0               # 奇数索引清零
 
 def asc_half2uint8_rd_v2(dst, src, mask):
     for i in range(128):
-        dst[2 * i] = 0                   # 偶数索引置零
+        dst[2 * i] = 0                   # 偶数索引清零
         if mask[i]:
             dst[2 * i + 1] = uint8(src[i])  # half -> uint8，FLOOR舍入，写入奇数索引
         else:
@@ -109,9 +109,9 @@ __simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
 - 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
+- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值清零。反之亦然。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../spr/asc_set_ctrl.md)。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

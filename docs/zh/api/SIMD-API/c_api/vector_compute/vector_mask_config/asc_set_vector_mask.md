@@ -133,7 +133,7 @@ PIPE_S
       // 读取VF场景外通过asc_set_vector_mask设置的掩码寄存器值
       vector_bool mask16 = asc_get_mask_spr_b16();
       vector_int16_t value16;
-      // 掩码筛选的元素广播为2，未筛选的元素置0
+      // 掩码筛选的元素广播为2，未筛选的元素清零
       asc_duplicate_scalar(value16, static_cast<int16_t>(2), mask16);
       // 掩码筛选的元素写入UB，未筛选的元素保持UB原值
       asc_storealign(output, value16, mask16);

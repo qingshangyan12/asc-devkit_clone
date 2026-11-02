@@ -68,7 +68,7 @@ PIPE_S
     - Atlas A2系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer->GM。
     <!-- end id9 -->
 - 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。
-- 该接口执行前不会自动将GM上已有数据置零。若开发者期望在原子取小前GM上的原始数据为零，则需手动清零。
+- 该接口执行前不会自动将GM上已有数据清零。若开发者期望在原子取小前GM上的原始数据为零，则需手动清零。
 - 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MTE2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../../scalar_compute/scalar_store/asc_store_dev.md)）不生效。
 - 本接口与紧邻的后续搬运指令之间的同步由硬件保证，因此以下示例中插入的多流水同步是不必要的：
 

@@ -100,7 +100,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

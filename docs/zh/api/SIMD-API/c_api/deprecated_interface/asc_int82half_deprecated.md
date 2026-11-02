@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_int82half_v2(vector_half& dst, vector_int8_t src
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。|
 | src | 输入 | 源操作数（矢量数据寄存器）。|
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中清零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
@@ -61,7 +61,7 @@ __simd_callee__ inline void asc_int82half_v2(vector_half& dst, vector_int8_t src
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置清零。
 
 ## 调用示例
 

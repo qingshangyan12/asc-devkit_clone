@@ -86,7 +86,7 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 比较时遵循$max(-0, +0) = +0$。
 - `dst`与`src`的数据类型需要保持一致。
-- 每个`DataBlock`内的最大值连续写入`dst`的前8个元素，这8个元素为有效输出，`dst`中的其他元素置0。
+- 每个`DataBlock`内的最大值连续写入`dst`的前8个元素，这8个元素为有效输出，`dst`中的其他元素清零。
 - 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的对应位置。
 - 仅输出最大值，不输出索引。
 

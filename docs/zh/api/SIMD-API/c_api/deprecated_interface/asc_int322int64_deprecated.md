@@ -38,7 +38,7 @@ def asc_int322int64(dst, src, mask):
         if mask[2 * i]:                  # 偶数索引位置参与计算
             dst[i] = int64(src[2 * i])   # int32 -> int64 扩展转换
         else:
-            dst[i] = 0                   # mask未选中，置零
+            dst[i] = 0                   # mask未选中，清零
 
 def asc_int322int64_v2(dst, src, mask):
     for i in range(32):
@@ -100,7 +100,7 @@ __simd_callee__ inline void asc_int322int64(vector_int64_t& dst,
 ## 约束说明
 
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

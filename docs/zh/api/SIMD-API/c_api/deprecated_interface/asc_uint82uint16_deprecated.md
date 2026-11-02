@@ -87,7 +87,7 @@ __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,
 ## 约束说明
 
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

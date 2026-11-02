@@ -80,7 +80,7 @@ __simd_callee__ inline void asc_axpy(vector_float& dst,
 ## 约束说明
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 

@@ -88,7 +88,7 @@ __simd_callee__ inline vector_int64_t asc_int322int64(vector_int32_t src,
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素清零。
 
 ## 调用示例
 
