@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id9 -->
+- Kirin9050处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin1" id10 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin2" id11 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id11 -->
+<!-- npu="kirin3" id12 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id12 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/MulDstAdd_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>

@@ -26,6 +26,15 @@
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf.h"
 
 namespace AscendC {
+constexpr Reg::CastTrait layoutZMrgZ = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+
+constexpr Reg::CastTrait LayoutZMrgZRndRSatNS = {
+    Reg::RegLayout::ZERO, Reg::SatMode::NO_SAT, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
+
+constexpr Reg::CastTrait MrgZRndA = {
+    Reg::RegLayout::UNKNOWN, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_ROUND};
+
 namespace Reg {
 constexpr int16_t SHIFT_ONE_BIT = 1;
 constexpr int16_t SHIFT_EIGHT_BIT = 8;
