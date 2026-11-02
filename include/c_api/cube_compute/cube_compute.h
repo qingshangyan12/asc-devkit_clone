@@ -667,7 +667,7 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hif8)
 __aicore__ inline void asc_enable_fp8();
 
 ASC_DEPRECATED(
-    9.3.0, "2027/11/01",
+    9.3.0, "2027/11/02",
     asc_mmad_s4(
         __cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k,
         uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source,
@@ -677,7 +677,7 @@ __aicore__ inline void asc_mmad_s4(
     uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val);
 
 ASC_DEPRECATED(
-    9.3.0, "2027/11/01",
+    9.3.0, "2027/11/02",
     asc_mmad_s4(
         __cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k,
         uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source,
@@ -688,7 +688,7 @@ __aicore__ inline void asc_mmad_s4(
     bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val);
 
 ASC_DEPRECATED(
-    9.3.0, "2027/11/01",
+    9.3.0, "2027/11/02",
     asc_mmad_sparse(
         __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n,
         asc_unit_flag_mode unit_flag_mode, bool c_matrix_source, bool c_matrix_init_val))
