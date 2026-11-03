@@ -33,16 +33,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     if (initTiling != nullptr) {
         const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
         debugMode_ = initTilingPtr->debugMode;
+#if __NPU_ARCH__ != 3510
         devType_ = initTilingPtr->devType;
+#endif
         tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
         hcclContext_ = (__gm__ OpResCtx*)context;
-        ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+        ASCENDC_HCCL_API_ASSERT(
+            hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
         InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
         return;
     }
     // initTiling is nullptr, get opType from context
     hcclContext_ = (__gm__ OpResCtx*)context;
-    ASCENDC_HCCL_API_ASSERT(hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    ASCENDC_HCCL_API_ASSERT(
+        hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
     const uint32_t opType = hcclContext_->opType[0];
     ASCENDC_HCCL_API_ASSERT(
