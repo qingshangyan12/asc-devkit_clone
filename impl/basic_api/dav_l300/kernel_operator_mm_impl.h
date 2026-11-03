@@ -503,7 +503,6 @@ __aicore__ inline void MmadCal(
                               "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
                               "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
         });
-    mmadParams.SetCmatrixInitVal(false);
     if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
         mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
     } else {

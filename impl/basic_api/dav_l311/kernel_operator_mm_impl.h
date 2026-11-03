@@ -481,13 +481,13 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
     ASCENDC_ASSERT(
         (SupportType<
             Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
-            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>>()),
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
         {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
                               "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
                               "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-                              "dst: int32_t, fm: int16_t, filter: int8_t.");
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
         });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
@@ -499,7 +499,11 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, config);
+    } else {
+        mad(c, a, b, config);
+    }
 }
 
 template <typename U, typename S>
@@ -519,13 +523,13 @@ __aicore__ inline void MmadCal(
     ASCENDC_ASSERT(
         (SupportType<
             Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
-            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>>()),
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
         {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
                               "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
                               "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-                              "dst: int32_t, fm: int16_t, filter: int8_t.");
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
         });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
@@ -537,7 +541,11 @@ __aicore__ inline void MmadCal(
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, bias, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, config);
+    } else {
+        mad(c, a, b, bias, config);
+    }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -546,15 +554,20 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     ASCENDC_ASSERT(
         (SupportType<
             Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
-            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>>()),
+            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
+            Tuple<int32_t, int8_t, int4b_t>>()),
         {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
                               "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
                               "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-                              "dst: int32_t, fm: int16_t, filter: int8_t.");
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
         });
-    mad(c, a, b, mmadParams.GetConfig0());
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, mmadParams.GetConfig0());
+    }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -564,16 +577,20 @@ __aicore__ inline void MmadCal(
     ASCENDC_ASSERT(
         (SupportType<
             Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
-            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>>()),
+            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
+            Tuple<int32_t, int8_t, int4b_t>>()),
         {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
                               "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
                               "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
-                              "dst: int32_t, fm: int16_t, filter: int8_t.");
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
         });
-    mmadParams.SetCmatrixInitVal(false);
-    mad(c, a, b, bias, mmadParams.GetConfig0());
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, bias, mmadParams.GetConfig0());
+    }
 }
 
 /* **************************************************************************************************
