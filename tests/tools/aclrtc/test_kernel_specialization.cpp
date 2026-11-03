@@ -103,6 +103,28 @@ TEST(KernelSpecializationRequestTest, NormalizesOptionalOutputKernelNameAndOwnsI
     output.assign("changed");
     EXPECT_EQ(normalized.kernelName, "add_custom_100000");
     EXPECT_EQ(normalized.outputKernelName, "specialized_add");
+
+    request.outputKernelEntry = "specialized.add=$1";
+    ASSERT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "kernel.elf", normalized), 0);
+    EXPECT_EQ(normalized.outputKernelName, request.outputKernelEntry);
+}
+
+TEST(KernelSpecializationRequestTest, RejectsOutputKernelNameWithCommaOrControlCharacters)
+{
+    auto request = CreateValidRequest();
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalized;
+    normalized.outputKernelName = "unchanged";
+    std::vector<std::string> invalidNames{"specialized,alloc", "specialized,badflag"};
+    for (unsigned char control : {0x01, 0x09, 0x0a, 0x1f, 0x7f}) {
+        invalidNames.emplace_back("specialized" + std::string(1, static_cast<char>(control)) + "add");
+    }
+    for (const auto& name : invalidNames) {
+        request.outputKernelEntry = name.c_str();
+        EXPECT_EQ(
+            ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "kernel.elf", normalized),
+            ACL_ERROR_RTC_INVALID_INPUT);
+        EXPECT_EQ(normalized.outputKernelName, "unchanged");
+    }
 }
 
 TEST(KernelSpecializationRequestTest, EnablesSuperKernelAndRemovesControlOption)
