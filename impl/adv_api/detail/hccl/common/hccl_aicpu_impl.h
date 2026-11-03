@@ -324,10 +324,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     uint8_t msgPos, uint64_t turnCnt, HcclHandle handleId)
 {
     handleIdCommitTurnCnt_[handleId] += turnCnt;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (!workingFlag_) {
+        return;
+    }
+#else
     if (queueNum_ != 0U || !workingFlag_) {
         return;
     }
-
+#endif
     __gm__ TurnCnt* commitGM = hcclMsgArea_->commMsg.singleMsg.commitTurnCnt + msgPos;
     do {
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
@@ -340,10 +345,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     commitGM->valid = COMMIT_VALID_MASK;
     FlushDataCache(commitGM);
     if (workingFlag_) {
+#if !(defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510)
         __gm__ TurnCnt* apiInfo = &(hcclMsgArea_->apiStats.commitStats[handleId2CmdType_[handleId]]);
         FlushDataCache(apiInfo);
         apiInfo->cnt += turnCnt;
         FlushDataCache(apiInfo);
+#endif
     }
 }
 
@@ -604,21 +611,17 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     ASCENDC_HCCL_API_ASSERT(
         curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION, { return; },
         "Call Commit failed, ensure Hccl::Init func has been called successfully!");
-    if (unlikely(handleId <= INVALID_HANDLE_ID || handleId >= HCCL_MAX_HANDLE_ID)) {
-        KERNEL_LOG(
-            KERNEL_ERROR, "Call Commit failed, handleId is[%d], expected in range of [0, %d).", handleId,
-            HCCL_MAX_HANDLE_ID);
-        return;
-    }
+    ASCENDC_HCCL_API_ASSERT(
+        handleId > INVALID_HANDLE_ID && handleId < HCCL_MAX_HANDLE_ID, { return; },
+        "Call Commit failed, handleId is[%d], expected in range of [0, %d).", handleId, HCCL_MAX_HANDLE_ID);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     const uint16_t commitCnt = handleIdCommitTurnCnt_[handleId];
-    if (unlikely(commitCnt >= handleIdRepeat_[handleId] * GetStepCntsPerRepeatByHandle(handleId))) {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "Call Commit for handleId[%d] failed, call num is[%u], "
-            "expected no larger than task num[%u].",
-            handleId, commitCnt + 1, handleIdRepeat_[handleId] * GetStepCntsPerRepeatByHandle(handleId));
-        return;
-    }
+    const uint16_t taskNum = handleIdRepeat_[handleId] * GetStepCntsPerRepeatByHandle(handleId);
+    ASCENDC_HCCL_API_ASSERT(
+        commitCnt < taskNum, { return; },
+        "Call Commit for handleId[%d] failed, call num is[%u], expected no larger than task num[%u].",
+        handleId, commitCnt + 1, taskNum);
+#endif
     const uint16_t stepSize = GetStepSizeByHandle(handleId);
     SetCommitTurnCntToGm(handleIdMsgPosition_[handleId], (stepSize == 0U ? 1U : stepSize), handleId);
 }
