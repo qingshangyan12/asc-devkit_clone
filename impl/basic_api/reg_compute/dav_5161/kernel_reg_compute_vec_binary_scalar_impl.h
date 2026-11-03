@@ -118,6 +118,7 @@ __simd_callee__ inline void LeakyReluImpl(S& dstReg, S& srcReg, U scalarValue, M
     vlrelu(dstReg, srcReg, scalarValue, mask, modeValue);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename T = DefaultType, typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __simd_callee__ inline void ShiftLeftsImpl(RegT& dstReg, RegT& srcReg0, ScalarT scalarValue, MaskReg& mask)
 {
@@ -147,32 +148,7 @@ __simd_callee__ inline void ShiftRightsImpl(RegT& dstReg, RegT& srcReg, ScalarT 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vshrs(dstReg, srcReg, scalar, mask, modeValue);
 }
-template <typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__simd_callee__ inline void ShiftRightsB64Impl(RegT& dstReg, RegT& srcReg, ScalarT scalar, MaskReg& mask)
-{
-    using ActualT = typename RegT::ActualT;
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    int16_t B32Width = 32;
-    if constexpr (Std::is_same_v<ActualT, uint64_t>) {
-        RegTensor<uint32_t> tmpReg0;
-        RegTensor<uint32_t> tmpReg1;
-        vshrs(tmpReg0, (RegTensor<uint32_t>&)srcReg.reg[0], scalar, mask, modeValue);
-        vshls(tmpReg1, (RegTensor<uint32_t>&)srcReg.reg[1], B32Width - scalar, mask, modeValue);
-        Or((RegTensor<uint32_t>&)dstReg.reg[0], tmpReg0, tmpReg1, mask);
-        vshrs(tmpReg0, (RegTensor<uint32_t>&)srcReg.reg[0], B32Width + scalar, mask, modeValue);
-        vshrs(tmpReg1, (RegTensor<uint32_t>&)srcReg.reg[1], scalar, mask, modeValue);
-        Or((RegTensor<uint32_t>&)dstReg.reg[1], tmpReg0, tmpReg1, mask);
-    } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
-        RegTensor<int32_t> tmpReg0;
-        RegTensor<int32_t> tmpReg1;
-        vshrs((RegTensor<uint32_t>&)tmpReg0, (RegTensor<uint32_t>&)srcReg.reg[0], scalar, mask, modeValue);
-        vshls((RegTensor<int32_t>&)tmpReg1, (RegTensor<int32_t>&)srcReg.reg[1], B32Width - scalar, mask, modeValue);
-        Or((RegTensor<int32_t>&)dstReg.reg[0], tmpReg0, tmpReg1, mask);
-        vshrs((RegTensor<uint32_t>&)tmpReg0, (RegTensor<uint32_t>&)srcReg.reg[0], B32Width + scalar, mask, modeValue);
-        vshrs(tmpReg1, (RegTensor<int32_t>&)srcReg.reg[1], scalar, mask, modeValue);
-        Or((RegTensor<int32_t>&)dstReg.reg[1], tmpReg0, tmpReg1, mask);
-    }
-}
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_SCALAR_IMPL_H
