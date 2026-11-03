@@ -13,7 +13,7 @@
 
 ## 通用约束
 
-### 地址对齐要求<a id="alignment_requirements"></a>
+### 通用地址对齐要求<a id="alignment_requirements"></a>
 
 AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数和目的操作数，各类存储单元的对齐要求如[表2](#alignment_requirements_table)所示，因此Ascend C API操作数的起始地址对齐要求应与这些存储单元的对齐要求保持一致。**需要注意的是，如果接口中已明确说明操作数起始地址对齐要求，则以具体API中的说明为准。**
 
@@ -31,13 +31,28 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 | BiasTable Buffer | 64Byte对齐。 |
 | Fixpipe Buffer | 64Byte对齐。 |
 
-> [!NOTE]
->
+> [!NOTE]说明
 > 上表所述地址对齐要求适用于一般情况，具体接口可能有不同要求。下面列举部分特殊情况（涉及的接口以C API为例）：
 > - Global Memory：[asc_ndim_copy_gm2ub](c_api/vector_datamove/asc_ndim_copy_gm2ub.md)的数据类型为b16、b32时，GM源地址分别要求2Byte、4Byte对齐。
 > - UB：[asc_ndim_copy_gm2ub](c_api/vector_datamove/asc_ndim_copy_gm2ub.md)的UB目的地址仅要求1Byte对齐。
 > - L0C Buffer：NPU架构版本3510的[asc_mmad](c_api/cube_compute/mmad_compute/asc_mmad.md)要求L0C结果地址1024Byte对齐。
 > - Fixpipe Buffer：NPU架构版本3510的[asc_copy_l12fb](c_api/cube_datamove/cube_compute_load/asc_copy_l12fb_arch_3510.md)要求随路Vector量化参数地址128Byte对齐。
+
+### 通用地址重叠约束<a id="address_overlap_constraints"></a>
+
+使用高维切分计算接口时，为了节省地址空间，可以使源操作数和目的操作数使用同一段存储空间。使用地址重叠时，需要满足以下约束：
+
+- 单次迭代内，源操作数与目的操作数必须完全重叠，不支持部分重叠。
+- 多次迭代间，不支持前序迭代的目的操作数与后序迭代的源操作数重叠。例如，第N次迭代的目的操作数是第N+1次迭代的源操作数时，第N次迭代可能改写后续迭代仍需读取的源数据，导致计算结果不符合预期。
+- 对于部分双目计算类接口，当数据类型为half、int32_t或float时，可在满足接口特定条件的情况下支持前序迭代的目的操作数与后序迭代的源操作数重叠。该重叠仅限于目的操作数与第二个源操作数重叠，且`src1RepStride`或`dstRepStride`必须为0；具体支持的接口以对应API文档为准。
+- 多次迭代间，不支持前序迭代的目的操作数与后序迭代的目的操作数重叠。前序迭代写入的数据可能被后续迭代覆盖，导致计算结果不符合预期。
+
+**图1** 地址重叠示例（不支持）<a id="address_overlap_example"></a>
+![](../figures/address_overlap_unsupported.png "地址重叠示例（不支持）")
+
+> [!NOTE]说明
+> 本节所述地址重叠通用约束适用于C API和基础API的一般情况，API参考中如有额外特殊说明的，则以具体API中的说明为准。
+> API中没有描述地址重叠约束的，视为不支持Tensor高维切分计算的地址重叠，地址重叠时计算结果可能不满足预期。
 
 ### 原子操作
 
@@ -107,8 +122,7 @@ AI Core中的数据搬运、矢量计算和矩阵计算由不同的硬件流水�
 | 基础API | `${INSTALL_DIR}/asc/include/kernel_operator.h` | 接口头文件位于`${INSTALL_DIR}/asc/include/basic_api`目录。 |
 | 高阶API | `${INSTALL_DIR}/asc/include/kernel_operator.h` | 接口头文件位于`${INSTALL_DIR}/asc/include/adv_api`和`${INSTALL_DIR}/asc/include/tiling`目录。<br>使用配套Host Tiling接口时，需要链接`libtiling_api.a`。 |
 
-> [!NOTE]
->
+> [!NOTE]说明
 > `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：`/usr/local/Ascend/cann`。
 
 ### 数据存储位置的描述方式
@@ -178,21 +192,3 @@ C API通常直接使用带地址空间限定符的指针表达操作数所在的
 | TSCM | L1 Buffer |
 | SPM | <!-- npu="950" id19 -->Ascend 950PR&950DT系列产品，Global Memory。<br><!-- end id19 --><!-- npu="910" id20 -->Atlas训练系列产品，L1 Buffer。<br><!-- end id20 --><!-- npu="310p" id21 -->Atlas推理系列产品AI Core，L1 Buffer。<br><!-- end id21 --><!-- npu="910b" id22 -->Atlas A2系列产品，Global Memory。<br><!-- end id22 --><!-- npu="A3" id23 -->Atlas A3系列产品，Global Memory。<!-- end id23 --> |
 | C2PIPE2GM | <!-- npu="950" id24 -->Ascend 950PR&950DT系列产品，Fixpipe Buffer。<br><!-- end id24 --><!-- npu="910b" id25 -->Atlas A2系列产品，Fixpipe Buffer。<br><!-- end id25 --><!-- npu="A3" id26 -->Atlas A3系列产品，Fixpipe Buffer。<!-- end id26 --> |
-
-
-### 地址重叠约束<a id="address_overlap_constraints"></a>
-
-使用高维切分计算接口时，为了节省地址空间，可以使源操作数和目的操作数使用同一段存储空间。使用地址重叠时，需要满足以下约束：
-
-- 单次迭代内，源操作数与目的操作数必须完全重叠，不支持部分重叠。
-- 多次迭代间，不支持前序迭代的目的操作数与后序迭代的源操作数重叠。例如，第N次迭代的目的操作数是第N+1次迭代的源操作数时，第N次迭代可能改写后续迭代仍需读取的源数据，导致计算结果不符合预期。
-- 对于部分双目计算类接口，当数据类型为half、int32_t或float时，可在满足接口特定条件的情况下支持前序迭代的目的操作数与后序迭代的源操作数重叠。该重叠仅限于目的操作数与第二个源操作数重叠，且`src1RepStride`或`dstRepStride`必须为0；具体支持的接口以对应API文档为准。
-- 多次迭代间，不支持前序迭代的目的操作数与后序迭代的目的操作数重叠。前序迭代写入的数据可能被后续迭代覆盖，导致计算结果不符合预期。
-
-**图1** 地址重叠示例（不支持）<a id="address_overlap_example"></a>
-![](../figures/address_overlap_unsupported.png "地址重叠示例（不支持）")
-
-> [!NOTE]    
->
-> 本节所述地址重叠通用约束适用于C API和基础API的一般情况，API参考中如有额外特殊说明的，则以具体API中的说明为准。
-> API中没有描述地址重叠约束的，视为不支持Tensor高维切分计算的地址重叠，地址重叠时计算结果可能不满足预期。
