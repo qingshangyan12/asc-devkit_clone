@@ -187,8 +187,8 @@ __simd_callee__ inline void CastImpl(RegT& dstReg, RegU& srcReg, MaskReg& mask)
         Tuple<int16_t, uint32_t>, Tuple<uint16_t, int32_t>, Tuple<int16_t, int32_t>, Tuple<uint8_t, uint32_t>,
         Tuple<uint8_t, int32_t>>();
     constexpr bool rndSatLayoutMergeCast = SupportType<
-        Tuple<ActualT, ActualU>, Tuple<int16_t, float>, Tuple<uint8_t, half>, Tuple<int8_t, half>,
-        Tuple<half, float>, Tuple<int4x2_t, half>>();
+        Tuple<ActualT, ActualU>, Tuple<int16_t, float>, Tuple<uint8_t, half>, Tuple<int8_t, half>, Tuple<half, float>,
+        Tuple<int4x2_t, half>>();
     constexpr bool rndSatMergeCast =
         SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, float>, Tuple<int16_t, half>>();
     constexpr bool rndLayoutMergeCast = SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, half>>();
