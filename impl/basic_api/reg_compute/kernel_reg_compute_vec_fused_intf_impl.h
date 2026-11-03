@@ -25,6 +25,8 @@
 
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_fused_impl.h"
+#elif __NPU_ARCH__ == 3103
+#include "../../basic_api/reg_compute/dav_l310/kernel_reg_compute_vec_fused_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_vec_fused_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
@@ -69,7 +71,7 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 // Kirin v516 平台不支持如下历史接口
 template <
     typename T0 = DefaultType, typename T1 = DefaultType, typename T2, RegLayout layout = RegLayout::ZERO, typename T3,

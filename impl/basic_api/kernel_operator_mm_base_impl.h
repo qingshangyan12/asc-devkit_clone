@@ -46,6 +46,8 @@
 #include "dav_5162/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_mm_impl.h"
+#elif (__NPU_ARCH__ == 3103)
+#include "dav_l310/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
@@ -345,7 +347,9 @@ LoadData(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
@@ -439,7 +443,7 @@ __aicore__ inline void LoadDataImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103))
 // cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <>
 __aicore__ inline void LoadDataImpl(

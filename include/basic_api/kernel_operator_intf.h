@@ -26,7 +26,7 @@
 #define ASCENDC_MODULE_OPERATOR_INTERFACE_H
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 // MICRO API
 #include "reg_compute/kernel_reg_compute_intf.h"
 #endif
@@ -99,7 +99,7 @@
 #include "include/adv_api/activation/softmaxgrad.h"
 #endif
 #if (__NPU_ARCH__ <= 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)
 #include "include/adv_api/index/arithprogression.h"
 #include "include/adv_api/normalization/layernormgrad.h"
 #include "include/adv_api/normalization/layernormgradbeta.h"
