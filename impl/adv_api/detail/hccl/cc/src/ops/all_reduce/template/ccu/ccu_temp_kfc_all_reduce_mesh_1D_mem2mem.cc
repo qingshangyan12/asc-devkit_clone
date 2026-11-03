@@ -13,6 +13,8 @@
 #include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
 #include "kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
 
+#include "kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem_pc.h"
+
 namespace mc2_ops_hccl {
 
 CcuTempKfcAllReduceMesh1DMem2Mem::CcuTempKfcAllReduceMesh1DMem2Mem(
@@ -31,7 +33,7 @@ HcclResult CcuTempKfcAllReduceMesh1DMem2Mem::CalcRes(
 
     CcuKernelInfo kernelInfo;
     strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllReduceMesh1DMem2Mem");
-    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcAllReduceMesh1DMem2MemKernel);
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuKfcAllReduceMesh1DMem2MemKernel);
 
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {

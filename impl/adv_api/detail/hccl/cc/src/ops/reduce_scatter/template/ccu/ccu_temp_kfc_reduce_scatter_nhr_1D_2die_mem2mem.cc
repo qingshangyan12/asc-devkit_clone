@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
 
+#include "kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem_pc.h"
+
 namespace mc2_ops_hccl {
 
 namespace {
@@ -120,7 +122,7 @@ HcclResult CcuTempKfcReduceScatterNHR1D2DieMem2Mem::CalcRes(
         CcuKernelInfo kernelInfo;
         CHK_SAFETY_FUNC_RET(strcpy_s(
             kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcReduceScatterNHR1D2DieMem2Mem"));
-        kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcReduceScatterNHR1D2DieMem2MemKernel);
+        kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuKfcReduceScatterNHR1D2DieMem2MemKernel);
 
         auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterNHR1D2Die>();
         kernelArg->rankSize = tempRankSize_;

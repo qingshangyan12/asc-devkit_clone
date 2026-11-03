@@ -12,6 +12,9 @@
 #include "ccu_assist_pub.h"
 #include "ccu_kernel_alg_base.h"
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#include "kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+
+#include "kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem_pc.h"
 
 namespace mc2_ops_hccl {
 
@@ -32,6 +35,11 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo;
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherMesh1DMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuKfcAllGatherMesh1DMem2MemKernel);
+    auto kernelArg = std::make_shared<pc::CcuKernelArgKfcAllGatherMesh1DMem2Mem>();
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelInfo.setKernelArg(kernelArg);
 
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
@@ -47,7 +55,6 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
         }
     }
 
-    // CcuKernelKfcServer replaces this placeholder before registration and reuses these channels.
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     HCCL_INFO(

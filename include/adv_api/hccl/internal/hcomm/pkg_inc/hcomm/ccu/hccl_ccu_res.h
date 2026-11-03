@@ -28,6 +28,8 @@ extern CcuResult HcommCcuKernelRegister(
 
 extern CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle);
 
+extern CcuResult HcommCcuFunctionGet(CcuKernelHandle kernelHandle, const char* funcName, uint64_t* pc);
+
 extern CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize);
 

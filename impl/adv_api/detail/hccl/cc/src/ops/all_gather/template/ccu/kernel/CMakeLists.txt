@@ -14,8 +14,11 @@ set(src_list
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_mesh1d.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_mesh1d.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_mesh1d_mem2mem_pc.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem_pc.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_nhr1d_mem2mem.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_nhr1d_mem2mem_pc.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_nhr1d_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_2dies_mesh1d_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_nhr1d_multi_jetty_mem2mem.cc

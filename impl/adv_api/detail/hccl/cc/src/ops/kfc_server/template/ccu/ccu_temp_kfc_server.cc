@@ -174,6 +174,29 @@ HcclResult InheritKfcServerKernelArg(
     return HCCL_SUCCESS;
 }
 
+// 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
+HcclResult InheritKfcServerPcKernelArg(
+    const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, KfcServerRole role,
+    uint32_t missionIndex)
+{
+    dstKernel = srcKernel;
+    CHK_PTR_NULL(srcKernel.kernelArg);
+    CHK_PTR_NULL(srcKernel.kernelFunc);
+    const auto* srcArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
+    auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
+    kfcArg->algSubType = srcArg->algSubType;
+    kfcArg->algArg = srcArg->algArg;
+    dstKernel.setSubKernelFromKernel();
+    kfcArg->usePc = true;
+    kfcArg->role = role;
+    kfcArg->hostMissionIndex = missionIndex;
+    kfcArg->opParam = param;
+    dstKernel.setKernelArg(kfcArg);
+    CHK_SAFETY_FUNC_RET(strcpy_s(dstKernel.kernelFuncName, sizeof(dstKernel.kernelFuncName), "CcuKernelKfcServerPc"));
+    dstKernel.kernelFunc = reinterpret_cast<void*>(CcuKfcServerPcKernel);
+    return HCCL_SUCCESS;
+}
+
 namespace {
 uint32_t GetMySubCommRank(const std::vector<std::vector<u32>>& subCommRanks, const u32 rankId)
 {
@@ -296,9 +319,15 @@ HcclResult CcuTempKfcServer::CalcRes(
         HCCL_INFO(
             "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]", missionIndex,
             resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName);
-        CHK_RET(InheritKfcServerKernelArg(
-            resourceRequest.ccuKernelInfos[kernelIndex], kernelInfo, param, mySubCommRank_, subCommRanks_,
-            missionIndex));
+        if (effectiveMissionNum == 1U) {
+            CHK_RET(InheritKfcServerPcKernelArg(
+                resourceRequest.ccuKernelInfos[kernelIndex], kernelInfo, param,
+                GetKfcServerRole(param.algName, missionIndex), missionIndex));
+        } else {
+            CHK_RET(InheritKfcServerKernelArg(
+                resourceRequest.ccuKernelInfos[kernelIndex], kernelInfo, param, mySubCommRank_, subCommRanks_,
+                missionIndex));
+        }
         resourceRequest.ccuKernelInfos[kernelIndex] = kernelInfo;
     }
 

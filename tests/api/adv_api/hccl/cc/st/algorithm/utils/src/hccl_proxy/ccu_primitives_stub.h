@@ -33,6 +33,9 @@ public:
     ResourceHandle GetChannelVariable(ChannelHandle channel, uint32_t index);
     void ConfigureProgram(uint32_t rankId, uint32_t rankSize, const std::vector<ChannelHandle>& channels);
     void RegisterArgument(ResourceHandle variable, uint32_t argId);
+    Result LoadFunctionArgument(ResourceHandle variable, uint32_t argId);
+    Result CaptureFunction(const std::vector<ResourceHandle>& arguments);
+    std::function<Result()> ExchangeFunctionCapture(std::function<Result()> capture);
     void Append(const Operation& operation);
     void AppendGroupCopy(
         ResourceHandle destination, ResourceHandle source, ResourceHandle length,
@@ -60,6 +63,22 @@ private:
     ResourceHandle nextHandle_{1};
     std::vector<Operation>* loopBodyTarget_{nullptr};
     std::map<ResourceHandle, std::vector<Operation>> loopBodies_;
+    std::function<Result()> functionCapture_;
+    const std::vector<ResourceHandle>* functionArguments_{nullptr};
+};
+
+class FunctionCaptureScope {
+public:
+    explicit FunctionCaptureScope(std::function<Result()> capture)
+        : compiler_(CompilerContext::Current()), previous_(compiler_.ExchangeFunctionCapture(std::move(capture)))
+    {}
+    ~FunctionCaptureScope() { compiler_.ExchangeFunctionCapture(std::move(previous_)); }
+    FunctionCaptureScope(const FunctionCaptureScope&) = delete;
+    FunctionCaptureScope& operator=(const FunctionCaptureScope&) = delete;
+
+private:
+    CompilerContext& compiler_;
+    std::function<Result()> previous_;
 };
 
 struct Condition {
@@ -225,6 +244,9 @@ public:
     explicit Func(Callable&& fn) : body_(std::forward<Callable>(fn))
     {}
 
+    template <typename Callable>
+    Func(Callable&& fn, uint32_t numIn, const char* name);
+
     void RunBody() const
     {
         if (body_)
@@ -255,6 +277,19 @@ template <>
 Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex);
 
 Result LoadArg(Variable variable, uint32_t argId);
+
+template <typename Callable>
+Func::Func(Callable&& fn, uint32_t numIn, const char* name)
+{
+    (void)name;
+    // ST captures the named function body inline; each formal binds to the matching task-arg slot.
+    Array<Variable> args(numIn);
+    for (uint32_t index = 0; index < numIn; ++index) {
+        LoadArg(args[index], index);
+    }
+    fn(args);
+}
+
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
 Result Load(uint64_t address, Variable destination);

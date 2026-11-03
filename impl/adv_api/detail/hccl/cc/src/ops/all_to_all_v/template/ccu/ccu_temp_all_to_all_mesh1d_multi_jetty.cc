@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 
+#include "kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty_pc.h"
+
 namespace mc2_ops_hccl {
 namespace {
 // 升 N>1 时须与 prepare 侧 a2aJettyNum 同步修改（hccl_ccu_v0_prepare.h）
@@ -56,6 +58,7 @@ HcclResult CcuTempAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuAllToAllMesh1DMultiJettyKernel"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuAllToAllMesh1DMultiJettyKernel);
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
