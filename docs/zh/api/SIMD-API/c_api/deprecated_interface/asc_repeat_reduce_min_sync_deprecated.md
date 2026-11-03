@@ -75,7 +75,7 @@ PIPE_V
 ## 约束说明
 
 - 输出中的索引index的数据是按照dst的数据类型进行存储，比如float输出的index数据应该为uint32，则读取时需要将float重新解释为uint32。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#address_overlap_constraints)。
 - dst的起始地址，输入类型为half时需要4字节对齐，输入类型为float时需要8字节对齐。
 - src的起始地址需要32字节对齐。
 

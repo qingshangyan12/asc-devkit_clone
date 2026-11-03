@@ -95,7 +95,7 @@
 ## 约束说明<a name="zh-cn_topic_0000002563051145_section1323412155712"></a>
 
 - offset量化参数，int16\_t类型，只有前9位有效。
-- vdeq地址对齐约束参考[地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- vdeq地址对齐约束参考[地址对齐约束](../../../general_description_and_constraints.md#alignment_requirements)。
 
 ## 调用示例<a name="zh-cn_topic_0000002563051145_section5349145316712"></a>
 

@@ -161,7 +161,7 @@
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#address_overlap_constraints)。
 - 源操作数的地址对齐约束请参考[通用地址对齐约束](../../../general_description_and_constraints.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束受操作数数据类型、`reduceType`和`order`参数的影响，请参考[表3](#tab3)。
 
     **表3**  目的操作数地址对齐约束及dstRepStride单位

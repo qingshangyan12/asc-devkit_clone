@@ -122,7 +122,7 @@
 ## 约束说明
 
 - 源操作数的对齐约束请参见[通用地址对齐约束](../../../general_description_and_constraints.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数起始地址的对齐约束与操作数数据类型有关，在`half`数据类型时需要保证16字节对齐，在`float`数据类型时需要保证32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#address_overlap_constraints)。
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合Unified Buffer（UB）的实际大小避免出现越界。
 
 <!-- npu="950,A3,910b" id18 -->

@@ -76,7 +76,7 @@ PIPE_V
 
 - 接口不支持通过[asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md)配置掩码。
 - dst、src0、src1的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#address_overlap_constraints)。
 
 ## 调用示例
 

@@ -76,7 +76,7 @@ PIPE_V
 
 - 需要配合[asc_set_cmp_mask](../vector_compare/asc_set_cmp_mask.md)接口使用。
 - dst、src0、src1的起始地址需要32字节对齐
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#address_overlap_constraints)。
 
 ## 调用示例
 

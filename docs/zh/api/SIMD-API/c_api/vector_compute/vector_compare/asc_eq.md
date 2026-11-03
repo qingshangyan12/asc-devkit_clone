@@ -71,7 +71,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#address_overlap_constraints)。
 - dst、src0、src1的起始地址需要32字节对齐。
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 - 使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。
