@@ -337,6 +337,7 @@ __simd_callee__ inline void DataCopyImpl(
         }
     }
 }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
 {
@@ -348,6 +349,7 @@ __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
     DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
 }
+#endif
 
 } // namespace Reg
 } // namespace AscendC

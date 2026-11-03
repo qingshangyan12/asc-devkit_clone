@@ -64,6 +64,7 @@ __simd_callee__ inline void FusedExpSubImpl(S& dstReg, V& srcReg0, V& srcReg1, M
     vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __simd_callee__ inline void FusedMulDstAddImpl(RegT& dstReg, RegT& srcReg0, RegT& srcReg1, MaskReg& mask)
 {
@@ -83,6 +84,7 @@ __simd_callee__ inline void FusedAbsSubImpl(RegT& dstReg, RegT& srcReg0, RegT& s
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vabsdif(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_IMPL_H

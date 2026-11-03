@@ -55,18 +55,6 @@ __simd_callee__ inline void GatherImpl(RegT& dstReg, RegT& srcReg0, RegU& srcReg
     }
 }
 
-template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename RegT>
-__simd_callee__ inline void GatherMaskImpl(RegT& dstReg, RegT srcReg, MaskReg mask)
-{
-    using ActualT = typename RegT::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>(),
-        "current data type is not supported on current device!");
-    constexpr auto modeValue = std::integral_constant<::StoreMode, static_cast<::StoreMode>(store)>();
-    vsqz(dstReg, srcReg, mask, modeValue);
-}
-
 template <typename T = DefaultType, typename RegT>
 __simd_callee__ inline void PrefixSumImpl(RegT& dstReg, MaskReg& mask)
 {
@@ -87,6 +75,7 @@ __aicore__ inline int64_t GetSprImpl()
     return get_ar();
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
 __simd_callee__ inline void ClearSprImpl()
 {
@@ -97,6 +86,8 @@ __simd_callee__ inline void ClearSprImpl()
     constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
     sprclr(sprValue);
 }
+#endif
+
 } // namespace Reg
 } // namespace AscendC
 #endif

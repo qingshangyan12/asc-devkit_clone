@@ -26,6 +26,7 @@
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {
 namespace Reg {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <
     typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type, typename RegT,
     typename RegU>
@@ -42,6 +43,7 @@ __simd_callee__ inline void HistogramsImpl(RegU& dstReg, RegT& srcReg, MaskReg& 
         chistv2(dstReg, srcReg, mask, HistogramsMode);
     }
 }
+#endif
 } // namespace Reg
 } // namespace AscendC
 

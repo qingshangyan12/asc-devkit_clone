@@ -70,6 +70,7 @@ __simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
     punpack(dst, src, partValue);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename RegT>
 __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& srcReg, int16_t bitOffset)
 {
@@ -89,57 +90,7 @@ __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& src
         movvp(dstMask, (RegTensor<uint32_t>&)srcReg, Offset);
     }
 }
-__simd_callee__ inline void MaskNotImpl(MaskReg& dstMask, MaskReg& srcMask, MaskReg& mask)
-{
-    pnot(dstMask, srcMask, mask);
-}
-__simd_callee__ inline void MaskAndImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
-{
-    pand(dstMask, srcMask0, srcMask1, mask);
-}
-__simd_callee__ inline void MaskOrImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
-{
-    por(dstMask, srcMask0, srcMask1, mask);
-}
-__simd_callee__ inline void MaskXorImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
-{
-    pxor(dstMask, srcMask0, srcMask1, mask);
-}
-__simd_callee__ inline void MaskMovImpl(MaskReg& dstMask, MaskReg& srcMask, MaskReg& mask)
-{
-    pmov(dstMask, srcMask, mask);
-}
-__simd_callee__ inline void MaskMovImpl(MaskReg& dstMask, MaskReg& srcMask) { pmov(dstMask, srcMask); }
-template <typename T>
-__simd_callee__ inline void MaskInterleaveImpl(
-    MaskReg& dstMask0, MaskReg& dstMask1, MaskReg& srcMask0, MaskReg& srcMask1)
-{
-    static_assert(SupportBytes<T, 1, 2, 4>(), "MaskInterleave only support type b8/b16/b32 on current device");
-    if constexpr (sizeof(T) == 1) {
-        pintlv_b8(dstMask0, dstMask1, srcMask0, srcMask1);
-    } else if constexpr (sizeof(T) == 2) {
-        pintlv_b16(dstMask0, dstMask1, srcMask0, srcMask1);
-    } else if constexpr (sizeof(T) == 4) {
-        pintlv_b32(dstMask0, dstMask1, srcMask0, srcMask1);
-    }
-}
-template <typename T>
-__simd_callee__ inline void MaskDeInterleaveImpl(
-    MaskReg& dstMask0, MaskReg& dstMask1, MaskReg& srcMask0, MaskReg& srcMask1)
-{
-    static_assert(SupportBytes<T, 1, 2, 4>(), "MaskDeInterleave only support type b8/b16/b32 on current device");
-    if constexpr (sizeof(T) == 1) {
-        pdintlv_b8(dstMask0, dstMask1, srcMask0, srcMask1);
-    } else if constexpr (sizeof(T) == 2) {
-        pdintlv_b16(dstMask0, dstMask1, srcMask0, srcMask1);
-    } else if constexpr (sizeof(T) == 4) {
-        pdintlv_b32(dstMask0, dstMask1, srcMask0, srcMask1);
-    }
-}
-__simd_callee__ inline void MaskSelImpl(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1, MaskReg& mask)
-{
-    psel(dstMask, srcMask0, srcMask1, mask);
-}
+
 template <typename T>
 __simd_callee__ inline MaskReg MoveMaskImpl()
 {
@@ -151,6 +102,7 @@ __simd_callee__ inline MaskReg MoveMaskImpl()
         return movp_b32();
     }
 }
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_MASKREG_IMPL_H

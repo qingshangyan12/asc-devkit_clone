@@ -694,6 +694,18 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
             }
         }
+    } else if constexpr (SupportType<ActualT, uint32_t>() || SupportType<ActualT, int32_t>()) {
+        constexpr auto modeValue = GetMaskMergeMode<mode>();
+        constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
+        RegTensor<float> dstReg0;
+        RegTensor<float> dstReg1;
+        vcvt(dstReg0, (RegTensor<int32_t>&)srcReg0, mask, roundModeValue, modeValue);
+        vcvt(dstReg1, (RegTensor<int32_t>&)srcReg1, mask, roundModeValue, modeValue);
+        vdiv((RegTensor<float>&)dstReg, dstReg0, dstReg1, mask, modeValue);
+        constexpr auto satModeValue =
+            std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::SAT)>();
+        constexpr auto truncModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_TRUNC>()>();
+        vcvt((RegTensor<int32_t>&)dstReg, (RegTensor<float>&)dstReg, mask, truncModeValue, satModeValue, modeValue);
     } else {
         vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
@@ -819,6 +831,7 @@ __simd_callee__ inline void MulAddDstImpl(U& dstReg, U& srcReg0, U& srcReg1, Mas
     vmula(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <
     typename T = DefaultType, typename SHIFT_T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
     typename RegT, typename RegShiftT>
@@ -888,28 +901,7 @@ __simd_callee__ inline void MullImpl(RegT& dstReg0, RegT& dstReg1, RegT& srcReg0
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Mull api is not supported on current device!"); });
 }
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void AddCarryOutImpl(MaskReg& carryp, RegT& dstReg, RegT& srcReg0, RegT& srcReg1, MaskReg& mask)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddCarryOut api is not supported on current device!"); });
-}
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void SubCarryOutImpl(MaskReg& carryp, RegT& dstReg, RegT& srcReg0, RegT& srcReg1, MaskReg& mask)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubCarryOut api is not supported on current device!"); });
-}
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void AddCarryOutsImpl(
-    MaskReg& carryp, RegT& dstReg, RegT& srcReg0, RegT& srcReg1, MaskReg& carrysrcp, MaskReg& mask)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AddCarryOuts api is not supported on current device!"); });
-}
-template <typename T = DefaultType, typename RegT>
-__simd_callee__ inline void SubCarryOutsImpl(
-    MaskReg& carryp, RegT& dstReg, RegT& srcReg0, RegT& srcReg1, MaskReg& carrysrcp, MaskReg& mask)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubCarryOuts api is not supported on current device!"); });
-}
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_IMPL_H
