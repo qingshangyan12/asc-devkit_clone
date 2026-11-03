@@ -21,6 +21,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #include "../../../include/basic_api/kernel_struct_mm.h"
+#include "../../../include/basic_api/kernel_operator_mm_bitmode_intf.h"
 namespace AscendC {
 /* **************************************************************************************************
  * LoadData 2dv2                                             *
@@ -39,16 +40,56 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 
 template <typename T>
+__aicore__ inline void LoadData2DL12L0ATransposeCal(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "LoadDataWithTranspose from L1 Buffer(A1) to L0A Buffer(A2) is not supported on current device");
+    });
+}
+
+template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
-    if constexpr (1 == sizeof(T)) {
-        load_cbuf_to_ca(
-            (__ca__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, false);
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, uint16_t, int8_t, int16_t, half>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, uint16_t, int8_t, int16_t, half on current device!");
+    if constexpr (SupportType<T, int4b_t>()) {
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_ca_s4(
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
+        } else {
+            load_cbuf_to_ca_s4(
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, false);
+        }
+
+    } else if constexpr (1 == sizeof(T)) {
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_ca(
+                (__ca__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
+        } else {
+            load_cbuf_to_ca(
+                (__ca__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, false);
+        }
+
     } else if constexpr (2 == sizeof(T)) {
-        load_cbuf_to_ca(
-            (__ca__ int16_t*)dst, (__cbuf__ int16_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, false);
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_ca(
+                (__ca__ int16_t*)dst, (__cbuf__ int16_t*)src, loadDataParam.mStartPosition,
+                loadDataParam.kStartPosition, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride,
+                loadDataParam.dstStride, true);
+        } else {
+            load_cbuf_to_ca(
+                (__ca__ int16_t*)dst, (__cbuf__ int16_t*)src, loadDataParam.mStartPosition,
+                loadDataParam.kStartPosition, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride,
+                loadDataParam.dstStride, false);
+        }
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
@@ -82,7 +123,20 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
-    if constexpr (1 == sizeof(T)) {
+    static_assert(
+        SupportType<T, int4b_t, uint8_t, uint16_t, int8_t, int16_t, half>(),
+        "LoadData 2dv2 only support int4b_t, uint8_t, uint16_t, int8_t, int16_t, half on current device!");
+    if constexpr (SupportType<T, int4b_t>()) {
+        if (loadDataParam.ifTranspose) {
+            load_cbuf_to_cb_s4(
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
+        } else {
+            load_cbuf_to_cb_s4(
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+                loadDataParam.mStep, loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, false);
+        }
+    } else if constexpr (1 == sizeof(T)) {
         if (loadDataParam.ifTranspose) {
             load_cbuf_to_cb(
                 (__cb__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
@@ -178,6 +232,110 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
+}
+
+template <typename T, typename U>
+__aicore__ inline void LoadData2DGM2L1Cal(
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
+{
+    static_assert(
+        ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
+         (IsSameType<T, int4b_t>::value && IsSameType<U, int2b_t>::value) ||
+         (IsSameType<T, int8_t>::value && IsSameType<U, int2b_t>::value) ||
+         (IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value)),
+        "LoadData dst type or src type is not supported on current device!");
+    set_mte2_qtable0(nd2nzParams.lookupTable0);
+    set_mte2_src_para(uint64_t(loadDataParam.srcStride));
+    uint8_t decompressMode = 0;
+    if constexpr (IsSameType<T, int4b_t>::value && IsSameType<U, int2b_t>::value) {
+        decompressMode = 0b0111;
+    } else if constexpr (IsSameType<T, int8_t>::value && IsSameType<U, int2b_t>::value) {
+        decompressMode = 0b0001;
+    } else if constexpr (IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value) {
+        decompressMode = 0b0110;
+    } else if constexpr (IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) {
+        set_mte2_qtable1(nd2nzParams.lookupTable1);
+        decompressMode = 0b0011;
+    }
+    load_gm_to_cbuf_2dv2(
+        (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+        loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, 0, decompressMode, 0);
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half,
+            bfloat16_t, float, int32_t, uint32_t>(),
+        "LoadData 2dv2 only support int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+         half, bfloat16_t, float, int32_t, uint32_t on current device!");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    if (loadDataParam.GetIfTranspose()) {
+        load_cbuf_to_ca(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 1);
+    } else {
+        load_cbuf_to_ca(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 0);
+    }
+#else
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca_s4(
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_ca_s4(
+                (__ca__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
+{
+    static_assert(
+        SupportType<
+            T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half,
+            bfloat16_t, float, int32_t, uint32_t>(),
+        "LoadData 2dv2 only support int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
+         half, bfloat16_t, float, int32_t, uint32_t on current device!");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    if (loadDataParam.GetIfTranspose()) {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 1);
+    } else {
+        load_cbuf_to_cb(
+            dst, src, loadDataParam.GetMStartPosition(), loadDataParam.GetKStartPosition(), loadDataParam.GetMStep(),
+            loadDataParam.GetKStep(), loadDataParam.GetSrcStride(), loadDataParam.GetDstStride(), 0);
+    }
+#else
+    if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb_s4(
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb_s4(
+                (__cb__ void*)dst, (__cbuf__ void*)src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
+#endif
 }
 
 /* **************************************************************************************************
@@ -320,6 +478,17 @@ __aicore__ inline void MmadCal(__cc__ float* c, __ca__ U* a, __cb__ S* b, const 
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const MmadParams& mmadParams)
 {
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
@@ -330,7 +499,11 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, config);
+    } else {
+        mad(c, a, b, config);
+    }
 }
 
 template <typename U, typename S>
@@ -347,6 +520,17 @@ __aicore__ inline void MmadCal(
     ASCENDC_ASSERT((cmatrixSource == mmadParams.cmatrixSource), {
         KERNEL_LOG(KERNEL_ERROR, "Mmad cmatrixSource param config error");
     });
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<T, U, S>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>, Tuple<half, half, half>,
+            Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>, Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
@@ -357,7 +541,56 @@ __aicore__ inline void MmadCal(
     config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
-    mad(c, a, b, bias, config);
+    if constexpr (SupportType<T, int32_t>() && SupportType<U, int8_t>() && SupportType<S, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, config);
+    } else {
+        mad(c, a, b, bias, config);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
+{
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
+            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
+            Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, 0, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, mmadParams.GetConfig0());
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void MmadCal(
+    __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
+{
+    ASCENDC_ASSERT(
+        (SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<int32_t, uint8_t, uint8_t>, Tuple<int32_t, int8_t, int8_t>,
+            Tuple<half, half, half>, Tuple<int32_t, uint8_t, int8_t>, Tuple<int32_t, int16_t, int8_t>,
+            Tuple<int32_t, int8_t, int4b_t>>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype combination is "
+                              "dst: int32_t, fm: uint8_t, filter: uint8_t; dst: int32_t, fm: int8_t, filter: int8_t; "
+                              "dst: half, fm: half, filter: half; dst: int32_t, fm: uint8_t, filter: int8_t; "
+                              "dst: int32_t, fm: int16_t, filter: int8_t; dst: int32_t, fm: int8_t, filter: int4b_t.");
+        });
+    if constexpr (SupportType<DstT, int32_t>() && SupportType<Src0T, int8_t>() && SupportType<Src1T, int4b_t>()) {
+        mad_s8s4(c, a, b, bias, mmadParams.GetConfig0());
+    } else {
+        mad(c, a, b, bias, mmadParams.GetConfig0());
+    }
 }
 
 /* **************************************************************************************************
@@ -396,6 +629,10 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     }
     set_fmatrix_b(regFMatrix);
 }
+
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix) { set_fmatrix(regFMatrix); }
+
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix) { set_fmatrix_b(regFMatrix); }
 
 template <typename T>
 __aicore__ inline void Load3DSetPaddingCal(const T padValue)
@@ -480,6 +717,11 @@ __aicore__ inline void BroadCastVecToMMCal(
 template <typename T>
 __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -501,6 +743,11 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half
@@ -522,6 +769,11 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
+    if (static_cast<uint64_t>(initConstValueParams.repeatTimes) > 32767UL) {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue repeatTimes out of range, max is 32767!"); });
+    }
+
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
         // 由于set_l0_set_value_h只支持half类型，故需要将其它类型的数据的二进制用half

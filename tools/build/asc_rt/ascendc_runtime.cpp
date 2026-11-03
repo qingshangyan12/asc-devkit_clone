@@ -7,7 +7,6 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-
 /*!
  * \file ascendc_runtime.cpp
  * \brief
@@ -128,6 +127,7 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend310b4", "Ascend310B4"},
         {"ascend5162a", "Ascend5162A"},
         {"kirinx90", "KirinX90"},
+        {"kirin9020", "Kirin9020"},
         {"kirin9030", "Kirin9030"},
         {"kirin9050", "Kirin9050"},
         {"kirindev0001", "KirinDev0001"},
