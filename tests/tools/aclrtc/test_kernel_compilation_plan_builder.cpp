@@ -284,6 +284,48 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
     EXPECT_EQ(plan.linkedKernelElfPath, workspace.ResourcePath() / ".aclrtc_session_1/outputs/linked_kernel.elf");
 }
 
+TEST(KernelCompilationPlanBuilderTest, RenamesOutputSymbolsAndFunctionMetadataAfterLinking)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchain("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable skToolchain("ACLRTC_TEST_SK_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHome("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t bytes[] = {1, 2};
+    const void* addresses[] = {bytes};
+    auto request = CreateRequest(workspace, addresses, nullptr);
+    for (const bool enableSuperKernel : {false, true}) {
+        request.enableSuperKernel = enableSuperKernel;
+        for (const std::string output : {std::string(), request.kernelName, std::string("specialized_add")}) {
+            request.outputKernelName = output;
+            KernelCompilationPlan plan;
+            ASSERT_EQ(
+                BuildPlanFromManifest(
+                    request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
+                0);
+            if (output.empty() || output == request.kernelName) {
+                EXPECT_EQ(plan.compilationCommands.back().commandKind, CompilationCommandKind::Link);
+                continue;
+            }
+            ASSERT_GE(plan.compilationCommands.size(), 2U);
+            EXPECT_EQ(
+                plan.compilationCommands[plan.compilationCommands.size() - 2U].commandKind,
+                CompilationCommandKind::Link);
+            const auto& rename = plan.compilationCommands.back();
+            EXPECT_EQ(rename.commandKind, CompilationCommandKind::ObjectCopy);
+            EXPECT_EQ(rename.executablePath, workspace.ToolchainPath() / "bin/llvm-objcopy");
+            std::vector<std::string> expected;
+            for (const char* suffix : {"", "_mix_aic", "_mix_aiv"}) {
+                const std::string original = request.kernelName + suffix;
+                const std::string renamed = output + suffix;
+                expected.emplace_back("--redefine-sym=" + original + "=" + renamed);
+                expected.emplace_back("--rename-section=.ascend.meta." + original + "=.ascend.meta." + renamed);
+            }
+            expected.emplace_back(plan.linkedKernelElfPath.string());
+            EXPECT_EQ(rename.arguments, expected);
+        }
+    }
+}
+
 TEST(KernelCompilationPlanBuilderTest, BuildsPlanWithoutOptionalExternalSourceFile)
 {
     KernelPlanTestWorkspace workspace;

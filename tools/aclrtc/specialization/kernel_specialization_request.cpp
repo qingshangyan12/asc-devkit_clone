@@ -244,6 +244,13 @@ aclError NormalizeKernelSpecializationRequest(
             apiRequest.kernelEntry, "kernelEntry", request.kernelName, copiedRequestTextByteCount)) {
         return ACLRTC_ERROR_INVALID_INPUT;
     }
+    if (apiRequest.outputKernelEntry == nullptr || apiRequest.outputKernelEntry[0] == '\0') {
+        request.outputKernelName = request.kernelName;
+    } else if (!CopyRequiredBoundedCString(
+                   apiRequest.outputKernelEntry, "outputKernelEntry", request.outputKernelName,
+                   copiedRequestTextByteCount)) {
+        return ACLRTC_ERROR_INVALID_INPUT;
+    }
 
     std::string copiedOutputElfPath;
     if (!CopyRequiredBoundedCString(outputElfPath, "outPath", copiedOutputElfPath, copiedRequestTextByteCount)) {

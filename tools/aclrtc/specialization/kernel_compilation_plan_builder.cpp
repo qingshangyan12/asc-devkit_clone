@@ -249,6 +249,37 @@ aclError KernelCompilationPlanBuilder::BindLinkCommand(
     return ACLRTC_SUCCESS;
 }
 
+aclError KernelCompilationPlanBuilder::BindOutputKernelNameCommand(KernelCompilationPlan& plan) const
+{
+    const auto& outputName = specializationRequest_.outputKernelName;
+    if (outputName.empty() || outputName == specializationRequest_.kernelName) {
+        return ACLRTC_SUCCESS;
+    }
+    std::string objectCopyPath;
+    if (!ExpandPathAndEnvironmentReferences(
+            "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy", "kernel symbol renaming", objectCopyPath)) {
+        return ACLRTC_ERROR_FAILURE;
+    }
+    CompilationCommand command;
+    command.commandKind = CompilationCommandKind::ObjectCopy;
+    command.diagnosticLabel = "rename_output_kernel";
+    command.executablePath = std::move(objectCopyPath);
+    if (!IsAbsoluteExecutableRegularFile(command.executablePath)) {
+        ASCENDLOGE("Kernel symbol renaming requires an executable llvm-objcopy: %s", command.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    // Runtime locates function metadata by symbol name, including paired MIX entries.
+    for (const char* suffix : {"", "_mix_aic", "_mix_aiv"}) {
+        const std::string original = specializationRequest_.kernelName + suffix;
+        const std::string renamed = outputName + suffix;
+        command.arguments.emplace_back("--redefine-sym=" + original + "=" + renamed);
+        command.arguments.emplace_back("--rename-section=.ascend.meta." + original + "=.ascend.meta." + renamed);
+    }
+    command.arguments.emplace_back(plan.linkedKernelElfPath.string());
+    plan.compilationCommands.emplace_back(std::move(command));
+    return ACLRTC_SUCCESS;
+}
+
 aclError KernelCompilationPlanBuilder::CheckResourceWorktreeDirectory() const
 {
     if (!resourceWorktreePath_.is_absolute()) {
@@ -302,6 +333,10 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         plan.compilationCommands.emplace_back(std::move(command));
     }
     result = BindLinkCommand(borrowedManifest_, plan);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    result = BindOutputKernelNameCommand(plan);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
