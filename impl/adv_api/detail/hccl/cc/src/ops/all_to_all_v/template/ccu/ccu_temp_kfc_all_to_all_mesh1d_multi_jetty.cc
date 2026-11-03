@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 
+#include "kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_pc.h"
+
 namespace mc2_ops_hccl {
 
 CcuTempKfcAllToAllMesh1DMultiJetty::CcuTempKfcAllToAllMesh1DMultiJetty(
@@ -51,6 +53,7 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllToAllMesh1DMultiJetty"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuKfcAllToAllMesh1DMultiJettyKernel);
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

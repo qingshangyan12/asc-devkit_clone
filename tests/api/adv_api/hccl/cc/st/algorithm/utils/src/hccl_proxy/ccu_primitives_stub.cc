@@ -107,6 +107,44 @@ void CompilerContext::RegisterArgument(ResourceHandle variable, uint32_t argId)
     program_.arguments.push_back(ArgDescriptor{argId, variable});
 }
 
+Result CompilerContext::LoadFunctionArgument(ResourceHandle variable, uint32_t argId)
+{
+    Operation operation;
+    operation.dst = variable;
+    if (functionArguments_ != nullptr) {
+        if (argId >= functionArguments_->size()) {
+            return Result::PARAM_ERROR;
+        }
+        operation.code = OpCode::ASSIGN_VAR;
+        operation.src0 = (*functionArguments_)[argId];
+    } else {
+        operation.code = OpCode::LOAD_ARG;
+        operation.index = argId;
+        RegisterArgument(variable, argId);
+    }
+    Append(operation);
+    return Result::SUCCESS;
+}
+
+std::function<Result()> CompilerContext::ExchangeFunctionCapture(std::function<Result()> capture)
+{
+    functionCapture_.swap(capture);
+    return capture;
+}
+
+Result CompilerContext::CaptureFunction(const std::vector<ResourceHandle>& arguments)
+{
+    if (!functionCapture_ || functionArguments_ != nullptr) {
+        return Result::STATE_ERROR;
+    }
+    struct ArgumentScope {
+        const std::vector<ResourceHandle>*& binding;
+        ~ArgumentScope() { binding = nullptr; }
+    } scope{functionArguments_};
+    functionArguments_ = &arguments;
+    return functionCapture_();
+}
+
 void CompilerContext::Append(const Operation& operation)
 {
     if (loopBodyTarget_ != nullptr) {
@@ -521,13 +559,7 @@ Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex)
 
 Result LoadArg(Variable variable, uint32_t argId)
 {
-    Operation operation;
-    operation.code = OpCode::LOAD_ARG;
-    operation.dst = variable.handle;
-    operation.index = argId;
-    CompilerContext::Current().Append(operation);
-    CompilerContext::Current().RegisterArgument(variable.handle, argId);
-    return Result::SUCCESS;
+    return CompilerContext::Current().LoadFunctionArgument(variable.handle, argId);
 }
 
 Result Load(Variable address, Variable destination)

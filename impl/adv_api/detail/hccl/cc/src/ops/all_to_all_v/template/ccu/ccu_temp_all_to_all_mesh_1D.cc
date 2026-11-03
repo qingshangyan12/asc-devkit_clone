@@ -13,6 +13,8 @@
 #include "kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_temp_all_to_all_mesh_1D.h"
 
+#include "kernel/ccu_kernel_all_to_all_mesh1d_pc.h"
+
 namespace mc2_ops_hccl {
 
 // 大禹纯 CLOS 双 die 机型 CCU 建链固定使用的 die：12 出口 = DIE0×8 + DIE1×4，
@@ -51,7 +53,7 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(
 
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllMesh1D"));
-    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAlltoAllMesh1DKernel);
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuAlltoAllMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo == Level0Shape::CLOS) {
         // 大禹纯 CLOS：CCU 单 kernel 全 channel 必须同 die（hcomm CheckChannelsDie），

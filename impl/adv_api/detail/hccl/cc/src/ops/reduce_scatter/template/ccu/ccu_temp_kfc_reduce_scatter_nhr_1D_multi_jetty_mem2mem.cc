@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 
+#include "kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem_pc.h"
+
 namespace mc2_ops_hccl {
 namespace {
 // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D 保持一致：当前 portNum 为 1。
@@ -66,6 +68,7 @@ HcclResult CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(pc::CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel);
     kernelInfo.channels = channelResort;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
