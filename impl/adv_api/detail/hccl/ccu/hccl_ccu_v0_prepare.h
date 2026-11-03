@@ -110,7 +110,13 @@ __aicore__ inline void AssembleA2avMjExt(
     ext.sendOffset = sendDispls * dataSize + sendLength * repeatIndex;
     ext.recvOffset = recvDispls * dataSize + recvCount * dataSize * repeatIndex;
     constexpr uint64_t loopCount = 8;
-    CalcGoSize(lastBlockSize, loopCount, CCU_MEMSLICE_SIZE * 8, ext.tailGoSize, ccuVersion);
+    // ext 为 __gm__ 指针，不可直接传给取普通指针的 CalcGoSize：先算进本地数组再逐字段写回
+    uint64_t tailGoSize[4] = {0U, 0U, 0U, 0U};
+    CalcGoSize(lastBlockSize, loopCount, CCU_MEMSLICE_SIZE * 8, tailGoSize, ccuVersion);
+    ext.tailGoSize[0] = tailGoSize[0];
+    ext.tailGoSize[1] = tailGoSize[1];
+    ext.tailGoSize[2] = tailGoSize[2];
+    ext.tailGoSize[3] = tailGoSize[3];
 }
 
 // ext 区 DCCI 回刷，照 AssembleHcclMsgExtForCCU 尾部
