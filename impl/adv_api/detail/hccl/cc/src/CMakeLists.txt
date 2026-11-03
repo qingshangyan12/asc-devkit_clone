@@ -10,6 +10,20 @@
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
 
+if(ASCCOMM_PRIMITIVES_HDR)
+elseif(ASC_COMM_SOURCE_PATH)
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm")
+else()
+    set(ASCCOMM_PRIMITIVES_HDR "$ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}")
+endif()
+
+if(ASCCOMM_PRIMITIVES_HDR)
+    get_filename_component(_ASCCOMM_SOURCE_DIR "${ASCCOMM_PRIMITIVES_HDR}/../../.." ABSOLUTE)
+    set(ASCCOMM_PRIMITIVES_INTERNAL_HDR "${_ASCCOMM_SOURCE_DIR}/src/aicpu/asccomm/primitives/api_c_adpt")
+else()
+    set(ASCCOMM_PRIMITIVES_INTERNAL_HDR "")
+endif()
+
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${ASCENDC_DIR}
@@ -146,6 +160,7 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/template_utils.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/kernel_launch.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/task_cache/mc2_aicpu_task_cache.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/task_cache/mc2_asccomm_command_cache.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/dfx/task_exception_fun.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/registry/alg_template_register.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/wrapper/alg_data_trans_wrapper.cc
@@ -213,6 +228,8 @@ if(PRODUCT_SIDE STREQUAL "device")
 
     target_include_directories(mc2_server PRIVATE
         ${INCLUDE_LIST}
+        ${ASCCOMM_PRIMITIVES_HDR}
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
     )
 
     target_compile_options(mc2_server PRIVATE
@@ -234,6 +251,7 @@ if(PRODUCT_SIDE STREQUAL "device")
     target_compile_definitions(mc2_server PRIVATE
         -DAICPU_COMPILE
         MC2_SERVER_ONLY
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_link_libraries(mc2_server PRIVATE
@@ -275,11 +293,14 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 
     target_include_directories(mc2_client PRIVATE
         ${INCLUDE_LIST}
+        ${ASCCOMM_PRIMITIVES_HDR}
+        ${ASCCOMM_PRIMITIVES_INTERNAL_HDR}
     )
 
     target_compile_definitions(mc2_client PRIVATE
         -DHOST_COMPILE
         MC2_CLIENT_ENABLE_CCU=$<BOOL:${MC2_CLIENT_ENABLE_CCU}>
+        ASCCOMM_ENABLE_INTERNAL_APIS
     )
 
     target_compile_options(mc2_client PRIVATE
@@ -325,9 +346,24 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
         target_link_options(mc2_client_hcomm_stub PRIVATE
             -Wl,-soname,libhcomm.so)
 
+        if(NOT TARGET mc2_client_asccomm_stub)
+            set(MC2_CLIENT_ASCCOMM_STUB_SRC
+                ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_asccomm_stub.cc)
+            file(WRITE ${MC2_CLIENT_ASCCOMM_STUB_SRC}
+                "extern \"C\" void __mc2_client_asccomm_stub(void) {}\n")
+            add_library(mc2_client_asccomm_stub SHARED
+                ${MC2_CLIENT_ASCCOMM_STUB_SRC})
+            set_target_properties(mc2_client_asccomm_stub PROPERTIES
+                OUTPUT_NAME asccomm_aicpu
+                LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_client_link_stub)
+            target_link_options(mc2_client_asccomm_stub PRIVATE
+                -Wl,-soname,libasccomm_aicpu.so)
+        endif()
+
         target_link_libraries(mc2_client PRIVATE
             -Wl,--no-as-needed
             mc2_client_hcomm_stub
+            mc2_client_asccomm_stub
             mc2_compat
             acl_rt
             c_sec

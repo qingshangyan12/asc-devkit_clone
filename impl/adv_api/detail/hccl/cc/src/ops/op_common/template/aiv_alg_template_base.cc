@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "aiv_alg_template_base.h"
+#include "asccomm_primitives.h"
 
 namespace mc2_ops_hccl {
 AivAlgTemplateBase::AivAlgTemplateBase() {}
@@ -109,13 +110,13 @@ HcclResult AivAlgTemplateBase::PreSync(const u32 queIdx, const std::vector<Threa
             // 主流向从流发送post
             // 第三个参数是目标流的notify的索引，在exector中计算资源的时候会确定从流需要多少索引
             CHK_RET(static_cast<HcclResult>(
-                HcommThreadNotifyRecordOnThread(currThread, threads[qidx], LOCAL_NOTIFY_IDX_ZERO)));
+                asccomm_thread_notify_record_on_thread(currThread, threads[qidx], LOCAL_NOTIFY_IDX_ZERO)));
         }
     } else {
         // Semaphore Wait
         // 从流等待主流通知
-        CHK_RET(
-            static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(currThread, LOCAL_NOTIFY_IDX_ZERO, CUSTOM_TIMEOUT)));
+        CHK_RET(static_cast<HcclResult>(
+            asccomm_thread_notify_wait_on_thread(currThread, LOCAL_NOTIFY_IDX_ZERO, CUSTOM_TIMEOUT)));
     }
 
     return HcclResult::HCCL_SUCCESS;
@@ -128,11 +129,11 @@ HcclResult AivAlgTemplateBase::PostSync(const u32 queIdx, const std::vector<Thre
         // Semaphore Wait
         for (u32 qidx = 0; qidx < threads.size() - 1; qidx++) {
             // 主流等待所有从流通知
-            CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(threads[qidx], qidx, CUSTOM_TIMEOUT)));
+            CHK_RET(static_cast<HcclResult>(asccomm_thread_notify_wait_on_thread(threads[qidx], qidx, CUSTOM_TIMEOUT)));
         }
     } else {
         // Semaphore Post
-        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyRecordOnThread(
+        CHK_RET(static_cast<HcclResult>(asccomm_thread_notify_record_on_thread(
             currThread, threads[0],
             queIdx - 1))); // LOCAL_NOTIFY_IDX_ZERO
     }

@@ -27,7 +27,14 @@ endif()
 add_subdirectory(tiling)
 
 if (BUILD_OPEN_PROJECT)
-  add_cann_device_project(asc-devkit)
+
+
+  include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
+  if(ASC_COMM_SOURCE_DIR)
+    add_cann_device_project(asc-devkit EXT_ARGS "-DASC_COMM_SOURCE_DIR=${ASC_COMM_SOURCE_DIR}")
+  else()
+    add_cann_device_project(asc-devkit)
+  endif()
 endif()
 
 
@@ -99,7 +106,6 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
-    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)

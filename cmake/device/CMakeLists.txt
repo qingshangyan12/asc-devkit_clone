@@ -40,6 +40,26 @@ include(${ASCENDC_DIR}/version.cmake)
 set(DEVICE_MODE TRUE)
 set(KERNEL_MODE TRUE)
 
+if(NOT EXISTS "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm/asccomm_primitives.h")
+    get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." REALPATH)
+    foreach(_asc_comm_candidate
+        "${_ASC_COMM_DEVKIT_ROOT}/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../asc/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../asc/asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../../asc-comm"
+        "${_ASC_COMM_DEVKIT_ROOT}/../../../asc/asc-comm")
+        if(EXISTS "${_asc_comm_candidate}/include/aicpu/hcomm/asccomm_primitives.h")
+            set(ASC_COMM_SOURCE_DIR "${_asc_comm_candidate}")
+            break()
+        endif()
+    endforeach()
+endif()
+if(ASC_COMM_SOURCE_DIR AND EXISTS "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+    set(ASCCOMM_PRIMITIVES_HDR "${ASC_COMM_SOURCE_DIR}/include/aicpu/hcomm")
+endif()
+
 add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
 add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
 add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)

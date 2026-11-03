@@ -180,7 +180,7 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     const bool useCannBridge = false;
     if (useCannBridge) {
-        HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
+        HcclResult cannRet = mc2_ops_hccl::RunWithAsccommCommandCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
@@ -196,7 +196,7 @@ HcclResult LaunchOpenOpParamDataImpl(
     CHK_SMART_PTR_NULL(executor);
 
     CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
-    HcclResult ret = mc2_ops_hccl::RunWithMc2TaskCache(
+    HcclResult ret = mc2_ops_hccl::RunWithAsccommCommandCache(
         *param, resCtx, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 

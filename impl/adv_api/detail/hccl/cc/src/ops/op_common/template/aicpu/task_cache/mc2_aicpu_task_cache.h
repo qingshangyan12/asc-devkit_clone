@@ -11,6 +11,8 @@
 #define MC2_AICPU_TASK_CACHE_H
 
 #include <array>
+#include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -32,19 +34,43 @@ enum class Mc2TaskCacheReserveResult {
 struct Mc2AicpuTaskCachePlan {
     bool enabled = false;
     std::string tag;
+    std::string exactKey;
     void* comm = nullptr;
     std::array<void*, 2> addrs{{nullptr, nullptr}};
     std::array<uint64_t, 2> sizes{{0U, 0U}};
 };
 
+// resourceDomainValidated is only valid within a pinned, immutable resource-holder domain.
+// Standalone callers must leave it false to retain full resource identity.
 HcclResult BuildMc2AicpuTaskCachePlan(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan);
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan,
+    bool asccommBackend = false, bool resourceDomainValidated = false);
+
+// Checks immutable channel metadata once when binding a pinned resource holder.
+bool ValidateMc2CommandResource(const AlgResourceCtxSerializable& resCtx);
 
 HcclResult Mc2AicpuTaskCacheLookup(const Mc2AicpuTaskCachePlan& plan, bool& isHit);
 HcclResult Mc2AicpuTaskCacheStart(const Mc2AicpuTaskCachePlan& plan);
 HcclResult Mc2AicpuTaskCacheEnd(const Mc2AicpuTaskCachePlan& plan);
 HcclResult Mc2AicpuTaskCacheExecute(const Mc2AicpuTaskCachePlan& plan);
 HcclResult Mc2AicpuTaskCacheClear(const Mc2AicpuTaskCachePlan& plan);
+
+// A scope pins the deserialized resource identity during one Server invocation.
+// Cache entries also retain this holder; a different holder never reuses their commands.
+class Mc2CommandResourceScope {
+public:
+    explicit Mc2CommandResourceScope(std::shared_ptr<const AlgResourceCtxSerializable> holder);
+    ~Mc2CommandResourceScope();
+    Mc2CommandResourceScope(const Mc2CommandResourceScope&) = delete;
+    Mc2CommandResourceScope& operator=(const Mc2CommandResourceScope&) = delete;
+
+private:
+    std::shared_ptr<const AlgResourceCtxSerializable> previous_;
+};
+bool Mc2AsccommCommandCacheSupported();
+HcclResult RunWithAsccommCommandCache(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const std::function<HcclResult()>& execute);
+HcclResult ClearAsccommCommandCache(void* comm);
 
 class Mc2AicpuTaskCacheManager {
 public:

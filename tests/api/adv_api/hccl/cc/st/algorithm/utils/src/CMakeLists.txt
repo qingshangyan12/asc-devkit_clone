@@ -35,6 +35,7 @@ target_compile_definitions(hccl-model-proxy PRIVATE
 
 target_include_directories(hccl-model-proxy PUBLIC
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    $ENV{ASCCOMM_PRIMITIVES_INCLUDE_DIR}
 )
 
 target_link_libraries(hccl-model-proxy PUBLIC
