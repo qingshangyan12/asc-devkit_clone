@@ -47,6 +47,7 @@ class CompileModeTests(unittest.TestCase):
                     compile_log_dir=params.compile_log_dir,
                     enable_sk=False,
                     compile_mode=mode,
+                    skip_static_bin_type=True,
                 )
                 opc.assert_not_called()
 
@@ -67,6 +68,7 @@ class CompileModeTests(unittest.TestCase):
                     '--log': 'info',
                     '--enable_super_kernel': False,
                     '--super_kernel_options': '',
+                    '--skip-static-bin-type': 'true',
                 }
                 parameters = SimpleNamespace(
                     full_options={key: Mock(get_value=Mock(return_value=value)) for key, value in values.items()}

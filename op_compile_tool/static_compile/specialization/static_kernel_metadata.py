@@ -183,6 +183,7 @@ def build_static_kernel_metadata(
         binFileSuffix='.o',
         sha256=hashlib.sha256(Path(output_elf).read_bytes()).hexdigest(),
         kernelName=kernel_entry if source['coreType'] == 'MIX' else resolved.load_symbol,
+        tiling_data=tiling.raw_run_info['tiling_data'],
         blockDim=tiling.block_dim,
         opParaSize=resolved.read_bytes + 8,
         workspace={

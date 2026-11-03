@@ -102,6 +102,6 @@ class V3ContractTests(unittest.TestCase):
                     inputs = dict(
                         dynamic_elf=elf, metadata=metadata,
                         tiling=SimpleNamespace(kernel_name='kernel', tiling_key=1), selected_kernel=selected,
-                        parameter_mode=mode, shape_config={}, op_type='Example', selected_from_collection=False,
+                        parameter_mode=mode, shape_config={}, op_type='Example',
                     )
                     resolve_kernel_metadata(inputs)

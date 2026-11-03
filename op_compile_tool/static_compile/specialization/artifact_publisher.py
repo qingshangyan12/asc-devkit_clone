@@ -1,14 +1,15 @@
-"""通过一次不可覆盖的原子 rename 发布已校验的产物目录。
+"""将已校验的产物逐个发布到共享输出目录，不覆盖已有文件。
 
-暂存目录必须由调用方私有，并在发布期间保持不变。rename 后 fsync 失败时，
-说明结果已经可见但持久性未确认；此时报告该状态，不进行具有误导性的回滚。
+暂存目录必须由调用方私有。文件分别原子 rename，整个文件对不具备事务原子性；
+任一文件发布后发生错误均报告 published=True，由父进程中止打包。
 """
 
 import ctypes
+import errno
 import os
 from pathlib import Path
 import stat
-from .errors import SpecializationError
+from .errors import ArtifactCollisionError, SpecializationError
 
 
 def _validate_no_symlinks(path):
@@ -17,35 +18,21 @@ def _validate_no_symlinks(path):
             raise SpecializationError('publish', f'symlink path is not allowed: {component}')
 
 
-def _sync_tree(directory_fd, device):
-    for name in os.listdir(directory_fd):
-        info = os.stat(name, dir_fd=directory_fd, follow_symlinks=False)
-        if info.st_dev != device:
-            raise SpecializationError('publish', 'stage contains another filesystem')
-        if stat.S_ISDIR(info.st_mode):
-            fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory_fd)
-            try:
-                _sync_tree(fd, device)
-            finally:
-                os.close(fd)
-        elif stat.S_ISREG(info.st_mode):
-            fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory_fd)
-            try:
-                if not stat.S_ISREG(os.fstat(fd).st_mode):
-                    raise SpecializationError('publish', 'stage entry changed type')
-                os.fsync(fd)
-            finally:
-                os.close(fd)
-        else:
-            raise SpecializationError('publish', f'stage contains nonregular entry: {name}')
+def _sync_files(directory_fd, names):
+    for name in names:
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory_fd)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
     os.fsync(directory_fd)
 
 
 def publish_artifacts(stage_dir, destination_dir):
-    """返回持久化发布后的目标 Path，绝不覆盖已有结果。"""
+    """fsync 后将暂存文件移入已有目标目录，返回该目录 Path。"""
     stage = Path(os.path.abspath(stage_dir))
     destination = Path(os.path.abspath(destination_dir))
-    renamed = False
+    published = False
     fds = []
     try:
         _validate_no_symlinks(stage)
@@ -54,17 +41,22 @@ def publish_artifacts(stage_dir, destination_dir):
             raise SpecializationError('publish', 'stage and destination must be disjoint directories')
         if not stage.is_dir() or stage == stage.parent:
             raise SpecializationError('publish', 'stage must be a directory')
-        if os.path.lexists(destination):
-            raise SpecializationError('publish', 'destination already exists')
         stage_parent = os.open(stage.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         fds.append(stage_parent)
-        dest_parent = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        fds.append(dest_parent)
+        dest_fd = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        fds.append(dest_fd)
         stage_fd = os.open(stage.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=stage_parent)
         fds.append(stage_fd)
         device = os.fstat(stage_fd).st_dev
-        if any(os.fstat(fd).st_dev != device for fd in (stage_parent, dest_parent)):
+        if any(os.fstat(fd).st_dev != device for fd in (stage_parent, dest_fd)):
             raise SpecializationError('publish', 'stage and destination must share a filesystem')
+        names = sorted(os.listdir(stage_fd))
+        for name in names:
+            info = os.stat(name, dir_fd=stage_fd, follow_symlinks=False)
+            if not stat.S_ISREG(info.st_mode):
+                raise SpecializationError('publish', f'stage contains nonregular artifact: {name}')
+            if os.path.lexists(destination / name):
+                raise ArtifactCollisionError('publish', f'artifact already exists: {destination / name}')
         libc = ctypes.CDLL(None, use_errno=True)
         try:
             rename = libc.renameat2
@@ -72,18 +64,24 @@ def publish_artifacts(stage_dir, destination_dir):
             raise SpecializationError('publish', 'renameat2 RENAME_NOREPLACE is unsupported') from exc
         rename.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
         rename.restype = ctypes.c_int
-        _sync_tree(stage_fd, device)
-        rc = rename(stage_parent, os.fsencode(stage.name), dest_parent, os.fsencode(destination.name), 1)
-        if rc != 0:
-            error = ctypes.get_errno()
-            raise OSError(error, os.strerror(error))
-        renamed = True
+        _sync_files(stage_fd, names)
+        for name in names:
+            rc = rename(stage_fd, os.fsencode(name), dest_fd, os.fsencode(name), 1)
+            if rc != 0:
+                error = ctypes.get_errno()
+                if error == errno.EEXIST:
+                    raise ArtifactCollisionError('publish', f'artifact already exists: {destination / name}',
+                                                 published=published)
+                raise OSError(error, os.strerror(error))
+            published = True
+        os.fsync(stage_fd)
+        os.fsync(dest_fd)
+        stage.rmdir()
         os.fsync(stage_parent)
-        os.fsync(dest_parent)
         return destination
     except OSError as exc:
-        suffix = '; directory published but durability is unconfirmed' if renamed else ''
-        raise SpecializationError('publish', str(exc) + suffix, published=renamed) from exc
+        suffix = '; artifacts are already visible' if published else ''
+        raise SpecializationError('publish', str(exc) + suffix, published=published) from exc
     finally:
         for fd in reversed(fds):
             os.close(fd)

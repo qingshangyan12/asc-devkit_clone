@@ -33,6 +33,7 @@ from multiprocessing import Pool
 from functools import partial
 from static_compile.static_compile_backend import compile_static_kernel_job
 from static_compile.specialization.static_op_tiling import RUN_INFO_FIELDS, OPTIONAL_RUN_INFO_FIELDS
+from static_compile.specialization.shape_config_adapter import RESOURCE_INFO_FIELDS, get_collected_bin_type
 from tbe.common.utils import log as logger
 from op_compiler_parse_args import OptionParser
 from static_compile.gen_binary_info_config import gen_binary_info_config
@@ -401,8 +402,8 @@ def _trans_dump_file_into_opc_format(json_dir, json_file, opc_dump_dir, soc_vers
         if op_type is None:
             raise Exception(f"error: cannot find field op_type in dump shape json: {json_file}")
         del js['op_type']
-        # Runtime fields remain on origin_path, not in the OPC descriptor.
-        for field in (*RUN_INFO_FIELDS, *OPTIONAL_RUN_INFO_FIELDS):
+        # 采集运行信息及动态资源信息保留在原始 JSON，不传入 OPC 编译描述。
+        for field in (*RUN_INFO_FIELDS, *OPTIONAL_RUN_INFO_FIELDS, *RESOURCE_INFO_FIELDS):
             js.pop(field, None)
         for params in ['inputs', 'outputs', 'attrs']:
             _modify_json_file_into_opc_format(js.get(params))
@@ -520,7 +521,7 @@ def _summary_from_compile_result_logs(compile_log_dir, opc_json_list_len, log_le
         logger.info(succ_log)
 
 
-def _compile_static_kernels(opc_params, compile_mode):
+def _compile_static_kernels(opc_params, compile_mode, skip_static_bin_type=True):
     if not os.path.isdir(opc_params.shape_info):
         logger.error(f'{opc_params.shape_info} is not existential, please check.')
         return False
@@ -542,7 +543,8 @@ def _compile_static_kernels(opc_params, compile_mode):
                     log_level=opc_params.log_level,
                     compile_log_dir=opc_params.compile_log_dir,
                     enable_sk=opc_params.enable_sk,
-                    compile_mode=compile_mode),
+                    compile_mode=compile_mode,
+                    skip_static_bin_type=skip_static_bin_type),
             opc_json_list
         ), total=len(opc_json_list)):
             pass
@@ -650,7 +652,9 @@ def _extent_shape_json_content(shape_extent_dir, file, js, file_str, follow_op_p
             _extent_shape_json_content_single(js, bin_file_name, extra_option, shape_extent_dir, file)
 
 
-def _extent_shape_json(shape_info, shape_extent_dir, follow_op_params, enable_sk, super_kernel_options):
+def _extent_shape_json(
+    shape_info, shape_extent_dir, follow_op_params, enable_sk, super_kernel_options, skip_static_bin_type=True
+):
     follow_op_params_switch = True if follow_op_params == "true" else False
     if os.path.exists(shape_extent_dir):
         shutil.rmtree(shape_extent_dir)
@@ -675,6 +679,11 @@ def _extent_shape_json(shape_info, shape_extent_dir, follow_op_params, enable_sk
             hash_value_with_time.update(f'{hash_value}_{ticks}'.encode())
             with open(file_str, encoding='utf-8') as f:
                 js = json.load(f)
+                bin_type = get_collected_bin_type(js, file_str) if skip_static_bin_type else None
+                is_static_binary = isinstance(bin_type, int) and not isinstance(bin_type, bool) and bin_type == 0
+                if skip_static_bin_type and is_static_binary:
+                    logger.info(f'Skipping static compilation for bin_type=0: {file_str}')
+                    continue
                 op_type = js.get('op_type')
                 if op_type is None:
                     raise Exception(f'cannot find op_type info in json {file_str} ')
@@ -682,6 +691,7 @@ def _extent_shape_json(shape_info, shape_extent_dir, follow_op_params, enable_sk
                 logger.info(f"kernel name of shape config file {file_str} will be {file_sha256}")
                 _extent_shape_json_content(shape_extent_dir, file_sha256, js, file_str, \
                                            follow_op_params_switch, enable_sk, super_kernel_options)
+    return any(name.endswith('.json') for name in os.listdir(shape_extent_dir))
 
 
 def static_kernel_compile(parameters: OptionParser):
@@ -700,6 +710,7 @@ def static_kernel_compile(parameters: OptionParser):
         bool(parameters.full_options["--enable_super_kernel"].get_value()),
         parameters.full_options["--super_kernel_options"].get_value(),
     )
+    skip_static_bin_type = parameters.full_options['--skip-static-bin-type'].get_value() == 'true'
     if compile_mode in ("tune", "aoe"):
         print(f"[WARNING] compile_mode={compile_mode} is being sunset and no longer supported, "
               f"automatically switching to opc mode for compilation (JIT disabled).")
@@ -717,7 +728,12 @@ def static_kernel_compile(parameters: OptionParser):
         logger.debug(f'super_kernel_options: {super_kernel_options}')
 
     shape_extent_dir = f'{output_path}/{os.path.basename(os.path.realpath(shape_info))}_extent'
-    _extent_shape_json(shape_info, shape_extent_dir, follow_op_params, enable_sk, super_kernel_options)
+    has_tasks = _extent_shape_json(
+        shape_info, shape_extent_dir, follow_op_params, enable_sk, super_kernel_options, skip_static_bin_type
+    )
+    if not has_tasks:
+        print('[op_compiler] No eligible static compilation tasks; skipping compilation and packaging.')
+        return True
     binary_json_file = f'{output_path}/binary_info_config.json'
     try:
         if not os.path.exists(output_path):
@@ -739,7 +755,7 @@ def static_kernel_compile(parameters: OptionParser):
                                 compile_res_dir, kernel_meta_dir, compile_log_dir, enable_sk')
         _compile_static_kernels(opc_params(shape_extent_dir, opc_dump_dir, soc_version, job, log_level,
                                 compile_res_dir, kernel_meta_dir, compile_log_dir, enable_sk),
-                     compile_mode=compile_mode)
+                     compile_mode=compile_mode, skip_static_bin_type=skip_static_bin_type)
 
         short_soc_version = trans_soc_ver_to_short(soc_version)
 

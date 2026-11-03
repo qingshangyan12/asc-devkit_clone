@@ -42,6 +42,7 @@ class MixTests(unittest.TestCase):
             tiling_key=7,
             tiling_args_index=2,
             tiling_data=bytes(72),
+            raw_run_info={'tiling_data': bytes(72).hex()},
             block_dim=20,
             workspaces=[],
             local_memory_size=0,
@@ -59,7 +60,7 @@ class MixTests(unittest.TestCase):
                 selected = resolve_entry(metadata, tiling.kernel_name)
                 inputs = dict(
                     dynamic_elf=path, metadata=metadata, tiling=tiling, selected_kernel=selected,
-                    parameter_mode=None, shape_config={}, op_type='Example', selected_from_collection=False,
+                    parameter_mode=None, shape_config={}, op_type='Example',
                 )
                 resolved = resolve_kernel_metadata(inputs)
         return resolved, tiling, elf

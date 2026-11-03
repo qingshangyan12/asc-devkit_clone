@@ -42,7 +42,7 @@ class TilingSlotTests(unittest.TestCase):
                 selected = resolve_entry(metadata, tiling.kernel_name)
                 inputs = dict(
                     dynamic_elf=path, metadata=metadata, tiling=tiling, selected_kernel=selected,
-                    parameter_mode=None, shape_config={}, op_type='Example', selected_from_collection=False,
+                    parameter_mode=None, shape_config={}, op_type='Example',
                 )
                 resolved = resolve_kernel_metadata(inputs)
                 elf.arguments.assert_not_called()

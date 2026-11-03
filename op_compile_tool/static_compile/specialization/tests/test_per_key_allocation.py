@@ -35,7 +35,7 @@ class PerKeyAllocationTests(unittest.TestCase):
                 inputs = dict(
                     dynamic_elf=p, metadata=metadata, tiling=tiling,
                     selected_kernel=resolve_entry(metadata, tiling.kernel_name), parameter_mode=None,
-                    shape_config={}, op_type='Example', selected_from_collection=False,
+                    shape_config={}, op_type='Example',
                 )
                 for capacity in (None, 0, 64, 600, 'invalid'):
                     metadata['opParaSize'] = capacity

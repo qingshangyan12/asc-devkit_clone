@@ -125,6 +125,8 @@ class OptionParser:
               "[tune]/[aoe] are unsupported.\n"
               "  -f/--follow_op_params_jit    whether follow all op params setting or not,"
               " default is [false], optional [true].\n"
+              "  --skip-static-bin-type   true (default): skip bin_type=0 and try JIT for dynamic binaries; "
+              "false: use OPC for all binaries.\n"
               "  -j/--job                 number of processes.")
 
     def __define_option(self, real_name_list: list, default_value: str, help_message: str, no_args: bool=False):
@@ -185,6 +187,8 @@ class OptionParser:
             None, "operator compile mode")
         self.__define_option([OPTOptions.FOLLOW_OP_PARAMS, OPTOptions.FOLLOW_OP_PARAMS_F], \
             f"false", "whether follow all op params setting or not")
+        self.__define_option([OPTOptions.SKIP_STATIC_BIN_TYPE],
+            "true", "skip static binaries; false selects OPC for all binaries")
         self.__define_option([OPTOptions.JOB, OPTOptions.JOB_J], \
             f"16", "number of processes")
         self.__define_option([OPTOptions.LOG, OPTOptions.LOG_L], \
@@ -523,6 +527,11 @@ class OptionParser:
                 self.__set_full_options_value(["-f", "--follow_op_params_jit"], value)
             if key in ("-j", "--job"):
                 self.__set_full_options_value(["-j", "--job"], value)
+            if key == "--skip-static-bin-type":
+                if value not in ("true", "false"):
+                    logger.error("--skip-static-bin-type must be true or false.")
+                    return False
+                self.__set_full_options_value([key], value)
             if key in ("--count"):
                 self.__set_full_options_value(["--count"], None)
             if key in ("--enable_super_kernel"):

@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from static_compile.specialization.shape_config_adapter import adapt_shape_config
+from static_compile.specialization.shape_config_adapter import RESOURCE_INFO_FIELDS, adapt_shape_config
 from static_compile.specialization.static_op_tiling import (
     RUN_INFO_FIELDS,
     OPTIONAL_RUN_INFO_FIELDS,
@@ -43,7 +43,7 @@ class CollectedTilingTests(unittest.TestCase):
             self.paths[kind] = folder / 'node.json'
             data = dict(self.node)
             if kind == 'debug':
-                data['bin_info'] = str(self.root / 'actual.o')
+                data.update(bin_info=str(self.root / 'actual.o'), bin_type=1, bin_id='dump-resource-id')
             self.write(kind, data)
         self.job = self.root / 'job.json'
         self.job.write_text(
@@ -74,7 +74,8 @@ class CollectedTilingTests(unittest.TestCase):
                 node = dict(self.node)
                 node.pop(field)
                 node['run_info'] = dict(self.runtime)
-                self.write('debug', dict(node, bin_info=str(self.root / 'actual.o')))
+                debug = dict(node, bin_info=str(self.root / 'actual.o'), bin_type=1, bin_id='dump-resource-id')
+                self.write('debug', debug)
                 with self.assertRaisesRegex(ValueError, 'top-level'):
                     self.adapt()
 
@@ -105,13 +106,13 @@ class CollectedTilingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'debug'):
             self.adapt()
 
-    def test_direct_debug_origin_keeps_dynamic_selection_witness(self):
+    def test_direct_debug_origin_provides_dump_resource_id(self):
         debug = json.loads(self.paths['debug'].read_text())
         self.write('debug', dict(debug, bin_type=1))
         job = json.loads(self.job.read_text())
         job['op_list'][0]['origin_path'] = str(self.paths['debug'])
         self.job.write_text(json.dumps(job))
-        self.assertTrue(self.adapt()['selected_from_collection'])
+        self.assertEqual(self.adapt()['resource_id'], 'dump-resource-id')
 
     def test_relative_bin_info_is_relative_to_debug_directory(self):
         debug = json.loads(self.paths['debug'].read_text())
@@ -176,12 +177,15 @@ class CollectedTilingTests(unittest.TestCase):
         output.mkdir()
         folder = self.root / 'extent'
         folder.mkdir()
-        node = dict(self.node, origin_path=str(self.paths['opcompile_selected']))
+        node = dict(
+            self.node, origin_path=str(self.paths['opcompile_selected']),
+            bin_info=str(self.root / 'actual.o'), bin_type=1, bin_id='dump-resource-id',
+        )
         (folder / 'node.json').write_text(json.dumps(node))
         _trans_dump_file_into_opc_format(str(folder), 'node.json', str(output), 'Ascend910B4')
         shape = json.loads((output / 'node.json').read_text())['op_list'][0]
         self.assertEqual(shape['origin_path'], str(self.paths['opcompile_selected']))
-        self.assertFalse(set((*RUN_INFO_FIELDS, *OPTIONAL_RUN_INFO_FIELDS)) & set(shape))
+        self.assertFalse(set((*RUN_INFO_FIELDS, *OPTIONAL_RUN_INFO_FIELDS, *RESOURCE_INFO_FIELDS)) & set(shape))
         self.assertEqual(adapt_shape_config(output / 'node.json', 'Ascend910B4')['run_info'], self.runtime)
 
     def test_workspace_bytes_preserves_order_and_zeros(self):
@@ -264,15 +268,9 @@ class CollectedTilingTests(unittest.TestCase):
         node = dict(self.node)
         node.pop('workspace_bytes')
         node['workspaces'] = [0]
-        self.write('debug', dict(node, bin_info=str(self.root / 'actual.o')))
+        self.write('debug', dict(node, bin_info=str(self.root / 'actual.o'), bin_type=1, bin_id='dump-resource-id'))
         with self.assertRaisesRegex(ValueError, 'workspace_bytes'):
             self.adapt()
-
-    def test_selection_witness_requires_dynamic_peer(self):
-        self.assertFalse(self.adapt()['selected_from_collection'])
-        record = json.loads(self.paths['debug'].read_text())
-        self.write('debug', dict(record, bin_type=1))
-        self.assertTrue(self.adapt()['selected_from_collection'])
 
     def test_unused_fields_are_not_required_or_validated(self):
         for kind, path in self.paths.items():

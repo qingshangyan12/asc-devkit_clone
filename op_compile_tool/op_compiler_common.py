@@ -83,6 +83,7 @@ class OPTOptions:
     COMPILE_MODE_M = "m"
     FOLLOW_OP_PARAMS = "follow_op_params_jit"
     FOLLOW_OP_PARAMS_F = "f"
+    SKIP_STATIC_BIN_TYPE = "skip-static-bin-type"
     JOB = "job"
     JOB_J = "j"
     LOG = "log"
@@ -108,6 +109,7 @@ COMPILING_OPTION_KEYS = [
     OPTOptions.OP_DEBUG_CONFIG, OPTOptions.OP_DEBUG_CONFIG_D,
     OPTOptions.COMPILE_MODE, OPTOptions.COMPILE_MODE_M,
     OPTOptions.FOLLOW_OP_PARAMS, OPTOptions.FOLLOW_OP_PARAMS_F,
+    OPTOptions.SKIP_STATIC_BIN_TYPE,
     OPTOptions.JOB, OPTOptions.JOB_J,
     OPTOptions.LOG, OPTOptions.LOG_L,
     OPTOptions.COUNT,

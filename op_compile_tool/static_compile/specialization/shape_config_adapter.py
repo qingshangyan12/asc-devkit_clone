@@ -9,6 +9,9 @@ from .soc_adapter import validate_collected_platform
 from .static_op_tiling import RUN_INFO_FIELDS, OPTIONAL_RUN_INFO_FIELDS, get_static_op_tiling
 
 
+RESOURCE_INFO_FIELDS = ('bin_info', 'bin_type', 'bin_id')
+
+
 def _reject_json_constant(value):
     raise ValueError('invalid JSON constant ' + value)
 
@@ -46,6 +49,20 @@ def _runtime_fields(node):
         if name in node:
             result[name] = copy.deepcopy(node[name])
     return result
+
+
+def _resource_fields(node):
+    """读取采集节点实际选中的动态资源，不再从 ELF 提取 resourceId。"""
+    bin_type = node.get('bin_type')
+    if not isinstance(bin_type, int) or isinstance(bin_type, bool) or bin_type != 1:
+        raise ValueError('collected bin_type must be integer 1 for JIT specialization')
+    resource_id = node.get('bin_id')
+    if not isinstance(resource_id, str) or not resource_id or '\0' in resource_id:
+        raise ValueError('missing or invalid collected bin_id')
+    dynamic = node.get('bin_info')
+    if not isinstance(dynamic, str) or not dynamic:
+        raise ValueError('missing dynamic ELF location (bin_info)')
+    return resource_id, dynamic
 
 
 def normalize(value):
@@ -105,15 +122,29 @@ def _debug_json_path(origin):
     return debug
 
 
+def get_collected_bin_type(node, origin_path):
+    """优先读取输入节点；旧采集路径未写该字段时从同节点 debug 补读。
+
+    只用于编译任务筛选。无法定位采集记录时保持旧输入的 OPC 兼容行为，
+    不把字段缺失当作已确认的静态二进制。
+    """
+    if 'bin_type' in node:
+        return node['bin_type']
+    try:
+        return _read_json(_debug_json_path(Path(origin_path).resolve())).get('bin_type')
+    except (OSError, ValueError, SpecializationError):
+        return None
+
+
 def adapt_shape_config(opc_json, soc):
     """将单 shape OPC 输入描述适配为 JIT worker 所需的编译上下文。
 
     输入为编译描述文件路径 opc_json 和目标芯片 soc。当前任务提供 shape、
     产物名及编译选项；通过 origin_path 定位同 PID、同文件名的 debug JSON，
-    统一读取顶层运行信息及 bin_info，校验任务上下文。
+    统一读取顶层运行信息、bin_id、bin_type 及 bin_info，校验任务上下文。
 
     返回 shape_config、op_type、dynamic_elf、dynamic_json、run_info 及
-    selected_from_collection；run_info 是内存字典，不是独立 run_info.json。
+    resource_id；run_info 是内存字典，不是独立 run_info.json。
     相对 bin_info 按 debug 所在目录解析，动态 JSON 使用 ELF 的同名 .json；
     本函数不读取动态资源内容，也不执行编译。
     """
@@ -125,19 +156,16 @@ def adapt_shape_config(opc_json, soc):
     origin = Path(shape.get('origin_path', path)).resolve()
     debug_path = _debug_json_path(origin)
     resource_doc = _read_json(debug_path)
+    resource_id, dynamic = _resource_fields(resource_doc)
     run_info = _runtime_fields(resource_doc)
     validate_context(shape, resource_doc, soc)
     if resource_doc.get('op_type') != doc['op_type']:
         raise ValueError('job operator differs from collected node')
-    dynamic = resource_doc.get('bin_info')
-    if not isinstance(dynamic, str) or not dynamic:
-        raise ValueError('missing dynamic ELF location (bin_info)')
     elf = Path(dynamic)
     if not elf.is_absolute():
         elf = debug_path.parent / elf
-    selected_from_collection = resource_doc.get('bin_type') == 1
     return dict(
-        selected_from_collection=selected_from_collection,
+        resource_id=resource_id,
         op_type=doc['op_type'],
         shape_config=shape,
         dynamic_elf=str(elf),

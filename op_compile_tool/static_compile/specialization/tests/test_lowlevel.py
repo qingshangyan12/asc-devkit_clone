@@ -242,24 +242,30 @@ int aclrtcKernelSpecialization(const aclrtcKernelSpecRequest *r, const char *out
             dest = p / 'dest'
             dest.mkdir()
             (dest / 'old').write_bytes(b'old')
-            with self.assertRaises(m.SpecializationError):
+            (dest / 'x').write_bytes(b'keep')
+            with self.assertRaises(m.ArtifactCollisionError) as failure:
                 m.publish_artifacts(stage, dest)
+            self.assertFalse(failure.exception.published)
+            self.assertEqual((dest / 'x').read_bytes(), b'keep')
             self.assertEqual((dest / 'old').read_bytes(), b'old')
             self.assertTrue(stage.exists())
+            (dest / 'x').unlink()
             (stage / 'link').symlink_to(stage / 'x')
             with self.assertRaises(m.SpecializationError):
-                m.publish_artifacts(stage, p / 'new')
+                m.publish_artifacts(stage, dest)
             (stage / 'link').unlink()
             with (
                 patch.object(m.os, 'fsync', side_effect=OSError('write error')),
-                self.assertRaises(m.SpecializationError),
+                self.assertRaises(m.SpecializationError) as failure,
             ):
-                m.publish_artifacts(stage, p / 'new')
+                m.publish_artifacts(stage, dest)
+            self.assertFalse(failure.exception.published)
             self.assertTrue(stage.exists())
-            self.assertFalse((p / 'new').exists())
-            m.publish_artifacts(stage, p / 'new')
+            self.assertFalse((dest / 'x').exists())
+            m.publish_artifacts(stage, dest)
             self.assertFalse(stage.exists())
-            self.assertEqual((p / 'new' / 'x').read_bytes(), b'data')
+            self.assertEqual((dest / 'x').read_bytes(), b'data')
+            self.assertEqual((dest / 'old').read_bytes(), b'old')
 
     def test_publish_reports_rename_commit_on_parent_fsync_error(self):
         m = self.module('static_compile.specialization.artifact_publisher')
@@ -268,22 +274,22 @@ int aclrtcKernelSpecialization(const aclrtcKernelSpecRequest *r, const char *out
             stage = root / 'stage'
             stage.mkdir()
             (stage / 'file').write_bytes(b'data')
+            dest = root / 'dest'
+            dest.mkdir()
             real_fsync = m.os.fsync
-            calls = []
 
             def fsync(fd):
-                calls.append(fd)
-                if len(calls) == 3:
+                if (dest / 'file').exists():
                     raise OSError('parent sync failure')
                 return real_fsync(fd)
 
             with patch.object(m.os, 'fsync', side_effect=fsync), self.assertRaises(m.SpecializationError) as failure:
-                m.publish_artifacts(stage, root / 'dest')
+                m.publish_artifacts(stage, dest)
             self.assertTrue(failure.exception.published)
-            self.assertFalse(stage.exists())
-            self.assertEqual((root / 'dest/file').read_bytes(), b'data')
+            self.assertEqual(list(stage.iterdir()), [])
+            self.assertEqual((dest / 'file').read_bytes(), b'data')
             with self.assertRaises(m.SpecializationError) as failure:
-                m.publish_artifacts(root / 'another', root / 'dest')
+                m.publish_artifacts(root / 'another', dest)
             self.assertFalse(failure.exception.published)
 
 

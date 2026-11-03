@@ -40,7 +40,6 @@ class KernelValidationTests(unittest.TestCase):
             'tiling': SimpleNamespace(kernel_name='entry', tiling_args_index=1, tiling_data=b'abcd'),
             'selected_kernel': selected,
             'parameter_mode': 'folded_with_desc',
-            'selected_from_collection': True,
         }
         self.elf = SimpleNamespace(
             functions={'entry'},

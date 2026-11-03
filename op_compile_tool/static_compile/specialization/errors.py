@@ -7,3 +7,7 @@ class SpecializationError(RuntimeError):
         self.stage = stage
         self.message = message
         super().__init__(f'{stage}: {message}')
+
+
+class ArtifactCollisionError(SpecializationError):
+    """最终产物已存在，禁止回退 OPC 覆盖同名文件。"""

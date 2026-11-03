@@ -47,6 +47,7 @@ class KernelCoreTypeTests(unittest.TestCase):
             tiling_key=7,
             tiling_args_index=2,
             tiling_data=bytes(72),
+            raw_run_info={'tiling_data': bytes(72).hex()},
             block_dim=4,
             workspaces=[],
             local_memory_size=0,
@@ -69,7 +70,7 @@ class KernelCoreTypeTests(unittest.TestCase):
                 selected = resolve_entry(metadata, tiling.kernel_name)
                 inputs = dict(
                     dynamic_elf=path, metadata=metadata, tiling=tiling, selected_kernel=selected,
-                    parameter_mode=None, shape_config={}, op_type='Example', selected_from_collection=False,
+                    parameter_mode=None, shape_config={}, op_type='Example',
                 )
                 resolved = resolve_kernel_metadata(inputs)
         self.assertEqual(metadata, original, 'resolving a key must not mutate the source JSON')

@@ -23,6 +23,7 @@ class MetadataTests(unittest.TestCase):
         tiling_cond=0,
         dynamic_mode=None,
         parameters=None,
+        tiling_data='abcd',
     ):
         dynamic = {
             'coreType': 'VectorCore',
@@ -47,6 +48,7 @@ class MetadataTests(unittest.TestCase):
             aicpu_block_dim=aicpu_block_dim,
             tiling_cond=tiling_cond,
             clear_atomic=True,
+            raw_run_info={'tiling_data': tiling_data},
         )
         functions = {'entry', 'entry_static_sk', *(f'entry_static_sk_split{i}' for i in range(1, 4))}
         if missing_function:
@@ -79,6 +81,14 @@ class MetadataTests(unittest.TestCase):
         for wrong in ([], [None], [None] * 3):
             with self.subTest(parameters=wrong), self.assertRaisesRegex(ValueError, 'parameter.*count'):
                 self.build(sk=False, parameters=wrong)
+
+    def test_collected_tiling_hex_is_preserved_in_plain_and_sk_json(self):
+        for sk in (False, True):
+            for text in ('00aBff', ''):
+                with self.subTest(sk=sk, tiling_data=text):
+                    result = self.build(sk=sk, tiling_data=text)
+                    self.assertEqual(result['tiling_data'], text)
+                    self.assertEqual(json.loads(json.dumps(result))['tiling_data'], text)
 
     def test_folded_descriptor_mode_reaches_static_json(self):
         result = self.build(sk=False, dynamic_mode='folded_with_desc')

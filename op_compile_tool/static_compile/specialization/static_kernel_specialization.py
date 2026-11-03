@@ -11,7 +11,6 @@ import os
 from pathlib import Path
 from dataclasses import dataclass
 from static_compile.specialization.shape_config_adapter import prepare_specialization_inputs
-from static_compile.specialization.resource_id_reader import read_resource_id
 from static_compile.specialization.soc_adapter import initialize_platform, validate_resource_platform
 from static_compile.specialization.argument_binding import resolve_kernel_metadata, bind_arguments
 from static_compile.specialization.specialization_options import build_specialization_options
@@ -32,39 +31,64 @@ class StaticKernelSpecializationJob:
 
 
 def specialize_static_kernel(job):
+    logger.info('Preparing specialization inputs from collected dump JSON: input=%s', job.opc_json)
     inputs = prepare_specialization_inputs(job.opc_json, job.soc_version)
     tiling = inputs['tiling']
     metadata = inputs['metadata']
+    logger.info(
+        'Dump JSON and dynamic resource JSON loaded and validated: op_type=%s, kernel_name=%s, tiling_key=%s',
+        inputs['op_type'], tiling.kernel_name, tiling.tiling_key,
+    )
+    logger.info('Initializing platform and validating resource compatibility: soc=%s', job.soc_version)
     short_soc = initialize_platform(job.soc_version)
     validate_resource_platform(
         metadata, metadata.get('supportInfo', {}), inputs['shape_config'], job.soc_version, short_soc
     )
-    resource_id = read_resource_id(inputs['dynamic_elf'])
+    logger.info('Platform compatibility validation succeeded: short_soc=%s', short_soc)
+    resource_id = inputs['resource_id']
+    logger.info(
+        'Validating ELF symbols and resource metadata: elf=%s, json=%s', inputs['dynamic_elf'], inputs['dynamic_json']
+    )
     resolved = resolve_kernel_metadata(inputs)
+    logger.info('Resource metadata validation succeeded; binding collected tiling arguments')
     arguments = bind_arguments(resolved, tiling)
+    logger.info(
+        'Argument binding succeeded: args_count=%s, tiling_args_index=%s, tiling_bytes=%s',
+        len(arguments), tiling.tiling_args_index, len(tiling.tiling_data),
+    )
+    logger.info('Converting compile and ACLGraph SK options: enable_sk=%s', job.enable_sk)
     options = build_specialization_options(
         inputs['shape_config'], job.enable_sk, tiling, resolved=resolved, op_type=inputs['op_type']
     )
+    logger.info(
+        'Option conversion succeeded: option_count=%s, sk_option_count=%s',
+        len(options.basic), len(options.super_kernel),
+    )
+    logger.debug('Converted options: options=%s, sk_options=%s', options.basic, options.super_kernel)
     basename = inputs['shape_config']['bin_filename']
     output = Path(job.output_dir) / (basename + '.o')
     output.parent.mkdir(parents=True, exist_ok=True)
+    logger.info('Constructing aclrtc specialization request: output=%s', output)
     request = OwnedSpecializationRequest(
         SpecializationInput(
             resource_id, tiling.kernel_name, arguments, options.basic, options.super_kernel, str(output)
         )
     )
+    logger.info('Specialization request constructed successfully')
     cann = Path(os.environ.get('ASCEND_HOME_PATH', ''))
     if not cann.is_absolute():
         raise ValueError('ASCEND_HOME_PATH must identify the installed toolkit')
     logger.info(
-        'Calling aclrtcKernelSpecialization: op_type=%s, kernel_name=%s, dynamic_elf=%s, enable_sk=%s',
-        inputs['op_type'], tiling.kernel_name, inputs['dynamic_elf'], job.enable_sk,
+        'Calling aclrtcKernelSpecialization: op_type=%s, kernel_name=%s, bin_id=%s, enable_sk=%s',
+        inputs['op_type'], tiling.kernel_name, resource_id, job.enable_sk,
     )
     # aclrtcKernelSpecialization 成功返回 0；invoke 已将非零 aclError 转为异常。
     # 显式保存状态码，说明只有特化成功后才可以继续生成配套静态 JSON。
     aclrtc_status = request.invoke(str(cann / 'lib64/libacl_rtc.so'))
     if aclrtc_status != 0:  # 防御性检查，覆盖未来 invoke 契约变化。
         raise RuntimeError(f'aclrtcKernelSpecialization failed with status {aclrtc_status}')
+    logger.info('aclrtcKernelSpecialization succeeded: status=%s, elf=%s', aclrtc_status, output)
+    logger.info('Generating and validating static kernel JSON against the specialized ELF')
     result = build_static_kernel_metadata(
         metadata,
         inputs['shape_config'],

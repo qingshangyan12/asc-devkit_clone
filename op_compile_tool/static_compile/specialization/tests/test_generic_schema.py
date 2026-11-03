@@ -20,13 +20,11 @@ class GenericSchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_resource_context(m, s, op)
 
-    def test_missing_identity_needs_actual_collection_for_every_operator(self):
+    def test_selected_resource_allows_missing_identity_for_every_operator(self):
         for op in ('DynamicQuant', 'MoeGatingTopKSoftmaxV2', 'PreviouslyUnseenOp'):
             m, s = context(op)
             m.pop('op_type')
-            with self.assertRaisesRegex(ValueError, 'identity'):
-                validate_resource_context(m, s, op)
-            validate_resource_context(m, s, op, selected_from_collection=True)
+            validate_resource_context(m, s, op)
 
     def test_float_alias_and_list_attributes(self):
         m, s = context('PreviouslyUnseenOp')
@@ -50,7 +48,7 @@ class GenericSchemaTests(unittest.TestCase):
                 validate_resource_context(m, s, 'PreviouslyUnseenOp')
                 self.assertEqual((m, s), original)
 
-    def test_int64_attribute_alias_preserves_value_checks(self):
+    def test_int64_attribute_alias_preserves_value_type_checks(self):
         m, s = context('PreviouslyUnseenOp')
         m['supportInfo']['attrs'] = [dict(name='dim', dtype='int64', value=-1)]
         s['attrs'] = [dict(name='dim', dtype='int', value=-1)]
@@ -60,8 +58,7 @@ class GenericSchemaTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'value type'):
                     validate_resource_context(m, s, 'PreviouslyUnseenOp')
         s['attrs'][0]['value'] = 0
-        with self.assertRaisesRegex(ValueError, 'attribute value mismatch'):
-            validate_resource_context(m, s, 'PreviouslyUnseenOp')
+        validate_resource_context(m, s, 'PreviouslyUnseenOp')
 
     def test_duplicate_or_incomplete_descriptors_rejected(self):
         m, s = context('PreviouslyUnseenOp')

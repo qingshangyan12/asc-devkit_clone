@@ -4,6 +4,7 @@ import copy
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -49,6 +50,8 @@ class BackendPreflightTests(unittest.TestCase):
             schedule_mode=0,
             local_memory_size=0,
             bin_info=str(self.elf),
+            bin_type=1,
+            bin_id='dump-resource-id',
         )
         self.job = self.root / 'input.json'
 
@@ -114,6 +117,25 @@ class BackendPreflightTests(unittest.TestCase):
         self.node.pop('bin_info')
         self.run_job(skipped=True, reason='bin_info')
 
+    def test_missing_resource_fields_skip_worker(self):
+        original = copy.deepcopy(self.node)
+        for field in ('bin_type', 'bin_id'):
+            with self.subTest(field=field):
+                self.node = copy.deepcopy(original)
+                self.node.pop(field)
+                self.run_job(skipped=True, reason=field)
+
+    def test_invalid_resource_fields_skip_worker(self):
+        original = copy.deepcopy(self.node)
+        for field, values in (
+            ('bin_type', (0, 2, True, False, '1', 1.0, None)),
+            ('bin_id', ('', 'id\0suffix', 1, True, None)),
+        ):
+            for value in values:
+                with self.subTest(field=field, value=value):
+                    self.node = dict(original, **{field: value})
+                    self.run_job(skipped=True, reason=field)
+
     def test_context_mismatch_skips_worker(self):
         self.node['deterministic'] = 'true'
         self.run_job(skipped=True, reason='context differs')
@@ -173,6 +195,7 @@ class BackendPreflightTests(unittest.TestCase):
         self.assertEqual(inputs['shape_config'], self.shape)
         self.assertEqual(inputs['op_type'], 'Test')
         self.assertEqual(inputs['dynamic_elf'], str(self.elf))
+        self.assertEqual(inputs['resource_id'], 'dump-resource-id')
         self.assertEqual(inputs['dynamic_json'], str(self.metadata))
         self.assertEqual(inputs['metadata'], self.resource)
         self.assertIs(inputs['selected_kernel'], inputs['metadata']['kernelList'][0])
@@ -214,11 +237,44 @@ class BackendPreflightTests(unittest.TestCase):
         self.debug.write_text(json.dumps(self.node))
         job = worker.StaticKernelSpecializationJob(str(self.job), str(self.root / 'stage'), 'Ascend910B4')
         with (
-            patch.object(worker, 'read_resource_id') as read_resource,
             patch.object(worker, 'OwnedSpecializationRequest') as request,
         ):
             with self.assertRaisesRegex(SpecializationError, 'tiling_data'):
                 worker.specialize_static_kernel(job)
-        read_resource.assert_not_called()
         request.assert_not_called()
         self.assertFalse((self.root / 'stage').exists())
+
+    def test_request_uses_dump_resource_id_without_elf_id_section(self):
+        from static_compile.specialization import static_kernel_specialization as worker
+        from static_compile.specialization.specialization_options import SpecializationOptions
+
+        self.node['bin_id'] = 'id-from-dump-not-from-elf'
+        self.write_inputs()
+        output = self.root / 'stage' / 'test.o'
+        captured = []
+
+        def invoke(request, library):
+            captured.append(request.request.resourceId.decode('utf-8'))
+            self.assertEqual(request.request.argsCount, 2)
+            self.assertEqual(request.request.argsBytes[1], 2)
+            self.assertTrue(library.endswith('/lib64/libacl_rtc.so'))
+            output.write_bytes(b'specialized ELF')
+            return 0
+
+        # 隔离依赖真实平台及编译器的阶段，保留输入读取、参数绑定及 C request 构造。
+        with (
+            patch.dict('os.environ', ASCEND_HOME_PATH=str(self.root / 'toolkit')),
+            patch.object(worker, 'initialize_platform', return_value='Ascend910B'),
+            patch.object(worker, 'validate_resource_platform'),
+            patch.object(worker, 'resolve_kernel_metadata', return_value=SimpleNamespace(tiling_index=1)),
+            patch.object(worker, 'build_specialization_options', return_value=SpecializationOptions((), (), False)),
+            patch.object(worker.OwnedSpecializationRequest, 'invoke', autospec=True, side_effect=invoke),
+            patch.object(worker, 'build_static_kernel_metadata', return_value={'kernelName': 'kernel'}),
+        ):
+            paths = worker.specialize_static_kernel(
+                worker.StaticKernelSpecializationJob(str(self.job), str(output.parent), 'Ascend910B4')
+            )
+        self.assertEqual(captured, ['id-from-dump-not-from-elf'])
+        self.assertEqual(paths, (str(output), str(output.with_suffix('.json'))))
+        self.assertEqual(output.read_bytes(), b'specialized ELF')
+        self.assertEqual(json.loads(output.with_suffix('.json').read_text()), {'kernelName': 'kernel'})

@@ -48,7 +48,6 @@ class ResourceContextTests(unittest.TestCase):
             lambda m, s: s['inputs'].__setitem__(0, None),
             lambda m, s: s['inputs'][1].update(name='group_index'),
             lambda m, s: s['inputs'][1].update(param_type='required'),
-            lambda m, s: s['attrs'][0].update(value=1),
             lambda m, s: s['attrs'][0].update(value=True),
             lambda m, s: s['attrs'][0].update(dtype='bool'),
             lambda m, s: s['attrs'].clear(),
@@ -96,12 +95,10 @@ class ResourceContextTests(unittest.TestCase):
     def test_collected_dynamic_selection_allows_placeholder_attr_value(self):
         metadata, shape = self.contexts()
         shape['attrs'][0]['value'] = 7
-        with self.assertRaisesRegex(ValueError, 'attribute value mismatch'):
-            self.validate(metadata, shape)
-        validate_resource_context(metadata, shape, 'DynamicQuant', selected_from_collection=True)
+        validate_resource_context(metadata, shape, 'DynamicQuant')
         shape['attrs'][0]['value'] = True
         with self.assertRaisesRegex(ValueError, 'value type'):
-            validate_resource_context(metadata, shape, 'DynamicQuant', selected_from_collection=True)
+            validate_resource_context(metadata, shape, 'DynamicQuant')
 
     def test_default_implementation_mode_is_high_performance(self):
         metadata, shape = self.contexts()

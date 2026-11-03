@@ -114,7 +114,7 @@ def _collect_operator_identities(owners):
     return identities
 
 
-def _validate_operator_identity(metadata, info, shape, op_type, selected_from_collection):
+def _validate_operator_identity(metadata, info, shape, op_type):
     identities = _collect_operator_identities((metadata, info, shape))
     keys = info.get('simplifiedKey', [])
     if not isinstance(keys, list):
@@ -128,11 +128,6 @@ def _validate_operator_identity(metadata, info, shape, op_type, selected_from_co
     identities.extend(key_identities)
     if any(identity != op_type for identity in identities):
         raise ValueError('resource operator identity mismatch')
-    resource_identities = _collect_operator_identities((metadata, info))
-    resource_identities.extend(key_identities)
-    # 同节点动态选择可以标识未命名资源；request 身份本身不构成资源证据。
-    if not resource_identities and not selected_from_collection:
-        raise ValueError('resource operator identity is missing')
 
 
 def _tensor_schema(descriptors):
@@ -246,7 +241,7 @@ def _validate_tensor_context(info, shape, tensor_schemas):
                 _validate_tensor(resource, tensor, name, param_type, index, label)
 
 
-def _validate_attribute(resource, actual, name, attr_type, index, selected_from_collection):
+def _validate_attribute(resource, actual, name, attr_type, index):
     if not isinstance(actual, dict):
         raise ValueError('invalid attribute descriptor')
     if actual.get('name') != name or _attribute_type(actual.get('dtype')) != attr_type:
@@ -256,18 +251,14 @@ def _validate_attribute(resource, actual, name, attr_type, index, selected_from_
     if resource.get('value_range') or resource.get('value_list'):
         raise ValueError('attribute range/list resources are unsupported')
     _validate_attribute_value(actual.get('value'), attr_type)
-    # 已校验的同节点选择允许编译占位值；其余情况仍要求属性值完全匹配。
-    if not selected_from_collection and resource.get('value') is not None:
-        if not _matches_attribute_type(resource['value'], attr_type) or resource['value'] != actual['value']:
-            raise ValueError('attribute value mismatch')
 
 
-def _validate_attribute_context(info, shape, attr_schema, selected_from_collection):
+def _validate_attribute_context(info, shape, attr_schema):
     resource_attrs, actual_attrs = info.get('attrs'), shape.get('attrs')
     if not isinstance(actual_attrs, list) or len(actual_attrs) != len(attr_schema):
         raise ValueError('attribute count mismatch')
     for index, (resource, actual, (name, attr_type)) in enumerate(zip(resource_attrs, actual_attrs, attr_schema)):
-        _validate_attribute(resource, actual, name, attr_type, index, selected_from_collection)
+        _validate_attribute(resource, actual, name, attr_type, index)
 
 
 def _validate_execution_context(metadata, info, shape, selected_kernel):
@@ -294,26 +285,25 @@ def _validate_execution_context(metadata, info, shape, selected_kernel):
         raise ValueError('resource implementation mode mismatch')
 
 
-def validate_resource_context(
-    metadata, shape, op_type, selected_kernel=None, *, selected_from_collection=False
-):
+def validate_resource_context(metadata, shape, op_type, selected_kernel=None):
     """将动态 JSON descriptor 绑定到具体编译请求，并按原顺序校验。
 
     tensor/参数组和属性使用资源声明；目标平台由 worker 的平台准备阶段统一检查。
     调用前由 prepare_specialization_inputs 完成入口、optional 空槽和动态参数组模式检查。
+    输入已确认 bin_type=1；资源中的属性值可以是编译占位，实际值以采集节点为准。
     """
     if not isinstance(metadata, dict) or not isinstance(shape, dict):
         raise ValueError('resource and shape context must be dictionaries')
     info = metadata.get('supportInfo')
     if not isinstance(info, dict) or info.get('opMode') != 'dynamic':
         raise ValueError('resource must have dynamic supportInfo')
-    _validate_operator_identity(metadata, info, shape, op_type, selected_from_collection)
+    _validate_operator_identity(metadata, info, shape, op_type)
     tensor_schemas = []
     for category in ('inputs', 'outputs'):
         tensor_schemas.append(_tensor_schema(info.get(category)))
     attr_schema = _attribute_schema(info.get('attrs'))
     _validate_tensor_context(info, shape, tensor_schemas)
-    _validate_attribute_context(info, shape, attr_schema, selected_from_collection)
+    _validate_attribute_context(info, shape, attr_schema)
     _validate_execution_context(metadata, info, shape, selected_kernel)
 
 
@@ -426,7 +416,6 @@ def resolve_kernel_metadata(inputs):
         inputs['shape_config'],
         inputs['op_type'],
         selected_kernel=inputs['selected_kernel'],
-        selected_from_collection=inputs['selected_from_collection'],
     )
     dynamic_elf = inputs['dynamic_elf']
     tiling = inputs['tiling']

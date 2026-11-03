@@ -39,13 +39,14 @@ class CollectedResourceTests(unittest.TestCase):
             node.update(runtime)
             origin = selected / 'node.json'
             origin.write_text(json.dumps(node))
-            record = dict(node, bin_info=str(root / 'actual.o'))
+            record = dict(node, bin_info=str(root / 'actual.o'), bin_type=1, bin_id='dump-resource-id')
             (debug / origin.name).write_text(json.dumps(record))
             shape = dict(node, origin_path=str(origin))
             job = root / 'job.json'
             job.write_text(json.dumps({'op_type': 'CustomQuant', 'op_list': [shape]}))
             result = adapt_shape_config(job, 'Ascend910B4')
             self.assertEqual(result['dynamic_elf'], str(root / 'actual.o'))
+            self.assertEqual(result['resource_id'], 'dump-resource-id')
             self.assertEqual(result['run_info'], runtime)
             # 同名但执行输入不同的节点不能关联到一起。
             record['attrs'] = [{'name': 'different', 'value': 1}]
@@ -53,7 +54,7 @@ class CollectedResourceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'context differs'):
                 adapt_shape_config(job, 'Ascend910B4')
 
-    def test_custom_schema_requires_resource_identity_and_exact_descriptors(self):
+    def test_selected_custom_schema_accepts_missing_identity_but_checks_descriptors(self):
         fixture = json.loads((Path(__file__).parent / 'fixtures/DynamicQuant.json').read_text())
         metadata, shape = fixture['metadata'], fixture['shape']
         for owner in [metadata['supportInfo'], shape]:
@@ -67,8 +68,7 @@ class CollectedResourceTests(unittest.TestCase):
         metadata['supportInfo'].pop('simplifiedKey', None)
         validate_resource_context(metadata, shape, 'CustomQuant')
         metadata.pop('op_type')
-        with self.assertRaisesRegex(ValueError, 'identity'):
-            validate_resource_context(metadata, shape, 'CustomQuant')
+        validate_resource_context(metadata, shape, 'CustomQuant')
         metadata['op_type'] = 'CustomQuant'
         bad = copy.deepcopy(shape)
         bad['inputs'][1]['name'] = 'other'
