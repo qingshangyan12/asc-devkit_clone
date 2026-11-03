@@ -26,7 +26,7 @@
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {
 namespace Reg {
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename T = DefaultType, typename U = DefaultType, typename RegT, typename RegU>
 __simd_callee__ inline void GatherImpl(RegT& dstReg, RegT& srcReg0, RegU& srcReg1)
 {
@@ -66,16 +66,6 @@ __simd_callee__ inline void PrefixSumImpl(RegT& dstReg, MaskReg& mask)
     vusqz(dstReg, mask);
 }
 
-template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
-__aicore__ inline int64_t GetSprImpl()
-{
-    static_assert(
-        SupportEnum<spr, SpecialPurposeReg::AR>(),
-        "current GetSpr api only support SpecialPurposeReg AR on current device!");
-    return get_ar();
-}
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
 __simd_callee__ inline void ClearSprImpl()
 {

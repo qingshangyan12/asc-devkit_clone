@@ -26,6 +26,7 @@
 
 namespace AscendC {
 namespace Reg {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <typename T, typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __simd_callee__ inline void AxpyImpl(RegT& dstReg, RegT& srcReg, const ScalarT scalarValue, const MaskReg& mask)
 {
@@ -36,6 +37,7 @@ __simd_callee__ inline void AxpyImpl(RegT& dstReg, RegT& srcReg, const ScalarT s
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vaxpy(dstReg, srcReg, scalarValue, mask, modeValue);
 }
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H

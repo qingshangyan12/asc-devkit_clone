@@ -414,6 +414,7 @@ __simd_callee__ inline void NegImpl(U& dstReg, U& srcReg, MaskReg& mask)
     vneg(dstReg, srcReg, mask, modeValue);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
 template <MaskMergeMode mode = MaskMergeMode::ZEROING>
 __simd_callee__ inline void LogXImpl(
     RegTensor<half>& dstReg, RegTensor<half>& srcReg, MaskReg& mask, const float lnXReciprocal)
@@ -507,6 +508,7 @@ __simd_callee__ inline void NotImpl(U& dstReg, U& srcReg, MaskReg& mask)
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vnot(dstReg, srcReg, mask, modeValue);
 }
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_UNARY_IMPL_H
