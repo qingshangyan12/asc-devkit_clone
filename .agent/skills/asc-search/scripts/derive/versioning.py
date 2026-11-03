@@ -32,8 +32,18 @@ def signature_available(signature: dict[str, Any], events: list[dict[str, Any]],
 
 def deprecation(signature: dict[str, Any], events: list[dict[str, Any]], target: str, arch: str) -> Any:
     value = signature.get("deprecated")
-    if value and (not value.get("version") or version_key(value["version"]) <= version_key(target)):
-        return value
+    if value:
+        declared = value.get("version")
+        if not declared:
+            return value
+        try:
+            in_effect = version_key(declared) <= version_key(target)
+        except ValueError:
+            # 畸形声明版本（如 ASC_DEPRECATED(9..2, ...)）视为该声明证据不可用，退回事件推导，
+            # 避免单个头文件错误中断整次索引构建。
+            in_effect = False
+        if in_effect:
+            return value
     candidates = []
     for event in events:
         if event["kind"] != "deprecated" or version_key(event["since"]) > version_key(target):
@@ -47,4 +57,6 @@ def deprecation(signature: dict[str, Any], events: list[dict[str, Any]], target:
         candidates.append((specificity, version_key(event["since"]), event["since"]))
     if not candidates:
         return None
-    return {"version": min(candidates)[2], "replacement": ""}
+    # 事件给出生效的废弃版本，但声明自身已标注的替代目标仍要保留（见推导契约）。
+    replacement = (value or {}).get("replacement", "")
+    return {"version": min(candidates)[2], "replacement": replacement}

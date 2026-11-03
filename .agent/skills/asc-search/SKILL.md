@@ -38,6 +38,7 @@ python3 <skill>/scripts/search.py --platform 950 --version 9.2.0 --operation cop
 CLI 细节见 [index.md](references/index.md)，三类头推导见 [契约](references/index_derivation_contract.md)。
 
 `--version 9.2.0` 匹配首次支持 ≤ 目标版本及生命周期允许的接口，`>=9.0.0` 可命中。
+`--changed-in` 与 `--version` 同样归一化，`9.2`、`>=9.2.0` 与 `9.2.0` 等价。
 查询版本必须与索引一致。废弃仍可返回，移除事件排除；页面命中不代表全部重载已支持。
 平台同时保留产品与架构条件，A2/A3 不能仅凭共享架构混为一谈。
 

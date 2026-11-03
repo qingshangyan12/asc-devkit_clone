@@ -43,12 +43,24 @@ def csv(value: str | None) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()] if value else []
 
 
+def strip_version_prefix(value: str) -> str:
+    """去掉旧 CLI 拼写的前缀 '>='，只保留目标版本号。"""
+    text = value.strip()
+    return text[2:].strip() if text.startswith(">=") else text
+
+
+def canonical_change_version(index: dict[str, Any], value: str) -> str:
+    """把 --changed-in 归一化到索引内实际的事件版本键（兼容 '>=9.2.0' 与 '9.2'）。"""
+    target = version_key(strip_version_prefix(value))
+    for since in index["views"].get("by_change_version", {}):
+        if version_key(since) == target:
+            return since
+    return strip_version_prefix(value)
+
+
 def version_target(index: dict[str, Any], value: str) -> str:
     """Resolve a target version; an index for another version cannot answer availability."""
-    target = value.strip()
-    # Accept the previous CLI spelling, now with target-version semantics.
-    if target.startswith(">="):
-        target = target[2:].strip()
+    target = strip_version_prefix(value)
     target_key = version_key(target)
     indexed = index["meta"]["cann_version"]
     if target_key != version_key(indexed):
@@ -142,7 +154,9 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         "pair": [],
         "feature": csv(args.feature),
         "version": [version_target(index, args.version)] if args.version else [],
-        "change_version": [args.changed_in.strip()] if getattr(args, "changed_in", None) else [],
+        "change_version": [canonical_change_version(index, args.changed_in)]
+        if getattr(args, "changed_in", None)
+        else [],
         "product": csv(args.product),
     }
     if args.convert:
@@ -353,11 +367,13 @@ def attach_change_events(index: dict[str, Any], results: list[dict[str, Any]], v
 
     只在显式使用 --changed-in 时附加，其他查询的输出结构不变。
     """
+    target = version_key(strip_version_prefix(version))
     for row in results:
         doc = index["documents"].get(row["path"])
         if doc is None:
             continue
-        events = [event for event in doc.get("version_changes") or [] if event.get("since") == version]
+        events = [event for event in doc.get("version_changes") or []
+                  if event.get("since") and version_key(event["since"]) == target]
         if events:
             row["version_changes"] = events
     return results
@@ -503,10 +519,11 @@ def main() -> int:
             return 0
         if args.changed_in and not results:
             known = ", ".join(sorted(index["views"].get("by_change_version", {}))) or "（无）"
+            target = canonical_change_version(index, args.changed_in)
             print(
                 "[]"
                 if args.json
-                else f"无命中：索引中没有 since = {args.changed_in.strip()} 的版本变更事件"
+                else f"无命中：索引中没有 since = {target} 的版本变更事件"
                 f"（索引内已有事件版本：{known}）"
             )
             return 0

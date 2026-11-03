@@ -23,18 +23,22 @@ from typing import Any
 
 import yaml
 
-VERSION_POINT_RE = re.compile(r"^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-([0-9A-Za-z.-]+))?$")
+VERSION_POINT_RE = re.compile(r"^(\d+(?:\.\d+)*)(?:-([0-9A-Za-z.-]+))?$")
 VERSION_RANGE_RE = re.compile(r"^>=(?P<floor>\d+(?:\.\d+){0,2}(?:-[0-9A-Za-z.-]+)?)$")
 LEGACY_RANGE_RE = re.compile(r"^(>=[0-9.]+),<=[0-9.]+$")
 
 
 def version_key(value: str) -> tuple:
+    """版本号归一化：接受 1 段以上的数字段（如 9.2 / 9.2.0 / 9.2.0.1）与可选预发布后缀。"""
     match = VERSION_POINT_RE.fullmatch(value)
     if not match:
         raise ValueError(f"invalid CANN version: {value!r}")
-    major, minor, patch, pre = match.groups()
-    parts = tuple((0, int(p)) if p.isdigit() else (1, p) for p in (pre or "").split("."))
-    return int(major), int(minor or 0), int(patch or 0), pre is None, parts
+    numbers, pre = match.groups()
+    parts = [int(part) for part in numbers.split(".")]
+    major, minor, patch = (parts + [0, 0])[:3]
+    extra = tuple(parts[3:])
+    pre_parts = tuple((0, int(p)) if p.isdigit() else (1, p) for p in (pre or "").split("."))
+    return major, minor, patch, extra, pre is None, pre_parts
 
 
 def first_support(value: str, *, allow_legacy: bool = False) -> str:
@@ -78,7 +82,7 @@ def detect_cann_version(explicit: str | None, repo_root: Path) -> str:
         return explicit
     home = os.environ.get("ASCEND_HOME_PATH", "")
     if home:
-        match = re.search(r"cann-(\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.-]+)?)(?=/|$)", home)
+        match = re.search(r"cann-(\d+\.\d+(?:\.\d+)*(?:-[0-9A-Za-z.-]+)?)(?=/|$)", home)
         if match:
             return match.group(1)
     cmake = repo_root / "version.cmake"
