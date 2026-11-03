@@ -14,12 +14,39 @@
 #include <queue>
 #include "alg_param.h"
 #include "ccu_kernel.h"
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 #include "ccu_primitives_impl_dl.h"
+#endif
 
 namespace mc2_ops_hccl {
 
 enum class CcuVersion : uint8_t { CCU_V1 = 0U, CCU_V2 = 1U, INVALID = 2U };
 
+#ifdef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）：仅支持 Ascend950 / CCU_V1；Ascend960 / CCU_V2 返回 INVALID，
+// 由上层（DispatchAllocByCommEngine）拒绝为 NOT_SUPPORT。
+inline CcuVersion GetCcuVersion()
+{
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    if (hrtGetDeviceType(deviceType) != HCCL_SUCCESS) {
+        HCCL_ERROR("GetCcuVersion: failed to get device type");
+        return CcuVersion::INVALID;
+    }
+    CcuVersion ccuVersion = CcuVersion::INVALID;
+    if (deviceType == DevType::DEV_TYPE_950) {
+        ccuVersion = CcuVersion::CCU_V1;
+    } else {
+        HCCL_ERROR(
+            "GetCcuVersion: asccomm ccu dataplane only supports Ascend950 / CCU_V1, deviceType[%u]",
+            static_cast<uint32_t>(deviceType));
+        return CcuVersion::INVALID;
+    }
+    HCCL_INFO(
+        "GetCcuVersion: deviceType[%u], ccuVersion[%u]", static_cast<uint32_t>(deviceType),
+        static_cast<uint32_t>(ccuVersion));
+    return ccuVersion;
+}
+#else
 inline CcuVersion GetCcuVersion()
 {
     DevType deviceType = DevType::DEV_TYPE_COUNT;
@@ -45,6 +72,7 @@ inline CcuVersion GetCcuVersion()
         static_cast<uint32_t>(ccuVersion));
     return ccuVersion;
 }
+#endif
 
 constexpr uint16_t LOC_CPY_LOOP_NUM = 8;
 constexpr uint64_t UB_MAX_TRANS_SIZE = 256 * 1024 * 1024;         // UB单次最大传输量256*1024*1024 Byte

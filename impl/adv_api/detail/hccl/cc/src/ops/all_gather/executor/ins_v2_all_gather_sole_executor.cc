@@ -13,7 +13,10 @@
 #include "ins_temp_all_gather_nhr.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
+// 实验构建（asc-comm 数据面）临时禁用 SoleNHR AllGather 模板。
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
+#endif
 #endif
 #include "topo_match_ubx.h"
 #include "alg_meta_registry.h"
@@ -240,11 +243,13 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 
+#ifndef MC2_CLIENT_USE_ASCCOMM_CCU_DATAPLANE
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,
     CcuTempKfcAllGatherNHR1DMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleNHR, AlgEngine::CCU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
+#endif
 
 #endif
 } // namespace mc2_ops_hccl
