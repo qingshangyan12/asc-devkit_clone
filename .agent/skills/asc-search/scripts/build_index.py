@@ -644,14 +644,22 @@ def overview(index: dict[str, Any], enums: dict[str, Any]) -> str:
 
 def input_fingerprints(root: Path) -> dict[str, str]:
     sources = list((root / "include/c_api").rglob("*.h"))
-    sources += [p for p in (root / "examples").rglob("*") if p.is_file() and
-                p.suffix.lower() in {".asc", ".c", ".cc", ".cpp", ".cxx", ".h", ".hpp"}]
+    sources += [
+        p
+        for p in (root / "examples").rglob("*")
+        if p.is_file() and p.suffix.lower() in {".asc", ".c", ".cc", ".cpp", ".cxx", ".h", ".hpp"}
+    ]
     scripts = list((SKILL_ROOT / "scripts").rglob("*.py"))
     scripts += list((SKILL_ROOT / "derive-overrides").glob("*.json"))
-    result = {"repo/" + p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in sorted(sources)}
-    result.update({"skill/" + p.relative_to(SKILL_ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-                   for p in sorted(scripts)})
+    result = {
+        "repo/" + p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(sources)
+    }
+    result.update(
+        {
+            "skill/" + p.relative_to(SKILL_ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(scripts)
+        }
+    )
     return result
 
 
@@ -704,11 +712,18 @@ def build(
         )
         applied = overrides_mod.apply_overrides(rel, derived, override_map)
         if doc["legacy_version"]:
-            unresolved.append({"document": rel, "field": "version",
-                               "issue": f"legacy upper bound ignored: {doc['legacy_version']}; review first support and lifecycle events"})
+            unresolved.append(
+                {
+                    "document": rel,
+                    "field": "version",
+                    "issue": f"legacy upper bound ignored: {doc['legacy_version']}; review first support and lifecycle events",
+                }
+            )
         is_entity = doc["okftype"] != "reference.index"
         if is_entity:
-            if (doc["version"] and not gate.version_covers(doc["version"], cann_version)) or not page_available(doc["version_changes"], cann_version):
+            if (doc["version"] and not gate.version_covers(doc["version"], cann_version)) or not page_available(
+                doc["version_changes"], cann_version
+            ):
                 filtered_by_version += 1
                 continue
             if derived["archs"] and arch not in derived["archs"]:
@@ -716,7 +731,9 @@ def build(
                 continue
             if derived["signatures"]:
                 eligible = [s for s in derived["signatures"] if not s["archs"] or arch in s["archs"]]
-                derived["signatures"] = [s for s in eligible if signature_available(s, doc["version_changes"], cann_version, arch)]
+                derived["signatures"] = [
+                    s for s in eligible if signature_available(s, doc["version_changes"], cann_version, arch)
+                ]
                 if eligible and not derived["signatures"]:
                     filtered_by_version += 1
                     continue
@@ -825,7 +842,9 @@ def build(
         "product_map_sha256": hashlib.sha256(PRODUCT_MAP_PATH.read_bytes()).hexdigest(),
         "gaps_sha256": hashlib.sha256(gaps_raw).hexdigest(),
         "input_sha256": input_fingerprints(root),
-        "document_sha256": {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(set(documents) | set(pending))},
+        "document_sha256": {
+            rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(set(documents) | set(pending))
+        },
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     # gaps.json 可选（人工维护）：缺失时落盘空台账快照，保证 --out 构建的实例目录

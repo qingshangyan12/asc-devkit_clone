@@ -189,7 +189,8 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         candidates = matched if candidates is None else candidates & matched
     if dims["version"]:
         candidates = {
-            path for path in (candidates if candidates is not None else index["documents"])
+            path
+            for path in (candidates if candidates is not None else index["documents"])
             if available_at(index, path, dims["version"][0])
         }
     if dims["kw"]:
@@ -372,8 +373,11 @@ def attach_change_events(index: dict[str, Any], results: list[dict[str, Any]], v
         doc = index["documents"].get(row["path"])
         if doc is None:
             continue
-        events = [event for event in doc.get("version_changes") or []
-                  if event.get("since") and version_key(event["since"]) == target]
+        events = [
+            event
+            for event in doc.get("version_changes") or []
+            if event.get("since") and version_key(event["since"]) == target
+        ]
         if events:
             row["version_changes"] = events
     return results
@@ -411,14 +415,14 @@ def run_query(args: argparse.Namespace, index: dict[str, Any], gaps: dict[str, A
     return _attach_changes(index, results, args)
 
 
-def _attach_changes(index: dict[str, Any], results: list[dict[str, Any]],
-                    args: argparse.Namespace) -> list[dict[str, Any]]:
+def _attach_changes(
+    index: dict[str, Any], results: list[dict[str, Any]], args: argparse.Namespace
+) -> list[dict[str, Any]]:
     """--changed-in：给候选附上该版本的变更事件摘要（过滤本身由 filter_query 完成）。"""
     for row in results:
         doc = index["documents"].get(row.get("path"))
         if doc and doc.get("version_changes"):
-            row["version_context"] = {"cann_version": index["meta"]["cann_version"],
-                                      "changes": doc["version_changes"]}
+            row["version_context"] = {"cann_version": index["meta"]["cann_version"], "changes": doc["version_changes"]}
     changed_in = getattr(args, "changed_in", None)
     if changed_in:
         results = attach_change_events(index, results, changed_in.strip())
@@ -426,8 +430,18 @@ def _attach_changes(index: dict[str, Any], results: list[dict[str, Any]],
 
 
 # 过滤维度（filter_query 消费的那些）；独立查询必须与它们求交，不能静默忽略。
-FILTER_DIM_ATTRS = ("stage", "operation", "category", "api_class", "dtype", "kw",
-                    "convert", "feature", "version", "product")
+FILTER_DIM_ATTRS = (
+    "stage",
+    "operation",
+    "category",
+    "api_class",
+    "dtype",
+    "kw",
+    "convert",
+    "feature",
+    "version",
+    "product",
+)
 
 
 def _active_filter_dims(args: argparse.Namespace) -> list[str]:
@@ -461,8 +475,10 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
         lines.append(f"{row['path']}{flags} | {name} | {','.join(row['why'])}{condition}\n  {desc}")
         context = row.get("version_context")
         if context and not row.get("version_changes"):
-            lines.append(f"  目标 CANN {context['cann_version']}，需核对重载/行为变更: " +
-                         "；".join(change_summary(e) for e in context["changes"]))
+            lines.append(
+                f"  目标 CANN {context['cann_version']}，需核对重载/行为变更: "
+                + "；".join(change_summary(e) for e in context["changes"])
+            )
         changes = row.get("version_changes") or []
         if changes:
             lines.append("  版本变更: " + "；".join(change_summary(event) for event in changes))
@@ -523,8 +539,7 @@ def main() -> int:
             print(
                 "[]"
                 if args.json
-                else f"无命中：索引中没有 since = {target} 的版本变更事件"
-                f"（索引内已有事件版本：{known}）"
+                else f"无命中：索引中没有 since = {target} 的版本变更事件（索引内已有事件版本：{known}）"
             )
             return 0
         print(json.dumps(results, ensure_ascii=False, indent=1) if args.json else render(index, results))

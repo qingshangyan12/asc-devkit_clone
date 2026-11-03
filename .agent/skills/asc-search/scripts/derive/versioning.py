@@ -1,4 +1,15 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """Consume first-support versions and scoped lifecycle events without producer imports."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -9,15 +20,19 @@ def event_applies(event: dict[str, Any], identifier: str, arch: str) -> bool:
     scope = event.get("scope", "")
     if not scope.startswith("overload:"):
         return False
-    target, _, event_arch = scope[len("overload:"):].partition("@")
+    target, _, event_arch = scope[len("overload:") :].partition("@")
     return target == identifier and (not event_arch or event_arch == arch)
 
 
 def page_available(events: list[dict[str, Any]], target: str) -> bool:
     # A fallback page selector does not establish that the entire API was removed.
-    return not any(e.get("kind") == "removed" and e.get("scope") == "page"
-                   and e.get("scope_basis") != "fallback"
-                   and version_key(e["since"]) <= version_key(target) for e in events)
+    return not any(
+        e.get("kind") == "removed"
+        and e.get("scope") == "page"
+        and e.get("scope_basis") != "fallback"
+        and version_key(e["since"]) <= version_key(target)
+        for e in events
+    )
 
 
 def signature_available(signature: dict[str, Any], events: list[dict[str, Any]], target: str, arch: str) -> bool:

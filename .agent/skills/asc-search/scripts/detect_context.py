@@ -10,6 +10,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 """Lazy read-only environment detection; explicit task targets always win."""
+
 from __future__ import annotations
 
 import argparse
@@ -24,11 +25,13 @@ from search import PLATFORMS
 from derive.gate import version_key
 
 # Full device identifiers only. Shared runtime enums such as ASCEND910B are ambiguous.
-DEVICE_PATTERNS = ((r"(?i)\b(?:ascend)?950(?:PR|DT)?(?:[_-]\w+)?\b", "950"),
-                   (r"(?i)\b(?:ascend)?910_93\w*\b", "a3"),
-                   (r"(?i)\b(?:ascend)?910B[1-4](?:C)?\b", "a2"),
-                   (r"(?i)\b(?:ascend)?310B[1-4]\b", "310b"),
-                   (r"(?i)\b(?:ascend)?310P[1-9]\b", "310p"))
+DEVICE_PATTERNS = (
+    (r"(?i)\b(?:ascend)?950(?:PR|DT)?(?:[_-]\w+)?\b", "950"),
+    (r"(?i)\b(?:ascend)?910_93\w*\b", "a3"),
+    (r"(?i)\b(?:ascend)?910B[1-4](?:C)?\b", "a2"),
+    (r"(?i)\b(?:ascend)?310B[1-4]\b", "310b"),
+    (r"(?i)\b(?:ascend)?310P[1-9]\b", "310p"),
+)
 
 
 def detect(platform=None, cann_version=None, package_root=None):
@@ -40,7 +43,9 @@ def detect(platform=None, cann_version=None, package_root=None):
         if tool:
             try:
                 probe = subprocess.run([tool, "info"], capture_output=True, text=True, timeout=5)
-                observations.append({"source": "npu-smi info", "output": probe.stdout[:16000], "returncode": probe.returncode})
+                observations.append(
+                    {"source": "npu-smi info", "output": probe.stdout[:16000], "returncode": probe.returncode}
+                )
                 if probe.returncode == 0:
                     for pattern, value in DEVICE_PATTERNS:
                         if re.search(pattern, probe.stdout):
@@ -50,10 +55,22 @@ def detect(platform=None, cann_version=None, package_root=None):
                     # than defaulting to logical device zero or guessing from arch.
                     if not candidates:
                         listed = subprocess.run([tool, "info", "-l"], capture_output=True, text=True, timeout=5)
-                        ids = re.findall(r"(?im)\bNPU\s+ID\s*:\s*(\d+)\b", listed.stdout) if listed.returncode == 0 else []
+                        ids = (
+                            re.findall(r"(?im)\bNPU\s+ID\s*:\s*(\d+)\b", listed.stdout)
+                            if listed.returncode == 0
+                            else []
+                        )
                         for device in dict.fromkeys(ids[:8]):
-                            board = subprocess.run([tool, "info", "-t", "board", "-i", device], capture_output=True, text=True, timeout=5)
-                            observations.append({"source": f"npu-smi board {device}", "output": board.stdout[:8000], "returncode": board.returncode})
+                            board = subprocess.run(
+                                [tool, "info", "-t", "board", "-i", device], capture_output=True, text=True, timeout=5
+                            )
+                            observations.append(
+                                {
+                                    "source": f"npu-smi board {device}",
+                                    "output": board.stdout[:8000],
+                                    "returncode": board.returncode,
+                                }
+                            )
                             if board.returncode == 0:
                                 for pattern, value in DEVICE_PATTERNS:
                                     if re.search(pattern, board.stdout):
@@ -87,9 +104,15 @@ def detect(platform=None, cann_version=None, package_root=None):
     if cann_version:
         version_key(cann_version)
     unknown = [key for key, value in (("platform", platform), ("cann_version", cann_version)) if not value]
-    return {"platform": platform, "arch": PLATFORMS[platform][0] if platform else None,
-            "cann_version": cann_version, "component_version": detected_component_version,
-            "platform_candidates": sorted(candidates), "evidence": observations, "unknown": unknown}
+    return {
+        "platform": platform,
+        "arch": PLATFORMS[platform][0] if platform else None,
+        "cann_version": cann_version,
+        "component_version": detected_component_version,
+        "platform_candidates": sorted(candidates),
+        "evidence": observations,
+        "unknown": unknown,
+    }
 
 
 def main():

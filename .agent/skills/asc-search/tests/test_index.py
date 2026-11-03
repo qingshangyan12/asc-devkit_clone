@@ -360,7 +360,7 @@ class VersionChangesTests(unittest.TestCase):
         invalid = {
             "not_a_list": "version_changes: {since: '9.2.0'}\n",
             "item_not_mapping": "version_changes:\n  - just-a-string\n",
-            "missing_scope": "version_changes:\n  - since: \"9.2.0\"\n    kind: overload_added\n    evidence: \"x\"\n",
+            "missing_scope": 'version_changes:\n  - since: "9.2.0"\n    kind: overload_added\n    evidence: "x"\n',
             "since_not_str": (
                 "version_changes:\n"
                 "  - since: 9.2\n"  # YAML float，不是版本点字符串
@@ -458,18 +458,22 @@ class VersionChangesTests(unittest.TestCase):
 
     def test_version_flag_matches_first_support_range(self) -> None:
         """9.2.0 查询同时命中更早支持和恰好从 9.2.0 开始支持的页面。"""
-        index, _ = self._build({
-            FIXTURE_REL: fixture_document(FIXTURE_EVENTS, version=">=9.0.0"),
-            FIXTURE_REL_PLAIN: fixture_document(version=">=9.2.0"),
-            FIXTURE_REL_OLD: fixture_document(version=">=9.3.0"),
-        })
+        index, _ = self._build(
+            {
+                FIXTURE_REL: fixture_document(FIXTURE_EVENTS, version=">=9.0.0"),
+                FIXTURE_REL_PLAIN: fixture_document(version=">=9.2.0"),
+                FIXTURE_REL_OLD: fixture_document(version=">=9.3.0"),
+            }
+        )
         expected = {FIXTURE_REL, FIXTURE_REL_PLAIN}
         for target in ("9.2.0", "9.2", ">=9.2.0"):
             with self.subTest(target=target):
                 hits = self._query(index, version=target)
                 self.assertEqual(expected, {row["path"] for row in hits})
                 self.assertTrue(all(f"version:{target.removeprefix('>=')}" in row["why"] for row in hits))
-        self.assertEqual([FIXTURE_REL], [row["path"] for row in self._query(index, version="9.2.0", changed_in="9.2.0")])
+        self.assertEqual(
+            [FIXTURE_REL], [row["path"] for row in self._query(index, version="9.2.0", changed_in="9.2.0")]
+        )
         self.assertEqual([FIXTURE_REL], [row["path"] for row in self._query(index, version="9.2.0", api="asc_fixture")])
 
     def test_version_query_requires_index_for_target_version(self) -> None:
@@ -482,7 +486,6 @@ class VersionChangesTests(unittest.TestCase):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValueError):
                     self._query(index, version=invalid)
-
 
 
 @unittest.skipUnless(HAS_FULL_DATA, "annotated devkit data is not installed; set ASC_SEARCH_TEST_ROOT")
@@ -626,7 +629,9 @@ class EnsureTests(unittest.TestCase):
     def test_committed_instance_ready_noop(self) -> None:
         """committed c_api 实例与 9.2.0×3510 匹配且新鲜：ensure 零动作。"""
         with self._patch_build_forbidden():
-            result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "3510", index_root=self._copy_instance("ready").parent)
+            result = self.ensure_mod.ensure(
+                REPO_ROOT, "c_api", "9.2.0", "3510", index_root=self._copy_instance("ready").parent
+            )
         self.assertEqual(result["status"], "ready")
         self.assertEqual(result["actions"], [])
         # 全量轮：15 个分类全部入索引（含 defs/deprecated_interface/experimental）

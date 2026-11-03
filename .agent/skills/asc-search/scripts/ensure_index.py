@@ -111,7 +111,11 @@ def light_fresh(instance: Path, root: Path, scope: build_index.Scope) -> tuple[b
 
 
 def strict_fresh(
-    instance: Path, root: Path, scope: build_index.Scope, cann_version: str, arch_label: str,
+    instance: Path,
+    root: Path,
+    scope: build_index.Scope,
+    cann_version: str,
+    arch_label: str,
     source_commit: str | None = None,
 ) -> tuple[bool, list[str]]:
     """全量重建比对（与 build_index --check 同语义，按目标筛选条件参数化）。"""
@@ -194,8 +198,14 @@ def main() -> int:
     try:
         cann_version = gate.detect_cann_version(args.cann_version, args.root)
         result = ensure(
-            args.root, args.surface, cann_version, args.arch, skip_drift=args.skip_drift, strict=args.strict,
-            index_root=args.index_root, source_commit=args.source_commit
+            args.root,
+            args.surface,
+            cann_version,
+            args.arch,
+            skip_drift=args.skip_drift,
+            strict=args.strict,
+            index_root=args.index_root,
+            source_commit=args.source_commit,
         )
     except (build_index.BuildError, ValueError, OSError, KeyError, subprocess.CalledProcessError) as exc:
         print(f"error: {exc}", file=sys.stderr)

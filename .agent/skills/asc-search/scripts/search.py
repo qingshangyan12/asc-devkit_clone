@@ -10,6 +10,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 """Read-only Agent interface to a prepared Ascend C API index."""
+
 from __future__ import annotations
 
 import argparse
@@ -21,8 +22,14 @@ import build_index
 import query
 import ensure_index
 
-PLATFORMS = {"a2": ("2201", "910b"), "a3": ("2201", "A3"), "950": ("3510", "950"),
-             "310b": ("3002", "310b"), "310p": ("2002", "310p"), "910": ("1001", "910")}
+PLATFORMS = {
+    "a2": ("2201", "910b"),
+    "a3": ("2201", "A3"),
+    "950": ("3510", "950"),
+    "310b": ("3002", "310b"),
+    "310p": ("2002", "310p"),
+    "910": ("1001", "910"),
+}
 
 
 def final_paths(result: dict) -> list[str]:
@@ -61,9 +68,11 @@ def search(args):
             args.product = product
     keywords = args.keywords or []
     has_query = bool(query._active_filter_dims(args) or args.api or args.deps_of or args.enum or args.param or args.gap)
-    rows = query.run_query(args, index, gaps) if has_query else [
-        {"path": path, "why": []} for path in index["scope"]["primary_docs"]
-    ]
+    rows = (
+        query.run_query(args, index, gaps)
+        if has_query
+        else [{"path": path, "why": []} for path in index["scope"]["primary_docs"]]
+    )
     if not has_query and not keywords:
         raise ValueError("provide keywords or at least one structured query dimension")
     if keywords:
@@ -78,7 +87,7 @@ def search(args):
     total = len(rows)
     if args.limit < 1:
         raise ValueError("--limit must be positive")
-    rows = rows[:args.limit]
+    rows = rows[: args.limit]
     for row in rows:
         rel = row.get("path", "")
         target = (root / rel).resolve()
@@ -86,29 +95,50 @@ def search(args):
         row["local_path"] = str(target)
         doc = index["documents"].get(rel)
         if doc:
-            row.update({key: doc[key] for key in ("title", "description", "version", "deprecated", "headers", "examples", "signatures")})
-            row["header_locations"] = [str(root / (p if p.startswith("include/") else "include/" + p)) for p in doc["headers"]]
-            row["example_locations"] = [dict(e, local_path=str(root / e["path"].lstrip("/") / e["file"])) for e in doc["examples"]]
-    return {"schema": "asc-search-results/1", "source": "asc-devkit",
-            "source_commit": index["meta"]["source_commit"], "repository": args.repository,
-            "root": str(root), "cann_version": index["meta"]["cann_version"],
-            "arch": index["meta"]["arch"], "platform": args.platform,
-            "count": len(rows), "matched_count": total, "truncated": total > len(rows), "results": rows}
+            row.update(
+                {
+                    key: doc[key]
+                    for key in ("title", "description", "version", "deprecated", "headers", "examples", "signatures")
+                }
+            )
+            row["header_locations"] = [
+                str(root / (p if p.startswith("include/") else "include/" + p)) for p in doc["headers"]
+            ]
+            row["example_locations"] = [
+                dict(e, local_path=str(root / e["path"].lstrip("/") / e["file"])) for e in doc["examples"]
+            ]
+    return {
+        "schema": "asc-search-results/1",
+        "source": "asc-devkit",
+        "source_commit": index["meta"]["source_commit"],
+        "repository": args.repository,
+        "root": str(root),
+        "cann_version": index["meta"]["cann_version"],
+        "arch": index["meta"]["arch"],
+        "platform": args.platform,
+        "count": len(rows),
+        "matched_count": total,
+        "truncated": total > len(rows),
+        "results": rows,
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = query.parser()
     parser.description = __doc__
-    parser.add_argument("--root", type=Path, default=build_index.REPO_ROOT,
-                        help="数据根（默认 skill 所在仓库根）")
+    parser.add_argument("--root", type=Path, default=build_index.REPO_ROOT, help="数据根（默认 skill 所在仓库根）")
     parser.add_argument("--keywords", nargs="+", help="short keywords; all must match title/description/family/tags")
     parser.add_argument("--platform", choices=sorted(PLATFORMS))
     parser.add_argument("--repository", default="https://gitcode.com/cann/asc-devkit.git")
     parser.add_argument("--limit", type=int, default=20)
-    parser.add_argument("--no-llm", dest="no_llm", action="store_true",
-                        default=os.environ.get("ASC_SEARCH_NO_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
-                        help="noLLM：只输出检索用例期望片段（单候选 expected，多候选 expected_any），"
-                             "跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
+    parser.add_argument(
+        "--no-llm",
+        dest="no_llm",
+        action="store_true",
+        default=os.environ.get("ASC_SEARCH_NO_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
+        help="noLLM：只输出检索用例期望片段（单候选 expected，多候选 expected_any），"
+        "跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）",
+    )
     return parser
 
 
