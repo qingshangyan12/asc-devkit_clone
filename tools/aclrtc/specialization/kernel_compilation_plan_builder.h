@@ -33,6 +33,7 @@ private:
     aclError BuildConstantSourcePatches(KernelCompilationPlan& plan) const;
     aclError BindManifestCommand(const ManifestCommand& spec, CompilationCommand& compilationCommand) const;
     aclError BindLinkCommand(const CompilationManifest& manifest, KernelCompilationPlan& plan) const;
+    aclError BindOutputKernelNameCommand(KernelCompilationPlan& plan) const;
 
     const NormalizedKernelSpecializationRequest& specializationRequest_;
     const CompilationManifest& borrowedManifest_;

@@ -45,6 +45,7 @@ struct NormalizedKernelSpecializationRequest {
     std::string specializationSessionId;
     std::string resourceId;
     std::string kernelName;
+    std::string outputKernelName;
     boost::filesystem::path outputElfPath;
     bool enableSuperKernel{false};
     KernelCompilerOptions compilerOptions;
