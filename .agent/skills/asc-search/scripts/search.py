@@ -12,10 +12,12 @@
 """Read-only Agent interface to a prepared Ascend C API index."""
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
 
+import build_index
 import query
 import ensure_index
 
@@ -42,10 +44,7 @@ def final_snippet(paths: list[str]) -> str:
 def search(args):
     if args.gap is not None and args.keywords:
         raise ValueError("--gap cannot be combined with --keywords; use the --gap query keyword")
-    root = args.root.resolve()
-    index_dir = args.index_dir
-    if index_dir is None:
-        raise ValueError("--index-dir is required; prepare an index before searching")
+    root, index_dir = resolve_paths(args)
     index, gaps = query.load(index_dir)
     fresh, reasons = ensure_index.light_fresh(index_dir, root, ensure_index.build_index.SCOPES[args.surface])
     if not fresh:
@@ -97,10 +96,11 @@ def search(args):
             "count": len(rows), "matched_count": total, "truncated": total > len(rows), "results": rows}
 
 
-def main(argv=None):
+def build_parser() -> argparse.ArgumentParser:
     parser = query.parser()
     parser.description = __doc__
-    parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--root", type=Path, default=build_index.REPO_ROOT,
+                        help="数据根（默认 skill 所在仓库根）")
     parser.add_argument("--keywords", nargs="+", help="short keywords; all must match title/description/family/tags")
     parser.add_argument("--platform", choices=sorted(PLATFORMS))
     parser.add_argument("--repository", default="https://gitcode.com/cann/asc-devkit.git")
@@ -109,8 +109,19 @@ def main(argv=None):
                         default=os.environ.get("ASC_SEARCH_NO_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
                         help="noLLM：只输出检索用例期望片段（单候选 expected，多候选 expected_any），"
                              "跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
+    return parser
+
+
+def resolve_paths(args) -> tuple[Path, Path]:
+    """数据根与索引目录：省略时默认取 skill 所在仓库根与 skill 内 index/<surface>。"""
+    root = args.root.resolve()
+    index_dir = args.index_dir if args.index_dir is not None else query.INDEX_DIR / args.surface
+    return root, index_dir
+
+
+def main(argv=None):
     try:
-        args = parser.parse_args(argv)
+        args = build_parser().parse_args(argv)
         result = search(args)
         if getattr(args, "no_llm", False):
             snippet = final_snippet(final_paths(result))

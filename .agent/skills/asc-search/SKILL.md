@@ -14,10 +14,11 @@ description: Ascend C API 的 Agent 底层检索。接受短关键词和 API、o
 无法确认产品或版本时返回 `needs_context`，不能默认 3510，也不能以 2201 猜 A2/A3。
 本机探测每轮上下文复用；不覆盖远端任务目标。
 
-调用方负责准备数据和索引；构建入口为：
+调用方负责准备数据和索引；`--root`、`--out`、`--index-dir` 省略时分别默认取 skill 所在仓库根
+与 skill 内 `index/<surface>`。构建入口为：
 
 ```bash
-python3 <skill>/scripts/build_index.py --root <devkit-root> --out <index-dir> --arch <arch> --cann-version <version>
+python3 <skill>/scripts/build_index.py --arch <arch> --cann-version <version>
 ```
 
 非 Git 数据快照传 `--source-commit <commit>`。未提供时标记 `unversioned`，不会继承外层仓库提交。索引按来源提交、目标版本、架构分别存储。
@@ -27,8 +28,7 @@ python3 <skill>/scripts/build_index.py --root <devkit-root> --out <index-dir> --
 ## 查询
 
 ```bash
-python3 <skill>/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
-  --platform 950 --version 9.2.0 --operation copy --keywords 非对齐
+python3 <skill>/scripts/search.py --platform 950 --version 9.2.0 --operation copy --keywords 非对齐
 ```
 
 短关键词以空格分隔，各词 AND，匹配 title/description/family/tags；结构化维度间 AND，

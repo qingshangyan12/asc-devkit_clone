@@ -205,6 +205,19 @@ class ExternalSearchTests(unittest.TestCase):
         self.assertEqual('asc-search-results/1', result['schema'])
         self.assertIn('results', result)
 
+    def test_paths_default_to_repo_root_and_skill_index(self):
+        """--root/--index-dir 省略时默认取 skill 所在仓库根与 skill 内 index/<surface>。"""
+        args = search.build_parser().parse_args(['--platform', '950'])
+        root, index_dir = search.resolve_paths(args)
+        self.assertEqual(build_index.REPO_ROOT.resolve(), root)
+        self.assertEqual(query.INDEX_DIR / 'c_api', index_dir)
+
+    def test_explicit_paths_are_preserved(self):
+        args = search.build_parser().parse_args(['--root', str(self.root), '--index-dir', str(self.index)])
+        root, index_dir = search.resolve_paths(args)
+        self.assertEqual(self.root.resolve(), root)
+        self.assertEqual(self.index, index_dir)
+
 
 class ContextDetectionTests(unittest.TestCase):
     def test_explicit_context_does_not_probe(self):

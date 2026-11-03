@@ -75,11 +75,12 @@ python3 -m pip install PyYAML
 
 ## 2. 机器检索接口
 
-调用方明确数据根、目标版本与架构，先构建独立索引，再进行只读查询：
+数据根、索引目录、目标版本与架构由调用方指定；`--root`、`--out`、`--index-dir` 省略时分别默认取
+skill 所在仓库根与 skill 内 `index/<surface>`。先构建独立索引，再进行只读查询：
 
 ```bash
-python3 .agent/skills/asc-search/scripts/build_index.py --root <devkit-root> --out <index-dir> --arch 3510 --cann-version 9.2.0
-python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> --platform 950 --version 9.2.0 --api asc_abs --dtype float
+python3 .agent/skills/asc-search/scripts/build_index.py --arch 3510 --cann-version 9.2.0
+python3 .agent/skills/asc-search/scripts/search.py --platform 950 --version 9.2.0 --api asc_abs --dtype float
 ```
 
 非 Git 快照传入 `--source-commit <commit>`；未提供时来源为 `unversioned`，不使用外层仓库 HEAD。
@@ -201,8 +202,8 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 输入为空格分隔的短关键词（与检索用例 `query` 写法一致，全部命中才入选）：
 
 ```bash
-python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
-  --platform 950 --version 9.2.0 --keywords 相减 绝对值 --no-llm
+python3 .agent/skills/asc-search/scripts/search.py --platform 950 --version 9.2.0 \
+  --keywords 相减 绝对值 --no-llm
 ```
 
 实测输出（CANN 9.2.0 × 3510 × C API，单候选）：
@@ -215,8 +216,8 @@ expected:
 多候选用例（关键词 `取绝对值 矢量`）：
 
 ```bash
-python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
-  --platform 950 --version 9.2.0 --keywords 取绝对值 矢量 --no-llm
+python3 .agent/skills/asc-search/scripts/search.py --platform 950 --version 9.2.0 \
+  --keywords 取绝对值 矢量 --no-llm
 ```
 
 ```yaml
