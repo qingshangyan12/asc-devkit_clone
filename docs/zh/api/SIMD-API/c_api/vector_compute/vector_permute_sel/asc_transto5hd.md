@@ -89,7 +89,7 @@ PIPE_V
 ## 约束说明
 
 - 操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#address_overlap_constraints)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 - `dst`和`src`不能传入相同的地址寄存器起始位置，即目的地址寄存器对和源地址寄存器对不能重叠。
 - `dst`和`src`仅支持`VA0`、`VA2`、`VA4`、`VA6`，且二者不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)。每个地址寄存器存储8个地址，接口会将传入的起始寄存器与相邻寄存器组成一组，处理16个地址。
 - 为获得更优性能，建议`dst`、`src`、`dst_high_half`和`src_high_half`传入编译期常量，例如直接传入`VA0`、`VA2`、`true`或`false`，或传入由这些常量初始化的局部变量。若传入运行时变量，编译器会保留地址寄存器或布尔参数的分支判断，影响性能。

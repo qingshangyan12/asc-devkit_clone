@@ -140,7 +140,7 @@ PIPE_MTE1
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - repeat=0表示不执行搬运操作。
 - 开发者需要保证目的操作数转置后的分形没有重叠。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#address_overlap_constraints)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

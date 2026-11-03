@@ -40,7 +40,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 ### UB的通用约束说明
 
 - UB地址对齐约束，请参考[通用地址对齐约束](../../../general_description_and_constraints.md#通用地址对齐约束)。
-- UB地址重叠约束，请参考[通用地址重叠约束](../../../general_description_and_constraints.md#address_overlap_constraints)。
+- UB地址重叠约束，请参考[通用地址重叠约束](../../../general_description_and_constraints.md#通用地址重叠约束)。
 
 ### UB的内存结构与bank冲突
 

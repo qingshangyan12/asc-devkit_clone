@@ -83,7 +83,7 @@ PIPE_V
 - distance不支持设置为负数。
 - distance取值不能超过src数据类型的位宽。
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#address_overlap_constraints)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 
 ## 调用示例
 

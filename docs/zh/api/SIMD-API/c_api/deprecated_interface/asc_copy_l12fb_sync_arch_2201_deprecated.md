@@ -61,7 +61,7 @@ PIPE_MTE1
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#address_overlap_constraints)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例

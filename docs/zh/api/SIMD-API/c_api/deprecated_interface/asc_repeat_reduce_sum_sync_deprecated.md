@@ -65,7 +65,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#address_overlap_constraints)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
 - dst的起始地址，输入类型为half时需要2字节对齐，输入类型为float时需要4字节对齐。
 - src的起始地址需要32字节对齐。
 
