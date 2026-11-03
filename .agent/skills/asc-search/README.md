@@ -97,12 +97,10 @@ python3 .agent/skills/asc-search/scripts/build_index.py \
 ```
 
 本机实测索引规模：主文档 602 篇、导航页 14 篇、按架构过滤 243 篇、按版本过滤 0 篇，
-范围内无缺 slim 头的文档。六张卡片依次对应 `--operation absolute`、`--operation copy --stage in`、
-`--convert float fp8_e4m3fn`、`--deps-of asc_copy_gm2ub_align --kind configures --reverse`、
-`--param asc_load_l2_cache_mode`、`--changed-in 9.2.0` 六条结构化查询（统一带 `--platform 950 --version 9.2.0`）。
+范围内无缺 slim 头的文档。以下卡片以关键字列出 `search.py` 的检索条件（统一带 `--platform 950 --version 9.2.0`），答案按实测命中整理。
 
 <details>
-<summary>问答 1：3510 架构上对 float 向量逐元素取绝对值，用哪个接口？</summary>
+<summary>问答 1：operation=absolute</summary>
 
 **答：** 用 `asc_abs`；如果需要“两数相减后再取绝对值”的融合计算，用 `asc_abs_sub`。
 
@@ -114,7 +112,7 @@ python3 .agent/skills/asc-search/scripts/build_index.py \
 </details>
 
 <details>
-<summary>问答 2：把数据搬入（GM→UB、GM→L1/L0 等）有哪些接口？</summary>
+<summary>问答 2：operation=copy, stage=in</summary>
 
 **答：** 命中 25 篇，按源/目的位置和是否随路转换区分。GM→UB 首选 `asc_copy_gm2ub`，非对齐或高维场景用
 `asc_copy_gm2ub_align`、`asc_ndim_copy_gm2ub`；GM→L1 的格式转换与矩阵搬运用 `asc_copy_gm2l1_*` 系列；
@@ -135,7 +133,7 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 </details>
 
 <details>
-<summary>问答 3：把 float 转成 fp8_e4m3fn_t 用哪些接口？</summary>
+<summary>问答 3：convert=float→fp8_e4m3fn</summary>
 
 **答：** 用 `asc_float2e4m3`（CANN 9.2.0 起），按 RINT 舍入和饱和/非饱和模式转换，结果按 `dst_quarter_pos`
 写入目的寄存器四分之一位置的离散元素、其余位置清零，也可由函数返回值返回；同族废弃页对应旧的无显式位置参数原型。
@@ -148,7 +146,7 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 </details>
 
 <details>
-<summary>问答 4：asc_copy_gm2ub_align 要搭配哪些配置接口？</summary>
+<summary>问答 4：deps-of=asc_copy_gm2ub_align, kind=configures, reverse</summary>
 
 **答：** 按反向依赖（`kind=configures`）检索，命中 `asc_set_copy_pad_val`：它为连续搬运数据块设置左右填充值，
 仅在 `enable_constant_pad=true` 时生效，支持 int8_t 到 float 共 9 种 dtype。
@@ -160,7 +158,7 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 </details>
 
 <details>
-<summary>问答 5：哪些接口使用 asc_load_l2_cache_mode 枚举形参？</summary>
+<summary>问答 5：param=asc_load_l2_cache_mode</summary>
 
 **答：** 命中 13 篇，覆盖标量读写路径的 L2 策略设置与 GM→UB、GM→L1 搬运接口。
 旧的 uint8 型 `l2_cache_ctl` 重载已废弃，替代方案统一改用 `asc_load_l2_cache_mode` 枚举重载。
@@ -177,7 +175,7 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 </details>
 
 <details>
-<summary>问答 6：CANN 9.2.0 有哪些版本变更？</summary>
+<summary>问答 6：changed-in=9.2.0</summary>
 
 **答：** `--changed-in 9.2.0` 命中 270 篇文档，均为文档头 `version_changes` 记录了 9.2.0 事件（新增重载、
 参数/返回值变化等）的接口，例如随路原子配置与标量原子操作。结果中的 `version_context` 会带上该版本的
