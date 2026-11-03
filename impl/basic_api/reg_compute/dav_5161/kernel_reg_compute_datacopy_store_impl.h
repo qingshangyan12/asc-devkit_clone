@@ -371,7 +371,6 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_t c
     DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstAddr, srcReg, ureg, count);
     DataCopyUnAlignPostImpl<T, PostLiteral::POST_MODE_UPDATE>(dstAddr, ureg, 0);
 }
-#endif
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
@@ -379,6 +378,7 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
     constexpr uint32_t count = GetVecLen() / sizeof(T);
     StoreImpl(dstAddr, srcReg, count);
 }
+#endif
 
 } // namespace Reg
 } // namespace AscendC
