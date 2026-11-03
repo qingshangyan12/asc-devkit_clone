@@ -45,7 +45,7 @@ class InstallTests(unittest.TestCase):
         links = [directory / "asc-search" for directory in self.targets.values()]
         for link in links:
             self.assertTrue(link.is_symlink())
-            self.assertEqual(link.resolve(), self.source)
+            self.assertEqual(link.resolve(), self.source.resolve())
             self.assertTrue((link / "SKILL.md").is_file())
         stats = [link.lstat().st_mtime_ns for link in links]
         install.install(self.source, self.targets)
@@ -108,13 +108,13 @@ class InstallTests(unittest.TestCase):
         first = subprocess.run(command, cwd=self.root, capture_output=True, text=True)
         self.assertEqual(first.returncode, 0, first.stderr)
         for directory in install.target_directories(repo, "project").values():
-            self.assertEqual((directory / "asc-search").resolve(), self.source)
+            self.assertEqual((directory / "asc-search").resolve(), self.source.resolve())
         linked_script = repo / ".agents/skills/asc-search/scripts/install.py"
         second = subprocess.run(
             [sys.executable, str(linked_script), "--scope", "project"], cwd=self.root, capture_output=True, text=True
         )
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertIn(f"Devkit checkout: {repo}", second.stdout)
+        self.assertIn(f"Devkit checkout: {repo.resolve()}", second.stdout)
         self.assertEqual(second.stdout.count("already installed"), 3)
 
     def test_user_install_default_and_single_agent(self) -> None:
@@ -131,12 +131,12 @@ class InstallTests(unittest.TestCase):
         ), mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": str(config_home)}):
             self.assertEqual(install.main(["--agent", "codex"]), 0)
             targets = install.target_directories(repo, "user")
-            self.assertEqual((targets["codex"] / "asc-search").resolve(), self.source)
+            self.assertEqual((targets["codex"] / "asc-search").resolve(), self.source.resolve())
             self.assertFalse(targets["claude"].exists())
             self.assertFalse(targets["opencode"].exists())
             self.assertEqual(install.main([]), 0)
             for directory in targets.values():
-                self.assertEqual((directory / "asc-search").resolve(), self.source)
+                self.assertEqual((directory / "asc-search").resolve(), self.source.resolve())
                 self.assertFalse((directory / 'asc-devkit-search').exists())
 
 

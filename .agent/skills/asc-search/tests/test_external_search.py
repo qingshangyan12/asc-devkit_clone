@@ -92,7 +92,7 @@ class ExternalSearchTests(unittest.TestCase):
         self.assertEqual(result['source_commit'], 'a' * 40)
         self.assertEqual(result['count'], 1)
         hit = result['results'][0]
-        self.assertEqual(hit['local_path'], str(self.doc))
+        self.assertEqual(Path(hit['local_path']).resolve(), self.doc.resolve())
         self.assertTrue(Path(hit['header_locations'][0]).is_file())
         self.assertTrue(Path(hit['example_locations'][0]['local_path']).is_file())
         other = Path(self.temp.name) / 'relocated'
@@ -100,7 +100,9 @@ class ExternalSearchTests(unittest.TestCase):
         shutil.copytree(self.root, other)
         out = Path(self.temp.name) / 'second'
         build_index.build(other, build_index.SCOPES['c_api'], out, '9.2.0', '3510', source_commit='a' * 40)
-        self.assertEqual(json.loads((out/'index.json').read_text()), json.loads((self.index/'index.json').read_text()))
+        first = build_index.strip_informational(json.loads((self.index / 'index.json').read_text()))
+        second = build_index.strip_informational(json.loads((out / 'index.json').read_text()))
+        self.assertEqual(first, second)
 
     def test_keywords_intersect_dimensions_and_platform(self):
         args = self.args('--operation', 'add')

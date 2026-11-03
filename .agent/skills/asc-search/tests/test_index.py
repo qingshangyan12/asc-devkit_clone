@@ -418,6 +418,15 @@ class VersionChangesTests(unittest.TestCase):
         self.assertNotIn(FIXTURE_REL_OLD, view["9.2.0"])
         self.assertNotIn("", view)
 
+    def test_changed_in_normalizes_legacy_spellings(self) -> None:
+        """--changed-in 与 --version 同样归一化：9.2 / >=9.2.0 / 9.2.0 等价。"""
+        index, _ = self._build({FIXTURE_REL: fixture_document(FIXTURE_EVENTS)})
+        for value in ("9.2", ">=9.2.0", "9.2.0"):
+            with self.subTest(value=value):
+                hits = self._query(index, changed_in=value)
+                self.assertEqual([FIXTURE_REL], [row["path"] for row in hits])
+                self.assertEqual(["9.2.0"], [event["since"] for event in hits[0]["version_changes"]])
+
     def test_changed_in_flag(self) -> None:
         """--changed-in：命中该版本有事件的文档，并只带该版本的事件摘要。"""
         index, _ = self._build({FIXTURE_REL: fixture_document(FIXTURE_EVENTS)})

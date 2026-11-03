@@ -105,6 +105,45 @@ class LifecycleTests(unittest.TestCase):
                 with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': ''}):
                     self.assertEqual(version, gate.detect_cann_version(None, self.root))
 
+    def test_event_deprecation_keeps_declared_replacement(self):
+        """声明废弃版本晚于目标时，事件给出版本，但声明自身的替代目标要保留。"""
+        signature = {'override_id': 'asc_sync_vec__z',
+                     'deprecated': {'version': '9.5.0', 'replacement': 'asc_other', 'date': '2026-01-01'}}
+        events = [dict(since='9.2.0', kind='deprecated', scope='overload:asc_sync_vec__z')]
+        self.assertEqual({'version': '9.2.0', 'replacement': 'asc_other'},
+                         deprecation(signature, events, '9.3.0', '3510'))
+
+    def test_malformed_declared_deprecation_version_falls_back_to_events(self):
+        """畸形 ASC_DEPRECATED 版本不中断构建：视为声明证据不可用，改由事件推导。"""
+        signature = {'override_id': 'asc_sync_vec__z',
+                     'deprecated': {'version': '9..2', 'replacement': 'asc_other'}}
+        events = [dict(since='9.3.0', kind='deprecated', scope='overload:asc_sync_vec__z')]
+        self.assertEqual({'version': '9.3.0', 'replacement': 'asc_other'},
+                         deprecation(signature, events, '9.4.0', '3510'))
+        self.assertIsNone(deprecation(signature, [], '9.4.0', '3510'))
+
+    def test_code_level_deprecated_macro_binds_following_declaration(self):
+        """代码级 ASC_DEPRECATED(v,date,replacement) 绑定到后续声明并保留替代目标。"""
+        (self.root / 'include/c_api/sync/sync.h').write_text(
+            'ASC_DEPRECATED(9.2.0, "2027/09/07", asc_other)\n'
+            '/**\n * @override_id asc_sync_vec__z\n * @archs 2201 3510\n */\n'
+            '__aicore__ inline void asc_sync_vec();\n'
+        )
+        index = self.build('9.2.0', events=[])
+        signature = index['documents'][self.rel]['signatures'][0]
+        self.assertEqual({'version': '9.2.0', 'replacement': 'asc_other'}, signature['deprecated'])
+
+    def test_malformed_deprecated_macro_does_not_abort_build(self):
+        """畸形版本号的 ASC_DEPRECATED 不中断构建（该声明证据不可用）。"""
+        (self.root / 'include/c_api/sync/sync.h').write_text(
+            'ASC_DEPRECATED(9..2, "2027/09/07", asc_other)\n'
+            '/**\n * @override_id asc_sync_vec__z\n * @archs 2201 3510\n */\n'
+            '__aicore__ inline void asc_sync_vec();\n'
+        )
+        index = self.build('9.2.0', events=[])
+        self.assertIn(self.rel, index['documents'])
+        self.assertFalse(index['documents'][self.rel]['deprecated'])
+
     def test_deprecation_is_order_independent_and_uses_precise_earliest_evidence(self):
         signature = {'override_id': 'asc_sync_vec__z', 'deprecated': None}
         events = [dict(since='9.0.0',kind='deprecated',scope='page',scope_basis='resolved'),
@@ -120,6 +159,18 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(deprecation(signature,events,'9.1.0','3510')['version'],'9.0.0')
         self.assertIsNone(deprecation(signature,[dict(since='9.0.0',kind='deprecated',scope='page',
                                                     scope_basis='fallback')],'9.1.0','3510'))
+
+    def test_four_segment_versions_are_accepted(self):
+        """version_key 接受三段以上数字段；四段版本在探测与构建中都不报错。"""
+        self.assertEqual(gate.version_key('9.2'), gate.version_key('9.2.0'))
+        self.assertGreater(gate.version_key('9.2.0.1'), gate.version_key('9.2.0'))
+        self.assertEqual('9.2.0.1', gate.detect_cann_version('9.2.0.1', self.root))
+        with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': '/opt/cann-9.2.0.1/toolkit'}):
+            self.assertEqual('9.2.0.1', gate.detect_cann_version(None, self.root))
+        (self.root / 'version.cmake').write_text('set(VERSION "9.2.0.1")\n')
+        with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': ''}):
+            self.assertEqual('9.2.0.1', gate.detect_cann_version(None, self.root))
+        self.assertIn(self.rel, self.build('9.2.0.1', version='>=9.2.0', events=[])['documents'])
 
     def test_version_query_tracks_prerelease_and_lifecycle(self):
         removed = dict(since='9.3.0', kind='removed', scope='page', scope_basis='kind_default')
