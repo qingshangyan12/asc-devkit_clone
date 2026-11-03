@@ -290,7 +290,7 @@
 
     -   mode = 1 : batch mode，在下发核函数（Kernel）时先进行判断，若空闲物理核数无法满足当前核函数（Kernel）的需要，则等待至空闲物理核数满足该核函数（Kernel）所需要的所有物理核时，同时下发执行，OP1和OP2的执行被切分（split）开，不会出现交叠执行的情况。
 
-    ![](../../figures/batchmode.png)
+    <img src="../../figures/batchmode.png" alt="" width="600px" height="626px">
 
     在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间同步接口时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
 

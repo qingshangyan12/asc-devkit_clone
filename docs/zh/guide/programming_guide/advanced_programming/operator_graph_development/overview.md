@@ -4,7 +4,7 @@
 
 算子入图的开发流程如下图所示：算子工程创建完成后，基于工程代码框架完成算子原型定义、核函数（Kernel）侧算子实现、host侧tiling实现并完成算子入图开发，通过工程编译脚本完成算子的编译部署，之后即可基于图IR执行算子，比如IR构图的方式调用自定义算子。该开发流程以[工程化算子开发](../aclnn_operator_development/overview.md)为基础，除了需要提供工程化算子开发中的算子实现文件外，还需要额外交付算子入图的代码文件。
 
-![](../../../figures/op_e2e_34.png)
+<img src="../../../figures/op_e2e_34.png" alt="" width="920px" height="281px">
 
 1.  环境准备。
     1.  CANN软件安装请参考[环境准备](../../../getting_started/environment_setup.md)。

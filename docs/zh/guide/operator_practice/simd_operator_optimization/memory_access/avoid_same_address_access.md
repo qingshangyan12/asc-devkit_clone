@@ -20,7 +20,7 @@
 
 如下图所示，AI Core内的各个核对Global Memory的数据同时发出读写请求，尽管addr0\~addr5是多个不同的地址，但因为落在连续的512字节范围内，被视为同一个地址请求，此时这几个数据请求会被串行处理，数据访问效率会降低。同地址访问的影响受同时访问的核数影响，同地址访问的核数越多时，串行导致的性能劣化越严重。
 
-![](../../../figures/reduce_opt.png)
+<img src="../../../figures/reduce_opt.png" alt="" width="600px" height="317px">
 
 避免同地址访问的方法主要是**调整数据访问顺序**。下文介绍配套的样例请参考[DataCopy最佳实践样例](../../../../../../examples/01_simd_cpp_api/05_best_practices/04_memory_access/data_copy)中的优化点4。
 

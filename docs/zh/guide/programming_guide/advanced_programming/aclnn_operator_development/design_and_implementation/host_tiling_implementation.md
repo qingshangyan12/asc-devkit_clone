@@ -18,7 +18,7 @@ TilingFunc运行在Host侧。框架在核函数（Kernel）启动前调用Tiling
 
 Host侧Tiling的输入和输出如下图所示：
 
-![Tiling实现的输入输出](../../../../figures/tiling_io.png "Tiling实现的输入输出")
+<img src="../../../../figures/tiling_io.png" alt="Tiling实现的输入输出" width="300px" height="407px">
 
 图中，`TilingContext`是TilingFunc与框架之间的数据载体：TilingFunc从中读取输入输出shape、属性信息，并将`TilingData`、`numBlocks`、`TilingKey`和workspace大小等结果写回其中。
 

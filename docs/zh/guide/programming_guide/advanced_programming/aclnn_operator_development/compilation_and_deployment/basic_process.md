@@ -14,7 +14,7 @@
 上述编译过程示意图如下：
 
 
-![](../../../../figures/operator_project_compilation_diagram.png "算子工程编译示意图")
+<img src="../../../../figures/operator_project_compilation_diagram.png" alt="算子工程编译示意图" width="600px" height="390px">
 
 ## 基本流程
 

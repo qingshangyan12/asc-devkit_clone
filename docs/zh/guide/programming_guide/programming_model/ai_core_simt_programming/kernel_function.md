@@ -31,7 +31,7 @@ __global__ void vec_add(float* x, float* y, float* z)
 -   device侧执行函数（除核函数（Kernel）之外）使用类型限定符\_\_aicore\_\_标识，可以调用同类的其它device侧执行函数。
 
 **图1**  核函数（Kernel）、host侧执行函数、device侧执行函数调用关系<a name="fig14484835135913"></a><br>
-![](../../../figures/op_func_call.png "算子程序中三种函数间的调用关系")
+<img src="../../../figures/op_func_call.png" alt="算子程序中三种函数间的调用关系" width="300px" height="343px">
 
 Host侧通过核函数（Kernel）调用符<<<...>>>的语法形式调用核函数（Kernel），如下所示：
 

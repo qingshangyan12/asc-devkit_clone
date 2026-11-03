@@ -13,7 +13,7 @@
 #warning \
     "impl/tensor_api/arch/vector/copy_pad_val/set_copy_pad_val_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"tensor_api/arch/vector/set_copy_pad_val.h\" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_COPY_PAD_VAL_SET_COPY_PAD_VAL_IMPL_H
 #endif
 
 /*!
@@ -45,7 +45,8 @@ __aicore__ inline void set_copy_pad_val(T pad_value)
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_COPY_PAD_VAL_SET_COPY_PAD_VAL_IMPL_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined( \
+    UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_COPY_PAD_VAL_SET_COPY_PAD_VAL_IMPL_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_COPY_PAD_VAL_SET_COPY_PAD_VAL_IMPL_H
 #endif

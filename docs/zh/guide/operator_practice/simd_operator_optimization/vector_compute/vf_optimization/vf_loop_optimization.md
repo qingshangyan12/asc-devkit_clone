@@ -157,7 +157,7 @@ __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t
 
 其中，地址寄存器最多支持4层循环寻址，如下图所示。
 
-![](../../../../figures/addressing.png)
+<img src="../../../../figures/addressing.png" alt="" width="920px" height="415px">
 
 如下是一个满足地址寄存器生成模式的代码示例，源操作数地址按照上图的方式进行最多四维的寻址：
 

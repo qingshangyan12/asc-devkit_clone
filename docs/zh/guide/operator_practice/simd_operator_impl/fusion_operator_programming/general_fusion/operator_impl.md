@@ -131,7 +131,7 @@ AllGatherMatmul算子逻辑分析：
     下图是通信卡数为4时，第二轮通信与rank0计算的示意图。tile 2表示图示为第二轮通信和与其相互掩盖的矩阵乘计算的处理流程。
 
     **图5**  AllGatherMatmul第二轮通信与rank0上主块1的矩阵乘示意图<a name="zh-cn_topic_0000002400208581_fig186371833121311"></a>  
-    ![](../../../../figures/agm_round2.png "AllGatherMatmul第二轮通信与rank0上主块1的矩阵乘示意图")
+    <img src="../../../../figures/agm_round2.png" alt="AllGatherMatmul第二轮通信与rank0上主块1的矩阵乘示意图" width="920px" height="427px">
 
 4.  类似步骤3，逐步完成剩余所有数据块的通信和计算。
 

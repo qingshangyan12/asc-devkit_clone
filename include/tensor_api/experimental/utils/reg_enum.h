@@ -55,9 +55,9 @@ enum class cast_sat_mode {
 };
 
 struct cast_options {
-    cast_layout layout = cast_layout::zero;
-    cast_round_mode round = cast_round_mode::rint;
-    cast_sat_mode sat = cast_sat_mode::not_sat;
+    cast_layout layout = cast_layout::unknown;
+    cast_round_mode round = cast_round_mode::unknown;
+    cast_sat_mode sat = cast_sat_mode::unknown;
 };
 
 enum class load_sideband_mode : uint8_t {
