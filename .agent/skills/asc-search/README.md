@@ -198,20 +198,26 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 默认 `search.py` 输出中间结果，由调用方 LLM 整理成答复。传入 `noLLM`（CLI 开关 `--no-llm`，
 也可设环境变量 `ASC_SEARCH_NO_LLM=1`）后跳过整理环节，按检索用例格式输出期望片段：
 单候选输出 `expected`（只有一项），多候选输出 `expected_any`（同一组，任一项命中即可）。
+输入为空格分隔的短关键词（与检索用例 `query` 写法一致，全部命中才入选）：
 
 ```bash
 python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
-  --platform 950 --version 9.2.0 --api asc_abs --dtype float --no-llm
+  --platform 950 --version 9.2.0 --keywords 相减 绝对值 --no-llm
 ```
 
-实测输出（CANN 9.2.0 × 3510 × C API）：
+实测输出（CANN 9.2.0 × 3510 × C API，单候选）：
 
 ```yaml
 expected:
-  - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+  - docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
 ```
 
-多候选用例（`--operation absolute`）：
+多候选用例（关键词 `取绝对值 矢量`）：
+
+```bash
+python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
+  --platform 950 --version 9.2.0 --keywords 取绝对值 矢量 --no-llm
+```
 
 ```yaml
 expected_any:
