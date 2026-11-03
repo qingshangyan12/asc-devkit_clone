@@ -59,10 +59,16 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
 {
     if (topoInfo->level0PcieMix) {
         if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+            // 与单级 MESH_1D 分支命中同一算法/模板，rank 上限契约一致，超限前置拒绝（V 版同款）
+            if (topoInfo->userRankSize > CCU_MESH1D_MAX_RANK_SIZE) {
+                HCCL_WARNING(
+                    "[AlltoAllAutoSelector][%s] rankSize[%u] exceeds CCU_MESH1D_MAX_RANK_SIZE[%u] under pcieMix.",
+                    __func__, topoInfo->userRankSize, CCU_MESH1D_MAX_RANK_SIZE);
+                return SelectorStatus::NOT_MATCH;
+            }
             selectAlgName = "CcuSchedAllToAllSoleMesh";
-            HCCL_WARNING(
-                "[AlltoAllAutoSelector][%s] algo[%s] not registered, not supported.", __func__, selectAlgName.c_str());
-            return SelectorStatus::NOT_MATCH;
+            HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+            return SelectorStatus::MATCH;
         }
         HCCL_WARNING("[AlltoAllAutoSelector] pcie mixed topo is not supported yet for ccu schedule mode.");
         return SelectorStatus::NOT_MATCH;

@@ -34,7 +34,7 @@
 
 **图1** unsqueeze流程
 
-![unsqueeze流程](../../figures/asc_unsqueeze.png)
+![unsqueeze流程](../../../../figures/asc_unsqueeze.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

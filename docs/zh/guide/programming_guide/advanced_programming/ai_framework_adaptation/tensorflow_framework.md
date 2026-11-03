@@ -9,7 +9,7 @@
 
 下图展示了完整的开发流程，具体步骤如下：
 
-![](../../../figures/copy.png)
+<img src="../../../figures/copy.png" alt="" width="300px" height="474px">
 
 1.  环境准备。
     1.  CANN软件安装请参考[环境准备](../../../getting_started/environment_setup.md)。

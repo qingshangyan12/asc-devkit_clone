@@ -37,7 +37,8 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     // 的全部 clos 链路收进 kernelInfo（实测每对 18 条，2P 即超 CCU_MAX_RANK_SIZE=16 上限），
     // 须与 AG 的 KFC Mesh 模板/hccl 母本同款：走 WithPriorityTopo 按对端选 1 条 mesh 优先链路。
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
-        CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+        CHK_RET(CalcChannelRequestMesh1DFullMesh(comm, param, topoInfo, subCommRanks_, channelDescs));
+        CHK_RET(FlattenChannelsToSingleDie(comm, channelDescs));
     } else {
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
             comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
@@ -79,6 +80,45 @@ u64 CcuTempKfcReduceScatterMesh1DMem2Mem::CalcScratchMultiple(BufferType inBuffT
     (void)inBuffType;
     (void)outBuffType;
     return templateRankSize_;
+}
+
+HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::FlattenChannelsToSingleDie(
+    HcclComm comm, std::vector<HcclChannelDesc>& channels)
+{
+    std::map<u32, std::vector<HcclChannelDesc>> rankIdToChannelDesc;
+    CHK_RET(RestoreChannelMap(channels, rankIdToChannelDesc));
+    u32 enableDieNum = 0;
+    u32 enableDieId = 0;
+    CHK_RET(GetDieInfoFromChannelDescs(comm, rankIdToChannelDesc, myRank_, enableDieNum, enableDieId));
+    CHK_PRT_RET(
+        enableDieNum < 1 || enableDieNum > CCU_DIE_NUM_MAX_2,
+        HCCL_ERROR("[CcuTempKfcReduceScatterMesh1DMem2Mem] get channelDescs fail, dieNum[%u].", enableDieNum),
+        HCCL_E_INTERNAL);
+
+    std::vector<std::vector<HcclChannelDesc>> channelsPerDie(enableDieNum);
+    std::map<u32, u32> rank2ChannelIdx;
+    constexpr u32 DIE_0 = 0;
+    constexpr u32 DIE_1 = 1;
+    for (u32 rank : subCommRanks_[0]) {
+        if (rank == myRank_) {
+            continue;
+        }
+        if (enableDieNum == 1) {
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, rank, rankIdToChannelDesc, enableDieId, rank2ChannelIdx, channelsPerDie[DIE_0]));
+        } else {
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, rank, rankIdToChannelDesc, DIE_0, rank2ChannelIdx, channelsPerDie[DIE_0]));
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, rank, rankIdToChannelDesc, DIE_1, rank2ChannelIdx, channelsPerDie[DIE_1]));
+        }
+    }
+    if (enableDieNum > 1) {
+        // 跨框 die0 连 die1 场景下，将出框端口数多的 die 的通道组放在前面
+        CHK_RET(ReverseChannelPerDieIfNeed(comm, myRank_, channelsPerDie));
+    }
+    channels = channelsPerDie[DIE_0];
+    return HCCL_SUCCESS;
 }
 
 } // namespace mc2_ops_hccl

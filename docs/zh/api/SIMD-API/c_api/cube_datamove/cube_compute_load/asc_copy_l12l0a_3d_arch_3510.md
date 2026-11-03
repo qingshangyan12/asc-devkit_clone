@@ -160,13 +160,13 @@ PIPE_MTE1
 
     **图2** feature map格式
 
-    ![ ](../../figures/load3d_01.png "feature-map格式")
+    ![ ](../../../../figures/load3d_01.png "feature-map格式")
 
 - 对应的filter的格式如下图：
 
     **图3** filter的格式
 
-    ![ ](../../figures/load3d_02.png "filter的格式")
+    ![ ](../../../../figures/load3d_02.png "filter的格式")
 
 其中n为filter的个数，可以看出维度排布为(Hk,Wk,Ci,n)，但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
@@ -174,7 +174,7 @@ PIPE_MTE1
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
-![ ](../../figures/load3d_03.png "卷积计算分块")
+![ ](../../../../figures/load3d_03.png "卷积计算分块")
 
 对于L0A Buffer中的feature map来说有两种方案，水平分块和垂直分块。分别对应[asc_set_l13d_rpt](../cube_load_aux_config/asc_set_l13d_rpt.md)参数中rpt_mode的0和1。
 
@@ -184,13 +184,13 @@ rpt_mode =0时，每次repeat会改变在filter窗口中读取数据点的位置
 
 **图5** rpt_mode = 0时的filter窗口
 
-![ ](../../figures/load3d_04.png "rpt_mode-0-时的filter窗口")
+![ ](../../../../figures/load3d_04.png "rpt_mode-0-时的filter窗口")
 
 rpt_mode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
 **图6** rpt_mode = 1时的filter窗口
 
-![ ](../../figures/load3d_05.png "rpt_mode-1-时的filter窗口")
+![ ](../../../../figures/load3d_05.png "rpt_mode-1-时的filter窗口")
 
 ### 使用3D卷积数据搬运完成矩阵计算所需2D格式数据的搬运
 

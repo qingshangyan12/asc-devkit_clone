@@ -124,7 +124,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 矢量计算API支持通过配置repeatTime参数控制指令的迭代执行次数。若将repeatTime设为2，矢量计算单元会执行2次迭代计算，可处理的数据量为2 × 8（单次迭代8个DataBlock） × 32Byte = 512Byte；若数据类型为half（2B / 元素），则对应计算256个元素。下图为2次迭代Exp计算的示意图。
 注意：受硬件限制，repeatTime的取值范围为[1, 255]，该约束适用于所有支持Memory矢量计算的产品。
 
-![2次迭代Exp计算](../../../../figures/iter2_exp.png)
+<img src="../../../../figures/iter2_exp.png" alt="2次迭代Exp计算" width="920px" height="347px">
 
 #### 地址间隔配置
 

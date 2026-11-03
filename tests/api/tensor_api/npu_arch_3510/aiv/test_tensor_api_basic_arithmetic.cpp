@@ -229,6 +229,42 @@ __aicore__ inline void TestSoftwareDivModes()
     EXPECT_EQ(ftz_dst.mask, src0.mask);
 }
 
+template <typename T, bool precisionMode, div_algo algo>
+__aicore__ inline void TestExplicitDivMode()
+{
+    for (auto mask : {all_mask<T>(), none_mask<T>()}) {
+        reg_type<T> src0{};
+        reg_type<T> src1{};
+        src0.mask = mask.reg;
+        src1.mask = none_mask<T>().reg;
+        auto dst = asc::te::experimental::div<precisionMode, algo>(src0, src1);
+        static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+        EXPECT_EQ(dst.mask, src0.mask);
+    }
+}
+
+TEST(test_tensor_api_basic_arithmetic, ExplicitDivAlgorithms)
+{
+    static_assert(static_cast<int>(div_algo::INTRINSIC) == 0);
+    static_assert(static_cast<int>(div_algo::PRECISION_0ULP_FTZ_TRUE) == 1);
+    TestExplicitDivMode<float, false, div_algo::DIFF_COMPENSATION>();
+    TestExplicitDivMode<float, true, div_algo::DIFF_COMPENSATION>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_0ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_0ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_0ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_0ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<float, false, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<float, true, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<half, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<half, false, div_algo::PRECISION_1ULP_FTZ_FALSE>();
+    TestExplicitDivMode<int16_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<uint16_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<int32_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+    TestExplicitDivMode<uint32_t, false, div_algo::PRECISION_1ULP_FTZ_TRUE>();
+}
+
 template <typename T>
 __aicore__ inline void TestMin()
 {

@@ -36,11 +36,11 @@
 
 **图1**  连续搬运示意图
 
-![](../../figures/asc_copy_gm2ub_continuous.png "连续搬运示意图")
+![](../../../../figures/asc_copy_gm2ub_continuous.png "连续搬运示意图")
 
 **图2**  高维切分搬运示意图
 
-![](../../figures/asc_copy_gm2ub_highdim_split.png "高维切分搬运示意图")
+![](../../../../figures/asc_copy_gm2ub_highdim_split.png "高维切分搬运示意图")
 
 本接口仅在AIV上生效。
 

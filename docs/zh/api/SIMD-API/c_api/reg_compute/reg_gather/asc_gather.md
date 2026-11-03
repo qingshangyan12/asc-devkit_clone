@@ -34,7 +34,7 @@
 
 **图 1** 寄存器源收集模式
 
-![寄存器源收集模式](../../figures/asc_gather_vec.png)
+![寄存器源收集模式](../../../../figures/asc_gather_vec.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 

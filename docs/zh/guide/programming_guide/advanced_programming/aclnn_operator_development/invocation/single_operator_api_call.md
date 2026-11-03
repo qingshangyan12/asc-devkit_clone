@@ -66,7 +66,7 @@ aclnnStatus aclnnXxx(void *workspace, uint64_t workspaceSize, aclOpExecutor *exe
 单算子API执行流程如下：
 
 **图1** 单算子API执行接口调用流程。
-![](../../../../figures/single_operator_api_execution_interface_call_flow.png "单算子API执行接口调用流程")
+<img src="../../../../figures/single_operator_api_execution_interface_call_flow.png" alt="单算子API执行接口调用流程" width="300px" height="584px">
 
 ### 包含头文件并准备检查宏
 

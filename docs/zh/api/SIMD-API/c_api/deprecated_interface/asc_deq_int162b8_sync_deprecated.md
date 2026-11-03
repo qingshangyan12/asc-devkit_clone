@@ -36,7 +36,7 @@
 - asc_deq_int162b8_l：将数据存放在每个DataBlock的低半块。
 
 如下图所示：
-![](../figures/asc_deq_int162b8_halfblock.png)
+![](../../../figures/asc_deq_int162b8_halfblock.png)
 
 计算公式如下：
 

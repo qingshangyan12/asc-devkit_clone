@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TENSOR_LAYOUT_H
+#endif
+
 /*!
  * \file layout.h
  * \brief Layout type and interface declarations.
@@ -19,3 +24,8 @@
 #include "tensor_api/tensor/layout_interface.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TENSOR_LAYOUT_H)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TENSOR_LAYOUT_H
+#endif

@@ -102,7 +102,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
     -   通过Channel merge、Channel split可以实现分形大小的转换，保证输出到L1 Buffer/GM的分形满足诉求。
     -   NZ2ND数据格式转换。
 
-![](../../../../figures/fixpipe.png)
+<img src="../../../../figures/fixpipe.png" alt="" width="920px" height="394px">
 
 上图中，Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数据类型。
 
@@ -163,7 +163,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     同步控制流程如下图所示：
 
-    ![](../../../../figures/core_sync_final_13.png)
+    <img src="../../../../figures/core_sync_final_13.png" alt="" width="920px" height="311px">
 
     上图中，ID1、ID2、ID3、ID4、ID5、ID6表示事件ID（EventID），每个EventID对应一块存储数据的搬运状态，确保数据操作的正确性和一致性。
 

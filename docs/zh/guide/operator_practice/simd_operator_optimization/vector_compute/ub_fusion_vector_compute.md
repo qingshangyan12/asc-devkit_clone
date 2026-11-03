@@ -5,7 +5,7 @@
 【描述】算子实现中涉及多次vector计算，且前一次计算输出是后一次计算输入的情况下，可将前一次计算输出暂存在Unified Buffer（UB）上直接作为下一次计算的输入，不需要将前一次的计算输出从UB搬运到GM后再从GM搬运到UB。这种UB融合的方式可以减少搬入搬出次数，实现连续vector计算，提升内存使用效率。数据流图对比如下：
 
 **图1**  数据流图对比<a name="fig9257105941218"></a>  
-![](../../../figures/flow_compare.png "数据流图对比")
+<img src="../../../figures/flow_compare.png" alt="数据流图对比" width="920px" height="300px">
 
 【反例】
 

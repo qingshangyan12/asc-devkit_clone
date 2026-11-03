@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample combines the experimental Tensor API register load/store operations with current C API conversion interfaces to perform element-wise data type conversion. All scenarios use one-dimensional input and output Tensors with shape `[512]` in logical elements.
+This sample combines experimental Tensor API register load, conversion, and store operations to perform element-wise data type conversion. All scenarios use one-dimensional input and output Tensors with shape `[512]` in logical elements.
 
 The sample covers seven conversion scenarios (numbered 1–7) between floating-point types and between integer and floating-point types. It also demonstrates the `unpack` and `unpack4` memory access modes together with `deinterleave` data reordering used for conversions between types of different widths. The computation is as follows:
 
@@ -34,13 +34,17 @@ y[i] = convert<To>(x[i])
 
   | SCENARIO_NUM | Input Type | Output Type | Layout | Round | Sat | Description |
   | --- | --- | --- | --- | --- | --- | --- |
-  | 1 | `half` | `int32_t` | `zero` | `floor` | `not_sat` | Rounds down and converts the result to a 32-bit signed integer. |
+  | 1 | `half` | `int32_t` | `zero` | `floor` | `unknown` | Rounds down and converts the result to a 32-bit signed integer. |
   | 2 | `float` | `int16_t` | `zero` | `rint` | `sat` | Rounds to the nearest integer and saturates the result to the `int16_t` range. |
-  | 3 | `int8_t` | `int32_t` | `zero` | `rint` | `not_sat` | Extends an 8-bit signed integer to a 32-bit signed integer. |
-  | 4 | `int32_t` | `uint8_t` | `zero` | `rint` | `sat` | Saturates the value to `[0, 255]` and converts it to an 8-bit unsigned integer. |
-  | 5 | `bfloat16_t` | `float` | `zero` | `rint` | `not_sat` | Extends `bfloat16_t` to `float`. |
+  | 3 | `int8_t` | `int32_t` | `zero` | `unknown` | `unknown` | Extends an 8-bit signed integer to a 32-bit signed integer. |
+  | 4 | `int32_t` | `uint8_t` | `zero` | `unknown` | `sat` | Saturates the value to `[0, 255]` and converts it to an 8-bit unsigned integer. |
+  | 5 | `bfloat16_t` | `float` | `zero` | `unknown` | `unknown` | Extends `bfloat16_t` to `float`. |
   | 6 | `float` | `bfloat16_t` | `zero` | `rint` | `not_sat` | Rounds `float` to `bfloat16_t`. |
-  | 7 | UB: `int4b_t`; register: `int4x2_t` | `half` | `zero/one/two/three` | `rint` | `not_sat` | Directly loads 512 packed INT4 values and converts all four quarters. |
+  | 7 | UB: `int4b_t`; register: `int4x2_t` | `half` | `zero/one/two/three` | `unknown` | `unknown` | Directly loads 512 packed INT4 values and converts all four quarters. |
+
+  Every `cast` call must explicitly supply compile-time `cast_options`. An `unknown` entry means that the conversion does not offer a choice for that mode; it cannot be replaced with `rint` or `not_sat`. See the [cast API documentation](../../../../../../docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/type_conversion/cast.md) for supported combinations.
+
+  Outside the SIMD VF, the kernel saves CTRL and clears `CTRL[60]` to use instruction-level saturation settings. After computation and output transfer, it synchronizes all pipelines and restores CTRL, avoiding reliance on global saturation settings. Scenario 2 includes rounding ties and values outside the `int16_t` range. Scenario 4 includes negative values, boundaries around 255, and the minimum and maximum `int32_t` values to verify saturation.
 
 - Sample Specifications:
 
@@ -117,20 +121,25 @@ y[i] = convert<To>(x[i])
     2. Wrap the MTE2 pipeline with `asc::te::mutex`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::experimental::update_mask` to set the valid-element mask.
     4. Use normal `load/store` for equal-width conversions, `unpack` or `unpack4` for widening loads, and use `deinterleave` to compact narrowing results before a normal `store`.
-    5. Call the current C API conversion overloads with `ASC_POSITION_EVEN` or `ASC_DISPERSE_FIRST_QUARTER`.
+    5. Call `experimental::cast` with explicit `cast_options` to convert the register elements.
     6. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core conversion code is as follows:
 
     ```cpp
-    auto src_reg = asc::te::experimental::load(src, coord);
+    constexpr asc::te::experimental::cast_options widening_cast_ops = {
+        asc::te::experimental::cast_layout::zero,
+        asc::te::experimental::cast_round_mode::unknown,
+        asc::te::experimental::cast_sat_mode::unknown};
+
+    auto src_reg = asc::te::experimental::load<asc::te::experimental::load_sideband_mode::unpack4>(src, coord);
     src_reg = src_reg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    auto dst_reg = asc::te::experimental::cast<int32_t>(src_reg);
+    auto dst_reg = asc::te::experimental::cast<int32_t, widening_cast_ops>(src_reg);
     asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
-    A narrowing conversion uses layout zero for the register result. A 2x narrowing conversion applies one `deinterleave` operation to extract even positions, while a 4x narrowing conversion applies two to extract every fourth element before writing contiguous destination data with a normal `store`.
+    The snippet shows scenario 3 (`int8_t → int32_t`), where `WiderT` is `int32_t` and the load mode is `unpack4`. A narrowing conversion uses layout zero for the register result. A 2x narrowing conversion applies one `deinterleave` operation to extract even positions, while a 4x narrowing conversion applies two to extract every fourth element before writing contiguous destination data with a normal `store`.
 
 ## Build and Run
 

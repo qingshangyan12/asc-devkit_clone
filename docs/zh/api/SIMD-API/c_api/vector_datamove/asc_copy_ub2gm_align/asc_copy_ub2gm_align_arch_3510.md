@@ -50,10 +50,10 @@
     - Normal模式下将`src_stride`设置为64，各数据块在UB中的起始偏移依次为0、64、128，每个数据块分别补充16字节dummy假数据。
 
     **图1**  Compact模式32字节对齐读数示意图
-    ![](../../figures/asc_copy_ub2gm_align_compact_padding.png "Compact模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_ub2gm_align_compact_padding.png "Compact模式32字节补齐示意图")
 
     **图2**  Normal模式32字节对齐读数示意图
-    ![](../../figures/asc_copy_ub2gm_align_normal_padding.png "Normal模式32字节补齐示意图")
+    ![](../../../../figures/asc_copy_ub2gm_align_normal_padding.png "Normal模式32字节补齐示意图")
 
     两种模式下，dummy假数据均不会写入GM。当只搬运1个数据块，或`burst_len`已经32字节对齐时，两种模式的搬运结果相同。
 
