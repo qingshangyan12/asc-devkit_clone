@@ -264,7 +264,7 @@ __global__ __launch_bounds__(128) void probe(int* flag, float* output, uint32_t 
         volatile int* vflag = flag;
         int32_t spins = 0;
         for (uint32_t i = 0; i < 1000u; ++i) {
-            spins += *vflag;                 // 每轮真实读GM，不被合并/省略
+            spins += *vflag;                 // 每轮真实读GM，不被合并、不被省略
         }
         output[0] = static_cast<float>(spins);
     }
@@ -681,3 +681,30 @@ asc_vf_call<vf_scale>(dim3(THREAD_COUNT), ub_out, input, count, 2.f);
 ```
 
 须显式指定完整实例，如`asc_vf_call<vf_scale<float>>`。
+
+### 模板默认实参中的设备内置变量
+
+Device侧模板函数（含VF模板函数与核函数模板）的**非类型模板参数默认值中不可以使用`warpSize`、`laneid()`、`blockIdx`等设备内置变量**，此类变量只能在函数体内使用。
+
+```cpp
+template <int kNumThreads,
+          int kNumWarps = kNumThreads / warpSize>   // ERROR: use of undeclared identifier 'warpSize'
+__simt_vf__ __launch_bounds__(kNumThreads) inline void vf_func(__gm__ int* out, uint32_t count)
+{
+    out[threadIdx.x] = kNumWarps;
+}
+```
+
+正确写法为模板默认实参使用字面常量或`constexpr`变量，函数体内再使用内置变量：
+
+```cpp
+template <int thread_num>          // 字面常量：编译通过
+__simt_vf__ __launch_bounds__(kNumThreads) inline void vf_func(__gm__ int* out, uint32_t count)
+{
+    const int32_t warp_num = thread_num / warpSize;
+    const int32_t warp_idx = threadIdx.x / warpSize;    // 函数体内使用warpSize：可用
+    out[threadIdx.x] = warp_num + warp_idx;
+}
+```
+
+该限制对`__simt_vf__`、`__simt_callee__`与核函数的模板函数均成立。
