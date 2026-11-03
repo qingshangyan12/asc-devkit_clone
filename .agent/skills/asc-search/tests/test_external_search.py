@@ -165,8 +165,8 @@ class ExternalSearchTests(unittest.TestCase):
         with self.assertRaisesRegex(build_index.BuildError, 'dependency target not found'):
             build_index.build(self.root, build_index.SCOPES['c_api'], self.index, '9.2.0', '3510', source_commit='a'*40)
 
-    def test_no_llm_returns_structured_final_output(self):
-        """noLLM：跳过整理，返回 asc-search-final/1，candidates 只含文档路径。"""
+    def test_no_llm_outputs_only_candidate_paths(self):
+        """noLLM：只输出候选文档路径，不输出 JSON 包装。"""
         import contextlib
         import io
         output = io.StringIO()
@@ -174,26 +174,29 @@ class ExternalSearchTests(unittest.TestCase):
             code = search.main(['--root', str(self.root), '--index-dir', str(self.index),
                                 '--platform', '950', '--version', '9.2.0', '--api', 'asc_demo', '--no-llm'])
         self.assertEqual(0, code)
-        result = json.loads(output.getvalue())
-        self.assertEqual('asc-search-final/1', result['schema'])
-        self.assertEqual('noLLM', result['mode'])
-        self.assertEqual(1, result['count'])
-        self.assertEqual('asc_demo', result['query']['api'])
-        self.assertNotIn('results', result)
-        self.assertEqual(['docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md'], result['candidates'])
+        self.assertEqual('docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md',
+                         output.getvalue().strip())
+
+    def test_no_llm_joins_multiple_paths_with_comma(self):
+        self.assertEqual('a.md, b.md', ', '.join(search.final_paths(
+            {'results': [{'path': 'a.md'}, {'path': 'b.md'}]})))
 
     def test_no_llm_env_switch_matches_flag(self):
-        """ASC_SEARCH_NO_LLM=1 与 --no-llm 等价。"""
+        """ASC_SEARCH_NO_LLM=1 与 --no-llm 等价；未开启时仍输出中间 JSON。"""
         import contextlib
         import io
-        for value, expected in (('1', 'asc-search-final/1'), ('', 'asc-search-results/1')):
+        path = 'docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md'
+        for value, expect_path in (('1', path), ('', None)):
             with self.subTest(value=value), mock.patch.dict('os.environ', {'ASC_SEARCH_NO_LLM': value}):
                 output = io.StringIO()
                 with contextlib.redirect_stdout(output):
                     code = search.main(['--root', str(self.root), '--index-dir', str(self.index),
                                         '--platform', '950', '--version', '9.2.0', '--api', 'asc_demo'])
                 self.assertEqual(0, code)
-                self.assertEqual(expected, json.loads(output.getvalue())['schema'])
+                if expect_path is not None:
+                    self.assertEqual(expect_path, output.getvalue().strip())
+                else:
+                    self.assertEqual('asc-search-results/1', json.loads(output.getvalue())['schema'])
 
     def test_default_mode_keeps_intermediate_result(self):
         result = search.search(self.args('--api', 'asc_demo'))

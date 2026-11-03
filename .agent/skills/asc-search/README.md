@@ -193,49 +193,30 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 每条候选同时携带 `version_context`、`signatures`、`header_locations` 与 `example_locations`，
 调用方据此打开实际文档、声明和样例位置核对。完整数据回归命令见文末。
 
-### 2.2 noLLM 模式：结构化结果直接作为最终输出
+### 2.2 noLLM 模式：只输出候选文档路径
 
 默认 `search.py` 输出中间结果，由调用方 LLM 整理成答复。传入 `noLLM`（CLI 开关 `--no-llm`，
-也可设环境变量 `ASC_SEARCH_NO_LLM=1`）后跳过整理环节：`search.py` 直接返回
-`asc-search-final/1` 结构化最终结果，调用方原样输出即可。
+也可设环境变量 `ASC_SEARCH_NO_LLM=1`）后跳过整理环节，只输出候选文档路径：单条直接输出，
+多条以逗号分隔。
 
 ```bash
 python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
   --platform 950 --version 9.2.0 --api asc_abs --dtype float --no-llm
 ```
 
-实测输出（CANN 9.2.0 × 3510 × C API；为便于阅读按 2 空格缩进展示，实际为单行 JSON，
-`root` 为本地数据根绝对路径，此处以占位符代替）：
+实测输出（CANN 9.2.0 × 3510 × C API）：
 
-```json
-{
-  "schema": "asc-search-final/1",
-  "mode": "noLLM",
-  "source": "asc-devkit",
-  "source_commit": "b918ac3fcf3f03b474b1a1d7cda5354769797eb8",
-  "repository": "https://gitcode.com/cann/asc-devkit.git",
-  "root": "/path/to/annotated/asc-devkit",
-  "cann_version": "9.2.0",
-  "arch": "3510",
-  "platform": "950",
-  "query": {
-    "dtype": "float",
-    "version": "9.2.0",
-    "api": "asc_abs",
-    "limit": 20,
-    "platform": "950"
-  },
-  "count": 1,
-  "matched_count": 1,
-  "truncated": false,
-  "candidates": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md"
-  ]
-}
+```text
+docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
 ```
 
-`query` 回显本次检索条件，`candidates` 只给出候选文档路径列表（相对数据根，可直接打开），
-`count`/`matched_count`/`truncated` 说明返回条数与截断情况；不需要调用方再做总结、澄清或改写。
+多候选用例（`--operation absolute`）：
+
+```text
+docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md, docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
+```
+
+路径相对数据根，可直接打开；无命中时不输出内容，错误仍返回 JSON（`{"status": "error", ...}`）。
 
 ## 3. 三类头的标准格式与真实示例
 

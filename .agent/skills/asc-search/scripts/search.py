@@ -21,43 +21,11 @@ import ensure_index
 
 PLATFORMS = {"a2": ("2201", "910b"), "a3": ("2201", "A3"), "950": ("3510", "950"),
              "310b": ("3002", "310b"), "310p": ("2002", "310p"), "910": ("1001", "910")}
-FINAL_SCHEMA = "asc-search-final/1"
-QUERY_ECHO_ATTRS = ("stage", "operation", "category", "api_class", "dtype", "feature",
-                    "version", "product", "api", "deps_of", "kind", "param", "enum",
-                    "gap", "changed_in", "keywords", "limit")
 
 
-def query_echo(args) -> dict:
-    """回显本次检索条件（字段名与 CLI 参数对应），供 noLLM 最终输出复现查询。"""
-    echo = {name: getattr(args, name) for name in QUERY_ECHO_ATTRS if getattr(args, name, None)}
-    platform = getattr(args, "platform", None)
-    if platform:
-        echo["platform"] = platform
-        if PLATFORMS[platform][1] == echo.get("product"):
-            echo.pop("product")  # --platform 已隐含产品，避免重复回显
-    if getattr(args, "reverse", False):
-        echo["reverse"] = True
-    return echo
-
-
-def final_output(result: dict, args) -> dict:
-    """noLLM：直接输出最终结果，candidates 只保留候选文档路径。"""
-    return {
-        "schema": FINAL_SCHEMA,
-        "mode": "noLLM",
-        "source": result["source"],
-        "source_commit": result["source_commit"],
-        "repository": result["repository"],
-        "root": result["root"],
-        "cann_version": result["cann_version"],
-        "arch": result["arch"],
-        "platform": result["platform"],
-        "query": query_echo(args),
-        "count": result["count"],
-        "matched_count": result["matched_count"],
-        "truncated": result["truncated"],
-        "candidates": [row.get("path", "") for row in result["results"]],
-    }
+def final_paths(result: dict) -> list[str]:
+    """noLLM：只保留候选文档路径，直接作为最终输出。"""
+    return [row.get("path", "") for row in result["results"]]
 
 
 def search(args):
@@ -118,12 +86,6 @@ def search(args):
             "count": len(rows), "matched_count": total, "truncated": total > len(rows), "results": rows}
 
 
-def search_result(args) -> dict:
-    """按 args.no_llm 选择中间结果或 noLLM 最终输出。"""
-    result = search(args)
-    return final_output(result, args) if getattr(args, "no_llm", False) else result
-
-
 def main(argv=None):
     parser = query.parser()
     parser.description = __doc__
@@ -134,10 +96,16 @@ def main(argv=None):
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--no-llm", dest="no_llm", action="store_true",
                         default=os.environ.get("ASC_SEARCH_NO_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
-                        help="noLLM：直接输出结构化最终结果，跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
+                        help="noLLM：只输出候选文档路径（逗号分隔），跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
     try:
-        result = search_result(parser.parse_args(argv))
-        print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
+        args = parser.parse_args(argv)
+        result = search(args)
+        if getattr(args, "no_llm", False):
+            paths = final_paths(result)
+            if paths:
+                print(", ".join(paths))
+        else:
+            print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         return 0
     except (ValueError, OSError, KeyError, TypeError) as exc:
         print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False))
