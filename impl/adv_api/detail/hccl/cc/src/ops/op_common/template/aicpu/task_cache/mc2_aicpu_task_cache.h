@@ -40,9 +40,14 @@ struct Mc2AicpuTaskCachePlan {
     std::array<uint64_t, 2> sizes{{0U, 0U}};
 };
 
+// resourceDomainValidated is only valid within a pinned, immutable resource-holder domain.
+// Standalone callers must leave it false to retain full resource identity.
 HcclResult BuildMc2AicpuTaskCachePlan(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan,
-    bool asccommBackend = false);
+    bool asccommBackend = false, bool resourceDomainValidated = false);
+
+// Checks immutable channel metadata once when binding a pinned resource holder.
+bool ValidateMc2CommandResource(const AlgResourceCtxSerializable& resCtx);
 
 HcclResult Mc2AicpuTaskCacheLookup(const Mc2AicpuTaskCachePlan& plan, bool& isHit);
 HcclResult Mc2AicpuTaskCacheStart(const Mc2AicpuTaskCachePlan& plan);

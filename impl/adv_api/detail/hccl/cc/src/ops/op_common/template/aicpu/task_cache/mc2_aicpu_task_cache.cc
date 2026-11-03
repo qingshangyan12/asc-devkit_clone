@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>
+#include <utility>
 
 #include "alg_env_config.h"
 #include "hcomm_primitives_dl.h"
@@ -27,7 +28,16 @@ constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v1";
 
 class Digest128Builder {
 public:
-    explicit Digest128Builder(const char* domain) { AddString(domain, std::strlen(domain)); }
+    explicit Digest128Builder(const char* domain, bool exactOnly = false) : exactOnly_(exactOnly)
+    {
+        if (domain == nullptr) {
+            return;
+        }
+        if (exactOnly_) {
+            exactBytes_.reserve(512U);
+        }
+        AddString(domain, std::strlen(domain));
+    }
 
     void AddU8(uint8_t value) { AddBytes(&value, sizeof(value)); }
 
@@ -69,7 +79,7 @@ public:
         }
     }
 
-    const std::string& ExactBytes() const { return exactBytes_; }
+    std::string TakeExactBytes() { return std::move(exactBytes_); }
 
     std::string Finish() const
     {
@@ -94,7 +104,10 @@ private:
 
     void AddBytes(const void* data, size_t size)
     {
-        exactBytes_.append(static_cast<const char*>(data), size);
+        if (exactOnly_) {
+            exactBytes_.append(static_cast<const char*>(data), size);
+            return;
+        }
         const auto* bytes = static_cast<const uint8_t*>(data);
         for (size_t i = 0; i < size; ++i) {
             first_ ^= static_cast<uint64_t>(bytes[i]);
@@ -109,6 +122,7 @@ private:
         length_ += static_cast<uint64_t>(size);
     }
 
+    bool exactOnly_ = false;
     std::string exactBytes_;
     uint64_t first_ = 0xcbf29ce484222325ULL;
     uint64_t second_ = 0x6a09e667f3bcc909ULL;
@@ -370,6 +384,17 @@ void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpa
     shape.AddU64(outputSpan);
 }
 
+void AddDynamicResourceFields(const OpParam& param, Digest128Builder& resource)
+{
+    resource.AddPointer(param.hcclComm);
+    resource.AddString(param.commName, COMM_INDENTIFIER_MAX_LENGTH);
+    resource.AddString(param.algTag, ALG_TAG_LENGTH);
+    resource.AddPointer(param.inputSymWindow);
+    resource.AddPointer(param.outputSymWindow);
+    resource.AddU64(static_cast<uint64_t>(param.opThread));
+    AddHcclMem(resource, param.hcclBuff);
+}
+
 bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& resCtx, Digest128Builder& resource)
 {
     resource.AddPointer(param.hcclComm);
@@ -547,8 +572,26 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
 
 } // namespace
 
+bool ValidateMc2CommandResource(const AlgResourceCtxSerializable& resCtx)
+{
+    bool hasValidChannel = false;
+    for (const auto& level : resCtx.channels) {
+        for (const auto& channel : level) {
+            if (!channel.isValid) {
+                continue;
+            }
+            hasValidChannel = true;
+            if (!IsSupportedProtocol(channel.protocol)) {
+                return false;
+            }
+        }
+    }
+    return hasValidChannel;
+}
+
 HcclResult BuildMc2AicpuTaskCachePlan(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan, bool asccommBackend)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan, bool asccommBackend,
+    bool resourceDomainValidated)
 {
     plan = Mc2AicpuTaskCachePlan{};
     if (asccommBackend ? !param.aicpuCacheEnable : GetExternalInputHcclAicpuCacheEnable() == 0U) {
@@ -582,7 +625,7 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         return HCCL_SUCCESS;
     }
 
-    Digest128Builder shape("mc2-task-cache-shape-v1");
+    Digest128Builder shape("mc2-task-cache-shape-v1", asccommBackend);
     uint64_t inputSpan = 0U;
     uint64_t outputSpan = 0U;
     bool spansValid = false;
@@ -598,8 +641,9 @@ HcclResult BuildMc2AicpuTaskCachePlan(
     }
 
     AddShapeFields(param, inputSpan, outputSpan, shape);
-    Digest128Builder resource("mc2-task-cache-resource-v1");
-    if (!AddResourceFields(param, resCtx, resource)) {
+    Digest128Builder resource(
+        asccommBackend && resourceDomainValidated ? nullptr : "mc2-task-cache-resource-v1", asccommBackend);
+    if (!(asccommBackend && resourceDomainValidated) && !AddResourceFields(param, resCtx, resource)) {
         SetBypass(plan, "unsupported or empty channel resource");
         return HCCL_SUCCESS;
     }
@@ -614,13 +658,24 @@ HcclResult BuildMc2AicpuTaskCachePlan(
         return HCCL_SUCCESS;
     }
 
-    plan.tag = std::string(CACHE_TAG_PREFIX) + ":" + std::to_string(static_cast<uint32_t>(param.opType)) + ":" +
-               shape.Finish() + ":" + resource.Finish();
-    // Stage one does not relocate captured command addresses. Any input/output
-    // base change causes a miss; exact bytes also disambiguate digest collisions.
-    shape.AddPointer(param.inputPtr);
-    shape.AddPointer(param.outputPtr);
-    plan.exactKey = shape.ExactBytes() + resource.ExactBytes();
+    if (asccommBackend) {
+        // A pinned immutable resource holder is the map's domain identity. Only
+        // OpParam-owned resource fields can vary within that domain.
+        shape.AddPointer(param.inputPtr);
+        shape.AddPointer(param.outputPtr);
+        if (resourceDomainValidated) {
+            AddDynamicResourceFields(param, shape);
+            plan.exactKey = shape.TakeExactBytes();
+        } else {
+            // Standalone callers without a validated domain retain full identity.
+            plan.exactKey = shape.TakeExactBytes() + resource.TakeExactBytes();
+        }
+    } else {
+        // Keep legacy HCOMM tags byte-for-byte compatible, without collecting an
+        // unused exact key or changing its digest algorithm.
+        plan.tag = std::string(CACHE_TAG_PREFIX) + ":" + std::to_string(static_cast<uint32_t>(param.opType)) + ":" +
+                   shape.Finish() + ":" + resource.Finish();
+    }
     plan.enabled = true;
     HCCL_INFO(
         "[MC2_TASK_CACHE][Plan] tag[%s], input[%p,%llu], output[%p,%llu].", plan.tag.c_str(), plan.addrs[0],

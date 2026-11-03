@@ -65,7 +65,7 @@ std::shared_ptr<CommandDomain> GetDomain(void* comm, const AlgResourceCtxSeriali
     if (found != domains.end()) {
         return found->second->comm == comm ? found->second : nullptr;
     }
-    if (domains.size() >= MAX_DOMAINS) {
+    if (domains.size() >= MAX_DOMAINS || !ValidateMc2CommandResource(resCtx)) {
         return nullptr;
     }
     auto domain = std::make_shared<CommandDomain>();
@@ -114,8 +114,12 @@ HcclResult RunWithAsccommCommandCache(
     Mc2AicpuTaskCachePlan plan;
     std::shared_ptr<CommandDomain> domain;
     try {
-        if (BuildMc2AicpuTaskCachePlan(param, resCtx, plan, true) == HCCL_SUCCESS && plan.enabled) {
+        if (param.aicpuCacheEnable && Mc2AsccommCommandCacheSupported()) {
             domain = GetDomain(param.hcclComm, resCtx);
+            if (domain != nullptr &&
+                (BuildMc2AicpuTaskCachePlan(param, resCtx, plan, true, true) != HCCL_SUCCESS || !plan.enabled)) {
+                domain.reset();
+            }
         }
     } catch (...) { /* No task has been submitted: execute without caching. */
     }
@@ -171,7 +175,8 @@ HcclResult RunWithAsccommCommandCache(
     }
     AsccommReplayInfoV1 info{};
     const auto cacheRet = CommandBackend()(ASCCOMM_REPLAY_END, &entry->handle, &info);
-    if (cacheRet != 0 || info.ready == 0 || info.storageBytes + plan.exactKey.size() > MAX_DOMAIN_BYTES - domain->bytes) {
+    if (cacheRet != 0 || info.ready == 0 ||
+        info.storageBytes + plan.exactKey.size() > MAX_DOMAIN_BYTES - domain->bytes) {
         return HCCL_SUCCESS; // Communication completed, but its capture is not admitted.
     }
     info.storageBytes += plan.exactKey.size();
