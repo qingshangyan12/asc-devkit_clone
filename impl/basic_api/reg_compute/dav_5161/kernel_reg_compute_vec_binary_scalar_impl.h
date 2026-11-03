@@ -117,6 +117,38 @@ __simd_callee__ inline void LeakyReluImpl(S& dstReg, S& srcReg, U scalarValue, M
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vlrelu(dstReg, srcReg, scalarValue, mask, modeValue);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+template <typename T = DefaultType, typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
+__simd_callee__ inline void ShiftLeftsImpl(RegT& dstReg, RegT& srcReg0, ScalarT scalarValue, MaskReg& mask)
+{
+    using ActualT = typename RegT::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>(),
+        "current data type is not supported on current device!");
+    static_assert(SupportType<ScalarT, int16_t>(), "current scalarValue data type is not supported on current device!");
+
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vshls(dstReg, srcReg0, scalarValue, mask, modeValue);
+}
+template <typename T = DefaultType, typename ScalarT, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
+__simd_callee__ inline void ShiftRightsImpl(RegT& dstReg, RegT& srcReg, ScalarT scalar, MaskReg& mask)
+{
+    using ActualT = typename RegT::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>(),
+        "current data type is not supported on current device!");
+    static_assert(SupportType<ScalarT, int16_t>(), "current scalar data type is not supported on current device!");
+    static_assert(
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current ShiftRights api only supported Mode ZEROING on current device!");
+
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vshrs(dstReg, srcReg, scalar, mask, modeValue);
+}
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_SCALAR_IMPL_H

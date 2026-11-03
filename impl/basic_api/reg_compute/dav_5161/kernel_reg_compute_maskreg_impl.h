@@ -69,6 +69,40 @@ __simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     punpack(dst, src, partValue);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+template <typename RegT>
+__simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& srcReg, int16_t bitOffset)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MaskGenWithRegTensor is not supported on current device!"); });
+}
+template <typename T = DefaultType, int16_t Offset, typename RegT>
+__simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dstMask, RegT& srcReg)
+{
+    using ActualT = typename RegT::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(SupportBytes<ActualT, 2, 4>(), "MaskGenWithRegTensor only support type b16/b32 on current device");
+    if constexpr (sizeof(ActualT) == 2) {
+        static_assert((Offset >= 0) && (Offset <= 15), "MaskGenWithRegTensor Offset must be in 0~15 when T is b16");
+        movvp(dstMask, (RegTensor<uint16_t>&)srcReg, Offset);
+    } else if constexpr (sizeof(ActualT) == 4) {
+        static_assert((Offset >= 0) && (Offset <= 31), "MaskGenWithRegTensor Offset must be in 0~31 when T is b32");
+        movvp(dstMask, (RegTensor<uint32_t>&)srcReg, Offset);
+    }
+}
+
+template <typename T>
+__simd_callee__ inline MaskReg MoveMaskImpl()
+{
+    static_assert(SupportBytes<T, 2, 4>(), "MoveMask only support type b16/b32 on current device");
+
+    if constexpr (sizeof(T) == 2) {
+        return movp_b16();
+    } else if constexpr (sizeof(T) == 4) {
+        return movp_b32();
+    }
+}
+#endif
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_MASKREG_IMPL_H
