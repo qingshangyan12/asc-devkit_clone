@@ -291,11 +291,18 @@ __aicore__ inline void SetItaMaxAddrCal(const ItaMaxAddrParaParams& params)
 
 __aicore__ inline void SetMatrixMxParaCal(const MatrixMxParaBitModeParams& params)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current version is not supported!"); });
+#else
     set_mx_buf_addr(params.GetConfig0());
+#endif
 }
 
 __aicore__ inline void SetMatrixMxParaCal(const MatrixMxParaParams& params)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current version is not supported!"); });
+#else
     constexpr uint8_t POS_A_MX_ADDR = 0;
     constexpr uint8_t POS_B_MX_ADDR = 32;
 
@@ -304,6 +311,7 @@ __aicore__ inline void SetMatrixMxParaCal(const MatrixMxParaParams& params)
     mxPara |= (uint64_t)(params.bMxAddr) << POS_B_MX_ADDR;
 
     set_mx_buf_addr(mxPara);
+#endif
 }
 
 template <typename DstT, typename Src0T, typename Src1T>

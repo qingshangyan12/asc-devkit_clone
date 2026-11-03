@@ -307,9 +307,12 @@ __aicore__ inline void LoadData2DL12L0BCal(
     __cb__ U* dst, __cbuf__ T* src0, __cbuf__ V* src1, const LoadData2DParamsV2& loadDataParams,
     const LoadData2DMxParams& loadMxDataParams)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current version is not supported!"); });
+#else
     static_assert(
         SupportType<T, fp8_e4m3fn_t, int4b_t>() ||
-            SupportType<Tuple<U, T>, Tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>, Tuple<int4b_t, int4b_t>>(),
+            SupportType<Tuple<U, T>, Tuple<fp8_e4m3fn_t, fp8_e4m3fn_t>, Tuple<int4b_t, int4b_t> >(),
         "LoadData 2dv2 with scale matrix only support fp8_e4m3fn_t/int4b_t dtype on current device!");
 
     if constexpr (SupportType<U, fp8_e4m3fn_t>()) {
@@ -340,6 +343,7 @@ __aicore__ inline void LoadData2DL12L0BCal(
     load_cbuf_to_cb_mx(
         mxDstAddr, static_cast<__cbuf__ void*>(src1), loadMxDataParams.xStartPosition, loadMxDataParams.yStartPosition,
         loadMxDataParams.xStep, loadMxDataParams.yStep, loadMxDataParams.srcStride, loadMxDataParams.dstStride);
+#endif
 }
 
 /* **************************************************************************************************
