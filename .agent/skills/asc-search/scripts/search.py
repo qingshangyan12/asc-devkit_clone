@@ -40,28 +40,8 @@ def query_echo(args) -> dict:
     return echo
 
 
-def final_candidate(row: dict) -> dict:
-    """把一条候选压成最终输出：只保留定位与展示必需字段，不落推导明细。"""
-    examples = [
-        {"file": e["file"], "start_line": e["start_line"], "end_line": e["end_line"],
-         "override_id": e["override_id"]}
-        for e in row.get("examples") or []
-    ]
-    return {
-        "path": row.get("path", ""),
-        "title": row.get("title", ""),
-        "description": row.get("description", ""),
-        "version": row.get("version", ""),
-        "deprecated": bool(row.get("deprecated")),
-        "headers": list(row.get("headers") or []),
-        "examples": examples,
-        "signatures": [s["override_id"] for s in row.get("signatures") or [] if s.get("override_id")],
-        "why": list(row.get("why") or []),
-    }
-
-
 def final_output(result: dict, args) -> dict:
-    """noLLM：把结构化检索结果直接整理为最终输出，不再交给调用方 LLM 改写。"""
+    """noLLM：直接输出最终结果，candidates 只保留候选文档路径。"""
     return {
         "schema": FINAL_SCHEMA,
         "mode": "noLLM",
@@ -76,7 +56,7 @@ def final_output(result: dict, args) -> dict:
         "count": result["count"],
         "matched_count": result["matched_count"],
         "truncated": result["truncated"],
-        "candidates": [final_candidate(row) for row in result["results"]],
+        "candidates": [row.get("path", "") for row in result["results"]],
     }
 
 

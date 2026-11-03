@@ -166,7 +166,7 @@ class ExternalSearchTests(unittest.TestCase):
             build_index.build(self.root, build_index.SCOPES['c_api'], self.index, '9.2.0', '3510', source_commit='a'*40)
 
     def test_no_llm_returns_structured_final_output(self):
-        """noLLM：跳过整理，直接返回 asc-search-final/1 结构化最终结果。"""
+        """noLLM：跳过整理，返回 asc-search-final/1，candidates 只含文档路径。"""
         import contextlib
         import io
         output = io.StringIO()
@@ -180,12 +180,7 @@ class ExternalSearchTests(unittest.TestCase):
         self.assertEqual(1, result['count'])
         self.assertEqual('asc_demo', result['query']['api'])
         self.assertNotIn('results', result)
-        candidate = result['candidates'][0]
-        self.assertEqual('docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md', candidate['path'])
-        self.assertEqual('asc_demo', candidate['title'])
-        self.assertEqual(['c_api/vector_compute/compute/vector_arith.h'], candidate['headers'])
-        self.assertEqual(['asc_demo__f32'], candidate['signatures'])
-        self.assertEqual('demo.asc', candidate['examples'][0]['file'])
+        self.assertEqual(['docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md'], result['candidates'])
 
     def test_no_llm_env_switch_matches_flag(self):
         """ASC_SEARCH_NO_LLM=1 与 --no-llm 等价。"""

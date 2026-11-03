@@ -229,46 +229,13 @@ python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-
   "matched_count": 1,
   "truncated": false,
   "candidates": [
-    {
-      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md",
-      "title": "asc_abs",
-      "description": "按mask对矢量寄存器中的元素逐元素取绝对值，结果写入目的寄存器或由函数返回值返回，支持int8、int16、half、int32与float。",
-      "version": ">=9.0.0",
-      "deprecated": false,
-      "headers": [
-        "c_api/reg_compute/compute/reg_arith.h"
-      ],
-      "examples": [
-        {
-          "file": "abs.asc",
-          "start_line": 33,
-          "end_line": 45,
-          "override_id": "asc_abs__Rvf32_vf32_vb"
-        }
-      ],
-      "signatures": [
-        "asc_abs__Rvi8_vi8_vb",
-        "asc_abs__Rvi16_vi16_vb",
-        "asc_abs__Rvi32_vi32_vb",
-        "asc_abs__Rvf16_vf16_vb",
-        "asc_abs__Rvf32_vf32_vb",
-        "asc_abs__vi8_vb",
-        "asc_abs__vi16_vb",
-        "asc_abs__vi32_vb",
-        "asc_abs__vf16_vb",
-        "asc_abs__vf32_vb"
-      ],
-      "why": [
-        "api:owner"
-      ]
-    }
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md"
   ]
 }
 ```
 
-`query` 回显本次检索条件，`candidates` 给出可直接展示的候选（文档路径、标题、摘要、首次支持版本、
-是否废弃、头文件、样例定位与重载 ID），`count`/`matched_count`/`truncated` 说明返回条数与截断情况；
-不需要调用方再做总结、澄清或改写。
+`query` 回显本次检索条件，`candidates` 只给出候选文档路径列表（相对数据根，可直接打开），
+`count`/`matched_count`/`truncated` 说明返回条数与截断情况；不需要调用方再做总结、澄清或改写。
 
 ## 3. 三类头的标准格式与真实示例
 
