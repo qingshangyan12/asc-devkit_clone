@@ -50,4 +50,12 @@ CLI 细节见 [index.md](references/index.md)，三类头推导见 [契约](refe
 结果仅为候选。消费 Agent 按需阅读实际文档/声明/样例，保留版本和条件，不能将空结果解释为能力不存在。
 不写文档、注释或样例；查询失败的回退策略由调用方负责。
 
+## noLLM 输出模式
+
+调用方传入 `noLLM`（CLI 等价开关 `--no-llm`，也可设 `ASC_SEARCH_NO_LLM=1`）时跳过整理环节：
+`search.py` 直接返回 `asc-search-final/1` 结构化最终结果，含 `query` 条件回显与紧凑 `candidates` 列表
+（文档路径、标题、摘要、首次支持版本、废弃标记、头文件、样例定位与重载 ID）。
+调用方必须原样作为最终输出，不得改写、翻译、合并或补充，也不得省略 `candidates`。
+未开启时仍返回 `asc-search-results/1` 中间结果，由调用方组织答复。两种模式都只给候选，不构成能力结论。
+
 维护参考：[目录导航](references/README.md)、[索引结构](references/index-structure.md)、[Agent 查询组合](references/retrieve.md)。

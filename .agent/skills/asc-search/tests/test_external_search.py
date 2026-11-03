@@ -165,6 +165,46 @@ class ExternalSearchTests(unittest.TestCase):
         with self.assertRaisesRegex(build_index.BuildError, 'dependency target not found'):
             build_index.build(self.root, build_index.SCOPES['c_api'], self.index, '9.2.0', '3510', source_commit='a'*40)
 
+    def test_no_llm_returns_structured_final_output(self):
+        """noLLM：跳过整理，直接返回 asc-search-final/1 结构化最终结果。"""
+        import contextlib
+        import io
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = search.main(['--root', str(self.root), '--index-dir', str(self.index),
+                                '--platform', '950', '--version', '9.2.0', '--api', 'asc_demo', '--no-llm'])
+        self.assertEqual(0, code)
+        result = json.loads(output.getvalue())
+        self.assertEqual('asc-search-final/1', result['schema'])
+        self.assertEqual('noLLM', result['mode'])
+        self.assertEqual(1, result['count'])
+        self.assertEqual('asc_demo', result['query']['api'])
+        self.assertNotIn('results', result)
+        candidate = result['candidates'][0]
+        self.assertEqual('docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_demo.md', candidate['path'])
+        self.assertEqual('asc_demo', candidate['title'])
+        self.assertEqual(['c_api/vector_compute/compute/vector_arith.h'], candidate['headers'])
+        self.assertEqual(['asc_demo__f32'], candidate['signatures'])
+        self.assertEqual('demo.asc', candidate['examples'][0]['file'])
+
+    def test_no_llm_env_switch_matches_flag(self):
+        """ASC_SEARCH_NO_LLM=1 与 --no-llm 等价。"""
+        import contextlib
+        import io
+        for value, expected in (('1', 'asc-search-final/1'), ('', 'asc-search-results/1')):
+            with self.subTest(value=value), mock.patch.dict('os.environ', {'ASC_SEARCH_NO_LLM': value}):
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    code = search.main(['--root', str(self.root), '--index-dir', str(self.index),
+                                        '--platform', '950', '--version', '9.2.0', '--api', 'asc_demo'])
+                self.assertEqual(0, code)
+                self.assertEqual(expected, json.loads(output.getvalue())['schema'])
+
+    def test_default_mode_keeps_intermediate_result(self):
+        result = search.search(self.args('--api', 'asc_demo'))
+        self.assertEqual('asc-search-results/1', result['schema'])
+        self.assertIn('results', result)
+
 
 class ContextDetectionTests(unittest.TestCase):
     def test_explicit_context_does_not_probe(self):
