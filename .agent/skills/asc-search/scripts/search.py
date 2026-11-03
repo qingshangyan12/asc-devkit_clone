@@ -24,8 +24,19 @@ PLATFORMS = {"a2": ("2201", "910b"), "a3": ("2201", "A3"), "950": ("3510", "950"
 
 
 def final_paths(result: dict) -> list[str]:
-    """noLLM：只保留候选文档路径，直接作为最终输出。"""
+    """noLLM：只保留候选文档路径。"""
     return [row.get("path", "") for row in result["results"]]
+
+
+def final_snippet(paths: list[str]) -> str:
+    """noLLM 最终输出：单候选 expected，多候选 expected_any（一组，任一项命中即可）。"""
+    if not paths:
+        return ""
+    if len(paths) == 1:
+        return "expected:\n  - " + paths[0]
+    lines = ["expected_any:", "  - - " + paths[0]]
+    lines += ["    - " + path for path in paths[1:]]
+    return "\n".join(lines)
 
 
 def search(args):
@@ -96,14 +107,15 @@ def main(argv=None):
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--no-llm", dest="no_llm", action="store_true",
                         default=os.environ.get("ASC_SEARCH_NO_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
-                        help="noLLM：只输出候选文档路径（逗号分隔），跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
+                        help="noLLM：只输出检索用例期望片段（单候选 expected，多候选 expected_any），"
+                             "跳过调用方 LLM 整理（也可设 ASC_SEARCH_NO_LLM=1）")
     try:
         args = parser.parse_args(argv)
         result = search(args)
         if getattr(args, "no_llm", False):
-            paths = final_paths(result)
-            if paths:
-                print(", ".join(paths))
+            snippet = final_snippet(final_paths(result))
+            if snippet:
+                print(snippet)
         else:
             print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         return 0

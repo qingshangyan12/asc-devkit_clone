@@ -52,9 +52,10 @@ CLI 细节见 [index.md](references/index.md)，三类头推导见 [契约](refe
 
 ## noLLM 输出模式
 
-调用方传入 `noLLM`（CLI 等价开关 `--no-llm`，也可设 `ASC_SEARCH_NO_LLM=1`）时跳过整理环节：
-`search.py` 只输出候选文档路径，多条以逗号分隔（如 `docs/zh/.../asc_abs.md, docs/zh/.../asc_abs_sub.md`），
-不含 JSON、摘要、声明和样例。调用方必须原样作为最终输出，不得改写、翻译或补充。
-未开启时仍返回 `asc-search-results/1` 中间结果，由调用方组织答复。两种模式都只给候选，不构成能力结论。
+调用方传入 `noLLM`（CLI 等价开关 `--no-llm`，也可设 `ASC_SEARCH_NO_LLM=1`）时跳过整理环节，
+直接输出检索用例期望片段：单候选输出 `expected`（只有一项），多候选输出 `expected_any`
+（同一组，任一项命中即可），路径相对数据根，不含 JSON、摘要、声明和样例。
+调用方必须原样作为最终输出，不得改写、翻译或补充。未开启时仍返回 `asc-search-results/1` 中间结果，
+由调用方组织答复。两种模式都只给候选，不构成能力结论。
 
 维护参考：[目录导航](references/README.md)、[索引结构](references/index-structure.md)、[Agent 查询组合](references/retrieve.md)。

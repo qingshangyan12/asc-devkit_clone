@@ -193,11 +193,11 @@ L1→L0A/L0B、L1→Fixpipe Buffer、L1→UB 分别为 `asc_copy_l12l0a/l12l0b`�
 每条候选同时携带 `version_context`、`signatures`、`header_locations` 与 `example_locations`，
 调用方据此打开实际文档、声明和样例位置核对。完整数据回归命令见文末。
 
-### 2.2 noLLM 模式：只输出候选文档路径
+### 2.2 noLLM 模式：直接输出检索用例期望片段
 
 默认 `search.py` 输出中间结果，由调用方 LLM 整理成答复。传入 `noLLM`（CLI 开关 `--no-llm`，
-也可设环境变量 `ASC_SEARCH_NO_LLM=1`）后跳过整理环节，只输出候选文档路径：单条直接输出，
-多条以逗号分隔。
+也可设环境变量 `ASC_SEARCH_NO_LLM=1`）后跳过整理环节，按检索用例格式输出期望片段：
+单候选输出 `expected`（只有一项），多候选输出 `expected_any`（同一组，任一项命中即可）。
 
 ```bash
 python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-dir <index-dir> \
@@ -206,14 +206,17 @@ python3 .agent/skills/asc-search/scripts/search.py --root <devkit-root> --index-
 
 实测输出（CANN 9.2.0 × 3510 × C API）：
 
-```text
-docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+```yaml
+expected:
+  - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
 ```
 
 多候选用例（`--operation absolute`）：
 
-```text
-docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md, docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
+```yaml
+expected_any:
+  - - docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+    - docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
 ```
 
 路径相对数据根，可直接打开；无命中时不输出内容，错误仍返回 JSON（`{"status": "error", ...}`）。
