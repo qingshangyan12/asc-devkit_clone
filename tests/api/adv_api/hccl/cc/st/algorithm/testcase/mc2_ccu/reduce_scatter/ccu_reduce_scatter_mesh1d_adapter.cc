@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "kfc_server_protocol.h"
 #include "ccu_reduce_scatter_mesh1d_adapter.h"
 
 #include "ccu_reduce_scatter.h"
@@ -83,18 +84,16 @@ Result CaptureCcuKfcReduceScatterMesh1DKernel(void* kernelArg)
     if (config.rankSize < 2 || config.rankId >= config.rankSize || config.channels.size() != config.rankSize - 1) {
         return Result::PARAM_ERROR;
     }
-    std::array<AscendC::ccu::Variable, REDUCE_SCATTER_MESH_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-    const CcuResult result = mc2_ops_hccl::CcuReduceScatterMesh1DMem2MemKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14],
-        arguments[15], config.channels.data(), static_cast<uint32_t>(config.channels.size()), config.rankSize,
-        config.rankId, config.dataType, config.outputType, config.reduceType);
+    mc2_ops_hccl::CcuKernelArgKfcReduceScatterMesh1DMem2Mem arg{};
+    arg.rankSize = config.rankSize;
+    arg.rankId = config.rankId;
+    arg.opParam.DataDes.dataType = config.dataType;
+    arg.opParam.DataDes.outputType = config.outputType;
+    arg.opParam.reduceType = config.reduceType;
+    arg.channelCount = static_cast<uint32_t>(config.channels.size());
+    std::copy(config.channels.begin(), config.channels.end(), arg.channels);
+    const CcuResult result = mc2_ops_hccl::CcuReduceScatterMesh1DMem2MemKernel(&arg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
@@ -119,18 +118,24 @@ std::array<uint64_t, 4> CalculateReduceScatterMeshGoSize(uint64_t size)
     return result;
 }
 
-// 16个taskArgs按kernel形参顺序排列，模拟AIV侧CcuPrepareForReduceScatterM2M写入HBM、
-// KFC dispatch（ccu_kernel_kfc_server.cc 的 RS 分支）逐槽转发的参数：
-// [0]=input [1]=output [2]=token [3]=scratch [4]=currentRankSliceInputOffset
-// [5]=chunkSize [6]=chunkLoopNum [7]=tailSize [8..11]=fullGoSize [12..15]=tailGoSize
+// Sole Mesh 使用与 KFC dispatch 一致的槽位：[0..4] 为公共参数，
+// [5..12] 为其他算法预留，[13..23] 为 Mesh 专用参数。
 std::vector<uint64_t> PrepareReduceScatterMeshTaskArgs(const ReduceScatterMeshLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
+        0,
         config.inputAddress,
         config.outputAddress,
-        config.token,
         config.scratchAddress,
         config.currentRankSliceInputOffset,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         config.chunkSize,
         config.chunkLoopNum,
         config.tailSize,
@@ -142,6 +147,9 @@ std::vector<uint64_t> PrepareReduceScatterMeshTaskArgs(const ReduceScatterMeshLa
         config.tailGoSize[1],
         config.tailGoSize[2],
         config.tailGoSize[3]};
+    args.insert(args.begin() + mc2_ops_hccl::KFC_FUNC_TOKEN_ARG_INDEX, config.token);
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 ScenarioData BuildReduceScatterMeshScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

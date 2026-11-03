@@ -19,7 +19,7 @@
 namespace HcclSim {
 namespace CcuSt {
 
-constexpr uint32_t ALL_REDUCE_TASK_ARG_COUNT = 26;
+constexpr uint32_t ALL_REDUCE_TASK_ARG_COUNT = 32;
 
 struct AllReduceKernelConfig {
     uint32_t rankId{0};

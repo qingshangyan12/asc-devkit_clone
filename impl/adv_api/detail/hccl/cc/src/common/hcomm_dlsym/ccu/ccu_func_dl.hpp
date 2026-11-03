@@ -22,6 +22,7 @@
 #include "ccu_types_dl.h"
 #include "ccu_primitives_impl_dl.h"
 #include "ccu_variable_dl.hpp"
+#include "ccu_array_dl.hpp"
 
 namespace AscendC {
 namespace ccu {
@@ -77,11 +78,42 @@ public:
             "ccu::Func: lambda must return void (no return value supported)");
     }
 
+    // 命名 func：lambda 唯一形参为 ccu::Array<ccu::Variable>&，按下标顺序读参，numIn 为入参个数。
+    // 与匿名 func 不同，**构造即注册**：声明处就把函数体录进当前正在注册的 kernel，name 是它在该
+    // kernel 内的唯一身份，之后可被 HcommCcuFunctionGet 按名字查到入口 pc，并被别的 kernel 用
+    // ccu::CallFunc(pc, args) 调用。由此带来两条硬约束：
+    //   1) 只能在 kernel 函数体内声明（声明点即绑定点，kernel 外没有可绑定的 kernel）；
+    //   2) 被 lambda 捕获的资源必须在声明之前准备好，因为函数体就在构造时执行。
+    // 构造函数无法回传错误码，失败走 CCU_THROW_IF_FAILED 抛出，由 kernel 注册路径的异常处理转成
+    // 注册失败。
+    template <typename Lambda>
+    Func(Lambda body, uint32_t numIn, const char* name) : numIn_(numIn), usesArray_(true)
+    {
+        static_assert(
+            std::is_same<typename internal::FunctorTraits<Lambda>::ReturnT, void>::value,
+            "ccu::Func: lambda must return void (no return value supported)");
+        static_assert(
+            internal::FunctorTraits<Lambda>::Arity == 1,
+            "ccu::Func: named func lambda must take exactly one ccu::Array<ccu::Variable>& parameter");
+
+        uint64_t handle = 0;
+        CCU_THROW_IF_FAILED(::CcuFuncNamedBlockBegin(name, &handle), "ccu::Func: CcuFuncNamedBlockBegin failed");
+        // 形参走连续块分配，下标与调用方 Array 的实参一一对应
+        Array<Variable> formals(numIn);
+        for (uint32_t i = 0; i < numIn; i++) {
+            CCU_THROW_IF_FAILED(
+                ::CcuFuncDefineInArg(handle, formals[i].handle), "ccu::Func: CcuFuncDefineInArg failed");
+        }
+        body(formals);
+        CCU_THROW_IF_FAILED(::CcuFuncBlockEnd(handle), "ccu::Func: CcuFuncBlockEnd failed");
+    }
+
     Func(const Func&) = delete;
     Func& operator=(const Func&) = delete;
 
     uint32_t NumIn() const { return numIn_; }
     const void* Key() const { return static_cast<const void*>(this); }
+    bool UsesArrayArg() const { return usesArray_; }
 
     // 在合成模式下调用：把 N 个 formal Variable 展开传给原 lambda。
     void RunBody(Variable* formals) const { body_(formals); }
@@ -89,6 +121,7 @@ public:
 private:
     uint32_t numIn_{0};
     std::function<void(Variable*)> body_;
+    bool usesArray_{false};
 };
 
 // ccu::CallFunc：global / static ccu::Func 引用 NTTP（C++14 合法）。
@@ -96,6 +129,10 @@ private:
 template <Func& Obj, typename... Args>
 inline CcuResult CallFunc(Args... args)
 {
+    // 命名 func 只能按 pc 跨 kernel 调用。
+    if (Obj.UsesArrayArg()) {
+        return CcuResult::CCU_E_NOT_SUPPORT;
+    }
     constexpr std::size_t kArgN = sizeof...(Args);
     if (static_cast<uint32_t>(kArgN) != Obj.NumIn()) {
         return CcuResult::CCU_E_PARA;
@@ -130,6 +167,35 @@ inline CcuResult CallFunc(Args... args)
         (void)i;
     }
     return ::CcuFuncCall(handle, actuals.empty() ? nullptr : actuals.data(), static_cast<uint32_t>(kArgN));
+}
+
+// ccu::CallFunc(pc, args)：按运行期 pc 跨 kernel 调用命名 func，pc 由 HcommCcuFunctionGet 查出后经 taskArgs 传入。
+// 实参只接受 Array，被调 func 按同样的下标顺序取用；被调形参少于实参时多余的自动忽略。
+// 用法：ccu::Variable pc{}; ccu::LoadArg(pc, 0); ccu::Array<ccu::Variable> args(2); ccu::CallFunc(pc, args);
+inline CcuResult CallFunc(const Variable& funcPc, Array<Variable>& args)
+{
+    if (args.size() > CCU_FUNC_TASK_ARG_MAX) {
+        return CcuResult::CCU_E_PARA;
+    }
+    std::vector< ::CcuVariableHandle> actuals(args.size());
+    for (uint32_t i = 0; i < args.size(); i++) {
+        actuals[i] = args[i].handle;
+    }
+    return ::CcuFuncCallByAddr(funcPc.handle, actuals.empty() ? nullptr : actuals.data(), args.size());
+}
+
+// Use existing variable handles in host-selected order; the sources need not form an Array.
+inline CcuResult CallFunc(const Variable& funcPc, const std::vector<Variable>& args)
+{
+    if (args.size() > CCU_FUNC_TASK_ARG_MAX) {
+        return CcuResult::CCU_E_PARA;
+    }
+    std::vector< ::CcuVariableHandle> actuals;
+    actuals.reserve(args.size());
+    for (const auto& arg : args) {
+        actuals.push_back(arg.handle);
+    }
+    return ::CcuFuncCallByAddr(funcPc.handle, actuals.empty() ? nullptr : actuals.data(), args.size());
 }
 
 } // namespace ccu

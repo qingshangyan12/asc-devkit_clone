@@ -111,6 +111,14 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
         CHK_PRT_RET(
             request0.ccuKernelNum.empty() || request1.ccuKernelNum.empty(),
             HCCL_ERROR("[InsV2AllToAllConcurrentExecutor][CalcRes] CCU kernel num is empty."), HCCL_E_INTERNAL);
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+        CHK_PRT_RET(
+            request0.ccuKernelInfos.size() != 1U || request1.ccuKernelInfos.size() != 1U,
+            HCCL_ERROR("[InsV2AllToAllConcurrentExecutor][CalcRes] expected one kernel per mission."), HCCL_E_INTERNAL);
+        request0.ccuKernelInfos[0].subKernelName = KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_NAME;
+        request1.ccuKernelInfos[0].kernelFunc = reinterpret_cast<void*>(CcuAllToAllMesh1DMultiJettyKernelMission2);
+        request1.ccuKernelInfos[0].subKernelName = KFC_FUNC_ALL_TO_ALL_MESH1D_MULTI_JETTY_MISSION2_NAME;
+#endif
         resourceRequest.slaveThreadNum = request0.slaveThreadNum + request1.slaveThreadNum + 1U;
         resourceRequest.notifyNumOnMainThread = request0.notifyNumOnMainThread + 1U;
         resourceRequest.notifyNumPerThread = request0.notifyNumPerThread;

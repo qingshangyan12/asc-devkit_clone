@@ -19,6 +19,7 @@ DEFINE_WEAK_FUNC(
     CcuResult, HcommCcuKernelRegister, CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName,
     const void* kernelFunc, const void** kernelArgs, uint32_t argNum, CcuKernelHandle* kernelHandle);
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterEnd, CcuInsHandle insHandle);
+DEFINE_WEAK_FUNC(CcuResult, HcommCcuFunctionGet, CcuKernelHandle kernelHandle, const char* funcName, uint64_t* pc);
 DEFINE_WEAK_FUNC(
     CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs,
     uint32_t argSize);
@@ -31,6 +32,7 @@ void CcuLaunchDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterStart);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegister);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterEnd);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuFunctionGet);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelLaunch);
 
     HCCL_INFO("[HcclWrapper-FPRINTF] CcuLaunchDlInit completed.\n");
