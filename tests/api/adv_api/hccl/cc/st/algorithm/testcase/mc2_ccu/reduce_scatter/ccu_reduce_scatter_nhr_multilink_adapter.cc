@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "kfc_server_protocol.h"
 #include "ccu_reduce_scatter_nhr_multilink_adapter.h"
 
 #include "ccu_reduce_scatter.h"
@@ -79,31 +80,30 @@ Result CaptureCcuKfcReduceScatterNhrMultiLinkKernel(void* kernelArg)
         config.jettyNum == 0U) {
         return Result::PARAM_ERROR;
     }
-    std::array<AscendC::ccu::Variable, REDUCE_SCATTER_NHR_ML_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], config.channels.data(), static_cast<uint32_t>(config.channels.size()),
-        config.rankSize, config.rankId, config.jettyNum, config.dataType, config.outputType, config.reduceType,
-        config.stepInfoVector, config.rank2ChannelIdx);
+    mc2_ops_hccl::CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem arg{};
+    arg.rankSize = config.rankSize;
+    arg.rankId = config.rankId;
+    arg.portNum = config.jettyNum;
+    arg.opParam.DataDes.dataType = config.dataType;
+    arg.opParam.DataDes.outputType = config.outputType;
+    arg.opParam.reduceType = config.reduceType;
+    std::strncpy(arg.opParam.algName, mc2_ops_hccl::KFC_RS_SOLE_NHR_ALG_NAME, sizeof(arg.opParam.algName) - 1);
+    arg.stepInfoVector = config.stepInfoVector;
+    arg.rank2ChannelIdx = config.rank2ChannelIdx;
+    arg.channelCount = static_cast<uint32_t>(config.channels.size());
+    std::copy(config.channels.begin(), config.channels.end(), arg.channels);
+    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(&arg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
-// 10个taskArgs按kernel形参顺序排列，模拟AIV侧CcuPrepareForReduceScatterSoleNhrM2M写入HBM、
-// KFC dispatch（ccu_kernel_kfc_server.cc 的 RS 分支）逐槽转发的参数：
-// [0]=input [1]=output [2]=token [3]=sliceSize [4]=inputSliceStride
-// [5]=sliceOneJettySize [6]=sliceLastJettySize [7]=repeatNumInv [8]=inputRepeatStride [9]=outputRepeatStride
+// Func arguments preserve the 10-slot queue payload; token is inserted in slot 3.
 std::vector<uint64_t> PrepareReduceScatterNhrMultiLinkTaskArgs(const ReduceScatterNhrMultiLinkLaunchConfig& config)
 {
-    return {
+    std::vector<uint64_t> args = {
+        0,
         config.inputAddress,
         config.outputAddress,
-        config.token,
         config.sliceSize,
         config.inputSliceStride,
         config.sliceOneJettySize,
@@ -111,6 +111,9 @@ std::vector<uint64_t> PrepareReduceScatterNhrMultiLinkTaskArgs(const ReduceScatt
         std::numeric_limits<uint64_t>::max() - 1U, // repeatNumInv（sole executor repeatNum=1）
         config.inputRepeatStride,
         config.outputRepeatStride};
+    args.insert(args.begin() + mc2_ops_hccl::KFC_FUNC_TOKEN_ARG_INDEX, config.token);
+    args.resize(CCU_FUNC_TASK_ARG_MAX, 0);
+    return args;
 }
 
 namespace {

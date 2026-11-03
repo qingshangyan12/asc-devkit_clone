@@ -21,6 +21,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "channel.h"
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
+#include "kernel/ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
 
@@ -94,6 +95,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::CalcRes(
         CcuKernelInfo kernelInfo{};
         CHK_SAFETY_FUNC_RET(strcpy_s(
             kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherNHR1DMem2Mem"));
+        kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKernelKfcAllGatherNHR1DMem2MemKernel);
         auto kernelArg = std::make_shared<CcuKernelArgKfcAllGatherNHR1DMem2Mem>();
         kernelArg->rankSize = tempRankSize_;
         kernelArg->rankId = mySubCommRank_;

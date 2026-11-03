@@ -19,9 +19,8 @@
 namespace HcclSim {
 namespace CcuSt {
 
-// 基础 11 个下发参数 + sliceSizePerJetty + lastSliceSizePerJetty（hccl_ccu_v0_prepare.h
-// CcuPrepareForAllToAllMultiJetty）
-constexpr uint32_t ALL_TO_ALL_MJ_TASK_ARG_COUNT = 13;
+// Func ABI: queue [0..2], token [3], queue [3..29], turn-end address [31].
+constexpr uint32_t ALL_TO_ALL_MJ_TASK_ARG_COUNT = 32;
 
 struct AllToAllMjKernelConfig {
     uint32_t rankId{0};

@@ -14,5 +14,38 @@
 // See ccu_variable_dl.hpp.  The stub already provides the Func abstraction
 // required by the algorithm sources captured by this ST target.
 #include "ccu_primitives_stub.h"
+#include "ccu_types.h"
+
+namespace AscendC {
+namespace ccu {
+
+inline CcuResult CallFunc(const Variable&, Array<Variable>& args)
+{
+    if (args.size() > CCU_FUNC_TASK_ARG_MAX) {
+        return CCU_E_PARA;
+    }
+    std::vector<ResourceHandle> handles;
+    for (uint32_t index = 0; index < args.size(); ++index) {
+        handles.push_back(args[index].handle);
+    }
+    return HcclSim::CcuSt::CompilerContext::Current().CaptureFunction(handles) == Result::SUCCESS ? CCU_SUCCESS :
+                                                                                                    CCU_E_INTERNAL;
+}
+
+inline CcuResult CallFunc(const Variable&, const std::vector<Variable>& args)
+{
+    if (args.size() > CCU_FUNC_TASK_ARG_MAX) {
+        return CCU_E_PARA;
+    }
+    std::vector<ResourceHandle> handles;
+    for (const auto& argument : args) {
+        handles.push_back(argument.handle);
+    }
+    return HcclSim::CcuSt::CompilerContext::Current().CaptureFunction(handles) == Result::SUCCESS ? CCU_SUCCESS :
+                                                                                                    CCU_E_INTERNAL;
+}
+
+} // namespace ccu
+} // namespace AscendC
 
 #endif // CCU_FUNC_DL_HPP

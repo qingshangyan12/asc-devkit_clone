@@ -21,8 +21,11 @@
 
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
+// Number of queue fields loaded per die.
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 constexpr uint32_t CCU_PARAM_NUM_MAX = CCU_PARAM_NUM_PER_DIE * 2;
+// Func argument count, including token and turnEndAddr.
+constexpr uint32_t CCU_FUNC_PARAM_NUM = CCU_FUNC_TASK_ARG_MAX;
 constexpr uint32_t CCU_ONE_PARAM_SIZE = 8;
 constexpr uint32_t CCU_TASK_NUM_MAX = 64;
 
@@ -47,9 +50,11 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     // 会导致双 mission 两个 kernel 各自 export 同一对 tag，注册期 ProcessInterCtxRes
     // 合并 exported sharedNotifies 时同名冲突（HCCL_E_PARA）。
     uint32_t hostMissionIndex = 0;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    uint32_t missionIndex = 0;
 };
 
-// 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
+// 多mission由Host使用独立start/done区域调度，轮次执行前沿用MissionPreSync栅栏。
 struct KfcServerContext : CcuKernelCtxBase {
     const CcuKernelArgKfcServer* arg;
 
@@ -63,6 +68,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;
